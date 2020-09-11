@@ -1,0 +1,11 @@
+.event-container {
+  .menu.event-view {
+    position: absolute;
+    padding: 15px;
+    left: 0;
+    right: 0;
+    top: 0;
+    transition: top 0.3s, opacity 0.5s;
+    color: #2D2D2D;
+  }
+}

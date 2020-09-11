@@ -1,0 +1,26 @@
+.message {
+  width: 100%;
+  top: 50%;
+  position:relative;
+  text-align: center;
+}
+
+button {
+  position:absolute;
+  height: 40px;
+  text-align: center;
+  color: white;
+    
+  border: 1px solid lightgray;
+  font-family: Roboto Medium, Roboto, sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 40px;
+
+  background: #55D346;
+  border-radius: 5px;
+}
+
+button[disabled] {
+  opacity: 0.5;
+}

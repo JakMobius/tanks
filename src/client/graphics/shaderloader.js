@@ -1,0 +1,2 @@
+
+/* #shader-loader-placeholder# */

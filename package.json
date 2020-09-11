@@ -1,0 +1,65 @@
+{
+  "name": "tanks",
+  "version": "1.0.0",
+  "description": "Browser action game project.",
+  "main": "main.js",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "chalk": "^4.1.0",
+    "express": "^4.16.0",
+    "express-session": "^1.17.1",
+    "hbs": "^4.1.1",
+    "mongodb": "^3.1.0",
+    "pako": "^1.0.11",
+    "readable-stream": "^3.6.0",
+    "through2": "^4.0.2",
+    "vinyl-fs": "^3.0.3",
+    "ws": "^6.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "aliasify": "^2.1.0",
+    "atlaspack": "^1.0.0",
+    "babel-core": "^6.26.3",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.1",
+    "browserify-incremental": "^3.1.1",
+    "browserify-transform-tools": "^1.7.0",
+    "bundle-collapser": "^1.4.0",
+    "canvas": "^2.6.1",
+    "chai": "^4.2.0",
+    "glsl-deparser": "^1.0.0",
+    "glsl-min-stream": "^1.0.0",
+    "glsl-parser": "^2.0.1",
+    "glsl-tokenizer": "^2.1.5",
+    "gulp": "^4.0.2",
+    "mocha": "^7.2.0",
+    "node-sass": "^4.14.1",
+    "nyc": "^15.1.0",
+    "stream-array": "^1.1.2",
+    "string-to-stream": "^3.0.1",
+    "tinyify": "^2.5.2"
+  },
+  "scripts": {
+    "test": "mocha --reporter list",
+    "start-server": "cd build/actions; node --trace-warnings --expose-internals start-server.js -s autorun",
+    "clear-cache": "cd build/actions; node --trace-warnings clear-cache.js",
+    "commit-client": "cd build/actions; node --trace-warnings commit-client.js",
+    "commit-mapeditor": "cd build/actions; node --trace-warnings commit-mapeditor.js",
+    "create-texture-atlas": "cd atlas; node atlas_creator.js"
+  },
+  "nyc": {
+    "instrument": true,
+    "sourceMap": true,
+    "exclude": [
+      "node_modules"
+    ]
+  },
+  "author": "JakMobius",
+  "license": "ISC",
+  "optionalDependencies": {
+    "fsevents": "^2.1.3"
+  }
+}

@@ -1,0 +1,75 @@
+.menu.editor-map-list {
+
+    margin-left: -400px;
+    margin-top: -250px;
+    width: 275px;
+    height: 500px;
+
+    .map-list {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding-top: 10px;
+        display: inline-block;
+        box-sizing: border-box;
+        overflow: auto;
+
+        .map-row {
+            position: relative;
+            height: 70px;
+            width: 100%;
+            padding: 5px 9px;
+            box-sizing: border-box;
+
+            .title {
+                font-size: 17px;
+            }
+
+            .block {
+                border-radius: 3px;
+                box-sizing: border-box;
+                width: 100%;
+                height: 100%;
+                padding: 10px;
+                box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 4px;
+                transition: 0.5s box-shadow, 0.5s border;
+                cursor: pointer;
+                border: solid 0 #00c4ff;
+
+                &.selected {
+                    border: solid 2px #00c4ff;
+                }
+            }
+
+            .size {
+                font-family: Helvetica, Arial, serif;
+                font-size: 13px;
+                color: #7f7f7f;
+
+                span.text {
+                    font-style: italic;
+                }
+            }
+
+            &:hover .block {
+                box-shadow: rgba(0, 0, 0, 0.4) 2px 2px 6px;
+            }
+
+            &:active .block {
+                box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 3px;
+            }
+        }
+    }
+
+    .footer button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .map-list-container {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        bottom: 55px;
+    }
+}

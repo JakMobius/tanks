@@ -1,0 +1,58 @@
+.menu.editor-map-preview {
+
+    margin-left: -100px;
+    margin-top: -250px;
+    width: 500px;
+    height: 500px;
+
+    .map-preview-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .map-canvas-container {
+        position: absolute;
+        top: 70px;
+        right: 0;
+        left: 0;
+        bottom: 55px;
+    }
+    .map-preview-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .title {
+        padding: 20px;
+    }
+
+    .map-preview-container {
+        input.map-title {
+            font-size: 20px;
+            padding: 5px;
+            transition: backround-color 0.3s;
+            width: auto;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            border-radius: 3px;
+            outline: none;
+            background: white;
+            box-sizing: border-box;
+            border: solid 1px #fff;
+            &:focus {
+                border: solid 1px #ddd;
+                background: #eeeeee;
+            }
+            &:hover {
+                background: #eeeeee;
+            }
+        }
+    }
+
+}
