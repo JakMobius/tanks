@@ -14,6 +14,12 @@ Module._load = function(module, parent, isMain) {
     }
 
     if(folder) {
+        if(!fs.existsSync(module)) {
+            // Github ignores empty folders, so
+            // we're checking if folder doesn't
+            // exist and assuming it's empty
+            return []
+        }
         return fs.readdirSync(module)
             .map(a => path.join(module, a))
             .map(each => {
