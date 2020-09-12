@@ -102,9 +102,12 @@ dist
 
 # TernJS port file
 .tern-port
+<<<<<<< HEAD
 
 # Custom
 .nyc_output
 .idea
 out
 *.DS_Store
+=======
+>>>>>>> 29049a358fa30822ec23580ff7098db9e7ef1544
