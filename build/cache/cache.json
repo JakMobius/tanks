@@ -1,640 +1,777 @@
 {
 	"resourceify": {
-		"/Users/Temich/PycharmProjects/tanks/src/client/utils/canvasfactory.js": {
-			"modificationTime": 1599463951723,
+		"/Users/Temich/PycharmProjects/tanks/src/client/utils/progress.js": {
+			"modificationTime": 1599902389796,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/utils/progress.js": {
-			"modificationTime": 1599463951723,
+		"/Users/Temich/PycharmProjects/tanks/src/client/utils/canvasfactory.js": {
+			"modificationTime": 1599902389796,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/utils/downloader.js": {
-			"modificationTime": 1599463951723,
+			"modificationTime": 1599902389796,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/sprite.js": {
-			"modificationTime": 1599463951723,
+			"modificationTime": 1599902389796,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/library/box2d.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/physicsutils.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/loop/renderloop.js": {
-			"modificationTime": 1599463951725,
+		"/Users/Temich/PycharmProjects/tanks/src/utils/eventemitter.js": {
+			"modificationTime": 1599902389796,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/utils/loop/scheduledtask.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389797,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/utils/loop/loop.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389797,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/loop/renderloop.js": {
+			"modificationTime": 1599902389797,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/screen.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389797,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/color.js": {
-			"modificationTime": 1599463951725,
+		"/Users/Temich/PycharmProjects/tanks/src/library/box2d.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/physicsutils.js": {
+			"modificationTime": 1599902389800,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/scenes/scene.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389800,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/particles/particle.js": {
-			"modificationTime": 1599463951725,
+		"/Users/Temich/PycharmProjects/tanks/src/utils/color.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/engine.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/controlpanel.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/binaryoptions.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/rectangle.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/spawnzone.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/touchcontroller.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/documenteventhandler.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/keyaxle.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/keyboardcontroller.js": {
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/bullet/clientbullet.js": {
+			"modificationTime": 1599902389800,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/matrix3.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389800,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/entitydrawer.js": {
+			"modificationTime": 1599902389800,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/camera.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/uniform.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/program.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaderloader.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shader.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/buffer.js": {
-			"modificationTime": 1599463951725,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/glbuffer.js": {
-			"modificationTime": 1599463951725,
+			"modificationTime": 1599902389800,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/particleprogram.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389801,
 			"data": [
 				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/particle-fragment.glsl",
 				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/particle-vertex.glsl"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/scenes/loading/loadingscene.js": {
-			"modificationTime": 1599463951726,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/scenes/loading/loading-scene.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/loop/requestframeloop.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/eventemitter.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/textureprogram.js": {
-			"modificationTime": 1599463951726,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/texture-fragment.glsl",
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/texture-vertex.glsl"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/mapdrawer.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/binaryoptions.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/rectangle.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/spawnzone.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/airblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/concreteblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/stoneblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/brickblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/unbreakableblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/woodblockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstateloader.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstatebinaryoptions.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstate.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/mapbinaryoptions.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/map/gamemap.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/documenteventhandler.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/view.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/controls/axle.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/buttonaxle.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/keyaxle.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/keyboardcontroller.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/eventview.js": {
-			"modificationTime": 1599463951726,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-view.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/eventcontainer.js": {
-			"modificationTime": 1599463951726,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-container.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/draghandler.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/controls/playercontrols.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/drag.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/fill.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/engine.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/truckprogram.js": {
-			"modificationTime": 1599463951726,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/truck-fragment.glsl",
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/truck-vertex.glsl"
-			]
-		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/lightmasktextureprogram.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389801,
 			"data": [
 				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl",
 				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/light-mask-texture-vertex.glsl"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/spawnzone.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/truckprogram.js": {
+			"modificationTime": 1599902389801,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/truck-fragment.glsl",
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/truck-vertex.glsl"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/types/concrete.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/eraser.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/types/stone.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/rotationalmatrix.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/types/unbreakable.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/controls/tankcontrols.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/types/wood.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/serialization/serializationgroup.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/mapdrawer.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/serializable.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/basicentitydrawer.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/sound/fx.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaderloader.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shader.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/uniform.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/program.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/postprocessingprogram.js": {
+			"modificationTime": 1599902389801,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/post-processing-fragment.glsl",
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/post-processing-vertex.glsl"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/blockdrawer.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/edgedblockdrawer.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/block/types/brick.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/scenes/loading/loadingscene.js": {
+			"modificationTime": 1599902389801,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/scenes/loading/loading-scene.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/particles/particle.js": {
+			"modificationTime": 1599902389801,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/particles/smoke.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389801,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/tankdrawer.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389801,
 			"data": []
 		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/particles/fireparticle.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/particles/explodeparticle.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/drawers/explodepooldrawer.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/world/clientworldeffect.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/particles/pellet.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/tank/types/clienttankpelletseffect.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/sound/fx.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/abstracttank.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/clienttank.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/rotationalmatrix.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstatebinaryoptions.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/mapbinaryoptions.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/airblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/concreteblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/stoneblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/brickblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/unbreakableblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/types/woodblockstate.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/blockstate/blockstateloader.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/map/gamemap.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/controls/axle.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/gamepadaxle.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/buttonaxle.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/gamepadbutton.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/interact/gamepadmanager.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/controls/playercontrols.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerleavepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/effectremovepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/mappacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerspawnpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playercontrolspacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/gamestatepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/blockupdatepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerconfigpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerrespawnpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/entityremovepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerchatpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerroomrequestpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/entitylistpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/roomlistpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerroomchangepacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/player.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/playerjoinpacket.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/abstracteffect.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/clienteffect.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/tank/clienttankeffect.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/world/worldeffectmodel.js": {
+			"modificationTime": 1599902389801,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/world/explode/worldexplodeeffectmodelpool.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/gameworld.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/clientgameworld.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/tank/tankfireeffectmodel.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/tank/types/clienttankfireeffect.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/world/explode/worldexplodeeffectmodel.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/effects/world/types/clientworldexplodeeffect.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/effects/tank/tankeffectmodel.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/utils/htmlescape.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/roomlistrequestpacket.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/entity/abstractentity.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/trucktankbehaviour.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/airbagbehaviour.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/tankbehaviour.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/wheeledtankbehaviour.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/view.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/chat/chatcontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/chat/chat.scss"
+			]
+		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389802,
 			"data": [
 				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.scss"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/tool.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/eventview.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-view.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/eventcontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-container.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/play-menu/playmenucontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/play-menu/play-menu.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/controls/controlscontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/controls/controls.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-preview/statscale.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/toolmanager.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-preview/tankpreviewcontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-preview/tank-preview.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-select/tankselectelement.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/trucktankbehaviour.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-select/tankselectcontainer.js": {
+			"modificationTime": 1599902389802,
+			"data": [
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-select/tank-select.scss"
+			]
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/models/mine.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/physics/tankbehaviour.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/bullet/models/mine.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/tankmodel.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/models/16mm.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/abstracttank.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/clienttank.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/entity/entitymodel.js": {
-			"modificationTime": 1599463951726,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/bulletmodel.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/bullet/models/16mm.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/models/42mm.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/utils.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/bullet/models/42mm.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/entity/abstractentity.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/bulletmodel.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/server/entity/serverentity.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/entity/bullet/models/cannonball.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/effects/abstracteffect.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/bullet/models/cannonball.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/server/effects/servereffect.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/controls/tankcontrols.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/effects/world/explode/worldexplodeeffectmodel.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/entitycreatepacket.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/effects/effectmodel.js": {
-			"modificationTime": 1599463951726,
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/effects/world/worldeffectmodel.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/networking/packets/effectcreatepacket.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/server/effects/world/serverworldeffect.js": {
-			"modificationTime": 1599463951726,
+		"/Users/Temich/PycharmProjects/tanks/src/entity/entitymodel.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/server/entity/bullet/serverbullet.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/client/entity/cliententity.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/weapon/weapon.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/buffer.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/weapon/models/42mm.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/glbuffer.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/tanks/models/sniper.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/models/sniper.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/run.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/brushprogram.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/client/graphics/programs/textureprogram.js": {
+			"modificationTime": 1599902389802,
 			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/brush-fragment.glsl",
-				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/brush-vertex.glsl"
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/fragment/texture-fragment.glsl",
+				"/Users/Temich/PycharmProjects/tanks/src/client/graphics/shaders/vertex/texture-vertex.glsl"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/history/history.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/serialization/serializationgroup.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/range/range.js": {
-			"modificationTime": 1599463951727,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/range/range.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/pencil.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/serializable.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/history/modification/mapmodification.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/history/modification/mapareamodification.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/menu/map-preview/mappreviewcontainer.js": {
-			"modificationTime": 1599463951727,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/menu/map-preview/map-preview.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/editormapbinaryoptions.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/history/modification/mapblockmodification.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/editormap.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/tools/types/area.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/binarypool.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/tankmodel.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/binaryencoder.js": {
-			"modificationTime": 1599463951727,
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/binarypool.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/serialization/binary/binarydecoder.js": {
-			"modificationTime": 1599463951727,
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/utils/base64.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/networking/binarypacket.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/dialog/dialogview.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/client/networking/client.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/dialog/dialogoverlay.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/weapon/models/machinegun.js": {
+			"modificationTime": 1599902389802,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/element/dragoverlay.js": {
-			"modificationTime": 1599463951727,
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/models/monster.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/models/monster.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/weapon/models/cannon.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/models/bigboi.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/models/bigboi.js": {
+			"modificationTime": 1599902389802,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/dropdown/dropdown.js": {
+			"modificationTime": 1599902389803,
 			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/element/drag-overlay.scss"
+				"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/dropdown/dropdown.scss"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/utils/common.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/constants.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/zstream.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/messages.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/gzheader.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/utils/strings.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/crc32.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/adler32.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/inffast.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/inftrees.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/inflate.js": {
-			"modificationTime": 1599463951727,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/inflate.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/trees.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/zlib/deflate.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/lib/deflate.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/node_modules/pako/index.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/mapstorage.js": {
-			"modificationTime": 1599463951728,
-			"data": []
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/menu/map-list/mapselectcontainer.js": {
-			"modificationTime": 1599463951728,
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/room-select/roomselectcontainer.js": {
+			"modificationTime": 1599902389803,
 			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/menu/map-list/map-list.scss"
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/room-select/room-select.scss"
 			]
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/menu/menuoverlay.js": {
-			"modificationTime": 1599463951728,
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/primaryoverlay.js": {
+			"modificationTime": 1599902389803,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/toolsettings/toolsettingsview.js": {
-			"modificationTime": 1599463951728,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.scss",
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/toolsettings/tool-settings.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/blockselect/blockselectbutton.js": {
-			"modificationTime": 1599463951729,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.scss",
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/blockselect/block-select.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/blockselect/blockselectmenu.js": {
-			"modificationTime": 1599463951729,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/blockselect/block-select.scss"
-			]
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/blockselect/blockselectoverlay.js": {
-			"modificationTime": 1599463951729,
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/scenes/gamescene.js": {
+			"modificationTime": 1599902389803,
 			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/toolbar/toolbar.js": {
-			"modificationTime": 1599463951729,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.scss",
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/ui/overlay/workspace/toolbar/toolbar.scss"
-			]
+		"/Users/Temich/PycharmProjects/tanks/src/utils/utils.js": {
+			"modificationTime": 1599902389803,
+			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/scenes/mapeditorscene.js": {
-			"modificationTime": 1599463951729,
-			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/styles.css"
-			]
+		"/Users/Temich/PycharmProjects/tanks/src/server/entity/serverentity.js": {
+			"modificationTime": 1599902389803,
+			"data": []
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/editor.js": {
-			"modificationTime": 1599463951729,
+		"/Users/Temich/PycharmProjects/tanks/src/server/effects/servereffect.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/server/effects/tank/servertankeffect.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/weapon/models/flamethrower.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/models/nasty.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/models/nasty.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/server/effects/world/serverworldeffect.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/server/entity/bullet/serverbullet.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/weapon/weapon.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/weapon/models/42mm.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/tanks/models/sniper.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/tanks/models/sniper.js": {
+			"modificationTime": 1599902389803,
+			"data": []
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/game.js": {
+			"modificationTime": 1599902389803,
 			"data": [
-				"/Users/Temich/PycharmProjects/tanks/src/client/mapeditor/style.css"
+				"/Users/Temich/PycharmProjects/tanks/src/client/game/style.css"
 			]
 		}
 	},
 	"css-compiler": {
-		"/Users/Temich/PycharmProjects/tanks/src/client/utils/browsercheck/browser-check.scss": {
-			"modificationTime": 1599463887507,
-			"data": ".unsupported-browser-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.unsupported-browser {\n  top: 50px;\n  left: 50%;\n  position: relative;\n  margin: 0 40px 40px -230px;\n  text-align: center;\n  width: 460px;\n  padding: 30px 30px 40px 30px;\n  border-radius: 10px;\n  box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -webkit-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -moz-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -o-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n}\n\n.unsupported-browser .text p {\n  margin: 3px 0 7px 0;\n}\n\n.unsupported-browser .header {\n  font-size: 18px;\n}\n\n.unsupported-browser a.supported-browser {\n  position: relative;\n  display: inline-block;\n  margin: 4px 10px -4px 10px;\n  padding: 10px 20px;\n  border-radius: 10px;\n  text-decoration: none;\n  font-weight: bold;\n}\n\n.unsupported-browser a.supported-browser:hover {\n  background: #f1f1f5;\n}\n\n.unsupported-browser a.supported-browser p {\n  color: #11E;\n}\n"
-		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/scenes/loading/loading-scene.scss": {
-			"modificationTime": 1599463890340,
+			"modificationTime": 1599902304884,
 			"data": ".loading-text {\n  width: 100%;\n  text-align: center;\n  top: 50%;\n  margin-top: -100px;\n  user-select: none;\n  cursor: default;\n  position: absolute;\n}\n"
 		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-view.scss": {
-			"modificationTime": 1599463890341,
-			"data": ".event-container .menu.event-view {\n  position: absolute;\n  padding: 15px;\n  left: 0;\n  right: 0;\n  top: 0;\n  transition: top 0.3s, opacity 0.5s;\n  color: #2D2D2D;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-container.scss": {
-			"modificationTime": 1599463890341,
-			"data": ".event-container {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n  width: 220px;\n  display: block;\n  pointer-events: none;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/play-menu/play-menu.scss": {
-			"modificationTime": 1599463890342,
-			"data": ".menu.nick {\n  margin-left: 150px;\n  margin-top: 10px;\n  width: 250px;\n  height: 140px;\n}\n\n.menu.nick input.nick {\n  position: absolute;\n  padding: 10px;\n  left: 20px;\n  top: 50px;\n  width: calc(100% - 60px);\n  font-size: 15px;\n  border: 1px solid #999;\n  border-radius: 3px;\n  box-shadow: rgba(0, 0, 0, 0.2) 0 0 2px;\n}\n\n.menu.nick button {\n  left: 13px;\n  width: 225px;\n  top: 87px;\n}\n\n.menu.nick .header {\n  position: absolute;\n  left: 20px;\n  right: 20px;\n  top: 10px;\n  font-family: Roboto, sans-serif;\n  font-size: 13px;\n  text-align: center;\n  text-transform: uppercase;\n  color: #2D2D2D;\n}\n\n.menu.nick input {\n  position: absolute;\n  width: 225px;\n  left: 13px;\n  height: 40px;\n  top: 35px;\n  text-align: center;\n  font-family: Roboto, sans-serif;\n  font-size: 17px;\n  line-height: 40px;\n  background: #F0F0F0;\n  border-radius: 5px;\n  border: none;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/controls/controls.scss": {
-			"modificationTime": 1599463890343,
-			"data": ".menu.tip {\n  margin-left: -400px;\n  margin-top: -235px;\n  width: 800px;\n  height: 460px;\n  transition: opacity 0.3s;\n}\n\n.menu.tip .header {\n  width: 100%;\n  margin-top: 20px;\n  text-align: center;\n  font-size: 20px;\n}\n\n.menu.tip .wish {\n  position: absolute;\n  bottom: 65px;\n  width: 100%;\n  text-align: center;\n  font-size: 14px;\n}\n\n.menu.tip .line {\n  position: relative;\n  top: 10px;\n  text-align: center;\n  margin: 20px 0;\n}\n\n.menu.tip table {\n  display: inline-block;\n  height: 65px;\n  margin: 0 10px;\n}\n\n.menu.tip button {\n  position: absolute;\n  bottom: 10px;\n  right: 10px;\n  width: 225px;\n}\n\n.menu.tip .checkbox {\n  position: absolute;\n  left: 10px;\n  bottom: 10px;\n}\n\n.menu.tip .key {\n  width: 50px;\n  height: 50px;\n  border: solid 1px #777;\n  border-radius: 5px;\n  text-align: center;\n  line-height: 50px;\n  text-transform: uppercase;\n  display: inline-block;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/dropdown/dropdown.scss": {
-			"modificationTime": 1599463890344,
-			"data": "@charset \"UTF-8\";\n.dropdown {\n  width: 100%;\n  min-height: 40px;\n  position: relative;\n  display: inline-block;\n  margin-right: 1em;\n  overflow: hidden;\n  cursor: pointer;\n  text-align: left;\n  white-space: nowrap;\n  outline: none;\n  border: 1px solid transparent;\n}\n\n.dropdown:not(.expanded) {\n  max-height: 40px;\n}\n\n.dropdown .select-wrapper {\n  display: block;\n  height: 40px;\n  line-height: 40px;\n  padding-left: 1em;\n  padding-right: 3em;\n  cursor: pointer;\n  position: relative;\n}\n\n.dropdown .select-wrapper.selected {\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n\n.dropdown::after {\n  content: \"▾\";\n  position: absolute;\n  right: 0.8em;\n  top: 0.7em;\n}\n\n.dropdown.selected {\n  padding-top: 40px;\n}\n\n.dropdown:not(.expanded).selected .select-wrapper:not(.selected) {\n  display: none;\n}\n\n.dropdown:not(.expanded) .select-wrapper:not(:first-child) {\n  display: none;\n}\n\n.dropdown:not(.expanded).selected .select-wrapper.selected {\n  display: block;\n}\n\n.dropdown.expanded {\n  border: 1px solid #3694d7;\n  background: white;\n  border-radius: .25em;\n  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 5px 0;\n}\n\n.dropdown.expanded .select-wrapper:not(:first-child) {\n  border-top: 0.06em solid #d9d9d9;\n}\n\n.dropdown.expanded .select-wrapper:hover, .dropdown.expanded .select-wrapper.selected {\n  color: #3694d7;\n}\n\n.dropdown.expanded::after {\n  transform: rotate(-180deg);\n  top: 0.8em;\n}\n\n.dropdown.selected .select-wrapper.selected {\n  border: none;\n}\n\n.dropdown.selected .select-wrapper:not(selected) {\n  border-top: 0.06em solid #d9d9d9;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/room-select/room-select.scss": {
-			"modificationTime": 1599463890345,
-			"data": ".menu.room-select {\n  overflow: visible;\n  margin-left: 170px;\n  margin-top: -290px;\n  width: 230px;\n  height: 40px;\n  opacity: 0.4;\n  transition: opacity 0.5s;\n}\n\n.menu.room-select:hover, .menu.room-select.expanded {\n  opacity: 1;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-preview/tank-preview.scss": {
-			"modificationTime": 1599463890346,
-			"data": ".menu.tankinfo {\n  margin-left: -400px;\n  margin-top: -235px;\n  width: 800px;\n  height: 225px;\n}\n\n.menu.tankinfo .tank-stats .stat {\n  position: relative;\n  height: 35px;\n}\n\n.menu.tankinfo .tank-stats .stat-scale {\n  position: absolute;\n  transition: width 0.5s ease-out, background 0.5s ease-out;\n  height: 23px;\n  border-radius: 5px;\n}\n\n.menu.tankinfo .tank-stats .stat-title {\n  position: absolute;\n  height: 23px;\n  line-height: 23px;\n  left: 5px;\n  font-family: Roboto, sans-serif;\n  color: white;\n}\n\n.menu.tankinfo .tank-stats .stat-value {\n  position: absolute;\n  height: 20px;\n  line-height: 20px;\n  transition: left 0.5s ease-out;\n}\n\n.menu.tankinfo .tank-stats .tankdescription {\n  position: absolute;\n  height: 30px;\n  left: 0;\n  bottom: 40px;\n  width: 100%;\n  padding: 10px;\n  overflow: auto;\n  word-wrap: break-word;\n}\n\n.menu.tankinfo .tank-preview {\n  left: 20px;\n  top: 20px;\n  width: 185px;\n  height: 185px;\n  position: absolute;\n}\n\n.menu.tankinfo .tank-preview canvas {\n  position: absolute;\n  left: 15px;\n  width: 155px;\n  height: 155px;\n}\n\n.menu.tankinfo .tank-preview h1 {\n  position: absolute;\n  top: 155px;\n  left: 0;\n  right: 0;\n  margin: 0;\n  font-family: Roboto, sans-serif;\n  font-weight: normal;\n  font-size: 22px;\n  text-align: center;\n}\n\n.menu.tankinfo .tank-stats {\n  position: absolute;\n  left: 230px;\n  right: 210px;\n  bottom: 30px;\n  top: 30px;\n}\n\n.menu.tankinfo .description {\n  right: 20px;\n  top: 20px;\n  bottom: 10px;\n  width: 170px;\n  position: absolute;\n  font-family: Roboto, sans-serif;\n  font-size: 15px;\n}\n"
-		},
-		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-select/tank-select.scss": {
-			"modificationTime": 1599463890347,
-			"data": ".menu.tankselect {\n  margin-left: -400px;\n  margin-top: 10px;\n  width: 530px;\n  height: 140px;\n}\n\n.menu.tankselect .shadow {\n  background: transparent;\n  transition: opacity 0.3s;\n  width: 50px;\n  height: 100%;\n  position: absolute;\n  pointer-events: none;\n}\n\n.menu.tankselect .shadow.left {\n  background: -moz-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  background: -webkit-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  background: linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  left: 0;\n}\n\n.menu.tankselect .shadow.right {\n  background: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  right: 0;\n}\n\n.menu.tankselect .tank-select-container {\n  overflow: auto;\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 491px;\n  height: 120px;\n  padding: 20px 20px 0 20px;\n  border-right: #ddf 1px solid;\n  white-space: nowrap;\n}\n\n.menu.tankselect .tank-preview-container {\n  width: 80px;\n  height: 95px;\n  display: inline-block;\n  transition: transform 0.5s, box-shadow 0.5s, border 0.5s;\n  box-shadow: rgba(0, 0, 0, 0) 5px 5px 10px;\n  cursor: pointer;\n  border-radius: 4px;\n  border: 1px transparent solid;\n  position: absolute;\n}\n\n.menu.tankselect .tank-preview-container:hover {\n  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;\n}\n\n.menu.tankselect .tank-preview-container:active {\n  transform: scale(0.9, 0.9);\n}\n\n.menu.tankselect .tank-preview-container.selected {\n  transform: scale(1.1, 1.1);\n  box-shadow: rgba(0, 0, 0, 0.15) 3px 3px 7px;\n  border: 1px #22ad22 solid;\n}\n\n.menu.tankselect .tank-preview-container .preview-canvas {\n  position: relative;\n  left: 5px;\n  top: 5px;\n  width: 70px;\n  height: 70px;\n}\n\n.menu.tankselect .tank-preview-container .tank-preview-title {\n  position: relative;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n"
-		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/chat/chat.scss": {
-			"modificationTime": 1599463890348,
+			"modificationTime": 1599902304885,
 			"data": ".chat-container {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.chat-container .chat {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 300px;\n  bottom: 200px;\n  overflow: auto;\n  padding: 10px;\n  font-family: 'Cousine', monospace;\n}\n\n.chat-container input.chat-input {\n  position: absolute;\n  width: calc(100% - 114px);\n  bottom: 50px;\n  left: 50px;\n  height: 30px;\n  padding: 7px;\n  text-align: center;\n}\n\n.chat-container input.chat-input.mobile {\n  bottom: auto;\n  left: 370px;\n  right: 70px;\n  top: 10px;\n  width: calc(100% - 460px);\n}\n"
 		},
 		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay.scss": {
-			"modificationTime": 1599463890349,
+			"modificationTime": 1599902304886,
 			"data": ".overlay {\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 100%;\n  height: 100%;\n  background: rgba(80, 80, 80, 0.3);\n  display: block;\n}\n\n.menu {\n  box-shadow: rgba(0, 0, 0, 0.5) 0 0 30px;\n}\n\n.menu {\n  left: 50%;\n  top: 50%;\n  position: absolute;\n  background: white;\n  border-radius: 5px;\n  box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;\n  overflow: hidden;\n}\n\n.menu .title {\n  font-family: Arial, serif;\n  font-size: 20px;\n  cursor: default;\n}\n\n.menu .footer {\n  position: absolute;\n  bottom: 0;\n  width: 100%;\n  height: 55px;\n  border-top: solid 1px #ececec;\n  padding: 5px 6px 7px 6px;\n  box-sizing: border-box;\n  text-align: right;\n}\n\n.menu .footer button {\n  display: inline-block;\n  position: relative;\n  height: 45px;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-view.scss": {
+			"modificationTime": 1599902304887,
+			"data": ".event-container .menu.event-view {\n  position: absolute;\n  padding: 15px;\n  left: 0;\n  right: 0;\n  top: 0;\n  transition: top 0.3s, opacity 0.5s;\n  color: #2D2D2D;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/overlay/events/event-container.scss": {
+			"modificationTime": 1599902304888,
+			"data": ".event-container {\n  position: absolute;\n  right: 10px;\n  bottom: 10px;\n  width: 220px;\n  display: block;\n  pointer-events: none;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/play-menu/play-menu.scss": {
+			"modificationTime": 1599902304889,
+			"data": ".menu.nick {\n  margin-left: 150px;\n  margin-top: 10px;\n  width: 250px;\n  height: 140px;\n}\n\n.menu.nick input.nick {\n  position: absolute;\n  padding: 10px;\n  left: 20px;\n  top: 50px;\n  width: calc(100% - 60px);\n  font-size: 15px;\n  border: 1px solid #999;\n  border-radius: 3px;\n  box-shadow: rgba(0, 0, 0, 0.2) 0 0 2px;\n}\n\n.menu.nick button {\n  left: 13px;\n  width: 225px;\n  top: 87px;\n}\n\n.menu.nick .header {\n  position: absolute;\n  left: 20px;\n  right: 20px;\n  top: 10px;\n  font-family: Roboto, sans-serif;\n  font-size: 13px;\n  text-align: center;\n  text-transform: uppercase;\n  color: #2D2D2D;\n}\n\n.menu.nick input {\n  position: absolute;\n  width: 225px;\n  left: 13px;\n  height: 40px;\n  top: 35px;\n  text-align: center;\n  font-family: Roboto, sans-serif;\n  font-size: 17px;\n  line-height: 40px;\n  background: #F0F0F0;\n  border-radius: 5px;\n  border: none;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/controls/controls.scss": {
+			"modificationTime": 1599902304890,
+			"data": ".menu.tip {\n  margin-left: -400px;\n  margin-top: -235px;\n  width: 800px;\n  height: 460px;\n  transition: opacity 0.3s;\n}\n\n.menu.tip .header {\n  width: 100%;\n  margin-top: 20px;\n  text-align: center;\n  font-size: 20px;\n}\n\n.menu.tip .wish {\n  position: absolute;\n  bottom: 65px;\n  width: 100%;\n  text-align: center;\n  font-size: 14px;\n}\n\n.menu.tip .line {\n  position: relative;\n  top: 10px;\n  text-align: center;\n  margin: 20px 0;\n}\n\n.menu.tip table {\n  display: inline-block;\n  height: 65px;\n  margin: 0 10px;\n}\n\n.menu.tip button {\n  position: absolute;\n  bottom: 10px;\n  right: 10px;\n  width: 225px;\n}\n\n.menu.tip .checkbox {\n  position: absolute;\n  left: 10px;\n  bottom: 10px;\n}\n\n.menu.tip .key {\n  width: 50px;\n  height: 50px;\n  border: solid 1px #777;\n  border-radius: 5px;\n  text-align: center;\n  line-height: 50px;\n  text-transform: uppercase;\n  display: inline-block;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-preview/tank-preview.scss": {
+			"modificationTime": 1599902304891,
+			"data": ".menu.tankinfo {\n  margin-left: -400px;\n  margin-top: -235px;\n  width: 800px;\n  height: 225px;\n}\n\n.menu.tankinfo .tank-stats .stat {\n  position: relative;\n  height: 35px;\n}\n\n.menu.tankinfo .tank-stats .stat-scale {\n  position: absolute;\n  transition: width 0.5s ease-out, background 0.5s ease-out;\n  height: 23px;\n  border-radius: 5px;\n}\n\n.menu.tankinfo .tank-stats .stat-title {\n  position: absolute;\n  height: 23px;\n  line-height: 23px;\n  left: 5px;\n  font-family: Roboto, sans-serif;\n  color: white;\n}\n\n.menu.tankinfo .tank-stats .stat-value {\n  position: absolute;\n  height: 20px;\n  line-height: 20px;\n  transition: left 0.5s ease-out;\n}\n\n.menu.tankinfo .tank-stats .tankdescription {\n  position: absolute;\n  height: 30px;\n  left: 0;\n  bottom: 40px;\n  width: 100%;\n  padding: 10px;\n  overflow: auto;\n  word-wrap: break-word;\n}\n\n.menu.tankinfo .tank-preview {\n  left: 20px;\n  top: 20px;\n  width: 185px;\n  height: 185px;\n  position: absolute;\n}\n\n.menu.tankinfo .tank-preview canvas {\n  position: absolute;\n  left: 15px;\n  width: 155px;\n  height: 155px;\n}\n\n.menu.tankinfo .tank-preview h1 {\n  position: absolute;\n  top: 155px;\n  left: 0;\n  right: 0;\n  margin: 0;\n  font-family: Roboto, sans-serif;\n  font-weight: normal;\n  font-size: 22px;\n  text-align: center;\n}\n\n.menu.tankinfo .tank-stats {\n  position: absolute;\n  left: 230px;\n  right: 210px;\n  bottom: 30px;\n  top: 30px;\n}\n\n.menu.tankinfo .description {\n  right: 20px;\n  top: 20px;\n  bottom: 10px;\n  width: 170px;\n  position: absolute;\n  font-family: Roboto, sans-serif;\n  font-size: 15px;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/tank-select/tank-select.scss": {
+			"modificationTime": 1599902304893,
+			"data": ".menu.tankselect {\n  margin-left: -400px;\n  margin-top: 10px;\n  width: 530px;\n  height: 140px;\n}\n\n.menu.tankselect .shadow {\n  background: transparent;\n  transition: opacity 0.3s;\n  width: 50px;\n  height: 100%;\n  position: absolute;\n  pointer-events: none;\n}\n\n.menu.tankselect .shadow.left {\n  background: -moz-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  background: -webkit-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  background: linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);\n  left: 0;\n}\n\n.menu.tankselect .shadow.right {\n  background: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);\n  right: 0;\n}\n\n.menu.tankselect .tank-select-container {\n  overflow: auto;\n  position: absolute;\n  left: 0;\n  top: 0;\n  width: 491px;\n  height: 120px;\n  padding: 20px 20px 0 20px;\n  border-right: #ddf 1px solid;\n  white-space: nowrap;\n}\n\n.menu.tankselect .tank-preview-container {\n  width: 80px;\n  height: 95px;\n  display: inline-block;\n  transition: transform 0.5s, box-shadow 0.5s, border 0.5s;\n  box-shadow: rgba(0, 0, 0, 0) 5px 5px 10px;\n  cursor: pointer;\n  border-radius: 4px;\n  border: 1px transparent solid;\n  position: absolute;\n}\n\n.menu.tankselect .tank-preview-container:hover {\n  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;\n}\n\n.menu.tankselect .tank-preview-container:active {\n  transform: scale(0.9, 0.9);\n}\n\n.menu.tankselect .tank-preview-container.selected {\n  transform: scale(1.1, 1.1);\n  box-shadow: rgba(0, 0, 0, 0.15) 3px 3px 7px;\n  border: 1px #22ad22 solid;\n}\n\n.menu.tankselect .tank-preview-container .preview-canvas {\n  position: relative;\n  left: 5px;\n  top: 5px;\n  width: 70px;\n  height: 70px;\n}\n\n.menu.tankselect .tank-preview-container .tank-preview-title {\n  position: relative;\n  left: 0;\n  right: 0;\n  text-align: center;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/ui/elements/dropdown/dropdown.scss": {
+			"modificationTime": 1599902304894,
+			"data": "@charset \"UTF-8\";\n.dropdown {\n  width: 100%;\n  min-height: 40px;\n  position: relative;\n  display: inline-block;\n  margin-right: 1em;\n  overflow: hidden;\n  cursor: pointer;\n  text-align: left;\n  white-space: nowrap;\n  outline: none;\n  border: 1px solid transparent;\n}\n\n.dropdown:not(.expanded) {\n  max-height: 40px;\n}\n\n.dropdown .select-wrapper {\n  display: block;\n  height: 40px;\n  line-height: 40px;\n  padding-left: 1em;\n  padding-right: 3em;\n  cursor: pointer;\n  position: relative;\n}\n\n.dropdown .select-wrapper.selected {\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n\n.dropdown::after {\n  content: \"▾\";\n  position: absolute;\n  right: 0.8em;\n  top: 0.7em;\n}\n\n.dropdown.selected {\n  padding-top: 40px;\n}\n\n.dropdown:not(.expanded).selected .select-wrapper:not(.selected) {\n  display: none;\n}\n\n.dropdown:not(.expanded) .select-wrapper:not(:first-child) {\n  display: none;\n}\n\n.dropdown:not(.expanded).selected .select-wrapper.selected {\n  display: block;\n}\n\n.dropdown.expanded {\n  border: 1px solid #3694d7;\n  background: white;\n  border-radius: .25em;\n  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 5px 0;\n}\n\n.dropdown.expanded .select-wrapper:not(:first-child) {\n  border-top: 0.06em solid #d9d9d9;\n}\n\n.dropdown.expanded .select-wrapper:hover, .dropdown.expanded .select-wrapper.selected {\n  color: #3694d7;\n}\n\n.dropdown.expanded::after {\n  transform: rotate(-180deg);\n  top: 0.8em;\n}\n\n.dropdown.selected .select-wrapper.selected {\n  border: none;\n}\n\n.dropdown.selected .select-wrapper:not(selected) {\n  border-top: 0.06em solid #d9d9d9;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/game/ui/overlay/primary/room-select/room-select.scss": {
+			"modificationTime": 1599902304895,
+			"data": ".menu.room-select {\n  overflow: visible;\n  margin-left: 170px;\n  margin-top: -290px;\n  width: 230px;\n  height: 40px;\n  opacity: 0.4;\n  transition: opacity 0.5s;\n}\n\n.menu.room-select:hover, .menu.room-select.expanded {\n  opacity: 1;\n}\n"
+		},
+		"/Users/Temich/PycharmProjects/tanks/src/client/utils/browsercheck/browser-check.scss": {
+			"modificationTime": 1599902362749,
+			"data": ".unsupported-browser-container {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n}\n\n.unsupported-browser {\n  top: 50px;\n  left: 50%;\n  position: relative;\n  margin: 0 40px 40px -230px;\n  text-align: center;\n  width: 460px;\n  padding: 30px 30px 40px 30px;\n  border-radius: 10px;\n  box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -webkit-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -moz-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n  -o-box-shadow: rgba(0, 0, 0, 0.3) 1px 4px 20px;\n}\n\n.unsupported-browser .text p {\n  margin: 3px 0 7px 0;\n}\n\n.unsupported-browser .header {\n  font-size: 18px;\n}\n\n.unsupported-browser a.supported-browser {\n  position: relative;\n  display: inline-block;\n  margin: 4px 10px -4px 10px;\n  padding: 10px 20px;\n  border-radius: 10px;\n  text-decoration: none;\n  font-weight: bold;\n}\n\n.unsupported-browser a.supported-browser:hover {\n  background: #f1f1f5;\n}\n\n.unsupported-browser a.supported-browser p {\n  color: #11E;\n}\n"
 		}
 	},
 	"glsl-compiler": {

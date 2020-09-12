@@ -5,6 +5,7 @@ const Collapser = require("../collapser");
 const Timings = require("../timings");
 const CSSPlugin = require("../compiler/plugins/css/cssplugin");
 const GLSLPlugin = require("../compiler/plugins/glslplugin");
+const path = require("path")
 
 async function compile() {
     let cssPlugin = new CSSPlugin()
@@ -43,6 +44,12 @@ async function compile() {
 }
 
 (async function perform() {
+
+    if(process.argv.length < 3) {
+        console.error("Error: Please, provide dist path")
+        return;
+    }
+
     Timings.begin("Building")
     await compile()
 
@@ -53,8 +60,10 @@ async function compile() {
 
     Timings.begin("Copying files to the dist")
 
-    let commitPath = "/Library/WebServer/Documents/new-tanks-online/game"
-    let assetsPath = "/Library/WebServer/Documents/new-tanks-online/"
+    let dist = process.argv[2]
+
+    let commitPath = path.resolve(dist, "game")
+    let assetsPath = path.resolve(dist)
 
     execSync(`
         rm -rf ${commitPath}/*

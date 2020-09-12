@@ -44,6 +44,11 @@ async function compile() {
 (async function perform() {
     Timings.begin("Building")
 
+    if(process.argv.length < 3) {
+        console.error("Error: Please, provide dist path")
+        return;
+    }
+
     await compile()
 
     Timings.begin("Collapsing")
@@ -52,8 +57,10 @@ async function compile() {
 
     Timings.begin("Copying files to the dist")
 
-    let assetsPath = "/Library/WebServer/Documents/new-tanks-online/"
-    let commitPath = "/Library/WebServer/Documents/new-tanks-online/map-editor"
+    let dist = process.argv[2]
+
+    let commitPath = path.resolve(dist, "map-editor")
+    let assetsPath = path.resolve(dist)
 
     execSync(`
         rm -rf ${commitPath}/*
