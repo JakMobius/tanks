@@ -5,6 +5,8 @@ const path = require("path")
 const readdirdeep = require("../src/utils/readdirdeep")
 const atlaspack = require('atlaspack')
 
+const destination = path.resolve(__dirname, "../src/client/copy/assets/img/")
+
 global.Image = Canvas.Image
 
 let canvases = [];
@@ -116,7 +118,8 @@ readdirdeep("./textures").then((list) => {
 	for(let j = 0; j < canvases.length; j++) {
 		if(!canvases[j]) break
 		console.log("Writing mipmap level " + j)
-		fs.writeFileSync("../src/client/copy/assets/img/atlas-mipmap-level-" + j + ".png", canvases[j].toBuffer());
-		fs.writeFileSync("../src/client/copy/assets/img/atlas-mipmap-level-" + j + ".json", JSON.stringify(json[j]));
+
+		fs.writeFileSync(path.resolve(destination, "atlas-mipmap-level-" + j + ".png"), canvases[j].toBuffer());
+		fs.writeFileSync(path.resolve(destination, "atlas-mipmap-level-" + j + ".json"), JSON.stringify(json[j]));
 	}
 });
