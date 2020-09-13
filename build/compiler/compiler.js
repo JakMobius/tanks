@@ -145,6 +145,12 @@ class Compiler {
         }
 
         let destination = Compiler.path(this.options.destination)
+        let dirname = path.dirname(destination)
+        try {
+            await fs.promises.access(dirname)
+        } catch(error) {
+            await fs.promises.mkdir(dirname, { recursive: true })
+        }
         await fs.promises.writeFile(destination, this.result)
     }
 
