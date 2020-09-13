@@ -1,10 +1,6 @@
 # tanks
 Browser action game project
 
-**Table of Contents**
-
-[TOC]
-
 ### Features
 
 - The game uses high-performance WebGL for graphics
@@ -14,18 +10,25 @@ Browser action game project
 - Realistic spread and reflection of blast waves
 - Convinient map editor
 - Low traffic consumption
-- Uses JavaScript for both server and client
+- Uses JavaScript for both server and client.
+- Custom build system allows developer to use the same files both in client and in server build for convinience
 
 # Installing the game
 
 *Please, note that Node 17.0 is required*
 
 1. Clone the repo
-`git clone https://github.com/JakMobius/tanks/`
+```
+git clone https://github.com/JakMobius/tanks/
+```
 2. Navigate to project folder
-`cd tanks`
+```
+cd tanks
+```
 3. Install dependencies
-`npm install`
+```
+npm install
+```
 
 # Starting the server
 - To start server with default settings, simply type
@@ -38,14 +41,18 @@ Browser action game project
 
 # Building the client
 - To build the client, run the following command:
-      cd build/actions;
-      node commit-client.js (target directory)
+```
+cd build/actions;
+node commit-client.js (target directory)
+```
 Your build will be located in "game" subdirectory
 
 # Building the map editor
 - To build the map editor, run the following command:
-      cd build/actions;
-      node commit-map-editor.js (target directory)
+```
+cd build/actions;
+node commit-map-editor.js (target directory)
+```
 Your build will be located in "map-editor" subdirectory
 
 Please, note: If you want to build both game client and map editor, it's recommended to pass the same command line arguments to `commit-client` and `commit-map-editor`
