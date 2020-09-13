@@ -4,18 +4,41 @@ const path = require("path")
 const cacheFile = path.resolve(__dirname, "cache/cache.json")
 
 class CompileCache {
+
+    /**
+     * @private
+     */
+    static async createCacheFile(cacheFile) {
+        let dirname = path.dirname(cacheFile)
+
+        function errorHandler(e) {
+            console.warn("Unable to read build cache file. Build will be much slower", e)
+        }
+
+        await fs.access(dirname).catch(error => {
+            return fs.mkdir(dirname, { recursive: true }).catch(errorHandler)
+        })
+
+        await fs.writeFile(cacheFile, "{}").catch(errorHandler)
+    }
+
     static async readCache(section) {
         let cache = null
 
-        await fs.readFile(cacheFile).then(a => cache = a).catch(async e => {
-            await fs.writeFile(cacheFile, "{}")
+        try {
+            cache = await fs.readFile(cacheFile)
+        } catch(e) {
+            await this.createCacheFile(cacheFile)
+        }
+
+        if(!cache) {
             let object = {}
             object[section] = {}
             return object
-        })
+        }
 
         let file
-        await fs.readFile(cacheFile, 'utf8').then(f => file = f).catch(e => f = null)
+        await fs.readFile(cacheFile, 'utf8').then(f => file = f).catch(e => file = null)
 
         if(file) {
             try {
@@ -40,14 +63,14 @@ class CompileCache {
     }
 
     static updateFile(file, section, data) {
-        if(!section[file]) {
+        if (section[file]) {
+            section[file].modificationTime = Date.now()
+            section[file].data = data
+        } else {
             section[file] = {
                 modificationTime: Date.now(),
                 data: data
             }
-        } else {
-            section[file].modificationTime = Date.now()
-            section[file].data = data
         }
     }
 
@@ -64,7 +87,9 @@ class CompileCache {
             cache = {}
         }
         cache[section] = object
-        await fs.writeFile(cacheFile, JSON.stringify(cache, null, "\t"))
+        await fs.writeFile(cacheFile, JSON.stringify(cache, null, "\t")).catch(e => {
+            console.warn(e)
+        })
     }
 
     static async clear() {

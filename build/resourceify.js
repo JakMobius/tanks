@@ -25,7 +25,7 @@ module.exports = function() {
     }
 
     result.readResources = async function() {
-        let cache = CompilerCache.readCache("resourceify")
+        let cache = await CompilerCache.readCache("resourceify")
 
         for(let entry of result.entries) {
             let name = entry.file
@@ -43,7 +43,7 @@ module.exports = function() {
                 result.resources = result.resources.concat(resources)
         }
 
-        CompilerCache.writeCache("resourceify", cache)
+        await CompilerCache.writeCache("resourceify", cache)
 
         return result.resources
     }
