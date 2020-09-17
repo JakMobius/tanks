@@ -6,7 +6,7 @@ $separator-color: #d9d9d9;
     width: 100%;
     min-height: 40px;
     position: relative;
-    display: inline-block;
+    box-sizing: border-box;
     margin-right: 1em;
     overflow: hidden;
     cursor: pointer;
@@ -42,14 +42,14 @@ $separator-color: #d9d9d9;
         top: 0.7em;
     }
 
-    &.selected {
+    &.expanded.selected {
         padding-top: 40px;
     }
 
     // If dropdown is closed
     &:not(.expanded) {
 
-        // Display only selected option, if there is any
+        // Display only selected option, if it exists
 
         &.selected .select-wrapper:not(.selected) {
             display:none

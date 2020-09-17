@@ -48,6 +48,7 @@
     "clear-cache": "cd build/actions; node --trace-warnings clear-cache.js",
     "commit-client": "cd build/actions; node --trace-warnings commit-client.js /Library/WebServer/Documents/new-tanks-online/",
     "commit-mapeditor": "cd build/actions; node --trace-warnings commit-mapeditor.js /Library/WebServer/Documents/new-tanks-online/",
+    "commit-hub": "cd build/actions; node --trace-warnings commit-hub.js",
     "create-texture-atlas": "cd atlas; node atlas_creator.js"
   },
   "nyc": {

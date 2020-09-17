@@ -23,7 +23,7 @@ class Compiler {
     constructor(options) {
         this.options = options
 
-        /**
+         /**
          * @type {Plugin[]}
          */
 

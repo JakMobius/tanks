@@ -9,8 +9,13 @@ const path = require("path")
 class Hub {
     constructor() {
         this.app = express()
+        this.resourcesDirectory = path.resolve(__dirname, "../../client/hub/")
         this.setupApp()
         this.logger = Logger.global
+    }
+
+    resourcePath(resource) {
+        return path.resolve(this.resourcesDirectory, resource)
     }
 
     log(text) {
@@ -59,6 +64,7 @@ class Hub {
         const self = this
 
         this.app.set('view engine', 'hbs')
+        this.app.set('views', this.resourcePath("views"));
 
         this.app.use(function(err, req, res, next) {
             res.header("Access-Control-Allow-Origin", "*");
@@ -72,7 +78,6 @@ class Hub {
             saveUninitialized: true
         })
 
-        this.app.set('views', path.resolve(__dirname, "views"))
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(this.session)
         this.app.use(function() {
@@ -104,9 +109,10 @@ class Hub {
         this.app.get(/(ajax)\/.*/, ajaxHandler)
         this.app.post(/(ajax)\/.*/, ajaxHandler)
 
-        this.app.use('/img', express.static('img'));
-        this.app.use('/script', express.static('script'));
-        this.app.use('/styles', express.static('styles'));
+        this.app.set('static', this.resourcePath("static"))
+        this.app.use('/img', express.static(this.resourcePath('img')));
+        this.app.use('/scripts', express.static(this.resourcePath('scripts')));
+        this.app.use('/styles', express.static(this.resourcePath('styles')));
 
 
         this.app.use(function(req, res, next){
