@@ -6,7 +6,6 @@ Browser action game project
 - The game uses high-performance WebGL for graphics
 - Client-server architecture allows you to play with your friends
 - Convinient server console
-- Simulation of blast waves spreading
 - Realistic spread and reflection of blast waves
 - Convinient map editor
 - Low traffic consumption
@@ -32,7 +31,9 @@ npm install
 
 # Starting the server
 - To start server with default settings, simply type
-      npm run start-server
+  ```
+  npm run start-server
+  ```
    By default, this command forces server to run script called `autorun`. This script is stored as `src/sever/scripts/autorun.script`.
 - To provide some custom command line arguments, run the following command:
       node src/server/main.js (your arguments)
