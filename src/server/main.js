@@ -36,7 +36,7 @@ async function initialize() {
     try {
         await DB.instance.connect()
     } catch(error) {
-        Logger.global.error("Не удалось подключиться к базе данных")
+        Logger.global.log("Не удалось подключиться к базе данных")
     }
 
     Logger.global.log("Привязка к порту...")
