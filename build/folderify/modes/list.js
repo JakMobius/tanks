@@ -26,5 +26,5 @@ module.exports = function(base, files, config) {
     hash = resolve(base, hash, config);
   }
 
-  return "[" + files.map(file => "require('" + file + "')").join(",") + "]";
+  return "[" + files.map(file => "require('" + file.replace(/\\/, "\\\\") + "')").join(",") + "]";
 };

@@ -33,7 +33,7 @@ class GLSLPlugin extends Plugin {
             let text
 
             if (await CompileCache.shouldUpdate(shader, cache)) {
-                let isVertex = shader.indexOf("/vertex/") !== -1
+                let isVertex = shader.indexOf("vertex") !== -1
 
                 Timings.begin("Minifying " + (isVertex ? "vertex" : "fragment") + " shader '" + relative + "'")
 
