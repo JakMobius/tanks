@@ -1,4 +1,4 @@
-/* @load-resource: '../styles.css' */
+/* @load-resource: '../style.css' */
 
 const Scene = require("../../scenes/scene")
 const MapDrawer = require("../../graphics/drawers/mapdrawer")

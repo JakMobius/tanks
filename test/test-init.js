@@ -45,7 +45,7 @@ describe('Server', function() {
         let list = fs.readdirSync(LibraryLoader.path + "commands")
         let commands = new Map()
 
-        it("should have all command files compiling", function() {
+        it("should have all command fs compiling", function() {
             for(let file of list) {
                 let command = require(LibraryLoader.path + "commands/" + file)
 

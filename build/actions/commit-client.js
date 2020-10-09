@@ -1,5 +1,4 @@
 
-const {execSync} = require('child_process');
 const Compiler = require("../compiler/compiler");
 const Collapser = require("../collapser");
 const Timings = require("../timings");
@@ -28,53 +27,28 @@ async function compile() {
         await Timings.perform("Compiling base", async () => {
             await bundle({
                 source: "src/client/game/index.js",
-                destination: "dist/game/index.js"
+                destination: "src/client/game/page/scripts/index.js"
             })
         })
 
         await Timings.perform("Compiling game", async () => {
             await bundle({
                 source: "src/client/game/game.js",
-                destination: "dist/game/game.js"
+                destination: "src/client/game/page/scripts/game.js"
             })
         })
 
-        cssPlugin.write(Compiler.path("dist/game/styles.css"))
+        await cssPlugin.write(Compiler.path("src/client/game/page/styles/style.css"))
     })
 }
 
 (async function perform() {
-
-    if(process.argv.length < 3) {
-        console.error("Error: Please, provide dist path")
-        return;
-    }
-
     Timings.begin("Building")
     await compile()
 
     Timings.begin("Collapsing")
-    await Collapser.collapse("../../dist/game/index.js")
-    await Collapser.collapse("../../dist/game/game.js")
-    Timings.end()
-
-    Timings.begin("Copying files to the dist")
-
-    let dist = process.argv[2]
-
-    let commitPath = path.resolve(dist, "game")
-    let assetsPath = path.resolve(dist)
-
-    execSync(`
-        rm -rf ${commitPath}/*
-        cd ${Compiler.projectDirectory}
-        cp -r src/client/copy/* ${assetsPath}
-        cp -r dist/game/* ${commitPath}
-        cp src/client/game/index.html ${commitPath}/index.html
-    `.split("\n").join("\n"))
-
+    await Collapser.collapse(Compiler.path("src/client/game/page/scripts/index.js"))
+    await Collapser.collapse(Compiler.path("src/client/game/page/scripts/game.js"))
     Timings.end()
     Timings.end()
-
-    console.log("\n\n")
 })()

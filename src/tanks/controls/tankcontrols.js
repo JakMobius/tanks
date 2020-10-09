@@ -1,6 +1,5 @@
 const BinarySerializable = require("../../serialization/binary/serializable.js")
 const Axle = require("./axle")
-
 class TankControls extends BinarySerializable {
 
     static groupName() {

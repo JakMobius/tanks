@@ -7,7 +7,7 @@ class Console {
 	commands = new Map();
 
 	/**
-	 * @type {GameSocket}
+	 * @type {Server}
 	 */
 	server = null
 
@@ -34,11 +34,18 @@ class Console {
 	createWindow() {
 		this.window = new ConsoleWindow()
 
-		this.window.on("tab", () => {
+		// Shift-tab feature doesn't work
+		// in WebStorm internal console.
+
+		this.window.on("tab", (shift) => {
 			if (this.tabCompletions) {
-				this.tabCompleteNext()
+				if(shift) {
+					this.tabCompletePrevious()
+				} else {
+					this.tabCompleteNext()
+				}
 			} else {
-				this.tabCompleteBegin(this.window.consoleTextbox.value)
+				this.tabCompleteBegin(this.window.consoleTextbox.value, shift)
 			}
 		})
 		this.window.on("keypress", () => {
@@ -54,7 +61,7 @@ class Console {
 		this.logger.addDestination(this.window.destination)
 	}
 
-	tabCompleteBegin(line) {
+	tabCompleteBegin(line, shift) {
 		let args = this.parseArguments(line)
 
 		if(args.length <= 1) {
@@ -89,8 +96,13 @@ class Console {
 
 		if (this.tabCompletions && this.tabCompletions.length) {
 			if(this.tabCompletions.length > 1) {
-				this.tabCompleteIndex = 0
-				this.tabCompleteNext()
+				if(shift) {
+					this.tabCompleteIndex = this.tabCompletions.length
+					this.tabCompletePrevious()
+				} else {
+					this.tabCompleteIndex = -1
+					this.tabCompleteNext()
+				}
 				return
 			}
 
@@ -100,12 +112,18 @@ class Console {
 		this.tabCompletions = null
 	}
 
-	tabCompleteNext() {
+	tabCompletePrevious() {
+		this.tabCompleteIndex--
+		if(this.tabCompleteIndex < 0) this.tabCompleteIndex = this.tabCompletions.length - 1;
 		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
+	}
+
+	tabCompleteNext() {
 		this.tabCompleteIndex++
 		if(this.tabCompleteIndex >= this.tabCompletions.length) {
 			this.tabCompleteIndex = 0
 		}
+		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
 	}
 
 	tabComplete() {

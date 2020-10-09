@@ -1,9 +1,13 @@
- const {execSync} = require('child_process');
+const {execSync} = require('child_process');
 const Compiler = require("../compiler/compiler");
 const Timings = require("../timings");
 const CSSPlugin = require("../compiler/plugins/css/cssplugin")
 const GLSLPlugin = require("../compiler/plugins/glslplugin")
 const Collapser = require("../collapser")
+const path = require("path")
+const fs = require("fs").promises
+const copyDirectory = require("../../src/utils/fs/copy-directory")
+const insertDirectory = require("../../src/utils/fs/insert-directory")
 
 async function compile() {
     let cssPlugin = new CSSPlugin()
@@ -37,38 +41,39 @@ async function compile() {
             })
         })
 
-        cssPlugin.write(Compiler.path("dist/mapeditor/style.css"))
+        await cssPlugin.write(Compiler.path("dist/mapeditor/style.css"))
     })
 }
 
 (async function perform() {
-    Timings.begin("Building")
-
     if(process.argv.length < 3) {
         console.error("Error: Please, provide dist path")
         return;
     }
 
+    Timings.begin("Building")
+
+    Timings.begin("Compiling map editor")
     await compile()
+    Timings.end()
 
     Timings.begin("Collapsing")
-    await Collapser.collapse("../../dist/mapeditor/bundle.js")
+    await Collapser.collapse("../../dist/mapeditor/editor.js")
     Timings.end()
 
     Timings.begin("Copying files to the dist")
 
-    let dist = process.argv[2]
+    let dist = Compiler.path(process.argv[2])
 
     let commitPath = path.resolve(dist, "map-editor")
-    let assetsPath = path.resolve(dist)
+    let assetsPath = dist
 
-    execSync(`
-        rm -rf ${commitPath}/*
-        cd ${Compiler.projectDirectory}
-        cp -r src/client/copy/* ${assetsPath}
-        cp -r dist/mapeditor/* ${commitPath}
-        cp src/client/mapeditor/index.html ${commitPath}/index.html
-    `.split("\n").join("\n"))
+    await fs.rmdir(commitPath, { recursive: true })
+    await fs.mkdir(commitPath)
+
+    await insertDirectory(Compiler.path("src/client/copy"), assetsPath)
+    await insertDirectory(Compiler.path("dist/mapeditor"), commitPath)
+    await fs.copyFile(Compiler.path("src/client/mapeditor/index.html"), path.resolve(commitPath, "index.html"))
 
     Timings.end()
     Timings.end()

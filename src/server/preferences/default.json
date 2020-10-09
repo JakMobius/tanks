@@ -1,0 +1,18 @@
+/*
+  Server preferences file.
+  JSON5 parser is used for parsing this file,
+  so C-style comments are allowed here.
+*/
+
+{
+  // Determines which port to bind for both websocket and express server
+  "port": 25565,
+
+  // Credentials for mongodb database
+  "database": {
+    "url": "mongodb://localhost:27017/",
+    "user": "admin",
+    "password": "admin",
+    "db": "tanks"
+  }
+}

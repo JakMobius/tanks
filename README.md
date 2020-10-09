@@ -1,6 +1,11 @@
 # tanks
 Browser action game project
 
+#### Please, note that project is under heavy development now
+This repository should not be treated as a real finished game for now. Some features listed in this readme are likely being refactored doesn't work right now. (For example, you should have an HTTP server to access the map editor. Ugh)
+
+However, you can contribute and help make this game more and more awesome `:)`
+
 ### Features
 
 - The game uses high-performance WebGL for graphics
@@ -14,7 +19,7 @@ Browser action game project
 
 # Installing the game
 
-*Please, note that Node 17.0 is required*
+*Please, note that Node 14 is required*
 
 1. Clone the repo
 ```
@@ -32,28 +37,44 @@ npm install
 # Starting the server
 - To start server with default settings, simply type
   ```
-  npm run start-server
+  cd build/actions;
+  node start-server.js -s autorun
   ```
-   By default, this command forces server to run script called `autorun`. This script is stored as `src/sever/scripts/autorun.script`.
+   By default, this command forces server to run script called `autorun`. This script is stored as `src/server/scripts/autorun.script`.
 - To provide some custom command line arguments, run the following command:
       node src/server/main.js (your arguments)
 ### Server command line arguments
-  - For now, there is only `-s (script name)` command line flag, which is used for running scripts as soon as server starts. Server scripts are located under `src/server/scripts` directory.
+- For now, there is only `-s (script name)` command line flag, which is used for running scripts as soon as server starts. Server scripts are located under `src/server/scripts` directory.
+### Configuring the server
+- To configure the server port and database credentials, edit the `src/server/preferences.json` file. If this file does not exist, start the server once. The default configuration file will be created.
 
+    **Note: your custom preferences file is listed in .gitignore, so you should not worry if your database passwords are going to be shared**
+- By default, the server only binds the port specified in the configuration. To start the game room and enter the game, you must first start the corresponding server modules using the `service` command. In the future this feature will help to create distributed systems where the hub and the game server can be located on different servers. For now it is enough to enter `service on` command to start the web-server and the game socket. After that you can use the `room create` command to create a game room. Then you will be able to go to `localhost:port/game` and play the game.
+
+    **Note: If you use the `-s autorun` flag when starting the server, or run the `run autorun` command in the server console, the server will automatically start all the necessary modules and create several game rooms.**
 # Building the client
-- To build the client, run the following command:
-```
-cd build/actions;
-node commit-client.js (target directory)
-```
-Your build will be located in "game" subdirectory
+To build the client, run the following command:
+  ```
+  cd build/actions;
+  node commit-client.js
+  ```
+You will be able to access your build via "localhost/game" request
+
+# Building the hub
+
+Although hub page is now now uselles as it is under development, there is an instruction how to rebuild it:
+  ```
+  cd build/actions;
+  node commit-hub.js
+  ```
+You will be able to access your build via "localhost/hub" request
 
 # Building the map editor
-- To build the map editor, run the following command:
-```
-cd build/actions;
-node commit-map-editor.js (target directory)
-```
-Your build will be located in "map-editor" subdirectory
+To build the map editor, run the following command:
+  ```
+  cd build/actions;
+  node commit-map-editor.js (target directory)
+  ```
 
-Please, note: If you want to build both game client and map editor, it's recommended to pass the same command line arguments to `commit-client` and `commit-map-editor`
+In the future, you will be able to access your build via "localhost/map-editor" request and edit your server maps. Now you should have additional HTTP-server to access map editor properly.
+

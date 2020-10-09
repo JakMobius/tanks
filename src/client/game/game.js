@@ -1,4 +1,3 @@
-/* @load-resource: './style.css' */
 
 const Screen = require("../screen")
 const LoadingScene = require("../scenes/loading/loadingscene")

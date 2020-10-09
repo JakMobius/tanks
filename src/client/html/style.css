@@ -17,30 +17,23 @@ body, html {
     position: fixed;
 }
 
-.menu button {
-    position: absolute;
+button {
+    position:absolute;
     height: 40px;
     text-align: center;
     color: white;
 
-    padding: 16px;
-
-    border: none;
+    border: 1px solid lightgray;
     font-family: Roboto Medium, Roboto, sans-serif;
     font-weight: 500;
-    font-size: 14px;
-    line-height: 12px;
+    font-size: 15px;
+    line-height: 40px;
 
-    background: #46cf36;
-    border-radius: 2px;
-    box-shadow: rgba(0, 0, 0, .3) 1px 1px 3px;
-
-    cursor: pointer;
-    outline: none;
+    background: #55D346;
+    border-radius: 5px;
 }
 
-.menu button:disabled {
-    cursor: not-allowed;
+button[disabled] {
     opacity: 0.5;
 }
 

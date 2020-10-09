@@ -1,7 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const Overlay = require(3);
-
-const View = require(4);
+const View = require(3);
 
 const Dropdown = require(2);
 
@@ -27,7 +25,7 @@ window.addEventListener("load", function () {
   body.append($("<p>").text("         💧  💧"));
 });
 },{}],2:[function(require,module,exports){
-const View = require(4);
+const View = require(3);
 
 class Dropdown extends View {
   constructor() {
@@ -105,44 +103,7 @@ class Dropdown extends View {
 
 module.exports = Dropdown;
 },{}],3:[function(require,module,exports){
-const EventEmitter = require(5);
-
-class Overlay extends EventEmitter {
-  constructor(options) {
-    super();
-    this.overlay = $("<div>").addClass("overlay");
-    this.shown = false;
-    this.root = options.root;
-    this.root.append(this.overlay);
-    this.overlay.hide();
-  }
-
-  show() {
-    if (this.shown) {
-      return;
-    }
-
-    this.shown = true;
-    this.overlay.show();
-    this.overlay.fadeIn();
-    this.overlay[0].focus();
-  }
-
-  hide(callback) {
-    if (!this.shown) {
-      return;
-    }
-
-    this.shown = false;
-    this.overlay.fadeOut(700, callback);
-    this.overlay[0].blur();
-  }
-
-}
-
-module.exports = Overlay;
-},{}],4:[function(require,module,exports){
-const EventEmitter = require(5);
+const EventEmitter = require(4);
 
 class View extends EventEmitter {
   /**
@@ -158,7 +119,7 @@ class View extends EventEmitter {
 }
 
 module.exports = View;
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 if (typeof window == "undefined") {
   const Events = require("eve" + "nts"); // noinspection JSDuplicatedDeclaration
 

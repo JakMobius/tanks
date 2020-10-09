@@ -1,11 +1,8 @@
 
-const {execSync} = require('child_process');
 const Compiler = require("../compiler/compiler");
 const Collapser = require("../collapser");
 const Timings = require("../timings");
 const CSSPlugin = require("../compiler/plugins/css/cssplugin");
-const GLSLPlugin = require("../compiler/plugins/glslplugin");
-const path = require("path")
 
 async function compile() {
     let cssPlugin = new CSSPlugin()
@@ -25,11 +22,11 @@ async function compile() {
         await Timings.perform("Compiling hub", async () => {
             await bundle({
                 source: "src/client/hub/index.js",
-                destination: "src/client/hub/scripts/index.js"
+                destination: "src/client/hub/page/scripts/index.js"
             })
         })
 
-        cssPlugin.write(Compiler.path("src/client/hub/styles/style.css"))
+        await cssPlugin.write(Compiler.path("src/client/hub/page/styles/style.css"))
     })
 }
 
@@ -39,9 +36,7 @@ async function compile() {
     await compile()
 
     Timings.begin("Collapsing")
-    await Collapser.collapse("../../src/client/hub/scripts/index.js")
+    await Collapser.collapse(Compiler.path("src/client/hub/page/scripts/index.js"))
     Timings.end()
     Timings.end()
-
-    console.log("\n\n")
 })()

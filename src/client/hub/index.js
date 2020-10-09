@@ -1,5 +1,6 @@
 
-const Overlay = require("../ui/overlay.js")
+/* @load-resource: '../html/style.css' */
+
 const View = require("../ui/view")
 const Dropdown = require("../ui/elements/dropdown/dropdown")
 

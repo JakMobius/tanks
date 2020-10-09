@@ -41,7 +41,7 @@ build/Release
 node_modules/
 jspm_packages/
 
-# TypeScript v1 declaration files
+# TypeScript v1 declaration fs
 typings/
 
 # TypeScript cache
@@ -82,7 +82,7 @@ typings/
 .nuxt
 dist
 
-# Gatsby files
+# Gatsby fs
 .cache/
 # Comment in the public line in if your project uses Gatsby and *not* Next.js
 # https://nextjs.org/blog/next-9-1#public-directory-support
@@ -97,7 +97,7 @@ dist
 # FuseBox cache
 .fusebox/
 
-# DynamoDB Local files
+# DynamoDB Local fs
 .dynamodb/
 
 # TernJS port file
@@ -110,5 +110,9 @@ dist
 out
 *.DS_Store
 build/cache/*
+
+# Not sharing server properties via github
+src/server/preferences.json
+
 =======
 >>>>>>> 29049a358fa30822ec23580ff7098db9e7ef1544

@@ -8,6 +8,7 @@ const PlayerRoomRequestPacket = require("../networking/packets/playerroomrequest
 const PlayerRoomChangePacket = require("../networking/packets/playerroomchangepacket")
 
 const Logger = require("./log/logger")
+const Preferences = require("./preferences/preferences")
 
 class GameSocket {
 

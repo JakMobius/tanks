@@ -8,6 +8,7 @@ const LoadingScene = require("../scenes/loading/loadingscene")
 const RequestFrameLoop = require("../../utils/loop/requestframeloop")
 
 require("../../utils/physicsutils.js").setupPhysics()
+require("/src/client/graphics/drawers/block/types/")
 
 class MapEditor extends Screen {
     constructor(config) {

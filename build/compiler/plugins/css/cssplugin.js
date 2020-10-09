@@ -86,8 +86,8 @@ class CSSPlugin extends Plugin {
         return Array.from(this.compiledResources.values()).join("\n")
     }
 
-    write(destination) {
-        fs.promises.writeFile(destination, this.getString(), 'utf8')
+    async write(destination) {
+        await fs.promises.writeFile(destination, this.getString(), 'utf8')
     }
 }
 

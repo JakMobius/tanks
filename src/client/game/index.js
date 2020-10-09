@@ -1,4 +1,6 @@
 
+/* @load-resource: '../html/style.css' */
+
 var BrowserCheckView = require("../utils/browsercheck/browsercheckview")
 
 window.addEventListener("load", function() {
@@ -10,7 +12,7 @@ function startGame() {
     $(document.body).append(root)
     var game = new Game({
         scale: window.devicePixelRatio,
-        ip: "ws://" + window.location.host + ":25565",
+        ip: "ws://" + window.location.host,
         root: root
     })
 
@@ -22,7 +24,7 @@ function startGame() {
 
 function downloadGameScript() {
     var script = document.createElement("script")
-    script.src = "./game.js"
+    script.src = "scripts/game.js"
     script.onload = startGame
     document.head.appendChild(script)
 }

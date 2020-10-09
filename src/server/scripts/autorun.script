@@ -1,3 +1,4 @@
+service on
 room create -name 'Сильверстоун' -map new/silverstone
 room create -name 'Детище Арсения' -map new/race-150x150
 room create -name 'Пустая карта' -map new/empty
