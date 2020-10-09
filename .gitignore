@@ -114,5 +114,9 @@ build/cache/*
 # Not sharing server properties via github
 src/server/preferences.json
 
+# Not sharing hub and game builds
+src/client/game/page/*
+src/client/hub/page/*
+
 =======
 >>>>>>> 29049a358fa30822ec23580ff7098db9e7ef1544
