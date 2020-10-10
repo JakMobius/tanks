@@ -1,12 +1,12 @@
 /* @load-resource: './play-menu.scss' */
 
-const View = require("../../../../../ui/view")
+const Menu = require("/src/client/ui/menu/menu")
 
-class PlayMenuContainer extends View {
+class PlayMenuContainer extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu nick")
+        this.element.addClass("nick")
         this.titleLabel = $("<div>").css("text-align", "center").addClass("header")
         this.titleLabel.text("ВВЕДИТЕ НИК")
         this.nickInput = $("<input>")

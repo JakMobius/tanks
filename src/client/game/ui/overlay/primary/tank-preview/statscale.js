@@ -1,5 +1,5 @@
 
-const View = require("../../../../../ui/view")
+const View = require("/src/client/ui/view")
 
 class StatScale extends View {
     constructor() {
@@ -39,7 +39,6 @@ class StatScale extends View {
             this.statScale.css("width", "165px")
             this.value.css("left", "165px")
             this.value.text("")
-
         }
     }
 }

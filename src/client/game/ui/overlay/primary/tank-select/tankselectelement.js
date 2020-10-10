@@ -1,7 +1,7 @@
 
-const View = require("../../../../../ui/view")
-const CanvasFactory = require("../../../../../utils/canvasfactory")
-const Sprite = require("../../../../../sprite")
+const View = require("/src/client/ui/view")
+const CanvasFactory = require("/src/client/utils/canvasfactory")
+const Sprite = require("/src/client/sprite")
 
 class TankSelectElement extends View {
 

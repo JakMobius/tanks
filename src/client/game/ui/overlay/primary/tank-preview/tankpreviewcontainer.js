@@ -1,7 +1,7 @@
 /* @load-resource: './tank-preview.scss' */
 
-const View = require("../../../../../ui/view")
 const StatScale = require("./statscale")
+const Menu = require("/src/client/ui/menu/menu")
 
 class Stat {
     constructor(options) {
@@ -20,7 +20,7 @@ class Stat {
     }
 }
 
-class TankPreviewContainer extends View {
+class TankPreviewContainer extends Menu {
 
     static stats = new Map([
         ["damage", new Stat({
@@ -58,7 +58,7 @@ class TankPreviewContainer extends View {
     constructor() {
         super();
 
-        this.element.addClass("menu tankinfo")
+        this.element.addClass("tankinfo")
 
         this.tankPreview = $("<div></div>").addClass("tank-preview")
 

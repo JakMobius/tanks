@@ -1,9 +1,9 @@
 /* @load-resource: './room-select.scss' */
 
-const View = require("../../../../../ui/view")
+const Menu = require("/src/client/ui/menu/menu")
 const Dropdown = require("../../../../../ui/elements/dropdown/dropdown")
 
-class RoomSelectContainer extends View {
+class RoomSelectContainer extends Menu {
     constructor() {
         super();
 

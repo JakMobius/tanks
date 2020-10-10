@@ -1,12 +1,12 @@
 /* @load-resource: './controls.scss' */
 
-const View = require("../../../../../ui/view")
+const Menu = require("/src/client/ui/menu/menu")
 
-class ControlsContainer extends View {
+class ControlsContainer extends Menu {
     constructor(options) {
         super(options);
 
-        this.element.addClass("menu tip")
+        this.element.addClass("tip")
 
         let header = $("<div>").addClass("header").text("Управление")
 

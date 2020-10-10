@@ -1,19 +1,19 @@
 /* @load-resource: './tank-select.scss' */
 
-const View = require("../../../../../ui/view")
-const ClientTank = require("../../../../../tanks/clienttank")
-const SniperTank = require("../../../../../tanks/models/sniper") // Default selected tank
+const Menu = require("/src/client/ui/menu/menu")
+const ClientTank = require("/src/client/tanks/clienttank")
+const SniperTank = require("/src/client/tanks/models/sniper") // Default selected tank
 
 const TankSelectElement = require("./tankselectelement")
-const Camera = require("../../../../../camera")
-const Box2D = require("../../../../../../library/box2d")
-const RenderLoop = require("../../../../../../utils/loop/renderloop")
+const Camera = require("/src/client/camera")
+const Box2D = require("/src/library/box2d")
+const RenderLoop = require("/src/utils/loop/renderloop")
 
-class TankSelectContainer extends View {
+class TankSelectContainer extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu tankselect")
+        this.element.addClass("tankselect")
 
         this.shadowLeft = $("<div>").addClass("shadow left");
         this.shadowRight = $("<div>").addClass("shadow right");
