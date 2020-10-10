@@ -108,7 +108,7 @@ class Compiler {
             Timings.begin("Compiling scripts")
 
             let source = Compiler.path(this.options.source)
-            let cacheFile = Compiler.path(this.options.cacheFile)
+            let cacheFile = this.options.cacheFile ? Compiler.path(this.options.cacheFile) : null
 
             this.compiler = this.createCompiler({
                 source: source,

@@ -13,7 +13,7 @@ class ServiceCommand extends Command {
             }],
             ["hub-only", {
                 hubPage: true,
-                gamePage: true,
+                gamePage: false,
                 rooms: false
             }],
             ["game-only", {

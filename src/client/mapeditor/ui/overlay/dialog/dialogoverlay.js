@@ -1,5 +1,5 @@
 
-const Overlay = require("../../../../ui/overlay")
+const Overlay = require("../../../../ui/overlay/overlay")
 const DialogView = require("./dialogview")
 
 class DialogOverlay extends Overlay {

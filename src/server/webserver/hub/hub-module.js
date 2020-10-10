@@ -7,14 +7,14 @@ class HubModule extends WebserverModule {
     constructor(config) {
         super(config);
 
-        this.resourcesDirectory = path.resolve(__dirname, "../../../client/game/page/")
+        this.resourcesDirectory = path.resolve(__dirname, "../../../client/hub/page/")
 
-        this.router.get("/game/", (req, res, next) => {
-            res.render("game/page/index")
+        this.router.get("/hub/", (req, res, next) => {
+            res.render("hub/page/index")
         })
 
-        this.router.use("/game/styles/", express.static(this.resourcePath("styles")))
-        this.router.use("/game/scripts/", express.static(this.resourcePath("scripts")))
+        this.router.use("/hub/styles/", express.static(this.resourcePath("styles")))
+        this.router.use("/hub/scripts/", express.static(this.resourcePath("scripts")))
     }
 }
 

@@ -1,20 +1,21 @@
-
 /* @load-resource: '../html/style.css' */
 
-const View = require("../ui/view")
+const Menu = require("../ui/menu/menu")
 const Dropdown = require("../ui/elements/dropdown/dropdown")
 
 window.addEventListener("load", function() {
 
     const body = $("body")
 
-    const view = new View()
+    body.css("padding", "20px")
+
+    const view = new Menu()
 
     view.element
         .css("position", "unset")
         .css("width", "200px")
 
-    view.element.addClass("menu expanded")
+    view.element.addClass("expanded")
 
     body.append($("<p>").text("Это страница хаба. Ей срочно нужен дизайн."))
     body.append($("<p>").text("Внизу менюшка, чтобы проверить, что система сборки подшивает нужные файлы"))

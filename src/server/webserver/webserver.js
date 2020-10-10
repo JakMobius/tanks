@@ -27,6 +27,8 @@ class WebServer {
         this.addModule(this.hubModule)
         this.addModule(this.gameModule)
         this.addModule(this.baseModule)
+
+        this.baseModule.enabled = true
     }
 
     addModule(module) {
@@ -37,31 +39,28 @@ class WebServer {
         }
     }
 
-    getModuleIterator() {
+    *getModules() {
         let valueListIterator = this.modules.values()
         let valueList = null
         let valueIterator = null
 
-        return {
-            next: function() {
-                let handle = null
-                 if(valueIterator) {
-                     handle = valueIterator.next()
-                 }
+        while(true) {
+            let handle = null
+            if (valueIterator) {
+                handle = valueIterator.next()
+            }
 
-                while(!handle || handle.done) {
-                    valueList = valueListIterator.next()
-                    if(valueList.done) {
-                        return { done: true, value: undefined }
-                    }
-                    valueIterator = valueList.value.values()
-                    handle = valueIterator.next()
+            while (!handle || handle.done) {
+                valueList = valueListIterator.next()
+                if (valueList.done) {
+                    return
                 }
+                valueIterator = valueList.value.values()
+                handle = valueIterator.next()
+            }
 
-                return {
-                    done: false,
-                    value: handle.value
-                }
+            if (handle.value.enabled) {
+                yield handle.value
             }
         }
     }
@@ -86,7 +85,7 @@ class WebServer {
         this.app.use(this.session)
 
         this.app.use((req, res, next) => {
-            let iterator = this.getModuleIterator()
+            let iterator = this.getModules()
 
             const iterate = () => {
                 let handle = iterator.next()
@@ -97,6 +96,7 @@ class WebServer {
 
                 handle.value.router(req, res, iterate)
             }
+
             iterate()
         })
     }

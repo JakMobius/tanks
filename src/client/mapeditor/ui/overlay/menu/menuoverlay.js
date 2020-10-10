@@ -1,5 +1,5 @@
 
-const Overlay = require("../../../../ui/overlay")
+const Overlay = require("../../../../ui/overlay/overlay")
 const MapSelectContainer = require("./map-list/mapselectcontainer")
 const MapPreviewContainer = require("./map-preview/mappreviewcontainer")
 const DialogOverlay = require("../../overlay/dialog/dialogoverlay")

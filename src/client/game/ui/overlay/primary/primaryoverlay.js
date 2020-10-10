@@ -1,5 +1,5 @@
 
-const Overlay = require("/src/client/ui/overlay")
+const Overlay = require("/src/client/ui/overlay/overlay")
 const ControlsContainer = require("./controls/controlscontainer")
 const PlayMenuContainer = require("./play-menu/playmenucontainer")
 const TankPreviewContainer = require("./tank-preview/tankpreviewcontainer")

@@ -22,12 +22,12 @@ class GLSLPlugin extends Plugin {
     async perform(resources) {
         Timings.begin("Inlining shaders")
 
-        let files = resources.filter(a => a.endsWith(".glsl"))
+        let files = resources.filter(a => a.resource.endsWith(".glsl"))
         let string = "let files = {}\n"
         let cache = await CompileCache.readCache("glsl-compiler")
 
-        for(let shader of files) {
-
+        for(let entry of files) {
+            let shader = entry.resource
             let relative = shader.substr(Compiler.projectDirectory.length)
             let shaderName = path.basename(shader).split(".")[0]
             let text

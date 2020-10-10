@@ -1,6 +1,6 @@
 /* @load-resource: './overlay.scss' */
 
-const EventEmitter = require("../../utils/eventemitter")
+const EventEmitter = require("../../../utils/eventemitter")
 
 class Overlay extends EventEmitter {
     constructor(options) {
@@ -27,6 +27,10 @@ class Overlay extends EventEmitter {
         this.shown = false
         this.overlay.fadeOut(700, callback)
         this.overlay[0].blur()
+    }
+
+    static menu() {
+        return $("<div>").addClass("menu")
     }
 }
 

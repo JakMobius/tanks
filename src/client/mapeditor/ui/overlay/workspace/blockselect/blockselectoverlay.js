@@ -1,5 +1,5 @@
 
-const Overlay = require("/src/client/ui/overlay")
+const Overlay = require("/src/client/ui/overlay/overlay")
 const BlockSelectMenu = require("./blockselectmenu")
 
 class BlockSelectOverlay extends Overlay {

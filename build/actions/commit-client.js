@@ -4,7 +4,6 @@ const Collapser = require("../collapser");
 const Timings = require("../timings");
 const CSSPlugin = require("../compiler/plugins/css/cssplugin");
 const GLSLPlugin = require("../compiler/plugins/glslplugin");
-const path = require("path")
 
 async function compile() {
     let cssPlugin = new CSSPlugin()

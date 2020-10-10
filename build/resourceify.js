@@ -8,12 +8,17 @@ function findResources(string, file) {
     return string.split("\n")
         .map(a => a.trim())
         .filter(a => a.startsWith(prefix) && a.endsWith(suffix))
-        .map(a => a.substr(prefix.length, a.length - prefix.length - suffix.length).trim().replace(/["']/g, ""))
+        .map(a => {
+            return a.substr(prefix.length, a.length - prefix.length - suffix.length).trim().replace(/["']/g, "")
+        })
         .map(a => {
             if (a.startsWith("/"))
                 return path.resolve(Compiler().projectDirectory, a.substr(1))
             return path.resolve(file, "..", a)
-        })
+        }).map(a => { return {
+            "caller": file,
+            "resource": a
+        }})
 }
 
 module.exports = function() {

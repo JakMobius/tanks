@@ -27,11 +27,17 @@ class Server {
     setHubPageActive(active) {
         this.hubPageActive = active
         this.setWebServerActive(this.hubPageActive || this.gamePageActive)
+        if(this.webServer) {
+            this.webServer.hubModule.enabled = active
+        }
     }
 
     setGamePageActive(active) {
         this.gamePageActive = active
         this.setWebServerActive(this.hubPageActive || this.gamePageActive)
+        if(this.webServer) {
+            this.webServer.gameModule.enabled = active
+        }
     }
 
     setWebServerActive(active) {

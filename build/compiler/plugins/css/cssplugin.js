@@ -25,13 +25,22 @@ class CSSPlugin extends Plugin {
         let cache = await CompileCache.readCache("css-compiler")
 
         const files = async (extension, filter) => {
-            let paths = resources.filter(a => a.endsWith(extension))
+            let paths = resources.filter(a => a.resource.endsWith(extension))
 
             if(typeof filter !== "function") filter = null
 
-            for(let path of paths) {
-
+            for(let entry of paths) {
+                let path = entry.resource
                 if(this.compiledResources.has(path)) continue
+
+                let stat = undefined
+
+                stat = await fs.promises.stat(path).catch(() => {})
+
+                if(!stat || !stat.isFile()) {
+                    console.error("Failed to access " + path + " (called from " + entry.caller + ")")
+                    continue
+                }
 
                 let file = await fs.promises.readFile(path, 'utf8')
                 let relative = path.substr(Compiler.projectDirectory.length)
@@ -87,6 +96,12 @@ class CSSPlugin extends Plugin {
     }
 
     async write(destination) {
+        let dirname = path.dirname(destination)
+
+        await fs.promises.access(dirname).catch(async (error) => {
+            await fs.promises.mkdir(dirname)
+        })
+
         await fs.promises.writeFile(destination, this.getString(), 'utf8')
     }
 }

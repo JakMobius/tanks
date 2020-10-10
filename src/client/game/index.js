@@ -1,4 +1,3 @@
-
 /* @load-resource: '../html/style.css' */
 
 var BrowserCheckView = require("../utils/browsercheck/browsercheckview")

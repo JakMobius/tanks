@@ -11,7 +11,7 @@ class BootCommand extends Command {
             type: "key",
             name: "script",
             aliases: ["s"],
-            description: "Выполнить скрипт(ы) после запуска сервера"
+            description: "Run script(-s) after server start"
         }))
 
         this.parsedFlags = null
@@ -37,7 +37,7 @@ class BootCommand extends Command {
     }
 
     getName() {
-        return "Команда запуска сервера";
+        return "Server boot command";
     }
 }
 
