@@ -1,14 +1,18 @@
 
 const Server = require("../src/server/server.js")
 const fs = require("fs")
-const LibraryLoader = require("../src/server/misc/libraryLoader")
 const Command = require("../src/server/commands/command.js")
 const mocha = require("mocha")
+const chai = require("chai")
+const path = require("path")
 
+const assert = chai.assert
 const describe = mocha.describe
 const it = mocha.it
 const before = mocha.before
 const after = mocha.after
+
+const serverPath = path.join(__dirname, "../src/server");
 
 describe('Server', function() {
 
@@ -19,7 +23,7 @@ describe('Server', function() {
         server = new Server({
             silent: true
         })
-        server.listen(25566)
+        server.bindClientPort(25566)
         server.terminate()
         server.console.logger.addDestination({
             log: function(text) {
@@ -42,12 +46,12 @@ describe('Server', function() {
     })
 
     describe('Console', function () {
-        let list = fs.readdirSync(LibraryLoader.path + "commands")
+        let list = fs.readdirSync(path.join(serverPath, "commands"))
         let commands = new Map()
 
         it("should have all command fs compiling", function() {
             for(let file of list) {
-                let command = require(LibraryLoader.path + "commands/" + file)
+                let command = require(path.join(serverPath, "commands", file))
 
                 if (command instanceof Command) {
                     // Checking all getters
@@ -80,7 +84,7 @@ describe('Server', function() {
                 server.console.evaluate("help")
                 assert.isNotEmpty(logs, "Room command did not print any text");
 
-                let list = fs.readdirSync(LibraryLoader.path + "commands")
+                let list = fs.readdirSync(path.join(serverPath, "commands"))
                 let log = logs.join("\n")
 
                 for(let entry of commands.entries()) {
@@ -103,7 +107,7 @@ describe('Server', function() {
                 assert.isNotEmpty(logs, "Room command did not print any text");
 
                 let log = logs.join("\n")
-                let maps = fs.readdirSync(LibraryLoader.path + "maps").map((name) => {
+                let maps = fs.readdirSync(path.join(serverPath, "maps")).map((name) => {
                     let parts = name.split(".")
                     if(parts.length > 1) parts.pop() // Removing extension
                     return parts.join(".")

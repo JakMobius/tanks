@@ -1,7 +1,7 @@
 
 const ServerBullet = require("../serverbullet")
 const BulletModelMine = require("../../../../entity/bullet/models/mine")
-const distToSegment = require("../../../misc/distToSegment")
+const Utils = require("/src/utils/utils")
 
 class ServerBulletMine extends ServerBullet {
     constructor(model) {
@@ -9,6 +9,8 @@ class ServerBulletMine extends ServerBullet {
 
         this.startVelocity = 0
         this.explodePower = 15
+        this.explodeDistance = 5
+        this.squareExplodeDistance = this.explodeDistance * this.explodeDistance
     }
 
     tick(dt) {
@@ -41,9 +43,9 @@ class ServerBulletMine extends ServerBullet {
                     let x2 = previousVertex.x * cos - previousVertex.y * sin + x
                     let y2 = previousVertex.x * sin + previousVertex.y * cos + y
 
-                    let dist = distToSegment(a, b, x1, y1, x2, y2)
+                    let dist = Utils.distToSegmentSquared(a, b, x1, y1, x2, y2)
 
-                    if(dist < 5) {
+                    if(dist < this.squareExplodeDistance) {
                         this.die()
                         return
                     }

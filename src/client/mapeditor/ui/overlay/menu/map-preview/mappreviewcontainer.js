@@ -1,6 +1,6 @@
 /* @load-resource: './map-preview.scss' */
 
-const View = require("../../../../../ui/view")
+const Menu = require("../../../../../ui/menu/menu")
 const MapStorage = require("../../../../mapstorage");
 const MapDrawer = require("../../../../../graphics/drawers/mapdrawer")
 const Camera = require("../../../../../camera")
@@ -8,7 +8,7 @@ const GameMap = require("../../../../../../utils/map/gamemap")
 const Box2D = require("../../../../../../library/box2d")
 const Sprite = require("../../../../../sprite")
 
-class MapPreviewContainer extends View {
+class MapPreviewContainer extends Menu {
     constructor() {
         super();
 

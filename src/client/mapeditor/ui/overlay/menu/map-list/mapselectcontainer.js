@@ -1,11 +1,11 @@
 /* @load-resource: './map-list.scss' */
 
-const View = require("../../../../../ui/view")
+const Menu = require("../../../../../ui/menu/menu")
 const MapStorage = require("../../../../mapstorage")
 const DragListener = require("../../../element/dragoverlay")
 const Utils = require("../../../../../../utils/utils");
 
-class MapSelectContainer extends View {
+class MapSelectContainer extends Menu {
     constructor(options) {
         super(options);
 
@@ -44,7 +44,7 @@ class MapSelectContainer extends View {
 
                 this.saveMaps()
             } catch(e) {
-                console.error(e)
+                console.log(e)
             }
         })
 
@@ -64,7 +64,7 @@ class MapSelectContainer extends View {
             MapStorage.write(this.maps)
             this.refreshMaps()
         } catch(e) {
-            console.error(e)
+            console.log(e)
             return false
         }
         return true

@@ -33,7 +33,7 @@ class MapStorage {
                     result.push(this.readMap(bytes))
                 }
             } catch (ignored) {
-                console.error(ignored)
+                console.log(ignored)
                 return []
             }
             return result

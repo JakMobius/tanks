@@ -11,7 +11,7 @@ function startGame() {
     $(document.body).append(root)
     var game = new Game({
         scale: window.devicePixelRatio,
-        ip: "ws://" + window.location.host,
+        ip: "ws://" + window.location.host + "/game-socket",
         root: root
     })
 

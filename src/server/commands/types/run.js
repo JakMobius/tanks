@@ -5,7 +5,7 @@ class RunCommand extends Command {
 
     onPerform(args) {
         if(args.length !== 1) {
-            this.logger.log("Использование: " + this.getUsage())
+            this.console.logger.log("Использование: " + this.getUsage())
             return
         }
 
@@ -13,7 +13,7 @@ class RunCommand extends Command {
     }
 
     onTabComplete(args) {
-        super.onTabComplete(args);
+        return super.onTabComplete(args);
     }
 
     getName() {

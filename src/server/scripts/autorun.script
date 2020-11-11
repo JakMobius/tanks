@@ -1,4 +1,4 @@
-service on
-room create -name 'Сильверстоун' -map new/silverstone
-room create -name 'Детище Арсения' -map new/race-150x150
-room create -name 'Пустая карта' -map new/empty
+service game-only
+room create -name 'Сильверстоун' -map silverstone
+room create -name 'Детище Арсения' -map race-150x150
+room create -name 'Пустая карта' -map empty

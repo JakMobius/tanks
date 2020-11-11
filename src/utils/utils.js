@@ -37,6 +37,22 @@ class Utils {
         return parts.join(".")
     }
 
+    static dist2(vx, vy, wx, wy) {
+        return (vx - wx) ** 2 + (vy - wy) ** 2
+    }
+
+    static distToSegmentSquared(px, py, vx, vy, wx, wy) {
+        const l2 = this.dist2(vx, vy, wx, wy);
+        if (l2 === 0) return this.dist2(px, py, vx, vy);
+        let t = ((px - vx) * (wx - vx) + (py - vy) * (wy - vy)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return this.dist2(px, py, vx + t * (wx - vx), vy + t * (wy - vy));
+    }
+
+    static distToSegment(px, py, vx, vy, wx, wy) {
+        return Math.sqrt(this.distToSegmentSquared(px, py, vx, vy, wx, wy));
+    }
+
     static random(min, max) {
         return Math.random() * (max - min) + min
     }

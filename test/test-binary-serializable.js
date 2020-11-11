@@ -5,6 +5,7 @@ const BinaryDecoder = require("../src/serialization/binary/binarydecoder")
 const mocha = require("mocha")
 const chai = require("chai")
 
+const assert = chai.assert
 const describe = mocha.describe
 const it = mocha.it
 const before = mocha.before

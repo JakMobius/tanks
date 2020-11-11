@@ -47,7 +47,7 @@ async function compile() {
 
 (async function perform() {
     if(process.argv.length < 3) {
-        console.error("Error: Please, provide dist path")
+        console.log("Error: Please, provide dist path")
         return;
     }
 
@@ -71,7 +71,7 @@ async function compile() {
     await fs.rmdir(commitPath, { recursive: true })
     await fs.mkdir(commitPath)
 
-    await insertDirectory(Compiler.path("src/client/copy"), assetsPath)
+    await insertDirectory(Compiler.path("src/client/html"), assetsPath)
     await insertDirectory(Compiler.path("dist/mapeditor"), commitPath)
     await fs.copyFile(Compiler.path("src/client/mapeditor/index.html"), path.resolve(commitPath, "index.html"))
 

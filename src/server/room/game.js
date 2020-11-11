@@ -1,7 +1,5 @@
 const Team = require("../team");
 const Color = require("../../utils/color");
-const GameMap = require('../../utils/map/gamemap')
-const Box2D = require("../../library/box2d")
 const Player = require("../../utils/player")
 const ServerTank = require("../tanks/servertank")
 const ServerGameWorld = require("../servergameworld")
@@ -154,7 +152,6 @@ class Game extends Room {
         this.tps = tps
         this.spt = 1 / this.tps
         this.loop.interval = 1000 / this.tps
-        this.bonusCreationInterval = 25 * this.tps
     }
 
     speedupGame(multiplier) {
@@ -170,7 +167,7 @@ class Game extends Room {
     broadcastPlayers(client) {
         for (let c of this.clients.values()) {
             if(c.data.player) {
-                new PlayerJoinPacket(c.data.player, c.data.player.tank.model).sendTo(client)
+                new PlayerJoinPacket(c.data.player, c.data.player.tank.model).sendTo(client.connection)
             }
         }
     }
@@ -187,13 +184,13 @@ class Game extends Room {
             if (c.data.player != null && c.data.player.id === player.id) {
                 let packet = new PlayerSpawnPacket(player, player.tank.model)
 
-                packet.sendTo(c)
+                packet.sendTo(c.connection)
             } else {
                 if(!joinPacket) {
                     joinPacket = new PlayerJoinPacket(player, player.tank.model)
                 }
 
-                joinPacket.sendTo(c)
+                joinPacket.sendTo(c.connection)
             }
         }
     }
@@ -212,10 +209,10 @@ class Game extends Room {
             this.loop.start()
         }
 
-        new MapPacket(this.world.map).sendTo(client)
+        new MapPacket(this.world.map).sendTo(client.connection)
         this.broadcastPlayers(client)
 
-        new EntityCreatePacket(Array.from(this.world.entities.values())).sendTo(client)
+        new EntityCreatePacket(Array.from(this.world.entities.values())).sendTo(client.connection)
     }
 
     clientDisconnected(client) {
@@ -266,75 +263,6 @@ class Game extends Room {
         player.tank.model.body.SetLinearVelocity(v)
     }
 
-    createExplosion(x, y, power, player) {
-        const pos = new Box2D.b2Vec2(x, y)
-        const force = power * 10000
-
-        for (let client of this.clients.values()) {
-            const p = client.data.player
-            if (!p) continue
-
-            const position = p.tank.model.body.GetPosition()
-
-            const dx = position.x - x
-            const dy = position.y - y
-
-            let dist = dx ** 2 + dy ** 2
-
-            dist = Math.max(dist, 100)
-
-
-            const impulse = force / dist // / Math.sqrt(dist)
-            const damage = power / Math.sqrt(dist) * 4 - 0.7
-
-            if (damage > 0) {
-                p.tank.damage(damage, player)
-                p.tank.model.body.ApplyImpulse(new Box2D.b2Vec2(dx * impulse, dy * impulse), pos)
-            }
-        }
-
-        for (let entity of this.world.entities.values()) {
-
-            const dx = entity.model.x - x
-            const dy = entity.model.y - y
-
-            if (dx === 0 && dy === 0) continue;
-
-            const dist = Math.sqrt(dx ** 2 + dy ** 2)
-
-            if (power / (dist + 1) > entity.explodeResistance) {
-                (function(self, entity) {
-                    self.loop.scheduleTask(() => entity.die(), dist / 200)
-                })(this, entity)
-            }
-        }
-
-        const damageRadius = power / 2
-
-        const cx = x / GameMap.BLOCK_SIZE
-        const cy = y / GameMap.BLOCK_SIZE
-        const x1 = Math.floor(cx - damageRadius)
-        const x2 = Math.ceil(cx + damageRadius)
-        const y1 = Math.floor(cy - damageRadius)
-        const y2 = Math.ceil(cy + damageRadius)
-
-        for (let bx = x1; bx < x2; bx++) {
-            for (let by = y1; by < y2; by++) {
-                const b = this.world.map.getBlock(bx, by)
-
-                if (b && b.constructor.isSolid) {
-                    const dist = Math.sqrt((by - cy) ** 2 + (bx - cx) ** 2)
-                    const damage = (damageRadius / (dist + 1) - 1) * 1000
-                    if (damage > 0) {
-                        this.world.map.damageBlock(bx, by, damage)
-                    }
-                }
-            }
-        }
-
-        //this.broadcast(new MapEffectPacket(x, y, power))
-    }
-
     /**
      *
      * @param msg {BinaryPacket}
@@ -342,12 +270,7 @@ class Game extends Room {
     broadcast(msg) {
         if(msg.shouldSend())
             for (let client of this.clients.values())
-                msg.sendTo(client)
-    }
-
-    playerDead(player) {
-        const position = player.tank.model.body.GetPosition()
-        this.createExplosion(position.x, position.y, 20)
+                msg.sendTo(client.connection)
     }
 
     getFreeTeam() {

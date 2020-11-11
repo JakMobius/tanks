@@ -2,7 +2,7 @@
 Browser action game project
 
 #### Please, note that project is under heavy development now
-This repository should not be treated as a real finished game for now. Some features listed in this readme are likely being refactored doesn't work right now. (For example, you should have an HTTP server to access the map editor. Ugh)
+This repository should not be treated as a real finished game for now. Some features listed in this readme are likely being refactored and doesn't work right now. (For example, you should have an HTTP server to access the map editor. Ugh)
 
 However, you can contribute and help make this game more and more awesome `:)`
 
@@ -42,9 +42,42 @@ npm install
   ```
    By default, this command forces server to run script called `autorun`. This script is stored as `src/server/scripts/autorun.script`.
 - To provide some custom command line arguments, run the following command:
-      node src/server/main.js (your arguments)
+  ```
+  node src/server/main.js (your arguments)
+  ```
 ### Server command line arguments
-- For now, there is only `-s (script name)` command line flag, which is used for running scripts as soon as server starts. Server scripts are located under `src/server/scripts` directory.
+- `-script <script name>`
+    
+    This flag is used for running scripts as soon as server starts. Server scripts are located under `src/server/scripts` directory.
+    
+    This flag can also be used with `-s` alias.
+    
+- `-preference-string <key>=<value>`
+
+    This flag is used for setting up your server preferences right before server starts. For example, if your database is located at a new address, you should use this flag as following:
+  ```
+  -preference-string database.url=mongodb://new-database-host:27017
+  ```
+  
+  This flag can also be used with`-ps` alias.
+  
+  You should only use this flag when you want to overwrite a string. If you want to set up a port or something else that is not a string, use one of the flags listed below
+- `-preference-number <key>=<value>`
+    
+    Use this flag to overwrite setting with a number
+    
+    This flag can also be used with`-pn` alias.
+    
+- `-preference-boolean <key>=<value>`
+    
+    Use this flag to overwrite setting with a boolean
+    
+    Value can either be:
+    - `yes`, `true` or `1` - mean `true`
+    - `no`, `false` or `0` - mean `false`
+    
+    This flag can also be used with`-pb` alias.
+    
 ### Configuring the server
 - To configure the server port and database credentials, edit the `src/server/preferences.json` file. If this file does not exist, start the server once. The default configuration file will be created.
 

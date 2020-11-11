@@ -42,9 +42,12 @@ class WebServer {
     *getModules() {
         let valueListIterator = this.modules.values()
         let valueList = null
+
+        /** @type {Iterator | null} */
         let valueIterator = null
 
         while(true) {
+            /** @type {IteratorYieldResult} */
             let handle = null
             if (valueIterator) {
                 handle = valueIterator.next()

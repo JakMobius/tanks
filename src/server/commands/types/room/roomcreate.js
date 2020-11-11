@@ -33,7 +33,7 @@ class RoomCreateCommand extends Command {
     onPerform(args) {
         let logger = this.console.logger
 
-        if(!this.console.server.socket) {
+        if(!this.console.server.gameSocket) {
             logger.log("§F00;Для выполнения этой команды необходимо запустить игровой сокет")
             logger.log("§777; ⭑ §;Чтобы управлять модулями сервера, используйте команду service")
             return;
@@ -58,7 +58,7 @@ class RoomCreateCommand extends Command {
         let gameName = mapName
         if(flags.has("name")) gameName = flags.get("name")[0]
 
-        if (this.console.server.socket.games.get(gameName)) {
+        if (this.console.server.gameSocket.games.get(gameName)) {
             logger.log(
                 "§F00;Ошибка: комната '" + gameName + "' уже существует\n" +
                 "§777; ⭑ §;Чтобы управлять существующей комнатой, используйте room view\n" +
@@ -88,7 +88,7 @@ class RoomCreateCommand extends Command {
             map: map
         })
 
-        this.console.server.socket.games.set(gameName, game)
+        this.console.server.gameSocket.games.set(gameName, game)
 
         logger.log("§0F0; Комната '" + gameName + "' создана")
         logger.log("§777; ⭑ §;Чтобы управлять комнатой, используйте 'room view " + gameName + "'")

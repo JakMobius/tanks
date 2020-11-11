@@ -1,0 +1,2 @@
+service game-only
+room create -name 'Сильверстоун' -map silverstone

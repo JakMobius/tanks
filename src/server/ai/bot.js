@@ -6,7 +6,7 @@ class GameBot extends Client {
 		super(config)
 		this.server = null
 		this.lifetime = 1
-		this.connection = new AIConnection()
+		this.websocket = new AIConnection()
 		this.server = null
 		this.tankid = 7
 		this.nick = null
@@ -20,13 +20,13 @@ class GameBot extends Client {
 
 	connectToRoom(room) {
 		this.server.configureClient(this, room)
-		this.connection.tell({
+		this.websocket.tell({
 			"cmd": "cfg",
 			"t": this.tankid,
 			"n": this.nick
 		})
 
-		this.connection.tell({
+		this.websocket.tell({
 			"cmd": "nhg"
 		})
 
@@ -49,7 +49,7 @@ class GameBot extends Client {
 			self.ticksToRespawn--
 
 			if(self.ticksToRespawn <= 0) {
-				this.connection.tell({
+				this.websocket.tell({
 					 cmd: "spn"
 				 })
 			}

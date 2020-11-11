@@ -1,6 +1,8 @@
 const JsonSerializable = require("../src/serialization/json/serializable")
 const mocha = require("mocha")
+const chai = require("chai")
 
+const assert = chai.assert
 const describe = mocha.describe
 const it = mocha.it
 const before = mocha.before

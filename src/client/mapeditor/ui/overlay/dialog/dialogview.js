@@ -1,11 +1,11 @@
 
-const View = require("../../../../ui/view")
+const Menu = require("../../../../ui/menu/menu")
 
-class DialogView extends View {
+class DialogView extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu dialog")
+        this.element.addClass("dialog")
         this.header = $("<div>").addClass("title")
         this.message = $("<div>").addClass("message")
         this.footer = $("<div>").addClass("footer")

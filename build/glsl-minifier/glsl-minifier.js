@@ -16,14 +16,14 @@ const optimize = (inputSource, isVertexShader) => {
     const optimizedSourceCode = optimizer(isVertexShader)(inputSource, 100, isVertexShader);
 
     if (optimizedSourceCode.includes('Error:')) {
-        console.error(optimizedSourceCode);
-        console.error('Exiting glsl-minifier!');
+        console.log(optimizedSourceCode);
+        console.log('Exiting glsl-minifier!');
         process.exit(-1);
     }
 
     function handleError(where, error) {
-        console.error(where + " failure!")
-        console.error(error)
+        console.log(where + " failure!")
+        console.log(error)
         process.exit(-1)
     }
 

@@ -16,7 +16,7 @@ const BinaryDecoder = require("../serialization/binary/binarydecoder")
  * {@link BinaryPacket#fromBinary fromBinary} static function, you can
  * read data from the decoder and return an instance of your package.
  *
- * To create a context packet, you only need to overwrite the
+ * To create a contextual packet, you only need to overwrite the
  * {@link BinaryPacket#typeName typeName} static function.
  * {@link BinaryPacket} itself will take care of instantiating your package
  * and writing the decoder to the {@link BinaryPacket.decoder decoder}
@@ -80,20 +80,17 @@ class BinaryPacket extends BinarySerializable {
     }
 
     /**
-     * Sends the packet to WebSocket client. When called once, packet
+     * Sends the packet to {@link AbstractConnection}. When called once, packet
      * get compiled and can no longer change its data
-     * @param client The packet receiver.
+     * @param connection {AbstractConnection} The packet receiver.
      */
 
-    sendTo(client) {
-        if(!this.shouldSend()) {
-            return
-        }
-        if(client.connection.readyState !== 1) {
+    sendTo(connection) {
+        if(!this.shouldSend() || !connection.isReady()) {
             return
         }
 
-        client.connection.send(this.getData())
+        connection.send(this)
     }
 
     shouldSend() {

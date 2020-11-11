@@ -2134,7 +2134,7 @@ class Screen extends Node {
         screen.destroy();
       });
       err = err || new Error('Uncaught Exception.');
-      console.error(err.stack ? err.stack + '' : err + '');
+      console.log(err.stack ? err.stack + '' : err + '');
       nextTick(function() {
         process.exit(1);
       });
@@ -2167,7 +2167,7 @@ class Screen extends Node {
       screen.destroy();
     });
     err = err || new Error('Uncaught Exception.');
-    console.error(err.stack ? err.stack + '' : err + '');
+    console.log(err.stack ? err.stack + '' : err + '');
     nextTick(function() {
       process.exit(1);
     });

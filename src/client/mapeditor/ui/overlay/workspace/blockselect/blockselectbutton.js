@@ -1,4 +1,3 @@
-/* @load-resource: '/src/client/ui/overlay.scss' */
 /* @load-resource: './block-select.scss' */
 
 const View = require("/src/client/ui/view")

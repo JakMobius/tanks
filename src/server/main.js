@@ -8,53 +8,90 @@ const DB = require("./db/db")
 const Logger = require("./log/logger")
 const Console = require("./console/console")
 const BootCommand = require("./commands/bootcommand")
-const Chalk = require("chalk")
 const Server = require("./server")
 const Preferences = require("./preferences/preferences")
 const packageJson = require('../../package.json');
+const url = require("url");
+
+async function initDatabase() {
+    Logger.global.log("Connecting to database")
+
+    if(Preferences.boolean("database.enabled")) {
+        DB.instance = new DB()
+        try {
+            await DB.instance.connect()
+        } catch (error) {
+            Logger.global.log("Failed to connect to database")
+            Logger.global.log(error)
+        }
+    }
+}
+
+async function configureClusterCommunication(server) {
+    if(Preferences.boolean("cluster.enabled")) {
+        let clusterPortSettingPath = "cluster.hub-port"
+        let clusterPort
+        const clusterPortSetting = Preferences.value(clusterPortSettingPath)
+
+        if(clusterPortSetting === "inherit-game-port") {
+            clusterPort = server.clientPort
+        } else {
+            Preferences.validatePort(clusterPortSetting, clusterPortSettingPath)
+            clusterPort = Number(clusterPortSetting)
+        }
+
+        server.setClusterPort(clusterPort)
+
+        let hubUrl = new url.URL(Preferences.string("cluster.hub-address"))
+
+        if(hubUrl.port === "") hubUrl.port = String(clusterPort)
+        hubUrl.pathname = "/cluster-link"
+
+        server.setSocketServerIP(hubUrl.href)
+    }
+}
 
 async function initialize() {
 
     await Preferences.read()
 
-    const console = new Console()
-    console.createWindow()
+    const serverConsole = new Console()
+    serverConsole.createWindow()
 
-    const bootCommand = new BootCommand({ console: console })
-    console.callHandle(bootCommand, process.argv)
-
-    const port = Preferences.value("port")
-
-    if(!Number.isInteger(port) || port < 0 || port > 65535) {
-        throw new Error("port setting should be integer in 0...65535 range")
-    }
-
-    Logger.global.log("Connecting to database")
-
-    DB.instance = new DB()
     try {
-        await DB.instance.connect()
-    } catch(error) {
-        Logger.global.log("Failed to connect to database")
-        Logger.global.log(error)
-    }
+        const bootCommand = new BootCommand({
+            console: serverConsole
+        })
+        serverConsole.callHandle(bootCommand, process.argv)
 
-    const server = new Server()
-    server.bindPort(port)
-    console.server = server
-    bootCommand.runPostInit()
+        Preferences.override(bootCommand.preferencesOverride)
+
+        await initDatabase()
+
+        const port = Preferences.port("port")
+        const server = new Server()
+        server.setClientPort(port)
+        server.console = serverConsole
+        serverConsole.server = server
+
+        await configureClusterCommunication(server)
+
+        bootCommand.runPostInit()
+    } catch(e) {
+        serverConsole.window.screen.destroy()
+        throw e
+    }
 }
 
 const time = Date.now()
 
-initialize().catch(err => {
-    console.error("Failed to start server")
-    console.error(err)
-    process.exit(0)
-}).then(() => {
+initialize().then(() => {
     Logger.global.log(
         `§0F0;Server v${packageJson.version} has been started successfully §444;(${(Date.now() - time) / 1000}s)\n` +
         `"777; ⭑ §;Type \"help\" for more information`
     )
+}).catch(e => {
+    console.error("Failed to start server")
+    console.error(e)
 })
 

@@ -8,6 +8,7 @@ const ClientTank = require("../../tanks/clienttank.js")
 const EventContainer = require("../../ui/overlay/events/eventcontainer")
 const ClientGameWorld = require("/src/client/game/clientgameworld")
 
+const BrowserClient = require("../../networking/browser-client")
 const MapPacket = require("/src/networking/packets/mappacket")
 const PlayerJoinPacket = require("/src/networking/packets/playerjoinpacket")
 const PlayerSpawnPacket = require("/src/networking/packets/playerspawnpacket")
@@ -32,7 +33,6 @@ const TankEffectModel = require("/src/effects/tank/tankeffectmodel")
 const ClientTankEffect = require("/src/client/effects/tank/clienttankeffect")
 const ClientWorldEffect = require("/src/client/effects/world/clientworldeffect")
 const ControlPanel = require("../ui/controlpanel")
-const Client = require("../../networking/client")
 const Camera = require("../../camera")
 const Keyboard = require("../../controls/interact/keyboardcontroller.js")
 const PrimaryOverlay = require("../ui/overlay/primary/primaryoverlay")
@@ -79,7 +79,7 @@ class GameScene extends Scene {
 
         this.playerControls.on("respawn", () => {
             if (this.world && this.world.player.tank) {
-                this.client.send(new PlayerRespawnPacket())
+                new PlayerRespawnPacket().sendTo(this.client.connection)
             }
         })
 
@@ -90,7 +90,7 @@ class GameScene extends Scene {
         this.setupUpdateLoop()
 
         this.alive = false
-        this.client = new Client({ ip: this.screen.config["ip"] })
+        this.client = new BrowserClient({ ip: this.screen.config["ip"] })
 
         this.mapDrawer = new MapDrawer(this.camera, this.screen.ctx)
         this.particleProgram = new ParticleProgram("particle-drawer-program", this.screen.ctx)
@@ -119,11 +119,11 @@ class GameScene extends Scene {
                 }
             }
 
-            this.client.send(new PlayerConfigPacket(nick, tank.getModel()))
+            new PlayerConfigPacket(nick, tank.getModel()).sendTo(this.client.connection)
         })
 
         this.overlay.roomSelectContainer.on("select", (room) => {
-            this.client.send(new PlayerRoomRequestPacket(room))
+            new PlayerRoomRequestPacket(room).sendTo(this.client.connection)
         })
 
         this.keyboard.keybinding("Escape", () => {
@@ -146,7 +146,7 @@ class GameScene extends Scene {
         const update = () => {
             this.screen.loop.scheduleTask(update, this.controlsUpdateInterval)
             if(this.world && this.world.player && this.world.player.tank.model.controls.shouldUpdate()) {
-                this.client.send(new PlayerControlsPacket(this.world.player.tank.model.controls))
+                new PlayerControlsPacket(this.world.player.tank.model.controls).sendTo(this.client.connection)
             }
         }
 
@@ -301,7 +301,7 @@ class GameScene extends Scene {
             }
         })
 
-        this.chatContainer.on("chat", (text) => this.client.send(new PlayerChatPacket(text)))
+        this.chatContainer.on("chat", (text) => new PlayerChatPacket(text).sendTo(this.client.connection))
         this.chatContainer.on("input-focus", () => {
             this.keyboard.stopListening()
         })

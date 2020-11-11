@@ -10,10 +10,10 @@ class RoomViewCommand extends Command {
         }
 
         let id = args[0]
-        let world = this.console.server.games.get(id)
+        let world = this.console.server.gameSocket.games.get(id)
 
         if (!world) {
-            logger.log("Комнаты '" + id + "' не существует")
+            logger.log("No such room: '" + id)
             return
         }
 
@@ -27,7 +27,7 @@ class RoomViewCommand extends Command {
         if(args.length === 1) {
             let result = []
 
-            for(let game of this.console.server.games.keys()) {
+            for(let game of this.console.server.gameSocket.games.keys()) {
                 if(game.startsWith(args[0])) {
                     result.push(game)
                 }
@@ -48,7 +48,7 @@ class RoomViewCommand extends Command {
     }
 
     getDescription() {
-        return "Переключиться на комнату"
+        return "Switch to room"
     }
 }
 

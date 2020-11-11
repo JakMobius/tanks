@@ -19,6 +19,27 @@ class CSSPlugin extends Plugin {
         this.compiledResources = new Map()
     }
 
+    async checkFilePath(entry) {
+        try {
+            if(!(await fs.promises.stat(entry.resource)).isFile()) {
+                console.error("CSSPlugin failed to load shader because specified path is not a file");
+                console.error(this.formatEntryForError(entry));
+                return false
+            }
+        } catch(e) {
+            console.error("CSSPlugin ecountered " + e.code + " while accessing the file");
+            console.error(this.formatEntryForError(entry));
+            return false
+        }
+
+        return true
+    }
+
+    formatEntryForError(entry) {
+        return  " Requested path: " + path.relative(Compiler.projectDirectory, entry.resource) + "\n" +
+                " Caller path:    " + path.relative(Compiler.projectDirectory, entry.caller)
+    }
+
     async perform(resources) {
         Timings.begin("Compiling stylesheets")
 
@@ -30,29 +51,21 @@ class CSSPlugin extends Plugin {
             if(typeof filter !== "function") filter = null
 
             for(let entry of paths) {
-                let path = entry.resource
-                if(this.compiledResources.has(path)) continue
+                let resourcePath = entry.resource
+                if(this.compiledResources.has(resourcePath)) continue
+                if(!await this.checkFilePath(entry)) continue;
 
-                let stat = undefined
-
-                stat = await fs.promises.stat(path).catch(() => {})
-
-                if(!stat || !stat.isFile()) {
-                    console.error("Failed to access " + path + " (called from " + entry.caller + ")")
-                    continue
-                }
-
-                let file = await fs.promises.readFile(path, 'utf8')
-                let relative = path.substr(Compiler.projectDirectory.length)
+                let file = await fs.promises.readFile(resourcePath, 'utf8')
+                let relative = resourcePath.substr(Compiler.projectDirectory.length)
 
                 if(filter !== null) {
-                    if(await CompileCache.shouldUpdate(path, cache)) {
+                    if(await CompileCache.shouldUpdate(resourcePath, cache)) {
                         Timings.begin("Compiling '" + relative + "'")
-                        file = await filter(path, file)
-                        CompileCache.updateFile(path, cache, file)
+                        file = await filter(resourcePath, file)
+                        CompileCache.updateFile(resourcePath, cache, file)
                     } else {
                         Timings.begin("Reading '" + relative + "' from cache")
-                        file = CompileCache.readCachedFile(path, cache)
+                        file = CompileCache.readCachedFile(resourcePath, cache)
                     }
                 } else {
                     Timings.begin("Inlining '" + relative + "'")
@@ -63,7 +76,7 @@ class CSSPlugin extends Plugin {
                     content: file
                 })
 
-                this.compiledResources.set(path, value)
+                this.compiledResources.set(resourcePath, value)
 
                 Timings.end()
             }
@@ -98,9 +111,23 @@ class CSSPlugin extends Plugin {
     async write(destination) {
         let dirname = path.dirname(destination)
 
-        await fs.promises.access(dirname).catch(async (error) => {
+        try {
+            let stat = await fs.promises.stat(dirname);
+            if(!stat.isDirectory()) {
+                console.error("Invalid target path: " + path.relative(Compiler.projectDirectory, destination))
+                return
+            }
+
+            await fs.promises.writeFile(destination, this.getString(), 'utf8')
+            return
+        } catch(e) {}
+
+        try {
             await fs.promises.mkdir(dirname)
-        })
+        } catch(e) {
+            console.error(e)
+            return
+        }
 
         await fs.promises.writeFile(destination, this.getString(), 'utf8')
     }

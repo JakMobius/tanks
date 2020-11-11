@@ -98,14 +98,15 @@ class PrimaryOverlay extends Overlay {
     show() {
         if(this.shown) return
         super.show()
-        this.game.client.send(new RoomListRequestPacket(true))
+        new RoomListRequestPacket(true).sendTo(this.game.client.connection)
         this.tankSelectMenu.loop.start()
     }
 
     hide(callback) {
         if(!this.shown) return
         super.hide(callback)
-        this.game.client.send(new RoomListRequestPacket(false))
+
+        new RoomListRequestPacket(false).sendTo(this.game.client.connection)
         this.tankSelectMenu.loop.stop()
     }
 }

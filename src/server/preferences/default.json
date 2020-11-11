@@ -1,18 +1,50 @@
 /*
-  Server preferences file.
-  JSON5 parser is used for parsing this file,
+  Server preferences file. JSON5 parser is used for parsing this file,
   so C-style comments are allowed here.
 */
 
 {
-  // Determines which port to bind for both websocket and express server
-  "port": 25565,
+	// Determines which port to bind for both websocket and express server
+	"port": 25565,
 
-  // Credentials for mongodb database
-  "database": {
-    "url": "mongodb://localhost:27017/",
-    "user": "admin",
-    "password": "admin",
-    "db": "tanks"
-  }
+	// Credentials for mongodb database
+	"database": {
+		"enabled": false,
+		"url": "mongodb://localhost:27017/",
+		"user": "admin",
+		"password": "admin",
+		"db": "tanks"
+	},
+
+	// Settings for the cluster communication mechanism
+	"cluster": {
+		// If your system consists of several servers, enable this option.
+		"enabled": false,
+
+		// When your servers runs in "game-only" or "socket-only" mode,
+		// it will try to communicate with the hub with this address.
+		// When the port is not specified, the port specified in the
+		// hub-port option will be used
+		"hub-address": "ws://localhost",
+
+		// In order to prevent unauthorised access to the cluster
+		// communication system, specify here the unique key. It must match
+		// on all servers.
+		"hub-access-hey": "please change this line to your unique key",
+
+		// When your server runs in "hub-only" or "on" mode, it will receive
+		// connections from another clusters of your system. Here you can
+		// specify, if different port should be used for this purpose.
+
+		// Type "inherit-game-port" if you wish to use the same port as your
+		// websocket and express server use. Please, note that this is less
+		// secure way as any client will be able to connect to your socket and
+		// only a 64-bit access key will be the only security layer
+
+		// If you like to use different port, type it here as a number.
+		// This way is much more secure because you can set up your
+		// firewall so that only certain IP addresses can access this
+		// port. This is an additional layer of security.
+		"hub-port": "inherit-game-port"
+	}
 }

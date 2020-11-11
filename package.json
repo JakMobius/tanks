@@ -1,6 +1,6 @@
 {
   "name": "tanks",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Browser action game project.",
   "main": "main.js",
   "dependencies": {
@@ -15,7 +15,7 @@
     "through2": "^4.0.2",
     "util": "^0.12.3",
     "vinyl-fs": "^3.0.3",
-    "ws": "^6.2.1"
+    "websocket": "^1.0.32"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
@@ -43,11 +43,11 @@
   },
   "scripts": {
     "test": "mocha --reporter list",
-    "start-server": "cd build/actions; node --trace-warnings --expose-internals start-server.js -s autorun",
-    "clear-cache": "cd build/actions; node --trace-warnings clear-cache.js",
-    "commit-client": "cd build/actions; node --trace-warnings commit-client.js /Library/WebServer/Documents/new-tanks-online/",
-    "commit-mapeditor": "cd build/actions; node --trace-warnings commit-mapeditor.js /Library/WebServer/Documents/new-tanks-online/",
-    "commit-hub": "cd build/actions; node --trace-warnings commit-hub.js",
+    "start-server": "cd build; cd actions; node start-server.js -s autorun",
+    "clear-cache": "cd build; cd actions; node clear-cache.js",
+    "commit-client": "cd build; cd actions; node commit-client.js",
+    "commit-mapeditor": "cd build; cd actions; node commit-mapeditor.js /Library/WebServer/Documents/new-tanks-online",
+    "commit-hub": "cd build; cd actions; node commit-hub.js",
     "create-texture-atlas": "cd atlas; node atlas_creator.js"
   },
   "nyc": {

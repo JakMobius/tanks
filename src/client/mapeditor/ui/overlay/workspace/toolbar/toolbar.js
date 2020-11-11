@@ -1,4 +1,3 @@
-/* @load-resource: '/src/client/ui/overlay.scss' */
 /* @load-resource: './toolbar.scss' */
 
 const View = require("/src/client/ui/view")
