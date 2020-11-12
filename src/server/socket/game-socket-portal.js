@@ -1,10 +1,10 @@
 const GameClient = require("../client")
 const SocketPortal = require("./socket-portal")
 
-const RoomListRequestPacket = require("../../networking/packets/roomlistrequestpacket")
-const RoomListPacket = require("../../networking/packets/roomlistpacket")
-const PlayerRoomRequestPacket = require("../../networking/packets/playerroomrequestpacket")
-const PlayerRoomChangePacket = require("../../networking/packets/playerroomchangepacket")
+const RoomListRequestPacket = require("../../networking/packets/game-packets/roomlistrequestpacket")
+const RoomListPacket = require("../../networking/packets/game-packets/roomlistpacket")
+const PlayerRoomRequestPacket = require("../../networking/packets/game-packets/playerroomrequestpacket")
+const PlayerRoomChangePacket = require("../../networking/packets/game-packets/playerroomchangepacket")
 
 class GameSocketPortal extends SocketPortal {
 
@@ -87,7 +87,7 @@ class GameSocketPortal extends SocketPortal {
         if(packet instanceof RoomListRequestPacket) {
             client.data["listeningForRooms"] = packet.request;
         } else if(packet instanceof PlayerRoomRequestPacket) {
-            const room = self.games.get(packet.room);
+            const room = this.games.get(packet.room);
 
             if (room) {
                 if(room.clients.size >= room.maxOnline) {

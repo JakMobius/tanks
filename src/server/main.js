@@ -48,10 +48,14 @@ async function configureClusterCommunication(server) {
         hubUrl.pathname = "/cluster-link"
 
         server.setSocketServerIP(hubUrl.href)
+
+        server.setClusterPassword(Preferences.string("cluster.hub-access-key"))
     }
 }
 
 async function initialize() {
+
+    let server
 
     await Preferences.read()
 
@@ -68,9 +72,8 @@ async function initialize() {
 
         await initDatabase()
 
-        const port = Preferences.port("port")
-        const server = new Server()
-        server.setClientPort(port)
+        server = new Server()
+        server.setClientPort(Preferences.port("port"))
         server.console = serverConsole
         serverConsole.server = server
 
@@ -78,7 +81,12 @@ async function initialize() {
 
         bootCommand.runPostInit()
     } catch(e) {
-        serverConsole.window.screen.destroy()
+
+        // Cleaning up everything that would cause program to stay active
+
+        if(server) server.terminate()
+        else if(serverConsole) serverConsole.window.screen.destroy()
+
         throw e
     }
 }

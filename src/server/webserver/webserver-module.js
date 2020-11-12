@@ -16,11 +16,11 @@ class WebserverModule {
     /**
      * @type string
      */
-    resourcesDirectory
+    resourcesDirectory = null
+
+    enabled = false
 
     constructor(config) {
-        this.enabled = false
-        this.resourcesDirectory = null
         this.priority = WebserverModule.PRIORITY_NORMAL
         this.router = express.Router()
     }

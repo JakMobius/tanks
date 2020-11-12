@@ -21,8 +21,8 @@ class ClientConnection extends AbstractConnection {
         this.client.sendPacket(packet)
     }
 
-    close() {
-        this.client.disconnect()
+    close(reason) {
+        this.client.disconnect(reason)
     }
 }
 

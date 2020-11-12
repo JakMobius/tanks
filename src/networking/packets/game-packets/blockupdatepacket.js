@@ -1,6 +1,6 @@
 
-const BinaryPacket = require("../binarypacket")
-const BlockState = require("../../utils/map/blockstate/blockstate")
+const BinaryPacket = require("../../binarypacket")
+const BlockState = require("../../../utils/map/blockstate/blockstate")
 
 class BlockUpdatePacket extends BinaryPacket {
     static typeName() { return 13 }

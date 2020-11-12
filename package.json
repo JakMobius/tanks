@@ -44,6 +44,8 @@
   "scripts": {
     "test": "mocha --reporter list",
     "start-server": "cd build; cd actions; node start-server.js -s autorun",
+    "start-server-in-game-configuration": "node src/server/main.js -pn port=25566 -s configure-game-server -ps cluster.hub-access-key=banana",
+    "start-server-in-hub-configuration": "node src/server/main.js -s configure-hub -pn port=25565",
     "clear-cache": "cd build; cd actions; node clear-cache.js",
     "commit-client": "cd build; cd actions; node commit-client.js",
     "commit-mapeditor": "cd build; cd actions; node commit-mapeditor.js /Library/WebServer/Documents/new-tanks-online",

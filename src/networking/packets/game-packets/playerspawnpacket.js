@@ -1,6 +1,6 @@
 
 const PlayerJoinPacket = require("./playerjoinpacket")
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 
 /**
  * This packet represents player spawn interact.

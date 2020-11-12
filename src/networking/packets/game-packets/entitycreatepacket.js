@@ -1,7 +1,7 @@
 
-const BinaryPacket = require("../binarypacket")
-const EntityModel = require("../../entity/entitymodel")
-const BinarySerializable = require("../../serialization/binary/serializable")
+const BinaryPacket = require("../../binarypacket")
+const EntityModel = require("../../../entity/entitymodel")
+const BinarySerializable = require("../../../serialization/binary/serializable")
 
 class EntityCreatePacket extends BinaryPacket {
     static typeName() { return 11 }

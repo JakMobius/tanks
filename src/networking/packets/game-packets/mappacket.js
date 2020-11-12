@@ -1,6 +1,6 @@
 
-const BinaryPacket = require("../binarypacket")
-const GameMap = require("../../utils/map/gamemap")
+const BinaryPacket = require("../../binarypacket")
+const GameMap = require("../../../utils/map/gamemap")
 
 class MapPacket extends BinaryPacket {
     static typeName() {

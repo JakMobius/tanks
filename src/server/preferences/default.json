@@ -30,7 +30,7 @@
 		// In order to prevent unauthorised access to the cluster
 		// communication system, specify here the unique key. It must match
 		// on all servers.
-		"hub-access-hey": "please change this line to your unique key",
+		"hub-access-key": "please change this line to your unique key",
 
 		// When your server runs in "hub-only" or "on" mode, it will receive
 		// connections from another clusters of your system. Here you can

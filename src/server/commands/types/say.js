@@ -1,6 +1,6 @@
 
 const Command = require("../command.js")
-const PlayerChatPacket = require("/src/networking/packets/playerchatpacket")
+const PlayerChatPacket = require("/src/networking/packets/game-packets/playerchatpacket")
 
 class SayCommand extends Command {
     onPerform(args) {
@@ -16,11 +16,11 @@ class SayCommand extends Command {
     }
 
     getDescription() {
-        return "Вывести сообщение в чат всей комнате"
+        return "Broadcast a message to current room"
     }
 
     getUsage() {
-        return `say <текст>`
+        return `say <message>`
     }
 
     requiresRoom() { return true }

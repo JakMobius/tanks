@@ -14,15 +14,15 @@ class WebServer {
      */
     modules = new Map()
 
+    hubModule = new HubModule()
+    gameModule = new GameModule()
+    baseModule = new BaseModule()
+
     constructor() {
         this.app = express()
         this.setupApp()
         this.logger = Logger.global
         this.server = null
-
-        this.hubModule = new HubModule()
-        this.gameModule = new GameModule()
-        this.baseModule = new BaseModule()
 
         this.addModule(this.hubModule)
         this.addModule(this.gameModule)

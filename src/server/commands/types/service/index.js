@@ -48,7 +48,7 @@ class ServiceCommand extends Command {
 
         server.setHubPageActive(config.hubPage)
         server.setGamePageActive(config.gamePage)
-        server.setRoomsActive(config.rooms)
+        server.setGameSocketActive(config.rooms)
     }
 
     getDescription() {

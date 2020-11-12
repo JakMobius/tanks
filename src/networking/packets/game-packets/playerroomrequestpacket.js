@@ -1,5 +1,5 @@
 
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 
 /**
  * This packet is sent when player wants to join the room

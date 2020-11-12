@@ -18,7 +18,7 @@ class AbstractConnection {
     /**
      * @abstract
      */
-    close() {}
+    close(reason) {}
 }
 
 module.exports = AbstractConnection

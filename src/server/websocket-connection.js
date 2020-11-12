@@ -1,7 +1,16 @@
 
 const AbstractConnection = require("../networking/abstract-connection")
+const WebSocket = require("websocket")
+const WebSocketConnection = WebSocket.connection
+const Logger = require("./log/logger");
 
 class WebsocketConnection extends AbstractConnection {
+
+    /**
+     * @type {WebSocketConnection}
+     */
+    websocket = null
+
     constructor(websocket) {
         super();
         this.websocket = websocket
@@ -15,8 +24,8 @@ class WebsocketConnection extends AbstractConnection {
         this.websocket.sendBytes(Buffer.from(packet.getData()))
     }
 
-    close() {
-        this.websocket.close()
+    close(reason) {
+        this.websocket.close(WebSocketConnection.CLOSE_REASON_NORMAL, reason)
     }
 }
 

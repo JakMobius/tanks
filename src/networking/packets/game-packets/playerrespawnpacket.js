@@ -1,5 +1,5 @@
 
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 
 class PlayerRespawnPacket extends BinaryPacket {
     static typeName() { return 9 }

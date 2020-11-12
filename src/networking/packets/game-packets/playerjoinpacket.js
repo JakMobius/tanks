@@ -1,7 +1,7 @@
 
-const TankModel = require("../../tanks/tankmodel")
-const BinaryPacket = require("../binarypacket")
-const Player = require("../../utils/player")
+const TankModel = require("../../../tanks/tankmodel")
+const BinaryPacket = require("../../binarypacket")
+const Player = require("../../../utils/player")
 
 /**
  * This packet is representing a player join interact.

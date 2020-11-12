@@ -1,6 +1,6 @@
 
-const BinaryPacket = require("../binarypacket")
-const TankModel = require("../../tanks/tankmodel")
+const BinaryPacket = require("../../binarypacket")
+const TankModel = require("../../../tanks/tankmodel")
 
 class PlayerConfigPacket extends BinaryPacket {
     static typeName() { return 7 }

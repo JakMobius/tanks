@@ -58,32 +58,40 @@ class AbstractClient {
         this.emit("open")
     }
 
+    /**
+     * @param buffer {ArrayBuffer}
+     */
     onData(buffer) {
         let decoder = BinaryPacket.binaryDecoder
         decoder.reset()
         decoder.readData(buffer)
         let packet = BinaryPacket.deserialize(decoder, BinaryPacket)
         if (packet) {
-            for (let [clazz, listeners] of this.listeners) {
-                if (clazz instanceof Function && packet.constructor === clazz) {
-                    for (let listener of listeners) {
-                        listener(packet)
-                    }
-                }
-            }
+            this.handlePacket(packet)
         } else {
-            decoder.reset()
-            console.warn("Unknown packet type: " + decoder.readUint16())
+            //decoder.reset()
+            //console.warn("Unknown packet type: " + decoder.readUint16())
         }
     }
 
-    onError(error) {
-        this.emit("error", error)
+    handlePacket(packet) {
+        for (let [clazz, listeners] of this.listeners) {
+            if (clazz instanceof Function && packet.constructor === clazz) {
+                for (let listener of listeners) {
+                    listener(packet)
+                }
+            }
+        }
+    }
+
+
+    onError(code, reason) {
+        this.emit("error", code, reason)
         this.connected = false
     }
 
-    onClose(event) {
-        this.emit("close", event)
+    onClose(code, reason) {
+        this.emit("close", code, reason)
         this.connected = false
     }
 

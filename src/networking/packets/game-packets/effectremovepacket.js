@@ -1,5 +1,5 @@
 
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 
 class EffectRemovePacket extends BinaryPacket {
     static typeName() {

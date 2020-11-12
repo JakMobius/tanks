@@ -1,40 +1,62 @@
 
-const WebSocketClient = require("websocket").client;
-const AbstractClient = require("../../networking/abstract-client")
+const ServerWebSocketClient = require("./server-web-socket-client");
 const Logger = require("../log/logger")
-const BinaryPacket = require("../../networking/binarypacket")
+const HandshakePacket = require("../../networking/packets/cluster-packets/handshake-packet")
+const ClusterHandshake = require("./cluster-handshake")
 
-class ClusterClient extends AbstractClient {
+class ClusterClient extends ServerWebSocketClient {
 
     /**
-     * @type WebSocketClient
+     * @type {string}
      */
-    client
+    password
+
+    /**
+     * @type {boolean}
+     */
+    reconnect = false
 
     constructor(config) {
         super(config)
-        this.client = null
-        this.webSocketConnection = null
-        this.reconnect = false
-        this.reconnectionDelay = 5000 // ms
+
+        this.on(HandshakePacket, (packet) => {
+            Logger.global.log("Performing handshake")
+            let salt = packet.handshakeData
+            ClusterHandshake.createKey(this.password, salt, (error, key) => {
+
+                if(error) {
+                    // Something went wrong
+
+                    this.connection.close("Failed to generate handshake key: " + error)
+                } else {
+                    // Sending back the generated handshake key
+                    packet.handshakeData = new Uint8Array(key)
+                    packet.sendTo(this.connection)
+                }
+            })
+        })
+
+        this.on("close", (code, reason) => {
+            Logger.global.log("Connection to hub was closed: " + reason)
+
+            this.reconnectDelayed()
+        })
+
+        this.on("error", (code, reason) => {
+            Logger.global.log("Failed to connect to hub" + reason)
+
+            this.reconnectDelayed()
+        })
     }
 
     connectToServer() {
-        if(this.client != null) return;
-        this.reconnect = true
+        Logger.global.log("Connecting to hub at " + this.config.ip)
+        super.connectToServer()
+    }
 
-        this.client = new WebSocketClient()
-
-        this.client.on("connectFailed", (error) => this.reconnectDelayed())
-        this.client.on("connect", (connection) => {
-            this.webSocketConnection = connection
-
-            connection.on('error', (error) => this.reconnectDelayed());
-            connection.on('close', () => this.reconnectDelayed());
-            connection.on('message', (message) => this.onData(message));
-        })
-
-        this.client.connect(this.config.ip)
+    onOpen() {
+        super.onOpen();
+        Logger.global.log("Successful connection, waiting for handshake request")
     }
 
     reconnectDelayed() {
@@ -47,48 +69,6 @@ class ClusterClient extends AbstractClient {
         }, this.reconnectionDelay);
     }
 
-    onData(message) {
-        try {
-            if(message.type !== "binary") {
-                Logger.global.log("Received invalid packet from socket server")
-                Logger.global.log("Binary message expected, " + message.type + " received.")
-                return
-            }
-
-            let data = message.binaryData
-            let decoder = BinaryPacket.binaryDecoder
-            decoder.reset()
-            decoder.readData(new Uint8Array(data).buffer)
-
-            // BinaryPacket.deserialize may only return
-            // a BinaryPacket instance
-
-            // noinspection JSValidateTypes
-            /** @type BinaryPacket */
-            let packet = BinaryPacket.deserialize(decoder, BinaryPacket)
-
-            this.handlePacket(packet);
-        } catch(e) {
-            Logger.global.error("Exception while handling packet from socket server")
-            Logger.global.error(e)
-        }
-    }
-
-    /**
-     * Called when a message from cluster server is received
-     * @param packet {BinaryPacket} Received packet
-     */
-    handlePacket(packet) {
-        Logger.global.log("Received packet")
-        Logger.global.log(packet)
-    }
-
-    onMessage(event) {
-        if(event.type === "binary") {
-            this.onData(event.binaryData.buffer)
-        }
-    }
-
     isConnecting() {
         // Since we don't want to drop packets,
         // cluster client is always available to
@@ -96,17 +76,9 @@ class ClusterClient extends AbstractClient {
         return true
     }
 
-    isOpen() {
-        return !!this.webSocketConnection
-    }
-
-    writePacket(packet) {
-        this.webSocketConnection.sendBytes(Buffer.from(packet))
-    }
-
-    disconnect() {
+    disconnect(reason) {
         this.reconnect = false
-        if(this.client) this.client.abort()
+        super.disconnect(reason)
     }
 }
 

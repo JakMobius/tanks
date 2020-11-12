@@ -1,6 +1,6 @@
 
 
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 
 class TankLocationsPacket extends BinaryPacket {
     static typeName() {

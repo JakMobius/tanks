@@ -1,5 +1,5 @@
 
-const BinaryPacket = require("../binarypacket")
+const BinaryPacket = require("../../binarypacket")
 const EffectModel = require("/src/effects/effectmodel")
 
 class EffectCreatePacket extends BinaryPacket {

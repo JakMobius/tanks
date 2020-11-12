@@ -4,7 +4,7 @@ const ControlsContainer = require("./controls/controlscontainer")
 const PlayMenuContainer = require("./play-menu/playmenucontainer")
 const TankPreviewContainer = require("./tank-preview/tankpreviewcontainer")
 const TankSelectContainer = require("./tank-select/tankselectcontainer")
-const RoomListRequestPacket = require("/src/networking/packets/roomlistrequestpacket")
+const RoomListRequestPacket = require("/src/networking/packets/game-packets/roomlistrequestpacket")
 const RoomSelectContainer = require("./room-select/roomselectcontainer")
 
 class PrimaryOverlay extends Overlay {

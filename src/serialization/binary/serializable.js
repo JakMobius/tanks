@@ -1,5 +1,6 @@
 
 const Group = require("../serializationgroup")
+const Logger = require("../../server/log/logger")
 
 /**
  * @abstract
@@ -36,7 +37,7 @@ class BinarySerializable {
      * To serialize and deserialize subclass instances, use
      * {@link serialize} and {@link deserialize} static
      * functions. This function should never be called on {@link BinarySerializable} class.
-     * * @param {BinaryEncoder} encoder The encoder which will store object data
+     * @param {BinaryEncoder} encoder The encoder which will store object data
      */
 
     toBinary(encoder) {

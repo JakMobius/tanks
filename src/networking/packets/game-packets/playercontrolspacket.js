@@ -1,6 +1,6 @@
 
-const TankControls = require("../../tanks/controls/tankcontrols")
-const BinaryPacket = require("../../networking/binarypacket")
+const TankControls = require("../../../tanks/controls/tankcontrols")
+const BinaryPacket = require("../../binarypacket")
 
 class PlayerControlsPacket extends BinaryPacket {
 

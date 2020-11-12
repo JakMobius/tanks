@@ -76,6 +76,7 @@ class BinaryPacket extends BinarySerializable {
         if(this.data == null) {
             this.data = this.encode()
         }
+
         return this.data
     }
 
