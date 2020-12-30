@@ -130,7 +130,7 @@ class Command {
 		}
 
 		if(readFlag) {
-			errors.push(`После флага '-${currentFlagName}' необходимо указать его значение`)
+			errors.push(`'-${currentFlagName}' flag requires value`)
 		}
 
 		return {
@@ -138,6 +138,21 @@ class Command {
 			unknown: unknownFlags,
 			errors: errors.length ? errors : null,
 			currentFlag: currentFlag
+		}
+	}
+
+	/**
+	 * Prints formatted flag error
+	 * @param found
+	 * @param logger
+	 */
+
+	logFlagErrors(found, logger) {
+		if(found.errors) {
+			logger.log(found.errors.join("\n"))
+		}
+		if(found.unknown.length) {
+			logger.log("§FF0;Unknown flags: " + found.unknown.join("\n"))
 		}
 	}
 

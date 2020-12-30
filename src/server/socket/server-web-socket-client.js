@@ -3,7 +3,7 @@ const WebSocketClient = require("websocket").client;
 const AbstractClient = require("../../networking/abstract-client")
 const Logger = require("../log/logger")
 const WebSocketConnection = require("websocket").connection;
-const ServerWebSocketClientConnection = require("./server-web-socket-client-connection")
+const ServerParticipantConnection = require("./participant-client/server-participant-connection")
 
 // Since `WebSocketClient` name is reserved by websocket module,
 // this class is named like this
@@ -24,10 +24,7 @@ class ServerWebSocketClient extends AbstractClient {
         this.webSocketConnection = null
         this.reconnect = false
         this.reconnectionDelay = 5000 // ms
-    }
-
-    createConnection() {
-        return new ServerWebSocketClientConnection(this)
+        this.logger = new Logger()
     }
 
     connectToServer() {
@@ -40,9 +37,9 @@ class ServerWebSocketClient extends AbstractClient {
         this.client.on("connect", (connection) => {
             this.webSocketConnection = connection
 
-            this.onOpen()
+            this.onConnection()
 
-            connection.on('error', (code, reason) => this.onError(code, reason));
+            connection.on('error', (error) => this.onError(error));
             connection.on('close', (code, reason) => this.onClose(code, reason));
             connection.on('message', (message) => this.onMessage(message));
         })
@@ -53,15 +50,15 @@ class ServerWebSocketClient extends AbstractClient {
     onMessage(message) {
         try {
             if(message.type !== "binary") {
-                Logger.global.log("Received invalid packet")
-                Logger.global.log("Binary message expected, " + message.type + " received.")
+                this.logger.log("Received invalid packet")
+                this.logger.log("Binary message expected, " + message.type + " received.")
                 return
             }
 
             super.onData(new Uint8Array(message.binaryData).buffer);
         } catch(e) {
-            Logger.global.log("Exception while handling packet")
-            Logger.global.log(e)
+            this.logger.log("Exception while handling packet")
+            this.logger.log(e)
         }
     }
 

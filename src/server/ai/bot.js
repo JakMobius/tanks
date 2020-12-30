@@ -1,4 +1,4 @@
-const Client = require("../client")
+const Client = require("../socket/socket-portal-client")
 const AIConnection = require("./ai_connection")
 
 class GameBot extends Client {

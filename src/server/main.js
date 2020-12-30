@@ -1,4 +1,6 @@
 
+const serverStartupTime = Date.now()
+
 /*
   Allow to require entire folders with require("/src/some/folder/with/modules/")
  */
@@ -14,9 +16,9 @@ const packageJson = require('../../package.json');
 const url = require("url");
 
 async function initDatabase() {
-    Logger.global.log("Connecting to database")
-
     if(Preferences.boolean("database.enabled")) {
+        Logger.global.log("Connecting to database")
+
         DB.instance = new DB()
         try {
             await DB.instance.connect()
@@ -55,12 +57,13 @@ async function configureClusterCommunication(server) {
 
 async function initialize() {
 
-    let server
-
     await Preferences.read()
 
     const serverConsole = new Console()
     serverConsole.createWindow()
+    Logger.global.log(`Loaded libraries within ${(Date.now() - serverStartupTime)/1000}s`)
+
+    let server
 
     try {
         const bootCommand = new BootCommand({
@@ -91,11 +94,11 @@ async function initialize() {
     }
 }
 
-const time = Date.now()
+const serverInitializeTime = Date.now()
 
 initialize().then(() => {
     Logger.global.log(
-        `§0F0;Server v${packageJson.version} has been started successfully §444;(${(Date.now() - time) / 1000}s)\n` +
+        `§0F0;Server v${packageJson.version} has been started successfully §444;(${(Date.now() - serverInitializeTime) / 1000}s)\n` +
         `"777; ⭑ §;Type \"help\" for more information`
     )
 }).catch(e => {

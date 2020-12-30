@@ -34,19 +34,14 @@ class RoomCreateCommand extends Command {
         let logger = this.console.logger
 
         if(!this.console.server.gameSocket) {
-            logger.log("§F00;Для выполнения этой команды необходимо запустить игровой сокет")
-            logger.log("§777; ⭑ §;Чтобы управлять модулями сервера, используйте команду service")
+            logger.log("§F00;This command requires game socket to be running")
+            logger.log("§777; ⭑ §;To manage server modules, use 'service' command")
             return;
         }
 
         let found = this.findFlags(args)
-        if(found.errors) {
-            logger.log(found.errors.join("\n"))
-            return
-        }
-        if(found.unknown.length) {
-            logger.log("§FF0;Нeизвестные аргументы: " + found.unknown.join("\n"))
-        }
+        this.logFlagErrors(found, logger)
+
         let flags = found.flags
 
         if(!flags.has("map")) {
@@ -59,39 +54,23 @@ class RoomCreateCommand extends Command {
         if(flags.has("name")) gameName = flags.get("name")[0]
 
         if (this.console.server.gameSocket.games.get(gameName)) {
-            logger.log(
-                "§F00;Ошибка: комната '" + gameName + "' уже существует\n" +
-                "§777; ⭑ §;Чтобы управлять существующей комнатой, используйте room view\n" +
-                "§777; ⭑ §;Чтобы удалить существующую комнату, используйте room delete"
-            )
+            logger.log( `§F00; Room '" + gameName + "' already exists\n` +
+                        `§777; ⭑ §;To control existing room, use 'room view' command\n` +
+                        `§777; ⭑ §;To delete existing room, use 'room delete' command`)
             return
         }
 
         let mapPath = path.resolve(mapFolder, mapName + ".map")
 
         if (!fs.existsSync(mapPath)) {
-            logger.log("§F00;Ошибка: Карта '" + mapName + "' не существует")
+            logger.log("§F00;No such map: '" + mapName + "'")
             return
         }
 
-        const gzip = fs.readFileSync(mapPath)
-        const data = pako.inflate(gzip)
-        const decoder = new BinaryDecoder({ largeIndices: true })
-        decoder.reset()
-        decoder.readData(data.buffer)
 
-        const map = GameMap.fromBinary(decoder)
 
-        const game = new Game({
-            name: gameName,
-            server: this.server,
-            map: map
-        })
-
-        this.console.server.gameSocket.games.set(gameName, game)
-
-        logger.log("§0F0; Комната '" + gameName + "' создана")
-        logger.log("§777; ⭑ §;Чтобы управлять комнатой, используйте 'room view " + gameName + "'")
+        logger.log( `§0F0; Room '${gameName}' has been sucessfully created")\n` +
+                    `§777; ⭑ §;To control this room, use 'room view "${gameName}"' command`)
     }
 
     onTabComplete(args) {

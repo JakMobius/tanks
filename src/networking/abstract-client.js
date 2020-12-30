@@ -58,6 +58,10 @@ class AbstractClient {
         this.emit("open")
     }
 
+    onConnection() {
+        this.onOpen()
+    }
+
     /**
      * @param buffer {ArrayBuffer}
      */
@@ -85,8 +89,8 @@ class AbstractClient {
     }
 
 
-    onError(code, reason) {
-        this.emit("error", code, reason)
+    onError(error) {
+        this.emit("error", error)
         this.connected = false
     }
 

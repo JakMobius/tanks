@@ -1,11 +1,8 @@
 
 const EventEmitter = require("../../utils/eventemitter")
-const LoggerDestination = require("../log/loggerdestination")
+const LoggerDestination = require("../log/logger-destination")
 const blessed = require("./blessed-fork/lib/blessed")
-const Color = require("/src/utils/color")
-const Chalk = require("chalk")
 const Textarea = require("./blessed-fork/lib/widgets/prompt")
-const util = require("util")
 
 class WindowDestination extends LoggerDestination {
     constructor(window) {
@@ -14,27 +11,7 @@ class WindowDestination extends LoggerDestination {
     }
 
     log(value) {
-        let text
-
-        if(typeof value == "string") {
-            text = this.convertChatColors(value)
-        } else {
-            text = util.inspect(value, {
-                depth: 0,
-                colors: true
-            })
-        }
-        this.window.write(text)
-    }
-
-    convertChatColors(text) {
-        return Color.replace(text, (color, bold, text) => {
-            let chalk = bold ? Chalk.bold : Chalk
-            if(color) {
-                chalk = chalk.hex(color)
-            }
-            return chalk(text)
-        })
+        this.window.write(value)
     }
 }
 
@@ -42,6 +19,16 @@ class HistoryEntry {
     constructor(text, cursorPos) {
         this.text = text
         this.cursorPos = cursorPos
+    }
+
+    storeState(console) {
+        this.text = console.consoleTextbox.value
+        this.cursorPos = console.consoleTextbox.cursorPosition
+    }
+
+    restoreState(console) {
+        console.consoleTextbox.setValue(this.text)
+        console.consoleTextbox.setCursorPosition(this.cursorPos)
     }
 }
 
@@ -127,12 +114,6 @@ class ConsoleWindow extends EventEmitter {
         this.consoleTextbox.key(["up"], () => this.historyGoUp())
         this.consoleTextbox.key(["down"], () => this.historyGoDown())
 
-        this.screen.on("element blur", (a, b) => {
-            if (a instanceof Textarea && (!b || !(b instanceof Textarea))) {
-                setImmediate(() => this.refocus())
-            }
-        })
-
         this.refocus()
         this.render()
     }
@@ -161,47 +142,37 @@ class ConsoleWindow extends EventEmitter {
     historyGoUp() {
         if(this.historyIndex === null) {
             if(this.history.length > 0) {
-                this.currentHistoryEntry.text = this.consoleTextbox.value
-                this.currentHistoryEntry.cursorPos = this.consoleTextbox.cursorPosition
+                this.currentHistoryEntry.storeState(this)
                 this.historyIndex = this.history.length - 1;
             } else {
                 return
             }
         } else {
-            this.history[this.historyIndex].text = this.consoleTextbox.value
-            this.history[this.historyIndex].cursorPos = this.consoleTextbox.cursorPosition
+            this.history[this.historyIndex].storeState(this)
             this.historyIndex--;
         }
 
         if(this.historyIndex < 0) this.historyIndex = 0
 
-        let cachedHistoryEntry = this.history[this.historyIndex]
-
-        this.consoleTextbox.setValue(cachedHistoryEntry.text)
-        this.consoleTextbox.setCursorPosition(cachedHistoryEntry.cursorPos)
+        this.history[this.historyIndex].restoreState(this)
         this.render()
     }
 
     historyGoDown() {
         if (this.historyIndex === null) return
 
-        this.history[this.historyIndex].text = this.consoleTextbox.value
-        this.history[this.historyIndex].cursorPos = this.consoleTextbox.cursorPosition
+        this.history[this.historyIndex].storeState(this)
 
         this.historyIndex++
 
         if (this.historyIndex >= this.history.length) {
             this.historyIndex = null
-            this.consoleTextbox.setValue(this.currentHistoryEntry.text)
-            this.consoleTextbox.setCursorPosition(this.currentHistoryEntry.cursorPos)
-            this.render()
+            this.currentHistoryEntry.restoreState(this)
         } else {
-            let cachedHistoryEntry = this.history[this.historyIndex]
-
-            this.consoleTextbox.setValue(cachedHistoryEntry.text)
-            this.consoleTextbox.setCursorPosition(cachedHistoryEntry.cursorPos)
-            this.render()
+            this.history[this.historyIndex].restoreState(this)
         }
+
+        this.render()
     }
 
     write(text) {

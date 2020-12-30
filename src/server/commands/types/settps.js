@@ -7,7 +7,7 @@ class SetTpsCommand extends Command {
         let tps = Number(args[0])
 
         if(!tps) {
-            this.logger.log("Использование: " + this.getUsage())
+            this.logger.log("Usage: " + this.getUsage())
             return
         }
 

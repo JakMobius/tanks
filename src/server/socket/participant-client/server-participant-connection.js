@@ -1,7 +1,7 @@
 
-const ClientConnection = require("../../networking/client-connection")
+const ClientConnection = require("../../../networking/client-connection")
 
-class ServerWebSocketClientConnection extends ClientConnection {
+class ServerParticipantConnection extends ClientConnection {
     close(reason) {
         // Calling `closeConnection` instead of `disconnect` here because
         // `disconnect` method prevents client from reconnecting again. We
@@ -12,4 +12,4 @@ class ServerWebSocketClientConnection extends ClientConnection {
     }
 }
 
-module.exports = ServerWebSocketClientConnection
+module.exports = ServerParticipantConnection

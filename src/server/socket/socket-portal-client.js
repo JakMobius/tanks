@@ -1,6 +1,6 @@
 
 
-class GameClient {
+class SocketPortalClient {
 	static globalId = 0
 
 	id
@@ -15,11 +15,11 @@ class GameClient {
 
 	constructor(config) {
 		config = config || {}
-		this.id = GameClient.globalId++
+		this.id = SocketPortalClient.globalId++
 		this.data = config.data || {}
 		this.connection = config.connection
 		this.websocket = config.websocket
 	}
 }
 
-module.exports = GameClient
+module.exports = SocketPortalClient

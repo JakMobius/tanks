@@ -2,6 +2,7 @@ const Logger = require("../log/logger")
 const fs = require("fs")
 const ConsoleWindow = require("./consolewindow")
 const path = require("path")
+const ArgumentParser = require("./argument-parser");
 
 class Console {
 	commands = new Map();
@@ -20,7 +21,6 @@ class Console {
 		this.server = null
 		this.observingRoom = null
 		this.visible = true
-		this.currentLogger = null
 		this.prompt = null
 
 		this.tabCompleteIndex = null
@@ -62,7 +62,7 @@ class Console {
 	}
 
 	tabCompleteBegin(line, shift) {
-		let args = this.parseArguments(line)
+		let args = ArgumentParser.parseArguments(line)
 
 		if(args.length <= 1) {
 
@@ -79,16 +79,18 @@ class Console {
 		} else {
 			let command = this.commands.get(args[0])
 			if (command) {
-				let line = args.slice(0, -1).join(" ") + " "
+				let prefix = ArgumentParser.parseArguments(line, true).slice(0, -1).join(" ") + " "
 				let completions = command.onTabComplete(args.slice(1))
 				if(completions.length) {
-					if(completions.length > 1)
+					if(completions.length > 1) {
 						this.logger.log(completions.join(", "))
+					}
+
 					this.tabCompletions = completions.map(arg => {
 						if(arg.indexOf(" ") !== -1) {
 							arg = "'" + arg + "'"
 						}
-						return line + arg
+						return prefix + arg
 					})
 				}
 			}
@@ -131,64 +133,6 @@ class Console {
 		this.tabCompleteIndex = null
 	}
 
-	parseArguments(line, keepQuotes) {
-		let escape = false
-		let string = null
-		let comment = null
-		let argument = ""
-		let result = []
-
-		for(let character of line) {
-
-			if(comment) {
-				if(character === "\n") comment = false
-				continue
-			}
-
-			if(!escape) {
-				if (character === "\\") {
-					escape = true
-					continue
-				}
-
-				if (string === null) {
-					if (character === "\"" || character === "\'") {
-						string = character
-						if(keepQuotes) argument += character
-						continue
-					}
-				} else {
-					if(character === string) {
-						if(keepQuotes) argument += character
-						string = null
-						continue
-					}
-				}
-
-				if(character === "#") {
-					comment = true
-					continue
-				}
-
-				if(character === " " && !string) {
-					if(argument) {
-						result.push(argument)
-						argument = ""
-					}
-					continue
-				}
-			}
-
-			argument += character
-
-			escape = false
-		}
-
-		result.push(argument)
-
-		return result
-	}
-
 	evaluate(line) {
 
 		line = line.trim()
@@ -197,7 +141,7 @@ class Console {
 
 		if(line.length === 0) return
 
-		let command = this.parseArguments(line)
+		let command = ArgumentParser.parseArguments(line)
 
 		if(!command.length || command[0].length === 0) return
 
@@ -206,13 +150,13 @@ class Console {
 		if (handle) {
 			this.callHandle(handle, command.slice(1))
         } else {
-            this.logger.log("§F00;Неизвестная команда: '" + command[0] + "'")
+            this.logger.log("§F00;Unknown command: '" + command[0] + "'")
         }
 	}
 
 	callHandle(handle, args) {
 		if (handle.requiresRoom() && !this.observingRoom) {
-			this.logger.log("§F00;Для использования этой команды необходимо находиться в комнате")
+			this.logger.log("§F00;You should be in a room for executing this command")
 		} else {
 			handle.onPerform(args)
 		}
@@ -230,10 +174,10 @@ class Console {
 		const file = path.resolve(__dirname, "..", "scripts", name + ".script")
 
 		if(!fs.existsSync(file)) {
-			this.logger.log("§F00;Не удалось выполнить скрипт '" + name + "'. Убедитесь, что файл существует.")
+			this.logger.log("§F00;Could not find script named '" + name + "'.")
 			return
 		}
-		this.logger.log("§FF0;Выполнение скрипта " + name)
+		this.logger.log("§FF0;Running script '" + name + "'")
 
 		const commands = fs.readFileSync(file, 'utf8').split("\n")
 		for(let i = index || 0; i < commands.length; i++) {

@@ -1,4 +1,4 @@
-const GameClient = require("../client")
+const SocketPortalClient = require("../socket/socket-portal-client")
 const BinaryPacket = require("../../networking/binarypacket")
 const Logger = require("../log/logger")
 const WebsocketConnection = require("../websocket-connection")
@@ -12,9 +12,11 @@ const WebsocketConnection = require("../websocket-connection")
  */
 class SocketPortal {
 
+    static clientClass = SocketPortalClient
+
     /**
      * Clients of exactly this portal
-     * @type {Map<number, GameClient>}
+     * @type {Map<number, SocketPortalClient>}
      */
     clients = new Map()
 
@@ -68,7 +70,7 @@ class SocketPortal {
      */
 
     handleConnection(connection) {
-        const client = new GameClient({
+        const client = new (this.constructor.clientClass)({
             websocket: connection,
             connection: new WebsocketConnection(connection)
         });
@@ -91,13 +93,13 @@ class SocketPortal {
      * This method is called when portal receives a message from
      * specific client
      * @param message {Object}
-     * @param client {GameClient}
+     * @param client {SocketPortalClient}
      */
     handleMessage(message, client) {
         try {
             if(message.type !== "binary") {
-                Logger.global.log("Received invalid packet from client " + client.id)
-                Logger.global.log("Binary message expected, " + message.type + " received.")
+                this.logger.log("Received invalid packet from client " + client.id)
+                this.logger.log("Binary message expected, " + message.type + " received.")
                 return
             }
 
@@ -109,21 +111,19 @@ class SocketPortal {
             // BinaryPacket.deserialize may only return
             // a BinaryPacket instance
 
-            // noinspection JSValidateTypes
-            /** @type BinaryPacket */
-            let packet = BinaryPacket.deserialize(decoder, BinaryPacket)
+            let packet = /** @type BinaryPacket */ BinaryPacket.deserialize(decoder, BinaryPacket)
 
             this.handlePacket(packet, client);
         } catch(e) {
-            Logger.global.error("Exception while handling packet from client " + client.id)
-            Logger.global.error(e)
+            this.logger.error("Exception while handling packet from client " + client.id)
+            this.logger.error(e)
         }
     }
 
     /**
      * Called when client sends packet
      * @param packet {BinaryPacket} Received packet
-     * @param client {GameClient} Packet sender
+     * @param client {SocketPortalClient} Packet sender
      */
     handlePacket(packet, client) {
 
@@ -131,7 +131,7 @@ class SocketPortal {
 
     /**
      * Called when client disconnects from the socket
-     * @param client {GameClient}
+     * @param client {SocketPortalClient}
      */
     clientDisconnected(client) {
 
@@ -139,7 +139,7 @@ class SocketPortal {
 
     /**
      * Called when new client connects to the socket*
-     * @param client {GameClient}
+     * @param client {SocketPortalClient}
      */
     clientConnected(client) {
 

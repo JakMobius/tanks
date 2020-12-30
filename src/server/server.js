@@ -1,9 +1,10 @@
 
 const UniversalPortListener = require("./universal-port-listener")
 const WebServer = require("./webserver/webserver")
-const GameSocket = require("./socket/game-socket-portal")
-const ClusterSocket = require("./socket/cluster-socket-portal")
-const ClusterClient = require("./socket/cluster-client")
+const GameSocket = require("./socket/game-server/game-socket-portal")
+const ClusterSocket = require("./socket/hub-server/cluster-socket-portal")
+const ServerParticipantClient = require("./socket/participant-client/server-participant-client")
+const CpuUsageWatcher = require("/src/utils/cpu-usage-watcher")
 
 class Server {
 
@@ -23,7 +24,7 @@ class Server {
     clusterSocket = null
 
     /**
-     * @type {ClusterClient}
+     * @type {ServerParticipantClient}
      */
     clusterClient = null
 
@@ -62,9 +63,16 @@ class Server {
      */
     clusterPassword = null
 
+    /**
+     * @type {CpuUsageWatcher}
+     */
+    cpuUsageWatcher = null
+
     console = null
 
-    constructor() {}
+    constructor() {
+        this.cpuUsageWatcher = new CpuUsageWatcher()
+    }
 
     setHubPageActive(active) {
         this.hubPageActive = active
@@ -130,7 +138,7 @@ class Server {
         if(active) {
             if(this.clusterClient) return
 
-            this.clusterClient = new ClusterClient({
+            this.clusterClient = new ServerParticipantClient({
                 ip: this.clusterServerIP
             })
 

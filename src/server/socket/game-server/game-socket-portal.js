@@ -1,10 +1,12 @@
-const GameClient = require("../client")
-const SocketPortal = require("./socket-portal")
+const SocketPortalClient = require("../socket-portal-client")
+const SocketPortal = require("../socket-portal")
 
-const RoomListRequestPacket = require("../../networking/packets/game-packets/roomlistrequestpacket")
-const RoomListPacket = require("../../networking/packets/game-packets/roomlistpacket")
-const PlayerRoomRequestPacket = require("../../networking/packets/game-packets/playerroomrequestpacket")
-const PlayerRoomChangePacket = require("../../networking/packets/game-packets/playerroomchangepacket")
+const RoomListRequestPacket = require("../../../networking/packets/game-packets/roomlistrequestpacket")
+const RoomListPacket = require("../../../networking/packets/game-packets/roomlistpacket")
+const PlayerRoomRequestPacket = require("../../../networking/packets/game-packets/playerroomrequestpacket")
+const PlayerRoomChangePacket = require("../../../networking/packets/game-packets/playerroomchangepacket")
+
+const pako = require("pako")
 
 class GameSocketPortal extends SocketPortal {
 
@@ -57,7 +59,7 @@ class GameSocketPortal extends SocketPortal {
     }
 
     /**
-     * @param client {GameClient}
+     * @param client {SocketPortalClient}
      * @param game {Room}
      */
 
@@ -147,6 +149,29 @@ class GameSocketPortal extends SocketPortal {
         }
 
         this.configureClient(client, game)
+    }
+
+    /**
+     * @async
+     * Creates a room with specified config
+     * @param config {RoomConfig}
+     */
+    async createRoom(config) {
+        const gzip = await fs.promise.readFile(config.map)
+        const data = pako.inflate(gzip)
+        const decoder = new BinaryDecoder({ largeIndices: true })
+        decoder.reset()
+        decoder.readData(data.buffer)
+
+        const map = GameMap.fromBinary(decoder)
+
+        const game = new Game({
+            name: config.name,
+            server: this.server,
+            map: map
+        })
+
+        this.games.set(config.name, game)
     }
 }
 

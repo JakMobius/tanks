@@ -1,11 +1,16 @@
 
-const SocketPortal = require("./socket-portal")
-const ClusterHandshake = require("./cluster-handshake")
-const HandshakePacket = require("../../networking/packets/cluster-packets/handshake-packet")
-const Logger = require("../log/logger")
+const SocketPortal = require("../socket-portal")
+const ClusterHandshake = require("../cluster-handshake")
+const HandshakePacket = require("/src/networking/packets/cluster-packets/handshake-packet")
+const HandshakeSuccessPacket = require("/src/networking/packets/cluster-packets/handshake-success-packet")
+const RoomCreateRequestPacket = require("/src/networking/packets/cluster-packets/room-creation-request-packet")
+const RoomConfig = require("/src/server/room/room-config")
+const ClusterSocketPortalClient = require("./cluster-socket-portal-client")
 const Chalk = require("chalk")
 
 class ClusterSocketPortal extends SocketPortal {
+
+    static clientClass = ClusterSocketPortalClient
 
     /**
      * @type {string}
@@ -14,6 +19,8 @@ class ClusterSocketPortal extends SocketPortal {
 
     constructor(config) {
         super(config);
+
+        this.logger.setPrefix("CLink hub")
     }
 
     handleRequest(request) {
@@ -52,14 +59,22 @@ class ClusterSocketPortal extends SocketPortal {
     }
 
     handleAuthorizationFail(client) {
-        Logger.global.log(Chalk.redBright(`Rejected connection from origin ${client.websocket.remoteAddress} due to failed handshake`))
+        this.logger.log(Chalk.redBright(`Rejected connection from origin ${client.websocket.remoteAddress} due to failed handshake`))
         client.connection.close("Access denied")
         client.data.authorizationSalt = null
     }
 
     handleAuthorizationSuccess(client) {
-        Logger.global.log(`The game server from origin ${client.websocket.remoteAddress} has been connected`)
+        this.logger.log(`The game server from origin ${client.websocket.remoteAddress} has been connected`)
         client.data.authorized = true
+
+        new HandshakeSuccessPacket().sendTo(client.connection)
+
+        let roomConfig = new RoomConfig()
+        roomConfig.name = "test room"
+        roomConfig.map = "trafalgara.map"
+
+        new RoomCreateRequestPacket(roomConfig).sendTo(client.connection)
     }
 
     clientConnected(client) {
@@ -75,6 +90,13 @@ class ClusterSocketPortal extends SocketPortal {
     handleAuthorizedPacket(packet, client) {
 
     }
+
+    // noinspection JSCheckFunctionSignatures
+    /**
+     * Called when client sends packet
+     * @param packet {BinaryPacket} Received packet
+     * @param client {ClusterSocketPortalClient} Packet sender
+     */
 
     handlePacket(packet, client) {
         if (client.data.authorized) this.handleAuthorizedPacket(packet, client)
