@@ -25,7 +25,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-var EventEmitter = require('events').EventEmitter;
+import { EventEmitter } from 'events';
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
 function listenerCount(stream, event) {
@@ -67,7 +67,7 @@ function emitKeypressEvents(stream) {
     stream.on('newListener', onNewListener);
   }
 }
-exports.emitKeypressEvents = emitKeypressEvents;
+export { emitKeypressEvents };
 
 /*
   Some patterns seen in terminal key escape codes, derived from combos seen

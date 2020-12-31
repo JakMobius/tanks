@@ -8,14 +8,16 @@
  * Modules
  */
 
-var unicode = require('../unicode');
-
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
-var Node = require('./node');
-var Input = require('./input');
+import Input from './input';
 
 class Prompt extends Input {
+	public value: any;
+	public cursorPosition: any;
+	public scrollPosition: any;
+	public backspaceVisiblePadding: any;
+
     /**
      * Textarea
      */
@@ -103,7 +105,7 @@ class Prompt extends Input {
         this.screen.grabKeys = false;
     }
 
-    insert(string, index, count, insertion) {
+    insert(string, index, count?, insertion?) {
         let result = string.substr(0, index - count);
         if(insertion) {
             result += insertion
@@ -290,4 +292,4 @@ class Prompt extends Input {
  * Expose
  */
 
-module.exports = Prompt;
+export default Prompt;

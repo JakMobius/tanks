@@ -30,7 +30,6 @@ class Compiler {
         this.plugins = []
         this.babelify = null
         this.resourcify = null
-        this.result = ""
     }
 
     /**
@@ -56,30 +55,56 @@ class Compiler {
         let o = Object.assign({}, incremental.args, {
             paths: [
                 Compiler.projectDirectory + "/"
-            ]
+            ],
+            extensions: ['.ts'],
+            detectGlobals: false
         })
 
-        const compiler = browserify(o)
+        const compiler = browserify(o, { debug: true })
         incremental(compiler, { cacheFile: options.cacheFile })
 
-        this.resourcify = resourceify()
+        //this.resourcify = resourceify()
         this.babelify = babelify.configure({
-            "plugins": [
-                ["@babel/plugin-proposal-class-properties", { loose: true }]
+            plugins: [
+                "babel-plugin-import-dir",
+                ["module-resolver", {
+                    extensions: [".js", ".ts", ".json"],
+                    alias: {
+                        "@": Compiler.path("src")
+                    }
+                }],
+                ["@babel/plugin-syntax-dynamic-import"],
+                ["@babel/plugin-syntax-class-properties"],
+                ["@babel/plugin-proposal-class-properties", { loose: true }],
+                ["@babel/plugin-transform-typescript"],
+                ["transform-dirname-filename"],
+                ["@babel/plugin-transform-runtime"]
             ],
-            sourceMaps: false
+            "presets": [
+                ['@babel/preset-env', {
+                    // "debug": true,
+                    "targets": "node 7"
+                }]
+            ],
+            sourceMaps: true,
+            sourceType: "module",
+            extensions: ['.ts', '.js']
         })
-
         compiler.transform(this.babelify)
-        compiler.transform(aliasify, {
-            replacements: {
-                "^/": function(path) {
-                    return path.substr(1)
-                }
-            },
-        })
-        compiler.transform(folderify)
-        compiler.plugin(this.resourcify.plugin)
+
+        //compiler.transform(folderify)
+        //compiler.plugin(this.resourcify.plugin)
+        //
+        compiler.external("fs")
+        compiler.external("http")
+        compiler.external("express")
+        compiler.external("express-session")
+        compiler.external("websocket")
+        compiler.external("url")
+        compiler.external("mongodb")
+        compiler.external("chalk")
+        compiler.external("crypto")
+        compiler.external("assert")
         compiler.require(options.source, { entry: true })
 
         return compiler
@@ -104,8 +129,10 @@ class Compiler {
     }
 
     compile() {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             Timings.begin("Compiling scripts")
+
+            await CompileCache.createCache()
 
             let source = Compiler.path(this.options.source)
             let cacheFile = this.options.cacheFile ? Compiler.path(this.options.cacheFile) : null
@@ -115,9 +142,18 @@ class Compiler {
                 cacheFile: cacheFile
             })
 
+            let isError = false
+
+            this.result = ""
+
             this.compiler.bundle()
                 .on('data', (data) => this.result += data)
-                .on('error', reject)
+                .on('error', (error) => {
+                    console.error(error.message)
+                    if(error.annotated) console.error(error.annotated)
+                    isError = true
+                })
+                .pipe(fs.createWriteStream('server.js', 'utf8'))
                 .on('finish', async () => {
                     Timings.end()
                     await this.finished()
@@ -132,18 +168,18 @@ class Compiler {
      * @return {Promise>}
      */
 
-    async finished() {
+    async finished(src, map) {
 
-        Timings.begin("Reading resources")
-
-        await this.resourcify.readResources()
-
-        Timings.end()
-
-        for(let plugin of this.plugins) {
-            await plugin.perform(this.resourcify.resources)
-        }
-
+        // Timings.begin("Reading resources")
+        //
+        // await this.resourcify.readResources()
+        //
+        // Timings.end()
+        //
+        // for(let plugin of this.plugins) {
+        //     await plugin.perform(this.resourcify.resources)
+        // }
+        //
         let destination = Compiler.path(this.options.destination)
         let dirname = path.dirname(destination)
         try {

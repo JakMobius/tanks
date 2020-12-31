@@ -8,16 +8,13 @@
  * Modules
  */
 
-var assert = require('assert');
-
-var colors = require('../colors')
-    , unicode = require('../unicode');
+import assert from 'assert';
+import colors from '../colors'
+import unicode from '../unicode';
+import helpers from '../helpers';
+import Node from "./node"
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
-
-var helpers = require('../helpers');
-
-var Node = require('./node');
 
 class Element extends Node {
     /**
@@ -2548,4 +2545,4 @@ Element.prototype.__defineSetter__('bottom', function (val) {
  * Expose
  */
 
-module.exports = Element;
+export default Element

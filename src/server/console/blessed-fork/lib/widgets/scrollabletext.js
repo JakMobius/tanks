@@ -8,7 +8,7 @@
  * Modules
  */
 
-var ScrollableBox = require('./scrollablebox');
+import ScrollableBox from './scrollablebox';
 
 class ScrollableText extends ScrollableBox {
     /**
@@ -27,4 +27,4 @@ class ScrollableText extends ScrollableBox {
  * Expose
  */
 
-module.exports = ScrollableText;
+export default ScrollableText;

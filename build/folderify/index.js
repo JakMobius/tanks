@@ -4,9 +4,10 @@ const Compiler = () => require("../compiler/compiler")
 
 module.exports = require('browserify-transform-tools').makeRequireTransform(
   'folderify', {
-    jsFilesOnly: true,
-    evaluateArguments: true,
-    falafelOptions: { ecmaVersion: 8 }
+      jsFilesOnly: true,
+      evaluateArguments: true,
+      falafelOptions: { ecmaVersion: 8 },
+      sourceType: "module",
   },
   function(args, opts, done) {
     let pattern = args[0];

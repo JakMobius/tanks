@@ -352,7 +352,7 @@ class b2Vec2 {
    x = 0
    y = 0
 
-   constructor(x_, y_) {
+   constructor(x_?, y_?) {
       if(arguments.length == 2) {
          this.x = x_;
          this.y = y_
@@ -479,7 +479,7 @@ class b2Vec3 {
    y = 0
    z = 0
 
-   constructor(x, y, z) {
+   constructor(x?, y?, z?) {
       if(arguments.length == 3) {
          this.x = x;
          this.y = y;
@@ -10465,7 +10465,8 @@ b2ContactManager.prototype.m_contactCount = 0;
 b2ContactManager.prototype.m_contactFilter = null;
 b2ContactManager.prototype.m_contactListener = null;
 b2ContactManager.prototype.m_contactFactory = null;
-b2ContactManager.prototype.m_allocator = null;var b2World = function() {
+b2ContactManager.prototype.m_allocator = null
+var b2World = function() {
    this.__varz();
    this.__constructor.apply(this, arguments)
 };
@@ -11141,102 +11142,7 @@ b2World.prototype.ClearForces = function() {
       body.m_torque = 0
    }
 };
-b2World.prototype.DrawDebugData = function() {
-   if(this.m_debugDraw == null) {
-      return
-   }
-   this.m_debugDraw.Clear();
-   var flags = this.m_debugDraw.GetFlags();
-   var i = 0;
-   var b;
-   var f;
-   var s;
-   var j;
-   var bp;
-   var invQ = new b2Vec2;
-   var x1 = new b2Vec2;
-   var x2 = new b2Vec2;
-   var xf;
-   var b1 = new b2AABB;
-   var b2 = new b2AABB;
-   var vs = [new b2Vec2, new b2Vec2, new b2Vec2, new b2Vec2];
-   var color = new b2Color(0, 0, 0);
-   if(flags & b2DebugDraw.e_shapeBit) {
-      for(b = this.m_bodyList;b;b = b.m_next) {
-         xf = b.m_xf;
-         for(f = b.GetFixtureList();f;f = f.m_next) {
-            s = f.GetShape();
-            if(b.IsActive() == false) {
-               color.Set(0.5, 0.5, 0.3);
-               this.DrawShape(s, xf, color)
-            }else {
-               if(b.GetType() == b2Body.b2_staticBody) {
-                  color.Set(0.5, 0.9, 0.5);
-                  this.DrawShape(s, xf, color)
-               }else {
-                  if(b.GetType() == b2Body.b2_kinematicBody) {
-                     color.Set(0.5, 0.5, 0.9);
-                     this.DrawShape(s, xf, color)
-                  }else {
-                     if(b.IsAwake() == false) {
-                        color.Set(0.6, 0.6, 0.6);
-                        this.DrawShape(s, xf, color)
-                     }else {
-                        color.Set(0.9, 0.7, 0.7);
-                        this.DrawShape(s, xf, color)
-                     }
-                  }
-               }
-            }
-         }
-      }
-   }
-   if(flags & b2DebugDraw.e_jointBit) {
-      for(j = this.m_jointList;j;j = j.m_next) {
-         this.DrawJoint(j)
-      }
-   }
-   if(flags & b2DebugDraw.e_controllerBit) {
-      for(var c = this.m_controllerList;c;c = c.m_next) {
-         c.Draw(this.m_debugDraw)
-      }
-   }
-   if(flags & b2DebugDraw.e_pairBit) {
-      color.Set(0.3, 0.9, 0.9);
-      for(var contact = this.m_contactManager.m_contactList;contact;contact = contact.GetNext()) {
-         var fixtureA = contact.GetFixtureA();
-         var fixtureB = contact.GetFixtureB();
-         var cA = fixtureA.GetAABB().GetCenter();
-         var cB = fixtureB.GetAABB().GetCenter();
-         this.m_debugDraw.DrawSegment(cA, cB, color)
-      }
-   }
-   if(flags & b2DebugDraw.e_aabbBit) {
-      bp = this.m_contactManager.m_broadPhase;
-      vs = [new b2Vec2, new b2Vec2, new b2Vec2, new b2Vec2];
-      for(b = this.m_bodyList;b;b = b.GetNext()) {
-         if(b.IsActive() == false) {
-            continue
-         }
-         for(f = b.GetFixtureList();f;f = f.GetNext()) {
-            var aabb = bp.GetFatAABB(f.m_proxy);
-            vs[0].Set(aabb.lowerBound.x, aabb.lowerBound.y);
-            vs[1].Set(aabb.upperBound.x, aabb.lowerBound.y);
-            vs[2].Set(aabb.upperBound.x, aabb.upperBound.y);
-            vs[3].Set(aabb.lowerBound.x, aabb.upperBound.y);
-            this.m_debugDraw.DrawPolygon(vs, 4, color)
-         }
-      }
-   }
-   if(flags & b2DebugDraw.e_centerOfMassBit) {
-      for(b = this.m_bodyList;b;b = b.m_next) {
-         xf = b2World.s_xf;
-         xf.R = b.m_xf.R;
-         xf.position = b.GetWorldCenter();
-         this.m_debugDraw.DrawTransform(xf)
-      }
-   }
-};
+
 b2World.prototype.QueryAABB = function(callback, aabb) {
    var broadPhase = this.m_contactManager.m_broadPhase;
    function WorldQueryWrapper(proxy) {
@@ -11294,7 +11200,7 @@ b2World.prototype.RayCast = function(callback, point1, point2) {
 };
 b2World.prototype.RayCastOne = function(point1, point2) {
    var result;
-   function RayCastOneWrapper(fixture, point, normal, fraction) {
+   function RayCastOneWrapper(fixture, point, normal, fraction?) {
       result = fixture;
       return fraction
    }
@@ -11303,7 +11209,7 @@ b2World.prototype.RayCastOne = function(point1, point2) {
 };
 b2World.prototype.RayCastAll = function(point1, point2) {
    var result = new Array;
-   function RayCastAllWrapper(fixture, point, normal, fraction) {
+   function RayCastAllWrapper(fixture, point, normal, fraction?) {
       result[result.length] = fixture;
       return 1
    }
@@ -11340,113 +11246,6 @@ b2World.prototype.m_allowSleep = null;
 b2World.prototype.m_groundBody = null;
 b2World.prototype.m_destructionListener = null;
 b2World.prototype.m_debugDraw = null;
-b2World.prototype.m_inv_dt0 = null;if(typeof exports !== "undefined") {
-   exports.b2BoundValues = b2BoundValues;
-   exports.b2Math = b2Math;
-   exports.b2DistanceOutput = b2DistanceOutput;
-   exports.b2Mat33 = b2Mat33;
-   exports.b2ContactPoint = b2ContactPoint;
-   exports.b2PairManager = b2PairManager;
-   exports.b2PositionSolverManifold = b2PositionSolverManifold;
-   exports.b2OBB = b2OBB;
-   exports.b2CircleContact = b2CircleContact;
-   exports.b2PulleyJoint = b2PulleyJoint;
-   exports.b2Pair = b2Pair;
-   exports.b2TimeStep = b2TimeStep;
-   exports.b2FixtureDef = b2FixtureDef;
-   exports.b2World = b2World;
-   exports.b2PrismaticJoint = b2PrismaticJoint;
-   exports.b2Controller = b2Controller;
-   exports.b2ContactID = b2ContactID;
-   exports.b2RevoluteJoint = b2RevoluteJoint;
-   exports.b2JointDef = b2JointDef;
-   exports.b2Transform = b2Transform;
-   exports.b2GravityController = b2GravityController;
-   exports.b2EdgeAndCircleContact = b2EdgeAndCircleContact;
-   exports.b2EdgeShape = b2EdgeShape;
-   exports.b2BuoyancyController = b2BuoyancyController;
-   exports.b2LineJointDef = b2LineJointDef;
-   exports.b2Contact = b2Contact;
-   exports.b2DistanceJoint = b2DistanceJoint;
-   exports.b2Body = b2Body;
-   exports.b2DestructionListener = b2DestructionListener;
-   exports.b2PulleyJointDef = b2PulleyJointDef;
-   exports.b2ContactEdge = b2ContactEdge;
-   exports.b2ContactConstraint = b2ContactConstraint;
-   exports.b2ContactImpulse = b2ContactImpulse;
-   exports.b2DistanceJointDef = b2DistanceJointDef;
-   exports.b2ContactResult = b2ContactResult;
-   exports.b2EdgeChainDef = b2EdgeChainDef;
-   exports.b2Vec2 = b2Vec2;
-   exports.b2Vec3 = b2Vec3;
-   exports.b2DistanceProxy = b2DistanceProxy;
-   exports.b2FrictionJointDef = b2FrictionJointDef;
-   exports.b2PolygonContact = b2PolygonContact;
-   exports.b2TensorDampingController = b2TensorDampingController;
-   exports.b2ContactFactory = b2ContactFactory;
-   exports.b2WeldJointDef = b2WeldJointDef;
-   exports.b2ConstantAccelController = b2ConstantAccelController;
-   exports.b2GearJointDef = b2GearJointDef;
-   exports.ClipVertex = ClipVertex;
-   exports.b2SeparationFunction = b2SeparationFunction;
-   exports.b2ManifoldPoint = b2ManifoldPoint;
-   exports.b2Color = b2Color;
-   exports.b2PolygonShape = b2PolygonShape;
-   exports.b2DynamicTreePair = b2DynamicTreePair;
-   exports.b2ContactConstraintPoint = b2ContactConstraintPoint;
-   exports.b2FrictionJoint = b2FrictionJoint;
-   exports.b2ContactFilter = b2ContactFilter;
-   exports.b2ControllerEdge = b2ControllerEdge;
-   exports.b2Distance = b2Distance;
-   exports.b2Fixture = b2Fixture;
-   exports.b2DynamicTreeNode = b2DynamicTreeNode;
-   exports.b2MouseJoint = b2MouseJoint;
-   exports.b2DistanceInput = b2DistanceInput;
-   exports.b2BodyDef = b2BodyDef;
-   exports.b2DynamicTreeBroadPhase = b2DynamicTreeBroadPhase;
-   exports.b2Settings = b2Settings;
-   exports.b2Proxy = b2Proxy;
-   exports.b2Point = b2Point;
-   exports.b2BroadPhase = b2BroadPhase;
-   exports.b2Manifold = b2Manifold;
-   exports.b2WorldManifold = b2WorldManifold;
-   exports.b2PrismaticJointDef = b2PrismaticJointDef;
-   exports.b2RayCastOutput = b2RayCastOutput;
-   exports.b2ConstantForceController = b2ConstantForceController;
-   exports.b2TimeOfImpact = b2TimeOfImpact;
-   exports.b2CircleShape = b2CircleShape;
-   exports.b2MassData = b2MassData;
-   exports.b2Joint = b2Joint;
-   exports.b2GearJoint = b2GearJoint;
-   exports.b2DynamicTree = b2DynamicTree;
-   exports.b2JointEdge = b2JointEdge;
-   exports.b2LineJoint = b2LineJoint;
-   exports.b2NullContact = b2NullContact;
-   exports.b2ContactListener = b2ContactListener;
-   exports.b2RayCastInput = b2RayCastInput;
-   exports.b2TOIInput = b2TOIInput;
-   exports.Features = Features;
-   exports.b2FilterData = b2FilterData;
-   exports.b2Island = b2Island;
-   exports.b2ContactManager = b2ContactManager;
-   exports.b2ContactSolver = b2ContactSolver;
-   exports.b2Simplex = b2Simplex;
-   exports.b2AABB = b2AABB;
-   exports.b2Jacobian = b2Jacobian;
-   exports.b2Bound = b2Bound;
-   exports.b2RevoluteJointDef = b2RevoluteJointDef;
-   exports.b2PolyAndEdgeContact = b2PolyAndEdgeContact;
-   exports.b2SimplexVertex = b2SimplexVertex;
-   exports.b2WeldJoint = b2WeldJoint;
-   exports.b2Collision = b2Collision;
-   exports.b2Mat22 = b2Mat22;
-   exports.b2SimplexCache = b2SimplexCache;
-   exports.b2PolyAndCircleContact = b2PolyAndCircleContact;
-   exports.b2MouseJointDef = b2MouseJointDef;
-   exports.b2Shape = b2Shape;
-   exports.b2Segment = b2Segment;
-   exports.b2ContactRegister = b2ContactRegister;
-   exports.b2DebugDraw = b2DebugDraw;
-   exports.b2Sweep = b2Sweep
-}
-;
+b2World.prototype.m_inv_dt0 = null;
+
+export default { b2BoundValues, b2Math, b2DistanceOutput, b2Mat33, b2ContactPoint, b2PairManager, b2PositionSolverManifold, b2OBB, b2CircleContact, b2PulleyJoint, b2Pair, b2TimeStep, b2FixtureDef, b2World, b2PrismaticJoint, b2Controller, b2ContactID, b2RevoluteJoint, b2JointDef, b2Transform, b2GravityController, b2EdgeAndCircleContact, b2EdgeShape, b2BuoyancyController, b2LineJointDef, b2Contact, b2DistanceJoint, b2Body, b2DestructionListener, b2PulleyJointDef, b2ContactEdge, b2ContactConstraint, b2ContactImpulse, b2DistanceJointDef, b2ContactResult, b2EdgeChainDef, b2Vec2, b2Vec3, b2DistanceProxy, b2FrictionJointDef, b2PolygonContact, b2TensorDampingController, b2ContactFactory, b2WeldJointDef, b2ConstantAccelController, b2GearJointDef, ClipVertex, b2SeparationFunction, b2ManifoldPoint, b2Color, b2PolygonShape, b2DynamicTreePair, b2ContactConstraintPoint, b2FrictionJoint, b2ContactFilter, b2ControllerEdge, b2Distance, b2Fixture, b2DynamicTreeNode, b2MouseJoint, b2DistanceInput, b2BodyDef, b2DynamicTreeBroadPhase, b2Settings, b2Proxy, b2Point, b2BroadPhase, b2Manifold, b2WorldManifold, b2PrismaticJointDef, b2RayCastOutput, b2ConstantForceController, b2TimeOfImpact, b2CircleShape, b2MassData, b2Joint, b2GearJoint, b2DynamicTree, b2JointEdge, b2LineJoint, b2NullContact, b2ContactListener, b2RayCastInput, b2TOIInput, Features, b2FilterData, b2Island, b2ContactManager, b2ContactSolver, b2Simplex, b2AABB, b2Jacobian, b2Bound, b2RevoluteJointDef, b2PolyAndEdgeContact, b2SimplexVertex, b2WeldJoint, b2Collision, b2Mat22, b2SimplexCache, b2PolyAndCircleContact, b2MouseJointDef, b2Shape, b2Segment, b2ContactRegister, b2DebugDraw, b2Sweep };

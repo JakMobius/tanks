@@ -8,15 +8,16 @@
  * Modules
  */
 
-var EventEmitter = require('events').EventEmitter
-  , StringDecoder = require('string_decoder').StringDecoder
-  , cp = require('child_process')
-  , util = require('util')
-  , fs = require('fs');
+import { EventEmitter } from 'events';
 
-var Tput = require('./tput')
-  , colors = require('./colors')
-  , slice = Array.prototype.slice;
+import { StringDecoder } from 'string_decoder';
+import cp from 'child_process';
+import util from 'util';
+import fs from 'fs';
+import Tput from './tput';
+import colors from './colors';
+
+var slice = Array.prototype.slice;
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
@@ -4292,4 +4293,4 @@ function merge(out) {
  * Expose
  */
 
-module.exports = Program;
+export default Program;

@@ -8,9 +8,9 @@
  * Modules
  */
 
-var fs = require('fs');
+import fs from 'fs';
 
-var unicode = require('./unicode');
+import unicode from './unicode';
 
 /**
  * Helpers
@@ -163,3 +163,5 @@ helpers.__defineGetter__('Element', function() {
   }
   return helpers._element;
 });
+
+export default helpers

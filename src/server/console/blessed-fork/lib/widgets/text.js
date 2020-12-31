@@ -8,8 +8,8 @@
  * Modules
  */
 
-var Node = require('./node');
-var Element = require('./element');
+
+import Element from './element';
 
 class Text extends Element {
     /**
@@ -28,4 +28,4 @@ class Text extends Element {
  * Expose
  */
 
-module.exports = Text;
+export default Text;

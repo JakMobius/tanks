@@ -1,9 +1,11 @@
 {
- "compilerOptions": {
-     "module": "commonjs",
-     "sourceMap": true
- },
- "exclude": [
-     "node_modules"
- ]
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@": ["@"]
+		},
+		"lib": ["ES6"],
+		"downlevelIteration": true,
+		"resolveJsonModule": true
+	}
 }

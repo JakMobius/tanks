@@ -8,10 +8,12 @@
  * Modules
  */
 
-var Node = require('./node');
-var Box = require('./box');
+
+import Box from './box';
 
 class ScrollableBox extends Box {
+	public baseLimit: any;
+
     /**
      * ScrollableBox
      */
@@ -209,7 +211,7 @@ class ScrollableBox extends Box {
         return this.scroll(offset - (this.childBase + this.childOffset), always);
     }
 
-    scrollTo(offset, always) {
+    scrollTo(offset, always?) {
         // XXX
         // At first, this appeared to account for the first new calculation of childBase:
         this.scroll(0);
@@ -220,7 +222,7 @@ class ScrollableBox extends Box {
         return this.childBase + this.childOffset;
     }
 
-    scroll(offset, always) {
+    scroll(offset, always?) {
         if (!this.scrollable) return;
 
         if (this.detached) return;
@@ -387,4 +389,4 @@ ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
  * Expose
  */
 
-module.exports = ScrollableBox;
+export default ScrollableBox;

@@ -4,7 +4,7 @@
  * https://github.com/chjj/blessed
  */
 
-var Element = require('./element');
+import Element from './element';
 
 class Box extends Element {
     /**
@@ -17,4 +17,4 @@ class Box extends Element {
     }
 }
 
-module.exports = Box;
+export default Box;

@@ -4,9 +4,10 @@
  * https://github.com/chjj/blessed
  */
 
-var net = require('net');
-var fs = require('fs');
-var EventEmitter = require('events').EventEmitter;
+import net from 'net';
+
+import fs from 'fs';
+import { EventEmitter } from 'events';
 
 var GPM_USE_MAGIC = false;
 
@@ -218,4 +219,4 @@ GpmClient.prototype.hasMetaKey =  function(mod) {
   return (mod & 8) ? true : false;
 };
 
-module.exports = GpmClient;
+export default GpmClient;

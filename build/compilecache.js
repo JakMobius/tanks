@@ -9,17 +9,8 @@ class CompileCache {
      * @private
      */
     static async createCacheFile(cacheFile) {
-        let dirname = path.dirname(cacheFile)
-
-        function errorHandler(e) {
-            console.warn("Unable to read build cache file. Build will be much slower", e)
-        }
-
-        await fs.access(dirname).catch(error => {
-            return fs.mkdir(dirname, { recursive: true }).catch(errorHandler)
-        })
-
-        await fs.writeFile(cacheFile, "{}").catch(errorHandler)
+        await this.createCache()
+        await fs.writeFile(cacheFile, "{}")
     }
 
     static async readCache(section) {
@@ -60,6 +51,14 @@ class CompileCache {
         let stats = await fs.stat(file)
 
         return cacheEntry.modificationTime < stats.mtime
+    }
+
+    static async createCache(file) {
+        let dirname = path.dirname(cacheFile)
+
+        await fs.access(dirname).catch(error => {
+            return fs.mkdir(dirname, { recursive: true })
+        })
     }
 
     static updateFile(file, section, data) {

@@ -21,16 +21,17 @@
  * Modules
  */
 
-var assert = require('assert')
-  , path = require('path')
-  , fs = require('fs')
-  , cp = require('child_process');
+import assert from 'assert';
+
+import path from 'path';
+import fs from 'fs';
+import cp from 'child_process';
 
 /**
  * Tput
  */
 
-function Tput(options) {
+function Tput(options?) {
   if (!(this instanceof Tput)) {
     return new Tput(options);
   }
@@ -771,7 +772,7 @@ Tput.prototype._compile = function(info, key, str) {
     , els
     , end;
 
-  function read(regex, no) {
+  function read(regex, no?) {
     cap = regex.exec(val);
     if (!cap) return;
     val = val.substring(cap[0].length);
@@ -3015,8 +3016,5 @@ Tput.utoa = Tput.prototype.utoa = {
  * Expose
  */
 
-exports = Tput;
-exports.sprintf = sprintf;
-exports.tryRead = tryRead;
-
-module.exports = exports;
+export { sprintf, tryRead };
+export default Tput;

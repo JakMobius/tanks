@@ -8,7 +8,7 @@
  * Modules
  */
 
-var ScrollableBox = require('./scrollablebox');
+import ScrollableBox from './scrollablebox';
 
 class Input extends ScrollableBox {
     /**
@@ -26,4 +26,4 @@ class Input extends ScrollableBox {
  * Expose
  */
 
-module.exports = Input;
+export default Input;

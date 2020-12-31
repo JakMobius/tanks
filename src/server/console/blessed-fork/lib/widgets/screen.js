@@ -8,23 +8,76 @@
  * Modules
  */
 
-var path = require('path')
-  , fs = require('fs')
-  , cp = require('child_process');
+import path from 'path';
 
-var colors = require('../colors')
-  , program = require('../program')
-  , unicode = require('../unicode');
+import fs from 'fs';
+import cp from 'child_process';
+import colors from '../colors';
+import program from '../program';
+import unicode from '../unicode';
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
-var helpers = require('../helpers');
-
-var Node = require('./node');
-var Element = require('./element');
-var Box = require('./box');
+import helpers from '../helpers';
+import Node from './node';
+import Element from './element';
+import Box from './box';
 
 class Screen extends Node {
+	public program: any;
+	public tput: any;
+	public autoPadding: any;
+	public tabc: any;
+	public dockBorders: any;
+	public ignoreLocked: any;
+	public _unicode: any;
+	public fullUnicode: any;
+	public dattr: any;
+	public renders: any;
+	public position: any;
+	public left: any;
+	public aleft: any;
+	public rleft: any;
+	public right: any;
+	public aright: any;
+	public rright: any;
+	public top: any;
+	public atop: any;
+	public rtop: any;
+	public bottom: any;
+	public abottom: any;
+	public rbottom: any;
+	public ileft: any;
+	public itop: any;
+	public iright: any;
+	public ibottom: any;
+	public iheight: any;
+	public iwidth: any;
+	public padding: any;
+	public hover: any;
+	public history: any;
+	public clickable: any;
+	public keyable: any;
+	public grabKeys: any;
+	public lockKeys: any;
+	public focused: any;
+	public _buf: any;
+	public _ci: any;
+	public cursor: any;
+	public _destroy: any;
+	public _listenedMouse: any;
+	public debugLog: any;
+	public destroyed: any;
+	public _listenedKeys: any;
+	public _hoverText: any;
+	public lines: any;
+	public olines: any;
+	public _borderStops: any;
+	public _savedFocus: any;
+	public _cursorBlink: any;
+	public _needsClickableSort: any;
+	public mouseDown: any;
+
   /**
    * Screen
    */
@@ -375,7 +428,7 @@ class Screen extends Node {
     return this.program.debug.apply(this.program, arguments);
   }
 
-  _listenMouse(el) {
+  _listenMouse(el?) {
     var self = this;
 
     if (el && !~this.clickable.indexOf(el)) {
@@ -466,7 +519,7 @@ class Screen extends Node {
     this._listenMouse(el);
   }
 
-  _listenKeys(el) {
+  _listenKeys(el?) {
     var self = this;
 
     if (el && !~this.keyable.indexOf(el)) {
@@ -576,7 +629,7 @@ class Screen extends Node {
     });
   }
 
-  alloc(dirty) {
+  alloc(dirty?) {
     var x, y;
 
     this.lines = [];
@@ -645,7 +698,7 @@ class Screen extends Node {
     this.emit('render');
   }
 
-  blankLine(ch, dirty) {
+  blankLine(ch?, dirty?) {
     var out = [];
     for (var x = 0; x < this.cols; x++) {
       out[x] = [this.dattr, ch || ' '];
@@ -1580,7 +1633,7 @@ class Screen extends Node {
     self.emit('focus', old);
   }
 
-  clearRegion(xi, xl, yi, yl, override) {
+  clearRegion(xi, xl, yi, yl, override?) {
     return this.fillRegion(this.dattr, ' ', xi, xl, yi, yl, override);
   }
 
@@ -2321,4 +2374,4 @@ Object.keys(angleTable).forEach(function(key) {
  * Expose
  */
 
-module.exports = Screen;
+export default Screen;
