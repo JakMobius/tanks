@@ -1,58 +1,46 @@
-import EventEmitter from '@/utils/eventemitter';
+import EventEmitter from 'src/utils/eventemitter';
 import MapBinaryOptions from './mapbinaryoptions';
 import BlockState from './blockstate/blockstate';
 import AirBlockState from './blockstate/types/airblockstate';
-import './blockstate/blockstateloader';
+import SpawnZone from "./spawnzone";
+import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import {Constructor} from "../../serialization/binary/serializable";
+import BinaryEncoder from "../../serialization/binary/binaryencoder";
+
+export interface GameMapConfig {
+	spawnZones?: SpawnZone[]
+	width?: number
+	height?: number
+	data: BlockState[]
+}
 
 class GameMap extends EventEmitter {
-	public needsUpdate: any;
-	public emit: any;
-	public map: any;
-	public BinaryOptions: any;
-	static BinaryOptions = MapBinaryOptions.shared
+	public needsUpdate: boolean;
+
+	static BinaryOptions: MapBinaryOptions = MapBinaryOptions.shared
 	static BLOCK_SIZE = 20;
 
-	/**
-	 *
-	 * @type {BlockState[]}
-	 */
-	data = []
+	data: BlockState[] = []
+	width: number = 0
+	height: number = 0
+	spawnZones: SpawnZone[] = []
 
-	/**
-	 *
-	 * @type {number}
-	 */
-	width = 0
-
-	/**
-	 *
-	 * @type {number}
-	 */
-	height = 0
-
-	/**
-	 * @type {SpawnZone[]}
-	 */
-
-	spawnZones = []
-
-	constructor(config) {
+	constructor(config: GameMapConfig) {
 		super()
-		config = config || {}
 
 		this.spawnZones = config.spawnZones || []
-		this.width = config.width || MapBinaryOptions.DEFAULT_WIDTH
-		this.height = config.height || MapBinaryOptions.DEFAULT_HEIGHT
+		this.width = config.width || MapBinaryOptions.shared.DEFAULT_WIDTH
+		this.height = config.height || MapBinaryOptions.shared.DEFAULT_HEIGHT
 		this.data = config.data
 		this.needsUpdate = true
 	}
 
-	getBlock(x, y) {
+	getBlock(x: number, y: number): BlockState {
 		if(x < 0 || y < 0 || x >= this.width || y >= this.height) return null
 		return this.data[x + this.width * y]
 	}
 
-	setBlock(x, y, block) {
+	setBlock(x: number, y: number, block: BlockState) {
 		let index = x + y * this.width;
 
 		this.data[index] = block
@@ -75,13 +63,13 @@ class GameMap extends EventEmitter {
 		this.emit("block-update", x, y)
 	}
 
-	spawnPointForTeam(id) {
+	spawnPointForTeam(id: number) {
 		const zone = this.spawnZones[id];
 
 		if(!zone) {
 			return {
-				x: Math.random() * this.map.width * GameMap.BLOCK_SIZE,
-				y: Math.random() * this.map.height * GameMap.BLOCK_SIZE
+				x: Math.random() * this.width * GameMap.BLOCK_SIZE,
+				y: Math.random() * this.height * GameMap.BLOCK_SIZE
 			}
 		}
 
@@ -91,7 +79,7 @@ class GameMap extends EventEmitter {
 		return {x: x, y: y}
 	}
 
-	damageBlock(x, y, d) {
+	damageBlock(x: number, y: number, d: number) {
 		x = Math.floor(x)
 		y = Math.floor(y)
 
@@ -125,14 +113,14 @@ class GameMap extends EventEmitter {
 		}
 	}
 
-	static fromBinary(decoder) {
-		let options = this.BinaryOptions.convertBinary(decoder)
+	static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+		let options = GameMap.BinaryOptions.convertBinary(decoder)
 
 		return new this(options)
 	}
 
-	toBinary(encoder, flags) {
-		this.constructor.BinaryOptions.convertOptions(encoder, this, flags)
+	toBinary(encoder: BinaryEncoder, flags: number[]) {
+		(this.constructor as typeof GameMap).BinaryOptions.convertOptions(encoder, this, flags)
 	}
 }
 

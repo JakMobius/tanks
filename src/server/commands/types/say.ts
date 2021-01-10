@@ -1,9 +1,9 @@
 
 import Command from '../command';
-import PlayerChatPacket from '@/networking/packets/game-packets/playerchatpacket';
+import PlayerChatPacket from 'src/networking/packets/game-packets/playerchatpacket';
 
 class SayCommand extends Command {
-    onPerform(args) {
+    onPerform(args: string[]): void {
         let text = args.join(" ")
 
         let packet = new PlayerChatPacket(text)
@@ -11,19 +11,21 @@ class SayCommand extends Command {
         this.console.logger.log(text)
     }
 
-    getName() {
+    getName(): string {
         return "say"
     }
 
-    getDescription() {
+    getDescription(): string {
         return "Broadcast a message to current room"
     }
 
-    getUsage() {
+    getUsage(): string {
         return `say <message>`
     }
 
-    requiresRoom() { return true }
+    requiresRoom(): boolean {
+        return true
+    }
 }
 
 export default SayCommand;

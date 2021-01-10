@@ -7,21 +7,21 @@ class Axle {
 	public update: any;
 
     constructor() {
-        this.sources = new Set()
+        this.sources = new Set<Axle>()
         this.ownValue = 0
         this.value = 0
-        this.destinations = new Set()
+        this.destinations = new Set<Axle>()
         this.update = false
     }
 
-    addSource(source) {
+    addSource(source: Axle) {
         this.sources.add(source)
         source.destinations.add(this)
         this.setNeedsUpdate()
         return this
     }
 
-    removeSource(source) {
+    removeSource(source: Axle) {
         this.sources.delete(source)
         source.destinations.delete(this)
         this.setNeedsUpdate()
@@ -34,7 +34,7 @@ class Axle {
         }
     }
 
-    connect(destination) {
+    connect(destination: Axle) {
         destination.addSource(this)
     }
 
@@ -50,7 +50,7 @@ class Axle {
         }
     }
 
-    setValue(value) {
+    setValue(value: number) {
         this.ownValue = value
         this.setNeedsUpdate()
     }

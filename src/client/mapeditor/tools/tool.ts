@@ -1,29 +1,28 @@
+import ToolManager from "./toolmanager";
 
 
 class Tool {
-	public dragging: any;
-	public cursor: any;
-	public locksDragging: any;
+	public dragging: boolean;
+	public cursor: string;
+	public locksDragging: boolean;
 	public settingsView: any;
+
     /**
      * Path to tool icon
-     * @type {string|null}
      */
-    image = null
+    image: string | null = null
 
     /**
      * Localized tool name
-     * @type {string|null}
      */
-    name = null
+    name: string | null = null
 
     /**
      * Tool manager associated with this tool
-     * @type {ToolManager}
      */
-    manager = null
+    manager: ToolManager = null
 
-    constructor(manager) {
+    constructor(manager: ToolManager) {
         this.image = null
         this.manager = manager
         this.name = null
@@ -33,28 +32,28 @@ class Tool {
         this.settingsView = null
     }
 
-    setCursor(cursor) {
+    setCursor(cursor: string): void {
         this.cursor = cursor
         this.manager.updateCursor()
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number): void {
         this.dragging = true
     }
 
-    mouseMove(x, y) {
+    mouseMove(x: number, y: number): void {
 
     }
 
-    mouseUp() {
+    mouseUp(): void {
         this.dragging = false
     }
 
-    becomeActive() {
+    becomeActive(): void {
 
     }
 
-    resignActive() {
+    resignActive(): void {
 
     }
 
@@ -62,7 +61,7 @@ class Tool {
 
     }
 
-    trace(x1, y1, x2, y2, callback) {
+    trace(x1: number, y1: number, x2: number, y2: number, callback: (x: number, y: number) => void) {
         let dx = x2 - x1
         let dy = y2 - y1
 

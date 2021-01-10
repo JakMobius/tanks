@@ -1,42 +1,41 @@
 
-import Box2D from '@/library/box2d';
-import GameMap from '@/utils/map/gamemap';
-import EventEmitter from '@/utils/eventemitter';
-import WorldExplodeEffectModelPool from '@/effects/world/explode/worldexplodeeffectmodelpool';
+import * as Box2D from 'src/library/box2d';
+import GameMap from 'src/utils/map/gamemap';
+import EventEmitter from 'src/utils/eventemitter';
+import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
+import AbstractEffect from 'src/effects/abstract-effect';
+import AbstractEntity from 'src/entity/abstractentity';
+import Player from 'src/utils/player';
+import ClientEffect from "./client/effects/clienteffect";
+import ClientTank from "./client/tanks/clienttank";
+import ClientTankEffect from "./client/effects/tank/clienttankeffect";
+import AbstractTank from './tanks/abstracttank';
+import BlockState from "./utils/map/blockstate/blockstate";
+import EntityModel from "./entity/entitymodel";
+import ExplodeEffectPool from "src/effects/world/explode/explode-effect-pool";
+
+export interface GameWorldConfig {
+    physicsTick?: number
+    maxTicks?: number
+    positionSteps?: number
+    velocitySteps?: number
+    map: GameMap
+}
 
 class GameWorld extends EventEmitter {
-	public physicsTick: any;
-	public maxTicks: any;
-	public positionSteps: any;
-	public velocitySteps: any;
-	public emit: any;
-    /**
-     * @type {Map<number, GameWorld>}
-     */
-    world
-    /**
-     * @type {GameMap}
-     */
-    map
-    /**
-     * @type {Map<number, Player>}
-     */
-    players = new Map()
-    /**
-     * @type {Map<number, AbstractEntity>}
-     */
-    entities = new Map()
-    /**
-     * @type {Map<number, AbstractEffect>}
-     */
-    effects = new Map()
+	public physicsTick: number;
+	public maxTicks: number;
+	public positionSteps: number;
+	public velocitySteps: number;
 
-    /**
-     * @type WorldExplodeEffectModelPool
-     */
-    explosionEffectPool
+    world: Box2D.World
+    map: GameMap
+    players = new Map<number, Player>()
+    entities = new Map<number, AbstractEntity>()
+    effects = new Map<number, AbstractEffect>()
+    explosionEffectPool: ExplodeEffectPool
 
-    constructor(options) {
+    constructor(options: GameWorldConfig) {
         super()
 
         options = Object.assign({
@@ -46,7 +45,7 @@ class GameWorld extends EventEmitter {
             velocitySteps: 1
         }, options)
 
-        this.world = new Box2D.b2World(new Box2D.b2Vec2(), true)
+        this.world = new Box2D.World(new Box2D.Vec2())
         this.map = options.map
 
         this.physicsTick = options.physicsTick
@@ -56,7 +55,7 @@ class GameWorld extends EventEmitter {
         this.createExplosionPool()
     }
 
-    createExplosionPool() {
+    createExplosionPool(): void {
         this.explosionEffectPool = new WorldExplodeEffectModelPool({
             world: this
         })
@@ -64,7 +63,7 @@ class GameWorld extends EventEmitter {
 
     // TODO: Вынести в отдельный класс
 
-    rebuildBlockPhysics() {
+    rebuildBlockPhysics(): void {
 
         for (let player of this.players.values()) {
             if(!player.tank) continue
@@ -84,7 +83,7 @@ class GameWorld extends EventEmitter {
                     let block = player.blockMap[n]
                     let mapBlock = this.map.getBlock(i, j)
 
-                    if ((mapBlock && mapBlock.constructor.isSolid) || (i < 0) || (j < 0) || (i >= this.map.width) || (j >= this.map.height)) {
+                    if ((mapBlock && (mapBlock.constructor as typeof BlockState).isSolid) || (i < 0) || (j < 0) || (i >= this.map.width) || (j >= this.map.height)) {
                         let pos = block.GetPosition()
 
                         pos.x = (i + 0.5) * GameMap.BLOCK_SIZE
@@ -106,7 +105,7 @@ class GameWorld extends EventEmitter {
         }
     }
 
-    processPhysics(dt) {
+    processPhysics(dt: number): void {
 
         this.explosionEffectPool.tick(dt)
 
@@ -122,7 +121,7 @@ class GameWorld extends EventEmitter {
         }
     }
 
-    processEntities(dt) {
+    processEntities(dt: number): void {
         for (let entity of this.entities.values()) {
             entity.tick(dt)
             if (entity.model.dead)
@@ -130,7 +129,7 @@ class GameWorld extends EventEmitter {
         }
     }
 
-    processEffects(dt) {
+    processEffects(dt: number): void {
         for(let effect of this.effects.values()) {
             effect.tick(dt)
             if(effect.dead) {
@@ -139,7 +138,7 @@ class GameWorld extends EventEmitter {
         }
     }
 
-    tick(dt) {
+    tick(dt: number): void {
         // Processing entities first because
         // otherwise processPhysics method
         // does an excessive initial tick
@@ -150,18 +149,18 @@ class GameWorld extends EventEmitter {
         this.processEffects(dt)
     }
 
-    createEntity(entity) {
+    createEntity(entity: AbstractEntity): void {
         entity.game = this
         this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
 
-    removeEntity(entity) {
+    removeEntity(entity: AbstractEntity): void {
         this.entities.delete(entity.model.id)
         this.emit("entity-remove", entity)
     }
 
-    createPlayer(player) {
+    createPlayer(player: Player) {
         if(this.players.has(player.id)) {
             this.players.get(player.id).destroy()
         }
@@ -171,29 +170,29 @@ class GameWorld extends EventEmitter {
         this.emit("player-create", player)
     }
 
-    removePlayer(player) {
+    removePlayer(player: Player) {
         player.destroy()
         //player.team.remove(player);
         this.players.delete(player.id)
         this.emit("player-remove", player)
     }
 
-    addTankEffect(effect, tank) {
+    addTankEffect(effect: AbstractEffect, tank: AbstractTank) {
         this.emit("effect-create", effect, tank)
     }
 
-    removeTankEffect(effect, tank) {
+    removeTankEffect(effect: AbstractEffect, tank: AbstractTank) {
         this.emit("effect-remove", effect, tank)
     }
 
-    addEffect(effect) {
+    addEffect(effect: AbstractEffect) {
         if(this.effects.has(effect.model.id)) return
 
         this.effects.set(effect.model.id, effect)
         this.emit("effect-create", effect)
     }
 
-    removeEffect(effect) {
+    removeEffect(effect: AbstractEffect) {
         if(this.effects.delete(effect.model.id)) {
             this.emit("effect-remove", effect)
         }

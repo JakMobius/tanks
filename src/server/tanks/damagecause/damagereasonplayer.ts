@@ -4,12 +4,10 @@ import DamageReason from './damagereason';
 class DamageReasonPlayer extends DamageReason {
 	public player: any;
 
-    constructor(options) {
-        super(options);
+    constructor() {
+        super();
 
-        if(options != null) {
-            this.player = options["player"]
-        }
+
     }
 }
 

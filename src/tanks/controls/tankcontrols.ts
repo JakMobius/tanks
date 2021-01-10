@@ -1,43 +1,28 @@
-import BinarySerializable from '../../serialization/binary/serializable';
+import BinarySerializable, {BinaryEncodable} from '../../serialization/binary/serializable';
 import Axle from './axle';
-class TankControls extends BinarySerializable {
-	public tank: any;
-	public throttle: any;
-	public steer: any;
-	public axles: any;
-	public primaryWeaponActive: any;
-	public minerActive: any;
-	public updated: any;
-	public directional: any;
-	public matrix: any;
+import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import BinaryEncoder from 'src/serialization/binary/binaryencoder';
+import RotationalMatrix from 'src/utils/rotationalmatrix';
+import TankModel from "../tankmodel";
 
-    static groupName() {
-        return TankControls.SERIALIZATION_GROUP_NAME
-    }
+class TankControls implements BinaryEncodable {
+	public tank: TankModel | undefined;
+	public throttle = 0
+	public steer = 0;
+	public axles = new Map<string, Axle>();
+	public primaryWeaponActive: boolean = false;
+	public minerActive: boolean = false;
+	public updated: boolean = false;
+	public directional: boolean = true;
+	public matrix: RotationalMatrix | null = null;
 
-    static typeName() {
-        return 0
-    }
-
-    constructor(tank?) {
-        super();
+    constructor(tank?: TankModel) {
         this.tank = tank
 
-        this.throttle = 0
-        this.steer = 0
-
-        this.axles = new Map()
         this.axles.set("x", new Axle())
         this.axles.set("y", new Axle())
         this.axles.set("primary-weapon", new Axle())
         this.axles.set("miner", new Axle())
-
-        this.primaryWeaponActive = false
-        this.minerActive = false
-        this.updated = false
-
-        this.directional = false
-        this.matrix = null
     }
 
     shouldUpdate() {
@@ -48,16 +33,6 @@ class TankControls extends BinarySerializable {
 
         if (this.axles.get("primary-weapon").needsUpdate()) return true
         return !!this.axles.get("miner").needsUpdate();
-
-
-    }
-
-    static fromJson(json) {
-        let controls = new TankControls()
-
-        controls.updateState(json)
-
-        return controls
     }
 
     getThrottle() {
@@ -133,7 +108,7 @@ class TankControls extends BinarySerializable {
         }
     }
 
-    updateState(decoder) {
+    updateState(decoder: BinaryDecoder): void {
         this.axles.get("x").setValue(Math.max(Math.min(decoder.readFloat32(), 1), -1))
         this.axles.get("y").setValue(Math.max(Math.min(decoder.readFloat32(), 1), -1))
         let weapons = decoder.readUint8()
@@ -144,13 +119,13 @@ class TankControls extends BinarySerializable {
         this.updateAxises()
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder): void {
         encoder.writeFloat32(this.axles.get("x").getValue())
         encoder.writeFloat32(this.axles.get("y").getValue())
 
         let weapons =
-            (this.isPrimaryWeaponActive() & 1) << 0 |
-            (this.isMinerActive() & 1) << 1
+            (this.isPrimaryWeaponActive() as unknown as number & 1) << 0 |
+            (this.isMinerActive() as unknown as number & 1) << 1
 
         encoder.writeUint8(weapons)
     }

@@ -28,7 +28,7 @@ class CpuUsageWatcher {
 
     }
 
-    getCpuUsage(seconds) {
+    getCpuUsage(seconds: number) {
         if(seconds % this.updateSeconds !== 0) {
             throw new Error(`Cannot count CPU usage for last ${seconds}s since update interval of the watcher is ${this.updateSeconds}s`)
         }

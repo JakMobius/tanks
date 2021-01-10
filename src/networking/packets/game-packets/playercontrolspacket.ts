@@ -1,32 +1,29 @@
 
 import TankControls from '../../../tanks/controls/tankcontrols';
 import BinaryPacket from '../../binarypacket';
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 class PlayerControlsPacket extends BinaryPacket {
-	public controls: any;
+	public controls: TankControls;
+    static typeName = 6
 
-    static typeName() { return 6 }
-
-    /**
-     * @param { TankControls } controls
-     */
-    constructor(controls) {
+    constructor(controls: TankControls) {
         super();
         this.controls = controls
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         this.controls.toBinary(encoder)
     }
 
     /**
      * Update specified tank controls
-     * @param { TankControls } controls
      */
-    updateControls(controls) {
+    updateControls(controls: TankControls): void {
         controls.updateState(this.decoder)
     }
 }
 
-BinaryPacket.register(PlayerControlsPacket)
+BinarySerializer.register(PlayerControlsPacket)
 export default PlayerControlsPacket;

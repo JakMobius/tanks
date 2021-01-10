@@ -1,8 +1,8 @@
 
-import Particle from './particle';
+import Particle, {ParticleConfig} from './particle';
 
 class Smoke extends Particle {
-    constructor(config) {
+    constructor(config: ParticleConfig) {
         super(config)
         this.color = config.color
         this.width = config.width || 4

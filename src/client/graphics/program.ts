@@ -1,21 +1,22 @@
 
 import Uniform from './uniform';
 import GLBuffer from './glbuffer';
+import Shader from "./shader";
 
 class Program {
-	public name: any;
-	public shaders: any;
-	public raw: any;
-	public ctx: any;
+	public name: string;
+	public shaders: Shader[];
+	public raw: WebGLProgram;
+	public ctx: WebGLRenderingContext;
 
-    constructor(name) {
+    constructor(name: string, ...shaders: Shader[]) {
         this.name = name
         this.shaders = Array.prototype.slice.call(arguments, 1)
         this.raw = null
         this.ctx = null
     }
 
-    link(gl) {
+    link(gl: WebGLRenderingContext) {
         this.raw = gl.createProgram()
         for(let shader of this.shaders)
             gl.attachShader(this.raw, shader.raw)
@@ -37,11 +38,11 @@ class Program {
         }).createBuffer()
     }
 
-    getUniform(name) {
+    getUniform(name: string) {
         return new Uniform(this, name)
     }
 
-    getAttribute(name) {
+    getAttribute(name: string) {
         return this.ctx.getAttribLocation(this.raw, name);
     }
 

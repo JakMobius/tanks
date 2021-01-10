@@ -1,18 +1,19 @@
 
-import Command from '../../command';
+import Command, {CommandConfig} from '../../command';
 import CommandFlag from '../../commandflag';
-import Game from '@/server/room/game';
+import Game from 'src/server/room/game';
 import fs from 'fs';
-import GameMap from '@/utils/map/gamemap';
-import BinaryDecoder from '@/serialization/binary/binarydecoder';
+import GameMap from 'src/utils/map/gamemap';
+import BinaryDecoder from 'src/serialization/binary/binarydecoder';
 import pako from 'pako';
 import path from 'path';
+import RoomConfig from "../../../room/room-config";
 
 const mapFolder = path.resolve(__dirname, "../../../maps")
 
 class RoomCreateCommand extends Command {
 
-    constructor(options) {
+    constructor(options: CommandConfig) {
         super(options);
 
         this.addFlag(new CommandFlag({
@@ -30,7 +31,7 @@ class RoomCreateCommand extends Command {
         }))
     }
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let logger = this.console.logger
 
         if(!this.console.server.gameSocket) {
@@ -49,12 +50,12 @@ class RoomCreateCommand extends Command {
             return
         }
 
-        let mapName = flags.get("map")[0]
+        let mapName = (flags.get("map") as string[])[0]
         let gameName = mapName
-        if(flags.has("name")) gameName = flags.get("name")[0]
+        if(flags.has("name")) gameName = (flags.get("name") as string[])[0]
 
         if (this.console.server.gameSocket.games.get(gameName)) {
-            logger.log( `§F00; Room '" + gameName + "' already exists\n` +
+            logger.log( `§F00; Room '${gameName}' already exists\n` +
                         `§777; ⭑ §;To control existing room, use 'room view' command\n` +
                         `§777; ⭑ §;To delete existing room, use 'room delete' command`)
             return
@@ -67,13 +68,18 @@ class RoomCreateCommand extends Command {
             return
         }
 
+        let roomConfig = new RoomConfig()
 
+        roomConfig.name = gameName
+        roomConfig.map = mapPath
 
-        logger.log( `§0F0; Room '${gameName}' has been sucessfully created")\n` +
-                    `§777; ⭑ §;To control this room, use 'room view "${gameName}"' command`)
+        this.console.server.gameSocket.createRoom(roomConfig).then(() => {
+            logger.log( `§0F0; Room '${gameName}' has been sucessfully created\n` +
+                        `§777; ⭑ §;To control this room, use 'room view "${gameName}"' command`)
+        })
     }
 
-    onTabComplete(args) {
+    onTabComplete(args: string[]) {
         let found = this.findFlags(args)
         let currentFlag = found.currentFlag
 

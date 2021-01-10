@@ -1,29 +1,23 @@
+import BinarySerializable, {BinarySerializableStatic, Constructor} from "./binary/serializable";
 
-class Group {
-    array = []
+class BinarySerializationGroup {
+    map = new Map<number, BinarySerializableStatic<any>>();
 
-    register(clazz) {
-        const clazzType = clazz.typeName()
+    constructor() {
 
-        for(let eachClazz of this.array) {
-            if(eachClazz.typeName() === clazzType) {
-                throw new Error(`Type name '${clazzType}' is already registered in this group.`)
-            }
-        }
-
-        this.array.push(clazz);
     }
 
-    get(type) {
-
-        for(let eachClazz of this.array) {
-            if(eachClazz.typeName() === type) {
-                return eachClazz
-            }
+    register(clazz: BinarySerializableStatic<any>): void {
+        if(this.map.has(clazz.typeName)) {
+            throw new Error(`Type name '${clazz.typeName}' is already registered in this group.`)
         }
 
-        return null
+        this.map.set(clazz.typeName, clazz);
+    }
+
+    get<C extends (Constructor<BinarySerializable<C>> & BinarySerializableStatic<C>)>(type: number): BinarySerializableStatic<C> | undefined {
+        return this.map.get(type);
     }
 }
 
-export default Group;
+export default BinarySerializationGroup;

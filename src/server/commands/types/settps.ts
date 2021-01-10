@@ -2,14 +2,12 @@
 import Command from '../command';
 
 class SetTpsCommand extends Command {
-	public logger: any;
-	public observingRoom: any;
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let tps = Number(args[0])
 
         if(!tps) {
-            this.logger.log("Usage: " + this.getUsage())
+            this.console.logger.log("Usage: " + this.getUsage())
             return
         }
 
@@ -17,26 +15,22 @@ class SetTpsCommand extends Command {
         if(tps < 1) tps = 1
 
         tps = Math.round(tps)
-        this.observingRoom.speedupGame(tps / 20)
+        this.console.observingRoom.speedupGame(tps / 20)
     }
 
-    onTabComplete(args) {
-        super.onTabComplete(args);
+    getDescription(): string {
+        return "Change room TPS"
     }
 
-    getDescription() {
-        return "Установить TPS для текущей комнаты"
-    }
-
-    getName() {
+    getName(): string {
         return "settps"
     }
 
-    getUsage() {
+    getUsage(): string {
         return "settps <tps>"
     }
 
-    requiresRoom() {
+    requiresRoom(): boolean {
         return true
     }
 }

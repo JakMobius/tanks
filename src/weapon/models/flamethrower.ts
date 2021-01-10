@@ -1,6 +1,12 @@
-import Weapon from '../weapon';
-import TankFireEffectModel from '@/effects/tank/tankfireeffectmodel';
-import ServerTankEffect from '@/server/effects/tank/servertankeffect';
+import Weapon, {WeaponConfig} from '../weapon';
+import TankFireEffectModel from 'src/effects/tank/tank-fire-effect-model';
+import ServerTankEffect from 'src/server/effects/tank/servertankeffect';
+
+export interface FlamethrowerConfig extends WeaponConfig {
+	damage?: number
+	radius?: number
+	angle?: number
+}
 
 class Flamethrower extends Weapon {
 	public damage: any;
@@ -10,7 +16,7 @@ class Flamethrower extends Weapon {
 	public fireEffect: any;
 	public serverEffect: any;
 
-	constructor(config) {
+	constructor(config: FlamethrowerConfig) {
 		config = Object.assign({
 			damage: 10,
 			radius: 90,

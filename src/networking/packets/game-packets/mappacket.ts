@@ -1,29 +1,30 @@
 
 import BinaryPacket from '../../binarypacket';
 import GameMap from '../../../utils/map/gamemap';
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 
 class MapPacket extends BinaryPacket {
 	public map: any;
 
-    static typeName() {
-        return 1
-    }
+    static typeName = 1
 
     static requireLargeIndices = true
 
-    constructor(map) {
+    constructor(map: GameMap) {
         super();
 
         this.map = map
     }
 
-    static fromBinary(decoder) {
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
         let map = GameMap.fromBinary(decoder)
         map.update()
-        return new MapPacket(map)
+        return new MapPacket(map) as any as T
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         this.map.toBinary(encoder, [
             GameMap.BinaryOptions.SIZE_FLAG,
             GameMap.BinaryOptions.DATA_FLAG
@@ -31,6 +32,6 @@ class MapPacket extends BinaryPacket {
     }
 }
 
-BinaryPacket.register(MapPacket)
+BinarySerializer.register(MapPacket)
 
 export default MapPacket;

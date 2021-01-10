@@ -1,41 +1,39 @@
 
 import Downloader from '../utils/downloader';
-import Sound from './sound';
+import Sound, {SoundConfig} from './sound';
 import FX from './fx';
+import Progress from "../utils/progress";
+import Camera from "../camera";
 
-window.AudioContext = window.AudioContext || window["webkitAudioContext"]
+window.AudioContext = window.AudioContext || (window as any)["webkitAudioContext"]
 
 class SoundEngine {
-	public context: any;
-	public sound: any;
-	public index: any;
-	public buffer: any;
-	public audioEnabled: any;
-	public camera: any;
+	public context = new AudioContext();
+	public sound: AudioBuffer[] = [];
+	public index: number;
+	public audioEnabled: boolean;
+	public camera: Camera;
 
     constructor() {
-        this.context = new AudioContext()
-        this.sound = []
+
     }
 
-    download(progress) {
-        const self = this
-
-        return Downloader.download(FX.sounds, function(response) {
-            self.context.decodeAudioData(response, (buffer) => {
-                self.sound[this.index] = buffer;
+    download(progress: Progress, index: number) {
+        return Downloader.download(FX.sounds, (response: ArrayBuffer) => {
+            this.context.decodeAudioData(response, (buffer: AudioBuffer) => {
+                this.sound[index] = buffer;
             });
         }, "arraybuffer", progress)
     }
 
-    playSound(s, options) {
+    playSound(s: number, options?: SoundConfig) {
         options = options || {}
 
         if(options.mapX !== undefined) {
             options.shouldPan = true
         }
 
-        const sound = new Sound(this.context, this.buffer, s, options);
+        const sound = new Sound(this.context, this.sound[s], options);
 
         if(this.audioEnabled) {
 
@@ -65,7 +63,7 @@ class SoundEngine {
         return sound
     }
 
-    updateSoundPosition(sound, camera?) {
+    updateSoundPosition(sound: Sound, camera?: Camera) {
 
         const options = sound.config;
 

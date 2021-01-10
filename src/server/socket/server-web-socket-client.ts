@@ -1,9 +1,12 @@
 
-import { client as WebSocketClient } from 'websocket';
 import AbstractClient from '../../networking/abstract-client';
 import Logger from '../log/logger';
-import { connection as WebSocketConnection } from 'websocket';
+import * as WebSocket from 'websocket';
 import ServerParticipantConnection from './participant-client/server-participant-connection';
+
+export interface ServerWebSocketClientConfig {
+    ip: string
+}
 
 // Since `WebSocketClient` name is reserved by websocket module,
 // this class is named like this
@@ -16,13 +19,13 @@ class ServerWebSocketClient extends AbstractClient {
 	public reconnect: any;
 	public reconnectionDelay: any;
 	public logger: any;
-    /**
-     * @type WebSocketClient
-     */
-    client
+	public ip: string
 
-    constructor(config) {
-        super(config)
+    public client: WebSocket.client
+
+    constructor(config: ServerWebSocketClientConfig) {
+        super()
+        this.ip = config.ip
         this.client = null
         this.webSocketConnection = null
         this.reconnect = false
@@ -34,7 +37,7 @@ class ServerWebSocketClient extends AbstractClient {
         if(this.client != null) return;
         this.reconnect = true
 
-        this.client = new WebSocketClient()
+        this.client = new WebSocket.client()
 
         this.client.on("connectFailed", (error) => this.onError(error))
         this.client.on("connect", (connection) => {
@@ -47,10 +50,10 @@ class ServerWebSocketClient extends AbstractClient {
             connection.on('message', (message) => this.onMessage(message));
         })
 
-        this.client.connect(this.config.ip)
+        this.client.connect(this.ip)
     }
 
-    onMessage(message) {
+    onMessage(message: WebSocket.IMessage) {
         try {
             if(message.type !== "binary") {
                 this.logger.log("Received invalid packet")
@@ -73,18 +76,17 @@ class ServerWebSocketClient extends AbstractClient {
         return !!this.webSocketConnection
     }
 
-    writePacket(packet) {
+    writePacket(packet: ArrayBuffer) {
         this.webSocketConnection.sendBytes(Buffer.from(packet))
     }
 
-    disconnect(reason?) {
+    disconnect(reason?: string) {
         this.reconnect = false
-        super.disconnect(reason)
         this.closeConnection(reason)
     }
 
-    closeConnection(reason) {
-        if(this.webSocketConnection) this.webSocketConnection.close(WebSocketConnection.CLOSE_REASON_NORMAL, reason)
+    closeConnection(reason: string) {
+        if(this.webSocketConnection) this.webSocketConnection.close(WebSocket.connection.CLOSE_REASON_NORMAL, reason)
         if(this.client) this.client.abort()
     }
 }

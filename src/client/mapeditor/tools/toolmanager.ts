@@ -3,51 +3,21 @@ import DocumentEventHandler from '../../controls/interact/documenteventhandler';
 import Camera from '../../camera';
 import Screen from '../../screen';
 import Tool from '../tools/tool';
+import KeyboardController from "../../controls/interact/keyboardcontroller";
+import EditorMap from "../editormap";
+import BlockState from "../../../utils/map/blockstate/blockstate";
 
 class ToolManager extends DocumentEventHandler {
 
-    /**
-     * @type Camera
-     */
-    camera = null
+    camera: Camera = null
+    canvas: HTMLCanvasElement = null
+    keyboard: KeyboardController = null
+    selectedTool: Tool = null
+    map: EditorMap = null
+    screen: Screen = null
+    selectedBlock: BlockState = null
 
-    /**
-     * @type {HTMLCanvasElement}
-     */
-    canvas = null
-
-    /**
-     * @type {KeyboardController}
-     */
-    keyboard = null
-
-    /**
-     * @type {Tool}
-     */
-    selectedTool = null
-
-    /**
-     * @type {EditorMap}
-     */
-    map = null
-
-    /**
-     * @type Screen
-     */
-    screen = null
-
-    /**
-     * @type {BlockState}
-     */
-    selectedBlock = null
-
-    /**
-     * @param screen {Screen}
-     * @param camera {Camera}
-     * @param map {EditorMap}
-     */
-
-    constructor(screen, camera, map) {
+    constructor(screen: Screen, camera: Camera, map: EditorMap) {
         super()
         this.screen = screen
         this.camera = camera
@@ -59,7 +29,7 @@ class ToolManager extends DocumentEventHandler {
         this.startListening()
     }
 
-    setNeedsRedraw(force) {
+    setNeedsRedraw(force = false) {
         this.emit("redraw", force)
     }
 
@@ -69,7 +39,7 @@ class ToolManager extends DocumentEventHandler {
         this.bind("mousemove", this.mouseMove)
     }
 
-    mouseDown(event) {
+    mouseDown(event: MouseEvent) {
         event.preventDefault()
 
         if(this.selectedTool && event.which === 1) {
@@ -85,14 +55,14 @@ class ToolManager extends DocumentEventHandler {
         }
     }
 
-    mouseUp(event) {
+    mouseUp(event: MouseEvent) {
         event.preventDefault()
         if(this.selectedTool) {
             this.selectedTool.mouseUp()
         }
     }
 
-    mouseMove(event) {
+    mouseMove(event: MouseEvent) {
         event.preventDefault()
 
         if(this.selectedTool) {
@@ -108,7 +78,7 @@ class ToolManager extends DocumentEventHandler {
         }
     }
 
-    selectTool(tool) {
+    selectTool(tool: Tool) {
         if(this.selectedTool) {
             this.selectedTool.resignActive()
         }
@@ -121,7 +91,7 @@ class ToolManager extends DocumentEventHandler {
         }
     }
 
-    selectBlock(block) {
+    selectBlock(block: BlockState) {
         this.selectedBlock = block
     }
 
@@ -137,7 +107,7 @@ class ToolManager extends DocumentEventHandler {
         this.screen.canvas.style.cursor = this.getCursor()
     }
 
-    createEvent(name) {
+    createEvent(name: string) {
         this.emit("event", name)
     }
 }

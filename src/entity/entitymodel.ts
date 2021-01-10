@@ -1,83 +1,63 @@
 
-import BinarySerializable from '../serialization/binary/serializable';
+import BinarySerializable, {Constructor} from '../serialization/binary/serializable';
+import BinaryEncoder from "../serialization/binary/binaryencoder";
+import BinaryDecoder from "../serialization/binary/binarydecoder";
+import GameWorld from "../gameworld";
+import AbstractEntity from "./abstractentity";
 
 /**
  * Entity model. Describes entity position,
- * velocity and angle. Each entity type should
+ * velocity and setAngle. Each entity type should
  * inherit this class.
  * This class used both on client and server
  * side. Can be updated dynamically through
  * binary serialization.
  */
 
-class EntityModel extends BinarySerializable {
+class EntityModel implements BinarySerializable<typeof EntityModel> {
 
-    static groupName() { return 5 }
+    static groupName = 5
+    static typeName = 0
 
-    /**
-     * Per-screen unique entity identifier
-     * @type number
-     */
-    id;
+    /// Per-screen unique entity identifier
+    public id = 0;
 
-    /**
-     * Entity X coordinate
-     * @type number
-     */
-    x = 0;
+    /// Entity X coordinate
+    public x = 0;
 
-    /**
-     * Entity Y coordinate
-     * @type number
-     */
-    y = 0;
+    /// Entity Y coordinate
+    public y = 0;
 
-    /**
-     * Entity X speed
-     * @type number
-     */
-    dx = 0;
+    /// Entity X speed
+    public dx = 0;
 
-    /**
-     * Entity Y speed
-     * @type number
-     */
-    dy = 0;
+    /// Entity Y speed
+    public dy = 0;
 
-    /**
-     * Entity rotation
-     * @type number
-     */
-    rotation = 0;
+    /// Entity rotation
+    public rotation = 0;
 
-    /**
-     * Indicating if entity has died
-     * @type {boolean}
-     */
-    dead = false
+    /// Indicating if entity has died
+    public dead = false
 
-    constructor() {
-        super();
+    public game: GameWorld
+    public entity?: AbstractEntity
 
-        this.id = 0
-        this.x = 0
-        this.y = 0
-        this.dx = 0
-        this.dy = 0
-        this.rotation = 0
+    constructor(game: GameWorld) {
+        this.game = game
     }
 
-    tick(dt) {
+    tick(dt: number): void {
         this.x += this.dx * dt
         this.y += this.dy * dt
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder): void {
         encoder.writeUint32(this.id)
         this.encodeDynamicData(encoder)
     }
 
-    encodeDynamicData(encoder) {
+    encodeDynamicData(encoder: BinaryEncoder): void {
         encoder.writeFloat32(this.x)
         encoder.writeFloat32(this.y)
         encoder.writeFloat32(this.dx)
@@ -85,7 +65,7 @@ class EntityModel extends BinarySerializable {
         encoder.writeFloat32(this.rotation)
     }
 
-    decodeDynamicData(decoder) {
+    decodeDynamicData(decoder: BinaryDecoder): void {
         this.x = decoder.readFloat32()
         this.y = decoder.readFloat32()
         this.dx = decoder.readFloat32()
@@ -93,14 +73,14 @@ class EntityModel extends BinarySerializable {
         this.rotation = decoder.readFloat32()
     }
 
-    static fromBinary(decoder) {
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
 
-        const entity = new this()
+        const entity = new this() as any as EntityModel
 
         entity.id = decoder.readUint32()
         entity.decodeDynamicData(decoder)
 
-        return entity
+        return entity as any as T
     }
 }
 

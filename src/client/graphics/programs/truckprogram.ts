@@ -5,22 +5,24 @@ import Program from '../program';
 
 import Shader from '../shader';
 import GLBuffer from '../glbuffer';
+import Uniform from "../uniform";
+import Sprite from "../../sprite";
 
 class TruckProgram extends Program {
-	public vertexBuffer: any;
-	public indexBuffer: any;
-	public vertexPositionAttribute: any;
-	public texturePositionAttribute: any;
-	public truckDistanceAttribute: any;
-	public truckTextureUniform: any;
-	public truckLengthUniform: any;
-	public matrixUniform: any;
-	public radiusUniform: any;
-	public textureUniform: any;
-	public vertexLength: any;
-	public trucks: any;
+	public vertexBuffer: GLBuffer<Float32Array>;
+	public indexBuffer: GLBuffer<Uint16Array>;
+	public vertexPositionAttribute: number;
+	public texturePositionAttribute: number;
+	public truckDistanceAttribute: number;
+	public truckTextureUniform: Uniform;
+	public truckLengthUniform: Uniform;
+	public matrixUniform: Uniform;
+	public radiusUniform: Uniform;
+	public textureUniform: Uniform;
+	public vertexLength: number;
+	public trucks: number;
 
-    constructor(name, ctx) {
+    constructor(name: string, ctx: WebGLRenderingContext) {
 
         let vertexShader = new Shader("truck-vertex", Shader.VERTEX).compile(ctx)
         let fragmentShader = new Shader("truck-fragment", Shader.FRAGMENT).compile(ctx)
@@ -30,11 +32,12 @@ class TruckProgram extends Program {
 
         this.ctx = ctx
         this.vertexBuffer = new GLBuffer({
+            clazz: Float32Array,
             gl: ctx,
             drawMode: this.ctx.DYNAMIC_DRAW
         }).createBuffer()
 
-        this.indexBuffer = new GLBuffer({
+        this.indexBuffer = new GLBuffer<Uint16Array>({
             gl: ctx,
             clazz: Uint16Array,
             bufferType: this.ctx.ELEMENT_ARRAY_BUFFER,
@@ -55,19 +58,19 @@ class TruckProgram extends Program {
         this.trucks = 0
     }
 
-    setTruckRadius(radius) {
+    setTruckRadius(radius: number) {
         this.radiusUniform.set1f(radius)
     }
 
-    setTruckLength(length) {
+    setTruckLength(length: number) {
         this.truckLengthUniform.set1f(length)
     }
 
-    setSprite(sprite) {
+    setSprite(sprite: Sprite) {
         this.truckTextureUniform.set4f(sprite.rect.x, sprite.rect.y, sprite.rect.w, sprite.rect.h)
     }
 
-    drawTruck(x, y, width, height, scale, distance) {
+    drawTruck(x: number, y: number, width: number, height: number, scale: number, distance: number) {
 
         distance = (distance % height) / height
 

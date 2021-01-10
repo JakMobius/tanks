@@ -1,15 +1,24 @@
 
-class Sound {
-	public context: any;
-	public buffer: any;
-	public config: any;
-	public gainNode: any;
-	public source: any;
-	public panner: any;
+export interface SoundConfig {
+    mapX?: number
+    mapY?: number
+    shouldPan?: boolean
+    volume?: number
+    loop?: boolean
+}
 
-    constructor(context, buffer, index, config) {
+class Sound {
+	public context: AudioContext;
+	public buffer: AudioBuffer;
+	public config: SoundConfig;
+	public gainNode: GainNode;
+	public source: AudioBufferSourceNode;
+	public panner: StereoPannerNode;
+    public lowpass: BiquadFilterNode;
+
+    constructor(context: AudioContext, buffer: AudioBuffer, config: SoundConfig) {
         this.context = context;
-        this.buffer = buffer.getSoundByIndex(index)
+        this.buffer = buffer
         this.config = config
     }
 
@@ -34,14 +43,12 @@ class Sound {
         }
     }
 
-    play(delay?) {
-        delay = delay || 0
+    play(delay: number = 0) {
         if(!this.gainNode) this.init()
         this.source.start(this.context.currentTime + delay);
     }
 
-    stop(delay) {
-        delay = delay || 0
+    stop(delay: number = 0) {
         try {
             this.gainNode.gain.exponentialRampToValueAtTime(delay + 0.001, this.context.currentTime + 0.1 + delay);
             this.source.stop(this.context.currentTime + 0.1 + delay);
@@ -50,7 +57,7 @@ class Sound {
         }
     }
 
-    setPan(pan) {
+    setPan(pan: number) {
         if(this.panner) {
             if(pan > 1) pan = 1
             if(pan < -1) pan = -1

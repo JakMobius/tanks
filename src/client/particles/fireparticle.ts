@@ -1,13 +1,12 @@
 
-import Particle from './particle';
+import Particle, {ParticleConfig} from './particle';
 
 class FireParticle extends Particle {
-	public config: any;
 	public scaling: any;
 	public colors: any;
 	public times: any;
 
-    createColors(config) {
+    createColors(config: ParticleConfig) {
         let varying = 30
         return [
             [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, 0],
@@ -17,7 +16,7 @@ class FireParticle extends Particle {
         ]
     }
 
-    createTimings(config) {
+    createTimings(config: ParticleConfig) {
         return [
             0.0,
             0.1,
@@ -26,9 +25,8 @@ class FireParticle extends Particle {
         ]
     }
 
-    constructor(config) {
+    constructor(config: ParticleConfig) {
         super(config)
-        this.config = config
         this.width = config.width || 4
         this.height = config.height || 4
         this.scaling = config.scaling || 0.01
@@ -38,7 +36,7 @@ class FireParticle extends Particle {
         this.tick(0)
     }
 
-    tick(dt) {
+    tick(dt: number) {
         super.tick(dt)
         let fraction = this.lifespan / this.lifetime
         let r, g, b, a, c1, c2
@@ -65,10 +63,10 @@ class FireParticle extends Particle {
         b = c1[2] * f2 + c2[2] * f1
         a = c1[3] * f2 + c2[3] * f1
 
-        this.color.r = Math.round(r)
-        this.color.g = Math.round(g)
-        this.color.b = Math.round(b)
-        this.color.alpha = a
+        this.color.setRed(Math.round(r))
+        this.color.setGreen(Math.round(g))
+        this.color.setBlue(Math.round(b))
+        this.color.setAlpha(a)
 
         this.width += this.scaling
         this.height += this.scaling

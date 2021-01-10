@@ -1,12 +1,24 @@
 
 import DocumentEventHandler from './documenteventhandler';
+import Vidget from "./vidget";
+import ControlPanel from "../../game/ui/controlpanel";
+
+export interface Touch {
+    left: number,
+    top: number,
+    bottom: number,
+    right: number,
+    id: number,
+    vidget?: Vidget
+    captured?: ControlPanel
+}
 
 class TouchController extends DocumentEventHandler {
-	public touchData: any;
-	public handler: any;
-	public canvas: any;
+	public touchData = new Map<number, Touch>();
+	public handler: ControlPanel;
+	public canvas: HTMLCanvasElement;
 
-    constructor(handler, canvas) {
+    constructor(handler: ControlPanel, canvas: HTMLCanvasElement) {
         super()
         this.touchData = new Map();
         this.handler = handler
@@ -20,16 +32,17 @@ class TouchController extends DocumentEventHandler {
         this.bind("touchend", this.ontouchend)
     }
 
-    ontouchstart(event) {
+    ontouchstart(event: TouchEvent) {
         const rect = this.canvas.getBoundingClientRect();
 
-        for(let touch of event.changedTouches) {
+        for(let i = 0; i < event.changedTouches.length; i++) {
+            let touch = event.changedTouches[i]
             const left = touch.pageX - document.body.scrollLeft - rect.x;
             const top = touch.pageY - document.body.scrollTop - rect.y;
             const bottom = rect.height - top;
             const right = rect.width - left;
 
-            const struct = {
+            const struct: Touch = {
                 left: left,
                 top: top,
                 bottom: bottom,
@@ -53,16 +66,17 @@ class TouchController extends DocumentEventHandler {
         event.preventDefault()
     };
 
-    ontouchmove(event) {
+    ontouchmove(event: TouchEvent) {
         const rect = this.canvas.getBoundingClientRect();
 
-        for(let e of event.changedTouches) {
-            const touch = this.touchData.get(e.identifier);
+        for(let i = 0; i < event.changedTouches.length; i++) {
+            let changedTouch = event.changedTouches[i]
+            const touch = this.touchData.get(changedTouch.identifier);
 
             if (!touch) return
 
-            const left = e.pageX - document.body.scrollLeft - rect.x;
-            const top = e.pageY - document.body.scrollTop - rect.y;
+            const left = changedTouch.pageX - document.body.scrollLeft - rect.x;
+            const top = changedTouch.pageY - document.body.scrollTop - rect.y;
             const bottom = rect.height - top;
             const right = rect.width - left;
 
@@ -71,21 +85,22 @@ class TouchController extends DocumentEventHandler {
             touch.right = right
             touch.bottom = bottom
 
-            touch.captured.touchMoved(touch)
+            if(touch.captured) touch.captured.touchMoved(touch)
         }
 
         event.preventDefault()
     };
 
-    ontouchend(event) {
+    ontouchend(event: TouchEvent) {
 
-        for(let e of event.changedTouches) {
-            const touch = this.touchData.get(e.identifier);
+        for(let i = 0; i < event.changedTouches.length; i++) {
+            let changedTouch = event.changedTouches[i]
+            const touch = this.touchData.get(changedTouch.identifier);
 
             if (!touch) return
 
             touch.captured.touchEnded(touch)
-            this.touchData.delete(e.identifier)
+            this.touchData.delete(changedTouch.identifier)
         }
 
         event.preventDefault()

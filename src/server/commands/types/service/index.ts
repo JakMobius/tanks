@@ -1,9 +1,15 @@
-import Command from '../../command';
+import Command, {CommandConfig} from '../../command';
+
+export interface ServerServiceConfig {
+    hubPage: boolean
+    gamePage: boolean
+    rooms: boolean
+}
 
 class ServiceCommand extends Command {
-	public actions: any;
+	public actions: Map<string, ServerServiceConfig>;
 
-    constructor(options) {
+    constructor(options: CommandConfig) {
         super(options);
 
         this.actions = new Map([
@@ -31,14 +37,14 @@ class ServiceCommand extends Command {
 
     }
 
-    onTabComplete(args) {
+    onTabComplete(args: string[]): string[] {
         if(args.length > 1) return []
         let last = args[0]
 
         return Array.from(this.actions.keys()).filter(a => a.startsWith(last))
     }
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         if(args.length !== 1 || !this.actions.has(args[0])) {
             this.console.logger.log(this.getHelp())
             return;

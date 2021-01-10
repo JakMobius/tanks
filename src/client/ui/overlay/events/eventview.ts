@@ -3,7 +3,7 @@
 import View from '../../view';
 
 class EventView extends View {
-    constructor(text) {
+    constructor(text: string) {
         super();
 
         this.element.addClass("menu event-view")
@@ -15,7 +15,7 @@ class EventView extends View {
         this.element.css("opacity", "1")
     }
 
-    disappear(callback) {
+    disappear(callback: () => void) {
         this.element.css("opacity", "0")
         setTimeout(callback, 500)
     }

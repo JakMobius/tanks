@@ -2,6 +2,8 @@ import SocketPortalClient from '../socket/socket-portal-client';
 import BinaryPacket from '../../networking/binarypacket';
 import Logger from '../log/logger';
 import WebsocketConnection from '../websocket-connection';
+import * as Websocket from 'websocket'
+import {BinarySerializer} from "../../serialization/binary/serializable";
 
 /**
  * This class represents a specific socket portal.
@@ -11,32 +13,25 @@ import WebsocketConnection from '../websocket-connection';
  * if specific socket portal should handle this connection or not.
  */
 class SocketPortal {
-	public config: any;
-	public dynamicConnectionHandler: any;
-	public webSocketServer: any;
+	public dynamicConnectionHandler: (request: Websocket.request) => void;
+	public webSocketServer: Websocket.server;
     static clientClass = SocketPortalClient
 
     /**
      * Clients of exactly this portal
-     * @type {Map<number, SocketPortalClient>}
      */
-    clients = new Map()
+    public clients = new Map<number, SocketPortalClient>()
 
     /**
      * List of IPs blocked for connecting to this portal
-     * @type {string[]}
      */
-    banned = []
+    public banned: string[] = []
 
-    /**
-     * @type {Logger}
-     */
-    logger = new Logger()
+    protected logger = new Logger()
 
-    constructor(config) {
-        this.config = config || {}
+    constructor() {
 
-        this.dynamicConnectionHandler = (request) => this.handleRequest(request)
+        this.dynamicConnectionHandler = (request: Websocket.request) => this.handleRequest(request)
     }
 
     /**
@@ -58,9 +53,8 @@ class SocketPortal {
      * are allowed. Overwrite this method if you wish only to process
      * exact request path or deny requests made from not-trusted
      * origin.
-     * @param request {WebSocketRequest}
      */
-    handleRequest(request) {
+    handleRequest(request: Websocket.request) {
         this.handleConnection(request.accept(null, request.origin));
     }
 
@@ -71,15 +65,15 @@ class SocketPortal {
      * @param connection {WebSocketConnection}
      */
 
-    handleConnection(connection) {
-        const client = new (this.constructor.clientClass)({
+    handleConnection(connection: Websocket.connection) {
+        const client = new ((this.constructor as typeof SocketPortal).clientClass)({
             websocket: connection,
             connection: new WebsocketConnection(connection)
         });
 
         this.clients.set(client.id, client)
 
-        client.websocket.on('message', (message) => {
+        client.websocket.on('message', (message: Websocket.IMessage) => {
             this.handleMessage(message, client)
         })
 
@@ -94,10 +88,8 @@ class SocketPortal {
     /**
      * This method is called when portal receives a message from
      * specific client
-     * @param message {Object}
-     * @param client {SocketPortalClient}
      */
-    handleMessage(message, client) {
+    handleMessage(message: Websocket.IMessage, client: SocketPortalClient) {
         try {
             if(message.type !== "binary") {
                 this.logger.log("Received invalid packet from client " + client.id)
@@ -113,12 +105,12 @@ class SocketPortal {
             // BinaryPacket.deserialize may only return
             // a BinaryPacket instance
 
-            let packet = /** @type BinaryPacket */ BinaryPacket.deserialize(decoder, BinaryPacket)
+            let packet = BinarySerializer.deserialize(decoder, BinaryPacket)
 
             this.handlePacket(packet, client);
         } catch(e) {
-            this.logger.error("Exception while handling packet from client " + client.id)
-            this.logger.error(e)
+            this.logger.log("Exception while handling packet from client " + client.id)
+            this.logger.log(e)
         }
     }
 
@@ -127,7 +119,7 @@ class SocketPortal {
      * @param packet {BinaryPacket} Received packet
      * @param client {SocketPortalClient} Packet sender
      */
-    handlePacket(packet, client) {
+    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
 
     }
 
@@ -135,7 +127,7 @@ class SocketPortal {
      * Called when client disconnects from the socket
      * @param client {SocketPortalClient}
      */
-    clientDisconnected(client) {
+    clientDisconnected(client: SocketPortalClient) {
 
     }
 
@@ -143,7 +135,7 @@ class SocketPortal {
      * Called when new client connects to the socket*
      * @param client {SocketPortalClient}
      */
-    clientConnected(client) {
+    clientConnected(client: SocketPortalClient) {
 
     }
 
@@ -152,7 +144,7 @@ class SocketPortal {
      * connections
      * @param webSocket
      */
-    bindToWebsocket(webSocket) {
+    bindToWebsocket(webSocket: Websocket.server) {
         this.webSocketServer = webSocket
         this.webSocketServer.on('request', this.dynamicConnectionHandler)
     }

@@ -1,6 +1,11 @@
 
 import Sprite from '../../sprite';
 import TextureProgram from '../../graphics/programs/textureprogram';
+import BlockDrawer from "./block/blockdrawer";
+import {Constructor} from "../../../serialization/binary/serializable";
+import Camera from "../../camera";
+import BlockState from "../../../utils/map/blockstate/blockstate";
+import GameMap from "../../../utils/map/gamemap";
 
 class MapDrawer {
 	public RegisteredDrawers: any;
@@ -9,12 +14,12 @@ class MapDrawer {
 	public program: any;
 	public oldBounds: any;
 
-    static registerBlockLoader(id, drawer) {
+    static registerBlockLoader(id: number, drawer: Constructor<BlockDrawer>) {
         this.RegisteredDrawers.set(id, drawer)
     }
     static RegisteredDrawers = new Map()
 
-    constructor(camera, ctx) {
+    constructor(camera: Camera, ctx: WebGLRenderingContext) {
         this.camera = camera
         this.ctx = ctx
 
@@ -33,7 +38,7 @@ class MapDrawer {
         }
     }
 
-    draw(map) {
+    draw(map: GameMap) {
         const scale = this.camera.scale;
 
         let mipmaplevel =  Math.ceil(1 / scale) - 1
@@ -97,8 +102,8 @@ class MapDrawer {
         }
     }
 
-    drawBlock(block, x, y, map) {
-        let id = block.constructor.typeId
+    drawBlock(block: BlockState, x: number, y: number, map: GameMap) {
+        let id = (block.constructor as typeof BlockState).typeId
 
         if(id === 0) return
 

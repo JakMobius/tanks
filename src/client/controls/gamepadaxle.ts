@@ -1,13 +1,14 @@
 
 import Axle from '../../tanks/controls/axle';
+import GamepadManager from "./interact/gamepadmanager";
 
 class GamepadAxle extends Axle {
-	public axle: any;
-	public controller: any;
-	public power: any;
-	public inverted: any;
+	public axle: number;
+	public controller: GamepadManager;
+	public power: number;
+	public inverted: boolean;
 
-    constructor(controller, axle) {
+    constructor(controller: GamepadManager, axle: number) {
         super();
         this.axle = axle
         this.controller = controller

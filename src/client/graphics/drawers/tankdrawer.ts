@@ -1,25 +1,17 @@
 
 import Color from '../../../utils/color';
 import Smoke from '../../particles/smoke';
+import ClientTank from "../../tanks/clienttank";
+import Camera from "../../camera";
 
 class TankDrawer {
 	public smokeTicks: any;
-    /**
-     * @type {ClientTank}
-     */
-    tank = null
 
-    /**
-     * @type {WebGLRenderingContextBase}
-     */
-    ctx = null
+    tank: ClientTank = null
 
-    /**
-     * @param tank {ClientTank}
-     * @param ctx {WebGLRenderingContextBase}
-     */
+    ctx: WebGLRenderingContextBase = null
 
-    constructor(tank, ctx) {
+    constructor(tank: ClientTank, ctx: WebGLRenderingContext) {
 
         this.tank = tank
         // TODO перенести эту шнягу куда-то ещё
@@ -27,7 +19,7 @@ class TankDrawer {
         this.ctx = ctx
     }
 
-    drawSmoke(dt) {
+    drawSmoke(dt: number) {
 
         if(!this.tank) return
         if(!this.tank.model) return
@@ -49,7 +41,8 @@ class TankDrawer {
                 y: position.y,
                 dx: (this.tank.model.matrix.sin * 5 + Math.random() - 0.5) * 15,
                 dy: (-this.tank.model.matrix.cos * 5 + Math.random() - 0.5) * 15,
-                size: 2,
+                width: 2,
+                height: 2,
                 scaling: 50,
                 color: color
             });
@@ -58,7 +51,7 @@ class TankDrawer {
         }
     }
 
-    draw(camera, dt) {}
+    draw(camera: Camera, dt: number): void {}
 }
 
 export default TankDrawer;

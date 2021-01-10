@@ -2,8 +2,12 @@
 import TankBehaviour from '../tanks/physics/tankbehaviour';
 import TankControls from './controls/tankcontrols';
 import RotationalMatrix from '../utils/rotationalmatrix';
-import BinarySerializable from '../serialization/binary/serializable';
-import Box2D from '../library/box2d';
+import BinarySerializable, {Constructor} from '../serialization/binary/serializable';
+import * as Box2D from '../library/box2d';
+import GameWorld from "../gameworld";
+import BinaryEncoder from "../serialization/binary/binaryencoder";
+import BinaryDecoder from "../serialization/binary/binarydecoder";
+import Weapon from "../weapon/weapon";
 
 /**
  * Tank model. Сombines the physical model
@@ -13,53 +17,25 @@ import Box2D from '../library/box2d';
  * binary serialization.
  */
 
-class TankModel extends BinarySerializable {
-	public SERIALIZATION_GROUP_NAME: any;
-    static SERIALIZATION_GROUP_NAME = 4
+class TankModel implements BinarySerializable<typeof TankModel> {
     static Types = new Map();
 
-    /**
-     * Physical behaviour of this tank
-     * @type TankBehaviour
-     */
-    behaviour = null
+    // Physical behaviour of this tank
+    behaviour: TankBehaviour = null
 
-    /**
-     * Box2D World, containing this tank.
-     * @type b2World
-     */
+    // Box2D World, containing this tank.
+    world: Box2D.World = null
 
-     world = null
+    // Box2D body of this tank.
+    body: Box2D.Body = null
 
-    /**
-     * Box2D body of this tank.
-     * @type b2Body
-     */
-    body = null
-
-    /**
-     * @type TankControls
-     */
-    controls = null
-
-    /**
-     * @type number
-     */
+    controls: TankControls = null
     health = 0
+    matrix: RotationalMatrix = null
 
-    /**
-     * @type RotationalMatrix
-     */
-    matrix = null
+    targetPosition: Box2D.Vec2
 
-    /**
-     * @type b2Vec2
-     */
-    targetPosition
-
-    constructor(options) {
-        super()
-
+    constructor() {
         this.behaviour = null
         this.world = null
         this.body = null
@@ -69,7 +45,7 @@ class TankModel extends BinarySerializable {
         this.targetPosition = null
     }
 
-    initPhysics(world) {
+    initPhysics(world: Box2D.World) {
         throw new Error("Abstract class instancing is invalid.")
     }
 
@@ -77,41 +53,36 @@ class TankModel extends BinarySerializable {
         this.world.DestroyBody(this.body)
     }
 
-    get x() { return this.body.m_xf.position.x }
-    get y() { return this.body.m_xf.position.y }
-    set x(x) { this.body.m_xf.position.x = x }
-    set y(y) { this.body.m_xf.position.y = y }
+    get x() { return this.body.m_xf.p.x }
+    get y() { return this.body.m_xf.p.y }
+    set x(x: number) { this.body.m_xf.p.x = x }
+    set y(y: number) { this.body.m_xf.p.y = y }
     get rotation() { return this.body.m_sweep.a }
-    set rotation(rotation) { this.body.m_sweep.a = rotation; this.matrix.angle(rotation) }
+    set rotation(rotation) { this.body.m_sweep.a = rotation; this.matrix.setAngle(rotation) }
 
-    static getWeapon() {
+    static getWeapon(): typeof Weapon {
         throw new Error("Abstract class instancing is illegal")
     }
 
-    static canPlaceMines() {
+    static canPlaceMines(): boolean {
         return true
     }
 
-    static getMaximumHealth() {
+    static getMaximumHealth(): number {
         return 10
     }
 
-    static getId() {
-        return 0
+    static getId(): number {
+        return this.typeName
     }
 
     // Serialization stuff
 
-    toBinary(encoder) {}
-    static fromBinary(decoder) { return new this }
+    toBinary(encoder: BinaryEncoder) {}
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T { return new this }
 
-    static typeName() {
-        return this.getId()
-    }
-
-    static groupName() {
-        return this.SERIALIZATION_GROUP_NAME
-    }
+    static typeName = 0
+    static groupName = 4
 }
 
 export default TankModel;

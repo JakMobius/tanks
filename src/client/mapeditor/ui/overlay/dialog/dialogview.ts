@@ -1,6 +1,15 @@
 
 import Menu from '../../../../ui/menu/menu';
 
+export interface DialogButtonConfig {
+    title: string
+    color?: string
+    side?: "left"
+    width?: string
+    onclick?: () => void
+    closes?: boolean
+}
+
 class DialogView extends Menu {
 	public header: any;
 	public message: any;
@@ -18,15 +27,15 @@ class DialogView extends Menu {
         this.element.append(this.footer)
     }
 
-    title(text) {
+    title(text: string) {
         this.header.text(text)
     }
 
-    text(text) {
+    text(text: string) {
         this.message.text(text)
     }
 
-    addButton(config) {
+    addButton(config: DialogButtonConfig) {
         let button = $("<button>")
         button.text(config.title)
         if(config.color) button.css("background-color", config.color)
@@ -38,12 +47,12 @@ class DialogView extends Menu {
             button.css("width", config.width)
         }
         if(config.onclick) {
-            button.click(() => {
+            button.on("click", () => {
                 config.onclick()
                 if(config.closes) this.emit("decision")
             })
         } else if(config.closes) {
-            button.click(() => this.emit("decision"))
+            button.on("click",() => this.emit("decision"))
         }
 
         this.footer.append(button)

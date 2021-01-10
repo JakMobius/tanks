@@ -1,13 +1,16 @@
 import TankModel from '../tankmodel';
 import PhysicsUtils from '../../utils/physicsutils';
 import WheeledTankBehaviour from '../physics/wheeledtankbehaviour';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
 import WeaponMachineGun from '../../weapon/models/machinegun';
 
-class MonsterTank extends TankModel {
+class MonsterTankModel extends TankModel {
 
-    constructor(options) {
-        super(options)
+    public static typeName = 3
+    public behaviour: WheeledTankBehaviour
+
+    constructor() {
+        super()
 
         this.behaviour = new WheeledTankBehaviour(this, {
             power: 30000
@@ -22,17 +25,13 @@ class MonsterTank extends TankModel {
         return 10
     }
 
-    static getId() {
-        return 3
-    }
-
-    initPhysics(world) {
+    initPhysics(world: Box2D.World) {
         this.world = world
 
         let size = 9
 
-        let bodyFixture = PhysicsUtils.squareFixture(size * 0.6, size, new Box2D.b2Vec2(0, -size * 0.25))
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(size * 0.18, size * 0.9, new Box2D.b2Vec2(-size * 0.78 , 0))
+        let bodyFixture = PhysicsUtils.squareFixture(size * 0.6, size, new Box2D.Vec2(0, -size * 0.25))
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(size * 0.18, size * 0.9, new Box2D.Vec2(-size * 0.78 , 0))
 
         this.body = PhysicsUtils.dynamicBody(world, {
             linearDamping: 0.3
@@ -44,6 +43,4 @@ class MonsterTank extends TankModel {
     }
 }
 
-TankModel.register(MonsterTank)
-
-export default MonsterTank;
+export default MonsterTankModel;

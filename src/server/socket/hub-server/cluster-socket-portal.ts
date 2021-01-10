@@ -1,29 +1,29 @@
 
 import SocketPortal from '../socket-portal';
 import ClusterHandshake from '../cluster-handshake';
-import HandshakePacket from '@/networking/packets/cluster-packets/handshake-packet';
-import HandshakeSuccessPacket from '@/networking/packets/cluster-packets/handshake-success-packet';
-import RoomCreateRequestPacket from '@/networking/packets/cluster-packets/room-creation-request-packet';
-import RoomConfig from '@/server/room/room-config';
+import HandshakePacket from 'src/networking/packets/cluster-packets/handshake-packet';
+import HandshakeSuccessPacket from 'src/networking/packets/cluster-packets/handshake-success-packet';
+import RoomCreateRequestPacket from 'src/networking/packets/cluster-packets/room-creation-request-packet';
+import RoomConfig from 'src/server/room/room-config';
 import ClusterSocketPortalClient from './cluster-socket-portal-client';
 import Chalk from 'chalk';
+import {request} from "websocket";
+import SocketPortalClient from "../socket-portal-client";
+import BinaryPacket from "../../../networking/binarypacket";
 
 class ClusterSocketPortal extends SocketPortal {
 
     static clientClass = ClusterSocketPortalClient
 
-    /**
-     * @type {string}
-     */
-    password
+    password: string
 
-    constructor(config?) {
-        super(config);
+    constructor() {
+        super();
 
         this.logger.setPrefix("CLink hub")
     }
 
-    handleRequest(request) {
+    handleRequest(request: request) {
         // Only handling /cluster-link requests
 
         if(request.resourceURL.path === "/cluster-link") {
@@ -31,13 +31,13 @@ class ClusterSocketPortal extends SocketPortal {
         }
     }
 
-    authorizeClient(client) {
+    authorizeClient(client: SocketPortalClient) {
         let salt = ClusterHandshake.generateSalt()
         client.data.authorizationSalt = salt
-        new HandshakePacket(new Int8Array(salt)).sendTo(client.connection)
+        new HandshakePacket(new Uint8Array(salt)).sendTo(client.connection)
     }
 
-    handleUnauthorizedPacket(packet, client) {
+    handleUnauthorizedPacket(packet: BinaryPacket, client: ClusterSocketPortalClient) {
         if(!client.data.authorizationSalt) {
             // Prevent duplicating authorization packets
             return
@@ -58,13 +58,13 @@ class ClusterSocketPortal extends SocketPortal {
         }
     }
 
-    handleAuthorizationFail(client) {
-        this.logger.log(Chalk.redBright(`Rejected connection from origin ${client.websocket.remoteAddress} due to failed handshake`))
+    handleAuthorizationFail(client: ClusterSocketPortalClient) {
+        this.logger.log(`§F00;Rejected connection from origin ${client.websocket.remoteAddress} due to failed handshake`)
         client.connection.close("Access denied")
         client.data.authorizationSalt = null
     }
 
-    handleAuthorizationSuccess(client) {
+    handleAuthorizationSuccess(client: ClusterSocketPortalClient) {
         this.logger.log(`The game server from origin ${client.websocket.remoteAddress} has been connected`)
         client.data.authorized = true
 
@@ -77,17 +77,17 @@ class ClusterSocketPortal extends SocketPortal {
         new RoomCreateRequestPacket(roomConfig).sendTo(client.connection)
     }
 
-    clientConnected(client) {
+    clientConnected(client: ClusterSocketPortalClient) {
         client.data.authorized = false
 
         this.authorizeClient(client)
     }
 
-    clientDisconnected(client) {
+    clientDisconnected(client: ClusterSocketPortalClient) {
 
     }
 
-    handleAuthorizedPacket(packet, client) {
+    handleAuthorizedPacket(packet: BinaryPacket, client: ClusterSocketPortalClient) {
 
     }
 
@@ -98,7 +98,7 @@ class ClusterSocketPortal extends SocketPortal {
      * @param client {ClusterSocketPortalClient} Packet sender
      */
 
-    handlePacket(packet, client) {
+    handlePacket(packet: BinaryPacket, client: ClusterSocketPortalClient) {
         if (client.data.authorized) this.handleAuthorizedPacket(packet, client)
         else this.handleUnauthorizedPacket(packet, client)
     }

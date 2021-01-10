@@ -65,7 +65,7 @@ class GLSLPlugin extends Plugin {
                 if(!text.length) {
                     await CompileCache.writeCache("glsl-compiler", cache)
 
-                    console.error("GLSLPlugin could not minify shader. Please, check file syntax")
+                    console.error("GLSLPlugin could] not minify shader. Please, check file syntax")
                     console.error(this.formatEntryForError(entry))
                 }
                 text = text

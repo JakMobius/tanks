@@ -2,43 +2,33 @@
 import RenderLoop from '../utils/loop/renderloop';
 import Loop from '../utils/loop/loop';
 import CanvasFactory from './utils/canvasfactory';
+import Scene from "./scenes/scene";
+import "./animation-frame-polyfill"
+import SoundEngine from "./sound/soundengine";
 
-window.requestAnimationFrame =
-    window.requestAnimationFrame ||
-    window["mozRequestAnimationFrame"] ||
-    window["webkitRequestAnimationFrame"] ||
-    window["msRequestAnimationFrame"]
+export interface ScreenConfig {
+    scale?: number
+    root: JQuery
+}
 
 class Screen {
-	public config: any;
-	public root: any;
-	public width: any;
-	public height: any;
-	public framebufferTextures: any;
-	public framebuffers: any;
-	public activeFramebufferIndex: any;
-	public inactiveFramebufferIndex: any;
-    /**
-     * @type {HTMLCanvasElement}
-     */
-    canvas = null
+	public config: ScreenConfig;
+	public root: JQuery;
+	public width: number;
+	public height: number;
+	public framebufferTextures: WebGLTexture[];
+	public framebuffers: WebGLFramebuffer[];
+	public activeFramebufferIndex: number;
+	public inactiveFramebufferIndex: number;
 
-    /**
-     * @type {WebGLRenderingContext}
-     */
-    ctx = null
+    public canvas: HTMLCanvasElement = null
+    public ctx: WebGLRenderingContext = null
+    public loop: Loop = null
+    public scene: Scene
+    private resizeHandler: () => void;
+    soundEngine: SoundEngine;
 
-    /**
-     * @type {Loop}
-     */
-    loop = null
-
-    /**
-     * @type {Scene}
-     */
-    scene
-
-    constructor(config) {
+    constructor(config: ScreenConfig) {
         config = Object.assign({
             scale: window.devicePixelRatio
         }, config)
@@ -47,6 +37,7 @@ class Screen {
         this.root = config.root
         this.initLoop()
         this.scene = null
+        //this.soundEngine = new SoundEngine()
 
         this.width = null
         this.height = null
@@ -55,14 +46,14 @@ class Screen {
         this.initResizeHandling()
         this.initialize()
 
-        this.loop.run = (dt) => this.tick(dt)
+        this.loop.run = (dt: number) => this.tick(dt)
     }
 
-    initLoop() {
-        this.loop = new RenderLoop(this)
+    initLoop(): void {
+        this.loop = new RenderLoop()
     }
 
-    initialize() {
+    initialize(): void {
         for(let texture of this.framebufferTextures) {
             let framebuffer = this.ctx.createFramebuffer()
             this.ctx.bindFramebuffer(this.ctx.FRAMEBUFFER, framebuffer)
@@ -73,7 +64,7 @@ class Screen {
         this.setScreenFramebuffer()
     }
 
-    setScene(scene) {
+    setScene(scene: Scene): void {
         if(this.scene) {
             this.scene.disappear()
             this.scene.overlayContainer.remove()
@@ -84,7 +75,7 @@ class Screen {
         this.root.append(this.scene.overlayContainer)
     }
 
-    initCanvas() {
+    initCanvas(): void {
         Object.assign(this, CanvasFactory())
 
         this.root.append($(this.canvas))
@@ -101,17 +92,17 @@ class Screen {
         this.inactiveFramebufferIndex = null
     }
 
-    activeFramebufferTexture() {
+    activeFramebufferTexture(): WebGLTexture {
         if(this.activeFramebufferIndex === null) return null
         return this.framebufferTextures[this.activeFramebufferIndex]
     }
 
-    inactiveFramebufferTexture() {
+    inactiveFramebufferTexture(): WebGLTexture {
         if(this.inactiveFramebufferIndex === null) return null
         return this.framebufferTextures[this.inactiveFramebufferIndex]
     }
 
-    swapFramebuffers() {
+    swapFramebuffers(): void {
         if(this.activeFramebufferIndex === null) {
             this.activeFramebufferIndex = 0
             this.inactiveFramebufferIndex = 1
@@ -122,17 +113,17 @@ class Screen {
         this.ctx.bindFramebuffer(this.ctx.FRAMEBUFFER, this.framebuffers[this.activeFramebufferIndex])
     }
 
-    clear() {
+    clear(): void {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
     }
 
-    setScreenFramebuffer() {
+    setScreenFramebuffer(): void {
         this.inactiveFramebufferIndex = this.activeFramebufferIndex
         this.activeFramebufferIndex = null
         this.ctx.bindFramebuffer(this.ctx.FRAMEBUFFER, null)
     }
 
-    initResizeHandling() {
+    initResizeHandling(): void {
         const handler = () => {
             this.width = this.root.width()
             this.height = this.root.height()
@@ -158,12 +149,18 @@ class Screen {
         }
         window.addEventListener("resize", handler)
         handler()
+        
+        this.resizeHandler = handler
     }
 
-    tick(dt) {
+    tick(dt: number): void {
         if(this.scene) {
             this.scene.draw(this.ctx, dt)
         }
+    }
+
+    destroy() {
+        window.removeEventListener("resize", this.resizeHandler)
     }
 }
 

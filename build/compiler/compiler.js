@@ -8,8 +8,10 @@ const JSBuilder = require("../jsbuilder")
 const GLSLMinify = require("../glsl-minifier/glsl-minifier")
 const Timings = require("../timings")
 const resourceify = require("../resourceify")
-const folderify = require("../folderify")
 const aliasify = require("aliasify")
+const exorcist = require('exorcist')
+const minifyStream = require('minify-stream')
+const collapse = require('bundle-collapser/plugin');
 
 const fs = require('fs')
 const path = require("path")
@@ -18,6 +20,22 @@ const cacheFile = path.resolve(__dirname, '../cache/browserify-cache.json')
 
 class Compiler {
 
+    static externalLibraries = [
+        "fs",
+        "http",
+        "express",
+        "express-session",
+        "websocket",
+        "url",
+        "mongodb",
+        "chalk",
+        "crypto",
+        "assert",
+        "path",
+        "pako",
+        "json5",
+        "process"
+    ]
     static projectDirectory = path.resolve(__dirname, "../..")
 
     constructor(options) {
@@ -62,17 +80,17 @@ class Compiler {
 
         const compiler = browserify(o, { debug: true })
         incremental(compiler, { cacheFile: options.cacheFile })
+        this.resourcify = resourceify()
 
-        //this.resourcify = resourceify()
         this.babelify = babelify.configure({
             plugins: [
-                "babel-plugin-import-dir",
                 ["module-resolver", {
                     extensions: [".js", ".ts", ".json"],
                     alias: {
-                        "@": Compiler.path("src")
+                        "src": Compiler.path("src")
                     }
                 }],
+                "babel-plugin-import-dir",
                 ["@babel/plugin-syntax-dynamic-import"],
                 ["@babel/plugin-syntax-class-properties"],
                 ["@babel/plugin-proposal-class-properties", { loose: true }],
@@ -91,20 +109,14 @@ class Compiler {
             extensions: ['.ts', '.js']
         })
         compiler.transform(this.babelify)
-
-        //compiler.transform(folderify)
-        //compiler.plugin(this.resourcify.plugin)
+        compiler.plugin(collapse)
+        compiler.plugin(this.resourcify.plugin)
         //
-        compiler.external("fs")
-        compiler.external("http")
-        compiler.external("express")
-        compiler.external("express-session")
-        compiler.external("websocket")
-        compiler.external("url")
-        compiler.external("mongodb")
-        compiler.external("chalk")
-        compiler.external("crypto")
-        compiler.external("assert")
+
+        for(let library of Compiler.externalLibraries) {
+            compiler.external(library)
+        }
+
         compiler.require(options.source, { entry: true })
 
         return compiler
@@ -146,15 +158,41 @@ class Compiler {
 
             this.result = ""
 
+            // let terserIgnoreList = []
+            //
+            // for(let libraryName of Compiler.externalLibraries) {
+            //     let library = require(libraryName)
+            //
+            //     for(let key in library) {
+            //         terserIgnoreList.push(key)
+            //     }
+            // }
+            //
+            // terserIgnoreList = terserIgnoreList.concat([])
+
             this.compiler.bundle()
+                // .pipe(minifyStream({
+                //     mangle: {
+                //         properties: {
+                //             reserved: terserIgnoreList,
+                //             keep_quoted: true
+                //         }
+                //     }
+                // }))
+                .pipe(exorcist(
+                    Compiler.path(this.options.destination + ".map"),
+                    null,
+                    "../",
+                    Compiler.projectDirectory
+                ))
                 .on('data', (data) => this.result += data)
                 .on('error', (error) => {
                     console.error(error.message)
                     if(error.annotated) console.error(error.annotated)
                     isError = true
                 })
-                .pipe(fs.createWriteStream('server.js', 'utf8'))
-                .on('finish', async () => {
+                //.pipe(fs.createWriteStream('server.js', 'utf8'))
+                .on('end', async () => {
                     Timings.end()
                     await this.finished()
                     resolve()
@@ -170,15 +208,15 @@ class Compiler {
 
     async finished(src, map) {
 
-        // Timings.begin("Reading resources")
-        //
-        // await this.resourcify.readResources()
-        //
-        // Timings.end()
-        //
-        // for(let plugin of this.plugins) {
-        //     await plugin.perform(this.resourcify.resources)
-        // }
+        Timings.begin("Reading resources")
+
+        await this.resourcify.readResources()
+
+        Timings.end()
+
+        for(let plugin of this.plugins) {
+            await plugin.perform(this.resourcify.resources)
+        }
         //
         let destination = Compiler.path(this.options.destination)
         let dirname = path.dirname(destination)

@@ -7,12 +7,12 @@ import Textarea from './blessed-fork/lib/widgets/prompt';
 class WindowDestination extends LoggerDestination {
 	public window: any;
 
-    constructor(window) {
+    constructor(window: ConsoleWindow) {
         super();
         this.window = window
     }
 
-    log(value) {
+    log(value: string) {
         this.window.write(value)
     }
 }
@@ -21,17 +21,17 @@ class HistoryEntry {
 	public text: any;
 	public cursorPos: any;
 
-    constructor(text, cursorPos) {
+    constructor(text: string, cursorPos: number) {
         this.text = text
         this.cursorPos = cursorPos
     }
 
-    storeState(console) {
+    storeState(console: ConsoleWindow) {
         this.text = console.consoleTextbox.value
         this.cursorPos = console.consoleTextbox.cursorPosition
     }
 
-    restoreState(console) {
+    restoreState(console: ConsoleWindow) {
         console.consoleTextbox.setValue(this.text)
         console.consoleTextbox.setCursorPosition(this.cursorPos)
     }
@@ -65,7 +65,7 @@ class ConsoleWindow extends EventEmitter {
             smartCSR: true
         })
 
-        this.screen.program.on("keypress", (key, data) => {
+        this.screen.program.on("keypress", (_: any, data: any) => {
             if(data.name === "tab") {
                 this.consoleTextbox.keyable = false
                 this.emit("tab", data.shift)
@@ -135,7 +135,7 @@ class ConsoleWindow extends EventEmitter {
         this.render()
     }
 
-    addHistoryEntry(command) {
+    addHistoryEntry(command: string) {
 
         let pushHistoryEntry = true
 
@@ -192,15 +192,15 @@ class ConsoleWindow extends EventEmitter {
         this.render()
     }
 
-    write(text) {
-        text = text.split("\n")
-        this.scrollView.insertLine(this.lines, text);
+    write(text: string) {
+        let lines = text.split("\n")
+        this.scrollView.insertLine(this.lines, lines);
         this.scrollView.setScrollPerc(100)
-        this.lines += text.length
+        this.lines += lines.length
         this.render();
     }
 
-    setPrompt(prompt) {
+    setPrompt(prompt: string) {
         this.prompt = prompt
 
         prompt += "> "
@@ -224,7 +224,7 @@ class ConsoleWindow extends EventEmitter {
             this.consoleTextbox.focus()
     }
 
-    setLine(text) {
+    setLine(text: string) {
         this.consoleTextbox.setValue(text)
         this.render()
     }

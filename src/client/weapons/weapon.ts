@@ -1,5 +1,15 @@
+import BulletModel from "../../entity/bullet/bulletmodel";
+import ClientGameWorld from "../clientgameworld";
 
-
+export interface WeaponConfig {
+    name: string
+    maxAmmo?: number
+    reloadTime?: number
+    bulletType?: typeof BulletModel
+    shootRate?: number,
+    sound?: number
+    game: ClientGameWorld
+}
 
 class Weapon {
 	public config: any;
@@ -14,13 +24,13 @@ class Weapon {
 	public sound: any;
 	public game: any;
 
-    constructor(config) {
+    constructor(config: WeaponConfig) {
         this.config = config
         this.name = config.name || "Weapon"
         this.maxAmmo = config.maxAmmo || Infinity
         this.shootRate = config.shootRate || 200
         this.reloadTime = config.reloadTime || 4.0
-        this.bulletType = config.bulletType || Weapon.Bullets["42mm"]
+        this.bulletType = config.bulletType
         this.ammo = this.maxAmmo
         this._isReloading = false
         this.shootingTime = null
@@ -40,11 +50,10 @@ class Weapon {
         if(this.sound.reload_end) this.game.playSound(this.sound.reload_end)
     }
 
-    setPan(value) {
+    setPan(value: number) {
         value = Number(value)
         for(let sound of this.sound) {
             if(sound.panner){
-                sound.panner.pan = value
                 sound.panner.setPosition(value, 0, 1 - Math.abs(value))
             }
         }

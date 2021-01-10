@@ -1,11 +1,12 @@
 
 import SocketPortalClient from '../socket-portal-client';
+import GameWorld from "../../../gameworld";
 
 class ClusterSocketPortalClient extends SocketPortalClient {
 
-    rooms = []
+    rooms: GameWorld[] = []
 
-    constructor(config) {
+    constructor(config: any) {
         super(config);
     }
 

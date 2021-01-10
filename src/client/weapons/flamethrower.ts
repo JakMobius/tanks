@@ -1,8 +1,8 @@
 
-import Weapon from './weapon';
+import Weapon, {WeaponConfig} from './weapon';
 
 class Flamethrower extends Weapon {
-    constructor(config) {
+    constructor(config: WeaponConfig) {
         super(config)
     }
 

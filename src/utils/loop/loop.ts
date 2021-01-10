@@ -2,8 +2,7 @@
 import ScheduledTask from './scheduledtask';
 
 class Loop {
-	public game: any;
-	public schedule: any;
+	public schedule = new Map<number, ScheduledTask>();
 	public schedules: any;
 	public ticks: any;
 	public loopTimestamp: any;
@@ -12,9 +11,7 @@ class Loop {
 	public run: any;
 	public running: any;
 
-    constructor(game) {
-        this.game = game
-        /** @type Map<number,ScheduledTask>*/
+    constructor() {
         this.schedule = new Map()
         this.schedules = 0;
         this.ticks = 0
@@ -32,9 +29,9 @@ class Loop {
         this.running = false
     }
 
-    cycle(dt) {}
+    cycle(dt: number) {}
 
-    runScheduledTasks(dt) {
+    runScheduledTasks(dt: number) {
         ScheduledTask.lockInitialTimers = true
         for(let [key, task] of this.schedule.entries()) {
             if(task.tick(dt)) {
@@ -44,7 +41,7 @@ class Loop {
         ScheduledTask.lockInitialTimers = false
     }
 
-    perform(timestamp?) {
+    perform(timestamp?: number) {
         if(timestamp === undefined) {
             timestamp = Date.now()
         }
@@ -73,7 +70,7 @@ class Loop {
         }
     }
 
-    scheduleTask(func, time) {
+    scheduleTask(func: () => void, time: number) {
         time = time || 0
         let index = this.schedules ++
 

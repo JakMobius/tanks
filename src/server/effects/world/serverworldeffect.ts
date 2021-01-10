@@ -1,6 +1,7 @@
 
 import ServerEffect from '../servereffect';
-import WorldEffectModel from '@/effects/world/worldeffectmodel';
+import WorldEffectModel from 'src/effects/world/world-effect-model';
+import ServerGameWorld from "../../servergameworld";
 
 /**
  * This class unites all the world effect implementations on the server
@@ -13,15 +14,8 @@ import WorldEffectModel from '@/effects/world/worldeffectmodel';
  */
 class ServerWorldEffect extends ServerEffect {
 
-    /**
-     * @type WorldEffectModel
-     */
-    model
-
-    /**
-     * @type ServerGameWorld
-     */
-    world
+    model: WorldEffectModel
+    world: ServerGameWorld
 
     /**
      * @private
@@ -30,29 +24,24 @@ class ServerWorldEffect extends ServerEffect {
      * constructor should not be called directly, use
      * {@link ServerWorldEffect#fromModel fromModel} static method
      * instead
-     * @param {WorldEffectModel} model
-     * @param {ServerGameWorld} world
      */
-    constructor(model, world) {
+    constructor(model: WorldEffectModel, world: ServerGameWorld) {
         super(model);
         this.model = model
         this.world = world
     }
 
-
-    // noinspection JSCheckFunctionSignatures
     /**
      * Wraps the {@link WorldEffectModel} in corresponding
      * {@link ServerWorldEffect} class. If this effect has any additional
      * server-side logic, the instance of appropriate subclass will be
      * returned. Otherwise, this method returns {@link ServerWorldEffect}
      * instance
-     * @param model {WorldEffectModel} Effect model to wrap
-     * @param world {ServerWorldEffect} A world which this effect will be created in
-     * @returns {ServerWorldEffect}
+     * @param model Effect model to wrap
+     * @param world A world where this effect will be created in
      */
-    static fromModel(model, world) {
-        let clazz = /** @type Class<ServerWorldEffect> */ this.Types.get(model.constructor)
+    static fromModelAndWorld(model: WorldEffectModel, world: ServerGameWorld): ServerWorldEffect {
+        let clazz: typeof ServerWorldEffect = this.Types.get(model.constructor as typeof WorldEffectModel) as any as typeof ServerWorldEffect
 
         if(clazz) return new clazz(model, world)
 

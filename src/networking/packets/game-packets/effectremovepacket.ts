@@ -1,26 +1,27 @@
 
 import BinaryPacket from '../../binarypacket';
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 class EffectRemovePacket extends BinaryPacket {
-	public id: any;
+	public id: number;
 
-    static typeName() {
-        return 19
-    }
+    static typeName = 19
 
-    constructor(id) {
+    constructor(id: number) {
         super();
         this.id = id
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeFloat64(this.id)
     }
 
-    static fromBinary(decoder) {
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
         return new this(decoder.readFloat64())
     }
 }
 
-BinaryPacket.register(EffectRemovePacket)
+BinarySerializer.register(EffectRemovePacket)
 export default EffectRemovePacket;

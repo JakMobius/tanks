@@ -1,22 +1,17 @@
 
 class Progress {
-	public completed: any;
-	public target: any;
-	public subtasks: any;
-	public fraction: any;
-	public refresh: any;
-	public parent: any;
+	public completed: number = 0;
+	public target: number = 0;
+	public subtasks: Progress[] = [];
+	public fraction: number = 0;
+	public refresh: boolean = false;
+	public parent?: Progress = null;
 
     constructor() {
-        this.completed = 0
-        this.target = 0
-        this.subtasks = []
-        this.fraction = 0
-        this.refresh = false
-        this.parent = null
+
     }
 
-    addSubtask(task) {
+    addSubtask(task: Progress) {
         task.parent = this
         this.subtasks.push(task)
         this.setNeedsUpdate()
@@ -60,7 +55,7 @@ class Progress {
         this.refresh = true
     }
 
-    setTarget(target) {
+    setTarget(target: number) {
         this.target = target
         this.setNeedsUpdate()
     }
@@ -69,7 +64,7 @@ class Progress {
         return this.target
     }
 
-    setCompleted(completed) {
+    setCompleted(completed: number) {
         this.completed = completed
         this.setNeedsUpdate()
     }

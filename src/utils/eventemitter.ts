@@ -1,13 +1,13 @@
 
 
 export default class EventEmitter {
-	public events: any;
+	public events = new Map<string, [(...args: any[]) => void]>();
 
     constructor() {
         this.events = new Map()
     }
 
-    emit(event) {
+    emit(event: string, ...args: any[]) {
         if (this.events.has(event)) {
             let args = Array.prototype.slice.call(arguments, 1)
             for (let listener of this.events.get(event)) {
@@ -16,7 +16,7 @@ export default class EventEmitter {
         }
     }
 
-    on(event, handler) {
+    on(event: string, handler: (...args: any[]) => void) {
         if (this.events.has(event)) {
             this.events.get(event).push(handler)
         } else {

@@ -1,16 +1,16 @@
 
 class Rectangle {
 
-    x1 = null
-    y1 = null
-    x2 = null
-    y2 = null
-    minX = null
-    maxX = null
-    minY = null
-    maxY = null
+    x1: number = null
+    y1: number = null
+    x2: number = null
+    y2: number = null
+    minX: number = null
+    maxX: number = null
+    minY: number = null
+    maxY: number = null
 
-    constructor(x1?, y1?, x2?, y2?) {
+    constructor(x1?: number, y1?: number, x2?: number, y2?: number) {
         if (arguments.length === 4) {
             this.x1 = x1
             this.x2 = x2
@@ -24,7 +24,7 @@ class Rectangle {
         return Number.isFinite(this.x1) && Number.isFinite(this.x2) && Number.isFinite(this.y1) && Number.isFinite(this.y2)
     }
 
-    contains(x, y) {
+    contains(x: number, y: number) {
         return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY
     }
 
@@ -62,7 +62,7 @@ class Rectangle {
         this.maxY = Math.max(this.y1, this.y2)
     }
 
-    translate(dx, dy) {
+    translate(dx: number, dy: number) {
         this.x1 += dx
         this.x2 += dx
         this.y1 += dy
@@ -71,21 +71,21 @@ class Rectangle {
         this.refreshBounds()
     }
 
-    setFrom(x, y) {
+    setFrom(x: number, y: number) {
         this.x1 = x
         this.y1 = y
 
         this.refreshBounds()
     }
 
-    setTo(x, y) {
+    setTo(x: number, y: number) {
         this.x2 = x
         this.y2 = y
 
         this.refreshBounds()
     }
 
-    equals(rect) {
+    equals(rect: Rectangle) {
         return rect.x1 === this.x1 && rect.x2 === this.x2 && rect.y1 === this.y1 && rect.y2 === this.y2
     }
 
@@ -93,7 +93,7 @@ class Rectangle {
         return new Rectangle(this.x1, this.y1, this.x2, this.y2)
     }
 
-    bounding(x1, y1, x2, y2) {
+    bounding(x1: number, y1: number, x2: number, y2: number) {
         if(this.x1 > x1) x1 = this.x1
         if(this.x2 < x2) x2 = this.x2
         if(this.y1 > y1) y1 = this.y1

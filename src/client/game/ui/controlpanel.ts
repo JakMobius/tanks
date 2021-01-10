@@ -1,30 +1,32 @@
+import Vidget from "../../controls/interact/vidget";
+import {Touch} from "../../controls/interact/touchcontroller";
 
 class ControlPanel {
-	public vidgets: any;
+	public vidgets: Vidget[] = []
 
     constructor() {
-        this.vidgets = []
+
     }
 
-    addVidget(vidget) {
+    addVidget(vidget: Vidget) {
         this.vidgets.push(vidget)
     }
 
-    draw(ctx, spt) {
+    draw(ctx: WebGLRenderingContext, dt: number) {
 
-        this.vidgets.forEach(function(vidget){
+        this.vidgets.forEach(function(vidget: Vidget){
             if(vidget.hidden) return
 
-            ctx.translate(vidget.x, vidget.y)
+            //ctx.translate(vidget.x, vidget.y)
 
-            vidget.draw(ctx, spt)
+            vidget.draw(ctx, dt)
 
-            ctx.translate(-vidget.x, -vidget.y)
+            //ctx.translate(-vidget.x, -vidget.y)
         })
 
     }
 
-    captureTouch(touch) {
+    captureTouch(touch: Touch) {
         let x = touch.left
         let y = touch.top
 
@@ -46,14 +48,14 @@ class ControlPanel {
         return false
     }
 
-    touchEnded(touch) {
+    touchEnded(touch: Touch) {
         if(touch.vidget) {
             touch.vidget.touchEnded()
             touch.vidget.touched = false
         }
     }
 
-    touchMoved(touch) {
+    touchMoved(touch: Touch) {
 
         let vidget = touch.vidget
 

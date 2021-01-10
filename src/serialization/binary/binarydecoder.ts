@@ -1,26 +1,31 @@
 
 import BinaryPool from './binarypool';
-import BinaryBuffer from './buffer';
+import {ByteArray, ByteArrayConstructor} from './buffer';
+import {Constructor} from "./serializable";
+import Buffer from "./buffer";
+
+export interface BinaryDecoderConfig {
+    largeIndices?: boolean
+    readIndexMode?: boolean
+}
 
 class BinaryDecoder extends BinaryPool {
-	public largeIndices: any;
-	public readIndexMode: any;
-	public buffers: any;
+	public largeIndices: boolean;
+	public readIndexMode: boolean;
+	public buffers = new Map<ByteArrayConstructor<ByteArray>, Buffer<ByteArray>>();
+
     /**
      * Shared instance of `BinaryDecoder`
-     * @type {BinaryDecoder}
      */
-    static shared = new BinaryDecoder()
+    static shared: BinaryDecoder = new BinaryDecoder()
 
-    constructor(options?) {
-        options = options || {}
+    constructor(options?: BinaryDecoderConfig) {
         super();
+        options = options || {}
 
-        this.largeIndices = options.largeIndices
-        this.readIndexMode = options.readIndexMode
+        this.largeIndices = !!options.largeIndices
+        this.readIndexMode = !!options.readIndexMode
 
-        /** @type {Map<Number, BinaryBuffer>} */
-        this.buffers = new Map()
         this.setupBuffers()
     }
 
@@ -28,9 +33,9 @@ class BinaryDecoder extends BinaryPool {
      * Reads binary data to buffers. Then
      * it's possible to use read functions
      * as `readString` or `readUint32`
-     * @param array {ArrayBuffer} Data buffer to read.
+     * @param array Data buffer to read.
      */
-    readData(array) {
+    readData(array: ArrayBuffer) {
         let compilerBytes = Uint16Array.BYTES_PER_ELEMENT
         let bufferIndex = 0
         let arrayPointer = 0
@@ -72,11 +77,7 @@ class BinaryDecoder extends BinaryPool {
         }
     }
 
-    /**
-     * Private function. Should never be used outside.
-     */
-
-    setupBuffers() {
+    private setupBuffers() {
         for(let [type, buffer] of BinaryPool.bufferTypes.entries()) {
             let newBuffer = buffer.clone()
             newBuffer.createBuffer()
@@ -85,61 +86,87 @@ class BinaryDecoder extends BinaryPool {
         }
     }
 
-    // Reading functions
+    getTypedBuffer<T extends ByteArray>(type: ByteArrayConstructor<T>): Buffer<T> | null {
+        return this.buffers.get(type) as Buffer<T>
+    }
 
     /**
      * Reads and returns an signed 8-bit integer or `Int8Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readInt8    = (n?: Number) => this.buffers.get(BinaryPool.INT8).next(n)
+    readInt8(): number
+    readInt8(n: number): Int8Array
+    readInt8(n?: number): Int8Array | number {
+        return this.getTypedBuffer(Int8Array).next(n)
+    }
 
     /**
      * Reads and returns an unsigned 8-bit integer or `Uint8Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readUint8   = (n?: Number) => this.buffers.get(BinaryPool.UINT8).next(n)
+    readUint8(): number
+    readUint8(n: number): Uint8Array
+    readUint8(n?: number): Uint8Array | number {
+        return this.getTypedBuffer(Uint8Array).next(n)
+    }
 
     /**
      * Reads and returns an signed 16-bit integer an `Int16Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readInt16   = (n?: Number) => this.buffers.get(BinaryPool.INT16).next(n)
+    readInt16(): number
+    readInt16(n: number): Int16Array
+    readInt16(n?: number): Int16Array | number {
+        return this.getTypedBuffer(Int16Array).next(n)
+    }
 
     /**
      * Reads and returns an unsigned 16-bit integer an `Uint16Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readUint16  = (n?: Number) => this.buffers.get(BinaryPool.UINT16).next(n)
+    readUint16(): number
+    readUint16(n: number): Uint16Array
+    readUint16(n?: number): Uint16Array | number {
+        return this.getTypedBuffer(Uint16Array).next(n)
+    }
 
     /**
      * Reads and returns an signed 32-bit integer or `Int32Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readInt32   = (n?: Number) => this.buffers.get(BinaryPool.INT32).next(n)
+    readInt32(): number
+    readInt32(n: number): Int32Array
+    readInt32(n?: number): Int32Array | number {
+        return this.getTypedBuffer(Int32Array).next(n)
+    }
 
     /**
      * Reads and returns an unsigned 32-bit integer or `Uint32Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readUint32  = (n?: Number) => this.buffers.get(BinaryPool.UINT32).next(n)
+    readUint32(): number
+    readUint32(n: number): Uint32Array
+    readUint32(n?: number): Uint32Array | number {
+        return this.getTypedBuffer(Uint32Array).next(n)
+    }
 
     /**
      * Reads and returns an single-precision float or `Float32Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readFloat32 = (n?: Number) => this.buffers.get(BinaryPool.FLOAT32).next(n)
+    readFloat32(): number
+    readFloat32(n: number): Float32Array
+    readFloat32(n?: number): Float32Array | number {
+        return this.getTypedBuffer(Float32Array).next(n)
+    }
 
     /**
      * Reads and returns an double-precision float or `Float64Array` when `n > 1`.
-     * @param n{Number?} Number of entries to read.
      */
-    readFloat64 = (n?: Number) => this.buffers.get(BinaryPool.FLOAT64).next(n)
+    readFloat64(): number
+    readFloat64(n: number): Float64Array
+    readFloat64(n?: number): Float64Array | number {
+        return this.getTypedBuffer(Float64Array).next(n)
+    }
 
     /**
      * Reads and returns a string.
      */
     readString = () => {
-        let buffer = this.buffers.get(BinaryPool.UINT16)
+        let buffer = this.getTypedBuffer(Uint16Array)
 
         let codes = [];
         let code;

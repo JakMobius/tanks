@@ -31,7 +31,7 @@ import cp from 'child_process';
  * Tput
  */
 
-function Tput(options?) {
+function Tput(options) {
   if (!(this instanceof Tput)) {
     return new Tput(options);
   }
@@ -772,7 +772,7 @@ Tput.prototype._compile = function(info, key, str) {
     , els
     , end;
 
-  function read(regex, no?) {
+  function read(regex, no) {
     cap = regex.exec(val);
     if (!cap) return;
     val = val.substring(cap[0].length);

@@ -4,6 +4,7 @@ import BinaryDecoder from '../../serialization/binary/binarydecoder';
 import BinaryEncoder from '../../serialization/binary/binaryencoder';
 import pako from 'pako';
 import EditorMap from './editormap';
+import GameMap from "../../utils/map/gamemap";
 
 class MapStorage {
 	public dataDecoder: any;
@@ -44,7 +45,7 @@ class MapStorage {
         return []
     }
 
-    static write(maps) {
+    static write(maps: EditorMap[]) {
         this.dataEncoder.reset()
 
         this.dataEncoder.writeUint16(maps.length)
@@ -62,7 +63,7 @@ class MapStorage {
         window.localStorage.setItem("editor-maps", Base64.bytesToBase64(new Uint8Array(buffer)))
     }
 
-    static readMap(buffer) {
+    static readMap(buffer: Uint8Array) {
         let raw = pako.inflate(buffer)
 
         this.mapDecoder.reset()
@@ -73,13 +74,7 @@ class MapStorage {
         return map
     }
 
-    /**
-     *
-     * @param map {GameMap}
-     * @param flags {number[]?}
-     * @returns {Uint8Array}
-     */
-    static writeMap(map, flags?) {
+    static writeMap(map: EditorMap, flags?: number[]): Uint8Array {
         this.mapEncoder.reset()
         map.toBinary(this.mapEncoder, flags)
         

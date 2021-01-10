@@ -24,7 +24,7 @@ async function initDatabase() {
     }
 }
 
-async function configureClusterCommunication(server) {
+async function configureClusterCommunication(server: Server) {
     if(Preferences.boolean("cluster.enabled")) {
         let clusterPortSettingPath = "cluster.hub-port"
         let clusterPort
@@ -88,6 +88,7 @@ async function initialize() {
         throw e
     }
 }
+
 
 const serverInitializeTime = Date.now()
 

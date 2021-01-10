@@ -3,15 +3,13 @@ import AbstractConnection from '../networking/abstract-connection';
 import WebSocket from 'websocket';
 const WebSocketConnection = WebSocket.connection
 import Logger from './log/logger';
+import BinaryPacket from "../networking/binarypacket";
 
 class WebsocketConnection extends AbstractConnection {
 
-    /**
-     * @type {WebSocketConnection}
-     */
-    websocket = null
+    websocket: WebSocket.connection = null
 
-    constructor(websocket) {
+    constructor(websocket: WebSocket.connection) {
         super();
         this.websocket = websocket
     }
@@ -20,11 +18,11 @@ class WebsocketConnection extends AbstractConnection {
         return this.websocket.state === "open"
     }
 
-    send(packet) {
+    send(packet: BinaryPacket) {
         this.websocket.sendBytes(Buffer.from(packet.getData()))
     }
 
-    close(reason) {
+    close(reason: string) {
         this.websocket.close(WebSocketConnection.CLOSE_REASON_NORMAL, reason)
     }
 }

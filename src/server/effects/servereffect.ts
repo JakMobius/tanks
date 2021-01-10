@@ -1,17 +1,15 @@
 
-import AbstractEffect from '@/effects/abstracteffect';
+import AbstractEffect from 'src/effects/abstract-effect';
+import EffectModel from "../../effects/effect-model";
 
 class ServerEffect extends AbstractEffect {
-	public Types: any;
     static shouldSynchroniseRemoval = true
 
     /**
      * Finds server-side implementation of the effect model
-     * @param model {EffectModel}
-     * @returns {ServerEffect}
      */
-    static fromModel(model) {
-        let clazz = /** @type Class<ServerEffect> */ this.Types.get(model.constructor)
+    static fromModel(model: EffectModel): ServerEffect {
+        let clazz = this.Types.get(model.constructor as typeof EffectModel)
 
         if(clazz) return new clazz(model)
         return null

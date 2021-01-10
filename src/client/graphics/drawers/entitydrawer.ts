@@ -1,16 +1,17 @@
+import TextureProgram from "../programs/textureprogram";
+import ClientEntity from "../../entity/cliententity";
 
 class EntityDrawer {
 	public entity: any;
 
-    constructor(entity) {
+    constructor(entity: ClientEntity) {
         this.entity = entity
     }
 
     /**
      * Draws the specified entity.
-     * @param program {TextureProgram}
      */
-    draw(program) {}
+    draw(program: TextureProgram) {}
 }
 
 export default EntityDrawer;

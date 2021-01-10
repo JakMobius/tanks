@@ -2,8 +2,10 @@
 // const FX = require("../../sound/fx")
 import FireParticle from '../../../particles/fireparticle';
 
-import ClientTankEffect from '../clienttankeffect';
-import TankFireEffectModel from '@/effects/tank/tankfireeffectmodel';
+import ClientTankEffect from 'src/client/effects/tank/clienttankeffect';
+import TankFireEffectModel from 'src/effects/tank/tank-fire-effect-model';
+import EffectModel from 'src/effects/effect-model';
+import ClientTank from "../../../tanks/clienttank";
 
 class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;
@@ -11,7 +13,9 @@ class ClientTankFireEffect extends ClientTankEffect {
 	public sound: any;
 	public dead: any;
 
-    constructor(model, tank) {
+	static Model: typeof EffectModel = TankFireEffectModel
+
+    constructor(model: EffectModel, tank: ClientTank) {
         super(model, tank);
 
         this.queue = 0
@@ -23,7 +27,7 @@ class ClientTankFireEffect extends ClientTankEffect {
         this.dead = true
     }
 
-    tick(dt) {
+    tick(dt: number) {
 
         const position = this.tank.model.body.GetPosition()
         const velocity = this.tank.model.body.GetLinearVelocity()
@@ -49,7 +53,6 @@ class ClientTankFireEffect extends ClientTankEffect {
                     width: 4,
                     height: 4,
                     scaling: 1.5,
-                    decelerating: 0.95,
                     lifetime: 0.4 + Math.random() * 0.1,
                 });
                 this.tank.world.particles.push(smoke)
@@ -58,7 +61,5 @@ class ClientTankFireEffect extends ClientTankEffect {
         }
     }
 }
-
-ClientTankEffect.associate(TankFireEffectModel, ClientTankFireEffect)
 
 export default ClientTankFireEffect;

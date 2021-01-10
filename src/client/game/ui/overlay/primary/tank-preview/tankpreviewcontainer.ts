@@ -2,39 +2,47 @@
 
 import StatScale from './statscale';
 
-import Menu from '@/client/ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
+import TankModel from "../../../../../../tanks/tankmodel";
+import ClientTank from "../../../../../tanks/clienttank";
 
-class Stat {
+export interface StatConfig {
+    name: string;
+    color: string;
+    maximum: number;
+    func: (value: number, maximum: number) => number;
+}
+
+export class Stat implements StatConfig {
 	public name: any;
 	public color: any;
 	public maximum: any;
 	public func: any;
 
-    constructor(options) {
+    constructor(options: StatConfig) {
         this.name = options.name
         this.color = options.color
         this.maximum = options.maximum
-        this.func = options.func || Stat.Linear()
+        this.func = options.func || Stat.Linear
     }
 
-    static Linear(value?, maximum?) {
+    static Linear(value: number, maximum: number) {
         return value / maximum
     }
 
-    static Reversive(value, maximum) {
+    static Reversive(value: number, maximum: number) {
         return maximum / value
     }
 }
 
 class TankPreviewContainer extends Menu {
-	public element: any;
-	public tankPreview: any;
-	public previewCanvas: any;
-	public previewCtx: any;
-	public previewTitle: any;
-	public statContainer: any;
-	public descriptionBlock: any;
-	public statElements: any;
+	public tankPreview: JQuery;
+	public previewCanvas: JQuery<HTMLCanvasElement>;
+	public previewCtx: WebGLRenderingContext;
+	public previewTitle: JQuery;
+	public statContainer: JQuery;
+	public descriptionBlock: JQuery;
+	public statElements = new Map<string, StatScale>()
     static stats = new Map([
         ["damage", new Stat({
             name: "УРОН",
@@ -79,8 +87,8 @@ class TankPreviewContainer extends Menu {
         let canvas = this.previewCanvas[0]
         canvas.width = 155 * devicePixelRatio
         canvas.height = 155 * devicePixelRatio
-        this.previewCtx = canvas.getContext("2d")
-        this.previewCtx.scale(devicePixelRatio, devicePixelRatio)
+        //this.previewCtx = canvas.getContext("2d")
+        //this.previewCtx.scale(devicePixelRatio, devicePixelRatio)
 
         this.previewTitle = $("<h1>")
 
@@ -94,7 +102,6 @@ class TankPreviewContainer extends Menu {
         this.element.append(this.statContainer)
         this.element.append(this.descriptionBlock)
 
-        this.statElements = new Map()
         this.setupStats()
     }
 
@@ -107,27 +114,28 @@ class TankPreviewContainer extends Menu {
         }
     }
 
-    drawTank(tank) {
-        this.previewCtx.save()
-        this.previewCtx.clearRect(0, 0, 155, 155)
-        this.previewCtx.translate(155 / 2, 155 / 2);
-        this.previewCtx.scale(5, 5);
+    drawTank(tank: typeof ClientTank) {
+        //this.previewCtx.save()
+        //this.previewCtx.clearRect(0, 0, 155, 155)
+        //this.previewCtx.translate(155 / 2, 155 / 2);
+        //this.previewCtx.scale(5, 5);
 
         // let drawer = new (tank.getDrawer())
         // drawer.draw(this.previewCtx, null)
 
-        this.previewCtx.restore()
+        //this.previewCtx.restore()
     }
 
-    applyStats(tank) {
+    applyStats(tank: typeof ClientTank) {
+        let stats = tank.getStats()
         for(let [key, element] of this.statElements.entries()) {
-            const statValue = tank.getStats()[key];
+            const statValue = stats[key];
 
             element.setValue(statValue)
         }
     }
 
-    previewTank(tank) {
+    previewTank(tank: typeof ClientTank) {
         this.drawTank(tank)
 
         this.previewTitle.text(tank.getName())

@@ -2,70 +2,73 @@
  * More reliable for serializing long-lasting or
  * large and scalable data structures.
  */
+import BinaryEncoder from "../serialization/binary/binaryencoder";
+import BinaryDecoder from "../serialization/binary/binarydecoder";
+
+type Packer = ((encoder: BinaryEncoder, options: any) => void)
+type Unpacker = ((decoder: BinaryDecoder, options: any) => void)
+type Decision = ((object: any) => boolean)
+
+export class FlagHandler {
+
+    id: number;
+    unpacker: Unpacker;
+    packer: Packer;
+    decision: Decision;
+
+    constructor(id: number) {
+        this.id = id
+        this.unpacker = null
+        this.packer = null
+        this.decision = null
+    }
+
+    setUnpacker(unpacker: Unpacker): FlagHandler {
+        this.unpacker = unpacker
+        return this
+    }
+
+    setPacker(packer: Packer): FlagHandler {
+        this.packer = packer
+        return this
+    }
+
+    packDecision(decision: Decision): FlagHandler {
+        this.decision = decision
+        return this
+    }
+
+}
 
 class BinaryOptions {
-	public flags: any;
-	public trimFlagIdentifier: any;
 
-    public static FlagHandler = class {
-        id: any;
-        unpacker: any;
-        packer: any;
-        decision: any;
-
-        constructor(id) {
-            this.id = id
-            this.unpacker = null
-            this.packer = null
-            this.decision = null
-        }
-
-        setUnpacker(handler) {
-            this.unpacker = handler
-            return this
-        }
-
-        setPacker(packer) {
-            this.packer = packer
-            return this
-        }
-
-        packDecision(decision) {
-            this.decision = decision
-            return this
-        }
-
-    }
+    /**
+     * Flag handler map
+     */
+    public flags = new Map<number, FlagHandler>()
+    public trimFlagIdentifier = false
 
     constructor() {
-
-        /**
-         * Flag handler map
-         * @type Map<number, BinaryOptions.FlagHandler>
-         */
-
-        this.flags = new Map()
-        this.trimFlagIdentifier = false
     }
 
-    addFlagHandler(handler) {
+    addFlagHandler(handler: FlagHandler) {
         this.flags.set(handler.id, handler)
     }
 
-    convertBinary(decoder, options?) {
-        let flags
+    convertBinary(decoder: BinaryDecoder, options?: any) {
+        let flags: number
 
-        if(this.trimFlagIdentifier) flags = decoder.readUint8()
+        if (this.trimFlagIdentifier) flags = decoder.readUint8()
         else flags = decoder.readUint16()
 
         options = options || {}
 
-        while(flags--) {
+        while (flags--) {
             let flag
-            if(this.trimFlagIdentifier) flag = decoder.readUint8()
+            if (this.trimFlagIdentifier) flag = decoder.readUint8()
             else flag = decoder.readUint16()
 
-            if(this.flags.has(flag)) {
+            if (this.flags.has(flag)) {
                 let handler = this.flags.get(flag)
                 handler.unpacker(decoder, options)
             }
@@ -74,27 +77,27 @@ class BinaryOptions {
         return options
     }
 
-    convertOptions(encoder, options, flags) {
+    convertOptions(encoder: BinaryEncoder, options: any, flags?: number[]) {
 
-        if(!options) options = {}
+        if (!options) options = {}
 
         let count = 0
 
-        for(let [flag, handler] of this.flags.entries()) {
+        for (let [flag, handler] of this.flags.entries()) {
             if (flags && flags.indexOf(flag) === -1) continue
             if (handler.decision && !handler.decision(options)) continue
 
             count++
         }
 
-        if(this.trimFlagIdentifier) encoder.writeUint8(count)
+        if (this.trimFlagIdentifier) encoder.writeUint8(count)
         else encoder.writeUint16(count)
 
-        for(let [flag, handler] of this.flags.entries()) {
-            if(flags && flags.indexOf(flag) === -1) continue
-            if(handler.decision && !handler.decision(options)) continue
+        for (let [flag, handler] of this.flags.entries()) {
+            if (flags && flags.indexOf(flag) === -1) continue
+            if (handler.decision && !handler.decision(options)) continue
 
-            if(this.trimFlagIdentifier) encoder.writeUint8(flag)
+            if (this.trimFlagIdentifier) encoder.writeUint8(flag)
             else encoder.writeUint16(flag)
 
             handler.packer(encoder, options)

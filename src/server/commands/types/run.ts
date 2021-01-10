@@ -3,17 +3,13 @@ import Command from '../command';
 
 class RunCommand extends Command {
 
-    onPerform(args) {
+    onPerform(args: string[]): void {
         if(args.length !== 1) {
-            this.console.logger.log("Использование: " + this.getUsage())
+            this.console.logger.log("Usage: " + this.getUsage())
             return
         }
 
         this.console.runScript(args[0], 0)
-    }
-
-    onTabComplete(args) {
-        return super.onTabComplete(args);
     }
 
     getName() {
@@ -29,7 +25,7 @@ class RunCommand extends Command {
     }
 
     getDescription() {
-        return "Выполнить скрипт"
+        return "Run script"
     }
 }
 

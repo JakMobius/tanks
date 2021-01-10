@@ -2,7 +2,14 @@
 import AbstractEntity from '../../entity/abstractentity';
 import Utils from '../../utils/utils';
 import GameMap from '../../utils/map/gamemap';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
+import EntityModel from "../../entity/entitymodel";
+import BlockState from "../../utils/map/blockstate/blockstate";
+
+interface WallHitPoint {
+    point: Box2D.Vec2
+    block: Box2D.Vec2
+}
 
 class ServerEntity extends AbstractEntity {
 	public explodeResistance: any;
@@ -11,12 +18,7 @@ class ServerEntity extends AbstractEntity {
     static types = new Map()
     static globalId = 0
 
-    /**
-     * @type {Game}
-     */
-    game = null;
-
-    constructor(model) {
+    constructor(model: EntityModel) {
         super(model);
 
         this.explodeResistance = 0.2
@@ -28,11 +30,11 @@ class ServerEntity extends AbstractEntity {
         this.model.dead = true
     }
 
-    tick(dt) {
+    tick(dt: number) {
         this.model.tick(dt)
     }
 
-    checkPlayerHit(x, y, dx, dy) {
+    checkPlayerHit(x: number, y: number, dx: number, dy: number) {
         if(!this.shooter.tank) return null
         const a = x, b = y;
         const c = x + dx, d = y + dy;
@@ -90,7 +92,7 @@ class ServerEntity extends AbstractEntity {
 
     // TODO: переписать на distToSegment
 
-    checkWallHit(x, y, dx, dy) {
+    checkWallHit(x: number, y: number, dx: number, dy: number): WallHitPoint | null {
         const steps = 10
 
         dx /= steps;
@@ -106,21 +108,21 @@ class ServerEntity extends AbstractEntity {
             let block = this.game.map.getBlock(bx, by);
 
             if(block !== null) {
-                if (!block.constructor.isSolid) {
+                if (!(block.constructor as typeof BlockState).isSolid) {
                     continue
                 }
             }
 
             return {
-                point: new Box2D.b2Vec2(x - dx, y - dy),
-                block: new Box2D.b2Vec2(bx, by)
+                point: new Box2D.Vec2(x - dx, y - dy),
+                block: new Box2D.Vec2(bx, by)
             }
         }
 
         return null
     }
 
-    static fromModel(model) {
+    static fromModel(model: EntityModel) {
         let type = this.types.get(model.constructor)
 
         if(type) {
@@ -129,7 +131,7 @@ class ServerEntity extends AbstractEntity {
         return null
     }
 
-    static associate(serverClass, modelClass) {
+    static associate(modelClass: typeof EntityModel, serverClass: typeof ServerEntity): void {
         this.types.set(modelClass, serverClass)
     }
 }

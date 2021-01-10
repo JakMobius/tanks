@@ -1,19 +1,17 @@
+import AbstractConnection from "../../networking/abstract-connection";
 
 
 class SocketPortalClient {
 	static globalId = 0
 
-	id
-	data
-	websocket
-	connection
+	id: number
+	data: any
+	websocket: any
+	connection: AbstractConnection
 
-	/**
-	 * @type {Room}
-	 */
-	game = null
+	game: any = null
 
-	constructor(config) {
+	constructor(config: any) {
 		config = config || {}
 		this.id = SocketPortalClient.globalId++
 		this.data = config.data || {}

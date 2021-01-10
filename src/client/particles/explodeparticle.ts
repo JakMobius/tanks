@@ -1,8 +1,14 @@
 
 import FireParticle from './fireparticle';
+import {ParticleConfig} from "./particle";
+
+export interface ExplodeParticleConfig extends ParticleConfig {
+    startOpacity: number
+    shifting: number
+}
 
 class ExplodeParticle extends FireParticle {
-    createColors(config) {
+    createColors(config: ExplodeParticleConfig) {
         let varying = 30
         return [
             [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, config.startOpacity],
@@ -18,7 +24,7 @@ class ExplodeParticle extends FireParticle {
     static all =        [0.00, 0.10, 0.40, 0.60, 0.80, 1.00] // 0
     static smokeOnly =  [0.00, 0.00, 0.00, 0.33, 0.66, 1.00] // 1
 
-    createTimings(config) {
+    createTimings(config: ExplodeParticleConfig) {
         let result = []
 
         let t1, t2, f1, f2
@@ -41,11 +47,9 @@ class ExplodeParticle extends FireParticle {
         return result
     }
 
-    constructor(config) {
+    constructor(config: ExplodeParticleConfig) {
         super(config);
     }
 }
-
-window.ExplodeParticle = ExplodeParticle
 
 export default ExplodeParticle;

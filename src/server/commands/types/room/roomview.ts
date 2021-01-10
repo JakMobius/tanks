@@ -1,8 +1,9 @@
 
 import Command from '../../command';
+import Game from "../../../room/game";
 
 class RoomViewCommand extends Command {
-    onPerform(args) {
+    onPerform(args: string[]) {
         let logger = this.console.logger
         if (args.length !== 1) {
             logger.log(this.getHelp())
@@ -10,7 +11,7 @@ class RoomViewCommand extends Command {
         }
 
         let id = args[0]
-        let world = this.console.server.gameSocket.games.get(id)
+        let world = this.console.server.gameSocket.games.get(id) as Game
 
         if (!world) {
             logger.log("No such room: '" + id)
@@ -23,7 +24,7 @@ class RoomViewCommand extends Command {
         this.console.window.render()
     }
 
-    onTabComplete(args) {
+    onTabComplete(args: string[]) {
         if(args.length === 1) {
             let result = []
 

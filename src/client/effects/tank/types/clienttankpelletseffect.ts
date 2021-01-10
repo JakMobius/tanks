@@ -1,20 +1,22 @@
 
 import ClientTankEffect from '../clienttankeffect';
-
-//const AbstractTankPelletsEffect = require("/src/effects/tank/abstracttankpelletseffect")
-import Pellet from '@/client/particles/pellet';
-
-import Color from '@/utils/color';
+import Pellet from 'src/client/particles/pellet'
+import Color from 'src/utils/color';
+import EffectModel from 'src/effects/effect-model';
+import TankPelletsEffectModel from 'src/effects/tank/tank-pellets-effect-model';
+import Player from 'src/utils/player';
 
 class ClientTankPelletsEffect extends ClientTankEffect {
 	public player: any;
 	public game: any;
 
-    start(player) {
+    static Model: typeof EffectModel = TankPelletsEffectModel
+
+    start(player: Player) {
         this.player = player
     }
 
-    draw(ctx) {
+    draw(ctx: WebGLRenderingContext) {
         const game = this.game;
         const player = this.player;
 
@@ -40,5 +42,4 @@ class ClientTankPelletsEffect extends ClientTankEffect {
     }
 }
 
-//ClientTankEffect.register(AbstractTankPelletsEffect, ClientTankPelletsEffect)
 export default ClientTankPelletsEffect;

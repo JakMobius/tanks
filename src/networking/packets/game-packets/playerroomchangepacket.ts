@@ -1,22 +1,23 @@
 
 import BinaryPacket from '../../binarypacket';
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 class PlayerRoomChangePacket extends BinaryPacket {
-	public room: any;
-	public error: any;
+	public room: string;
+	public error: string;
 
-    static typeName() {
-        return 18
-    }
+    static typeName = 18
 
-    constructor(room, error?) {
+    constructor(room: string, error?: string) {
         super();
 
         this.room = room
         this.error = error
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeUint8(this.error ? 0 : 1)
         encoder.writeString(this.room)
         if(this.error) {
@@ -24,7 +25,7 @@ class PlayerRoomChangePacket extends BinaryPacket {
         }
     }
 
-    static fromBinary(decoder) {
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
         let isSuccess = decoder.readUint8()
         let room = decoder.readString()
         let error = isSuccess ? null : decoder.readString()
@@ -32,14 +33,14 @@ class PlayerRoomChangePacket extends BinaryPacket {
         return new this(room, error)
     }
 
-    static allow(room) {
+    static allow(room: string) {
         return new this(room)
     }
 
-    static deny(room, error) {
+    static deny(room: string, error: string) {
         return new this(room, error)
     }
 }
 
-BinaryPacket.register(PlayerRoomChangePacket)
+BinarySerializer.register(PlayerRoomChangePacket)
 export default PlayerRoomChangePacket;

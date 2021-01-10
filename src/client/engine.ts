@@ -1,20 +1,44 @@
+import FX from "./sound/fx";
+import ClientTank from "./tanks/clienttank";
+import ClientGameWorld from "./clientgameworld";
+import TankModel from "../tanks/tankmodel";
+import Sound from "./sound/sound";
 
+
+export interface EngineConfig {
+    sound: number,
+    gears?: EngineGearConfig[],
+    multiplier: number,
+    pitch: number
+    volume?: number
+}
+
+export interface EngineGearConfig {
+    /// When should gearbox switch to the next gear
+    high?: number
+
+    /// When should gearbox switch to the previous gear
+    low?: number
+
+    /// Gear ratio
+    gearing: number
+}
 
 class Engine {
-	public config: any;
+	public config: EngineConfig;
 	public game: any;
-	public tank: any;
-	public sound: any;
-	public rpm: any;
-	public gear: any;
+	public tank: TankModel;
+	public sound: Sound;
+	public rpm: number;
+	public gear: number;
 	public const: any;
 	public destinationRPM: any;
 
-    constructor(config) {
+    constructor(config: EngineConfig) {
         this.config = config
     }
 
-    configure(game, tank) {
+    configure(game: ClientGameWorld, tank: TankModel) {
         this.game = game
         this.tank = tank
         this.sound = this.game.playSound(this.config.sound, {
@@ -28,8 +52,6 @@ class Engine {
         this.const = {
             multiplier: this.config.multiplier || 11,
             gears: this.config.gears || [{gearing: 1}],
-            gearUpRPM: this.config.gearUpRPM || 2.1,
-            gearDownRPM: this.config.gearDownRPM || 1.9,
             pitch: this.config.pitch || 1,
             volume: this.config.volume || 1
         }
@@ -50,11 +72,11 @@ class Engine {
                 this.sound.config.mapX = this.tank.x
                 this.sound.config.mapY = this.tank.y
             }
-            if(this.tank.model.health === 0) {
+            if(this.tank.health === 0) {
                 this.destinationRPM = 0
-                this.sound.gainNode.value
+                this.sound.gainNode.gain.value
             } else {
-                const tankSpeed = this.tank.options.transmissionSpeed * this.game.tps;
+                const tankSpeed = this.tank.behaviour.details.transmissionSpeed * this.game.tps;
 
                 const rpm = tankSpeed / this.const.multiplier;
 
@@ -71,9 +93,9 @@ class Engine {
                     this.gear++
                 }
 
-                const minRPM = 1 - this.tank.options.clutch / 6;
+                const minRPM = 1 - this.tank.behaviour.details.clutch / 6;
 
-                this.destinationRPM = (Math.max(minRPM, rpm) * this.const.gears[this.gear].gearing) * this.tank.options.clutch + (1 - this.tank.options.clutch)
+                this.destinationRPM = (Math.max(minRPM, rpm) * this.const.gears[this.gear].gearing) * this.tank.behaviour.details.clutch + (1 - this.tank.behaviour.details.clutch)
             }
 
             if(this.destinationRPM < this.rpm) {
@@ -90,7 +112,7 @@ class Engine {
 
             if(this.sound) {
                 this.sound.source.playbackRate.value = this.rpm * this.const.pitch
-                let volume = 0.3 + this.tank.options.clutch / 4;
+                let volume = 0.3 + this.tank.behaviour.details.clutch / 4;
                 if(this.rpm < 0.7) {
                     volume *= (this.rpm - 0.2) * 2
                 }

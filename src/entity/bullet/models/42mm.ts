@@ -1,14 +1,10 @@
 import BulletModel from '../bulletmodel';
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 class BulletModel42mm extends BulletModel {
-
-	static typeName() { return 0 }
-
-	constructor() {
-		super();
-	}
+	static typeName = 0
 }
 
-BulletModel.register(BulletModel42mm)
+BinarySerializer.register(BulletModel42mm)
 
 export default BulletModel42mm;

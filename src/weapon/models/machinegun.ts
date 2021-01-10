@@ -1,10 +1,10 @@
-import Weapon from '../weapon';
+import Weapon, {WeaponConfig} from '../weapon';
 import Bullet16mm from '../../entity/bullet/models/16mm';
 
 class WeaponMachineGun extends Weapon {
 	public state: any;
 
-	constructor(config) {
+	constructor(config: WeaponConfig) {
 		config = Object.assign({
 			maxAmmo: 50,
 			shootRate: 100,

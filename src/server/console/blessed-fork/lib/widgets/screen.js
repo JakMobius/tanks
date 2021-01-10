@@ -128,7 +128,7 @@ class Screen extends Node {
 
     this.ignoreLocked = options.ignoreLocked || [];
 
-    this._unicode = this.tput.unicode || this.tput.numbers.U8 === 1;
+    this._unicode = this.tput.unicode || this.tput.numbers["U8"] === 1;
     this.fullUnicode = this.options.fullUnicode && this._unicode;
 
     this.dattr = ((0 << 18) | (0x1ff << 9)) | 0x1ff;
@@ -973,7 +973,7 @@ class Screen extends Node {
 
     // Experimental: fixes this situation:
     // +----------+
-    //            | <-- empty space here, should be a T angle
+    //            | <-- empty space here, should be a T setAngle
     // +-------+  |
     // |       |  |
     // +-------+  |
@@ -984,7 +984,7 @@ class Screen extends Node {
     //     if (!this.options.ignoreDockContrast) {
     //       if (lines[y + 1][x][0] !== attr) return ch;
     //     }
-    //     angle |= 1 << 0;
+    //     setAngle |= 1 << 0;
     //   }
     // }
 
@@ -1294,7 +1294,7 @@ class Screen extends Node {
           // NOTE: It could be the case that the $LANG
           // is all that matters in some cases:
           // if (!this.tput.unicode && ch > '~') {
-          if (!this.tput.unicode && this.tput.numbers.U8 !== 1 && ch > '~') {
+          if (!this.tput.unicode && this.tput.numbers["U8"] !== 1 && ch > '~') {
             ch = this.tput.utoa[ch] || '?';
           }
         }
@@ -2343,7 +2343,7 @@ var dangles = {
 //   '\u250c': true  // '┌'
 // };
 
-// Every ACS angle character can be
+// Every ACS setAngle character can be
 // represented by 4 bits ordered like this:
 // [langle][uangle][rangle][dangle]
 var angleTable = {

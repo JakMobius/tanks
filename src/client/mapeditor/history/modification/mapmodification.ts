@@ -1,17 +1,10 @@
+import EditorMap from "../../editormap";
 
 class MapModification {
 
-    /**
-     *
-     * @type {EditorMap}
-     */
-    map = null
+    map: EditorMap = null
 
-    /**
-     *
-     * @param map {EditorMap}
-     */
-    constructor(map) {
+    constructor(map: EditorMap) {
         this.map = map
     }
 

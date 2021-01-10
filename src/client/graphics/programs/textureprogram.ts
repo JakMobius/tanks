@@ -5,20 +5,29 @@ import Program from '../program';
 
 import Shader from '../shader';
 import GLBuffer from '../glbuffer';
+import Sprite from "../../sprite";
+import Matrix3 from "../matrix3";
+import {ByteArray} from "../../../serialization/binary/buffer";
+import {Constructor} from "../../../serialization/binary/serializable";
+import Uniform from "../uniform";
+
+export interface TextureProgramConfig {
+    largeIndices: boolean
+}
 
 class TextureProgram extends Program {
-	public indexBufferType: any;
-	public vertexBuffer: any;
-	public indexBuffer: any;
-	public vertexPositionAttribute: any;
-	public texturePositionAttribute: any;
-	public textureUniform: any;
-	public matrixUniform: any;
-	public vertexLength: any;
-	public textures: any;
-	public transform: any;
+	public indexBufferType: number
+	public vertexBuffer: GLBuffer<Float32Array>;
+	public indexBuffer: GLBuffer<ByteArray>;
+	public vertexPositionAttribute: number;
+	public texturePositionAttribute: number;
+	public textureUniform: Uniform;
+	public matrixUniform: Uniform;
+	public vertexLength: number;
+	public textures: number;
+	public transform: Matrix3;
 
-    constructor(name, ctx, options?) {
+    constructor(name: string, ctx: WebGLRenderingContext, options?: TextureProgramConfig) {
         options = Object.assign({
             largeIndices: false
         }, options)
@@ -41,12 +50,13 @@ class TextureProgram extends Program {
 
         this.ctx = ctx
         this.vertexBuffer = new GLBuffer({
+            clazz: Float32Array,
             gl: ctx,
             drawMode: this.ctx.STATIC_DRAW,
             capacity: options.largeIndices ? 16384 : 128 // Rare reallocation
         }).createBuffer()
 
-        this.indexBuffer = new GLBuffer({
+        this.indexBuffer = new GLBuffer<ByteArray>({
             gl: ctx,
             clazz: arrayType,
             bufferType: this.ctx.ELEMENT_ARRAY_BUFFER,
@@ -62,18 +72,14 @@ class TextureProgram extends Program {
         this.vertexLength = 4
 
         this.textures = 0
-
-        /**
-         * @type {Matrix3}
-         */
         this.transform = null
     }
 
-    setTransform(transform) {
+    setTransform(transform: Matrix3) {
         this.transform = transform
     }
 
-    drawTexture(x1, y1, x2, y2, x3, y3, x4, y4, sx, sy, sw, sh) {
+    drawTexture(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, sx: number, sy: number, sw: number, sh: number) {
         if(this.transform) {
             /*
                 Not using arrays/objects here because it will lead to
@@ -109,12 +115,12 @@ class TextureProgram extends Program {
         this.textures ++
     }
 
-    tightenTexture(sprite, x1, y1, x2, y2, x3, y3, x4, y4) {
+    tightenTexture(sprite: Sprite, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) {
         let r = sprite.rect
         this.drawTexture(x1, y1, x2, y2, x3, y3, x4, y4, r.x, r.y, r.w, r.h)
     }
 
-    drawSprite(sprite, x, y, width, height, sx, sy, sw, sh) {
+    drawSprite(sprite: Sprite, x: number, y: number, width: number, height: number, sx?: number, sy?: number, sw?: number, sh?: number) {
         const r = sprite.rect;
 
         if (sx === undefined) sx = r.x
@@ -135,10 +141,10 @@ class TextureProgram extends Program {
         )
     }
 
-    prepare(update) {
+    prepare(update: boolean = true) {
         this.vertexBuffer.bind()
 
-        if(update === true || update === undefined) {
+        if(update === true) {
             this.indexBuffer.reset()
             this.vertexBuffer.reset()
         }
@@ -153,8 +159,8 @@ class TextureProgram extends Program {
         this.ctx.vertexAttribPointer(this.texturePositionAttribute, 2, this.ctx.FLOAT, false, stride, 8);
     }
 
-    draw(update) {
-        if(update === true || update === undefined) {
+    draw(update: boolean = true) {
+        if(update === true) {
             this.indexBuffer.updateData()
             this.vertexBuffer.updateData()
         } else {

@@ -1,18 +1,20 @@
 
 import Tool from '../tool';
 import GameMap from '../../../../utils/map/gamemap';
+import ToolManager from '../toolmanager';
+import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class Fill extends Tool {
-	public actionName: any;
+    public actionName: any;
 
-    constructor(scene) {
-        super(scene);
+    constructor(manager: ToolManager) {
+        super(manager);
 
         this.image = "../assets/mapeditor/fill.png"
         this.actionName = "Заливка"
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
         x = Math.floor(x / GameMap.BLOCK_SIZE)
@@ -21,11 +23,11 @@ class Fill extends Tool {
         this.fill(x, y)
     }
 
-    getBitset(bitset, index) {
+    getBitset(bitset: Uint8Array, index: number) {
         return bitset[Math.floor(index >> 3)] & (1 << (index & 0b111))
     }
 
-    setBitset(bitset, index, value) {
+    setBitset(bitset: Uint8Array, index: number, value: boolean) {
         let byte = Math.floor(index >> 3)
         let bit = index & 0b111
         bitset[byte] &= (~(1 << bit))
@@ -34,13 +36,13 @@ class Fill extends Tool {
         }
     }
 
-    fill(x, y) {
+    fill(x: number, y: number) {
         const map = this.manager.map
         let baseBlock = map.getBlock(x, y)
 
         if(!baseBlock) return
 
-        let baseId = baseBlock.constructor.typeId
+        let baseId = (baseBlock.constructor as typeof BlockState).typeId
         let copy = new Uint8Array(Math.ceil(map.data.length / 8))
         let carets = [x + y * map.width]
 
@@ -58,7 +60,7 @@ class Fill extends Tool {
 
                 let block = map.getBlock(x, y)
 
-                if(block.constructor.typeId !== baseId) {
+                if((block.constructor as typeof BlockState).typeId !== baseId) {
                     continue
                 }
 

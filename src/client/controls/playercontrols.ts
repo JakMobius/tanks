@@ -1,6 +1,9 @@
 
 import Axle from '../../tanks/controls/axle';
 import EventEmitter from '../../utils/eventemitter';
+import TankControls from "../../tanks/controls/tankcontrols";
+import GamepadManager from "./interact/gamepadmanager";
+import KeyboardController from "./interact/keyboardcontroller";
 
 class PlayerControls extends EventEmitter {
 	public axles: any;
@@ -20,11 +23,11 @@ class PlayerControls extends EventEmitter {
         this.respawning = true
     }
 
-    createAxle(name) {
+    createAxle(name: string) {
         this.axles.set(name, new Axle())
     }
 
-    connectTankControls(controls) {
+    connectTankControls(controls: TankControls) {
         controls.axles.get("y").addSource(this.axles.get("tank-throttle"))
         controls.axles.get("x").addSource(this.axles.get("tank-steer"))
         controls.axles.get("primary-weapon").addSource(this.axles.get("tank-primary-weapon"))
@@ -38,30 +41,30 @@ class PlayerControls extends EventEmitter {
         this.axles.get("tank-miner").disconnectAll()
     }
 
-    setupGamepad(gamepad) {
-        this.axles.get("tank-throttle")      .addSource(gamepad.getAxle(1).invert())
-        this.axles.get("tank-steer")         .addSource(gamepad.getAxle(2))
-        this.axles.get("tank-miner")         .addSource(gamepad.getButton(4))
-        this.axles.get("tank-primary-weapon").addSource(gamepad.getButton(5))
-        this.axles.get("tank-respawn")       .addSource(gamepad.getButton(2))
+    setupGamepad(gamepad: GamepadManager) {
+        this.axles.get("tank-throttle")      .addSource(gamepad.createAxle(1).invert())
+        this.axles.get("tank-steer")         .addSource(gamepad.createAxle(2))
+        this.axles.get("tank-miner")         .addSource(gamepad.createButton(4))
+        this.axles.get("tank-primary-weapon").addSource(gamepad.createButton(5))
+        this.axles.get("tank-respawn")       .addSource(gamepad.createButton(2))
     }
 
-    setupKeyboard(keyboard) {
+    setupKeyboard(keyboard: KeyboardController) {
         this.axles.get("tank-throttle")
-            .addSource(keyboard.getKeyAxle("KeyW")     .smooth())
-            .addSource(keyboard.getKeyAxle("ArrowUp")  .smooth())
-            .addSource(keyboard.getKeyAxle("KeyS")     .smooth().reverse())
-            .addSource(keyboard.getKeyAxle("ArrowDown").smooth().reverse())
+            .addSource(keyboard.createKeyAxle("KeyW")     .smooth())
+            .addSource(keyboard.createKeyAxle("ArrowUp")  .smooth())
+            .addSource(keyboard.createKeyAxle("KeyS")     .smooth().reverse())
+            .addSource(keyboard.createKeyAxle("ArrowDown").smooth().reverse())
 
         this.axles.get("tank-steer")
-            .addSource(keyboard.getKeyAxle("KeyD")      .smooth())
-            .addSource(keyboard.getKeyAxle("ArrowRight").smooth())
-            .addSource(keyboard.getKeyAxle("KeyA")      .smooth().reverse())
-            .addSource(keyboard.getKeyAxle("ArrowLeft") .smooth().reverse())
+            .addSource(keyboard.createKeyAxle("KeyD")      .smooth())
+            .addSource(keyboard.createKeyAxle("ArrowRight").smooth())
+            .addSource(keyboard.createKeyAxle("KeyA")      .smooth().reverse())
+            .addSource(keyboard.createKeyAxle("ArrowLeft") .smooth().reverse())
 
-        this.axles.get("tank-miner")         .addSource(keyboard.getKeyAxle("KeyQ"))
-        this.axles.get("tank-primary-weapon").addSource(keyboard.getKeyAxle("Space"))
-        this.axles.get("tank-respawn")       .addSource(keyboard.getKeyAxle("KeyR"))
+        this.axles.get("tank-miner")         .addSource(keyboard.createKeyAxle("KeyQ"))
+        this.axles.get("tank-primary-weapon").addSource(keyboard.createKeyAxle("Space"))
+        this.axles.get("tank-respawn")       .addSource(keyboard.createKeyAxle("KeyR"))
     }
 
     refresh() {

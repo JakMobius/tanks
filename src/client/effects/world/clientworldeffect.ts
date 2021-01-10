@@ -1,29 +1,20 @@
+
 import ClientEffect from '../clienteffect';
+import EffectModel from 'src/effects/effect-model';
+import ClientGameWorld from "../../clientgameworld";
 
 class ClientWorldEffect extends ClientEffect {
-	public model: any;
-	public world: any;
-	public Types: any;
+    public model: EffectModel;
+    public world: ClientGameWorld;
 
-    /**
-     * @param model {WorldEffectModel}
-     * @param world {ClientGameWorld}
-     */
-    constructor(model, world) {
+    constructor(model: EffectModel, world: ClientGameWorld) {
         super(model)
         this.model = model
         this.world = world
     }
 
-    // noinspection JSCheckFunctionSignatures
-    /**
-     * @param model {WorldEffectModel}
-     * @param world {ClientGameWorld}
-     * @returns {ClientWorldEffect | null}
-     */
-    static fromModel(model, world) {
-        /** @type Class<ClientWorldEffect> */
-        let clazz = this.Types.get(model.constructor)
+    static fromModelAndWorld(model: EffectModel, world: ClientGameWorld): ClientEffect | null {
+        let clazz = this.Types.get(model.constructor as typeof EffectModel) as unknown as typeof ClientWorldEffect
         if(!clazz) return null
         return new clazz(model, world)
     }

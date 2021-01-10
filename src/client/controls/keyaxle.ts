@@ -1,10 +1,11 @@
 
 import ButtonAxle from './buttonaxle';
+import KeyboardController from "./interact/keyboardcontroller";
 
 class KeyAxle extends ButtonAxle {
 	public key: any;
 
-    constructor(keyboard, key, min, max) {
+    constructor(keyboard: KeyboardController, key: string, min: number, max: number) {
         super(min, max)
         this.key = key
 

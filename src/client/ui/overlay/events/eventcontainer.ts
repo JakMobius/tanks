@@ -23,7 +23,7 @@ class EventContainer extends View {
         }
     }
 
-    createEvent(text) {
+    createEvent(text: string) {
         let view = new EventView(text)
 
         this.element.append(view.element)

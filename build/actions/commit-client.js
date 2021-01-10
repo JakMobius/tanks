@@ -25,19 +25,19 @@ async function compile() {
     await Timings.perform("Compiling", async () => {
         await Timings.perform("Compiling base", async () => {
             await bundle({
-                source: "src/client/game/index.js",
-                destination: "src/client/game/page/scripts/index.js"
+                source: "src/server/html-pages/game-page/index.ts",
+                destination: "src/server/html-pages/game-page/scripts/index.js"
             })
         })
 
         await Timings.perform("Compiling game", async () => {
             await bundle({
-                source: "src/client/game/game.js",
-                destination: "src/client/game/page/scripts/game.js"
+                source: "src/client/game/game-screen.ts",
+                destination: "src/server/html-pages/game-page/scripts/game.js"
             })
         })
 
-        await cssPlugin.write(Compiler.path("src/client/game/page/styles/style.css"))
+        await cssPlugin.write(Compiler.path("src/server/html-pages/game-page/styles/style.css"))
     })
 }
 
@@ -46,8 +46,8 @@ async function compile() {
     await compile()
 
     Timings.begin("Collapsing")
-    await Collapser.collapse(Compiler.path("src/client/game/page/scripts/index.js"))
-    await Collapser.collapse(Compiler.path("src/client/game/page/scripts/game.js"))
+    await Collapser.collapse(Compiler.path("src/server/html-pages/game-page/scripts/index.js"))
+    await Collapser.collapse(Compiler.path("src/server/html-pages/game-page/scripts/game.js"))
     Timings.end()
     Timings.end()
 })()

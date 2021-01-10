@@ -4,9 +4,8 @@ class View extends EventEmitter {
 
     /**
      * View raw element
-     * @type {jQuery}
      */
-    element = null;
+    element: JQuery;
 
     constructor() {
         super()

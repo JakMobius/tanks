@@ -1,5 +1,14 @@
 
 import TankModel from './tankmodel';
+import GameWorld from 'src/gameworld';
+import Player from 'src/utils/player';
+import AbstractEffect from 'src/effects/abstract-effect';
+import BinaryEncoder from 'src/serialization/binary/binaryencoder';
+import BinaryDecoder from 'src/serialization/binary/binarydecoder';
+
+interface AbstractTankConfig {
+    world?: GameWorld
+}
 
 /**
  * Tank class, abstracted from code
@@ -10,59 +19,35 @@ import TankModel from './tankmodel';
  * client side)
  */
 
-class AbstractTank {
+abstract class AbstractTank {
     static Types = new Map()
 
-    /**
-     * Player that owns this tank
-     * @type Player
-     */
-    player = null
+    // Player that owns this tank
+    public player: Player = null
+    public model: TankModel = null
+    public world: GameWorld = null
+    public effects = new Map<number, AbstractEffect>()
 
-    /**
-     * Generic model of this tank
-     * @type {TankModel}
-     */
-    model = null
-
-    /**
-     * @type {GameWorld}
-     */
-    world = null
-
-    /**
-     * @type {Map<number, AbstractEffect>}
-     */
-    effects = new Map()
-
-    /**
-     * @param {Object | null} options
-     * @param {GameWorld | null} options.world
-     */
-
-    constructor(options) {
-        if(options) {
-            if(options.world) {
+    protected constructor(options?: AbstractTankConfig) {
+        if (options) {
+            if (options.world) {
                 this.world = options.world
             }
         }
     }
 
-    /**
-     * @returns {Class<TankModel>}
-     */
-    static getModel() {}
+    static getModel(): typeof TankModel {
+        return null
+    }
 
-    destroy() {
+    destroy(): void {
         this.model.destroy()
     }
 
-    encodeDynamicData() {}
-    decodeDynamicData() {}
+    encodeDynamicData(encoder: BinaryEncoder): void {}
+    decodeDynamicData(decoder: BinaryDecoder): void {}
 
-    create() {}
-    tick(dt) {}
+    abstract tick(dt: number): void
 }
-
 
 export default AbstractTank;

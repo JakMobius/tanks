@@ -1,10 +1,10 @@
 
-import BinarySerializable from '../serialization/binary/serializable';
+import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
 import BinaryEncoder from '../serialization/binary/binaryencoder';
 import BinaryDecoder from '../serialization/binary/binarydecoder';
+import AbstractConnection from "./abstract-connection";
 
 /**
- * @abstract
  * This class is a binary data packet that can be transmitted over a
  * network with low redundancy. There is two packet types: standalone
  * and contextual. Standalone packets do not require any other data in
@@ -28,42 +28,43 @@ import BinaryDecoder from '../serialization/binary/binarydecoder';
  * decoder buffer is released for reuse.
  */
 
-class BinaryPacket extends BinarySerializable {
-	public data: any;
-	public decoder: any;
-    static SERIALIZATION_GROUP_NAME = 3
+class BinaryPacket implements BinarySerializable<typeof BinaryPacket> {
+
+    /**
+     * Compiled binary data of the packet.
+     */
+
+	public data: ArrayBuffer | null = null;
+
+    /**
+     * A decoder saved for the handlers.
+     * Valid until it is reused.
+     */
+
+	public decoder: BinaryDecoder | null = null;
+
+    /*
+     Considering that the buffer will only be reused after the
+     data packet is processed, we can store it for handlers to
+     use. (Although it's always going to be
+     BinaryDecoder.shared... Uhh... Nevermind...)
+     */
+
     static requireLargeIndices = false
     static binaryEncoder = new BinaryEncoder({ writeIndexMode: true })
     static binaryDecoder = new BinaryDecoder({ readIndexMode: true })
-    static groupName = () => BinaryPacket.SERIALIZATION_GROUP_NAME
+
+    static groupName = 3
+    static typeName = 0
 
     constructor() {
-        super();
-
-        /**
-         * @type {ArrayBuffer} Compiled binary data of the packet.
-         */
-        this.data = null
-
-        /**
-         * @type {BinaryDecoder} A decoder saved for the handlers.
-         * Valid until it is reused.
-         */
-        this.decoder = null
-
-        /*
-         Considering that the buffer will only be reused after the
-         data packet is processed, we can store it for handlers to
-         use. (Although it's always going to be
-         BinaryDecoder.shared... Uhh... Nevermind...)
-         */
     }
 
     encode() {
         let encoder = BinaryPacket.binaryEncoder
-        encoder.largeIndices = this.constructor.requireLargeIndices
+        encoder.largeIndices = (this.constructor as typeof BinaryPacket).requireLargeIndices
         encoder.reset()
-        BinaryPacket.serialize(this, encoder)
+        BinarySerializer.serialize(this, encoder)
 
         return encoder.compile()
     }
@@ -71,9 +72,9 @@ class BinaryPacket extends BinarySerializable {
     /**
      * When called once, packet get compiled and can no longer change
      * its data
-     * @returns {ArrayBuffer} Packet data
+     * @returns Packet data
      */
-    getData() {
+    getData(): ArrayBuffer {
         if(this.data == null) {
             this.data = this.encode()
         }
@@ -84,10 +85,10 @@ class BinaryPacket extends BinarySerializable {
     /**
      * Sends the packet to {@link AbstractConnection}. When called once, packet
      * get compiled and can no longer change its data
-     * @param connection {AbstractConnection} The packet receiver.
+     * @param connection The packet receiver.
      */
 
-    sendTo(connection) {
+    sendTo(connection: AbstractConnection): void {
         if(!this.shouldSend() || !connection.isReady()) {
             return
         }
@@ -95,14 +96,18 @@ class BinaryPacket extends BinarySerializable {
         connection.send(this)
     }
 
-    shouldSend() {
+    shouldSend(): boolean {
         return true
     }
 
-    static fromBinary(decoder) {
-        let packet = new this()
+    toBinary(encoder: BinaryEncoder): void {
+
+    }
+
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+        let packet = new this() as any as BinaryPacket
         packet.decoder = decoder
-        return packet
+        return packet as any as T
     }
 }
 

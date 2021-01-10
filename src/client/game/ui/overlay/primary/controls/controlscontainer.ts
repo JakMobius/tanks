@@ -1,15 +1,13 @@
 /* @load-resource: './controls.scss' */
 
-import Menu from '@/client/ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
 
 class ControlsContainer extends Menu {
-	public element: any;
-	public checkbox: any;
-	public button: any;
-	public emit: any;
+	public checkbox: JQuery;
+	public button: JQuery;
 
-    constructor(options?) {
-        super(options);
+    constructor() {
+        super();
 
         this.element.addClass("tip")
 
@@ -49,9 +47,9 @@ class ControlsContainer extends Menu {
     }
 
     line() { return $("<div>").addClass("line") }
-    key(button) { return $("<div>").addClass("key").text(button) }
+    key(button: string) { return $("<div>").addClass("key").text(button) }
 
-    steeringTable(buttons) {
+    steeringTable(buttons: string) {
         let table = $("<table>")
         let tbody = $("<tbody>")
         let button = 0

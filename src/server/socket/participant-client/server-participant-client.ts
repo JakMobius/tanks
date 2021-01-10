@@ -1,25 +1,18 @@
 
-import ServerWebSocketClient from '../server-web-socket-client';
-import HandshakePacket from '@/networking/packets/cluster-packets/handshake-packet';
-import HandshakeSuccessPacket from '@/networking/packets/cluster-packets/handshake-success-packet';
-import RoomCreateRequestPacket from '@/networking/packets/cluster-packets/room-creation-request-packet';
-import Logger from '@/server/log/logger';
+import ServerWebSocketClient, {ServerWebSocketClientConfig} from '../server-web-socket-client';
+import HandshakePacket from 'src/networking/packets/cluster-packets/handshake-packet';
+import HandshakeSuccessPacket from 'src/networking/packets/cluster-packets/handshake-success-packet';
+import RoomCreateRequestPacket from 'src/networking/packets/cluster-packets/room-creation-request-packet';
+import Logger from 'src/server/log/logger';
 import ClusterHandshake from '../cluster-handshake';
 import ServerParticipantConnection from './server-participant-connection';
 
 class ServerParticipantClient extends ServerWebSocketClient {
 
-    /**
-     * @type {string}
-     */
-    password
+    password: string
+    reconnect: boolean = false
 
-    /**
-     * @type {boolean}
-     */
-    reconnect = false
-
-    constructor(config) {
+    constructor(config: ServerWebSocketClientConfig) {
         super(config)
 
         this.logger.setPrefix("CLink Client")
@@ -63,7 +56,7 @@ class ServerParticipantClient extends ServerWebSocketClient {
     }
 
     connectToServer() {
-        this.logger.log("Connecting to hub at §77F;" + this.config.ip)
+        this.logger.log("Connecting to hub at §77F;" + this.ip)
         super.connectToServer()
     }
 
@@ -76,7 +69,7 @@ class ServerParticipantClient extends ServerWebSocketClient {
         this.logger.log("§7F7;Successfully connected to the hub")
     }
 
-    createConnection() {
+    createConnection(): ServerParticipantConnection {
         return new ServerParticipantConnection(this)
     }
 
@@ -97,7 +90,7 @@ class ServerParticipantClient extends ServerWebSocketClient {
         return true
     }
 
-    disconnect(reason?) {
+    disconnect(reason?: string) {
         this.reconnect = false
         super.disconnect(reason)
     }

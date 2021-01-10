@@ -1,33 +1,32 @@
 
-import View from '@/client/ui/view';
-import CanvasFactory from '@/client/utils/canvasfactory';
-import Sprite from '@/client/sprite';
+import View from 'src/client/ui/view';
+import CanvasFactory from 'src/client/utils/canvasfactory';
+import Sprite from 'src/client/sprite';
+import ClientTank from 'src/client/tanks/clienttank';
+import * as Box2D from 'src/library/box2d'
+import Camera from "src/client/camera";
+
+export interface TankSelectElementViewConfig {
+    Tank: typeof ClientTank
+    previewWorld: Box2D.World
+    previewCamera: Camera
+}
 
 class TankSelectElement extends View {
-	public previewWorld: any;
-	public previewCamera: any;
-	public element: any;
-	public width: any;
-	public position: any;
-	public canvas: any;
-	public ctx: any;
-	public title: any;
-	public emit: any;
-	public hidden: any;
+	public previewWorld: Box2D.World;
+	public previewCamera: Camera;
+	public width: number;
+	public position: number;
+	public canvas: HTMLCanvasElement;
+	public ctx: WebGLRenderingContext;
+	public title: JQuery;
+	public hidden: boolean;
     canvasSize = 70;
 
-    /**
-     *
-     * @type {Class<ClientTank>}
-     */
-    Tank = null;
+    Tank: typeof ClientTank = null;
+    tank: ClientTank = null
 
-    /**
-     * @type {ClientTank}
-     */
-    tank = null
-
-    constructor(options) {
+    constructor(options: TankSelectElementViewConfig) {
         super();
         this.Tank = options.Tank
         this.previewWorld = options.previewWorld
@@ -59,7 +58,7 @@ class TankSelectElement extends View {
         this.element.hide()
     }
 
-    setPosition(x) {
+    setPosition(x: number) {
         this.position = x
         this.element.css("left", x)
     }
@@ -89,7 +88,7 @@ class TankSelectElement extends View {
         return this.tank
     }
 
-    draw(dt) {
+    draw(dt: number) {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
         let tank = this.getTank()
         tank.model.body.SetAngle(tank.model.body.GetAngle() + dt)

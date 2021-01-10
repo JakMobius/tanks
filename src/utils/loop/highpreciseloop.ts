@@ -5,8 +5,8 @@ class HighPreciseLoop extends Loop {
 	public interval: any;
 	public totalTime: any;
 
-    constructor(game?) {
-        super(game);
+    constructor() {
+        super();
         this.interval = 1000 / 60
         this.maximumTimestep = 100
         this.totalTime = 0
@@ -16,7 +16,7 @@ class HighPreciseLoop extends Loop {
         this.perform()
     }
 
-    cycle(dt) {
+    cycle(dt: number) {
         this.totalTime -= dt
         this.totalTime += this.interval
         if(this.totalTime < -this.maximumTimestep) {

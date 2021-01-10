@@ -1,6 +1,16 @@
 
-import Box2D from '../../library/box2d';
-import TankBehaviour from './tankbehaviour';
+import * as Box2D from '../../library/box2d';
+import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
+import TankModel from "../tankmodel";
+
+interface WheeledTankDetails extends TankBehaviourDetails {
+    leftWheelsAngle: number
+    rightWheelsAngle: number
+    leftWheelsSpeed: number
+    rightWheelsSpeed: number
+    leftWheelsDist: number
+    rightWheelsDist: number
+}
 
 class WheeledTankModel extends TankBehaviour {
 	public turnRate: any;
@@ -8,29 +18,30 @@ class WheeledTankModel extends TankBehaviour {
 	public axleWidth: any;
 	public wheelSpeed: any;
 
-    constructor(tank, config?) {
+	private preallocatedVector = new Box2D.Vec2()
+    private preallocatedPoint = new Box2D.Vec2()
+
+    public details: WheeledTankDetails = {
+	    clutch: 0,
+	    transmissionSpeed: 0,
+        leftWheelsAngle: 0,
+        rightWheelsAngle: 0,
+        leftWheelsSpeed: 0,
+        rightWheelsSpeed: 0,
+        leftWheelsDist: 0,
+        rightWheelsDist: 0
+    }
+
+    constructor(tank: TankModel, config: TankBehaviourConfig) {
         super(tank, config)
 
         this.turnRate = 2
         this.axleDistance = 0.6
         this.axleWidth = 0.8
         this.wheelSpeed = 9.8
-
-        this.details = {
-            leftWheelsAngle: 0,
-            rightWheelsAngle: 0,
-            leftWheelsSpeed: 0,
-            rightWheelsSpeed: 0,
-            leftWheelsDist: 0,
-            rightWheelsDist: 0
-        }
     }
 
-    clone() {
-        return new WheeledTankModel(this)
-    }
-
-    tick(dt) {
+    tick(dt: number) {
         super.tick(dt)
         const tank = this.tank
         const body = tank.body
@@ -52,11 +63,14 @@ class WheeledTankModel extends TankBehaviour {
         const y2 = -tank.matrix.sin * vx + tank.matrix.cos * vy;
         const turnRate = (y2 * steerX * this.turnRate - angular) * k / (Math.abs(y2) / 15 + 1)
 
-        body.ApplyForce(body.GetWorldVector(new Box2D.b2Vec2(0, throttle)), body.GetWorldPoint(new Box2D.b2Vec2(0, 0)))
+        body.GetWorldVector(new Box2D.Vec2(0, throttle), this.preallocatedVector)
+        body.GetWorldPoint(new Box2D.Vec2(0, 0), this.preallocatedPoint)
+
+        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
         body.ApplyTorque(turnRate)
     }
 
-    countDetails(dt) {
+    countDetails(dt: number) {
         let tank = this.tank
         let body = tank.body
         let steer = tank.controls.getSteer()

@@ -1,20 +1,34 @@
 
 import Progress from './utils/progress';
 import Downloader from './utils/downloader';
+import Uniform from "./graphics/uniform";
+
+export interface SpriteDownloadOptions {
+    mipMapLevels: number
+}
+
+export interface SpriteRect {
+    x: number
+    y: number
+    w: number
+    h: number
+
+    [key: string]: number | null
+}
 
 class Sprite {
-	public rects: any;
-	public rect: any;
-	public mipmaplevel: any;
+	public rects: SpriteRect[];
+	public rect: SpriteRect;
+	public mipmaplevel: number;
 	public sprites: any;
 	public mipmapimages: any;
 	public complete: any;
     static sprites = new Map()
-    static mipmapatlases = []
-    static mipmapimages = []
+    static mipmapatlases: { [key: string]: SpriteRect }[] = []
+    static mipmapimages: HTMLImageElement[] = []
     static mipmaplevel = 0
 
-    constructor(name) {
+    constructor(name: string) {
 
         // Do not remove
         // Destructuring the sprite
@@ -42,7 +56,7 @@ class Sprite {
         this.updateRect(this.rects[0])
     }
 
-    updateRect(rect) {
+    updateRect(rect: SpriteRect) {
         this.rect = rect
         // this.topLeft.x = rect.x
         // this.topLeft.y = rect.y
@@ -55,7 +69,7 @@ class Sprite {
         // this.centerLeft.x =
     }
 
-    static setMipMapLevel(level) {
+    static setMipMapLevel(level: number) {
         this.mipmaplevel = level
 
         for(let sprite of this.sprites.values()) {
@@ -63,14 +77,14 @@ class Sprite {
         }
     }
 
-    static setGLMipMapLevel(gl, uniform, level) {
+    static setGLMipMapLevel(gl: WebGLRenderingContext, uniform: Uniform, level: number) {
         uniform.set1i(level)
     }
 
-    static applyTexture(gl) {
+    static applyTexture(gl: WebGLRenderingContext) {
         let i = 0
         for(let image of this.mipmapimages) {
-            gl.activeTexture(gl["TEXTURE" + i])
+            gl.activeTexture((gl as any)["TEXTURE" + i])
             const texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -82,7 +96,7 @@ class Sprite {
         }
     }
 
-    static setSmoothing(gl, enabled) {
+    static setSmoothing(gl: WebGLRenderingContext, enabled: boolean) {
         if(enabled) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -92,7 +106,7 @@ class Sprite {
         }
     }
 
-    static download(progress, gl, options?) {
+    static download(progress: Progress, gl: WebGLRenderingContext, options?: SpriteDownloadOptions): Promise<void> {
         options = Object.assign( {
             mipMapLevels: 3
         }, options)
@@ -101,6 +115,7 @@ class Sprite {
             let mipMapLevels = options.mipMapLevels
             let succeededMipmapLevels = mipMapLevels
             let awaiting = succeededMipmapLevels * 2
+
             const assetReady = () => {
                 if(!--awaiting) {
                     let root = Sprite.mipmapatlases[0]
@@ -117,11 +132,8 @@ class Sprite {
 
             for(let level = 0; level < mipMapLevels; level++) {
                 (function(level) {
-                    /** @type Progress */
-                    let textureProgress = null
-
-                    /** @type Progress */
-                    let atlasProgress = null
+                    let textureProgress: Progress = null
+                    let atlasProgress: Progress = null
 
                     if(progress) {
                         textureProgress = new Progress()
@@ -176,10 +188,10 @@ class Sprite {
 
     /**
      * @param name Name of the sprite, like "tanks/sniper/body-bright"
-     * @returns {Sprite} The sprite associated with this name
+     * @returns The sprite associated with this name
      */
 
-    static named(name) {
+    static named(name: string): Sprite {
         return Sprite.sprites.get(name)
     }
 }

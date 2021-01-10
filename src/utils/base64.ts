@@ -1,6 +1,6 @@
 
 
-let Encoder, Decoder
+let Encoder: typeof TextEncoder, Decoder: typeof TextDecoder
 
 if(typeof TextEncoder == "undefined") {
     Encoder = require('ut' + 'il').TextEncoder
@@ -33,7 +33,7 @@ const base64codes = [
     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
 ];
 
-function getBase64Code(charCode) {
+function getBase64Code(charCode: number) {
     if (charCode >= base64codes.length) {
         throw new Error("Unable to parse base64 string.");
     }
@@ -44,7 +44,7 @@ function getBase64Code(charCode) {
     return code;
 }
 
-function bytesToBase64(bytes) {
+function bytesToBase64(bytes: Uint8Array) {
     let result = '', i, l = bytes.length;
     for (i = 2; i < l; i += 3) {
         result += base64abc[bytes[i - 2] >> 2];
@@ -66,7 +66,7 @@ function bytesToBase64(bytes) {
     return result;
 }
 
-function base64ToBytes(str) {
+function base64ToBytes(str: string) {
     if (str.length % 4 !== 0) {
         throw new Error("Unable to parse base64 string.");
     }
@@ -99,12 +99,12 @@ function base64ToBytes(str) {
     return result.subarray(0, result.length - missingOctets);
 }
 
-function base64encode(str, encoder) {
+function base64encode(str: string, encoder?: TextEncoder) {
     encoder = encoder || new Encoder()
     return bytesToBase64(encoder.encode(str));
 }
 
-function base64decode(str, decoder) {
+function base64decode(str: string, decoder?: TextDecoder) {
     decoder = decoder || new Decoder()
     return decoder.decode(base64ToBytes(str));
 }

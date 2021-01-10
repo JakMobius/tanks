@@ -4,11 +4,11 @@ import BotClient from '../../ai/bot';
 class AICommand extends Command {
 	public observingRoom: any;
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let logger = this.console.logger
 
         if (args.length < 1) {
-            logger.log("Использование: " + this.getUsage())
+            logger.log("Usage: " + this.getUsage())
             return
         }
 
@@ -70,23 +70,23 @@ class AICommand extends Command {
         }
     }
 
-    onTabComplete(args) {
+    onTabComplete(args: string[]) {
         return super.onTabComplete(args);
     }
 
-    getDescription() {
-        return "Управление AI"
+    getDescription(): string {
+        return "AI control command"
     }
 
-    getName() {
+    getName(): string {
         return "ai"
     }
 
-    getUsage() {
+    getUsage(): string {
         return "ai <create|remove|list|save|screenshot> [ник]"
     }
 
-    requiresRoom() {
+    requiresRoom(): boolean {
         return true;
     }
 }

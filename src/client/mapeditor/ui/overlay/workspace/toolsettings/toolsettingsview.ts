@@ -1,10 +1,10 @@
 /* @load-resource: './tool-settings.scss' */
 
-import View from '@/client/ui/view';
+import View from 'src/client/ui/view';
+import Tool from "../../../../tools/tool";
 
 class ToolSettingsView extends View {
-	public element: any;
-	public hidden: any;
+	public hidden: boolean;
 
     constructor() {
         super();
@@ -15,7 +15,7 @@ class ToolSettingsView extends View {
         this.hidden = true
     }
 
-    setupTool(tool) {
+    setupTool(tool: Tool) {
         if (tool.settingsView) {
             this.show()
             this.element.children().detach()

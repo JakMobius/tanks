@@ -1,18 +1,17 @@
 
 import EntityModel from './entitymodel';
+import GameWorld from 'src/gameworld';
 
 class AbstractEntity {
-    /**
-     * @type EntityModel
-     */
+    public model: EntityModel = null
+    public game: GameWorld
 
-    model = null
-
-    constructor(model) {
+    constructor(model: EntityModel) {
         this.model = model
+        model.entity = this
     }
 
-    tick(dt) {
+    tick(dt: number) {
         this.model.tick(dt)
     }
 }

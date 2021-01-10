@@ -2,12 +2,14 @@
 import Command from '../command';
 
 class BanIPCommand extends Command {
-	public logger: any;
 	public server: any;
 
-    onPerform(args) {
+    onPerform(args: string[]): void {
+
+        let logger = this.console.logger
+
         if(args.length < 1) {
-            this.logger.log("Использование: " + this.getUsage())
+            logger.log("Использование: " + this.getUsage())
             return
         }
 
@@ -22,33 +24,33 @@ class BanIPCommand extends Command {
 
                 this.server.banned.push(ip)
 
-                this.logger.log(" - Забанен игрок #" + c.id + " с ником " + name + " и ip " + ip)
+                logger.log(" - Забанен игрок #" + c.id + " с ником " + name + " и ip " + ip)
                 kicked = true
             }
         }
 
         if(!kicked) {
-            this.logger.log("Не найдено игрока (игроков) с ником " + name)
+            logger.log("Не найдено игрока (игроков) с ником " + name)
         }
     }
 
-    onTabComplete(args) {
-        super.onTabComplete(args);
+    onTabComplete(args: string[]): string[] {
+        return super.onTabComplete(args);
     }
 
-    getDescription() {
+    getDescription(): string {
         return "Забанить игрока по айпи (до перезагрузки сервера)"
     }
 
-    getName() {
+    getName(): string {
         return "banip"
     }
 
-    getUsage() {
+    getUsage(): string {
         return "banip <nick>"
     }
 
-    requiresRoom() {
+    requiresRoom(): boolean {
         return true
     }
 }

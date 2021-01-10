@@ -4,21 +4,21 @@ import Chalk from 'chalk';
 
 class HelpCommand extends Command {
 
-    onPerform(args) {
+    onPerform(args: string[]): void {
         let logger = this.console.logger
 
-        logger.log(Chalk.bold("Команды:"))
+        logger.log("§!;Commands:")
 
         let length = 0
 
         for(let command of this.console.commands.values()) {
-            let usage = command.getUsage() || command
+            let usage = command.getUsage()
             if (length < usage.length) {
                 length = usage.length
             }
         }
 
-        let dash = Chalk.gray(" - ")
+        let dash = "§777; - "
 
         for(let command of this.console.commands.values()) {
 
@@ -28,21 +28,21 @@ class HelpCommand extends Command {
                 str += " "
             }
 
-            let desc = command.getDescription() || "Нет описания"
+            let desc = command.getDescription() || "No description"
 
             logger.log(str + dash + desc)
         }
     }
 
-    getName() {
+    getName(): string {
         return "help"
     }
 
-    getDescription() {
-        return "Помощь"
+    getDescription(): string {
+        return "Help"
     }
 
-    getUsage() {
+    getUsage(): string {
         return "help"
     }
 }

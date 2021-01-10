@@ -1,27 +1,26 @@
 /* @load-resource: './tank-select.scss' */
 
-import Menu from '@/client/ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
 
-import ClientTank from '@/client/tanks/clienttank';
-import SniperTank from '@/client/tanks/models/sniper'; // Default selected tank
+import ClientTank from 'src/client/tanks/clienttank';
+import SniperTank from 'src/client/tanks/models/sniper'; // Default selected tank
 import TankSelectElement from './tankselectelement';
-import Camera from '@/client/camera';
-import Box2D from '@/library/box2d';
-import RenderLoop from '@/utils/loop/renderloop';
+import Camera from 'src/client/camera';
+import * as Box2D from 'src/library/box2d';
+import RenderLoop from 'src/utils/loop/renderloop';
+import TankModel from "../../../../../../tanks/tankmodel";
 
 class TankSelectContainer extends Menu {
-	public element: any;
-	public shadowLeft: any;
-	public shadowRight: any;
-	public container: any;
-	public leftShadowHidden: any;
-	public rightShadowHidden: any;
-	public selectedTank: any;
-	public previewCamera: any;
-	public previewWorld: any;
-	public loop: any;
-	public containers: any;
-	public emit: any;
+	public shadowLeft: JQuery;
+	public shadowRight: JQuery;
+	public container: JQuery;
+	public leftShadowHidden: boolean;
+	public rightShadowHidden: boolean;
+	public selectedTank: typeof ClientTank;
+	public previewCamera: Camera;
+	public previewWorld: Box2D.World;
+	public loop: RenderLoop;
+	public containers: TankSelectElement[];
 
     constructor() {
         super();
@@ -41,20 +40,17 @@ class TankSelectContainer extends Menu {
 
         this.previewCamera = new Camera({
             baseScale: 2,
-            viewport: new Box2D.b2Vec2(70, 70),
-            defaultPosition: new Box2D.b2Vec2(0, 0),
+            viewport: new Box2D.Vec2(70, 70),
+            defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
         })
 
         this.previewCamera.tick(0)
-        this.previewWorld = new Box2D.b2World(new Box2D.b2Vec2(), true)
+        this.previewWorld = new Box2D.World(new Box2D.Vec2())
 
         this.loop = new RenderLoop()
-        this.loop.run = (dt) => this.renderCards(dt)
+        this.loop.run = (dt: number) => this.renderCards(dt)
 
-        /**
-         * @type {TankSelectElement[]}
-         */
         this.containers = []
 
         this.setupList()
@@ -110,7 +106,7 @@ class TankSelectContainer extends Menu {
         this.updateCards()
     }
 
-    renderCards(dt) {
+    renderCards(dt: number) {
         for(let container of this.containers) {
             if(container.hidden) continue
             container.draw(dt)
@@ -119,7 +115,7 @@ class TankSelectContainer extends Menu {
 
     updateCards() {
         let container = this.container.get(0)
-        let lowerBound = container.scrollX
+        let lowerBound = container.scrollLeft
         let upperBound = lowerBound + container.clientWidth
 
         for(let container of this.containers) {
@@ -141,7 +137,7 @@ class TankSelectContainer extends Menu {
         }
     }
 
-    selectTank(container) {
+    selectTank(container: TankSelectElement) {
         const Tank = container.Tank
 
         this.element.find(".tank-preview-container.selected").removeClass("selected")

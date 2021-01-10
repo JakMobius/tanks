@@ -1,5 +1,5 @@
 
-import ClientTank from '../clienttank';
+import ClientTank, {TankConfig} from '../clienttank';
 import TankDrawer from '../../graphics/drawers/tankdrawer';
 import SniperTankModel from '../../../tanks/models/sniper';
 import Engine from '../../engine';
@@ -7,18 +7,23 @@ import FX from '../../sound/fx';
 import Sprite from '../../sprite';
 import LightMaskTextureProgram from '../../graphics/programs/lightmasktextureprogram';
 import TruckProgram from '../../graphics/programs/truckprogram';
+import Camera from "../../camera";
+import BigBoiTankModel from "../../../tanks/models/bigboi";
 
 class Drawer extends TankDrawer {
-	public size: any;
-	public bodyBrightSprite: any;
-	public bodyDarkSprite: any;
-	public bodyLightMask: any;
-	public truckSprite: any;
-	public bodyProgram: any;
-	public truckProgram: any;
+	public size: number;
+	public bodyBrightSprite: Sprite;
+	public bodyDarkSprite: Sprite;
+	public bodyLightMask: Sprite;
+	public truckSprite: Sprite;
+	public bodyProgram: LightMaskTextureProgram;
+	public truckProgram: TruckProgram;
+	public tank: SniperTank
 
-    constructor(tank, ctx) {
+    constructor(tank: SniperTank, ctx: WebGLRenderingContext) {
         super(tank, ctx);
+
+        this.tank = tank
 
         this.size = 9
         this.bodyBrightSprite = Sprite.named("tanks/sniper/body-bright")
@@ -38,7 +43,7 @@ class Drawer extends TankDrawer {
         this.truckProgram.setTruckRadius(0.25)
     }
 
-    draw(camera, dt) {
+    draw(camera: Camera, dt: number) {
 
         let angle = this.tank.model.body.GetAngle()
 
@@ -88,9 +93,17 @@ class Drawer extends TankDrawer {
     }
 }
 
+export interface SniperTankConfig extends TankConfig {
+    model?: SniperTankModel
+}
+
 class SniperTank extends ClientTank {
-    constructor(model?) {
-        super(model);
+
+    public model: SniperTankModel
+
+    constructor(options?: SniperTankConfig) {
+        options = options || {}
+        super(options);
 
         this.engine = new Engine({
             sound: FX.ENGINE_2,
@@ -103,6 +116,8 @@ class SniperTank extends ClientTank {
             multiplier: 20,
             pitch: 1
         })
+
+        this.setupModel(options.model)
     }
 
     static getDrawer() { return Drawer }
@@ -125,5 +140,4 @@ class SniperTank extends ClientTank {
     }
 }
 
-ClientTank.register(SniperTank)
 export default SniperTank;

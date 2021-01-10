@@ -4,8 +4,8 @@ import Loop from './loop';
 class RequestFrameLoop extends Loop {
 	public request: any;
 
-    constructor(game) {
-        super(game);
+    constructor() {
+        super();
         this.timeMultiplier = 0.001
         this.request = false
     }

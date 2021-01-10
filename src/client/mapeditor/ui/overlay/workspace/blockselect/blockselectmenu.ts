@@ -1,13 +1,11 @@
 /* @load-resource: './block-select.scss' */
 
-import View from '@/client/ui/view';
+import View from 'src/client/ui/view';
 
-import BlockState from '@/utils/map/blockstate/blockstate';
+import BlockState from 'src/utils/map/blockstate/blockstate';
 
 class BlockSelectMenu extends View {
-	public element: any;
-	public list: any;
-	public emit: any;
+	public list: JQuery;
 
     constructor() {
         super();
@@ -26,7 +24,7 @@ class BlockSelectMenu extends View {
             this.list.append($("<div>")
                 .addClass("block-button")
                 .css("background-image", "url(../assets/mapeditor/blocks/" + name + ".png)")
-                .click({ id: id, name: name }, (event) => {
+                .on("click", { id: id, name: name }, (event) => {
                     const Block = BlockState.getBlockStateClass(event.data.id)
                     const block = new Block()
                     this.emit("select", block)

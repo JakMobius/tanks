@@ -18,7 +18,7 @@ async function compile() {
     await Timings.perform("Compiling server", async () => {
         await bundle({
             source: "src/server/main.ts",
-            destination: "server.js"
+            destination: "dist/server.js"
         })
     })
 }

@@ -1,9 +1,13 @@
 
 import ServerBullet from '../serverbullet';
 import BulletModelCannonball from '../../../../entity/bullet/models/cannonball';
+import BulletModel from "../../../../entity/bullet/bulletmodel";
 
 class ServerBulletCannonball extends ServerBullet {
-    constructor(model) {
+
+    static Model = BulletModelCannonball
+
+    constructor(model: BulletModelCannonball) {
         super(model);
 
         this.startVelocity = 600
@@ -13,5 +17,4 @@ class ServerBulletCannonball extends ServerBullet {
     }
 }
 
-ServerBullet.associate(ServerBulletCannonball, BulletModelCannonball);
 export default ServerBulletCannonball;

@@ -1,62 +1,62 @@
 
 import AbstractTank from '../../tanks/abstracttank';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
+import ClientGameWorld from "../../../src/client/clientgameworld";
+import TankModel from 'src/tanks/tankmodel';
+import ClientTankEffect from '../effects/tank/clienttankeffect';
+import TankDrawer from '../graphics/drawers/tankdrawer';
+import {TankStat} from "./tank-stat";
+import Engine from "../engine";
+import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../serialization/binary/binaryencoder";
+
+export interface TankConfig {
+    model?: TankModel
+    world?: ClientGameWorld
+}
 
 class ClientTank extends AbstractTank {
-	public engine: any;
-	public serverPosition: any;
+	public engine: Engine;
+	public serverPosition: Box2D.Vec2;
 	public health: any;
 	public Types: any;
-    /**
-     * @type {TankDrawer}
-     */
-    drawer = null
 
-    /**
-     * @type {Map<number, ClientTankEffect>}
-     */
-    effects = new Map()
+    drawer: TankDrawer = null
+    effects = new Map<number, ClientTankEffect>()
+    world: ClientGameWorld
 
-    /**
-     * @type {ClientGameWorld}
-     */
-    world
-
-    /**
-     *
-     * @param {Object | null} options
-     * @param {ClientGameWorld | null} options.world
-     * @param {TankModel | null} options.model
-     */
-
-    constructor(options) {
+    constructor(options?: TankConfig) {
         super(options)
         this.drawer = null
         this.engine = null
         this.serverPosition = null
+    }
 
-        if(options && options.model) {
-            let expected = this.constructor.getModel()
-            if (expected && options.model.constructor !== expected) {
+    setupModel(model: TankModel) {
+        if(model) {
+            let expected = (this.constructor as typeof ClientTank).getModel()
+            if (expected && model.constructor !== expected) {
                 throw new TypeError("Invalid model type")
             }
-            this.model = options.model
+            this.model = model
         } else {
-            this.model = new (this.constructor.getModel())
+            const tankClass = (this.constructor as typeof ClientTank).getModel()
+            this.model = new tankClass()
         }
     }
 
-    setupDrawer(ctx) {
-        this.drawer = new (this.constructor.getDrawer())(this, ctx)
+    setupDrawer(ctx: WebGLRenderingContext): void {
+        let tankClass = (this.constructor as typeof ClientTank)
+        this.drawer = new (tankClass.getDrawer())(this, ctx)
     }
 
-    destroy() {
+    destroy(): void {
         this.model.destroy()
     }
 
-    tick(dt) {
+    tick(dt: number) {
         if(this.serverPosition) {
-            let pos = this.model.body.GetPosition()
+            let pos = this.model.body.GetTransform().p
             let target = this.serverPosition
 
             let diffX = (target.x - pos.x)
@@ -79,7 +79,7 @@ class ClientTank extends AbstractTank {
         this.model.behaviour.countDetails(dt)
     }
 
-    decodeDynamicData(decoder) {
+    decodeDynamicData(decoder: BinaryDecoder) {
         let teleport = decoder.readUint8()
         let x = decoder.readFloat32()
         let y = decoder.readFloat32()
@@ -109,28 +109,32 @@ class ClientTank extends AbstractTank {
         } else {
             if (this.serverPosition)
                 this.serverPosition.Set(x, y)
-            else this.serverPosition = new Box2D.b2Vec2(x, y)
+            else this.serverPosition = new Box2D.Vec2(x, y)
         }
-        this.model.body.SetPositionAndAngle(position, rotation)
+        this.model.body.GetTransform().SetPositionAngle(position, rotation)
 
         this.health = decoder.readFloat32()
     }
 
-    static createDrawer() {}
-    static getDrawer() {}
-    static getName() {}
-    static getDescription() {}
-    static getStats() {}
+    encodeDynamicData(encoder: BinaryEncoder) {
 
-    static fromModel(model) {
-        let clazz = ClientTank.Types.get(model.constructor.getId())
+    }
+
+    static createDrawer() {}
+    static getDrawer(): typeof TankDrawer { return null }
+    static getName(): string { return null }
+    static getDescription(): string { return null }
+    static getStats(): TankStat { return null }
+
+    static fromModel(model: TankModel): ClientTank {
+        let clazz = ClientTank.Types.get((model.constructor as typeof TankModel).getId())
 
         return new clazz({
             model: model
         })
     }
 
-    static register(clazz) {
+    static register(clazz: typeof ClientTank): void {
         this.Types.set(clazz.getModel().getId(), clazz)
     }
 }

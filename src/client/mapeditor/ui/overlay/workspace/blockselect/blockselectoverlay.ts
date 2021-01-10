@@ -1,27 +1,24 @@
 
-import Overlay from '@/client/ui/overlay/overlay';
+import Overlay, {OverlayConfig} from 'src/client/ui/overlay/overlay';
 import BlockSelectMenu from './blockselectmenu';
 
 class BlockSelectOverlay extends Overlay {
-	public menu: any;
-	public overlay: any;
-	public hide: any;
-	public emit: any;
+	public menu = new BlockSelectMenu();
 
-    constructor(options) {
+    constructor(options: OverlayConfig) {
         super(options);
 
         this.menu = new BlockSelectMenu()
         this.overlay.append(this.menu.element)
 
         this.overlay.attr("tabindex", 1)
-        this.overlay.keydown((event) => {
+        this.overlay.on("keydown", (event: JQuery.TriggeredEvent) => {
             if(event.key === "Escape") {
                 this.hide()
             }
         })
 
-        this.overlay.on("click", (event) => {
+        this.overlay.on("click", (event: JQuery.TriggeredEvent) => {
             if(event.target === this.overlay[0]) {
                 this.hide()
             }

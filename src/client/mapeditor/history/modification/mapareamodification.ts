@@ -1,21 +1,25 @@
 
 import MapModification from './mapmodification';
 import AirBlockState from '../../../../utils/map/blockstate/types/airblockstate';
+import GameMap from "../../../../utils/map/gamemap";
+import EditorMap from "../../editormap";
+import Rectangle from "../../../../utils/rectangle";
+import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class MapAreaModification extends MapModification {
 	public area: any;
 	public oldData: any;
 	public newData: any;
 
-    constructor(map, area, newData) {
+    constructor(map: EditorMap, area: Rectangle, newData: BlockState[]) {
         super(map);
 
         this.area = area
-        this.oldData = this.fetchData(area)
+        this.oldData = this.fetchData()
         this.newData = newData
     }
 
-    fetchData() {
+    fetchData(): BlockState[] {
         let result = []
 
         let minX = Math.max(0, this.area.minX)
@@ -32,7 +36,7 @@ class MapAreaModification extends MapModification {
         return result
     }
 
-    setArea(data) {
+    setArea(data: BlockState[]) {
         let sourceIndex = 0
 
         let minX = Math.max(0, this.area.minX)

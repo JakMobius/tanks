@@ -1,30 +1,28 @@
 
 import StringRepeat from '../../utils/stringrepeat';
 import CommandFlag from "./commandflag";
+import Console from '../console/console'
+import Logger from "../log/logger";
+
+export interface CommandConfig {
+	console: Console
+}
+
+export interface CommandParsedFlags {
+	flags: Map<string, string[] | boolean>
+	unknown: string[]
+	errors: string[] | null
+	currentFlag: CommandFlag | null
+}
 
 class Command {
 
-	/**
-	 * @type {Console}
-	 */
-	console = null
+	console: Console = null
+	subcommands: Command[] = []
+	flags: CommandFlag[] = []
+	supercommand: Command = null
 
-	/**
-	 * @type {Command[]}
-	 */
-	subcommands = []
-
-	/**
-	 * @type {CommandFlag[]}
-	 */
-	flags = []
-
-	/**
-	 * @type {Command | null}
-	 */
-	supercommand = null
-
-	constructor(options) {
+	constructor(options?: CommandConfig) {
 		if(options) {
 			this.console = options.console
 		}
@@ -34,7 +32,7 @@ class Command {
 	 * Adds a flag to this command
 	 */
 
-	addFlag(flag) {
+	protected addFlag(flag: CommandFlag) {
 		this.flags.push(flag)
 	}
 
@@ -42,7 +40,7 @@ class Command {
 	 * Adds a subcommand to this command
 	 */
 
-	addSubcommand(subcommand) {
+	protected addSubcommand(subcommand: Command) {
 		this.subcommands.push(subcommand)
 		subcommand.supercommand = this
 	}
@@ -52,7 +50,7 @@ class Command {
 	 * @param args Command arguments array
 	 */
 
-	onPerform(args) {
+	public onPerform(args: string[]) {
 		if(!this.trySubcommand(args)) {
 			this.console.logger.log(this.getHelp())
 		}
@@ -60,38 +58,25 @@ class Command {
 
 	/**
 	 * Search for command-specific flags in given arguments
- 	 * @param args: string[]
-	 * @return {{
-	 * 		flags: Map<string, string[]|boolean>,
-	 * 		unknown: string[],
-	 * 		errors: string[] | null,
-	 * 		currentFlag: string | null
-	 * 	}}
 	 */
 
-	findFlags(args) {
+	protected findFlags(args: string[]): CommandParsedFlags {
 
-		/**
-		 * @type {Map<string, string[]|boolean>}
-		 */
-		let knownFlags = new Map()
-		let unknownFlags = []
-		let currentFlagName = null
+		let knownFlags = new Map<string, string[] | boolean>()
+		let unknownFlags: string[] = []
+		let currentFlagName: string | null = null
 
 		/**
 		 * This variable is intended to indicate if
 		 * flag value is being readen. We cannot
 		 * use `currentFlag === null` comparsion here
-		 * because we want to remain `currentFlag`
+		 * because we want to keep `currentFlag`
 		 * after the last cycle.
-		 * @type {boolean}
 		 */
 		let readFlag = false
 
-		/** @type {CommandFlag | null} */
-		let currentFlag = null
-		/** @type {string[]} */
-		let errors = []
+		let currentFlag: CommandFlag | null = null
+		let errors: string[] = []
 
 		for(let arg of args) {
 
@@ -124,7 +109,7 @@ class Command {
 			}
 
 			if(currentFlag !== null) {
-				knownFlags.get(currentFlag.name).push(arg)
+				(knownFlags.get(currentFlag.name) as string[]).push(arg)
 			}
 
 			readFlag = false
@@ -148,7 +133,7 @@ class Command {
 	 * @param logger
 	 */
 
-	logFlagErrors(found, logger) {
+	protected logFlagErrors(found: CommandParsedFlags, logger: Logger) {
 		if(found.errors) {
 			logger.log(found.errors.join("\n"))
 		}
@@ -162,7 +147,7 @@ class Command {
 	 * @param name Name or alias for subcommand to search
 	 * @returns `null` if the flag was not found, {@link Command} otherwise
 	 */
-	getSubcommand(name: string): Command | null {
+	protected getSubcommand(name: string): Command | null {
 		for(let command of this.subcommands) {
 			if(command.getName() === name) {
 				return command
@@ -174,10 +159,9 @@ class Command {
 
 	/**
 	 * Tries to find flag with provided name
-	 * @param {string} name
 	 * @returns `null` if the flag was not found, {@link CommandFlag} otherwise
 	 */
-	getFlag(name): CommandFlag | null {
+	protected getFlag(name: string): CommandFlag | null {
 		for(let flag of this.flags) {
 			if(flag.name === name || flag.aliases.indexOf(name) !== -1) {
 				return flag
@@ -195,7 +179,7 @@ class Command {
 	 * // Will try to call subcommand called `"create"` with arguments `["empty", "-n", "Empty Room"]`
 	 * this.trySubcommand(["create", "empty", "-n", "Empty Room"])
 	 */
-	trySubcommand(args: string[]): boolean {
+	protected trySubcommand(args: string[]): boolean {
 		if(args.length === 0) return false
 
 		let found = this.getSubcommand(args[0])
@@ -208,10 +192,9 @@ class Command {
 
 	/**
 	 * Tries to found commands that could be tab-completed
-	 * @param args {string[]}
 	 */
 
-	tryTabCompleteSubcommand(args: string[]): string[] {
+	protected tryTabCompleteSubcommand(args: string[]): string[] {
 		if(args.length === 0) return []
 
 		let subcommand = args[0]
@@ -236,7 +219,7 @@ class Command {
 	 * @param args Command arguments array
 	 */
 
-	onTabComplete(args: string[]) : string[] {
+	public onTabComplete(args: string[]) : string[] {
 		return this.tryTabCompleteSubcommand(args)
 	}
 
@@ -245,18 +228,17 @@ class Command {
 	 * @returns command description
 	 */
 
-	getDescription(): string {
+	public getDescription(): string {
 		return null
 	}
 
 	/**
 	 * Getter for command name
-	 * @returns {string} command name
-	 * @abstract
+	 * @returns command name
 	 */
 
-	getName(): string {
-		throw new Error("Abstract method Command.getName called!");
+	public getName(): string {
+		throw "Called 'getName' on abstract class!"
 	}
 
 	/**
@@ -265,9 +247,9 @@ class Command {
 	 * @returns {string} Hierarchy name.
 	 */
 
-	getHierarchyName() {
+	public getHierarchyName() {
 		let result = ""
-		for(let parent = this; parent; parent = parent.supercommand) {
+		for(let parent: Command = this; parent; parent = parent.supercommand) {
 			if(result.length) result = " " + result
 			result = parent.getName() + result
 		}
@@ -279,7 +261,7 @@ class Command {
 	 * @returns command usage
 	 */
 
-	getUsage() {
+	public getUsage(): string {
 		if(this.subcommands.length) {
 			return this.getHierarchyName() + " <" + this.subcommands.map(a => a.getName()).join("|") + ">"
 		}
@@ -294,16 +276,16 @@ class Command {
 	 * @returns `true` if command should be called from the room, `false` otherwise.
 	 */
 
-	requiresRoom() {
+	public requiresRoom(): boolean {
 		return false
 	}
 
 	/**
-	 * @returns {string} large help text with usage, flags, and all the stuff user might be searching for
+	 * @returns large help text with usage, flags, and all the stuff user might be searching for
 	 */
 
-	getHelp() {
-		let result = "Использование: " + this.getUsage()
+	public getHelp(): string {
+		let result = "Usage: " + this.getUsage()
 
 		if(this.subcommands.length) {
 			result += "\n"

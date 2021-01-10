@@ -2,18 +2,17 @@
 import EventEmitter from '../../../utils/eventemitter';
 
 class DocumentEventHandler extends EventEmitter {
-	public listeners: any;
-	public target: any;
+	public listeners = new Map<string, () => void>();
+	public target: GlobalEventHandlers | GlobalEventHandlers[];
 	public keys: any;
 
     constructor() {
         super()
-        /** @type Map<string,any> */
-        this.listeners = new Map()
+
         this.target = document.body
     }
 
-    bind(event, handler) {
+    bind(event: string, handler: (event: Event) => void) {
         if(this.listeners.has(event)) {
             this.unbind(event)
         }
@@ -31,7 +30,7 @@ class DocumentEventHandler extends EventEmitter {
         }
     }
 
-    unbind(event) {
+    unbind(event: string) {
         if(Array.isArray(this.target)) {
             for (let target of this.target)
                 target.removeEventListener(event, this.listeners.get(event))

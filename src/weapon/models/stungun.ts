@@ -1,15 +1,20 @@
-import Weapon from '../weapon';
+import Weapon, {WeaponConfig} from '../weapon';
+import Game from "../../server/room/game";
+import Player from "../../utils/player";
+
+export interface WeaponStungunConfig extends WeaponConfig {
+    damage: number
+    radius: number
+}
 
 class WeaponStungun extends Weapon {
-	public name: any;
-	public damage: any;
-	public radius: any;
-	public squareRadius: any;
-	public points: any;
+	public damage: number;
+	public radius: number;
+	public squareRadius: number;
+	public points: number[][];
 
-    constructor(config) {
+    constructor(config: WeaponStungunConfig) {
         super(config)
-        this.name = config.name || "Stungun"
         this.damage = config.damage || 1.4 // Для каждой точки (то есть если точки две, то суммарный урон в два раза больше)
         this.radius = config.radius || 50
         this.squareRadius = this.radius ** 2
@@ -21,7 +26,8 @@ class WeaponStungun extends Weapon {
         return true
     }
 
-    shoot(tank?) {
+    shoot() {
+        let tank = this.tank
         let player = tank.player
         let game = player.game
         const position = tank.model.body.GetPosition()
@@ -44,7 +50,7 @@ class WeaponStungun extends Weapon {
     }
 }
 
-const near = function (x, y, tplayer, game, distance) {
+const near = function (x: number, y: number, tplayer: Player, game: Game, distance: number) {
     const result = [];
     for (let client of game.clients.values()) {
         const player = client.data.player;

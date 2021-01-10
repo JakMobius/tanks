@@ -4,23 +4,15 @@ import EntityDrawer from '../graphics/drawers/entitydrawer';
 import EntityModel from '../../entity/entitymodel';
 
 class ClientEntity extends AbstractEntity {
-	public drawer: any;
-	public types: any;
-    static types = new Map()
+	public drawer: EntityDrawer = null;
+	static types = new Map<typeof EntityModel, typeof ClientEntity>()
 
-    constructor(model) {
-
-        super();
-
-        /** @type EntityDrawer */
-        this.drawer = null
-
-        /** @type EntityModel */
-        this.model = model
+    constructor(model: EntityModel) {
+        super(model);
     }
 
-    static fromModel(model) {
-        let type = this.types.get(model.constructor)
+    static fromModel(model: EntityModel) {
+        let type = this.types.get(model.constructor as typeof EntityModel)
 
         if(type) {
             return new type(model)
@@ -34,7 +26,7 @@ class ClientEntity extends AbstractEntity {
      * @param modelClass Bullet model
      */
 
-    static associate(clientClass, modelClass) {
+    static associate(clientClass: typeof ClientEntity, modelClass: typeof EntityModel) {
         this.types.set(modelClass, clientClass)
     }
 }

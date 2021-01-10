@@ -1,13 +1,11 @@
 /* @load-resource: './play-menu.scss' */
 
-import Menu from '@/client/ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
 
 class PlayMenuContainer extends Menu {
-	public element: any;
-	public titleLabel: any;
-	public nickInput: any;
-	public playButton: any;
-	public emit: any;
+	public titleLabel: JQuery
+	public nickInput: JQuery
+	public playButton: JQuery
 
     constructor() {
         super();
@@ -23,9 +21,9 @@ class PlayMenuContainer extends Menu {
         this.element.append(this.playButton)
 
         let handler = () => {
-            if(this.nickInput.val().length === 0) {
+            if(String(this.nickInput.val()).length === 0) {
                 this.playButton.prop("disabled", true)
-            } else if(this.nickInput.val().length > 10) {
+            } else if(String(this.nickInput.val()).length > 10) {
                 this.playButton.prop("disabled", true)
             } else this.playButton.prop("disabled", false)
         }
@@ -39,7 +37,7 @@ class PlayMenuContainer extends Menu {
             if(this.playButton.is("[disabled]")) return
 
             let nick = this.nickInput.val()
-            localStorage.setItem("tanks-nick", nick)
+            localStorage.setItem("tanks-nick", String(nick))
             this.emit("play")
         })
 

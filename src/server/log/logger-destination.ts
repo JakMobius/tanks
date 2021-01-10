@@ -1,10 +1,6 @@
 
 class LoggerDestination {
-
-    /**
-     * @abstract
-     */
-    log() {}
+    log(value: string) {}
 
     close() {}
 }

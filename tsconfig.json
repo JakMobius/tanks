@@ -2,10 +2,17 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@": ["@"]
+			"src": ["src"]
 		},
-		"lib": ["ES6"],
+		"lib": [
+			"ES2016",
+			"dom"
+		],
+		"target": "ES5",
 		"downlevelIteration": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"esModuleInterop": true
 	}
 }

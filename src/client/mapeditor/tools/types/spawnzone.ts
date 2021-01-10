@@ -5,62 +5,51 @@ import Particle from '../../../particles/particle';
 import Color from '../../../../utils/color';
 import SpawnZone from '../../../../utils/map/spawnzone';
 import GameMap from '../../../../utils/map/gamemap';
+import ToolManager from "../toolmanager";
 
 class SpawnZoneTool extends Tool {
-	public actionName: any;
-	public selectedTeam: any;
-	public program: any;
-	public clearZoneButton: any;
-	public decorations: any;
-    /**
-     * @type {Map<number, Color>}
-     */
-    colors = null
+    public image = "../assets/mapeditor/spawnzones.png"
+	public actionName = "Зона спавна";
+	public selectedTeam: number | null = null;
+	public program: ParticleProgram;
+	public clearZoneButton: JQuery;
+	public decorations = new Map<number, Particle>();
 
-    constructor(manager) {
+    public readonly colors = new Map<number, Color>([
+        [0, new Color(255, 0, 0)],
+        [1, new Color(0, 255, 0)],
+        [2, new Color(0, 0, 255)]
+    ])
+
+    constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "../assets/mapeditor/spawnzones.png"
-        this.actionName = "Зона спавна"
-        this.selectedTeam = null
         this.program = new ParticleProgram("spawn-zones-program", this.manager.screen.ctx)
-
-        this.colors = new Map([
-            [0, new Color(255, 0, 0)],
-            [1, new Color(0, 255, 0)],
-            [2, new Color(0, 0, 255)]
-        ])
 
         this.setupMenu()
         this.setupDecorations()
     }
 
-    /**
-     *
-     * @param i {number}
-     * @param color {Color}
-     * @returns {jQuery}
-     */
-    createTeamButton(i, color) {
+    createTeamButton(i: number, color: Color): JQuery {
         return $("<div>").addClass("tool inline").append(
             $("<div>").addClass("wrapper")
                 .css("background-color", color.code())
         ).click((e) => this.selectTeam($(e.target).closest(".tool"), i))
     }
 
-    selectTeam(button, i) {
+    selectTeam(button: JQuery, i: number) {
         button.parent().find(".tool.selected").removeClass("selected")
         button.addClass("selected")
 
         this.selectedTeam = i
-        this.clearZoneButton.attr("disabled", false)
+        this.clearZoneButton.attr("disabled", "false")
     }
 
     setupMenu() {
         this.clearZoneButton = $("<button>")
             .text("Очистить")
-            .attr("disabled", true)
-            .click(() => {
+            .attr("disabled", "true")
+            .on("click", () => {
                 if(this.selectedTeam !== null) {
                     this.deleteZone(this.selectedTeam)
                     this.manager.setNeedsRedraw()
@@ -80,10 +69,10 @@ class SpawnZoneTool extends Tool {
     }
 
     setupDecorations() {
-        this.decorations = new Map()
 
         for(let [index, color] of this.colors) {
             let decoration = new Particle({
+                x: 0, y: 0,
                 color: color.withAlpha(0.5)
             })
 
@@ -123,7 +112,7 @@ class SpawnZoneTool extends Tool {
         this.manager.setNeedsRedraw()
     }
 
-    deleteZone(id) {
+    deleteZone(id: number) {
         let i = 0;
         for(let zone of this.manager.map.spawnZones) {
 
@@ -135,7 +124,7 @@ class SpawnZoneTool extends Tool {
         }
     }
 
-    getZone(id) {
+    getZone(id: number) {
         for(let zone of this.manager.map.spawnZones) {
             if(zone.id === id) {
                 return zone
@@ -145,7 +134,7 @@ class SpawnZoneTool extends Tool {
         return null
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
         if(this.selectedTeam === null) return
@@ -161,7 +150,7 @@ class SpawnZoneTool extends Tool {
         zone.y2 = zone.y1
     }
 
-    mouseMove(x, y) {
+    mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
         if(this.selectedTeam !== null && this.dragging) {

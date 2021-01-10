@@ -3,7 +3,7 @@ import Command from '../command';
 
 class ExitCommand extends Command {
 
-	onPerform() {
+	onPerform(): void {
 		// if(this.console.currentLogger !== this.console.server.logger) {
 		// 	this.console.render()
 		// 	return
@@ -12,15 +12,15 @@ class ExitCommand extends Command {
 		process.exit(0)
 	}
 
-	getName() {
+	getName(): string {
         return "exit";
     }
 
-    getDescription() {
-        return "Выйти из комнаты / закрыть сервер";
+    getDescription(): string {
+        return "Escape the room / terminate the server";
     }
 
-    getUsage() {
+    getUsage(): string {
 		return "exit"
 	}
 }

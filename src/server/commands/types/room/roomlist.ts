@@ -2,19 +2,19 @@ import Chalk from 'chalk';
 import Command from '../../command';
 
 class RoomListCommand extends Command {
-    onPerform(args) {
+    onPerform(args: string[]) {
         let logger = this.console.logger
-        let rooms = this.console.server.games
+        let rooms = this.console.server.gameSocket.games
         let roomCount = rooms.size
 
         if (roomCount === 0) {
             logger.log(
-                Chalk.redBright("Нет активных комнат\n") +
-                Chalk.gray(" ⭑ ") + "Для создания новой комнаты используйте команду room create"
+                "§F77;Нет активных комнат\n" +
+                "§777; ⭑ §;Для создания новой комнаты используйте команду room create"
         );
 
         } else {
-            let string = "Активных комнат: " + Chalk.cyanBright(roomCount) + "\n"
+            let string = "Активных комнат: §7FF;" + roomCount + "\n"
 
             let totalOnline = 0
             let dot = Chalk.gray(" • ")
@@ -26,7 +26,7 @@ class RoomListCommand extends Command {
                 string += dot + id + ": " + online + " онлайн\n"
             }
 
-            string += "Суммарный онлайн: " + Chalk.cyanBright(totalOnline)
+            string += "Суммарный онлайн: : §7FF;" + totalOnline
 
             logger.log(string)
         }

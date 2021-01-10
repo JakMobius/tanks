@@ -15,9 +15,9 @@ function startGame() {
     })
 
     editor.loop.start()
-    editor.canvas.focus()
+    editor.canvas.focus();
 
-    window.editor = editor
+    (window as any).editor = editor
 }
 
 function downloadGameScript() {

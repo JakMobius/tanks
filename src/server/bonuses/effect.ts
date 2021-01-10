@@ -1,21 +1,22 @@
+import BonusModel from "./bonus";
+import Player from "../../utils/player";
 
 class Effect {
-	public type: any;
-	effects = {}
+	public id: number
 
 	constructor() {
-		this.type = {}
-	}
-
-	start(player) {
 
 	}
 
-	tick(player) {
+	start(player: Player) {
 
 	}
 
-	end(player) {
+	tick(player: Player) {
+
+	}
+
+	end(player: Player) {
 
 	}
 }

@@ -1,16 +1,16 @@
 
 import BinaryPacket from '../../binarypacket';
+import {BinarySerializer} from "../../../serialization/binary/serializable";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import AbstractEntity from "../../../entity/abstractentity";
 
 class EntityListPacket extends BinaryPacket {
 	public entities: any;
 	public entitySize: any;
 
-    static typeName() { return 10 }
+    static typeName = 10
 
-    /**
-     * @param entities {Map<Number, AbstractEntity>}
-     */
-    constructor(entities) {
+    constructor(entities: Map<Number, AbstractEntity>) {
         super();
         this.entities = entities
         this.entitySize = 0
@@ -24,7 +24,7 @@ class EntityListPacket extends BinaryPacket {
         return this.entitySize > 0
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
 
         encoder.writeUint16(this.entitySize)
 
@@ -34,10 +34,7 @@ class EntityListPacket extends BinaryPacket {
         }
     }
 
-    /**
-     * @param map {Map<Number, AbstractEntity>}
-     */
-    updateEntities(map) {
+    updateEntities(map: Map<Number, AbstractEntity>): void {
         let i = this.decoder.readUint16()
 
         while(i--) {
@@ -50,5 +47,5 @@ class EntityListPacket extends BinaryPacket {
     }
 }
 
-BinaryPacket.register(EntityListPacket)
+BinarySerializer.register(EntityListPacket)
 export default EntityListPacket;

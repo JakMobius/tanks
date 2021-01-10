@@ -1,13 +1,16 @@
 import TankModel from '../tankmodel';
 import PhysicsUtils from '../../utils/physicsutils';
 import PhysicalTankModel from '../physics/trucktankbehaviour';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
 import WeaponBomber from '../../weapon/models/bomber';
 
 class BomberTank extends TankModel {
 
-    constructor(config) {
-        super(config)
+    public static typeName = 2
+    public behaviour: PhysicalTankModel
+
+    constructor() {
+        super()
 
         this.behaviour = new PhysicalTankModel(this, {
             lineardamping: 0.93,
@@ -23,17 +26,13 @@ class BomberTank extends TankModel {
         return 20
     }
 
-    static getId() {
-        return 2
-    }
-
-    initPhysics(world) {
+    initPhysics(world: Box2D.World) {
         this.world = world
 
         let size = 9
 
-        let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.70, new Box2D.b2Vec2(0, -size * 0.25))
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(size / 2, size * 0.75, new Box2D.b2Vec2(size, -0.066 * size))
+        let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.70, new Box2D.Vec2(0, -size * 0.25))
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(size / 2, size * 0.75, new Box2D.Vec2(size, -0.066 * size))
 
         this.body = PhysicsUtils.dynamicBody(world);
 
@@ -42,7 +41,5 @@ class BomberTank extends TankModel {
             this.body.CreateFixture(fixture)
     }
 }
-
-TankModel.register(BomberTank)
 
 export default BomberTank;

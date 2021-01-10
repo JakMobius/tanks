@@ -1,24 +1,11 @@
+import BinaryPacket from "./binarypacket";
 
-/**
- * @abstract
- */
-class AbstractConnection {
-    /**
-     * @abstract
-     * @returns boolean
-     */
-    isReady() {}
+abstract class AbstractConnection {
+    abstract isReady(): boolean
 
-    /**
-     * @abstract
-     * @param bytes {BinaryPacket}
-     */
-    send(bytes) {}
+    abstract send(bytes: BinaryPacket): void
 
-    /**
-     * @abstract
-     */
-    close(reason) {}
+    abstract close(reason?: string): void
 }
 
 export default AbstractConnection;

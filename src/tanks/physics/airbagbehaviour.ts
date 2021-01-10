@@ -1,30 +1,45 @@
-import Box2D from '../../library/box2d';
-import TankBehaviour from './tankbehaviour';
+import * as Box2D from '../../library/box2d';
+import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
+import TankModel from "../tankmodel";
+
+interface AirbagBehaviourDetails extends TankBehaviourDetails {
+    propellerDist: number,
+    clutch: number
+}
+
+interface AirbagBehaviourConfig extends TankBehaviourConfig {
+    torque?: number
+    friction?: number
+    propellerSpeed?: number
+}
 
 class AirbagTankModel extends TankBehaviour {
 	public torque: any;
 	public friction: any;
 	public propellerSpeed: any;
 
-    constructor(tank, config) {
+	public details: AirbagBehaviourDetails = {
+        transmissionSpeed: 0,
+        propellerDist: 0,
+        clutch: 0
+    }
+
+    private preallocatedVector = new Box2D.Vec2()
+    private preallocatedPoint = new Box2D.Vec2()
+
+    constructor(tank: TankModel, config: AirbagBehaviourConfig) {
         super(tank, config)
 
         this.power = config.power || 50000
         this.torque = config.torque || 120000
         this.friction = config.friction || 0.1
         this.propellerSpeed = config.propellerSpeed || 40
-
-        this.details = {
-            transmissionSpeed: 0,
-            propellerDist: 0,
-            clutch: 0
-        }
     }
 
-    tick(dt) {
+    tick(dt: number) {
         const body = this.tank.body;
 
-        const velocity = body.GetLinearVelocity();
+        const velocity = body.m_linearVelocity;
 
         const x = velocity.x;
         const y = velocity.y;
@@ -47,11 +62,14 @@ class AirbagTankModel extends TankBehaviour {
         const throttle = this.power * this.tank.controls.getThrottle();
         const rotation = this.torque * this.tank.controls.getSteer() * this.tank.controls.getThrottle();
 
-        body.ApplyForce(body.GetWorldVector(new Box2D.b2Vec2(0, throttle)), body.GetWorldPoint(new Box2D.b2Vec2(0, 0)))
+        body.GetWorldVector(new Box2D.Vec2(0, throttle), this.preallocatedVector)
+        body.GetWorldPoint(new Box2D.Vec2(0, 0), this.preallocatedPoint)
+
+        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
         body.ApplyTorque(rotation)
     }
 
-    countDetails(dt) {
+    countDetails(dt: number) {
         const tank = this.tank
         const speed = (Math.abs(tank.controls.getThrottle()) + 0.5) * this.propellerSpeed;
 

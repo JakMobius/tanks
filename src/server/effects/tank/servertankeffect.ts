@@ -1,6 +1,8 @@
 
 import ServerEffect from '../servereffect';
-import TankEffectModel from '@/effects/tank/tankeffectmodel';
+import TankEffectModel from 'src/effects/tank/tankeffectmodel';
+import ServerTank from "../../tanks/servertank";
+import EffectModel from "../../../effects/effect-model";
 
 /**
  * This class unites all the tank effect implementations on the server
@@ -13,15 +15,8 @@ import TankEffectModel from '@/effects/tank/tankeffectmodel';
  */
 class ServerTankEffect extends ServerEffect {
 
-    /**
-     * @type TankEffectModel
-     */
-    model
-
-    /**
-     * @type ServerTank
-     */
-    tank
+    model: TankEffectModel
+    tank: ServerTank
 
     /**
      * @private
@@ -30,10 +25,8 @@ class ServerTankEffect extends ServerEffect {
      * constructor should not be called directly, use
      * {@link ServerTankEffect#fromModel fromModel} static method
      * instead
-     * @param {TankEffectModel} model
-     * @param {ServerTank} tank
      */
-    constructor(model, tank) {
+    constructor(model: TankEffectModel, tank: ServerTank) {
         super(model);
         this.model = model
         this.tank = tank
@@ -46,12 +39,11 @@ class ServerTankEffect extends ServerEffect {
      * server-side logic, the instance of appropriate subclass will be
      * returned. Otherwise, this method returns {@link ServerTankEffect}
      * instance
-     * @param model {TankEffectModel} Effect model to wrap
-     * @param tank {ServerTank} A tank this effect will appear on
-     * @returns {ServerTankEffect}
+     * @param model Effect model to wrap
+     * @param tank Tank, on which this effect will be applied on
      */
-    static fromModelAndTank(model, tank) {
-        let clazz = /** @type Class<ServerTankEffect> */ super.fromModel(model)
+    static fromModelAndTank(model: TankEffectModel, tank: ServerTank): ServerTankEffect {
+        let clazz = this.Types.get(model.constructor as typeof TankEffectModel) as typeof ServerTankEffect
 
         if(clazz) return new clazz(model, tank)
 

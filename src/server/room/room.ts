@@ -1,36 +1,29 @@
-
-
+import BinaryPacket from "../../networking/binarypacket";
+import Server from "../server";
+import SocketPortalClient from "../socket/socket-portal-client";
+import {Class} from "../../utils/class";
+import {Constructor} from "../../serialization/binary/serializable";
 
 class Room {
-	public maxOnline: any;
-    /**
-     * Map of clients, connected to this room.
-     * @type {Map<Number,Client>}
-     */
-    clients = null
+	public maxOnline: number = 10;
+    /// Map of clients, connected to this room.
+    clients = new Map<Number, SocketPortalClient>()
 
-    /**
-     * Event listener map
-     * @type {Map<Number,Array<Function>>}
-     */
-    listeners = null
+    /// Event listener map
+    listeners = new Map<string | Class<any>, Array<Function>>()
 
-    /**
-     * Server associated with this room
-     * @type {Server}
-     */
-    server = null
-    name = null
+    /// Server associated with this room
+    server: Server = null
+    name: string = null
+    
+    public currentOnline: number = 0
 
     constructor() {
-        this.clients = new Map()
-        this.listeners = new Map()
-        this.server = null
-        this.name = null
-        this.maxOnline = 10
     }
 
-    on(what, handler) {
+    on<T>(what: Constructor<T>, handler: ((client: SocketPortalClient, packet: T) => void)): void
+    on(what: string, handler: (() => void)): void
+    on(what: Constructor<any> | string, handler: Function): void {
         if(this.listeners.has(what)) {
             this.listeners.get(what).push(handler)
         } else {
@@ -38,15 +31,17 @@ class Room {
         }
     }
 
-    clientConnected(client) {
+    clientConnected(client: SocketPortalClient) {
         this.clients.set(client.id, client)
+        this.currentOnline++
     }
 
-    clientDisconnected(client) {
+    clientDisconnected(client: SocketPortalClient) {
         this.clients.delete(client.id)
+        this.currentOnline--
     }
 
-    clientMessage(client, packet) {
+    clientMessage(client: SocketPortalClient, packet: BinaryPacket) {
         for (let [clazz, listeners] of this.listeners.entries()) {
             if (clazz instanceof Function && packet.constructor === clazz) {
                 for (let listener of listeners) {
@@ -56,7 +51,7 @@ class Room {
         }
     }
 
-    emit(event) {
+    emit(event: Class<any> | string, ...rest: any[]) {
         let listeners = this.listeners.get(event)
         let args = Array.prototype.slice.call(arguments, 1)
 

@@ -1,13 +1,12 @@
 
 import AbstractConnection from './abstract-connection';
+import AbstractClient from "./abstract-client";
+import BinaryPacket from "./binarypacket";
 
 class ClientConnection extends AbstractConnection {
-	public client: any;
+	public client: AbstractClient;
 
-    /**
-     * @param client {AbstractClient}
-     */
-    constructor(client) {
+    constructor(client: AbstractClient) {
         super();
         this.client = client
     }
@@ -19,12 +18,12 @@ class ClientConnection extends AbstractConnection {
         return this.client.isOpen() || this.client.isConnecting();
     }
 
-    send(packet) {
+    send(packet: BinaryPacket) {
         this.client.sendPacket(packet)
     }
 
-    close(reason) {
-        this.client.disconnect(reason)
+    close(reason: string) {
+        this.client.disconnect()
     }
 }
 

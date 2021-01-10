@@ -1,12 +1,12 @@
 
-import View from '@/client/ui/view';
+import View from 'src/client/ui/view';
+import {Stat} from "./tankpreviewcontainer";
 
 class StatScale extends View {
-	public element: any;
-	public statScale: any;
-	public value: any;
-	public title: any;
-	public stat: any;
+	public statScale: JQuery;
+	public value: JQuery;
+	public title: JQuery;
+	public stat: Stat;
 
     constructor() {
         super();
@@ -23,14 +23,14 @@ class StatScale extends View {
         this.stat = null
     }
 
-    setStat(stat) {
+    setStat(stat: Stat) {
         this.stat = stat
         this.statScale.css("background", stat.color)
         this.value.css("color", stat.color)
         this.title.text(stat.name)
     }
 
-    setValue(value) {
+    setValue(value: number) {
         if (value) {
             this.element.css("opacity", "")
             let fraction = this.stat.func(value, this.stat.maximum);

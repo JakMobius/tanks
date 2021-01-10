@@ -2,7 +2,18 @@
 
 import BrowserCheck from './browsercheck';
 
-export default function(callback){
+function browserLink (footer: JQuery, name: string, image: string, href: string): void {
+    footer.append(
+        $("<a>").addClass("supported-browser").append(
+            $("<img>")
+                .attr("src", image)
+                .attr("alt", name),
+            $("<p>").text(name)
+        ).attr("href", href)
+    )
+}
+
+export default function(callback: () => void){
 
     /**
      * Chrome 8
@@ -49,23 +60,14 @@ export default function(callback){
                     "скачать последнюю версию одного из этих браузеров:")
             )
 
-            function browserLink(name, image, href) {
-                footer.append(
-                    $("<a>").addClass("supported-browser").append(
-                        $("<img>")
-                            .attr("src", image)
-                            .attr("alt", name),
-                        $("<p>").text(name)
-                    ).attr("href", href)
-                )
-            }
-
             browserLink(
+                footer,
                 "Google Chrome",
                 "../assets/browser/chrome.png",
                 "https://www.google.com/chrome/browser/desktop/"
             )
             browserLink(
+                footer,
                 "Firefox",
                 "../assets/browser/firefox.png",
                 "https://www.mozilla.org/firefox/new"

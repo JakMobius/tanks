@@ -23,32 +23,42 @@ import HTMLEscape from '../../utils/htmlescape';
 import HighPreciseLoop from '../../utils/loop/highpreciseloop';
 import Room from './room';
 import Logger from '../log/logger';
-import '@/server/entity/bullet/models/';
-import '@/server/effects/world/types/';
-import '@/server/effects/tank/types/';
-require("/src/utils/physicsutils").setupPhysics()
+import SocketPortalClient from "../socket/socket-portal-client";
+import ServerEntity from "../entity/serverentity";
+import ServerEffect from "../effects/servereffect";
+import GameMap from "../../utils/map/gamemap";
+import Server from "../server";
+
+import 'src/tanks/model-loader'
+import 'src/server/entity/bullet/model-loader';
+import 'src/server/effects/world/type-loader';
+import 'src/server/effects/tank/type-loader';
+import 'src/utils/map/blockstate/type-loader';
+
+interface GameConfig {
+    name: string
+    map: GameMap
+    server: Server
+}
 
 class Game extends Room {
-	public teams: any;
-	public loop: any;
-	public ticks: any;
-	public logger: any;
-	public multiplier: any;
-	public world: any;
-	public spt: any;
-	public tps: any;
-	public timer: any;
+	public teams = [
+        new Team(0, new Color(58, 104, 193)),
+        new Team(1, new Color(222, 54, 54)),
+        new Team(2, new Color(14, 193, 1))
+    ]
+	public loop = new HighPreciseLoop();
+	public ticks: number = 0;
+	public logger: Logger = new Logger();
+	public multiplier: number = 1;
+	public world: ServerGameWorld;
+	public spt: number;
+	public tps: number;
+	public timer: number;
 
-    constructor(options) {
+    constructor(options: GameConfig) {
         super()
 
-        this.teams = [
-            new Team(0, new Color(58, 104, 193)),
-            new Team(1, new Color(222, 54, 54)),
-            new Team(2, new Color(14, 193, 1))
-        ]
-
-        this.loop = new HighPreciseLoop()
         this.loop.run = () => this.tick()
 
         this.ticks = 0
@@ -56,6 +66,7 @@ class Game extends Room {
         this.logger = new Logger()
         this.multiplier = 1
         this.name = options.name
+        this.server = options.server
 
         this.world = new ServerGameWorld({
             map: options.map,
@@ -129,47 +140,47 @@ class Game extends Room {
             this.broadcast(new PlayerChatPacket(text))
         })
 
-        this.world.on("entity-create", entity => {
+        this.world.on("entity-create", (entity: ServerEntity) => {
             this.broadcast(new EntityCreatePacket(entity))
         })
 
-        this.world.on("entity-remove", entity => {
+        this.world.on("entity-remove", (entity: ServerEntity) => {
             this.broadcast(new EntityRemovePacket(entity))
         })
 
-        this.world.on("effect-create", (effect) => {
+        this.world.on("effect-create", (effect: ServerEffect) => {
             this.broadcast(new EffectCreatePacket(effect.model))
         })
 
-        this.world.on("effect-remove", (effect) => {
-            if(effect.constructor.shouldSynchroniseRemoval)
+        this.world.on("effect-remove", (effect: ServerEffect) => {
+            if((effect.constructor as typeof ServerEffect).shouldSynchroniseRemoval)
                 this.broadcast(new EffectRemovePacket(effect.model.id))
         })
 
         // TODO: Batch block update packets
 
-        this.world.map.on("block-update", (x, y) => {
+        this.world.map.on("block-update", (x: number, y: number) => {
             this.broadcast(new BlockUpdatePacket(x, y, this.world.map.getBlock(x, y)))
         })
     }
 
-    setTPS(tps) {
+    setTPS(tps: number): void {
         this.tps = tps
         this.spt = 1 / this.tps
         this.loop.interval = 1000 / this.tps
     }
 
-    speedupGame(multiplier) {
+    speedupGame(multiplier: number): void {
         this.multiplier = multiplier
     }
 
-    log(line) {
+    log(line: string): void {
         if (this.logger) {
             this.logger.log(line)
         }
     }
 
-    broadcastPlayers(client) {
+    broadcastPlayers(client: SocketPortalClient): void {
         for (let c of this.clients.values()) {
             if(c.data.player) {
                 new PlayerJoinPacket(c.data.player, c.data.player.tank.model).sendTo(client.connection)
@@ -177,13 +188,9 @@ class Game extends Room {
         }
     }
 
-    sendPlayerJoinEvent(clients, player) {
+    sendPlayerJoinEvent(clients: Iterable<SocketPortalClient>, player: Player) {
 
-        /**
-         * @type {PlayerJoinPacket | null}
-         */
-
-        let joinPacket = null
+        let joinPacket: PlayerJoinPacket | null = null
 
         for (let c of clients) {
             if (c.data.player != null && c.data.player.id === player.id) {
@@ -206,7 +213,7 @@ class Game extends Room {
         }
     }
 
-    clientConnected(client) {
+    clientConnected(client: SocketPortalClient) {
         super.clientConnected(client)
 
         if (!this.timer) {
@@ -220,7 +227,7 @@ class Game extends Room {
         new EntityCreatePacket(Array.from(this.world.entities.values())).sendTo(client.connection)
     }
 
-    clientDisconnected(client) {
+    clientDisconnected(client: SocketPortalClient) {
         super.clientDisconnected(client)
 
         this.log("Disconnected " + client.id)
@@ -253,33 +260,31 @@ class Game extends Room {
         this.broadcast(new TankLocationsPacket(this.world.players))
     }
 
-    respawnPlayer(client) {
+    respawnPlayer(client: SocketPortalClient) {
         const player = client.data.player
         const team = player.team
+        const tank: ServerTank = player.tank
 
-        player.tank.model.health = player.tank.model.constructor.getMaximumHealth()
+        tank.model.health = player.tank.model.constructor.getMaximumHealth()
 
         const spawnPoint = this.world.map.spawnPointForTeam(team.id)
-        player.tank.model.body.SetPositionAndAngle(spawnPoint, 0)
+        tank.model.body.SetPosition(spawnPoint)
+        tank.model.body.SetAngle(0)
 
         const v = player.tank.model.body.GetLinearVelocity()
         v.Set(0, 0)
-        player.tank.teleported = true
-        player.tank.model.body.SetLinearVelocity(v)
+        tank.teleported = true
+        tank.model.body.SetLinearVelocity(v)
     }
 
-    /**
-     *
-     * @param msg {BinaryPacket}
-     */
-    broadcast(msg) {
+    broadcast(msg: BinaryPacket) {
         if(msg.shouldSend())
             for (let client of this.clients.values())
                 msg.sendTo(client.connection)
     }
 
     getFreeTeam() {
-        let mostUnfilled = []
+        let mostUnfilled: Team[] = []
         let minClientCount = Infinity
 
         for (let i = this.teams.length - 1; i >= 0; i--) {

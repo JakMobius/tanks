@@ -3,7 +3,7 @@ import Command from '../command';
 
 class TPSCommand extends Command {
 
-	onPerform(args) {
+	onPerform(args: string[]) {
 	    // let logger = this.console.logger
 		// let ticks = Number(args[0]) || 20
         //

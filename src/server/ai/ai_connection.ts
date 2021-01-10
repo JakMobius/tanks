@@ -14,18 +14,18 @@ class AIConnection {
 		this.externalHandlers = {}
 	}
 
-	tell(value) {
+	tell(value: any) {
 		this._emitExternal("message", [value])
 	}
 
-	_emitLocal(evt, args?) {
+	_emitLocal(evt: string, args?: string[]) {
 		const handler = this.localHandlers[evt];
 		if(handler) {
 			handler.apply(this, args)
 		}
 	}
 
-	_emitExternal(evt, args?) {
+	_emitExternal(evt: string, args?: string[]) {
 		const handlers = this.externalHandlers[evt];
 		if(handlers) {
 			for(let handler of handlers) {
@@ -39,11 +39,11 @@ class AIConnection {
 		this._emitExternal("close")
 	}
 
-	send(value) {
+	send(value: string) {
 		this._emitLocal("onMessage", [value])
 	}
 
-	on(event, handler) {
+	on(event: string | number, handler: () => void) {
 		const handlers = this.externalHandlers[event];
 		if (handlers) {
 			this.externalHandlers[event].push(handler)

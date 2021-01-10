@@ -9,7 +9,7 @@ class DragHandler extends DocumentEventHandler {
 	public draggingEnabled: any;
 	public oldScale: any;
 
-    constructor(target) {
+    constructor(target: HTMLElement) {
         super()
 
         this.target = target
@@ -32,12 +32,12 @@ class DragHandler extends DocumentEventHandler {
         this.bind('gestureend', this.zoomChange)
     }
 
-    zoomStart(event) {
+    zoomStart(event: MSGestureEvent) {
         event.preventDefault()
         this.oldScale = event.scale
     }
 
-    zoomChange(event) {
+    zoomChange(event: MSGestureEvent) {
         event.preventDefault()
         if(this.isMacOS) {
             if(event.scale) {
@@ -47,7 +47,7 @@ class DragHandler extends DocumentEventHandler {
         }
     }
 
-    mouseDown(event) {
+    mouseDown(event: MouseEvent) {
         event.preventDefault()
         if((event.which === 1 && this.draggingEnabled) || event.which === 2) {
             this.dragging = true
@@ -57,12 +57,12 @@ class DragHandler extends DocumentEventHandler {
         this.oldY = event.pageY
     }
 
-    mouseUp(event) {
+    mouseUp(event: MouseEvent) {
         event.preventDefault()
         this.dragging = false
     }
 
-    mouseMove(event) {
+    mouseMove(event: MouseEvent) {
         event.preventDefault()
 
         if(this.dragging) {
@@ -76,7 +76,7 @@ class DragHandler extends DocumentEventHandler {
         this.oldY = event.pageY
     }
 
-    wheel(event) {
+    wheel(event: WheelEvent) {
         event.preventDefault()
         if(event.ctrlKey) {
             if(event.deltaY)

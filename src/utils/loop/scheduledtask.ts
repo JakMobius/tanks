@@ -5,16 +5,16 @@ class ScheduledTask {
 	public lock: any;
     static lockInitialTimers = false
 
-    constructor(func, time) {
+    constructor(func: () => void, time: number) {
         this.func = func
         this.time = time
         this.lock = ScheduledTask.lockInitialTimers
     }
 
-    tick(dt) {
+    tick(dt: number) {
         if(this.lock) {
             this.lock = false
-            return
+            return false
         }
         if((this.time -= dt) <= 0) {
             this.func.apply(null)

@@ -2,48 +2,44 @@
 import Command from '../command';
 
 class KickCommand extends Command {
-	public logger: any;
-	public server: any;
+    onPerform(args: string[]): void {
 
-    onPerform(args) {
+        let logger = this.console.logger
+
         if(args.length < 1) {
-            this.logger.log("Использование: " + this.getUsage())
+            logger.log("Usage: " + this.getUsage())
             return
         }
 
         const name = args.join(" ")
         let kicked = false
 
-        for(let c of this.server.clients.values()) {
+        for(let c of this.console.server.gameSocket.clients.values()) {
             if (c.data.player && c.data.player.nick.trim() === name) {
-                c.connection.close(1000, "Вас кикнули")
-                this.logger.log(" - Кикнут игрок #" + c.id + " с ником " + name)
+                c.connection.close("You were kicked from this server")
+                logger.log(" - Kicked '" + name + "' (id = " + c.id + ")")
                 kicked = true
             }
         }
 
         if(!kicked) {
-            this.logger.log("Не найдено игрока (игроков) с ником " + name)
+            logger.log("'" + name + "' is offline")
         }
     }
 
-    onTabComplete(args) {
-        super.onTabComplete(args);
-    }
-
-    getDescription() {
+    getDescription(): string {
         return "Кикнуть клиента"
     }
 
-    getName() {
+    getName(): string {
         return "kick"
     }
 
-    getUsage() {
+    getUsage(): string {
         return "kick <nick>"
     }
 
-    requiresRoom() {
+    requiresRoom(): boolean {
         return true
     }
 }

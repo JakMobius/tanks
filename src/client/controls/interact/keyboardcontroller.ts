@@ -13,14 +13,14 @@ class KeyboardController extends DocumentEventHandler {
         this.isMacOS = navigator.userAgent.indexOf("Mac") !== -1
     }
 
-    keybinding(name, handler) {
+    keybinding(name: string, handler: (event: KeyboardEvent) => void) {
         let parts = name.split("-")
         let cmd = parts.indexOf("Cmd") !== -1
         let shift = parts.indexOf("Shift") !== -1
         let alt = parts.indexOf("Alt") !== -1
         let key = parts.pop()
 
-        this.on("keydown", (event) => {
+        this.on("keydown", (event: KeyboardEvent) => {
             let eventCmd = this.isMacOS ? event.metaKey : event.ctrlKey
             let eventShift = event.shiftKey
             let eventAlt = event.altKey
@@ -51,7 +51,7 @@ class KeyboardController extends DocumentEventHandler {
         return false
     }
 
-    keyPressedOnce(key) {
+    keyPressedOnce(key: string) {
         if(this.keys.has(key)) {
             this.keys.delete(key)
             return true
@@ -59,12 +59,12 @@ class KeyboardController extends DocumentEventHandler {
         return false
     }
 
-    keyup(e) {
+    keyup(e: KeyboardEvent) {
         this.emit("keyup", e)
         this.keys.delete(e.code)
     }
 
-    keydown(e) {
+    keydown(e: KeyboardEvent) {
         if(e.repeat) {
             e.preventDefault()
             return
@@ -73,7 +73,7 @@ class KeyboardController extends DocumentEventHandler {
         this.keys.add(e.code)
     }
 
-    getKeyAxle(key, min, max) {
+    createKeyAxle(key: string, min?: number, max?: number) {
         return new KeyAxle(this, key, min, max)
     }
 }

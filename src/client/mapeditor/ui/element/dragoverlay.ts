@@ -3,11 +3,11 @@
 import DocumentEventHandler from '../../../controls/interact/documenteventhandler';
 
 class DragOverlay extends DocumentEventHandler {
-	public root: any;
-	public element: any;
-	public hovered: any;
+	public root: JQuery;
+	public element: JQuery;
+	public hovered: boolean;
 
-    constructor(root) {
+    constructor(root: JQuery) {
         super();
 
         this.root = root
@@ -23,7 +23,7 @@ class DragOverlay extends DocumentEventHandler {
         this.bind("drop", this.drop)
     }
 
-    dragEnter(event) {
+    dragEnter(event: DragEvent) {
         event.preventDefault()
         if(!this.hovered) {
             this.element.addClass("visible")
@@ -31,11 +31,11 @@ class DragOverlay extends DocumentEventHandler {
         }
     }
 
-    dragOver(event) {
+    dragOver(event: DragEvent) {
         event.preventDefault()
     }
 
-    dragLeave(event) {
+    dragLeave(event: DragEvent) {
         event.preventDefault()
 
         if(this.hovered && event.target && $(event.target).closest(".drag-overlay")[0]) {
@@ -44,7 +44,7 @@ class DragOverlay extends DocumentEventHandler {
         }
     }
 
-    drop(event) {
+    drop(event: DragEvent) {
         event.preventDefault()
 
         if(this.hovered) {

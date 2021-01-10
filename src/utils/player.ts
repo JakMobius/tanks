@@ -1,19 +1,30 @@
 
 import PhysicsUtils from './physicsutils';
-import Box2D from '../library/box2d';
+import * as Box2D from '../library/box2d';
+import GameWorld from "../gameworld";
+import AbstractTank from "../tanks/abstracttank";
+import Team from "../server/team";
+import Effect from "../server/bonuses/effect";
+import BonusModel from "../server/bonuses/bonus";
+
+export interface PlayerConfig {
+    nick?: string
+    id?: number
+    world?: GameWorld
+    team?: Team
+}
 
 class Player {
 	public nick: any;
 	public id: any;
 	public team: any;
 	public blockMap: any;
-    /** @type AbstractTank */
-    tank
+	public bonuses: BonusModel[]
 
-    /** @type GameWorld */
-    world
+    tank: AbstractTank
+    world: GameWorld
 
-    constructor(config?) {
+    constructor(config?: PlayerConfig) {
         config = config || {}
         this.nick = config.nick
         this.id = config.id
@@ -23,7 +34,7 @@ class Player {
         this.blockMap = []
     }
 
-    setTank(tank) {
+    setTank(tank: AbstractTank) {
         this.tank = tank
         tank.player = this
     }
@@ -41,8 +52,8 @@ class Player {
                 continue
             }
 
-            const bodyDef = new Box2D.b2BodyDef;
-            bodyDef.type = Box2D.b2Body.b2_staticBody;
+            const bodyDef = new Box2D.BodyDef();
+            bodyDef.type = Box2D.staticBody;
             bodyDef.position.x = 0
             bodyDef.position.y = 0
 

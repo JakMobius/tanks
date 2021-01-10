@@ -7,6 +7,4 @@ class BrickBlockState extends BlockState {
     static typeId = 1;
 }
 
-BlockState.registerBlockStateClass(BrickBlockState)
-
 export default BrickBlockState;

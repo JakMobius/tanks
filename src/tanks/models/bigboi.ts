@@ -1,18 +1,21 @@
 import TankModel from '../tankmodel';
 import PhysicsUtils from '../../utils/physicsutils';
 import BasicTankBehaviour from '../physics/trucktankbehaviour';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
 import Cannon from '../../weapon/models/cannon';
 
 class BigBoiTank extends TankModel {
 
-    constructor(options) {
-        super(options);
+    public static typeName = 5
+    public behaviour: BasicTankBehaviour
+
+    constructor() {
+        super();
 
         this.behaviour = new BasicTankBehaviour(this, {
             lateralFriction: 150,
             power: 40000,
-            angulardamping: 2,
+            angularDamping: 2,
             angularFriction: 0.1,
             truckSlipperness: 0
         });
@@ -26,11 +29,7 @@ class BigBoiTank extends TankModel {
         return 20
     }
 
-    static getId() {
-        return 5
-    }
-
-    initPhysics(world) {
+    initPhysics(world: Box2D.World) {
         this.world = world
 
         let size = 9
@@ -46,7 +45,7 @@ class BigBoiTank extends TankModel {
         let trackFixtures = PhysicsUtils.horizontalSquareFixtures(
             segment,
             size,
-            new Box2D.b2Vec2(size, 0), {
+            new Box2D.Vec2(size, 0), {
             density: 2
         })
 
@@ -58,7 +57,5 @@ class BigBoiTank extends TankModel {
             this.body.CreateFixture(fixture)
     }
 }
-
-TankModel.register(BigBoiTank)
 
 export default BigBoiTank;

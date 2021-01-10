@@ -2,12 +2,16 @@
 
 import EventEmitter from '../../../utils/eventemitter';
 
-class Overlay extends EventEmitter {
-	public overlay: any;
-	public shown: any;
-	public root: any;
+export interface OverlayConfig {
+    root: JQuery
+}
 
-    constructor(options) {
+class Overlay extends EventEmitter {
+	public overlay: JQuery;
+	public shown: boolean;
+	public root: JQuery;
+
+    constructor(options: OverlayConfig) {
         super()
         this.overlay = $("<div>").addClass("overlay")
         this.shown = false
@@ -25,7 +29,7 @@ class Overlay extends EventEmitter {
         this.overlay[0].focus()
     }
 
-    hide(callback?) {
+    hide(callback?: () => void): void {
         if(!this.shown) { return }
 
         this.shown = false

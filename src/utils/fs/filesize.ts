@@ -12,7 +12,7 @@ const binaryUnits = ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
  *
  * @return Formatted string.
  */
-function humanFileSize(bytes, format = true, precision=1) {
+function humanFileSize(bytes: number, format = true, precision = 1) {
     const thresh = format ? 1000 : 1024;
 
     if (Math.abs(bytes) < thresh) {

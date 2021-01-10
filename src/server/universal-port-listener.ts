@@ -1,38 +1,35 @@
 
 import WebSocket from 'websocket';
-import HTTP from 'http';
+import * as HTTP from 'http';
 
 class UniversalPortListener {
 
     /**
      * Port that is being listened by this instance
-     * @type number
      */
-    port
+    port: number
 
     /**
      * Websocket retain counter
-     * @type number
      */
     socketRetainCounter = 0
 
     /**
      * HTTPServer retain counter
-     * @type number
      */
     httpRetainCounter = 0
 
     /**
      * HTTPServer binded to this port
      */
-    httpServer
+    httpServer: HTTP.Server
 
     /**
      * WebSocket server binded to this port
      */
-    webSocketServer
+    webSocketServer: WebSocket.server
 
-    constructor(port) {
+    constructor(port: number) {
         this.port = port
     }
 

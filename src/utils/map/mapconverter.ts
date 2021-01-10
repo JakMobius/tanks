@@ -7,9 +7,10 @@ import BinaryDecoder from '../../serialization/binary/binarydecoder';
 import EditorMap from '../../client/mapeditor/editormap';
 import BlockState from './blockstate/blockstate';
 import SpawnZone from './spawnzone';
+import fs from 'fs';
 
 class MapConverter {
-    static jsonToBinary(json) {
+    static jsonToBinary(json: any) {
         let spawnZones = json["spawnZones"]
         let data = json["data"]
 
@@ -30,7 +31,7 @@ class MapConverter {
         return pako.gzip(new Uint8Array(buffer));
     }
 
-    static writeBinarySpawnZones(json, encoder) {
+    static writeBinarySpawnZones(json: any, encoder: BinaryEncoder) {
         encoder.writeUint16(GameMap.BinaryOptions.SPAWN_ZONES_FLAG)
 
         encoder.writeUint16(json.length)
@@ -42,7 +43,7 @@ class MapConverter {
         }
     }
 
-    static writeBinaryMapData(string, encoder) {
+    static writeBinaryMapData(string: string, encoder: BinaryEncoder) {
         encoder.writeUint16(GameMap.BinaryOptions.DATA_FLAG)
 
         let array = new Uint32Array(string.split(",").map(a => parseInt(a, 36)))
@@ -67,7 +68,7 @@ class MapConverter {
     //     return 0x0000
     // }
 
-    static convert_0x0000_to_0x0001(data) {
+    static convert_0x0000_to_0x0001(data: ArrayBuffer) {
         let decoder = BinaryDecoder.shared
         decoder.reset()
         decoder.readData(data)
@@ -122,7 +123,6 @@ class MapConverter {
     }
 }
 
-import fs from 'fs';
 const mapsPath = path.resolve(__dirname, '..', '..', 'server/maps/')
 let files = fs.readdirSync(mapsPath)
 

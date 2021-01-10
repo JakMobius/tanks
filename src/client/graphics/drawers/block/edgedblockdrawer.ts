@@ -1,13 +1,15 @@
 
 import BlockDrawer from './blockdrawer';
-import Sprite from '../../../sprite';
+import Sprite, {SpriteRect} from '../../../sprite';
 import GameMap from '../../../../utils/map/gamemap';
+import TextureProgram from '../../programs/textureprogram';
+import BlockState from 'src/utils/map/blockstate/blockstate';
 
 class EdgedBlockDrawer extends BlockDrawer {
-	public variants: any;
-	public spritePath: any;
-	public spriteSize: any;
-	public halfSpriteSize: any;
+    public variants: Sprite[][];
+    public spritePath: any;
+    public spriteSize: any;
+    public halfSpriteSize: any;
 
     constructor() {
         super();
@@ -21,11 +23,11 @@ class EdgedBlockDrawer extends BlockDrawer {
         super.loadSprites()
         this.variants = []
 
-        if(Array.isArray(this.spritePath)) {
-            for(let path of this.spritePath) {
+        if (Array.isArray(this.spritePath)) {
+            for (let path of this.spritePath) {
                 this.variants.push(this.loadVariant(path))
             }
-        } else if(typeof this.spritePath == "string") {
+        } else if (typeof this.spritePath == "string") {
             this.variants.push(this.loadVariant(this.spritePath))
         }
 
@@ -33,8 +35,8 @@ class EdgedBlockDrawer extends BlockDrawer {
         this.halfSpriteSize = this.spriteSize / 2
     }
 
-    loadVariant(path) {
-        if(path.length && !path.endsWith("/")) {
+    loadVariant(path: string): Sprite[] {
+        if (path.length && !path.endsWith("/")) {
             path += "/"
         }
 
@@ -53,7 +55,7 @@ class EdgedBlockDrawer extends BlockDrawer {
         ]
     }
 
-    drawSlice(program, x, y, slice, s, h, dx, dy) {
+    drawSlice(program: TextureProgram, x: number, y: number, slice: SpriteRect, s: any, h: number, dx: any, dy: any) {
         dx += slice.x
         dy += slice.y
         program.vertexBuffer.appendArray([
@@ -72,15 +74,12 @@ class EdgedBlockDrawer extends BlockDrawer {
         program.textures++
     }
 
-    draw(program, x, y, block) {
+    draw(program: TextureProgram, x: number, y: number, block: BlockState) {
         if(!this.variants) {
             this.loadSprites()
         }
 
-        let variant;
-
-        if(block.variant) variant = this.variants[block.variant]
-        else variant = this.variants[0]
+        let variant = this.variants[block.variant || 0]
 
         x *= GameMap.BLOCK_SIZE
         y *= GameMap.BLOCK_SIZE

@@ -1,16 +1,16 @@
 
 import WebserverModule from '../webserver-module';
-import path from 'path';
-import express from 'express';
+import * as path from 'path';
+import * as express from 'express';
 
 class GameModule extends WebserverModule {
-    constructor(config?) {
-        super(config);
+    constructor() {
+        super();
 
-        this.resourcesDirectory = path.resolve(__dirname, "../../../client/game/page/")
+        this.resourcesDirectory = path.resolve(__dirname, "../../html-pages/game-page")
 
         this.router.get("/game/", (req, res, next) => {
-            res.render("game/page/index")
+            res.render("game-page/page/index")
         })
 
         this.router.use("/game/styles/", express.static(this.resourcePath("styles")))

@@ -13,6 +13,4 @@ class WoodBlockState extends BlockState {
     }
 }
 
-BlockState.registerBlockStateClass(WoodBlockState)
-
 export default WoodBlockState;

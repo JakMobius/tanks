@@ -4,7 +4,7 @@ import Progress from './progress';
 class Downloader {
 	public index: any;
 
-    static getXHR(dataType, progress) {
+    static getXHR(dataType: XMLHttpRequestResponseType, progress: Progress) {
         let xhr = new XMLHttpRequest();
         if(dataType)
             xhr.responseType = dataType;
@@ -19,9 +19,9 @@ class Downloader {
         return () => xhr
     }
 
-    static download(urls, handler, dataType, progress) {
+    static download(urls: string[], handler: ((response: ArrayBuffer, index: number) => void), dataType: any, progress: Progress) {
         return new Promise((resolve, reject) => {
-            let requests = []
+            let requests: JQuery.jqXHR[] = []
             let awaiting = urls.length
             let cancelled = false
             const assetReady = () => { if(!--awaiting) resolve() }
@@ -34,19 +34,20 @@ class Downloader {
                     progress.addSubtask(taskProgress)
                 }
 
+                let taskIndex: number = i
+
                 requests.push(
                     $.ajax({
                         url: url,
-                        index: i,
                         xhr: this.getXHR(dataType, taskProgress)
-                    }).done(function(){
+                    }).done(function(msg){
                         if(cancelled) return
-                        handler.apply(this, arguments)
+                        handler(msg, taskIndex)
                         assetReady()
-                    }).fail(function(response, status, error){
+                    }).fail(function(response, _status, error){
                         if(cancelled) return
                         cancelled = true
-                        let reason = "Failed to download " + urls[this.index] + ": " + error
+                        let reason = "Failed to download " + urls[taskIndex] + ": " + error
 
                         for(let request of requests) {
                             if(request !== this) request.abort()

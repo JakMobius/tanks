@@ -1,8 +1,8 @@
-import Weapon from '../weapon';
+import Weapon, {WeaponConfig} from '../weapon';
 import CannonBall from '../../entity/bullet/models/cannonball';
 
 class WeaponCannon extends Weapon {
-	constructor(config) {
+	constructor(config: WeaponConfig) {
 		config = Object.assign({
 			maxAmmo: 5,
 			shootRate: 2000,

@@ -2,7 +2,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-export default async function copyDirectory(from, to) {
+export default async function copyDirectory(from: string, to: string) {
     try {
         await fs.mkdir(to);
     } catch(e) {}

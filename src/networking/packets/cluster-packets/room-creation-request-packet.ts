@@ -1,30 +1,29 @@
 
 import BinaryPacket from '../../binarypacket';
-import RoomConfig from '@/server/room/room-config';
+import RoomConfig from 'src/server/room/room-config';
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 class RoomCreationRequestPacket extends BinaryPacket {
-	public config: any;
+	public config: RoomConfig;
 
-    static typeName() { return 1003 }
+    static typeName = 1003
 
-    /**
-     * @param config {RoomConfig} Configuration of room to create
-     */
-    constructor(config) {
+    constructor(config: RoomConfig) {
         super();
         this.config = config
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         this.config.toBinary(encoder)
     }
 
-    static fromBinary(decoder) {
-
-        let config = /** @type {RoomConfig} */ RoomConfig.fromBinary(decoder)
-        return new RoomCreationRequestPacket(config)
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+        let config = RoomConfig.fromBinary(decoder)
+        return new RoomCreationRequestPacket(config) as any as T
     }
 }
 
-BinaryPacket.register(RoomCreationRequestPacket)
+BinarySerializer.register(RoomCreationRequestPacket)
 export default RoomCreationRequestPacket;

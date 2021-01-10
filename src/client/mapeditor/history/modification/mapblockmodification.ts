@@ -1,5 +1,7 @@
 
 import MapModification from './mapmodification';
+import EditorMap from "../../editormap";
+import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class MapBlockModification extends MapModification {
 	public x: any;
@@ -7,7 +9,7 @@ class MapBlockModification extends MapModification {
 	public oldBlock: any;
 	public newBlock: any;
 
-    constructor(map, x, y, newBlock) {
+    constructor(map: EditorMap, x: number, y: number, newBlock: BlockState) {
         super(map);
 
         this.x = x

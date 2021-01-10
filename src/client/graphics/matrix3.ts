@@ -38,7 +38,7 @@
  */
 const m3 = (function() {
     "use strict";
-    function multiply(a?, b?) {
+    function multiply(a: Float32Array, b: Float32Array) {
         const a00 = a[0];
         const a01 = a[1];
         const a02 = a[2];
@@ -80,7 +80,7 @@ const m3 = (function() {
         ]);
     }
 
-    function translation(tx?, ty?) {
+    function translation(tx: number, ty: number) {
         return new Float32Array([
             1, 0, 0,
             0, 1, 0,
@@ -88,11 +88,11 @@ const m3 = (function() {
         ]);
     }
 
-    function translate(m?, tx?, ty?) {
+    function translate(m: Float32Array, tx: number, ty: number) {
         return multiply(m, translation(tx, ty));
     }
 
-    function rotation(s?, c?) {
+    function rotation(s: number, c: number) {
         return new Float32Array([
             c, -s, 0,
             s, c, 0,
@@ -100,15 +100,15 @@ const m3 = (function() {
         ]);
     }
 
-    function rotate(m?, angle?) {
+    function rotate(m: Float32Array, angle: number) {
         return multiply(m, rotation(Math.sin(angle), Math.cos(angle)));
     }
 
-    function turn(m?, s?, c?) {
+    function turn(m: Float32Array, s: number, c: number) {
         return multiply(m, rotation(s, c));
     }
 
-    function scaling(sx?, sy?) {
+    function scaling(sx: number, sy: number) {
         return new Float32Array([
             sx, 0, 0,
             0, sy, 0,
@@ -116,11 +116,11 @@ const m3 = (function() {
         ]);
     }
 
-    function scale(m?, sx?, sy?) {
+    function scale(m: Float32Array, sx: number, sy: number) {
         return multiply(m, scaling(sx, sy));
     }
 
-    function inverse(m?) {
+    function inverse(m: Float32Array) {
         const t00 = m[3 + 1] * m[2 * 3 + 2] - m[3 + 2] * m[2 * 3 + 1];
         const t10 = m[1] * m[2 * 3 + 2] - m[2] * m[2 * 3 + 1];
         const t20 = m[1] * m[3 + 2] - m[2] * m[3 + 1];
@@ -153,8 +153,8 @@ const m3 = (function() {
 
 
 class Matrix3 {
-	public m: any;
-	public stack: any;
+	public m: Float32Array;
+	public stack: Float32Array[];
 
     constructor() {
         this.m = new Float32Array([
@@ -177,27 +177,27 @@ class Matrix3 {
         this.m = m3.inverse(this.m)
     }
 
-    rotate(angle) {
+    rotate(angle: number) {
         this.m = m3.rotate(this.m, angle)
     }
 
-    turn(sin, cos) {
+    turn(sin: number, cos: number) {
         this.m = m3.turn(this.m, sin, cos)
     }
 
-    translate(x, y) {
+    translate(x: number, y: number) {
         this.m = m3.translate(this.m, x, y)
     }
 
-    scale(x, y) {
+    scale(x: number, y: number) {
         this.m = m3.scale(this.m, x, y)
     }
 
-    transformX(x, y) {
+    transformX(x: number, y: number) {
         return (this.m[0] * x + this.m[3] * y + this.m[6])
     }
 
-    transformY(x, y) {
+    transformY(x: number, y: number) {
         return (this.m[1] * x + this.m[4] * y + this.m[7])
     }
 

@@ -1,8 +1,9 @@
 import Chalk from 'chalk';
 import util from 'util';
-import Color from '@/utils/color';
+import Color from 'src/utils/color';
+import LoggerDestination from "./logger-destination";
 
-class Logger {
+class Logger implements LoggerDestination {
 	public destinations: any;
 	public redirectToGlobal: any;
 	public prefix: any;
@@ -14,32 +15,32 @@ class Logger {
 		this.prefix = null
 	}
 
-	setPrefix(prefix) {
+	setPrefix(prefix: string) {
 		this.prefix = "[" + prefix + "] "
 	}
 
-	addDestination(destination) {
+	addDestination(destination: LoggerDestination) {
 		this.removeDestination(destination)
 
 		this.destinations.push(destination)
 	}
 
-	removeDestination(destination) {
+	removeDestination(destination: LoggerDestination) {
 		for (let i = this.destinations.length - 1; i >= 0; i--) {
-			if(this.destinations[i].id === destination.id) {
+			if(this.destinations[i] === destination) {
 				this.destinations.splice(i, 1)
 				break
 			}
 		}
 	}
 
-	static callDestinations(destinations, text) {
+	static callDestinations(destinations: LoggerDestination[], text: string) {
 		for (let i = destinations.length - 1; i >= 0; i--) {
 			destinations[i].log(text)
 		}
 	}
 
-	static convertChatColors(text) {
+	static convertChatColors(text: string) {
 		return Color.replace(text, (color, bold, text) => {
 			let chalk = bold ? Chalk.bold : Chalk
 			if(color) {
@@ -49,7 +50,7 @@ class Logger {
 		})
 	}
 
-	log(text) {
+	log(text: string) {
 
 		if(typeof text == "string") {
 			text = Logger.convertChatColors(text)
@@ -67,6 +68,9 @@ class Logger {
 		} else {
 			Logger.callDestinations(this.destinations, text)
 		}
+	}
+
+	close(): void {
 	}
 }
 

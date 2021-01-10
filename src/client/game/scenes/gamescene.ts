@@ -1,73 +1,84 @@
 
-import Box2D from '@/library/box2d';
-import Scene from '../../scenes/scene';
-import GameMap from '../../../utils/map/gamemap';
-import ClientEntity from '../../entity/cliententity';
-import ClientTank from '../../tanks/clienttank';
-import EventContainer from '../../ui/overlay/events/eventcontainer';
-import ClientGameWorld from '@/client/game/clientgameworld';
-import BrowserClient from '../../networking/browser-client';
-import MapPacket from '@/networking/packets/game-packets/mappacket';
-import PlayerJoinPacket from '@/networking/packets/game-packets/playerjoinpacket';
-import PlayerSpawnPacket from '@/networking/packets/game-packets/playerspawnpacket';
-import TankLocationsPacket from '@/networking/packets/game-packets/gamestatepacket';
-import PlayerControlsPacket from '@/networking/packets/game-packets/playercontrolspacket';
-import PlayerConfigPacket from '@/networking/packets/game-packets/playerconfigpacket';
-import PlayerChatPacket from '@/networking/packets/game-packets/playerchatpacket';
-import PlayerRespawnPacket from '@/networking/packets/game-packets/playerrespawnpacket';
-import EntityCreatePacket from '@/networking/packets/game-packets/entitycreatepacket';
-import EntityRemovePacket from '@/networking/packets/game-packets/entityremovepacket';
-import EntityListPacket from '@/networking/packets/game-packets/entitylistpacket';
-import BlockUpdatePacket from '@/networking/packets/game-packets/blockupdatepacket';
-import PlayerLeavePacket from '@/networking/packets/game-packets/playerleavepacket';
-import RoomListPacket from '@/networking/packets/game-packets/roomlistpacket';
-import PlayerRoomRequestPacket from '@/networking/packets/game-packets/playerroomrequestpacket';
-import PlayerRoomChangePacket from '@/networking/packets/game-packets/playerroomchangepacket';
-import EffectCreatePacket from '@/networking/packets/game-packets/effectcreatepacket';
-import EffectRemovePacket from '@/networking/packets/game-packets/effectremovepacket';
-import WorldEffectModel from '@/effects/world/worldeffectmodel';
-import TankEffectModel from '@/effects/tank/tankeffectmodel';
-import ClientTankEffect from '@/client/effects/tank/clienttankeffect';
-import ClientWorldEffect from '@/client/effects/world/clientworldeffect';
+import * as Box2D from 'src/library/box2d';
+import Scene, {SceneConfig} from 'src/client/scenes/scene';
+import GameMap from 'src/utils/map/gamemap';
+import ClientEntity from 'src/client/entity/cliententity';
+import ClientTank from 'src/client/tanks/clienttank';
+import EventContainer from 'src/client/ui/overlay/events/eventcontainer';
+import ClientGameWorld from 'src/client/clientgameworld';
+import BrowserClient from 'src/client/networking/browser-client';
+import MapPacket from 'src/networking/packets/game-packets/mappacket';
+import PlayerJoinPacket from 'src/networking/packets/game-packets/playerjoinpacket';
+import PlayerSpawnPacket from 'src/networking/packets/game-packets/playerspawnpacket';
+import TankLocationsPacket from 'src/networking/packets/game-packets/gamestatepacket';
+import PlayerControlsPacket from 'src/networking/packets/game-packets/playercontrolspacket';
+import PlayerConfigPacket from 'src/networking/packets/game-packets/playerconfigpacket';
+import PlayerChatPacket from 'src/networking/packets/game-packets/playerchatpacket';
+import PlayerRespawnPacket from 'src/networking/packets/game-packets/playerrespawnpacket';
+import EntityCreatePacket from 'src/networking/packets/game-packets/entitycreatepacket';
+import EntityRemovePacket from 'src/networking/packets/game-packets/entityremovepacket';
+import EntityListPacket from 'src/networking/packets/game-packets/entitylistpacket';
+import BlockUpdatePacket from 'src/networking/packets/game-packets/blockupdatepacket';
+import PlayerLeavePacket from 'src/networking/packets/game-packets/playerleavepacket';
+import RoomListPacket from 'src/networking/packets/game-packets/roomlistpacket';
+import PlayerRoomRequestPacket from 'src/networking/packets/game-packets/playerroomrequestpacket';
+import PlayerRoomChangePacket from 'src/networking/packets/game-packets/playerroomchangepacket';
+import EffectCreatePacket from 'src/networking/packets/game-packets/effectcreatepacket';
+import EffectRemovePacket from 'src/networking/packets/game-packets/effectremovepacket';
+import WorldEffectModel from 'src/effects/world/world-effect-model';
+import TankEffectModel from 'src/effects/tank/tankeffectmodel';
+import ClientTankEffect from 'src/client/effects/tank/clienttankeffect';
+import ClientWorldEffect from 'src/client/effects/world/clientworldeffect';
 import ControlPanel from '../ui/controlpanel';
-import Camera from '../../camera';
-import Keyboard from '../../controls/interact/keyboardcontroller';
+import Camera from 'src/client/camera';
+import Keyboard from 'src/client/controls/interact/keyboardcontroller';
 import PrimaryOverlay from '../ui/overlay/primary/primaryoverlay';
 import ChatContainer from '../ui/overlay/chat/chatcontainer';
-import TouchController from '../../controls/interact/touchcontroller';
-import PlayerControls from '../../controls/playercontrols';
-import GamepadManager from '../../controls/interact/gamepadmanager';
-import MapDrawer from '../../graphics/drawers/mapdrawer';
-import ParticleProgram from '../../graphics/programs/particleprogram';
-import TextureProgram from '../../graphics/programs/textureprogram';
-import ExplodePoolDrawer from '../../graphics/drawers/explodepooldrawer';
+import TouchController from 'src/client/controls/interact/touchcontroller';
+import PlayerControls from 'src/client/controls/playercontrols';
+import GamepadManager from 'src/client/controls/interact/gamepadmanager';
+import MapDrawer from 'src/client/graphics/drawers/mapdrawer';
+import ParticleProgram from 'src/client/graphics/programs/particleprogram';
+import TextureProgram from 'src/client/graphics/programs/textureprogram';
+import ExplodePoolDrawer from 'src/client/graphics/drawers/explodepooldrawer';
+import TankModel from "src/tanks/tankmodel";
+import AbstractTank from "src/tanks/abstracttank";
+import AbstractClient from "src/networking/abstract-client";
+import Player from "src/utils/player";
+import KeyboardController from "src/client/controls/interact/keyboardcontroller";
+import ClientEffect from "../../effects/clienteffect";
+import GameScreen from "../game-screen";
+import SoundEngine from "../../sound/soundengine";
+
+export interface GameSceneConfig extends SceneConfig {
+    screen: GameScreen,
+    bgscale?: number,
+    ip: string
+}
 
 class GameScene extends Scene {
-	public config: any;
-	public controlsUpdateInterval: any;
-	public camera: any;
-	public keyboard: any;
-	public controls: any;
-	public gamepad: any;
-	public touchController: any;
-	public playerControls: any;
-	public client: any;
-	public alive: any;
-	public mapDrawer: any;
-	public particleProgram: any;
-	public entityProgram: any;
-	public explodePoolDrawer: any;
-	public overlay: any;
-	public eventContainer: any;
-	public chatContainer: any;
-	public effects: any;
-	public timer: any;
-    /**
-     * @type ClientGameWorld
-     */
-    world
+	public config: GameSceneConfig;
+	public controlsUpdateInterval: number;
+	public camera: Camera;
+	public keyboard: KeyboardController;
+	public controls: ControlPanel;
+	public gamepad: GamepadManager;
+	public touchController: TouchController;
+	public playerControls: PlayerControls;
+	public client: AbstractClient;
+	public alive: boolean;
+	public mapDrawer: MapDrawer;
+	public particleProgram: ParticleProgram;
+	public entityProgram: TextureProgram;
+	public explodePoolDrawer: ExplodePoolDrawer;
+	public overlay: PrimaryOverlay;
+	public eventContainer: EventContainer;
+	public chatContainer: ChatContainer;
+	public effects: Map<number, ClientEffect>;
+	public timer: number;
+    public world: ClientGameWorld
 
-    constructor(config) {
+    constructor(config: GameSceneConfig) {
         super(config)
 
         this.config = config
@@ -77,8 +88,8 @@ class GameScene extends Scene {
 
         this.camera = new Camera({
             baseScale: 3,
-            viewport: new Box2D.b2Vec2(this.screen.width, this.screen.height),
-            defaultPosition: new Box2D.b2Vec2(0, 0),
+            viewport: new Box2D.Vec2(this.screen.width, this.screen.height),
+            defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
         })
 
@@ -104,7 +115,7 @@ class GameScene extends Scene {
         this.setupUpdateLoop()
 
         this.alive = false
-        this.client = new BrowserClient({ ip: this.screen.config["ip"] })
+        this.client = new BrowserClient({ ip: config["ip"] })
 
         this.mapDrawer = new MapDrawer(this.camera, this.screen.ctx)
         this.particleProgram = new ParticleProgram("particle-drawer-program", this.screen.ctx)
@@ -120,15 +131,15 @@ class GameScene extends Scene {
         this.overlay.show()
     }
 
-    initOverlay() {
+    private initOverlay() {
         this.overlay = new PrimaryOverlay({
             root: this.overlayContainer,
             game: this
         })
 
-        this.overlay.on("play", (nick, tank) => {
+        this.overlay.on("play", (nick: string, tank: typeof AbstractTank) => {
             if(this.world && this.world.player) {
-                if(tank.getModel().getId() === this.world.player.tank.model.constructor.getId()) {
+                if(tank.getModel().getId() === (this.world.player.tank.model.constructor as typeof TankModel).getId()) {
                     return
                 }
             }
@@ -136,7 +147,7 @@ class GameScene extends Scene {
             new PlayerConfigPacket(nick, tank.getModel()).sendTo(this.client.connection)
         })
 
-        this.overlay.roomSelectContainer.on("select", (room) => {
+        this.overlay.roomSelectContainer.on("select", (room: string) => {
             new PlayerRoomRequestPacket(room).sendTo(this.client.connection)
         })
 
@@ -151,12 +162,12 @@ class GameScene extends Scene {
         })
     }
 
-    initEvents() {
+    private initEvents() {
         this.eventContainer = new EventContainer()
         this.overlayContainer.append(this.eventContainer.element)
     }
 
-    setupUpdateLoop() {
+    private setupUpdateLoop() {
         const update = () => {
             this.screen.loop.scheduleTask(update, this.controlsUpdateInterval)
             if(this.world && this.world.player && this.world.player.tank.model.controls.shouldUpdate()) {
@@ -167,18 +178,21 @@ class GameScene extends Scene {
         update()
     }
 
-    newPlayer(player, tank) {
+    private newPlayer(player: Player, tank: TankModel) {
         this.world.createPlayer(player)
 
-        player.setTank(ClientTank.fromModel(tank))
+        let newTank = ClientTank.fromModel(tank)
+
+        player.setTank(newTank)
         player.tank.world = this.world
-        player.tank.setupDrawer(this.screen.ctx)
         player.tank.model.initPhysics(this.world.world)
+
+        newTank.setupDrawer(this.screen.ctx)
 
         return player
     }
 
-    connect() {
+    private connect() {
         this.client.connectToServer()
 
         this.client.on(MapPacket, (packet) => {
@@ -271,13 +285,14 @@ class GameScene extends Scene {
                 let player = this.world.players.get(effect.tankId)
                 if (!player || !player.tank) return
 
-                let tank = /** @type ClientTank */ player.tank
+                let tank: ClientTank = player.tank as ClientTank
 
-                let wrapper = ClientTankEffect.fromModel(effect, tank)
+                let wrapper = ClientTankEffect.fromModelAndTank(effect, tank)
                 tank.effects.set(effect.id, wrapper)
+
                 this.effects.set(effect.id, wrapper)
             } else if(effect instanceof WorldEffectModel) {
-                let wrapper = ClientWorldEffect.fromModel(effect, this.world)
+                let wrapper = ClientWorldEffect.fromModelAndWorld(effect, this.world)
                 this.world.effects.set(effect.id, wrapper)
                 this.effects.set(effect.id, wrapper)
             }
@@ -305,7 +320,7 @@ class GameScene extends Scene {
         this.camera.viewport.y = this.screen.height
     }
 
-    createChat() {
+    private createChat() {
         this.chatContainer = new ChatContainer()
         this.overlayContainer.append(this.chatContainer.element)
 
@@ -315,7 +330,7 @@ class GameScene extends Scene {
             }
         })
 
-        this.chatContainer.on("chat", (text) => new PlayerChatPacket(text).sendTo(this.client.connection))
+        this.chatContainer.on("chat", (text: string) => new PlayerChatPacket(text).sendTo(this.client.connection))
         this.chatContainer.on("input-focus", () => {
             this.keyboard.stopListening()
         })
@@ -329,7 +344,7 @@ class GameScene extends Scene {
         cancelAnimationFrame(this.timer)
     }
 
-    draw(ctx, dt) {
+    draw(ctx: WebGLRenderingContext, dt: number) {
 
         this.gamepad.refresh()
         this.playerControls.refresh()
@@ -347,7 +362,7 @@ class GameScene extends Scene {
         this.drawEntities()
         this.mapDrawer.draw(this.world.map)
         this.drawPlayers(dt)
-        this.drawParticles(dt)
+        this.drawParticles()
 
         // Post-processing
 
@@ -359,7 +374,7 @@ class GameScene extends Scene {
         this.world.tick(dt)
     }
 
-    drawParticles() {
+    private drawParticles() {
         if(this.world.particles.length) {
             this.particleProgram.use()
             this.particleProgram.prepare()
@@ -373,14 +388,14 @@ class GameScene extends Scene {
         }
     }
 
-    drawPlayers(dt) {
+    private drawPlayers(dt: number) {
         let players = this.world.players
         for(let player of players.values()) {
-            player.tank.drawer.draw(this.camera, dt)
+            (player.tank as ClientTank).drawer.draw(this.camera, dt)
         }
     }
 
-    drawEntities() {
+    private drawEntities() {
         let entities = this.world.entities
         if(entities.size > 0) {
             this.entityProgram.use()

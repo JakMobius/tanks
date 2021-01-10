@@ -1,20 +1,20 @@
 import express from 'express';
 import Logger from '../log/logger';
 import session from 'express-session';
-import path from 'path';
+import * as path from 'path';
 import GameModule from './game/game-module';
 import HubModule from './hub/hub-module';
 import BaseModule from './base-module';
+import WebserverModule from "./webserver-module";
+import * as HTTP from "http";
 
 class WebServer {
-	public app: any;
-	public logger: any;
-	public server: any;
-	public session: any;
-    /**
-     * @type {Map<Number, [WebserverModule]>}
-     */
-    modules = new Map()
+	public app: express.Application;
+	public logger: Logger;
+	public server: HTTP.Server;
+	public session: express.RequestHandler;
+
+    modules = new Map<Number, [WebserverModule]>()
 
     hubModule = new HubModule()
     gameModule = new GameModule()
@@ -33,7 +33,7 @@ class WebServer {
         this.baseModule.enabled = true
     }
 
-    addModule(module) {
+    addModule(module: WebserverModule) {
         if(this.modules.has(module.priority)) {
             this.modules.get(module.priority).push(module)
         } else {
@@ -41,40 +41,37 @@ class WebServer {
         }
     }
 
-    *getModules() {
-        let valueListIterator = this.modules.values()
-        let valueList = null
-
-        /** @type {Iterator | null} */
-        let valueIterator = null
+    *getModules(): Generator<WebserverModule, WebserverModule> {
+        let valueListIterator: Iterator<[WebserverModule]> = this.modules.values()
+        let valueList: IteratorResult<[WebserverModule], [WebserverModule]> = null
+        let valueIterator: Iterator<WebserverModule> | null = null
 
         while(true) {
-            /** @type {IteratorYieldResult} */
-            let handle = null
-            if (valueIterator) {
-                handle = valueIterator.next()
-            }
+            let handle: IteratorResult<WebserverModule, WebserverModule>
+            if (valueIterator) handle = valueIterator.next()
 
             while (!handle || handle.done) {
                 valueList = valueListIterator.next()
                 if (valueList.done) {
-                    return
+                    break;
                 }
                 valueIterator = valueList.value.values()
                 handle = valueIterator.next()
             }
 
-            if (handle.value.enabled) {
-                yield handle.value
-            }
+            if(!handle || !handle.value) break;
+
+            if (handle.value.enabled) yield handle.value
         }
+
+        return null
     }
 
     setupApp() {
         this.app.set('view engine', 'hbs')
-        this.app.set('views', path.resolve(__dirname, "../../client/"))
+        this.app.set('views', path.resolve(__dirname, "../html-pages/"))
 
-        this.app.use(function(err, req, res, next) {
+        this.app.use(function(req, res, next) {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             next();
@@ -104,14 +101,26 @@ class WebServer {
 
             iterate()
         })
+
+        let self = this
+        this.app.use(function(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
+            let iterator = self.getModules()
+
+            const iterate = () => {
+                let handle = iterator.next()
+                if(handle.done) {
+                    next()
+                    return
+                }
+
+                handle.value.router(err, req, res, iterate)
+            }
+
+            iterate()
+        })
     }
 
-    /**
-     *
-     * @param server
-     */
-
-    listen(server) {
+    listen(server: HTTP.Server) {
         this.server = server
         server.on("request", this.app)
     }

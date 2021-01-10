@@ -1,11 +1,16 @@
 
-import Buffer from './buffer';
+import Buffer, {ByteArray, ByteArrayConstructor} from './buffer';
 import BinaryPool from './binarypool';
 
+export interface BinaryEncoderConfig {
+    largeIndices?: boolean
+    writeIndexMode?: boolean
+}
+
 class BinaryEncoder extends BinaryPool {
-	public buffers: any;
-	public largeIndices: any;
-	public writeIndexMode: any;
+	public buffers: Map<ByteArrayConstructor<ByteArray>, Buffer<ByteArray>>
+	public largeIndices: boolean;
+	public writeIndexMode: boolean
     static shared = new BinaryEncoder()
 
     compileBuffer = new Buffer({
@@ -13,9 +18,9 @@ class BinaryEncoder extends BinaryPool {
         capacity: 512
     })
 
-    constructor(options?) {
+    constructor(options?: BinaryEncoderConfig) {
+        super()
         options = options || {}
-        super();
         this.buffers = new Map()
         this.largeIndices = !!options.largeIndices
         this.writeIndexMode = !!options.writeIndexMode
@@ -43,56 +48,56 @@ class BinaryEncoder extends BinaryPool {
      * Writes signed byte to buffer
      * @param int8 {number} value to write
      */
-    writeInt8    = int8    => { this.buffers.get(BinaryEncoder.INT8).push(int8) }
+    writeInt8(int8: number) { this.buffers.get(Int8Array).push(int8) }
 
     /**
      * Writes unsigned byte to buffer
      * @param uint8 {number} value to write
      */
-    writeUint8   = uint8   => { this.buffers.get(BinaryEncoder.UINT8).push(uint8) }
+    writeUint8(uint8: number) { this.buffers.get(Uint8Array).push(uint8) }
 
     /**
      * Writes signed 2-byte integer to buffer
      * @param int16 {number} value to write
      */
-    writeInt16   = int16   => { this.buffers.get(BinaryEncoder.INT16).push(int16) }
+    writeInt16(int16: number) { this.buffers.get(Int16Array).push(int16) }
 
     /**
      * Writes unsigned 2-byte integer to buffer
      * @param uint16 {number} value to write
      */
-    writeUint16  = uint16  => { this.buffers.get(BinaryEncoder.UINT16).push(uint16) }
+    writeUint16(uint16: number) { this.buffers.get(Uint16Array).push(uint16) }
 
     /**
      * Writes signed 4-byte integer to buffer
      * @param int32 {number} value to write
      */
-    writeInt32   = int32   => { this.buffers.get(BinaryEncoder.INT32).push(int32) }
+    writeInt32(int32: number) { this.buffers.get(Int32Array).push(int32) }
 
     /**
      * Writes unsigned 4-byte integer to buffer
      * @param uint32 {number} value to write
      */
-    writeUint32  = uint32  => { this.buffers.get(BinaryEncoder.UINT32).push(uint32) }
+    writeUint32(uint32: number) { this.buffers.get(Uint32Array).push(uint32) }
 
     /**
      * Writes medium-precision float to buffer
      * @param float32 {number} value to write
      */
-    writeFloat32 = float32 => { this.buffers.get(BinaryEncoder.FLOAT32).push(float32) }
+    writeFloat32(float32: number) { this.buffers.get(Float32Array).push(float32) }
 
     /**
      * Writes high-precision float to buffer
      * @param float64 {number} value to write
      */
-    writeFloat64 = float64 => { this.buffers.get(BinaryEncoder.FLOAT64).push(float64) }
+    writeFloat64(float64: number) { this.buffers.get(Float64Array).push(float64) }
 
     /**
      * Writes a null-terminated string to buffer
      * @param string {string} value to write
      */
-    writeString  = string  => {
-        let buffer = this.buffers.get(BinaryEncoder.UINT16)
+    writeString(string: string) {
+        let buffer = this.buffers.get(Uint16Array)
 
         for(let i = 0, l = string.length; i < l; i++) {
             let code = string.charCodeAt(i)
@@ -102,14 +107,14 @@ class BinaryEncoder extends BinaryPool {
         buffer.push(0) // Adding string end character '\0'
     }
 
-    writeInt8Array    = int8Array    => this.buffers.get(BinaryEncoder.INT8).appendArray(int8Array)
-    writeUint8Array   = uint8Array   => this.buffers.get(BinaryEncoder.UINT8).appendArray(uint8Array)
-    writeInt16Array   = int16Array   => this.buffers.get(BinaryEncoder.INT16).appendArray(int16Array)
-    writeUint16Array  = uint16Array  => this.buffers.get(BinaryEncoder.UINT16).appendArray(uint16Array)
-    writeInt32Array   = int32Array   => this.buffers.get(BinaryEncoder.INT32).appendArray(int32Array)
-    writeUint32Array  = uint32Array  => this.buffers.get(BinaryEncoder.UINT32).appendArray(uint32Array)
-    writeFloat32Array = float32Array => this.buffers.get(BinaryEncoder.FLOAT32).appendArray(float32Array)
-    writeFloat64Array = float64Array => this.buffers.get(BinaryEncoder.FLOAT64).appendArray(float64Array)
+    writeInt8Array    (int8Array:    Int8Array)    { this.buffers.get(Int8Array)   .appendArray(int8Array) }
+    writeUint8Array   (uint8Array:   Uint8Array)   { this.buffers.get(Uint8Array)  .appendArray(uint8Array) }
+    writeInt16Array   (int16Array:   Int16Array)   { this.buffers.get(Int16Array)  .appendArray(int16Array) }
+    writeUint16Array  (uint16Array:  Uint16Array)  { this.buffers.get(Uint16Array) .appendArray(uint16Array) }
+    writeInt32Array   (int32Array:   Int32Array)   { this.buffers.get(Int32Array)  .appendArray(int32Array) }
+    writeUint32Array  (uint32Array:  Uint32Array)  { this.buffers.get(Uint32Array) .appendArray(uint32Array) }
+    writeFloat32Array (float32Array: Float32Array) { this.buffers.get(Float32Array).appendArray(float32Array) }
+    writeFloat64Array (float64Array: Float64Array) { this.buffers.get(Float64Array).appendArray(float64Array) }
 
     compile() {
         this.compileBuffer.reset()

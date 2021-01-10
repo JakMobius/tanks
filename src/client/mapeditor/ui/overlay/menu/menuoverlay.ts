@@ -1,5 +1,5 @@
 
-import Overlay from '../../../../ui/overlay/overlay';
+import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import MapSelectContainer from './map-list/mapselectcontainer';
 import MapPreviewContainer from './map-preview/mappreviewcontainer';
 import DialogOverlay from '../../overlay/dialog/dialogoverlay';
@@ -9,7 +9,7 @@ class MenuOverlay extends Overlay {
 	public mapSelect: any;
 	public mapPreview: any;
 
-    constructor(options) {
+    constructor(options: OverlayConfig) {
         super(options);
 
         this.mapSelect = new MapSelectContainer()
@@ -18,11 +18,11 @@ class MenuOverlay extends Overlay {
         this.overlay.append(this.mapPreview.element)
         this.overlay.append(this.mapSelect.element)
 
-        this.mapSelect.on("select", (map) => {
+        this.mapSelect.on("select", (map: EditorMap) => {
             this.mapPreview.previewMap(map)
         })
 
-        this.mapPreview.on("rename", (map) => {
+        this.mapPreview.on("rename", (map: EditorMap) => {
             this.mapSelect.updateMapTitle(map)
         })
 
@@ -30,7 +30,7 @@ class MenuOverlay extends Overlay {
             this.mapSelect.saveMaps()
         })
 
-        this.mapPreview.on("open", (map) => {
+        this.mapPreview.on("open", (map: EditorMap) => {
             this.emit("open", map)
         })
 
@@ -38,7 +38,7 @@ class MenuOverlay extends Overlay {
             this.createMap()
         })
 
-        this.mapPreview.on("delete", (map) => {
+        this.mapPreview.on("delete", (map: EditorMap) => {
             this.deleteMap(map)
         })
     }
@@ -97,7 +97,8 @@ class MenuOverlay extends Overlay {
                 let map = new EditorMap({
                     name: name,
                     width: width,
-                    height: height
+                    height: height,
+                    data: EditorMap.emptyMapData(width, height)
                 })
 
                 this.mapSelect.maps.push(map)
@@ -116,15 +117,15 @@ class MenuOverlay extends Overlay {
         creationOverlay.show()
     }
 
-    deleteMap(map) {
+    deleteMap(map: EditorMap) {
         let step = 0
 
         let deletionOverlay = new DialogOverlay({
             root: this.overlay
         })
 
-        let deleteButton = null
-        let denyButton = null
+        let deleteButton: JQuery = null
+        let denyButton: JQuery = null
 
         const next = () => {
             deleteButton && deleteButton.remove()

@@ -1,11 +1,11 @@
-import Command from '../../command';
+import Command, {CommandConfig} from '../../command';
 import RoomCreateCommand from './roomcreate';
 import RoomListCommand from './roomlist';
 import RoomViewCommand from './roomview';
 
 class RoomCommand extends Command {
 
-    constructor(options) {
+    constructor(options: CommandConfig) {
         super(options);
 
         this.addSubcommand(new RoomCreateCommand(options))

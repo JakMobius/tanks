@@ -1,24 +1,22 @@
 /* @load-resource: './chat.scss' */
 
-import View from '@/client/ui/view';
+import View from 'src/client/ui/view';
 
-import HTMLEscape from '@/utils/htmlescape';
-import Color from '@/utils/color';
+import HTMLEscape from 'src/utils/htmlescape';
+import Color from 'src/utils/color';
 
 class ChatContainer extends View {
-	public element: any;
-	public chat: any;
-	public input: any;
-	public emit: any;
+	public chat: JQuery;
+	public input: JQuery;
 
     constructor() {
         super();
         this.element.addClass("chat-container")
         this.chat = $("<div>").addClass("chat")
         this.input = $("<input>").addClass("chat-input").hide()
-        this.input.on("keydown", (evt) => {
+        this.input.on("keydown", (evt: JQuery.Event) => {
             if (evt.key === "Enter") {
-                let value = this.input.val().trim()
+                let value = String(this.input.val()).trim()
                 if(value.length) {
                     this.emit("chat", value)
                 }
@@ -45,7 +43,7 @@ class ChatContainer extends View {
         this.emit("input-blur")
     }
 
-    addMessage(text) {
+    addMessage(text: string) {
         text = this.parseColor(HTMLEscape(text))
 
         this.chat.append($("<div>").html(text))
@@ -53,14 +51,14 @@ class ChatContainer extends View {
         element.scrollTop = element.scrollHeight - element.clientHeight
     }
 
-    parseColor(text) {
+    parseColor(text: string) {
 
         // Some examples:
         // §F00; This text will be colored red
         // §0F0; This text will be colored green,§; but this text will be styled as default
         // §!00F; This text will become bold and blue,§!; and this is a bold text with default color
 
-        return Color.replace(text, function(color, bold, text) {
+        return Color.replace(text, function(color: string, bold: boolean, text: string) {
             if(bold) {
                 if(color)
                     return "<span style='font-weight:bold;color:#" + color + ";'>" + text + "</span>"

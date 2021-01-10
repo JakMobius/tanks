@@ -1,13 +1,16 @@
 import TankModel from '../tankmodel';
 import PhysicsUtils from '../../utils/physicsutils';
-import Box2D from '../../library/box2d';
+import * as Box2D from '../../library/box2d';
 import BasicTankBehaviour from '../physics/trucktankbehaviour';
 import WeaponStungun from '../../weapon/models/stungun';
 
 class TeslaTank extends TankModel {
 
-    constructor(options) {
-        super(options)
+    public static typeName = 6
+    public behaviour: BasicTankBehaviour
+
+    constructor() {
+        super()
 
         new BasicTankBehaviour(this, {
             lineardamping: 0.93,
@@ -17,18 +20,14 @@ class TeslaTank extends TankModel {
     }
 
     static getWeapon() {
-        return 8
+        return WeaponStungun
     }
 
     static getMaximumHealth() {
         return 20
     }
 
-    static getId() {
-        return WeaponStungun
-    }
-
-    initPhysics(world) {
+    initPhysics(world: Box2D.World) {
         this.world = world
         
         let size = 9
@@ -36,7 +35,7 @@ class TeslaTank extends TankModel {
         const segment = size / 4
 
         const bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.8)
-        const trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.b2Vec2(size / 2 + segment, 0))
+        const trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.Vec2(size / 2 + segment, 0))
 
         this.body = PhysicsUtils.dynamicBody(world)
         this.body.CreateFixture(bodyFixture)
@@ -46,7 +45,5 @@ class TeslaTank extends TankModel {
         this.world = world
     }
 }
-
-TankModel.register(TeslaTank)
 
 export default TeslaTank;

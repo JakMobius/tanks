@@ -1,23 +1,20 @@
 import Screen from '../screen';
 
+export interface SceneConfig {
+    screen: Screen
+}
+
 class Scene {
 
-    /**
-     * @type {Screen}
-     */
-    screen = null
+    screen: Screen = null
+    overlayContainer: JQuery = null
 
-    /**
-     * @type {jQuery}
-     */
-    overlayContainer = null
-
-    constructor(config) {
+    constructor(config: SceneConfig) {
         this.overlayContainer = $("<div>")
         this.screen = config.screen
     }
 
-    draw(ctx, dt) {}
+    draw(ctx: WebGLRenderingContext, dt: number) {}
 
     layout() {}
     appear() {}

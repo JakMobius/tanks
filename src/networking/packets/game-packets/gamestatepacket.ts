@@ -1,13 +1,14 @@
 
 
 import BinaryPacket from '../../binarypacket';
+import Player from "../../../utils/player";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 class TankLocationsPacket extends BinaryPacket {
-	public players: any;
+	public players: Map<number, Player>;
 
-    static typeName() {
-        return 4
-    }
+    static typeName = 4
 
     /**
      * Creates a packet that contains information about
@@ -15,13 +16,13 @@ class TankLocationsPacket extends BinaryPacket {
      * @param players {Map<Number, Player>} Tank map to be encoded
      */
 
-    constructor(players) {
+    constructor(players: Map<number, Player>) {
         super();
 
         this.players = players
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeUint16(this.players.size)
 
         for (let [key, player] of this.players) {
@@ -32,9 +33,9 @@ class TankLocationsPacket extends BinaryPacket {
 
     /**
      * Updates tank positions based on packet data.
-     * @param players {Map<Number, Player>} Map containing each player
+     * @param players Map containing each player
      */
-    updateTankLocations(players) {
+    updateTankLocations(players: Map<number, Player>) {
         if (!this.decoder) {
             throw new Error("This packet is not valid anymore: The decoder buffer has been reused.")
         }
@@ -46,13 +47,13 @@ class TankLocationsPacket extends BinaryPacket {
             let key = this.decoder.readUint32()
 
             let player = players.get(key)
-            player.tank.decodeDynamicData(this.decoder, true)
+            player.tank.decodeDynamicData(this.decoder)
         }
 
         this.decoder.restore()
     }
 }
 
-BinaryPacket.register(TankLocationsPacket)
+BinarySerializer.register(TankLocationsPacket)
 
 export default TankLocationsPacket;

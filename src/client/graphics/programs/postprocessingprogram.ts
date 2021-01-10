@@ -6,19 +6,20 @@ import Program from '../program';
 
 import Shader from '../shader';
 import GLBuffer from '../glbuffer';
+import Uniform from "../uniform";
 
 class PostProcessingProgram extends Program {
-	public vertexBuffer: any;
-	public indexBuffer: any;
+	public vertexBuffer: GLBuffer<Float32Array>;
+	public indexBuffer: GLBuffer<Uint8Array>;
 	public vertexPositionAttribute: any;
-	public textureUniform: any;
-	public widthUniform: any;
-	public heightUniform: any;
-	public vertexLength: any;
-	public texturePositionAttribute: any;
-	public textures: any;
+	public textureUniform: Uniform;
+	public widthUniform: Uniform;
+	public heightUniform: Uniform;
+	public vertexLength: number;
+	public texturePositionAttribute: number;
+	public textures: number;
 
-    constructor(name, ctx) {
+    constructor(name: string, ctx: WebGLRenderingContext) {
         let vertexShader = new Shader("post-processing-vertex", Shader.VERTEX).compile(ctx)
         let fragmentShader = new Shader("post-processing-fragment", Shader.FRAGMENT).compile(ctx)
 
@@ -29,6 +30,7 @@ class PostProcessingProgram extends Program {
         this.ctx = ctx
 
         this.vertexBuffer = new GLBuffer({
+            clazz: Float32Array,
             gl: this.ctx,
             drawMode: this.ctx.STATIC_DRAW,
             capacity: 8

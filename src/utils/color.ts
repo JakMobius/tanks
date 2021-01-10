@@ -1,47 +1,43 @@
 class Color {
-	public r: any;
-	public g: any;
-	public b: any;
-	public alpha: any;
-	public string: any;
+	private r: number;
+	private g: number;
+	private b: number;
+	private alpha: number;
+	private string: string | null;
 
-    constructor(red, green, blue, alpha?) {
+    constructor(red: number, green: number, blue: number, alpha: number = 1.0) {
         this.r = red
         this.g = green
         this.b = blue
-        this.alpha = alpha || 1.0
+        this.alpha = alpha
     }
 
-    setRed(r) {
+    setRed(r: number) {
         this.r = r
-        this.string = 0
+        this.string = null
     }
 
-    setGreen(g) {
+    setGreen(g: number) {
         this.g = g
-        this.string = 0
+        this.string = null
     }
 
-    setBlue(b) {
+    setBlue(b: number) {
         this.b = b
-        this.string = 0
+        this.string = null
     }
 
-    setAlpha(a) {
+    setAlpha(a: number) {
         this.alpha = a
-        this.string = 0
+        this.string = null
     }
 
     /**
      * Returns chat color code with specified RGB values
-     * @param r {number}
-     * @param g {number}
-     * @param b {number}
-     * @param bold {boolean}
      */
 
-    static chatColor(r, g, b, bold=false) {
-        let color = ""
+    static chatColor(r: number, g: number, b: number, bold= false): string {
+        let color: string
         if (
             (r & 0xF) === ((r >> 4) & 0xF) &&
             (g & 0xF) === ((g >> 4) & 0xF) &&
@@ -59,23 +55,9 @@ class Color {
         }
     }
 
-    static replace(text, replace) {
+    static replace(text: string, replace: (color: string, bold: boolean, text: string) => string) {
         return text.replace(/(§!?[0-9A-F]{0,6};)?[^§\n]*/gi, function(a) {
-
-            // if(!/^\\*(§!?[0-9A-F]{0,6};/.test(a)) {
-            //     return replace("", false, a)
-            // }
-            //
-            // // Checking if color sequence is screened
-            //
-            // let start = a.indexOf("§")
             let prefix = ""
-            // if(start % 2 === 1) {
-            //     return a.substr(1)
-            // } else if(start) {
-            //     prefix = a.substr(0, start)
-            //     a = a.substr(start)
-            // }
 
             let index = a.indexOf(";")
             let color = a.substr(1, index - 1)
@@ -86,11 +68,11 @@ class Color {
         })
     }
 
-    toChatColor(bold) {
+    toChatColor(bold: boolean) {
         return Color.chatColor(this.r, this.g, this.b, bold)
     }
 
-    code() {
+    code(): string {
 
         if (this.string) return this.string
 
@@ -113,11 +95,11 @@ class Color {
         return this.string
     }
 
-    static saturateChannel(c, saturation) {
+    static saturateChannel(c: number, saturation: number) {
         return Math.round((c - 127) * saturation + 127)
     }
 
-    applyingSaturation(saturation) {
+    applyingSaturation(saturation: number): Color {
         return new Color(
             Color.saturateChannel(this.r, saturation),
             Color.saturateChannel(this.g, saturation),
@@ -126,24 +108,40 @@ class Color {
         )
     }
 
-    withAlpha(alpha) {
+    withAlpha(alpha: number): Color {
         return new Color(this.r, this.g, this.b, alpha)
     }
 
-    static red() {
+    static red(): Color {
         return new Color(255, 0, 0)
     }
 
-    static green() {
+    static green(): Color {
         return new Color(0, 255, 0)
     }
 
-    static blue() {
+    static blue(): Color {
         return new Color(0, 0, 255)
     }
 
-    static gray() {
+    static gray(): Color {
         return new Color(127, 127, 127)
+    }
+
+    getRed() {
+        return this.r
+    }
+
+    getGreen() {
+        return this.g
+    }
+
+    getBlue() {
+        return this.b
+    }
+
+    getAlpha() {
+        return this.alpha
     }
 }
 

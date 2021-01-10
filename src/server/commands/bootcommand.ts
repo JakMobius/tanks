@@ -1,12 +1,22 @@
 
-import Command from './command';
+import Command, {CommandConfig} from './command';
 import CommandFlag from './commandflag';
+
+export interface ConfigOverride {
+    key: string[]
+    value: any
+}
+
+export interface ConfigOverrideList {
+    overrides: ConfigOverride[]
+    errors: string[]
+}
 
 class BootCommand extends Command {
 	public preferencesOverride: any;
 	public parsedFlags: any;
 
-    constructor(options) {
+    constructor(options: CommandConfig) {
         super(options);
 
         this.preferencesOverride = null
@@ -42,7 +52,7 @@ class BootCommand extends Command {
         this.parsedFlags = null
     }
 
-    parsePreferencesFlag(flag) {
+    private static parsePreferencesFlag(flag: string): ConfigOverride | null {
         let parts = flag.split("=")
         if(parts.length !== 2) return null
 
@@ -55,7 +65,7 @@ class BootCommand extends Command {
         }
     }
 
-    parsePreferencesOverrides(parsedFlags) {
+    private static parsePreferencesOverrides(parsedFlags: Map<string, string>) : ConfigOverrideList {
         let stringOverride = parsedFlags.get("preference-string")
         let numberOverride = parsedFlags.get("preference-number")
         let booleanOverride = parsedFlags.get("preference-boolean")
@@ -63,13 +73,13 @@ class BootCommand extends Command {
         let overrides = []
 
         if(stringOverride) for(let override of stringOverride) {
-            let flag = this.parsePreferencesFlag(override)
+            let flag = BootCommand.parsePreferencesFlag(override)
             if (flag)  overrides.push(flag)
             else errors.push(`Invalid preference flag syntax: ${flag}`)
         }
 
         if(numberOverride) for(let override of numberOverride) {
-            let flag = this.parsePreferencesFlag(override)
+            let flag = BootCommand.parsePreferencesFlag(override)
             if (flag) {
                 if (Number.isNaN(parseFloat(flag.value))) errors.push(`Invalid number for preference flag: "${flag.value}"`)
                 else {
@@ -80,21 +90,22 @@ class BootCommand extends Command {
         }
 
         if(booleanOverride) for(let override of booleanOverride) {
-            let flag = this.parsePreferencesFlag(override)
-            if(!flag) return false
-            flag.value = flag.value.toLowerCase()
-            if(flag.value === "true") flag.value = true
-            else if(flag.value === "false") flag.value = false
-            else if(flag.value === "1") flag.value = true
-            else if(flag.value === "0") flag.value = false
-            else if(flag.value === "yes") flag.value = true
-            else if(flag.value === "no") flag.value = false
-            else {
-                errors.push(`"${flag.value}" is not a valid boolean`)
-                continue
-            }
+            let flag = BootCommand.parsePreferencesFlag(override)
+            if(flag) {
+                flag.value = flag.value.toLowerCase()
+                if(flag.value === "true") flag.value = true
+                else if(flag.value === "false") flag.value = false
+                else if(flag.value === "1") flag.value = true
+                else if(flag.value === "0") flag.value = false
+                else if(flag.value === "yes") flag.value = true
+                else if(flag.value === "no") flag.value = false
+                else {
+                    errors.push(`"${flag.value}" is not a valid boolean`)
+                    continue
+                }
 
-            overrides.push(flag)
+                overrides.push(flag)
+            } else errors.push(`Invalid preference flag syntax: ${flag}`)
         }
 
         return {
@@ -103,7 +114,7 @@ class BootCommand extends Command {
         }
     }
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let flags = this.findFlags(args.slice(2))
         if (flags.errors) {
             console.log(flags.errors.join("\n"))
@@ -112,7 +123,7 @@ class BootCommand extends Command {
 
         this.parsedFlags = flags.flags
 
-        let preferencesOverrideResult = this.parsePreferencesOverrides(this.parsedFlags)
+        let preferencesOverrideResult = BootCommand.parsePreferencesOverrides(this.parsedFlags)
 
         if(preferencesOverrideResult.errors.length) {
             for(let error of preferencesOverrideResult.errors) {
@@ -125,7 +136,7 @@ class BootCommand extends Command {
 
     }
 
-    runPostInit() {
+    public runPostInit() {
         let scripts = this.parsedFlags.get("script")
         if(scripts) {
             for(let script of scripts) {

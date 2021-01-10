@@ -1,22 +1,26 @@
 
-import Color from '@/utils/color';
+import Color from 'src/utils/color';
 import ExplodeParticle from '../../particles/explodeparticle';
 import PostProcessingProgram from '../programs/postprocessingprogram';
 import Particle from '../../particles/particle';
+import Screen from "../../screen";
+import Camera from "../../camera";
+import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
+import ClientGameWorld from "../../clientgameworld";
 
 class ExplodePoolDrawer {
 	public screen: any;
 	public camera: any;
 	public program: any;
 
-    constructor(camera, screen) {
+    constructor(camera: Camera, screen: Screen) {
         this.screen = screen
         this.camera = camera
 
         this.program = new PostProcessingProgram("explosion-drawer", this.screen.ctx)
     }
 
-    draw(pool, dt) {
+    draw(pool: ExplodeEffectPool, dt: number) {
         if(dt === 0) return
 
         this.program.use()
@@ -52,6 +56,7 @@ class ExplodePoolDrawer {
                 let dy = 0
 
                 for (let i = 0; i < 3; i++) {
+
                     let decoration = new ExplodeParticle({
                         width: 2 + normalized * 8,
                         height: 2 + normalized * 8,
@@ -63,9 +68,9 @@ class ExplodePoolDrawer {
                         lifetime: 0.6 - normalized / 2 + Math.random() * 0.3,
                         startOpacity: normalized / 2,
                         shifting: 1 - normalized * 2
-                    })
+                    });
 
-                    pool.world.particles.push(decoration)
+                    (pool.world as ClientGameWorld).particles.push(decoration)
                 }
             }
         }

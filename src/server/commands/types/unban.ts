@@ -4,7 +4,7 @@ import Command from '../command';
 class UnbanCommand extends Command {
 	public server: any;
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let logger = this.console.logger
         if(args.length !== 1) {
             logger.log("Использование: " + this.getUsage())
@@ -20,10 +20,6 @@ class UnbanCommand extends Command {
             this.server.banned.splice(index, 1)
             logger.log(" - Разбанен ip " + ip)
         }
-    }
-
-    onTabComplete(args) {
-        super.onTabComplete(args);
     }
 
     getDescription() {

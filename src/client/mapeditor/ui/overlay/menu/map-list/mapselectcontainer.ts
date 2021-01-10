@@ -5,19 +5,20 @@ import Menu from '../../../../../ui/menu/menu';
 import MapStorage from '../../../../mapstorage';
 import DragListener from '../../../element/dragoverlay';
 import Utils from '../../../../../../utils/utils';
+import EditorMap from "../../../../editormap";
 
 class MapSelectContainer extends Menu {
-	public noMapsLabel: any;
-	public mapContainer: any;
-	public mapList: any;
-	public footer: any;
-	public createNewMapButton: any;
-	public maps: any;
-	public dragListener: any;
-	public selectedMap: any;
+	public noMapsLabel: JQuery;
+	public mapContainer: JQuery;
+	public mapList: JQuery;
+	public footer: JQuery;
+	public createNewMapButton: JQuery;
+	public maps: EditorMap[];
+	public dragListener: DragListener;
+	public selectedMap: EditorMap;
 
-    constructor(options?) {
-        super(options);
+    constructor() {
+        super();
 
         this.element.addClass("menu editor-map-list")
 
@@ -80,7 +81,7 @@ class MapSelectContainer extends Menu {
         return true
     }
 
-    updateMapTitle(map) {
+    updateMapTitle(map: EditorMap) {
         let index = this.maps.indexOf(map)
         if(index === -1) return
 
@@ -129,7 +130,7 @@ class MapSelectContainer extends Menu {
         }
     }
 
-    selected(map) {
+    selected(map: EditorMap) {
         if(this.selectedMap !== map) {
             this.emit("select", map)
             this.selectedMap = map

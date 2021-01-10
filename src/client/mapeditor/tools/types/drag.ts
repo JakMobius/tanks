@@ -1,9 +1,10 @@
 
 import Tool from '../tool';
+import ToolManager from "../toolmanager";
 
 class Drag extends Tool {
-    constructor(scene) {
-        super(scene);
+    constructor(manager: ToolManager) {
+        super(manager);
 
         this.image = "../assets/mapeditor/drag.png"
         this.locksDragging = false
@@ -13,7 +14,7 @@ class Drag extends Tool {
         this.setCursor("grab")
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number) {
         super.mouseUp()
         this.setCursor("grabbing")
     }

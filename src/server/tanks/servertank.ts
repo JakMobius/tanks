@@ -3,35 +3,27 @@ import AbstractTank from '../../tanks/abstracttank';
 import TankModel from '../../tanks/tankmodel';
 import Weapon from '../../weapon/weapon';
 import MinerWeapon from '../../weapon/models/miner';
+import BinaryEncoder from 'src/serialization/binary/binaryencoder';
+import ServerTankEffect from "../effects/tank/servertankeffect";
+import DamageReason from "./damagecause/damagereason";
+import ServerGameWorld from "../servergameworld";
 
-for(let tank of require("../../tanks/tankloader")) {
-    TankModel.Types.set(tank.getId(), tank)
+export interface ServerTankConfig {
+    type: typeof TankModel
+    world: ServerGameWorld
 }
 
 class ServerTank extends AbstractTank {
-	public teleported: any;
-	public health: any;
-    /**
-     * @type {Weapon | null}
-     */
-    primaryWeapon = null
+	public teleported: boolean;
+	public health: number;
 
-    /**
-     * @type {Weapon | null}
-     */
-    minerWeapon = null
+    primaryWeapon: Weapon | null = null
 
-    /**
-     * @type {ServerGameWorld}
-     */
-    world = null
+    minerWeapon: Weapon | null = null
 
-    /**
-     * @param {Object} options
-     * @param {Class<TankModel>} options.type
-     * @param {ServerGameWorld} options.world
-     */
-    constructor(options) {
+    world: ServerGameWorld = null
+
+    constructor(options: ServerTankConfig) {
         super(options);
 
         this.model = new (options.type);
@@ -59,7 +51,7 @@ class ServerTank extends AbstractTank {
         this.teleported = false
     }
 
-    tick(dt) {
+    tick(dt: number): void {
         this.primaryWeapon.tick()
         this.minerWeapon.tick()
 
@@ -67,17 +59,17 @@ class ServerTank extends AbstractTank {
         this.model.behaviour.tick(dt)
     }
 
-    addDamageReason(reason) {
+    addDamageReason(reason: DamageReason): void {
         // TODO
     }
 
-    damage(damage, reason) {
+    damage(damage: number, reason: DamageReason): void {
         this.addDamageReason(reason)
         this.model.health = Math.max(0, this.model.health - damage)
     }
 
-    encodeDynamicData(encoder) {
-        encoder.writeUint8(this.teleported)
+    encodeDynamicData(encoder: BinaryEncoder): void {
+        encoder.writeUint8(this.teleported as any as number)
         this.teleported = false
         let position = this.model.body.GetPosition()
         encoder.writeFloat32(position.x)
@@ -94,7 +86,7 @@ class ServerTank extends AbstractTank {
         encoder.writeFloat32(this.health)
     }
 
-    addEffect(effect) {
+    addEffect(effect: ServerTankEffect): void {
         if(this.effects.has(effect.model.id)) {
             return
         }
@@ -104,7 +96,7 @@ class ServerTank extends AbstractTank {
         this.world.addTankEffect(effect, this)
     }
 
-    removeEffect(effect) {
+    removeEffect(effect: ServerTankEffect): void {
         if(this.effects.delete(effect.model.id)) {
             this.world.removeTankEffect(effect, this)
         }

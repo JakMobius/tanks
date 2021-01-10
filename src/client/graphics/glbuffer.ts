@@ -1,7 +1,14 @@
 
-import Buffer from '../../serialization/binary/buffer';
+import Buffer, {BufferConfig, ByteArray} from '../../serialization/binary/buffer';
 
-class GLBuffer extends Buffer {
+export interface GLBufferConfig<T> extends BufferConfig<T> {
+    gl?: WebGLRenderingContext
+    index?: number
+    drawMode?: GLenum
+    bufferType?: GLenum
+}
+
+class GLBuffer<T extends ByteArray> extends Buffer<T> {
 	public gl: any;
 	public index: any;
 	public drawMode: any;
@@ -9,12 +16,12 @@ class GLBuffer extends Buffer {
 	public glBuffer: any;
 	public shouldUpdate: any;
 
-    constructor(config) {
+    constructor(config: GLBufferConfig<T>) {
         super(config);
 
         this.gl = config.gl
         this.index = config.index
-        this.clazz = this.clazz || Float32Array
+        this.clazz = config.clazz
         this.drawMode = config.drawMode || this.gl.STATIC_DRAW
         this.bufferType = config.bufferType || this.gl.ARRAY_BUFFER
         this.glBuffer = null
@@ -27,7 +34,7 @@ class GLBuffer extends Buffer {
         return this
     }
 
-    extend(minimumCapacity?) {
+    extend(minimumCapacity?: number) {
         if(super.extend(minimumCapacity)) {
             this.shouldUpdate = true
             return true

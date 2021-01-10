@@ -34,7 +34,7 @@ let i = 0;
 let images = [];
 const json = {};
 
-readdirdeep("./textures").then((list) => {
+readdirDeep("./textures").then((list) => {
 	for(let file of list) {
 		if(!file.endsWith(".png")) {
 			continue

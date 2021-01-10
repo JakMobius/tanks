@@ -4,77 +4,32 @@ import WebServer from './webserver/webserver';
 import GameSocket from './socket/game-server/game-socket-portal';
 import ClusterSocket from './socket/hub-server/cluster-socket-portal';
 import ServerParticipantClient from './socket/participant-client/server-participant-client';
-import CpuUsageWatcher from '@/utils/cpu-usage-watcher.ts';
+import CpuUsageWatcher from 'src/utils/cpu-usage-watcher';
+import GameSocketPortal from "./socket/game-server/game-socket-portal";
+import ClusterSocketPortal from "./socket/hub-server/cluster-socket-portal";
+import Console from "./console/console";
 
 class Server {
+    portListeners = new Map<Number, UniversalPortListener>()
+    gameSocket: GameSocketPortal | null = null
+    clusterSocket: ClusterSocketPortal | null = null
+    clusterClient: ServerParticipantClient | null = null
+    gamePageActive: boolean = false
+    hubPageActive: boolean = false
+    webServer: WebServer = null
+    clusterPort: number | null = null
+    clientPort: number | null = null
+    clusterServerIP: string | null = null
+    clusterPassword: string | null = null
+    cpuUsageWatcher: CpuUsageWatcher = null
 
-    /**
-     * @type {Map<Number, UniversalPortListener>}
-     */
-    portListeners = new Map()
-
-    /**
-     * @type {GameSocketPortal}
-     */
-    gameSocket = null
-
-    /**
-     * @type {ClusterSocketPortal}
-     */
-    clusterSocket = null
-
-    /**
-     * @type {ServerParticipantClient}
-     */
-    clusterClient = null
-
-    /**
-     * @type {boolean}
-     */
-    gamePageActive = false
-
-    /**
-     * @type {boolean}
-     */
-    hubPageActive = false
-
-    /**
-     * @type {WebServer}
-     */
-    webServer = null
-
-    /**
-     * @type {number | null}
-     */
-    clusterPort = null
-
-    /**
-     * @type {number | null}
-     */
-    clientPort = null
-
-    /**
-     * @type {number | null}
-     */
-    clusterServerIP = null
-
-    /**
-     * @type {string | null}
-     */
-    clusterPassword = null
-
-    /**
-     * @type {CpuUsageWatcher}
-     */
-    cpuUsageWatcher = null
-
-    console = null
+    console: Console = null
 
     constructor() {
         this.cpuUsageWatcher = new CpuUsageWatcher()
     }
 
-    setHubPageActive(active) {
+    setHubPageActive(active: boolean): void {
         this.hubPageActive = active
 
         this.setWebServerActive(this.hubPageActive || this.gamePageActive)
@@ -86,7 +41,7 @@ class Server {
         this.setClusterClientActive(!active)
     }
 
-    setGamePageActive(active) {
+    setGamePageActive(active: boolean): void {
         this.gamePageActive = active
         this.setWebServerActive(this.hubPageActive || this.gamePageActive)
         if(this.webServer) {
@@ -94,7 +49,7 @@ class Server {
         }
     }
 
-    setWebServerActive(active) {
+    setWebServerActive(active: boolean): void {
         if(active === (!!this.webServer)) return;
         if(active) {
             if(this.webServer) return
@@ -113,7 +68,7 @@ class Server {
         }
     }
 
-    setGameSocketActive(active) {
+    setGameSocketActive(active: boolean): void {
         if(active) {
             if (this.gameSocket) return
 
@@ -131,7 +86,7 @@ class Server {
         }
     }
 
-    setClusterClientActive(active) {
+    setClusterClientActive(active: boolean): void {
 
         if(this.clusterServerIP === null) return
 
@@ -152,7 +107,7 @@ class Server {
         }
     }
 
-    setClusterSocketServerActive(active) {
+    setClusterSocketServerActive(active: boolean): void {
         if(this.clusterPort === null) return
 
         if(active) {
@@ -173,23 +128,23 @@ class Server {
         }
     }
 
-    isWebServerActive() {
+    isWebServerActive(): boolean {
         return !!this.webServer
     }
 
-    isGameSocketActive() {
+    isGameSocketActive(): boolean {
         return !!this.gameSocket
     }
 
-    isClusterClientActive() {
+    isClusterClientActive(): boolean {
         return !!this.clusterClient
     }
 
-    isClusterSocketActive() {
+    isClusterSocketActive(): boolean {
         return !!this.clusterSocket
     }
 
-    getPortListener(port) {
+    getPortListener(port: number): UniversalPortListener {
         let cached = this.portListeners.get(port)
         if (cached) return cached
 
@@ -198,23 +153,23 @@ class Server {
         return server
     }
 
-    setClientPort(port) {
+    setClientPort(port: number): void {
         this.clientPort = port
     }
 
-    setClusterPort(port) {
+    setClusterPort(port: number): void {
         this.clusterPort = port
     }
 
-    setSocketServerIP(ip) {
+    setSocketServerIP(ip: string): void {
         this.clusterServerIP = ip
     }
 
-    setClusterPassword(password) {
+    setClusterPassword(password: string): void {
         this.clusterPassword = password
     }
 
-    terminate() {
+    terminate(): void {
         this.console.window.screen.destroy()
         this.setHubPageActive(false)
         this.setGamePageActive(false)

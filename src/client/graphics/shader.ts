@@ -1,20 +1,20 @@
 
-import shaders from './shaderloader';
+const shaders = require('./shaderloader') as { [key: string]: string }
 
 class Shader {
-	public name: any;
-	public type: any;
-	public raw: any;
+	public name: string;
+	public type: GLenum;
+	public raw: WebGLShader;
     static VERTEX = 0
     static FRAGMENT = 1
 
-    constructor(name, type) {
+    constructor(name: string, type: number) {
         this.name = name
         this.type = type
         this.raw = null
     }
 
-    compile(gl) {
+    compile(gl: WebGLRenderingContext) {
         this.raw = gl.createShader(this.type === Shader.VERTEX ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER)
 
         if(!shaders[this.name]) {

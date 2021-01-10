@@ -1,23 +1,23 @@
 /* @load-resource: './style.css' */
 
-import Screen from '../screen';
+import Screen, {ScreenConfig} from '../screen';
 
 import Progress from '../utils/progress';
 import Sprite from '../sprite';
 import MapEditorScene from './scenes/mapeditorscene';
 import LoadingScene from '../scenes/loading/loadingscene';
 import RequestFrameLoop from '../../utils/loop/requestframeloop';
+import 'src/client/graphics/drawers/block/types/*';
 
-require("../../utils/physicsutils.js").setupPhysics()
-import '@/client/graphics/drawers/block/types/';
+import PhysicsUtils from 'src/utils/physicsutils';
 
 class MapEditor extends Screen {
-    constructor(config) {
+    constructor(config: ScreenConfig) {
         super(config)
     }
 
     initLoop() {
-        this.loop = new RequestFrameLoop(this)
+        this.loop = new RequestFrameLoop()
     }
 
     initialize() {
@@ -34,7 +34,7 @@ class MapEditor extends Screen {
         }))
 
         Sprite.download(spriteDownloadProgress, this.ctx).then(() => {
-            Sprite.applyTexture(this.ctx, 0)
+            Sprite.applyTexture(this.ctx)
             this.setScene(new MapEditorScene({
                 screen: this
             }))

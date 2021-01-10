@@ -1,33 +1,31 @@
 
 import BinaryPacket from '../../binarypacket';
-import EffectModel from '@/effects/effectmodel';
+import EffectModel from 'src/effects/effect-model';
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
 
 class EffectCreatePacket extends BinaryPacket {
-	public effect: any;
+	public effect: EffectModel;
 
-    static typeName() {
-        return 14
-    }
+    static typeName = 14
 
-    /**
-     * @param {EffectModel} effect
-     */
-    constructor(effect) {
+    constructor(effect: EffectModel) {
         super()
 
         this.effect = effect
     }
 
-    toBinary(encoder) {
-        EffectModel.serialize(this.effect, encoder)
+    toBinary(encoder: BinaryEncoder) {
+        BinarySerializer.serialize(this.effect, encoder)
     }
 
-    static fromBinary(decoder) {
-        const effect = EffectModel.deserialize(decoder, EffectModel)
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+        const effect = BinarySerializer.deserialize(decoder, EffectModel)
 
         return new this(effect)
     }
 }
 
-BinaryPacket.register(EffectCreatePacket)
+BinarySerializer.register(EffectCreatePacket)
 export default EffectCreatePacket;

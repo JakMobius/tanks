@@ -1,28 +1,33 @@
 
-import Overlay from '@/client/ui/overlay/overlay';
+import Overlay, {OverlayConfig} from 'src/client/ui/overlay/overlay';
 import ControlsContainer from './controls/controlscontainer';
 import PlayMenuContainer from './play-menu/playmenucontainer';
 import TankPreviewContainer from './tank-preview/tankpreviewcontainer';
 import TankSelectContainer from './tank-select/tankselectcontainer';
-import RoomListRequestPacket from '@/networking/packets/game-packets/roomlistrequestpacket';
+import RoomListRequestPacket from 'src/networking/packets/game-packets/roomlistrequestpacket';
 import RoomSelectContainer from './room-select/roomselectcontainer';
+import GameScene from "../../../scenes/gamescene";
+import TankModel from "../../../../../tanks/tankmodel";
+import ClientTank from "../../../../tanks/clienttank";
+
+export interface PrimaryOverlayConfig extends OverlayConfig {
+    game: GameScene
+}
 
 class PrimaryOverlay extends Overlay {
-	public shown: any;
-	public game: any;
-	public menuContainer: any;
-	public steeringContainer: any;
-	public overlay: any;
-	public playMenu: any;
-	public steeringShown: any;
-	public emit: any;
-	public tankSelectMenu: any;
-	public steeringMenu: any;
-	public roomSelectContainer: any;
-	public selectedTank: any;
-	public tankPreviewMenu: any;
+	public shown: boolean;
+	public game: GameScene;
+	public menuContainer: JQuery;
+	public steeringContainer: JQuery;
+	public playMenu: PlayMenuContainer;
+	public steeringShown: boolean;
+	public tankSelectMenu: TankSelectContainer;
+	public steeringMenu: ControlsContainer;
+	public roomSelectContainer: RoomSelectContainer;
+	public selectedTank: typeof ClientTank;
+	public tankPreviewMenu: TankPreviewContainer;
 
-    constructor(options) {
+    constructor(options: PrimaryOverlayConfig) {
         super(options)
         this.shown = false
         this.game = options.game
@@ -40,15 +45,15 @@ class PrimaryOverlay extends Overlay {
         this.createSteeringContainer()
     }
 
-    shouldShowSteering() {
+    shouldShowSteering(): boolean {
         return localStorage.getItem("showHints") !== "0"
     }
 
-    setShouldShowSteering(value) {
+    setShouldShowSteering(value: boolean): void {
         localStorage.setItem("showHints", value ? "1" : "0")
     }
 
-    createPlayMenu() {
+    createPlayMenu(): void {
 
         this.playMenu = new PlayMenuContainer()
 
@@ -68,13 +73,13 @@ class PrimaryOverlay extends Overlay {
         this.menuContainer.append(this.playMenu.element)
     }
 
-    emitPlay() {
+    emitPlay(): void {
         this.emit("play", this.playMenu.nickInput.val(), this.tankSelectMenu.selectedTank)
     }
 
-    createSteeringContainer() {
+    createSteeringContainer(): void {
         this.steeringMenu = new ControlsContainer()
-        this.steeringMenu.on("confirm", (disable) => {
+        this.steeringMenu.on("confirm", (disable: boolean) => {
             this.setShouldShowSteering(!disable)
             this.hide(() => {
                 this.steeringContainer.hide()
@@ -86,36 +91,36 @@ class PrimaryOverlay extends Overlay {
         this.steeringContainer.append(this.steeringMenu.element)
     }
 
-    createServerDropdown() {
+    createServerDropdown(): void {
         this.roomSelectContainer = new RoomSelectContainer()
         this.menuContainer.append(this.roomSelectContainer.element)
     }
 
-    createTankSelectContainer() {
+    createTankSelectContainer(): void {
         this.tankSelectMenu = new TankSelectContainer()
-        this.tankSelectMenu.on("select", (tank) => this.selectTank(tank))
+        this.tankSelectMenu.on("select", (tank: typeof ClientTank) => this.selectTank(tank))
         this.selectTank(this.tankSelectMenu.selectedTank)
         this.menuContainer.append(this.tankSelectMenu.element)
     }
 
-    selectTank(tank) {
+    selectTank(tank: typeof ClientTank): void {
         this.selectedTank = tank
         this.tankPreviewMenu.previewTank(tank)
     }
 
-    createTankPreviewMenu() {
+    createTankPreviewMenu(): void {
         this.tankPreviewMenu = new TankPreviewContainer()
         this.menuContainer.append(this.tankPreviewMenu.element)
     }
 
-    show() {
+    show(): void {
         if(this.shown) return
         super.show()
         new RoomListRequestPacket(true).sendTo(this.game.client.connection)
         this.tankSelectMenu.loop.start()
     }
 
-    hide(callback?) {
+    hide(callback?: () => void): void {
         if(!this.shown) return
         super.hide(callback)
 

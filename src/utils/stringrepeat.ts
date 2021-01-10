@@ -1,5 +1,5 @@
 
-export default (str, num) => {
+export default (str: string, num: number) => {
     if (num < 1) return '';
     let result = '';
     while (num > 0) {

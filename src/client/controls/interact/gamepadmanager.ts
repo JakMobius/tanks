@@ -3,7 +3,7 @@ import DocumentEventHandler from './documenteventhandler';
 import GamepadAxle from '../gamepadaxle';
 import GamepadButton from '../gamepadbutton';
 
-navigator.getGamepads = navigator.getGamepads || navigator["webkitGetGamepads"]
+navigator.getGamepads = navigator.getGamepads || (navigator as any)["webkitGetGamepads"]
 
 class GamepadManager extends DocumentEventHandler {
 	public gamepad: any;
@@ -45,7 +45,7 @@ class GamepadManager extends DocumentEventHandler {
         }
     }
 
-    gamepadConnected(event) {
+    gamepadConnected(event: GamepadEvent) {
         if(this.gamepad !== null) {
             return
         }
@@ -53,17 +53,17 @@ class GamepadManager extends DocumentEventHandler {
         this.axises = new Array(navigator.getGamepads()[this.gamepad].axes.length)
     }
 
-    gamepadDisconnected(event) {
+    gamepadDisconnected(event: GamepadEvent) {
         if(event.gamepad.index === this.gamepad) {
             this.gamepad = null
         }
     }
 
-    getAxle(index) {
+    createAxle(index: number): GamepadAxle {
         return new GamepadAxle(this, index)
     }
 
-    getButton(index) {
+    createButton(index: number): GamepadButton {
         return new GamepadButton(this, index)
     }
 }

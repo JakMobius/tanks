@@ -1,7 +1,7 @@
 
 class ArgumentParser {
 
-    static parseArguments(line, keepQuotes?) {
+    static parseArguments(line: string, keepQuotes = false) {
         let escape = false
         let quoteSymbol = null
         let comment = null

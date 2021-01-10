@@ -1,18 +1,18 @@
 
-import Command from '../command';
-import WorldExplodeEffectModel from '@/effects/world/explode/worldexplodeeffectmodel';
-import ServerWorldEffect from '@/server/effects/world/serverworldeffect';
+import Command, {CommandConfig} from '../command';
+import WorldExplodeEffectModel from 'src/effects/world/explode/world-explode-effect-model';
+import ServerWorldEffect from 'src/server/effects/world/serverworldeffect';
 
 class ExplodeCommand extends Command {
-	public defaultPower: any;
+	public defaultPower: number;
 
-    constructor(options) {
+    constructor(options?: CommandConfig) {
         super(options);
 
         this.defaultPower = 4
     }
 
-    onPerform(args) {
+    onPerform(args: string[]): void {
         let logger = this.console.logger
 
         if(args.length < 2) {
@@ -46,7 +46,7 @@ class ExplodeCommand extends Command {
             power: power
         })
 
-        let serverEffect = ServerWorldEffect.fromModel(effect, world)
+        let serverEffect = ServerWorldEffect.fromModelAndWorld(effect, world)
         world.addEffect(serverEffect)
     }
 

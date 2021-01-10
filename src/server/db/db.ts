@@ -4,17 +4,11 @@ import { MongoClient } from 'mongodb';
 import Preferences from '../preferences/preferences';
 
 class DB {
-	public url: any;
-	public client: any;
-    /**
-     * @type DB
-     */
-    static instance
+	public url: string;
+	public client: MongoClient;
+    static instance: DB
 
-    /**
-     * @type string
-     */
-    db
+    db: string
 
     constructor() {
 
@@ -48,7 +42,7 @@ class DB {
         this.client.db(this.db)
     }
 
-    async disconnect(force) {
+    async disconnect(force: boolean) {
         await this.client.close(force)
     }
 }

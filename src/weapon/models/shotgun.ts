@@ -1,25 +1,37 @@
-import Weapon from '../weapon';
-import Box2D from '../../library/box2d';
+import Weapon, {WeaponConfig} from '../weapon';
+import * as Box2D from '../../library/box2d';
+import ServerTank from "../../server/tanks/servertank";
+
+export interface ShotgunConfig extends WeaponConfig {
+    damage?: number
+    radius?: number
+    angle?: number
+}
 
 class Shotgun extends Weapon {
 	public name: any;
 	public damage: any;
 	public radius: any;
 	public squareRadius: any;
-	public effectID: any;
 	public angle: any;
 
-    constructor(config) {
+    constructor(config: ShotgunConfig) {
+
+        config = Object.assign(config, {
+            damage: 6,
+            radius: 60,
+            shootRate: 800,
+            reloadTime: 4000,
+            maxAmmo: 3,
+            angle: Math.PI / 2
+        })
+
         super(config);
-        this.name = config.name || "Shotgun"
-        this.damage = config.damage || 6
-        this.radius = config.radius || 60
         this.squareRadius = this.radius ** 2
-        this.shootRate = config.shootRate || 800
-        this.reloadTime = config.reloadTime || 4000
-        this.maxAmmo = config.maxAmmo || 3
-        this.effectID = 2
-        this.angle = Math.PI / 2
+        this.shootRate = config.shootRate
+        this.reloadTime = config.reloadTime
+        this.maxAmmo = config.maxAmmo
+        this.angle = config.angle
         this.id = 7
     }
 
@@ -27,7 +39,7 @@ class Shotgun extends Weapon {
         return new Shotgun(this)
     }
 
-    shoot(tank?) {
+    shoot() {
         // TODO
         // const player = tank.player
         // const bx = -tank.model.matrix.sin * 7000;
@@ -55,12 +67,12 @@ class Shotgun extends Weapon {
         //
         //     if (dist > this.squareRadius) continue
         //
-        //     let angle = Math.atan2(x, y) + pAngle;
+        //     let setAngle = Math.atan2(x, y) + pAngle;
         //
-        //     if (angle > Math.PI) angle -= Math.PI * 2
-        //     if (angle < -Math.PI) angle += Math.PI * 2
+        //     if (setAngle > Math.PI) setAngle -= Math.PI * 2
+        //     if (setAngle < -Math.PI) setAngle += Math.PI * 2
         //
-        //     if (Math.abs(angle) >= this.angle / 2) continue
+        //     if (Math.abs(setAngle) >= this.setAngle / 2) continue
         //
         //     const lengthCoef = (Math.sqrt(1 - dist / this.squareRadius
         //     ));

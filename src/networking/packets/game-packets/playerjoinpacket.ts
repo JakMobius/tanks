@@ -2,6 +2,9 @@
 import TankModel from '../../../tanks/tankmodel';
 import BinaryPacket from '../../binarypacket';
 import Player from '../../../utils/player';
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 
 /**
  * This packet is representing a player join interact.
@@ -11,9 +14,9 @@ class PlayerJoinPacket extends BinaryPacket {
 	public player: any;
 	public tank: any;
 
-    static typeName() { return 2 }
+    static typeName = 2
 
-    constructor(player, tank) {
+    constructor(player: Player, tank: TankModel) {
         super();
 
         this.player = player
@@ -21,25 +24,25 @@ class PlayerJoinPacket extends BinaryPacket {
         this.decoder = null
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeUint16(this.player.id)
         encoder.writeString(this.player.nick)
 
-        TankModel.serialize(this.tank, encoder)
+        BinarySerializer.serialize(this.tank, encoder)
     }
 
-    static fromBinary(decoder) {
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
         let player = new Player()
         player.id = decoder.readUint16()
         player.nick = decoder.readString()
 
-        let tank = TankModel.deserialize(decoder, TankModel)
+        let tank = BinarySerializer.deserialize(decoder, TankModel)
 
         return new this(player, tank)
     }
 
 }
 
-BinaryPacket.register(PlayerJoinPacket)
+BinarySerializer.register(PlayerJoinPacket)
 
 export default PlayerJoinPacket;

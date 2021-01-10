@@ -1,13 +1,14 @@
 /* @load-resource: './map-preview.scss' */
 
-import Menu from '../../../../../ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
 
-import MapStorage from '../../../../mapstorage';
-import MapDrawer from '../../../../../graphics/drawers/mapdrawer';
-import Camera from '../../../../../camera';
-import GameMap from '../../../../../../utils/map/gamemap';
-import Box2D from '../../../../../../library/box2d';
-import Sprite from '../../../../../sprite';
+import MapStorage from 'src/client/mapeditor/mapstorage';
+import MapDrawer from 'src/client/graphics/drawers/mapdrawer';
+import Camera from 'src/client/camera';
+import GameMap from 'src/utils/map/gamemap';
+import * as Box2D from 'src/library/box2d';
+import Sprite from 'src/client/sprite';
+import EditorMap from "../../../../editormap";
 
 class MapPreviewContainer extends Menu {
 	public map: any;
@@ -85,7 +86,7 @@ class MapPreviewContainer extends Menu {
             }
         })
 
-        this.header.on("keyup", (event) => {
+        this.header.on("keyup", (event: JQuery.KeyboardEventBase) => {
             if(event.originalEvent.code === "Enter") this.header.blur()
         })
 
@@ -113,12 +114,12 @@ class MapPreviewContainer extends Menu {
         this.ctx.blendFunc(this.ctx.SRC_ALPHA, this.ctx.ONE_MINUS_SRC_ALPHA);
         this.ctx.enable(this.ctx.BLEND);
 
-        Sprite.applyTexture(this.ctx, 0)
+        Sprite.applyTexture(this.ctx)
 
         this.camera = new Camera({
             baseScale: 1,
-            viewport: new Box2D.b2Vec2(this.canvas.clientWidth, this.canvas.clientHeight),
-            defaultPosition: new Box2D.b2Vec2(0, 0)
+            viewport: new Box2D.Vec2(this.canvas.clientWidth, this.canvas.clientHeight),
+            defaultPosition: new Box2D.Vec2(0, 0)
         })
 
         this.mapDrawer = new MapDrawer(this.camera, this.ctx)
@@ -153,7 +154,7 @@ class MapPreviewContainer extends Menu {
         a.remove()
     }
 
-    previewMap(map) {
+    previewMap(map: EditorMap) {
         if (!!map !== !!this.map) {
             if (map) {
                 this.preview.show()

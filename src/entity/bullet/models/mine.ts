@@ -1,12 +1,8 @@
 import BulletModel from '../bulletmodel';
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 class BulletModelMine extends BulletModel {
-
-    static typeName() { return 7 }
-
-    constructor(config) {
-        super(config)
-    }
+    static typeName = 7
 }
 
 // module.exports = new MineType({
@@ -18,6 +14,6 @@ class BulletModelMine extends BulletModel {
 //     id: 7
 // })
 
-BulletModel.register(BulletModelMine)
+BinarySerializer.register(BulletModelMine)
 
 export default BulletModelMine;

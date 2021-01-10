@@ -1,25 +1,32 @@
 
 import WebserverModule from './webserver-module';
-import path from 'path';
-import express from 'express';
+import * as path from 'path';
+import * as express from 'express';
 
 class BaseModule extends WebserverModule {
-    constructor(options?) {
-        super(options);
+    constructor() {
+        super();
 
-        this.resourcesDirectory = path.resolve(__dirname, "../../client/html/")
+        this.resourcesDirectory = path.resolve(__dirname, "../html-pages/")
         this.priority = WebserverModule.PRIORITY_LOWEST
 
         this.router.use("/assets/", express.static(this.resourcePath("assets")))
         this.router.use((req, res, next) => this.onNotFound.apply(this, [req, res, next]))
-        this.router.use((err, req, res, next) => this.onError.apply(this, [err, req, res, next]))
+
+        let self = this
+        this.router.use(function(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
+            self.onError(err, req, res, next)
+        })
     }
 
-    onNotFound(req, res, next?) {
+    onNotFound(req: express.Request, res: express.Response, next: express.NextFunction) {
         res.status(404);
 
         if (req.accepts('html')) {
-            res.render('html/views/404.hbs');
+            res.render('views/404.hbs', undefined, (err, html) => {
+                if(err) next(err)
+                res.send(html)
+            });
         } else if (req.accepts('json')) {
             res.send({ error: 'Not found' });
         } else {
@@ -27,11 +34,13 @@ class BaseModule extends WebserverModule {
         }
     }
 
-    onError(err, res, req?) {
+    onError(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
         res.status(500);
 
+        console.log(err)
+
         if (req.accepts('html')) {
-            res.render('500');
+            res.render('views/500.hbs');
         } else if (req.accepts('json')) {
             res.send({ error: 'Internal server error' });
         } else {

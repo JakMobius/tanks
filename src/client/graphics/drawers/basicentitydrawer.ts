@@ -2,14 +2,17 @@
 import EntityDrawer from './entitydrawer';
 import Sprite from '../../sprite';
 import Matrix3 from '../matrix3';
+import ClientEntity from "../../entity/cliententity";
+import RotationalMatrix from "../../../utils/rotationalmatrix";
+import Program from "../program";
+import TextureProgram from "../programs/textureprogram";
 
 class BasicEntityDrawer extends EntityDrawer {
-	public sprites: any;
-	public spriteNames: any;
-	public matrix: any;
-    static spriteNames = []
+	public matrix: Matrix3;
+    static sprites: Sprite[];
+    static spriteNames: string[] = []
 
-    static getSprite(i) {
+    static getSprite(i: number): Sprite {
         if(!this.sprites) {
             Object.defineProperty(this,"sprites", {
                 enumerable: false,
@@ -22,13 +25,13 @@ class BasicEntityDrawer extends EntityDrawer {
         return this.sprites[i]
     }
 
-    constructor(entity) {
+    constructor(entity: ClientEntity) {
         super(entity);
 
         this.matrix = new Matrix3()
     }
 
-    drawSprite(sprite, width, height, program) {
+    drawSprite(sprite: Sprite, width: number, height: number, program: TextureProgram) {
         const x = this.entity.model.x
         const y = this.entity.model.y
         const w = width / 6

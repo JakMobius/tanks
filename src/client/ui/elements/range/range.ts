@@ -3,14 +3,14 @@
 import View from '../../view';
 
 class RangeView extends View {
-	public thumb: any;
-	public track: any;
-	public thumbContainer: any;
-	public value: any;
-	public dragging: any;
-	public oldX: any;
-	public dragX: any;
-	public trackWidth: any;
+	public thumb: JQuery;
+	public track: JQuery;
+	public thumbContainer: JQuery;
+	public value: number;
+	public dragging: boolean;
+	public oldX: number;
+	public dragX: number;
+	public trackWidth: number;
 
     constructor() {
         super();
@@ -54,7 +54,7 @@ class RangeView extends View {
         })
     }
 
-    setValue(value) {
+    setValue(value: number) {
         this.value = value
         this.thumb.css("left", (value * 100).toFixed(2) + "%")
     }

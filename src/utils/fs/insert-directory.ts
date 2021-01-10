@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import copyDirectory from './copy-directory';
 
-export default async function insertDirectory(from, to) {
+export default async function insertDirectory(from: string, to: string) {
     let list = await fs.readdir(from);
 
     for(let name of list) {

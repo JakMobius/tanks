@@ -1,9 +1,10 @@
 
 import Tool from '../tool';
 import SniperTank from '../../../tanks/models/sniper';
-import Box2D from '../../../../library/box2d';
+import * as Box2D from '../../../../library/box2d';
 import PlayerControls from '../../../controls/playercontrols';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
+import ToolManager from "../toolmanager";
 
 class RunTool extends Tool {
 	public selectingLocation: any;
@@ -16,14 +17,14 @@ class RunTool extends Tool {
 	public runButton: any;
 	public locationButton: any;
 
-    constructor(manager) {
+    constructor(manager: ToolManager) {
         super(manager);
 
         this.image = "../assets/mapeditor/tank.png"
         this.setupMenu()
         this.selectingLocation = false
 
-        this.world = new Box2D.b2World(new Box2D.b2Vec2(0, 0))
+        this.world = new Box2D.World(new Box2D.Vec2(0, 0))
         this.tank = new SniperTank()
         this.tank.setupDrawer(this.manager.screen.ctx)
         this.tank.model.initPhysics(this.world)
@@ -44,12 +45,12 @@ class RunTool extends Tool {
         this.runButton = $("<div>")
             .addClass("tool inline")
             .css("background-image", "url(../assets/mapeditor/start.png)")
-            .click(() => this.toggle())
+            .on("click",() => this.toggle())
 
         this.locationButton = $("<div>")
             .addClass("tool inline")
             .css("background-image", "url(../assets/mapeditor/locate.png)")
-            .click(() => this.selectLocation())
+            .on("click",() => this.selectLocation())
 
         this.settingsView = $("<div>")
             .append(this.locationButton)
@@ -113,7 +114,7 @@ class RunTool extends Tool {
         this.tank.drawer.draw(this.manager.camera, dt)
     }
 
-    mouseMove(x, y) {
+    mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
 

@@ -1,16 +1,29 @@
 import SocketPortalClient from '../socket/socket-portal-client';
 import AIConnection from './ai_connection';
+import Server from "../server";
+import Room from "../room/room";
+
+export interface GameBotConfig {
+	server: Server;
+	lifetime: number;
+	tankid: number;
+	nick: string;
+	time: number;
+	isBot: boolean;
+	alive: boolean;
+}
 
 class GameBot extends SocketPortalClient {
-	public server: any;
-	public lifetime: any;
-	public tankid: any;
-	public nick: any;
-	public time: any;
-	public isBot: any;
-	public alive: any;
+	public server: Server;
+	public lifetime: number;
+	public tankid: number;
+	public nick: string;
+	public time: number;
+	public isBot: boolean;
+	public alive: boolean;
+	public ticksToRespawn: number
 
-	constructor(config?) {
+	constructor(config?: GameBotConfig) {
 		super(config)
 		this.server = null
 		this.lifetime = 1
@@ -22,12 +35,12 @@ class GameBot extends SocketPortalClient {
 		this.isBot = true
 	}
 
-	initAI(json) {
+	initAI(json: any) {
 
 	}
 
-	connectToRoom(room) {
-		this.server.configureClient(this, room)
+	connectToRoom(room: Room) {
+		this.server.gameSocket.configureClient(this, room)
 		this.websocket.tell({
 			"cmd": "cfg",
 			"t": this.tankid,
@@ -43,29 +56,25 @@ class GameBot extends SocketPortalClient {
 
 	tick() {
 
-		if(self.alive && self.data.player.tank.model.health <= 0) {
-			self.alive = false
+		if(this.alive && this.data.player.tank.model.health <= 0) {
+			this.alive = false
 
-			self.ticksToRespawn = 40
+			this.ticksToRespawn = 40
 		}
 
-		if(!self.alive && self.data.player.tank.model.health > 0) {
-			self.alive = true
+		if(!this.alive && this.data.player.tank.model.health > 0) {
+			this.alive = true
 		}
 
-		if(self.ticksToRespawn > 0 || !self.alive) {
-			self.ticksToRespawn--
+		if(this.ticksToRespawn > 0 || !this.alive) {
+			this.ticksToRespawn--
 
-			if(self.ticksToRespawn <= 0) {
+			if(this.ticksToRespawn <= 0) {
 				this.websocket.tell({
 					 cmd: "spn"
 				 })
 			}
-
-
 		}
-
-
 	}
 }
 

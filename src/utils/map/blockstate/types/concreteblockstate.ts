@@ -6,6 +6,4 @@ class ConcreteBlockState extends BlockState {
     static typeId = 2;
 }
 
-BlockState.registerBlockStateClass(ConcreteBlockState)
-
 export default ConcreteBlockState;

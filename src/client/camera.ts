@@ -1,6 +1,16 @@
 
-import Box2D from '../library/box2d';
+import * as Box2D from '../library/box2d';
 import Matrix3 from './graphics/matrix3';
+
+export interface CameraConfig {
+    baseScale?: number
+    target?: Box2D.Vec2
+    inertial?: boolean
+    viewportLimit?: Box2D.Vec2
+    defaultPosition: Box2D.Vec2
+    viewport: Box2D.Vec2
+    limit?: boolean
+}
 
 class Camera {
 	public baseScale: any;
@@ -12,41 +22,32 @@ class Camera {
 	public limit: any;
 	public viewportLimit: any;
 	public scale: any;
-    /**
-     * @type {Matrix3}
-     */
-    matrix = null
+
+    matrix: Matrix3 = null
 
     /**
      * Enable inertial camera movement.
-     * @type {boolean}
      */
     inertial = false
 
     /**
      * Camera position (exclude camera shaking)
-     * @type {b2Vec2}
      */
-    position = null
+    position?: Box2D.Vec2 = null
 
     /**
      * Camera position delta
-     * @type {b2Vec2}
      */
-    shaking = null
+    shaking: Box2D.Vec2 = null
 
     /**
      * Camera shaking velocity
-     * @type {b2Vec2}
      */
-    shakeVelocity = null
+    shakeVelocity: Box2D.Vec2 = null
 
-    /**
-     * @type {b2Vec2}
-     */
-    target = null
+    target: Box2D.Vec2 = null
 
-    constructor(options) {
+    constructor(options: CameraConfig) {
         options = Object.assign({
             baseScale: 1,
             target: null,
@@ -61,17 +62,17 @@ class Camera {
 
         this.position = null
 
-        this.velocity = new Box2D.b2Vec2()
-        this.shaking = new Box2D.b2Vec2()
-        this.shakeVelocity = new Box2D.b2Vec2()
-        this.realTarget = new Box2D.b2Vec2()
+        this.velocity = new Box2D.Vec2()
+        this.shaking = new Box2D.Vec2()
+        this.shakeVelocity = new Box2D.Vec2()
+        this.realTarget = new Box2D.Vec2()
         this.targetVelocity = null
 
         this.limit = options.limit
         this.viewportLimit = null
 
         if(this.limit) {
-            this.viewportLimit = options.viewportLimit || new Box2D.b2Vec2(1440, 900)
+            this.viewportLimit = options.viewportLimit || new Box2D.Vec2(1440, 900)
         }
 
         this.matrix = new Matrix3()
@@ -83,7 +84,7 @@ class Camera {
             this.position.x = this.defaultPosition.x
             this.position.y = this.defaultPosition.y
         } else {
-            this.position = this.defaultPosition.Copy()
+            this.position = this.defaultPosition.Clone()
         }
         this.shaking.x = 0
         this.shaking.y = 0
@@ -92,10 +93,10 @@ class Camera {
     }
 
     getPosition() {
-        return new Box2D.b2Vec2(this.position.x + this.shaking.x, this.position.y + this.shaking.y)
+        return new Box2D.Vec2(this.position.x + this.shaking.x, this.position.y + this.shaking.y)
     }
 
-    targetPosition(position, velocity, target, lookahead, dt) {
+    targetPosition(position: Box2D.Vec2, velocity: Box2D.Vec2, target: Box2D.Vec2, lookahead: number, dt: number) {
         let lookAheadX = position.x + velocity.x * lookahead
         let lookAheadY = position.y + velocity.y * lookahead
 
@@ -113,9 +114,8 @@ class Camera {
 
     /**
      * Moves the camera to follow the target.
-     * @param dt {number} Frame seconds
      */
-    tick(dt) {
+    tick(dt: number) {
 
         this.matrix.reset()
 
@@ -153,7 +153,7 @@ class Camera {
                 this.position.y = target.y
             }
         } else {
-            this.position = target.Copy()
+            this.position = target.Clone()
         }
 
         this.matrix.scale(this.scale, this.scale)

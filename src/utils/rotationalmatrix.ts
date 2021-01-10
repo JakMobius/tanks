@@ -2,36 +2,40 @@
 class RotationalMatrix {
 
     /**
-     * Sine of the rotation angle
-     * @type number
+     * Rotation angle
      */
-    sin = 1;
+    angle: number
+
+    /**
+     * Sine of the rotation angle
+     */
+    sin: number;
 
     /**
      * Cosine of the rotation angle
-     * @type number
      */
-    cos = 0;
+    cos: number;
 
-    constructor(angle?) {
-        angle = angle || 0
+    constructor(angle: number = 0) {
 
         this.sin = Math.sin(angle)
         this.cos = Math.cos(angle)
+        this.angle = angle
     }
 
-    angle(angle) {
+    setAngle(angle: number) {
         if(angle !== this.angle) {
             this.sin = Math.sin(angle)
             this.cos = Math.cos(angle)
+            this.angle = angle
         }
     }
 
-    turnHorizontalAxis(x, y) {
+    turnHorizontalAxis(x: number, y: number) {
         return x * this.cos - y * this.sin
     }
 
-    turnVerticalAxis(x, y) {
+    turnVerticalAxis(x: number, y: number) {
         return x * this.sin + y * this.cos
     }
 }

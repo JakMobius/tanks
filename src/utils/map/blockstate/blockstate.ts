@@ -1,24 +1,27 @@
 
 import BlockStateBinaryOptions from './blockstatebinaryoptions';
+import GameMap from "../gamemap";
+
+interface BlockStateConfig {
+    damage?: number
+    solid?: boolean
+}
 
 class BlockState {
-	public damage: any;
-	public solid: any;
-	public facing: any;
-	public Types: any;
+    public variant: number
+	public damage: number;
+	public solid: boolean;
+	public facing: number;
     static BinaryOptions = BlockStateBinaryOptions.shared
 
-    /**
-     * @type {Map<number, Class<BlockState>>}
-     */
-    static Types = new Map()
+    static Types = new Map<number, typeof BlockState>()
 
     static health = 16000
     static isSolid = true
     static typeName = "unspecified"
     static typeId = 0
 
-    constructor(options?: Object) {
+    constructor(options?: BlockStateConfig) {
         options = options || {}
         this.damage = options.damage || 0
         this.solid = options.solid || (this.constructor as typeof BlockState).isSolid
@@ -29,33 +32,33 @@ class BlockState {
         return new (this.constructor as typeof BlockState)(this)
     }
 
-    update(map, x, y) {
+    update(map: GameMap, x: number, y: number) {
         if(this.facing !== -1) {
             this.updateNeighbourFacing(map, x, y)
         }
     }
 
-    getNeighbourId(map, x, y): number {
+    getNeighbourId(map: GameMap, x: number, y: number): number {
         let block = map.getBlock(x, y);
-        if(block) return block.constructor.typeId
+        if(block) return (block.constructor as typeof BlockState).typeId
         return 0
     }
 
-    updateNeighbourFacing(map, x, y) {
+    updateNeighbourFacing(map: GameMap, x: number, y: number) {
         const id = (this.constructor as typeof BlockState).typeId
 
         this.facing = 0
 
         let sides = 0
 
-        sides |= (this.getNeighbourId(map, x - 1, y - 1) === id) as unknown as number << 7
-        sides |= (this.getNeighbourId(map, x,y - 1) === id) as unknown as number << 6
-        sides |= (this.getNeighbourId(map, x + 1, y - 1) === id) as unknown as number << 5
-        sides |= (this.getNeighbourId(map, x + 1, y) === id) as unknown as number << 4
-        sides |= (this.getNeighbourId(map, x + 1, y + 1) === id) as unknown as number << 3
-        sides |= (this.getNeighbourId(map, x, y + 1) === id) as unknown as number << 2
-        sides |= (this.getNeighbourId(map, x - 1, y + 1) === id) as unknown as number << 1
-        sides |= (this.getNeighbourId(map, x - 1, y) === id) as unknown as number << 0
+        sides |= (this.getNeighbourId(map, x - 1, y - 1) === id) as any as number << 7
+        sides |= (this.getNeighbourId(map, x,y - 1) === id) as any as number << 6
+        sides |= (this.getNeighbourId(map, x + 1, y - 1) === id) as any as number << 5
+        sides |= (this.getNeighbourId(map, x + 1, y) === id) as any as number << 4
+        sides |= (this.getNeighbourId(map, x + 1, y + 1) === id) as any as number << 3
+        sides |= (this.getNeighbourId(map, x, y + 1) === id) as any as number << 2
+        sides |= (this.getNeighbourId(map, x - 1, y + 1) === id) as any as number << 1
+        sides |= (this.getNeighbourId(map, x - 1, y) === id) as any as number << 0
 
         sides |= sides << 8
 
@@ -96,23 +99,18 @@ class BlockState {
     }
 
     getHealth() {
-        return this.constructor.health * (1 - this.damage)
+        return (this.constructor as typeof BlockState).health * (1 - this.damage)
     }
 
-    setHealth(health) {
-        this.damage = 1 - health / this.constructor.health
+    setHealth(health: number) {
+        this.damage = 1 - health / (this.constructor as typeof BlockState).health
     }
 
-    static registerBlockStateClass(clazz) {
+    static registerBlockStateClass(clazz: typeof BlockState) {
         this.Types.set(clazz.typeId, clazz)
     }
 
-    /**
-     * @param id {Number}
-     * @returns {Class<BlockState>}
-     */
-
-    static getBlockStateClass(id) {
+    static getBlockStateClass(id: number): typeof BlockState {
         return this.Types.get(id) || BlockState
     }
 }

@@ -1,14 +1,14 @@
 /* @load-resource: './room-select.scss' */
 
-import Menu from '@/client/ui/menu/menu';
+import Menu from 'src/client/ui/menu/menu';
 
 import Dropdown from '../../../../../ui/elements/dropdown/dropdown';
+import Room from "../../../../../../server/room/room";
+import {ClientRoomInformation} from "../../../../../../networking/packets/game-packets/roomlistpacket";
 
 class RoomSelectContainer extends Menu {
-	public selectedRoom: any;
-	public dropdown: any;
-	public element: any;
-	public emit: any;
+	public selectedRoom: string;
+	public dropdown: Dropdown;
 
     constructor() {
         super();
@@ -26,7 +26,7 @@ class RoomSelectContainer extends Menu {
             this.element.removeClass("expanded")
         })
 
-        this.dropdown.on("select", (option) => {
+        this.dropdown.on("select", (option: JQuery) => {
             let room = option.find(".room-name").text()
 
             if(room === this.selectedRoom) return
@@ -38,31 +38,32 @@ class RoomSelectContainer extends Menu {
         this.dropdown.prototypeCell
             .append($("<span>").addClass("room-name"))
             .append(" (")
-            .append($("<span>").addClass("room-online"))
+            .append($("<span>").addClass("room-playersOnline"))
             .append(" / ")
-            .append($("<span>").addClass("room-max-online"))
+            .append($("<span>").addClass("room-max-playersOnline"))
             .append(")")
     }
 
-    selectRoom(room) {
+    selectRoom(room: string): void {
         this.selectedRoom = room
 
-        this.dropdown.getOptions().each((index, option) => {
-            option = $(option)
+        this.dropdown.getOptions().each((index: number, element: HTMLElement) => {
+            let option = $(element)
             if(option.data("value") === room) {
                 this.dropdown.selectOption(option)
                 return false
             }
+            return void 0
         })
     }
 
-    updateRooms(rooms) {
+    updateRooms(rooms: ClientRoomInformation[]): void {
         this.dropdown.setOptionCount(rooms.length)
 
-        this.dropdown.getOptions().each((index, option) => {
-            option = $(option)
+        this.dropdown.getOptions().each((index: number, element: HTMLElement) => {
+            let option = $(element)
             const room = rooms[index]
-            const disabled = room.online >= room.maxOnline;
+            const disabled = room.currentOnline >= room.maxOnline;
 
             option.data("value", room.name)
 
@@ -70,8 +71,8 @@ class RoomSelectContainer extends Menu {
             else option.removeClass("disabled")
 
             option.find(".room-name").text(room.name)
-            option.find(".room-online").text(room.online)
-            option.find(".room-max-online").text(room.maxOnline)
+            option.find(".room-playersOnline").text(room.currentOnline)
+            option.find(".room-max-playersOnline").text(room.maxOnline)
 
             if(this.selectedRoom === room.name) {
                 this.dropdown.selectOption(option)

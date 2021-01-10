@@ -1,44 +1,40 @@
 import BinaryPacket from './binarypacket';
 import ClientConnection from './client-connection';
+import AbstractConnection from "./abstract-connection";
+import {Class} from "../utils/class";
+import SocketPortalClient from "../server/socket/socket-portal-client";
+import {BinarySerializer, Constructor} from "../serialization/binary/serializable";
 
-class AbstractClient {
-	public config: any;
-	public listeners: any;
-	public queue: any;
-	public connected: any;
-    /**
-     * @type {AbstractConnection}
-     */
-    connection
+abstract class AbstractClient {
+    public listeners = new Map<string | Constructor<any>, Array<Function>>();
+    public queue: BinaryPacket[] = [];
+    public connected: any;
+    public connection: AbstractConnection
 
-    constructor(config) {
-        this.config = config
-        this.listeners = new Map()
+    protected constructor() {
         this.connection = this.createConnection()
-        this.queue = []
     }
 
-    /**
-     * @returns {AbstractConnection}
-     */
-    createConnection() {
+    createConnection(): AbstractConnection {
         return new ClientConnection(this)
     }
 
-    on(what, handler) {
-        if(this.listeners.has(what)) {
+    on<T>(what: Constructor<T>, handler: ((packet: T) => void)): void
+    on(what: string, handler: ((...args: any[]) => void)): void
+    on(what: Constructor<any> | string, handler: Function): void {
+        if (this.listeners.has(what)) {
             this.listeners.get(what).push(handler)
         } else {
             this.listeners.set(what, [handler])
         }
     }
 
-    emit(event) {
+    emit(event: string | Constructor<any>, ...rest: any[]) {
         let listeners = this.listeners.get(event)
         let args = Array.prototype.slice.call(arguments, 1)
 
-        if(listeners) {
-            for(let listener of listeners) {
+        if (listeners) {
+            for (let listener of listeners) {
                 listener.apply(null, args)
             }
         }
@@ -54,7 +50,7 @@ class AbstractClient {
     onOpen() {
         this.connected = true
 
-        for(let packet of this.queue) this.writePacket(packet)
+        for (let packet of this.queue) this.writePacket(packet.getData())
 
         this.queue = []
 
@@ -65,14 +61,11 @@ class AbstractClient {
         this.onOpen()
     }
 
-    /**
-     * @param buffer {ArrayBuffer}
-     */
-    onData(buffer) {
+    onData(buffer: ArrayBuffer) {
         let decoder = BinaryPacket.binaryDecoder
         decoder.reset()
         decoder.readData(buffer)
-        let packet = BinaryPacket.deserialize(decoder, BinaryPacket)
+        let packet = BinarySerializer.deserialize(decoder, BinaryPacket)
         if (packet) {
             this.handlePacket(packet)
         } else {
@@ -81,7 +74,7 @@ class AbstractClient {
         }
     }
 
-    handlePacket(packet) {
+    handlePacket(packet: BinaryPacket) {
         for (let [clazz, listeners] of this.listeners) {
             if (clazz instanceof Function && packet.constructor === clazz) {
                 for (let listener of listeners) {
@@ -92,56 +85,31 @@ class AbstractClient {
     }
 
 
-    onError(error?) {
+    onError(error?: any) {
         this.emit("error", error)
         this.connected = false
     }
 
-    onClose(code, reason?) {
+    onClose(code: number, reason?: string) {
         this.emit("close", code, reason)
         this.connected = false
     }
 
-    /**
-     * @abstract
-     * @returns {boolean}
-     */
-    isOpen() {
+    abstract isOpen(): boolean
 
-    }
+    abstract isConnecting(): boolean
 
-    /**
-     * @abstract
-     * @returns {boolean}
-     */
-    isConnecting() {
-
-    }
-
-    sendPacket(packet) {
-        if(this.isOpen()) {
+    sendPacket(packet: BinaryPacket) {
+        if (this.isOpen()) {
             this.writePacket(packet.getData())
-        } else if(this.isConnecting()) {
+        } else if (this.isConnecting()) {
             this.queue.push(packet)
         }
     }
 
-    /**
-     * @abstract
-     * @protected
-     * @param {ArrayBuffer} data
-     */
-    writePacket(data) {
+    protected abstract writePacket(data: ArrayBuffer): void
 
-    }
-
-    /**
-     * @abstract
-     * Disconnect socket from server
-     */
-    disconnect() {
-
-    }
+    abstract disconnect(): void
 }
 
 export default AbstractClient;

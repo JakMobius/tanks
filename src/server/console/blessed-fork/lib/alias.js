@@ -11,7 +11,7 @@
 var alias = exports;
 
 // These are the boolean capabilities:
-alias.bools = {
+alias["bools"] = {
   //         Variable                                      Cap-                               TCap                                  Description
   //         Booleans                                      name                               Code
   'auto_left_margin':                                      ['bw',                                 'bw'], //                                cub1 wraps from col‐ umn 0 to last column
@@ -54,7 +54,7 @@ alias.bools = {
 };
 
 // These are the numeric capabilities:
-alias.numbers = {
+alias["numbers"] = {
   //         Variable                                      Cap-                               TCap                                  Description
   //          Numeric                                      name                               Code
   'columns':                                               ['cols',                               'co'], //                                number of columns in a line
@@ -100,7 +100,7 @@ alias.numbers = {
 };
 
 // These are the string capabilities:
-alias.strings = {
+alias["strings"] = {
   //         Variable                                    Cap-                             TCap                                   Description
   //          String                                     name                             Code
   'acs_chars':                                           ['acsc',                             'ac'], //                              graphics charset pairs, based on vt100

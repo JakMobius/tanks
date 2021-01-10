@@ -1,19 +1,22 @@
 
-import WorldExplodeEffectModel from '@/effects/world/explode/worldexplodeeffectmodel';
-import ServerWorldEffect from '@/server/effects/world/serverworldeffect';
+import WorldExplodeEffectModel from 'src/effects/world/explode/world-explode-effect-model';
+import ServerWorldEffect from 'src/server/effects/world/serverworldeffect';
 import ServerEntity from '../serverentity';
-import GameMap from '../../../utils/map/gamemap';
+import Player from "../../../utils/player";
+import ServerGameWorld from "../../servergameworld";
+import BulletModel from "../../../entity/bullet/bulletmodel";
 
 class ServerBullet extends ServerEntity {
-	public wallDamage: any;
-	public playerDamage: any;
-	public explodePower: any;
-	public mass: any;
-	public startVelocity: any;
-    /** @type Player */
-    shooter = null
+	public wallDamage: number;
+	public playerDamage: number;
+	public explodePower: number;
+	public mass: number;
+	public startVelocity: number;
+    public shooter: Player = null
 
-    constructor(model) {
+    static Model: typeof BulletModel
+
+    constructor(model: BulletModel) {
         super(model);
 
         this.wallDamage = 0
@@ -23,7 +26,7 @@ class ServerBullet extends ServerEntity {
         this.startVelocity = 20
     }
 
-    tick(dt) {
+    tick(dt: number) {
         let dx = this.model.dx * dt
         let dy = this.model.dy * dt
 
@@ -65,7 +68,7 @@ class ServerBullet extends ServerEntity {
                 y: this.model.y,
                 power: this.explodePower
             })
-            this.shooter.world.addEffect(ServerWorldEffect.fromModel(effect, this.shooter.world))
+            this.shooter.world.addEffect(ServerWorldEffect.fromModelAndWorld(effect, this.shooter.world as ServerGameWorld))
         }
     }
 }

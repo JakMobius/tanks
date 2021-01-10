@@ -1,36 +1,49 @@
-import Box2D from '../../library/box2d';
-import TankBehaviour from './tankbehaviour';
+import * as Box2D from '../../library/box2d';
+import TankBehaviour, {TankBehaviourConfig} from './tankbehaviour';
+import TankModel from "../tankmodel";
+
+export interface TruckTankBehaviourConfig extends TankBehaviourConfig {
+    truckbase?: number
+    truckSlipperness?: number
+    truckSlipperySpeed?: number
+    [others: string]: any;
+}
+
+export interface TruckTankDetails {
+    leftTrackSpeed: number
+    rightTrackSpeed: number
+    leftTrackDist: number
+    rightTrackDist: number
+    clutch: number
+    transmissionSpeed: number
+}
 
 class TruckTankBehaviour extends TankBehaviour {
 	public truckbase: any;
 	public truckSlipperness: any;
 	public truckSlipperySpeed: any;
 
-    constructor(tank, config?) {
+	public details: TruckTankDetails = {
+        leftTrackSpeed: 0,
+        rightTrackSpeed: 0,
+        leftTrackDist: 0,
+        rightTrackDist: 0,
+        clutch: 0,
+        transmissionSpeed: 0
+    }
+
+    private preallocatedVector = new Box2D.Vec2()
+    private preallocatedPoint = new Box2D.Vec2()
+
+    constructor(tank: TankModel, config: TruckTankBehaviourConfig) {
         super(tank, config)
 
         this.truckbase = config.truckbase || 30
         this.truckSlipperness = config.truckSlipperness || 15
         this.truckSlipperySpeed = config.truckSlipperySpeed || 30
-
-        this.details = {
-            leftTrackSpeed: 0,
-            rightTrackSpeed: 0,
-            leftTrackDist: 0,
-            rightTrackDist: 0,
-            clutch: 0,
-            transmissionSpeed: 0
-        }
     }
 
-    clone() {
-        return new TruckTankBehaviour(this)
-    }
-
-    /**
-     * @param dt {number}
-     */
-    tick(dt) {
+    tick(dt: number) {
         super.tick(dt)
         const tank = this.tank
         const body = this.tank.body;
@@ -45,11 +58,18 @@ class TruckTankBehaviour extends TankBehaviour {
         const ls = leftTrackSpeed * this.power;
         const rs = rightTrackSpeed * this.power;
 
-        body.ApplyForce(body.GetWorldVector(new Box2D.b2Vec2(0, ls)), body.GetWorldPoint(new Box2D.b2Vec2(-this.truckbase, 0)))
-        body.ApplyForce(body.GetWorldVector(new Box2D.b2Vec2(0, rs)), body.GetWorldPoint(new Box2D.b2Vec2(this.truckbase, 0)))
+        body.GetWorldVector(new Box2D.Vec2(0, ls), this.preallocatedVector)
+        body.GetWorldPoint(new Box2D.Vec2(-this.truckbase, 0), this.preallocatedPoint)
+
+        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
+
+        body.GetWorldVector(new Box2D.Vec2(0, rs), this.preallocatedVector)
+        body.GetWorldPoint(new Box2D.Vec2(this.truckbase, 0), this.preallocatedPoint)
+
+        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
     }
 
-    countDetails(dt) {
+    countDetails(dt: number) {
         const tank = this.tank
         const body = tank.body;
 

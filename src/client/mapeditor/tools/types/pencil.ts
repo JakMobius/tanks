@@ -3,39 +3,34 @@ import Tool from '../tool';
 import GameMap from '../../../../utils/map/gamemap';
 import RangeView from '../../../ui/elements/range/range';
 import BrushProgram from '../../../graphics/programs/brushprogram';
+import ToolManager from "../toolmanager";
+import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class Pencil extends Tool {
-	public actionName: any;
-	public decorationProgram: any;
-	public brushX: any;
-	public brushY: any;
-	public brushPositionKnown: any;
-	public isSquare: any;
+	public actionName = "Карандаш";
+    public image = "../assets/mapeditor/pencil.png"
+
+	public decorationProgram: BrushProgram;
+	public brushX = 0;
+	public brushY = 0;
+	public brushPositionKnown = false;
+	public isSquare = false;
 	public thicknessRangeInput: any;
 	public thicknessLabel: any;
 	public thicknessContainer: any;
 	public roundModeButton: any;
 	public squareModeButton: any;
-	public thickness: any;
-	public oldX: any;
-	public oldY: any;
+	public thickness: number;
+	public oldX: number;
+	public oldY: number;
 
-    constructor(scene) {
-        super(scene);
-
-        this.image = "../assets/mapeditor/pencil.png"
-        this.actionName = "Карандаш"
+    constructor(manager: ToolManager) {
+        super(manager);
 
         this.decorationProgram = new BrushProgram("brush-program", this.manager.screen.ctx)
         this.decorationProgram.use()
         this.decorationProgram.blockSizeUniform.set1f(GameMap.BLOCK_SIZE)
         this.decorationProgram.colorUniform.set4f(0, 1, 0, 0.5)
-
-        this.brushX = 0
-        this.brushY = 0
-        this.brushPositionKnown = false
-
-        this.isSquare = false
 
         this.setupMenu()
         this.setThickness(1)
@@ -67,7 +62,7 @@ class Pencil extends Tool {
                 this.isSquare = true
             })
 
-        this.thicknessRangeInput.on("value", (value) => {
+        this.thicknessRangeInput.on("value", (value: number) => {
             this.setThickness(Math.round(value * 16) + 1)
         })
 
@@ -80,21 +75,21 @@ class Pencil extends Tool {
             .css("height", "100%")
     }
 
-    setThickness(thickness) {
+    setThickness(thickness: number) {
         this.thickness = thickness
         this.thicknessLabel.text(String(this.thickness))
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
         this.onMouse(x, y, false)
     }
 
-    mouseMove(x, y) {
+    mouseMove(x: number, y: number) {
         this.onMouse(x, y, true)
     }
 
-    onMouse(x, y, continuous) {
+    onMouse(x: number, y: number, continuous: boolean) {
         this.brushPositionKnown = true
 
         let blockX
@@ -119,7 +114,7 @@ class Pencil extends Tool {
         }
     }
 
-    performDrawing(x, y, trace) {
+    performDrawing(x: number, y: number, trace: boolean) {
         x = Math.floor(x / GameMap.BLOCK_SIZE)
         y = Math.floor(y / GameMap.BLOCK_SIZE)
 
@@ -139,7 +134,7 @@ class Pencil extends Tool {
         this.manager.map.history.commitActions(this.actionName)
     }
 
-    draw(x, y) {
+    draw(x: number, y: number) {
         const radius = this.thickness / 2
         const area = Math.ceil(radius)
 
@@ -180,8 +175,9 @@ class Pencil extends Tool {
         this.manager.setNeedsRedraw(true)
     }
 
-    fragment(x, y) {
-        if(this.manager.map.getBlock(x, y).constructor.typeId === this.manager.selectedBlock.constructor.typeId)
+    fragment(x: number, y: number) {
+        if((this.manager.map.getBlock(x, y).constructor as typeof BlockState).typeId ===
+            (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
             return
 
         let block = this.manager.selectedBlock.clone()

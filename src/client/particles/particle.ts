@@ -1,24 +1,39 @@
 
 import Color from '../../utils/color';
 
-class Particle {
-	public x: any;
-	public y: any;
-	public dx: any;
-	public dy: any;
-	public dead: any;
-	public lifetime: any;
-	public lifespan: any;
-	public damping: any;
-	public color: any;
-	public width: any;
-	public height: any;
+export interface ParticleConfig {
+    x: number
+    y: number
+    dx?: number
+    dy?: number
+    lifetime?: number
+    lifespan?: number
+    damping?: number
+    color?: Color
+    width?: number
+    height?: number
+    scaling?: number
+}
 
-    constructor(config) {
+class Particle {
+	public x: number;
+	public y: number;
+	public dx: number;
+	public dy: number;
+	public dead: boolean;
+	public lifetime: number;
+	public lifespan: number;
+	public damping: number;
+	public color: Color;
+	public width: number;
+	public height: number;
+	public scaling: number;
+
+    constructor(config: ParticleConfig) {
         this.x = config.x
         this.y = config.y
-        this.dx = config.dx
-        this.dy = config.dy
+        this.dx = config.dx || 0
+        this.dy = config.dy || 0
         this.dead = false
         this.lifetime = config.lifetime || 0.4
         this.lifespan = config.lifespan || 0
@@ -26,14 +41,18 @@ class Particle {
         this.color = config.color || new Color(0, 0, 0)
         this.width = config.width || 0
         this.height = config.height || 0
+        this.scaling = config.scaling || 0
     }
 
-    tick(dt) {
+    tick(dt: number) {
         this.dx *= this.damping
         this.dy *= this.damping
         this.x += this.dx * dt
         this.y += this.dy * dt
         this.lifespan += dt
+
+        this.width += this.scaling * dt
+        this.height += this.scaling * dt
 
         if(this.lifespan > this.lifetime) {
             this.dead = true

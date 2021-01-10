@@ -8,22 +8,24 @@ import KeyboardController from '../../../controls/interact/keyboardcontroller';
 import MapDrawer from '../../../graphics/drawers/mapdrawer';
 import EditorMap from '../../editormap';
 import MapAreaModification from '../../history/modification/mapareamodification';
+import ToolManager from "../toolmanager";
+import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class AreaTool extends Tool {
 	public area: any;
 	public program: any;
 	public copyBufferDrawer: any;
-	public decoration: any;
-	public copyBuffer: any;
+	public decoration: Particle;
+	public copyBuffer: EditorMap;
 	public keyboard: any;
 	public initialAreaState: any;
 	public movingArea: any;
 	public pasting: any;
 	public hover: any;
-	public oldX: any;
-	public oldY: any;
+	public oldX: number;
+	public oldY: number;
 
-    constructor(manager) {
+    constructor(manager: ToolManager) {
         super(manager);
 
         this.area = new Rectangle()
@@ -32,7 +34,8 @@ class AreaTool extends Tool {
         this.copyBufferDrawer = new MapDrawer(this.manager.camera, this.manager.screen.ctx)
 
         this.decoration = new Particle({
-            color: new Color(127, 127, 127, 0.5)
+            x: 0, y: 0,
+            color: new Color(127, 127, 127, 0.5),
         })
 
         this.copyBuffer = null
@@ -65,7 +68,7 @@ class AreaTool extends Tool {
         this.manager.setNeedsRedraw(true)
     }
 
-    copy(cut) {
+    copy(cut: boolean) {
         if(!this.area.isValid()) return
 
         let bound = this.area.bounding(0, 0, this.manager.map.width, this.manager.map.height)
@@ -141,7 +144,7 @@ class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        let modification = new MapAreaModification(this.manager.map, this.area.clone(), this.copyBuffer.data.map(a => a.clone()))
+        let modification = new MapAreaModification(this.manager.map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
 
         modification.perform()
         this.manager.map.history.registerModification(modification)
@@ -150,7 +153,7 @@ class AreaTool extends Tool {
         this.manager.setNeedsRedraw(true)
     }
 
-    mouseDown(x, y) {
+    mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
         x = Math.floor(x / EditorMap.BLOCK_SIZE)
@@ -192,7 +195,7 @@ class AreaTool extends Tool {
         this.movingArea = false
     }
 
-    mouseMove(x, y) {
+    mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
         x = Math.floor(x / EditorMap.BLOCK_SIZE)

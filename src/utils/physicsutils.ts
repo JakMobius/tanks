@@ -1,62 +1,45 @@
-import Box2D from '../library/box2d';
+import * as Box2D from '../library/box2d';
 
 class PhysicsUtils {
-    static createFixture(options) {
-        if(!options) options = {}
+    static createFixture(shape: Box2D.Shape, fixture?: Partial<Box2D.IFixtureDef>): Box2D.IFixtureDef {
+        if(!fixture) fixture = {}
 
-        const fixture = new Box2D.b2FixtureDef;
-        fixture.friction = options.friction || 0.3
-        fixture.density = options.density || 1
-        fixture.restitution = options.restitution || 0;
-
-        return fixture
-    }
-
-    static squareFixture(width, height, offset?, options?) {
-        if(!offset) {
-            offset = new Box2D.b2Vec2(0, 0)
-        }
-
-        const shape = new Box2D.b2PolygonShape
-        shape.SetAsOrientedBox(width, height, offset, 0)
-
-        const fixture = this.createFixture(options)
+        fixture.friction = fixture.friction || 0.3
+        fixture.density = fixture.density || 1
+        fixture.restitution = fixture.restitution || 0;
         fixture.shape = shape
 
-        return fixture
+        return fixture as Box2D.IFixtureDef
     }
 
-    static horizontalSquareFixtures(width, height, offset, options?) {
+    static dynamicBody(world: Box2D.World, options?: Partial<Box2D.IBodyDef>) {
+        options = options || {}
+        options.type = options.type || Box2D.dynamicBody;
+
+        return world.CreateBody(options);
+    }
+
+    static squareFixture(width: number, height: number, offset?: Box2D.XY, options?: Partial<Box2D.IFixtureDef>): Box2D.IFixtureDef {
+        if(!offset) offset = { x: 0, y: 0 }
+
+        const shape = new Box2D.PolygonShape()
+        shape.SetAsBox(width, height, offset, 0)
+
+        return this.createFixture(shape, options)
+    }
+
+    static horizontalSquareFixtures(width: number, height: number, offset: Box2D.XY, options?: Partial<Box2D.IFixtureDef>) {
         return [
-            this.squareFixture(width, height, new Box2D.b2Vec2(-offset.x, offset.y), options),
-            this.squareFixture(width, height, new Box2D.b2Vec2(offset.x, offset.y), options)
+            this.squareFixture(width, height, new Box2D.Vec2(-offset.x, offset.y), options),
+            this.squareFixture(width, height, new Box2D.Vec2(offset.x, offset.y), options)
         ]
     }
 
-    static dynamicBody(world, options?) {
-        options = options || {}
-        const bodyDef = new Box2D.b2BodyDef;
-        bodyDef.type = Box2D.b2Body.b2_dynamicBody;
+    static vertexFixture(vertexArray: Box2D.XY[], options?: Partial<Box2D.IFixtureDef>) {
+        const shape = new Box2D.PolygonShape();
+        shape.Set(vertexArray)
 
-        let body = world.CreateBody(bodyDef);
-
-        body.SetLinearDamping(options.linearDamping || 1.0)
-        body.SetAngularDamping(options.angularDamping || 8.0)
-
-        return body
-    }
-
-    static vertexFixture(vertexArray, options?) {
-        const shape = new Box2D.b2PolygonShape;
-        shape.SetAsArray(vertexArray)
-        const fixture = this.createFixture(options)
-        fixture.shape = shape
-        return fixture
-    }
-
-    static setupPhysics() {
-        Box2D.b2Settings.b2_maxTranslation = 20
-        Box2D.b2Settings.b2_maxTranslationSquared = 4000
+        return this.createFixture(shape, options)
     }
 }
 

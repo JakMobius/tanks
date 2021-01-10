@@ -5,10 +5,11 @@ import Program from '../program';
 
 import Shader from '../shader';
 import GLBuffer from '../glbuffer';
+import Particle from "../../particles/particle";
 
 class ParticleProgram extends Program {
-	public vertexBuffer: any;
-	public colorBuffer: any;
+	public vertexBuffer: GLBuffer<Float32Array>;
+	public colorBuffer: GLBuffer<Uint32Array>;
 	public indexBuffer: any;
 	public vertexPositionAttribute: any;
 	public colorAttribute: any;
@@ -16,7 +17,7 @@ class ParticleProgram extends Program {
 	public vertexLength: any;
 	public particles: any;
 
-    constructor(name, ctx) {
+    constructor(name: string, ctx: WebGLRenderingContext) {
 
         let vertexShader = new Shader("particle-vertex", Shader.VERTEX).compile(ctx)
         let fragmentShader = new Shader("particle-fragment", Shader.FRAGMENT).compile(ctx)
@@ -26,11 +27,12 @@ class ParticleProgram extends Program {
 
         this.ctx = ctx
         this.vertexBuffer = new GLBuffer({
+            clazz: Float32Array,
             gl: ctx,
             drawMode: this.ctx.STATIC_DRAW
         }).createBuffer()
 
-        this.colorBuffer = new GLBuffer({
+        this.colorBuffer = new GLBuffer<Uint32Array>({
             gl: ctx,
             clazz: Uint32Array,
             drawMode: this.ctx.STATIC_DRAW
@@ -66,19 +68,21 @@ class ParticleProgram extends Program {
         this.ctx.vertexAttribPointer(this.colorAttribute, 4, this.ctx.UNSIGNED_BYTE, true, colorBytes, 0);
     }
 
-    drawParticle(particle) {
+    drawParticle(particle: Particle) {
 
-        if(particle.color.alpha <= 0) {
+        let alpha = particle.color.getAlpha()
+
+        if(alpha <= 0) {
             return
         }
 
         const w = particle.width / 2
         const h = particle.height / 2
 
-        const r = particle.color.r & 0xff
-        const g = particle.color.g & 0xff
-        const b = particle.color.b & 0xff
-        const a = (particle.color.alpha * 255) & 0xff
+        const r = particle.color.getRed() & 0xff
+        const g = particle.color.getGreen() & 0xff
+        const b = particle.color.getRed() & 0xff
+        const a = (alpha * 255) & 0xff
         const data = a << 24 | b << 16 | g << 8 | r
 
         for(let i = 0; i < 4; i++) {

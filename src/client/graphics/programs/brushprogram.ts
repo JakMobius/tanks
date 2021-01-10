@@ -8,7 +8,7 @@ import GLBuffer from '../glbuffer';
 import GameMap from '../../../utils/map/gamemap';
 
 class BrushProgram extends Program {
-	public vertexBuffer: any;
+	public vertexBuffer: GLBuffer<Float32Array>;
 	public indexBuffer: any;
 	public vertexPositionAttribute: any;
 	public matrixUniform: any;
@@ -20,7 +20,7 @@ class BrushProgram extends Program {
 	public vertexLength: any;
 	public particles: any;
 
-    constructor(name, ctx) {
+    constructor(name: string, ctx: WebGLRenderingContext) {
         let vertexShader = new Shader("brush-vertex", Shader.VERTEX).compile(ctx)
         let fragmentShader = new Shader("brush-fragment", Shader.FRAGMENT).compile(ctx)
         super(name, vertexShader, fragmentShader)
@@ -29,6 +29,7 @@ class BrushProgram extends Program {
 
         this.ctx = ctx
         this.vertexBuffer = new GLBuffer({
+            clazz: Float32Array,
             gl: ctx,
             drawMode: this.ctx.STATIC_DRAW
         }).createBuffer()
@@ -60,14 +61,14 @@ class BrushProgram extends Program {
         this.ctx.vertexAttribPointer(this.vertexPositionAttribute, 2, this.ctx.FLOAT, false, stride, 0);
     }
 
-    setBrushDiameter(diameter) {
+    setBrushDiameter(diameter: number) {
         let radius = diameter / 2
         let s = GameMap.BLOCK_SIZE
         this.brushDiameterUniform.set1i(diameter)
         this.brushSquareRadiusUniform.set1f(radius ** 2 * (s ** 2))
     }
 
-    setBrushBounds(x1, y1, x2, y2) {
+    setBrushBounds(x1: number, y1: number, x2: number, y2: number) {
         this.vertexBuffer.array[0] = x1
         this.vertexBuffer.array[1] = y1
         this.vertexBuffer.array[2] = x2

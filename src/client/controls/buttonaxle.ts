@@ -9,7 +9,7 @@ class ButtonAxle extends Axle {
 	public keypressTimestamp: any;
 	public pressed: any;
 
-    constructor(min, max) {
+    constructor(min: number, max: number) {
         super()
         this.min = min === undefined ? 0 : min
         this.max = max === undefined ? 1 : max
@@ -24,7 +24,7 @@ class ButtonAxle extends Axle {
         this.pressed = false
     }
 
-    keyPressed(value?) {
+    keyPressed(value?: number) {
         if (value === undefined) {
             this.target = this.max
         } else {
@@ -41,8 +41,8 @@ class ButtonAxle extends Axle {
         this.setNeedsUpdate()
     }
 
-    smooth(time) {
-        this.animationTime = time || 0.25
+    smooth(time: number = 0.25) {
+        this.animationTime = time
         return this
     }
 

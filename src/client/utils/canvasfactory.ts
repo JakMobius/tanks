@@ -2,12 +2,12 @@
 export default function() {
     const canvas = document.createElement("canvas")
 
-    let ctx
+    let ctx: WebGLRenderingContext
     try {
         ctx = canvas.getContext("webgl")
     } catch(ignored) {}
     try {
-        ctx = canvas.getContext("experimental-webgl")
+        ctx = canvas.getContext("experimental-webgl") as WebGLRenderingContext
     } catch(ignored) {}
 
     if(!ctx) throw new Error("WebGL not supported")

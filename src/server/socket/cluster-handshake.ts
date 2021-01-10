@@ -9,8 +9,8 @@ class ClusterHandshake {
         return crypto.randomBytes(this.handshakeBytes)
     }
 
-    static checkKey(password, salt, key, callback) {
-        this.createKey(password, salt, (error, expectedKey) => {
+    static checkKey(password: string, salt: Uint8Array, key: Uint8Array, callback: (result: boolean) => void) {
+        this.createKey(password, salt, (error: Error | null, expectedKey: Buffer) => {
             if (key) {
                 let expectedKeyBytes = new Uint8Array(expectedKey)
 
@@ -29,7 +29,7 @@ class ClusterHandshake {
         })
     }
 
-    static createKey(password, salt, callback) {
+    static createKey(password: string, salt: Uint8Array, callback: (error: Error | null, expectedKey: Buffer) => void) {
         crypto.scrypt(password, salt, this.handshakeBytes, callback)
     }
 }

@@ -1,6 +1,6 @@
 
 import PlayerJoinPacket from './playerjoinpacket';
-import BinaryPacket from '../../binarypacket';
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 /**
  * This packet represents player spawn interact.
@@ -10,9 +10,9 @@ import BinaryPacket from '../../binarypacket';
  */
 
 class PlayerSpawnPacket extends PlayerJoinPacket {
-    static typeName() { return 3 }
+    static typeName = 3
 }
 
-BinaryPacket.register(PlayerSpawnPacket)
+BinarySerializer.register(PlayerSpawnPacket)
 
 export default PlayerSpawnPacket;

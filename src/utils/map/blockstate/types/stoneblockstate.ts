@@ -7,6 +7,4 @@ class StoneBlockState extends BlockState {
     static typeId = 5;
 }
 
-BlockState.registerBlockStateClass(StoneBlockState)
-
 export default StoneBlockState;

@@ -1,3 +1,4 @@
+import MapModification from "./modification/mapmodification";
 
 class History {
 	public history: any;
@@ -10,7 +11,7 @@ class History {
         this.historyIndex = -1
     }
 
-    commitActions(name) {
+    commitActions(name: string) {
         this.history.push({
             modifications: this.currentModifications,
             actionName: name
@@ -19,19 +20,19 @@ class History {
         this.historyIndex++
     }
 
-    registerModification(modification) {
+    registerModification(modification: MapModification) {
         if(this.historyIndex < this.history.length - 1)
             this.history = this.history.slice(0, this.historyIndex + 1)
 
         this.currentModifications.push(modification)
     }
 
-    revertModifications(modifications) {
+    revertModifications(modifications: MapModification[]) {
         for(let i = modifications.length - 1; i >= 0; i--)
             modifications[i].revert()
     }
 
-    performModifications(modifications) {
+    performModifications(modifications: MapModification[]) {
         for(let modification of modifications) {
             modification.perform()
         }

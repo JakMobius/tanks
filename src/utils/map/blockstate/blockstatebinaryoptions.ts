@@ -1,5 +1,5 @@
 
-import BinaryOptions from '../../binaryoptions';
+import BinaryOptions, {FlagHandler} from '../../binaryoptions';
 
 class BlockStateBinaryOptions extends BinaryOptions {
 
@@ -11,7 +11,7 @@ class BlockStateBinaryOptions extends BinaryOptions {
 
         this.trimFlagIdentifier = true
 
-        this.addFlagHandler(new BinaryOptions.FlagHandler(BlockStateBinaryOptions.DAMAGE_FLAG)
+        this.addFlagHandler(new FlagHandler(BlockStateBinaryOptions.DAMAGE_FLAG)
             .setUnpacker((decoder, object) => {
                 object.damage = decoder.readUint16() / 0xFFFF
             })

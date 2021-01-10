@@ -1,11 +1,11 @@
 /* @load-resource: '../style.css' */
 
-import Scene from '../../scenes/scene';
+import Scene, {SceneConfig} from '../../scenes/scene';
 
 import MapDrawer from '../../graphics/drawers/mapdrawer';
 import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
-import Box2D from '../../../library/box2d';
+import * as Box2D from '../../../library/box2d';
 import GameMap from '../../../utils/map/gamemap';
 import KeyboardController from '../../controls/interact/keyboardcontroller';
 import DragHandler from '../../controls/interact/draghandler';
@@ -13,26 +13,26 @@ import ToolbarView from '../ui/overlay/workspace/toolbar/toolbar';
 import ToolManager from '../tools/toolmanager';
 import EventContainer from '../../ui/overlay/events/eventcontainer';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
+import EditorMap from "../editormap";
+import Tools from "../tools/type-loader"
 
 class MapEditorScene extends Scene {
-	public time: any;
-	public progress: any;
-	public keyboard: any;
-	public map: any;
-	public dragHandler: any;
-	public camera: any;
-	public mapDrawer: any;
-	public menuOverlay: any;
-	public toolManager: any;
-	public eventContainer: any;
-	public toolSettingsView: any;
-	public toolbar: any;
 
-    constructor(config) {
+	public keyboard = new KeyboardController();
+	public map: EditorMap;
+	public dragHandler: DragHandler;
+	public camera: Camera;
+	public mapDrawer: MapDrawer;
+	public menuOverlay: MenuOverlay;
+	public toolManager: ToolManager;
+	public eventContainer: EventContainer;
+	public toolSettingsView: ToolSettingsView;
+	public toolbar: ToolbarView;
+
+    constructor(config: SceneConfig) {
         super(config)
-        this.time = 0
-        this.progress = config.progress
-        this.keyboard = new KeyboardController()
+
+
         this.keyboard.startListening()
         this.map = null
 
@@ -42,11 +42,11 @@ class MapEditorScene extends Scene {
 
         this.camera = new Camera({
             baseScale: 1,
-            viewport: new Box2D.b2Vec2(0, 0),
-            defaultPosition: new Box2D.b2Vec2(0, 0),
-            limit: false
+            viewport: new Box2D.Vec2(0, 0),
+            defaultPosition: new Box2D.Vec2(0, 0),
+            limit: false,
+            inertial: false
         })
-        this.camera.intertial = false
 
         this.setupWorkspace()
 
@@ -63,7 +63,7 @@ class MapEditorScene extends Scene {
 
             if(this.map) {
                 if(!this.camera.target) {
-                    this.camera.target = new Box2D.b2Vec2(0, 0)
+                    this.camera.target = new Box2D.Vec2(0, 0)
                 }
                 this.camera.target.x = this.map.width * GameMap.BLOCK_SIZE / 2
                 this.camera.target.y = this.map.height * GameMap.BLOCK_SIZE / 2
@@ -130,7 +130,7 @@ class MapEditorScene extends Scene {
         this.layout()
     }
 
-    setNeedsRedraw(force) {
+    setNeedsRedraw(force: boolean) {
         if(force) this.mapDrawer.reset()
         this.screen.loop.start()
     }
@@ -157,8 +157,7 @@ class MapEditorScene extends Scene {
 
         this.toolbar.loadSavedBlock()
 
-        require("../tools/types/")
-            .map(Tool => new Tool(this.toolManager))
+        Tools.map(Tool => new Tool(this.toolManager))
             .forEach((tool) => this.toolbar.addTool(tool))
 
         this.overlayContainer.append(this.toolSettingsView.element)
@@ -173,7 +172,7 @@ class MapEditorScene extends Scene {
         this.camera.viewport.y = this.screen.height
     }
 
-    draw(ctx, dt) {
+    draw(ctx: WebGLRenderingContext, dt: number) {
         if(!this.map) return
 
         this.camera.tick(dt)

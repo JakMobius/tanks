@@ -1,8 +1,9 @@
 
-import Command from '../command';
+import Command, {CommandConfig} from '../command';
 import CommandFlag from '../commandflag';
 import Chalk from 'chalk';
-import filesize from '@/utils/fs/filesize';
+import filesize from 'src/utils/fs/filesize';
+import Server from "../../server";
 
 class StatusCommand extends Command {
 	public groupDepth: any;
@@ -13,7 +14,7 @@ class StatusCommand extends Command {
     static connectingText = "§!FF0;connecting"
     static connectedText = "§!0F0;connected"
 
-    constructor(options) {
+    constructor(options: CommandConfig) {
         super(options);
 
         this.addFlag(new CommandFlag({
@@ -54,15 +55,15 @@ class StatusCommand extends Command {
         this.groupDepth = 0
     }
 
-    activeText(isActive) {
+    activeText(isActive: boolean) {
         return isActive ? StatusCommand.activeText : StatusCommand.inactiveText
     }
 
-    connectingText(isConnected) {
+    connectingText(isConnected: boolean) {
         return isConnected ? StatusCommand.connectedText : StatusCommand.connectingText
     }
 
-    printStatus(name, status?) {
+    printStatus(name: string, status?: string) {
 
         let prefix = " - "
 
@@ -77,15 +78,15 @@ class StatusCommand extends Command {
         }
     }
 
-    printStatusIsActive(name, isActive) {
+    printStatusIsActive(name: string, isActive: boolean) {
         this.printStatus(name, this.activeText(isActive))
     }
 
-    formatCPUUsage(server, seconds) {
+    formatCPUUsage(server: Server, seconds: number) {
         let cpuMicroseconds = server.cpuUsageWatcher.getCpuUsage(seconds)
         if(cpuMicroseconds < 0) return "§777;unknown"
-        let percentage = (cpuMicroseconds / 1000000 / seconds).toFixed(3)
-        let string = percentage + "%"
+        let percentage = (cpuMicroseconds / 1000000 / seconds)
+        let string = percentage.toFixed(3) + "%"
         if(percentage < 50) string = "§0F0;" + string
         else if(percentage < 70) string = "§FF0;" + string
         else if(percentage < 90) string = "§F70;" + string
@@ -101,7 +102,7 @@ class StatusCommand extends Command {
         this.groupDepth--
     }
 
-    onPerform(args) {
+    onPerform(args: string[]) {
         let flags = this.findFlags(args)
 
         this.logFlagErrors(flags, this.console.logger)
@@ -109,7 +110,7 @@ class StatusCommand extends Command {
         this.printServerStatus(flags.flags)
     }
 
-    printServerStatus(flags) {
+    printServerStatus(flags: Map<string, boolean | string[]>) {
         let logger = this.console.logger
         logger.log("Server status:")
 
@@ -122,7 +123,7 @@ class StatusCommand extends Command {
         if(noFlags || flags.get("cluster"))   this.printClusterLinkStatus(!noFlags)
     }
 
-    printMemoryUtilizationStatus(detailed) {
+    printMemoryUtilizationStatus(detailed: boolean) {
 
         let memoryUsage = process.memoryUsage()
 
@@ -139,7 +140,7 @@ class StatusCommand extends Command {
             this.printStatus("memory usage", "§0FF;" + filesize(process.memoryUsage().rss))
         }
     }
-    printCPUUtilizationStatus(detailed) {
+    printCPUUtilizationStatus(detailed: boolean) {
         let server = this.console.server
 
         if(detailed) {
@@ -156,7 +157,7 @@ class StatusCommand extends Command {
         }
     }
 
-    printWebserverStatus() {
+    printWebserverStatus(detailed: boolean) {
         let server = this.console.server
         let isWebServerActive = server.isWebServerActive()
 
@@ -170,7 +171,7 @@ class StatusCommand extends Command {
         }
     }
 
-    printGameSocketStatus() {
+    printGameSocketStatus(detailed: boolean) {
         let server = this.console.server
         let isGameSocketActive = server.isGameSocketActive()
 
@@ -186,7 +187,7 @@ class StatusCommand extends Command {
 
     }
 
-    printClusterLinkStatus() {
+    printClusterLinkStatus(detailed: boolean) {
         let server = this.console.server
         let isClusterClientActive = server.isClusterClientActive()
         let isClusterSocketActive = server.isClusterSocketActive()

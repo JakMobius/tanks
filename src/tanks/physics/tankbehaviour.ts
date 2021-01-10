@@ -1,37 +1,50 @@
 
 import TankModel from '../tankmodel';
 
+export interface TankBehaviourConfig {
+    power?: number
+    lateralFriction?: number
+    frontalfriction?: number
+    angularFriction?: number
+}
+
+export interface TankBehaviourDetails {
+    transmissionSpeed: number
+    clutch: number
+}
+
 /**
  * Class which defines the physical behaviour of each specific type of tank (tracked, wheeled, etc.)
  */
 class TankBehaviour {
-	public power: any;
-	public lateralFriction: any;
-	public frontalfriction: any;
-	public angularFriction: any;
-	public tank: any;
+	public power: number;
+	public lateralFriction: number;
+	public frontalfriction: number;
+	public angularFriction: number;
+	public tank: TankModel;
     /**
      * Physical model details. Used mostly for
      * rendering on client side.
-     * @type Object
      */
-    details = {};
+    details: TankBehaviourDetails = {
+        transmissionSpeed: 0,
+        clutch: 0
+    };
 
-    constructor(tank, config) {
+    constructor(tank: TankModel, config: TankBehaviourConfig) {
 
         this.power = config.power || 10000
         this.lateralFriction = config.lateralFriction || 150
         this.frontalfriction = config.frontalfriction || 20
         this.angularFriction = config.angularFriction || 0.8
 
-        /** @type TankModel */
         this.tank = tank
     }
 
-    tick(dt) {
+    tick(dt: number): void {
         const tank = this.tank
         const body = tank.body
-        const velocity = body.GetLinearVelocity();
+        const velocity = body.m_linearVelocity;
 
         const vx = velocity.x;
         const vy = velocity.y;
@@ -73,7 +86,7 @@ class TankBehaviour {
         body.SetLinearVelocity(velocity)
     }
 
-    countDetails(dt) {}
+    countDetails(dt: number) {}
 }
 
 export default TankBehaviour;

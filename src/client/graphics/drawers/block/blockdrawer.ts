@@ -1,14 +1,12 @@
 
 import Sprite from '../../../sprite';
-import GameMap from '@/utils/map/gamemap';
+import GameMap from 'src/utils/map/gamemap';
+import BlockState from "../../../../utils/map/blockstate/blockstate";
+import TextureProgram from "../../programs/textureprogram";
 
 class BlockDrawer {
-	public id: any;
+	public id: number;
 	public crackSprites: any;
-
-    constructor() {
-        this.id = 0
-    }
 
     loadSprites() {
         this.crackSprites = [
@@ -20,15 +18,9 @@ class BlockDrawer {
         ]
     }
 
-    /**
-     *
-     * @param {TextureProgram} program
-     * @param x
-     * @param y
-     * @param {BlockState} block
-     */
-    draw(program, x, y, block) {
-        if (!block.constructor.typeId) return
+
+    draw(program: TextureProgram, x: number, y: number, block: BlockState) {
+        if (!(block.constructor as typeof BlockState).typeId) return
         let crack = Math.floor(block.damage * 6)
         if(crack) {
             program.drawSprite(this.crackSprites[crack - 1], x, y, GameMap.BLOCK_SIZE, GameMap.BLOCK_SIZE)

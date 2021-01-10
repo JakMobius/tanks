@@ -1,27 +1,24 @@
 
 import ClientWorldEffect from '../clientworldeffect';
-import WorldExplodeEffectModel from '@/effects/world/explode/worldexplodeeffectmodel';
+import WorldExplodeEffectModel from 'src/effects/world/explode/world-explode-effect-model';
+import ClientGameWorld from "../../../clientgameworld";
 
 class ClientWorldExplodeEffect extends ClientWorldEffect {
 	public die: any;
+	public model: WorldExplodeEffectModel
 
-    constructor(model, world) {
+	static Model = WorldExplodeEffectModel
+
+    constructor(model: WorldExplodeEffectModel, world: ClientGameWorld) {
         super(model, world);
         this.model = model
     }
 
-    /**
-     * @type {WorldExplodeEffectModel}
-     */
-    model
-
-    tick(dt) {
+    tick(dt: number) {
         this.world.explosionEffectPool.start(this.model.x, this.model.y, this.model.power)
 
         this.die()
     }
 }
-
-ClientWorldEffect.associate(WorldExplodeEffectModel, ClientWorldExplodeEffect)
 
 export default ClientWorldExplodeEffect;

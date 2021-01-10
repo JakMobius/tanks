@@ -1,5 +1,6 @@
 
 import MapBinaryOptions from '../../utils/map/mapbinaryoptions';
+import {FlagHandler} from "../../utils/binaryoptions";
 
 class EditorMapBinaryOptions extends MapBinaryOptions {
 
@@ -10,7 +11,7 @@ class EditorMapBinaryOptions extends MapBinaryOptions {
     constructor() {
         super();
 
-        this.addFlagHandler(new MapBinaryOptions.FlagHandler(this.NAME_FLAG)
+        this.addFlagHandler(new FlagHandler(this.NAME_FLAG)
             .setPacker((encoder, options) => {
                 encoder.writeString(options.name || "")
             })

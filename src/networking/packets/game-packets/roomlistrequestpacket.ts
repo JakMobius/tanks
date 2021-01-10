@@ -1,29 +1,30 @@
 
 import BinaryPacket from '../../binarypacket';
+import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 
 class RoomListRequestPacket extends BinaryPacket {
-	public request: any;
+	public request: boolean;
 
-    static typeName() { return 5 }
+    static typeName = 5
 
     /**
      * @param {boolean} request Indicates if room list update should be enabled.
      */
-    constructor(request) {
+    constructor(request: boolean) {
         super();
         this.request = request
     }
 
-    toBinary(encoder) {
-        /** @type {number} */
-        const byte = this.request ? 1 : 0
-        encoder.writeUint8(byte)
+    toBinary(encoder: BinaryEncoder) {
+        encoder.writeUint8(this.request as any as number)
     }
 
-    static fromBinary(decoder) {
-        return new RoomListRequestPacket(decoder.readUint8())
+    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+        return new RoomListRequestPacket(decoder.readUint8() as any as boolean) as any as T
     }
 }
 
-BinaryPacket.register(RoomListRequestPacket)
+BinarySerializer.register(RoomListRequestPacket)
 export default RoomListRequestPacket;

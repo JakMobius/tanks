@@ -1,4 +1,5 @@
 import Effect from './effect';
+import Player from "../../utils/player";
 
 class EffectRepair {
 	public type: any;
@@ -13,7 +14,7 @@ class EffectRepair {
 		}
 	}
 
-	start(player) {
+	start(player: Player) {
 		this.player = player
 		this.player.tank.model.health = this.player.tank.constructor.getMaximumHealth()
 		this.player.tank.alive = true

@@ -1,42 +1,52 @@
-import Box2D from '../library/box2d';
+import * as Box2D from '../library/box2d';
 import Bullet42mmModel from '../entity/bullet/models/42mm';
 import ServerBullet from '../server/entity/bullet/serverbullet';
+import Axle from "../tanks/controls/axle";
+import ServerTank from "../server/tanks/servertank";
+import BulletModel from "../entity/bullet/bulletmodel";
+
+export interface WeaponConfig {
+    maxAmmo?: number
+    shootRate?: number
+    reloadTime?: number
+    bulletType?: typeof BulletModel
+    tank?: ServerTank
+    triggerAxle?: Axle
+}
 
 class Weapon {
-	public config: any;
-	public maxAmmo: any;
-	public shootRate: any;
-	public reloadTime: any;
-	public bulletType: any;
-	public ammo: any;
-	public isReloading: any;
-	public shootingTime: any;
-	public id: any;
+	public config: WeaponConfig;
+	public maxAmmo: number;
+	public shootRate: number;
+	public reloadTime: number;
+	public bulletType: typeof BulletModel;
+	public ammo: number;
+	public isReloading: boolean;
+	public shootingTime: number;
+	public id: number
+
     /**
      * Indicates whether weapon is currently shooting
-     * @type {boolean}
      */
-    engaged = false
+    engaged: boolean = false
 
     /**
      * Trigger axle. Weapon will shoot if its value is above 0.5
-     * @type {Axle}
      */
-    triggerAxle = null
+    triggerAxle: Axle | null = null
 
     /**
      * Tanks that equipped with this weapon
-     * @type {ServerTank}
      */
-    tank = null
+    tank: ServerTank = null
 
-    constructor(config) {
+    constructor(config: WeaponConfig) {
         config = config || {}
         this.config = config
-        this.maxAmmo = config.maxAmmo || Infinity
-        this.shootRate = config.shootRate || 2000
-        this.reloadTime = config.reloadTime || 4000
-        this.bulletType = config.bulletType || Bullet42mmModel
+        this.maxAmmo = config.maxAmmo ?? Infinity
+        this.shootRate = config.shootRate ?? 2000
+        this.reloadTime = config.reloadTime ?? 4000
+        this.bulletType = config.bulletType ?? Bullet42mmModel
         this.tank = config.tank
         this.triggerAxle = config.triggerAxle
         this.ammo = this.maxAmmo
@@ -45,13 +55,13 @@ class Weapon {
         this.engaged = false
     }
 
-    reload() {
+    reload(): void {
         if (this.isReloading) return
         this.isReloading = true
         this.shootingTime = Date.now()
     }
 
-    launchBullet(tank, x, y, rotation?) {
+    launchBullet(tank: ServerTank, x: number, y: number, rotation?: number): void {
         let sin, cos
 
         if(rotation === undefined) {
@@ -63,7 +73,7 @@ class Weapon {
             cos = Math.cos(rotation)
         }
 
-        const bullet = new (this.bulletType)();
+        const bullet = new (this.bulletType)(tank.world);
         const entity = ServerBullet.fromModel(bullet)
 
         entity.shooter = tank.player
@@ -76,12 +86,12 @@ class Weapon {
 
         tank.world.createEntity(entity)
 
-        tank.model.body.ApplyImpulse(
-            new Box2D.b2Vec2(
+        tank.model.body.ApplyLinearImpulse(
+            new Box2D.Vec2(
                 -bullet.dx * entity.mass,
                 -bullet.dy * entity.mass
             ),
-            new Box2D.b2Vec2(
+            new Box2D.Vec2(
                 x, y
             )
         )

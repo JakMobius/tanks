@@ -1,14 +1,16 @@
 
 import BinaryPacket from '../../binarypacket';
 import EntityModel from '../../../entity/entitymodel';
-import BinarySerializable from '../../../serialization/binary/serializable';
+import BinarySerializable, {BinarySerializer} from '../../../serialization/binary/serializable';
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import AbstractEntity from "../../../entity/abstractentity";
 
 class EntityCreatePacket extends BinaryPacket {
 	public entities: any;
 
-    static typeName() { return 11 }
+    static typeName = 11
 
-    constructor(entities) {
+    constructor(entities: undefined | AbstractEntity | Array<AbstractEntity>) {
         super();
 
         if(entities === undefined) {
@@ -18,24 +20,24 @@ class EntityCreatePacket extends BinaryPacket {
         } else this.entities = entities
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeUint16(this.entities.length)
 
         for(let entity of this.entities) {
-            BinarySerializable.serialize(entity.model, encoder)
+            BinarySerializer.serialize(entity.model, encoder)
         }
     }
 
-    createEntities(callback) {
+    createEntities(callback: (model: EntityModel) => void) {
         let decoder = this.decoder
         let count = decoder.readUint16()
 
         for(let i = 0; i < count; i++) {
-            let model = BinarySerializable.deserialize(decoder, EntityModel)
+            let model = BinarySerializer.deserialize(decoder, EntityModel)
             if(model) callback(model)
         }
     }
 }
 
-BinaryPacket.register(EntityCreatePacket)
+BinarySerializer.register(EntityCreatePacket)
 export default EntityCreatePacket;

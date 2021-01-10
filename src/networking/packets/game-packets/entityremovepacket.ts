@@ -1,26 +1,29 @@
 
 import BinaryPacket from '../../binarypacket';
+import AbstractEntity from "../../../entity/abstractentity";
+import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 class EntityRemovePacket extends BinaryPacket {
-	public entityId: any;
+	public entityId: number;
 
-    static typeName() { return 12 }
+    static typeName = 12
 
-    constructor(entity) {
+    constructor(entity: AbstractEntity) {
         super();
 
         this.entityId = entity ? entity.model.id : 0
     }
 
-    toBinary(encoder) {
+    toBinary(encoder: BinaryEncoder) {
         encoder.writeUint32(this.entityId)
     }
 
-    updateEntities(map) {
+    updateEntities(map: Map<number, AbstractEntity>) {
         this.entityId = this.decoder.readUint32()
         map.delete(this.entityId)
     }
 }
 
-BinaryPacket.register(EntityRemovePacket)
+BinarySerializer.register(EntityRemovePacket)
 export default EntityRemovePacket;

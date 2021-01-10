@@ -1,40 +1,31 @@
 
-import express from 'express';
-import path from 'path';
+import * as express from 'express';
+import * as path from 'path';
 
-/**
- * @abstract
- */
 class WebserverModule {
-	public priority: any;
-	public router: any;
+	public priority: number;
+	public router = express.Router();
     // The lower priority, the later the handler is called.
     static PRIORITY_LOWEST = 0
     static PRIORITY_NORMAL = 1
     static PRIORITY_MONITOR = 2
     static PRIORITY_HIGHEST = 3
 
-    /**
-     * @type string
-     */
-    resourcesDirectory = null
+    resourcesDirectory: string = null
 
     enabled = false
 
-    constructor(config) {
+    constructor() {
         this.priority = WebserverModule.PRIORITY_NORMAL
-        this.router = express.Router()
     }
 
-    staticAccess(path) {
+    staticAccess(path: string) {
         this.router.use(path, this.router.static(this.resourcePath(path)))
     }
 
-    resourcePath(resourcePath) {
+    resourcePath(resourcePath: string) {
         return path.resolve(this.resourcesDirectory, resourcePath)
     }
-
-    request
 }
 
 export default WebserverModule;

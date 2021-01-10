@@ -1,12 +1,13 @@
 import Logger from '../log/logger';
-import fs from 'fs';
+import * as fs from 'fs';
 import ConsoleWindow from './consolewindow';
-import path from 'path';
+import * as path from 'path';
 import ArgumentParser from './argument-parser';
 
 // @ts-ignore
 import CommandList from "../commands/types/*"
 import Command from "../commands/command";
+import Server from "../server";
 
 class Console {
 	public observingRoom: any;
@@ -17,16 +18,8 @@ class Console {
 	public window: ConsoleWindow;
 	public currentLogger: Logger;
 	commands = new Map<string, Command>();
-
-	/**
-	 * @type {Server}
-	 */
-	server = null
-
-	/**
-	 * @type {Logger}
-	 */
-	logger = null
+	server: Server = null
+	logger: Logger = null
 
 	constructor() {
 		this.server = null
@@ -42,13 +35,13 @@ class Console {
 		this.loadCommands()
 	}
 
-	createWindow() {
+	createWindow(): void {
 		this.window = new ConsoleWindow()
 
 		// Shift-tab feature doesn't work
 		// in WebStorm internal console.
 
-		this.window.on("tab", (shift) => {
+		this.window.on("tab", (shift: boolean) => {
 			if (this.tabCompletions) {
 				if(shift) {
 					this.tabCompletePrevious()
@@ -65,14 +58,14 @@ class Console {
 		this.window.on("exit", () => {
 			this.commands.get("exit").onPerform([])
 		})
-		this.window.on("command", (command) => {
+		this.window.on("command", (command: string) => {
 			this.evaluate(command)
 		})
 
 		this.logger.addDestination(this.window.destination)
 	}
 
-	tabCompleteBegin(line, shift) {
+	tabCompleteBegin(line: string, shift: boolean): void {
 		let args = ArgumentParser.parseArguments(line)
 
 		if(args.length <= 1) {
@@ -125,13 +118,13 @@ class Console {
 		this.tabCompletions = null
 	}
 
-	tabCompletePrevious() {
+	tabCompletePrevious(): void {
 		this.tabCompleteIndex--
 		if(this.tabCompleteIndex < 0) this.tabCompleteIndex = this.tabCompletions.length - 1;
 		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
 	}
 
-	tabCompleteNext() {
+	tabCompleteNext(): void {
 		this.tabCompleteIndex++
 		if(this.tabCompleteIndex >= this.tabCompletions.length) {
 			this.tabCompleteIndex = 0
@@ -139,12 +132,12 @@ class Console {
 		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
 	}
 
-	tabComplete() {
+	tabComplete(): void {
 		this.tabCompletions = null
 		this.tabCompleteIndex = null
 	}
 
-	evaluate(line) {
+	evaluate(line: string): void {
 
 		line = line.trim()
 
@@ -165,7 +158,7 @@ class Console {
         }
 	}
 
-	callHandle(handle, args) {
+	callHandle(handle: Command, args: string[]) {
 		if (handle.requiresRoom() && !this.observingRoom) {
 			this.logger.log("§F00;You should be in a room for executing this command")
 		} else {
@@ -173,7 +166,7 @@ class Console {
 		}
 	}
 
-	switchToLogger(logger) {
+	switchToLogger(logger: Logger) {
 		if(this.currentLogger) {
 			this.currentLogger.removeDestination(this.logger)
 		}
@@ -181,7 +174,7 @@ class Console {
 		this.currentLogger = logger
 	}
 
-	runScript(name, index) {
+	runScript(name: string, index: number = 0) {
 		const file = path.resolve(__dirname, "..", "scripts", name + ".script")
 
 		if(!fs.existsSync(file)) {
@@ -191,7 +184,7 @@ class Console {
 		this.logger.log("§FF0;Running script '" + name + "'")
 
 		const commands = fs.readFileSync(file, 'utf8').split("\n")
-		for(let i = index || 0; i < commands.length; i++) {
+		for(let i = index; i < commands.length; i++) {
 			const command = commands[i]
 			this.evaluate(command)
 		}

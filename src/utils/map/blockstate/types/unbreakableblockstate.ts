@@ -6,6 +6,4 @@ class TrophephngoldBlockState extends BlockState {
     static typeId = 4;
 }
 
-BlockState.registerBlockStateClass(TrophephngoldBlockState)
-
 export default TrophephngoldBlockState;

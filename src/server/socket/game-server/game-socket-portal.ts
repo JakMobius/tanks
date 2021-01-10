@@ -5,18 +5,22 @@ import RoomListPacket from '../../../networking/packets/game-packets/roomlistpac
 import PlayerRoomRequestPacket from '../../../networking/packets/game-packets/playerroomrequestpacket';
 import PlayerRoomChangePacket from '../../../networking/packets/game-packets/playerroomchangepacket';
 import pako from 'pako';
+import Room from "../../room/room";
+import * as Websocket from "websocket";
+import BinaryPacket from "../../../networking/binarypacket";
+import * as fs from "fs"
+import RoomConfig from "../../room/room-config";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import GameMap from "../../../utils/map/gamemap";
+import Game from "../../room/game";
 
 class GameSocketPortal extends SocketPortal {
 	public roomsInterval: any;
 	public server: any;
-    /**
-     * @type {Map<string, Room>}
-     */
-    games = new Map()
+    public games = new Map<string, Room>()
 
-    constructor(config?) {
-        super(config)
-        this.config = config || {}
+    constructor() {
+        super()
         this.setupRoomsUpdate()
     }
 
@@ -28,7 +32,7 @@ class GameSocketPortal extends SocketPortal {
         clearInterval(this.roomsInterval)
     }
 
-    handleRequest(request) {
+    handleRequest(request: Websocket.request) {
 
         // Only handling /game-socket requests
 
@@ -46,7 +50,7 @@ class GameSocketPortal extends SocketPortal {
 
         for(let client of this.clients.values()) {
             if(client.data["listeningForRooms"]) {
-                packet.sendTo(client)
+                packet.sendTo(client.connection)
             }
         }
     }
@@ -57,12 +61,7 @@ class GameSocketPortal extends SocketPortal {
         super.terminate()
     }
 
-    /**
-     * @param client {SocketPortalClient}
-     * @param game {Room}
-     */
-
-    configureClient(client, game) {
+    configureClient(client: SocketPortalClient, game: Room) {
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
             client.game.clientDisconnected(client)
@@ -74,7 +73,7 @@ class GameSocketPortal extends SocketPortal {
         client.game = game
     }
 
-    clientDisconnected(client) {
+    clientDisconnected(client: SocketPortalClient) {
         super.clientDisconnected(client);
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
@@ -82,7 +81,7 @@ class GameSocketPortal extends SocketPortal {
         }
     }
 
-    handlePacket(packet, client) {
+    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
         super.handlePacket(packet, client)
 
         if(packet instanceof RoomListRequestPacket) {
@@ -127,36 +126,31 @@ class GameSocketPortal extends SocketPortal {
         return game
     }
 
-    clientConnected(client) {
+    clientConnected(client: SocketPortalClient) {
         let connection = client.connection
 
-        if(this.banned.indexOf(connection.remoteAddress) !== -1) {
-            connection.close(1000, "Администратор внёс Ваш ip в бан-лист")
-            return
-        }
+        // if(this.banned.indexOf(connection.remoteAddress) !== -1) {
+        //     connection.close("Администратор внёс Ваш ip в бан-лист")
+        //     return
+        // }
 
         if(this.games.size === 0) {
-            connection.close(1000, "Нет запущенных игр, попробуйте позже")
+            connection.close("Нет запущенных игр, попробуйте позже")
             return
         }
 
         let game = this.getFreeGame();
 
         if(!game) {
-            connection.close(1000, "Сервер переполнен, попробуйте позже")
+            connection.close("Сервер переполнен, попробуйте позже")
             return
         }
 
         this.configureClient(client, game)
     }
 
-    /**
-     * @async
-     * Creates a room with specified config
-     * @param config {RoomConfig}
-     */
-    async createRoom(config) {
-        const gzip = await fs.promise.readFile(config.map)
+    async createRoom(config: RoomConfig) {
+        const gzip = await fs.promises.readFile(config.map)
         const data = pako.inflate(gzip)
         const decoder = new BinaryDecoder({ largeIndices: true })
         decoder.reset()

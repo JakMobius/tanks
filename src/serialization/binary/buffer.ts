@@ -1,31 +1,49 @@
+import {Constructor} from "./serializable";
 
-class Buffer {
+export type ByteArray =
+    | Uint8Array
+    | Uint8ClampedArray
+    | Uint16Array
+    | Uint32Array
+    | Int8Array
+    | Int16Array
+    | Int32Array
+    | Float32Array
+    | Float64Array;
+
+export interface ByteArrayConstructor<T> extends Constructor<T> {
+    BYTES_PER_ELEMENT: number
+}
+
+export interface BufferConfig<T> {
+    capacity?: number
+    clazz: ByteArrayConstructor<T>
+}
+
+class Buffer<T extends ByteArray = Uint8Array> {
 	public initialCapacity: any;
-	public array: any;
-	public stack: any;
+	public array: T;
+	public stack: number[];
     /**
      * Buffer base capacity.
      * If the `initialCapacity` equals to
      * 128, then buffer actual capacity
      * is multiply of 128.
-     * @type {Number|Null}
      */
-    capacity = null
+    capacity: number | null = null
 
     /**
      * Buffer internal class type.
-     * @type {Class<TypedArray>}
      */
-    clazz = null
+    clazz: ByteArrayConstructor<T> = null
 
     /**
      * Current entry pointer. Increased
      * when reading or writing data.
-     * @type {number}
      */
-    pointer = 0
+    pointer: number = 0
 
-    constructor(options) {
+    constructor(options: BufferConfig<T>) {
         this.initialCapacity = options.capacity || 128
         this.capacity = 0
         this.clazz = options.clazz
@@ -56,7 +74,7 @@ class Buffer {
      * @returns {boolean} `true`, if buffer has been reallocated, `false` otherwise
      */
 
-    extend(minimumCapacity?) {
+    extend(minimumCapacity?: number) {
         if (minimumCapacity === undefined) {
             this.capacity += this.initialCapacity
         } else {
@@ -84,10 +102,9 @@ class Buffer {
 
     /**
      * Converts this dynamic buffer into static `ArrayBuffer`
-     * @returns {ArrayBuffer}
      */
 
-    toArrayBuffer() {
+    toArrayBuffer(): ArrayBuffer {
         return this.array.buffer.slice(0, this.pointer * this.clazz.BYTES_PER_ELEMENT)
     }
 
@@ -98,7 +115,7 @@ class Buffer {
      * @param value {Number}
      */
 
-    push(value) {
+    push(value: number) {
         if(this.pointer >= this.capacity) {
             this.extend()
         }
@@ -107,10 +124,10 @@ class Buffer {
 
     /**
      * Appends `Array` to the end of this buffer.
-     * @param array {Array|TypedArray} Array to append.
+     * @param array Array to append.
      */
 
-    appendArray(array) {
+    appendArray(array: number[] | T) {
         let newSize = this.pointer + array.length
         if(newSize >= this.capacity) {
             this.extend(newSize)
@@ -126,7 +143,7 @@ class Buffer {
      * @param buffer {Buffer} Buffer to append.
      */
 
-    appendBuffer(buffer) {
+    appendBuffer(buffer: Buffer<ByteArray>) {
         if(buffer.pointer === 0) {
             return
         }
@@ -149,11 +166,11 @@ class Buffer {
     /**
      * Reads `TypedArray` to internal buffer. Then it's
      * possible to use `next(n)` method.
-     * @param array {TypedArray} An array to read data. Should be the same type as the buffer.
-     * @param pointer {Number} How many bytes to skip before start reading.
-     * @param size {Number} Number of overlay to read
+     * @param array An array to read data. Should be the same type as the buffer.
+     * @param pointer How many bytes to skip before start reading.
+     * @param size Number of overlay to read
      */
-    read(array, pointer, size) {
+    read(array: ArrayBuffer, pointer: number, size: number) {
         this.extend(size)
         let buffer = new (this.clazz)(array, pointer, size)
         this.array.set(buffer)
@@ -163,24 +180,26 @@ class Buffer {
         this.pointer = 0
     }
 
-    next(n) {
+    next(): number
+    next(n: number): T
+    next(n?: number): number | T {
         if(n === undefined || n <= 1) {
             return this.array[this.pointer++]
         } else if(typeof n == "number") {
-            let temp = this.array.slice(this.pointer, this.pointer + n)
+            let temp = this.array.slice(this.pointer, this.pointer + n) as T
             this.pointer += n
             return temp
         }
+        return undefined
     }
 
     /**
      * Makes a new buffer with the same options.
      * Does not copy buffer content.
-     * @returns {Buffer}
      */
 
-    clone() {
-        return new Buffer({
+    clone(): Buffer<T> {
+        return new Buffer<T>({
             capacity: this.initialCapacity,
             clazz: this.clazz
         })

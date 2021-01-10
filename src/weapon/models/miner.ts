@@ -1,8 +1,8 @@
-import Weapon from '../weapon';
+import Weapon, {WeaponConfig} from '../weapon';
 import Mine from '../../entity/bullet/models/mine';
 
 class WeaponMiner extends Weapon {
-    constructor(config) {
+    constructor(config: WeaponConfig) {
         config = Object.assign({
             maxAmmo: 1,
             shootRate: 1000,

@@ -1,12 +1,12 @@
 
-import WorldExplodeEffectModelPool from '@/effects/world/explode/worldexplodeeffectmodelpool';
-import GameMap from '@/utils/map/gamemap';
+import WorldExplodeEffectModelPool, {WorldExplodeEffectModelConfig} from 'src/effects/world/explode/world-explode-effect-model';
+import GameMap from 'src/utils/map/gamemap';
 
 class ServerWorldExplodeEffectModelPool extends WorldExplodeEffectModelPool {
 	public blockDamageCoefficient: any;
 	public world: any;
 
-    constructor(config) {
+    constructor(config: WorldExplodeEffectModelConfig) {
         super(config);
         // Ну это сколько-то.
         // Домножь на damageEnergyFraction, чтобы прикинуть
@@ -14,7 +14,7 @@ class ServerWorldExplodeEffectModelPool extends WorldExplodeEffectModelPool {
         this.blockDamageCoefficient = 20000
     }
 
-    damageBlock(x, y, damage) {
+    damageBlock(x: number, y: number, damage: number) {
         this.world.map.damageBlock(x / GameMap.BLOCK_SIZE, y / GameMap.BLOCK_SIZE, damage * this.blockDamageCoefficient)
     }
 }

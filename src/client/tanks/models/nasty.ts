@@ -1,31 +1,36 @@
 
 
-import ClientTank from '../clienttank';
-import TankDrawer from '@/client/graphics/drawers/tankdrawer';
-import NastyTankModel from '@/tanks/models/nasty';
-import Engine from '@/client/engine';
-import FX from '@/client/sound/fx';
-import Sprite from '@/client/sprite';
-import LightMaskTextureProgram from '@/client/graphics/programs/lightmasktextureprogram';
-import TextureProgram from '@/client/graphics/programs/textureprogram';
-import Matrix3 from '@/client/graphics/matrix3';
+import ClientTank, {TankConfig} from '../clienttank';
+import TankDrawer from 'src/client/graphics/drawers/tankdrawer';
+import NastyTankModel from 'src/tanks/models/nasty';
+import Engine from 'src/client/engine';
+import FX from 'src/client/sound/fx';
+import Sprite from 'src/client/sprite';
+import LightMaskTextureProgram from 'src/client/graphics/programs/lightmasktextureprogram';
+import TextureProgram from 'src/client/graphics/programs/textureprogram';
+import Matrix3 from 'src/client/graphics/matrix3';
+import Camera from "../../camera";
+import TankModel from "../../../tanks/tankmodel";
+import {TankStat} from "../tank-stat";
+import BigBoiTankModel from "../../../tanks/models/bigboi";
 
 class Drawer extends TankDrawer {
-	public size: any;
-	public bodyBrightSprite: any;
-	public bodyDarkSprite: any;
-	public bodyLightMask: any;
-	public ruderSprite: any;
-	public bodyProgram: any;
-	public textureProgram: any;
-	public propellerSprites: any;
-	public spriteMatrix: any;
-	public ruderAngle: any;
-	public tank: any;
-	public drawSmoke: any;
+	public size: number = 9;
+	public bodyBrightSprite: Sprite;
+	public bodyDarkSprite: Sprite;
+	public bodyLightMask: Sprite;
+	public ruderSprite: Sprite;
+	public bodyProgram: LightMaskTextureProgram;
+	public textureProgram: TextureProgram;
+	public propellerSprites: Sprite[];
+	public spriteMatrix: Matrix3;
+	public ruderAngle: number;
+	public tank: NastyTank;
 
-    constructor(tank, ctx) {
+    constructor(tank: NastyTank, ctx: WebGLRenderingContext) {
         super(tank, ctx);
+
+        this.tank = tank
 
         this.size = 9
         this.bodyBrightSprite = Sprite.named("tanks/nasty/body-bright")
@@ -45,7 +50,7 @@ class Drawer extends TankDrawer {
             this.propellerSprites.push(Sprite.named("tanks/nasty/propeller_" + i))
     }
 
-    draw(camera, dt) {
+    draw(camera: Camera, dt: number) {
 
         let angle = this.tank.model.body.GetAngle()
 
@@ -108,9 +113,17 @@ class Drawer extends TankDrawer {
     }
 }
 
+export interface NastyTankConfig extends TankConfig {
+    model?: NastyTankModel
+}
+
 class NastyTank extends ClientTank {
-    constructor(model) {
-        super(model);
+
+    public model: NastyTankModel
+
+    constructor(options: NastyTankConfig) {
+        options = options || {}
+        super(options);
 
         this.engine = new Engine({
             sound: FX.ENGINE_4,
@@ -118,18 +131,20 @@ class NastyTank extends ClientTank {
             pitch: 0.9,
             volume: 0.6
         })
+
+        this.setupModel(options.model)
     }
 
-    static getDrawer() { return Drawer }
-    static getModel() { return NastyTankModel }
-    static getName() { return "Мерзила" }
-    static getDescription() {
+    static getDrawer(): typeof TankDrawer { return Drawer }
+    static getModel(): typeof TankModel { return NastyTankModel }
+    static getName(): string { return "Мерзила" }
+    static getDescription(): string {
         return "Любите запах напалма на утрам? Тогда эта машина - " +
             "идеальный выбор для вас! Сложный в управлении, но чудовищно " +
             "разрушительный танк с огнемётом на воздушной подушке."
     }
 
-    static getStats() {
+    static getStats(): TankStat {
         return {
             damage: 4,
             health: 15,
@@ -140,5 +155,4 @@ class NastyTank extends ClientTank {
     }
 }
 
-ClientTank.register(NastyTank)
 export default NastyTank;

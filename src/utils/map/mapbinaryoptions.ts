@@ -1,36 +1,37 @@
 
-import BinaryOptions from '../binaryoptions';
+import BinaryOptions, {FlagHandler} from '../binaryoptions';
 import BlockState from '../../utils/map/blockstate/blockstate';
 import SpawnZone from './spawnzone';
+import BinaryEncoder from "../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../serialization/binary/binarydecoder";
 
 class MapBinaryOptions extends BinaryOptions {
 
-    static DATA_FLAG = 0x0000;
-    static SIZE_FLAG = 0x0001;
-    static SPAWN_ZONES_FLAG = 0x0002;
+    DATA_FLAG = 0x0000;
+    SIZE_FLAG = 0x0001;
+    SPAWN_ZONES_FLAG = 0x0002;
 
-    static DEFAULT_WIDTH = 50;
-    static DEFAULT_HEIGHT = 50;
+    DEFAULT_WIDTH = 50;
+    DEFAULT_HEIGHT = 50;
 
     static shared = new MapBinaryOptions()
 
     constructor() {
         super();
 
-        this.addFlagHandler(new MapBinaryOptions.FlagHandler(MapBinaryOptions.SIZE_FLAG)
-            .setPacker((encoder, options) => {
-                encoder.writeUint32(options.width === undefined ? MapBinaryOptions.DEFAULT_WIDTH : options.width)
-                encoder.writeUint32(options.height === undefined ? MapBinaryOptions.DEFAULT_WIDTH : options.height)
+        this.addFlagHandler(new FlagHandler(this.SIZE_FLAG)
+            .setPacker((encoder: BinaryEncoder, options: any) => {
+                encoder.writeUint32(options.width === undefined ? this.DEFAULT_WIDTH : options.width)
+                encoder.writeUint32(options.height === undefined ? this.DEFAULT_WIDTH : options.height)
             })
-            .setUnpacker((decoder, options) => {
+            .setUnpacker((decoder: BinaryDecoder, options: any) => {
                 options.width = decoder.readUint32()
                 options.height = decoder.readUint32()
             })
         )
 
-        this.addFlagHandler(new MapBinaryOptions.FlagHandler(MapBinaryOptions.DATA_FLAG)
-            .setPacker((encoder, options) => {
-
+        this.addFlagHandler(new FlagHandler(this.DATA_FLAG)
+            .setPacker((encoder: BinaryEncoder, options: any) => {
                 for(let block of options.data) {
                     const Block = block.constructor
                     encoder.writeUint8(Block.typeId)
@@ -39,8 +40,8 @@ class MapBinaryOptions extends BinaryOptions {
                 }
             })
             .setUnpacker((decoder, options) => {
-                if(options.width === undefined) options.width = MapBinaryOptions.DEFAULT_WIDTH
-                if(options.height === undefined) options.height = MapBinaryOptions.DEFAULT_HEIGHT
+                if(options.width === undefined) options.width = this.DEFAULT_WIDTH
+                if(options.height === undefined) options.height = this.DEFAULT_HEIGHT
                 const size = options.width * options.height
 
                 let blockOptions
@@ -58,7 +59,7 @@ class MapBinaryOptions extends BinaryOptions {
             })
         )
 
-        this.addFlagHandler(new MapBinaryOptions.FlagHandler(MapBinaryOptions.SPAWN_ZONES_FLAG)
+        this.addFlagHandler(new FlagHandler(this.SPAWN_ZONES_FLAG)
             .setPacker((encoder, options) => {
                 encoder.writeUint16(options.spawnZones.length)
 

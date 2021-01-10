@@ -1,12 +1,12 @@
 
-import Overlay from '../../../../ui/overlay/overlay';
+import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import DialogView from './dialogview';
 
 class DialogOverlay extends Overlay {
 	public dialog: any;
 	public requiresDecision: any;
 
-    constructor(options) {
+    constructor(options: OverlayConfig) {
         super(options)
 
         this.dialog = new DialogView()
@@ -20,8 +20,8 @@ class DialogOverlay extends Overlay {
         this.overlay.focus()
 
         if(!this.requiresDecision) {
-            this.overlay.click((event) => {
-                if(event.target === this.overlay) {
+            this.overlay.on("click", (event) => {
+                if(this.overlay.has(event.target).length) {
                     this.hide()
                 }
             })
@@ -35,7 +35,7 @@ class DialogOverlay extends Overlay {
         super.show()
     }
 
-    hide(callback?) {
+    hide(callback?: () => void) {
         this.overlay.blur()
         super.hide(() => {
             this.overlay.remove()

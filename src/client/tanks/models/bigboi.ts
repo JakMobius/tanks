@@ -1,5 +1,5 @@
 
-import ClientTank from '../clienttank';
+import ClientTank, {TankConfig} from '../clienttank';
 import TankDrawer from '../../graphics/drawers/tankdrawer';
 import BigBoiTankModel from '../../../tanks/models/bigboi';
 import Engine from '../../engine';
@@ -7,6 +7,9 @@ import FX from '../../sound/fx';
 import Sprite from '../../sprite';
 import LightMaskTextureProgram from '../../graphics/programs/lightmasktextureprogram';
 import TruckProgram from '../../graphics/programs/truckprogram';
+import {TankStat} from "../tank-stat";
+import TankModel from "../../../tanks/tankmodel";
+import Camera from "../../camera";
 
 class Drawer extends TankDrawer {
 	public size: any;
@@ -16,9 +19,13 @@ class Drawer extends TankDrawer {
 	public truckSprite: any;
 	public bodyProgram: any;
 	public truckProgram: any;
+	public tank: BigboiTank
 
-    constructor(tank, ctx) {
+    constructor(tank: BigboiTank, ctx: WebGLRenderingContext) {
         super(tank, ctx);
+
+        // TODO: временно
+        this.tank = tank
 
         this.size = 9
         this.bodyBrightSprite = Sprite.named("tanks/golden-bigboi/body-bright")
@@ -35,7 +42,7 @@ class Drawer extends TankDrawer {
         this.truckProgram.setTruckRadius(0.25)
     }
 
-    draw(camera, dt) {
+    draw(camera: Camera, dt: number) {
 
         let angle = this.tank.model.body.GetAngle()
 
@@ -77,9 +84,17 @@ class Drawer extends TankDrawer {
     }
 }
 
+export interface BigBoiTankConfig extends TankConfig {
+    model?: BigBoiTankModel
+}
+
 class BigboiTank extends ClientTank {
-    constructor(model) {
-        super(model);
+
+    public model: BigBoiTankModel
+
+    constructor(options?: BigBoiTankConfig) {
+        options = options || {}
+        super(options);
 
         this.engine = new Engine({
             sound: FX.ENGINE_1,
@@ -90,19 +105,22 @@ class BigboiTank extends ClientTank {
             multiplier: 20,
             pitch: 0.8
         })
+
+        // TODO: Временное
+        this.setupModel(options.model)
     }
 
-    static getDrawer() { return Drawer }
-    static getModel() { return BigBoiTankModel }
-    static getName() { return "Big Boi" }
-    static getDescription() {
+    static getDrawer(): typeof TankDrawer { return Drawer }
+    static getModel(): typeof TankModel { return BigBoiTankModel }
+    static getName(): string { return "Big Boi" }
+    static getDescription(): string {
         return "Это невероятное чудо техники создано, чтобы " +
             "уничтожать всё на своём пути. Снаряд этого танка, " +
             "имея огромную массу, способен резко изменить " +
             "траекторию движения соперника или вовсе закрутить и обездвижить его."
     }
 
-    static getStats() {
+    static getStats(): TankStat {
         return {
             damage: 4,
             health: 20,
@@ -113,5 +131,4 @@ class BigboiTank extends ClientTank {
     }
 }
 
-ClientTank.register(BigboiTank)
 export default BigboiTank;

@@ -52,11 +52,11 @@ class Dropdown extends View {
         this.collapsed ? this.expand() : this.collapse()
     }
 
-    setOptionCount(count) {
+    setOptionCount(count: number) {
         let children = this.getOptions()
         if(children.length > count) {
             while(children.length > count) {
-                children.pop().remove()
+                children.last().remove()
             }
         } else if(children.length < count) {
             while(children.length < count) {
@@ -66,14 +66,11 @@ class Dropdown extends View {
         }
     }
 
-    /**
-     * @return {jQuery}
-     */
-    getOptions() {
+    getOptions(): JQuery {
         return this.element.children()
     }
 
-    selectOption(option) {
+    selectOption(option: JQuery) {
         this.element.find(".select-wrapper.selected").removeClass("selected")
         if(option) {
             option.addClass("selected")
