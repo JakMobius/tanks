@@ -1,5 +1,5 @@
 import * as Box2D from '../../library/box2d';
-import TankBehaviour, {TankBehaviourConfig} from './tankbehaviour';
+import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
 import TankModel from "../tankmodel";
 
 export interface TruckTankBehaviourConfig extends TankBehaviourConfig {
@@ -9,13 +9,11 @@ export interface TruckTankBehaviourConfig extends TankBehaviourConfig {
     [others: string]: any;
 }
 
-export interface TruckTankDetails {
+export interface TruckTankDetails extends TankBehaviourDetails {
     leftTrackSpeed: number
     rightTrackSpeed: number
     leftTrackDist: number
     rightTrackDist: number
-    clutch: number
-    transmissionSpeed: number
 }
 
 class TruckTankBehaviour extends TankBehaviour {

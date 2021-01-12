@@ -9,9 +9,9 @@
  */
 
 import EventEmitter from '../events';
-let Screen; import('./screen').then(module => Screen = module.default)
+let Screen; import('./screen').then(module => Screen = module.Screen)
 
-class Node extends EventEmitter {
+export class Node extends EventEmitter {
     public options: any;
     public screen: any;
     public parent: any;
@@ -277,9 +277,3 @@ class Node extends EventEmitter {
 }
 
 Node.uid = 0;
-
-/**
- * Expose
- */
-
-export default Node;

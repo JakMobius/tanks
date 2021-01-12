@@ -9,6 +9,8 @@
  */
 
 import fs from 'fs';
+import {Element} from "./widgets/element";
+import {Screen} from "./widgets/screen";
 
 import unicode from './unicode';
 
@@ -94,8 +96,8 @@ helpers.escape = function(text) {
 };
 
 helpers.parseTags = function(text, screen) {
-  return helpers.Element.prototype._parseTags.call(
-    { parseTags: true, screen: screen || helpers.Screen.global }, text);
+  return Element.prototype._parseTags.call(
+    { parseTags: true, screen: screen || Screen.global }, text);
 };
 
 helpers.generateTags = function(style, text) {
@@ -128,7 +130,7 @@ helpers.generateTags = function(style, text) {
 };
 
 helpers.attrToBinary = function(style, element) {
-  return helpers.Element.prototype.sattr.call(element || {}, style);
+  return Element.prototype.sattr.call(element || {}, style);
 };
 
 helpers.stripTags = function(text) {
@@ -150,18 +152,5 @@ helpers.dropUnicode = function(text) {
     .replace(unicode.chars.surrogate, '?');
 };
 
-helpers.__defineGetter__('Screen', function() {
-  if (!helpers._screen) {
-    helpers._screen = require('./widgets/screen');
-  }
-  return helpers._screen;
-});
-
-helpers.__defineGetter__('Element', function() {
-  if (!helpers._element) {
-    helpers._element = require('./widgets/element');
-  }
-  return helpers._element;
-});
 
 export default helpers

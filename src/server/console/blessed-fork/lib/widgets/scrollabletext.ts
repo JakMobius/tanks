@@ -1,5 +1,5 @@
 /**
- * text.js - text element for blessed
+ * scrollabletext.js - scrollable text element for blessed
  * Copyright (c) 2013-2015, Christopher Jeffrey and contributors (MIT License).
  * https://github.com/chjj/blessed
  */
@@ -8,24 +8,13 @@
  * Modules
  */
 
+import {ScrollableBox} from './scrollablebox';
 
-import Element from './element';
-
-class Text extends Element {
-    /**
-     * Text
-     */
+export class ScrollableText extends ScrollableBox {
     constructor(options) {
         options = options || {};
-        options.shrink = true;
+        options.alwaysScroll = true;
         super(options);
-        this.type = 'text';
+        this.type = 'scrollable-text';
     }
 }
-
-
-/**
- * Expose
- */
-
-export default Text;

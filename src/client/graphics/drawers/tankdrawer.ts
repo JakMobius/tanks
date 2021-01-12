@@ -4,7 +4,7 @@ import Smoke from '../../particles/smoke';
 import ClientTank from "../../tanks/clienttank";
 import Camera from "../../camera";
 
-class TankDrawer {
+ class TankDrawer {
 	public smokeTicks: any;
 
     tank: ClientTank = null

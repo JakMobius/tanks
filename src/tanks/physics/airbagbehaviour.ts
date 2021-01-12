@@ -4,7 +4,6 @@ import TankModel from "../tankmodel";
 
 interface AirbagBehaviourDetails extends TankBehaviourDetails {
     propellerDist: number,
-    clutch: number
 }
 
 interface AirbagBehaviourConfig extends TankBehaviourConfig {

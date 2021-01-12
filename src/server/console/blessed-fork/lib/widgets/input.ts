@@ -8,22 +8,12 @@
  * Modules
  */
 
-import ScrollableBox from './scrollablebox';
+import {ScrollableBox} from './scrollablebox';
 
-class Input extends ScrollableBox {
-    /**
-     * Input
-     */
+export class Input extends ScrollableBox {
     constructor(options) {
         options = options || {};
         super(options);
         this.type = 'input';
     }
 }
-
-
-/**
- * Expose
- */
-
-export default Input;

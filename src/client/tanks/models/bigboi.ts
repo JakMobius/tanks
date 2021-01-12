@@ -12,13 +12,13 @@ import TankModel from "../../../tanks/tankmodel";
 import Camera from "../../camera";
 
 class Drawer extends TankDrawer {
-	public size: any;
-	public bodyBrightSprite: any;
-	public bodyDarkSprite: any;
-	public bodyLightMask: any;
-	public truckSprite: any;
-	public bodyProgram: any;
-	public truckProgram: any;
+	public size: number;
+	public bodyBrightSprite: Sprite;
+	public bodyDarkSprite: Sprite;
+	public bodyLightMask: Sprite;
+	public truckSprite: Sprite;
+	public bodyProgram: LightMaskTextureProgram;
+	public truckProgram: TruckProgram;
 	public tank: BigboiTank
 
     constructor(tank: BigboiTank, ctx: WebGLRenderingContext) {

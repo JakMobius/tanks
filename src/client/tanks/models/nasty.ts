@@ -85,7 +85,6 @@ class Drawer extends TankDrawer {
         this.textureProgram.drawSprite(propeller, scale * 0.17, -scale * 1.06, scale * 0.6, scale * 0.08)
         this.textureProgram.setTransform(this.spriteMatrix)
 
-
         this.spriteMatrix.save()
         this.spriteMatrix.translate(-scale * 0.46, 0)
 

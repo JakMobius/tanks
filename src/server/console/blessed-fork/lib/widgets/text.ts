@@ -1,20 +1,21 @@
 /**
- * box.js - box element for blessed
+ * text.js - text element for blessed
  * Copyright (c) 2013-2015, Christopher Jeffrey and contributors (MIT License).
  * https://github.com/chjj/blessed
  */
 
-import Element from './element';
+/**
+ * Modules
+ */
 
-class Box extends Element {
-    /**
-     * Box
-     */
+
+import {Element} from './element';
+
+export class Text extends Element {
     constructor(options) {
         options = options || {};
+        options.shrink = true;
         super(options);
-        this.type = 'box';
+        this.type = 'text';
     }
 }
-
-export default Box;

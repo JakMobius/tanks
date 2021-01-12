@@ -198,7 +198,7 @@ class StatusCommand extends Command {
         else if(isClusterSocketActive) clusterLinkMode = StatusCommand.clusterLinkServerText
         else clusterLinkMode = StatusCommand.inactiveText
 
-        this.printStatus("cluster link", clusterLinkMode)
+        this.printStatus("cluster connection", clusterLinkMode)
         this.beginStatusGroup()
         if(isClusterSocketActive) {
             this.printStatus("remote servers", Chalk.green(server.clusterSocket.clients.size))

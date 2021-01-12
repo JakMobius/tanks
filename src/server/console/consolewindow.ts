@@ -1,8 +1,7 @@
 
 import EventEmitter from '../../utils/eventemitter';
 import LoggerDestination from '../log/logger-destination';
-import blessed from './blessed-fork/lib/blessed';
-import Textarea from './blessed-fork/lib/widgets/prompt';
+import * as blessed from './blessed-fork/lib/blessed';
 
 class WindowDestination extends LoggerDestination {
 	public window: any;
@@ -76,11 +75,12 @@ class ConsoleWindow extends EventEmitter {
         })
 
         this.scrollView = new blessed.ScrollableText({
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 1,
-
+            position: {
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 1,
+            },
             scrollable: true,
             mouse: true,
             keys: true,
@@ -91,10 +91,12 @@ class ConsoleWindow extends EventEmitter {
         })
 
         this.consoleTextbox = new blessed.Prompt({
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 1,
+            position: {
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 1,
+            },
             style: {
                 fg: 'white',
                 bg: 'black'
@@ -103,10 +105,12 @@ class ConsoleWindow extends EventEmitter {
         });
 
         this.promptLabel = new blessed.Text({
-            bottom: 0,
-            left: 0,
-            width: 10,
-            height: 1,
+            position: {
+                bottom: 0,
+                left: 0,
+                width: 10,
+                height: 1,
+            },
             style: {
                 fg: 'white',
                 bg: 'black'
@@ -220,7 +224,7 @@ class ConsoleWindow extends EventEmitter {
     }
 
     refocus() {
-        if (!this.screen.focused || !(this.screen.focused instanceof Textarea))
+        if (!this.screen.focused || !(this.screen.focused instanceof blessed.Prompt))
             this.consoleTextbox.focus()
     }
 

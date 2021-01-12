@@ -110,6 +110,7 @@ dist
 out
 *.DS_Store
 build/cache/*
+dist/*
 
 # Not sharing server properties via github
 src/server/preferences.json

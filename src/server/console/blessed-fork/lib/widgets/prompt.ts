@@ -10,9 +10,9 @@
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
-import Input from './input';
+import {Input} from './input';
 
-class Prompt extends Input {
+export class Prompt extends Input {
 	public value: any;
 	public cursorPosition: any;
 	public scrollPosition: any;
@@ -66,18 +66,18 @@ class Prompt extends Input {
 
         if (cy === program.y) {
             if (cx > program.x) {
-                program.cuf(cx - program.x);
+                program.cursorForward(cx - program.x);
             } else if (cx < program.x) {
-                program.cub(program.x - cx);
+                program.cursorBackward(program.x - cx);
             }
         } else if (cx === program.x) {
             if (cy > program.y) {
-                program.cud(cy - program.y);
+                program.cursorDown(cy - program.y);
             } else if (cy < program.y) {
-                program.cuu(program.y - cy);
+                program.cursorUp(program.y - cy);
             }
         } else {
-            program.cup(cy, cx);
+            program.cursorPos(cy, cx);
         }
     }
 
@@ -291,5 +291,3 @@ class Prompt extends Input {
 /**
  * Expose
  */
-
-export default Prompt;

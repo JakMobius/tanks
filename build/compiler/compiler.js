@@ -96,7 +96,8 @@ class Compiler {
                 ["@babel/plugin-proposal-class-properties", { loose: true }],
                 ["@babel/plugin-transform-typescript"],
                 ["transform-dirname-filename"],
-                ["@babel/plugin-transform-runtime"]
+                ["@babel/plugin-transform-runtime"],
+                ["@babel/plugin-proposal-export-default-from"]
             ],
             "presets": [
                 ['@babel/preset-env', {

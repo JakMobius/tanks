@@ -9,9 +9,9 @@
  */
 
 
-import Box from './box';
+import {Box} from './box';
 
-class ScrollableBox extends Box {
+export class ScrollableBox extends Box {
 	public baseLimit: any;
 
     /**
@@ -385,8 +385,4 @@ ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
     return this.getScrollHeight() > this.height;
 });
 
-/**
- * Expose
- */
 
-export default ScrollableBox;

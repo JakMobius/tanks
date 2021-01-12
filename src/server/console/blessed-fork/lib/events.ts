@@ -11,19 +11,19 @@ var slice = Array.prototype.slice;
  */
 
 class EventEmitter {
-  _maxListeners;
-  _events;
+  _maxListeners: number;
+  _events: any;
 
   constructor() {
     if (!this._events) this._events = {};
   }
 
-  setMaxListeners(n)
+  setMaxListeners(n: number)
   {
     this._maxListeners = n;
   }
 
-  addListener(type, listener)
+  addListener(type: string, listener: () => void)
   {
     if (!this._events[type]) {
       this._events[type] = listener;
@@ -35,11 +35,11 @@ class EventEmitter {
     this._emit('newListener', [type, listener]);
   }
 
-  on(type, listener){
+  on(type: string, listener: (...params: any[]) => any){
     return this.addListener(type, listener);
   }
 
-  removeListener(type, listener) {
+  removeListener(type: string, listener: (...params: any[]) => any) {
     var handler = this._events[type];
     if (!handler) return;
 
@@ -58,11 +58,11 @@ class EventEmitter {
     }
   }
 
-  off(type, listener) {
+  off(type: string, listener: () => void) {
     return this.removeListener(type, listener)
   }
 
-  removeAllListeners(type) {
+  removeAllListeners(type: string) {
     if (type) {
       delete this._events[type];
     } else {
@@ -70,7 +70,7 @@ class EventEmitter {
     }
   }
 
-  once(type, listener) {
+  once(type: string, listener: () => void) {
     function on() {
       this.removeListener(type, on);
       return listener.apply(this, arguments);
@@ -79,13 +79,7 @@ class EventEmitter {
     return this.on(type, on);
   }
 
-  listeners(type) {
-    return typeof this._events[type] === 'function'
-        ? [this._events[type]]
-        : this._events[type] || [];
-  }
-
-  _emit(type, args) {
+  _emit(type: string, args: any[]) {
     var handler = this._events[type]
         , ret;
 
@@ -113,7 +107,7 @@ class EventEmitter {
     return ret !== false;
   }
 
-  emit(type) {
+  emit(type, ...params: any[]) {
     var args = slice.call(arguments, 1)
         , params = slice.call(arguments)
         , el = this;

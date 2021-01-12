@@ -12,41 +12,118 @@ import assert from 'assert';
 import colors from '../colors'
 import unicode from '../unicode';
 import helpers from '../helpers';
-import Node from "./node"
+import {Node} from "./node"
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
-class Element extends Node {
-    /**
-     * Element
-     */
-    constructor(options) {
+type ElementHAlign = 'left' | 'center' | 'right'
+type ElementVAlign = 'top' | 'middle' | 'bottom'
+
+interface ElementStyle {
+    fg?: boolean
+    bg?: boolean
+    bold?: boolean
+    underline?: boolean
+    blink?: boolean
+    inverse?: boolean
+    invisible?: boolean
+    transparent?: boolean
+    border?: ElementBorder
+}
+
+interface ElementPosition {
+    left?: number
+    right?: number
+    top?: number
+    bottom?: number
+    width?: number | "shrink"
+    height?: number | "shrink"
+}
+
+interface ElementEdgeOffset {
+    left: number
+    top: number
+    bottom: number
+    right: number
+}
+
+interface ElementBorder {
+    left?: boolean
+    top?: boolean
+    bottom?: boolean
+    right?: boolean
+    type: string
+}
+
+export interface ElementConfig {
+    noOverflow?: boolean;
+    name?: string,
+    position?: ElementPosition
+    shrink?: boolean
+    style?: ElementStyle
+    shadow?: boolean
+    dockBorders?: boolean
+    fixed?: boolean
+    align?: ElementHAlign
+    valign?: ElementVAlign
+    hidden?: boolean
+    wrap?: boolean
+    ch?: string
+    padding?: Partial<ElementEdgeOffset> | number
+    clickable?: boolean
+    input?: boolean
+    keyable?: boolean
+    parseTags?: boolean
+    content?: string
+    label?: string
+    hoverText?: string
+}
+
+export class Element extends Node {
+
+    public name: string
+    public position: ElementPosition
+    public noOverflow: boolean
+    public style: ElementStyle;
+    public dockBorders: boolean
+    public shadow: boolean
+    public hidden: boolean
+    public fixed: boolean
+    public align: ElementHAlign
+    public valign: ElementVAlign
+    public wrap: boolean
+    public shrink: boolean
+    public ch: string
+    public padding: ElementEdgeOffset
+    public border: ElementBorder
+    public clickable: boolean
+    public input: boolean
+    public keyable: boolean
+    public parseTags: boolean
+    public draggable: boolean
+    public content: string
+
+    constructor(options?: ElementConfig) {
         super(options);
 
-        var self = this;
+        let self = this;
 
         options = options || {};
 
         this.name = options.name;
+        this.position = options.position
 
-        options.position = options.position || {
-            left: options.left,
-            right: options.right,
-            top: options.top,
-            bottom: options.bottom,
-            width: options.width,
-            height: options.height
-        };
-
-        if (options.position.width === 'shrink'
-            || options.position.height === 'shrink') {
+        if (options.position && (options.position.width === 'shrink'
+            || options.position.height === 'shrink')) {
             if (options.position.width === 'shrink') {
                 delete options.position.width;
             }
             if (options.position.height === 'shrink') {
                 delete options.position.height;
             }
-            options.shrink = true;
+            this.shrink = true;
+        } else {
+            this.shrink = options.shrink
         }
 
         this.position = options.position;
@@ -57,62 +134,29 @@ class Element extends Node {
 
         this.style = options.style;
 
-        if (!this.style) {
-            this.style = {};
-            this.style.fg = options.fg;
-            this.style.bg = options.bg;
-            this.style.bold = options.bold;
-            this.style.underline = options.underline;
-            this.style.blink = options.blink;
-            this.style.inverse = options.inverse;
-            this.style.invisible = options.invisible;
-            this.style.transparent = options.transparent;
-        }
-
         this.hidden = options.hidden || false;
         this.fixed = options.fixed || false;
         this.align = options.align || 'left';
         this.valign = options.valign || 'top';
         this.wrap = options.wrap !== false;
-        this.shrink = options.shrink;
         this.fixed = options.fixed;
         this.ch = options.ch || ' ';
 
         if (typeof options.padding === 'number' || !options.padding) {
-            options.padding = {
-                left: options.padding,
-                top: options.padding,
-                right: options.padding,
-                bottom: options.padding
+            let padding: number = options.padding as number || 0
+            this.padding = {
+                left: padding,
+                top: padding,
+                right: padding,
+                bottom: padding
             };
-        }
-
-        this.padding = {
-            left: options.padding.left || 0,
-            top: options.padding.top || 0,
-            right: options.padding.right || 0,
-            bottom: options.padding.bottom || 0
-        };
-
-        this.border = options.border;
-        if (this.border) {
-            if (typeof this.border === 'string') {
-                this.border = {type: this.border};
-            }
-            this.border.type = this.border.type || 'bg';
-            if (this.border.type === 'ascii') this.border.type = 'line';
-            this.border.ch = this.border.ch || ' ';
-            this.style.border = this.style.border || this.border.style;
-            if (!this.style.border) {
-                this.style.border = {};
-                this.style.border.fg = this.border.fg;
-                this.style.border.bg = this.border.bg;
-            }
-            //this.border.style = this.style.border;
-            if (this.border.left == null) this.border.left = true;
-            if (this.border.top == null) this.border.top = true;
-            if (this.border.right == null) this.border.right = true;
-            if (this.border.bottom == null) this.border.bottom = true;
+        } else {
+            this.padding = {
+                left: options.padding.left || 0,
+                top: options.padding.top || 0,
+                right: options.padding.right || 0,
+                bottom: options.padding.bottom || 0
+            };
         }
 
         // if (options.mouse || options.clickable) {
@@ -137,8 +181,8 @@ class Element extends Node {
         }
 
         // TODO: Possibly move this to Node for onScreenEvent('mouse', ...).
-        this.on('newListener', function fn(type) {
-            // type = type.split(' ').slice(1).join(' ');
+        this.on('newListener', function fn(type: string) {
+
             if (type === 'mouse'
                 || type === 'click'
                 || type === 'mouseover'
@@ -185,11 +229,11 @@ class Element extends Node {
             if (options.effects.focus) options.focusEffects = options.effects.focus;
         }
 
-        [['hoverEffects', 'mouseover', 'mouseout', '_htemp'],
-            ['focusEffects', 'focus', 'blur', '_ftemp']].forEach(function (props) {
+        for (const props of [['hoverEffects', 'mouseover', 'mouseout', '_htemp'],
+            ['focusEffects', 'focus', 'blur', '_ftemp']]) {
             var pname = props[0], over = props[1], out = props[2], temp = props[3];
             self.screen.setEffects(self, self, over, out, self.options[pname], temp);
-        });
+        }
 
         if (this.options.draggable) {
             this.draggable = true;
@@ -302,7 +346,7 @@ class Element extends Node {
         return this.screen.focused = this;
     }
 
-    setContent(content, noClear, noTags) {
+    setContent(content: string, noClear?: boolean, noTags?: boolean) {
         if (!noClear) this.clearPos();
         this.content = content || '';
         this.parseContent(noTags);
@@ -324,7 +368,7 @@ class Element extends Node {
         return this.getContent().replace(/\x1b\[[\d;]*m/g, '');
     }
 
-    parseContent(noTags) {
+    parseContent(noTags?: boolean) {
         if (this.detached) return false;
 
         var width = this.width - this.iwidth;
@@ -847,7 +891,7 @@ class Element extends Node {
         return this.setIndex(0);
     }
 
-    clearPos(get, override) {
+    clearPos(get?: boolean, override?: boolean) {
         if (this.detached) return;
         var lpos = this._getCoords(get);
         if (!lpos) return;
@@ -868,13 +912,13 @@ class Element extends Node {
         if (this._label) {
             this._label.setContent(options.text);
             if (options.side !== 'right') {
-                this._label.rleft = 2 + (this.border ? -1 : 0);
+                this._label.rleft = 2 + (this.style.border ? -1 : 0);
                 this._label.position.right = undefined;
                 if (!this.screen.autoPadding) {
                     this._label.rleft = 2;
                 }
             } else {
-                this._label.rright = 2 + (this.border ? -1 : 0);
+                this._label.rright = 2 + (this.style.border ? -1 : 0);
                 this._label.position.left = undefined;
                 if (!this.screen.autoPadding) {
                     this._label.rright = 2;
@@ -1473,7 +1517,7 @@ class Element extends Node {
                     // Is partially covered above.
                     notop = true;
                     v = ppos.yi - yi;
-                    if (this.border) v--;
+                    if (this.style.border) v--;
                     if (thisparent.border) v++;
                     base += v;
                     yi += v;
@@ -1486,7 +1530,7 @@ class Element extends Node {
                     // Is partially covered below.
                     nobot = true;
                     v = yl - ppos.yl;
-                    if (this.border) v--;
+                    if (this.style.border) v--;
                     if (thisparent.border) v++;
                     yl -= v;
                 }
@@ -1501,13 +1545,13 @@ class Element extends Node {
             if (xi < el.lpos.xi) {
                 xi = el.lpos.xi;
                 noleft = true;
-                if (this.border) xi--;
+                if (this.style.border) xi--;
                 if (thisparent.border) xi++;
             }
             if (xl > el.lpos.xl) {
                 xl = el.lpos.xl;
                 noright = true;
-                if (this.border) xl++;
+                if (this.style.border) xl++;
                 if (thisparent.border) xl--;
             }
             //if (xi > xl) return;
@@ -1619,7 +1663,7 @@ class Element extends Node {
 
         this.lpos = coords;
 
-        if (this.border && this.border.type === 'line') {
+        if (this.style.border && this.style.border.type === 'line') {
             this.screen._borderStops[coords.yi] = true;
             this.screen._borderStops[coords.yl - 1] = true;
             // if (!this.screen._borderStops[coords.yi]) {
@@ -1644,7 +1688,7 @@ class Element extends Node {
             attr = this._clines.attr[Math.min(coords.base, this._clines.length - 1)];
         }
 
-        if (this.border) xi++, xl--, yi++, yl--;
+        if (this.style.border) xi++, xl--, yi++, yl--;
 
         // If we have padding/valign, that means the
         // content-drawing loop will skip a few cells/lines.
@@ -1810,7 +1854,7 @@ class Element extends Node {
         if (coords.notop || coords.nobot) i = -Infinity;
         if (this.scrollbar && (yl - yi) < i) {
             x = xl - 1;
-            if (this.scrollbar.ignoreBorder && this.border) x++;
+            if (this.scrollbar.ignoreBorder && this.style.border) x++;
             if (this.alwaysScroll) {
                 y = this.childBase / (i - (yl - yi));
             } else {
@@ -1839,7 +1883,7 @@ class Element extends Node {
             }
         }
 
-        if (this.border) xi--, xl++, yi--, yl++;
+        if (this.style.border) xi--, xl++, yi--, yl++;
 
         if (this.tpadding) {
             xi -= this.padding.left, xl += this.padding.right;
@@ -1847,7 +1891,7 @@ class Element extends Node {
         }
 
         // Draw the border.
-        if (this.border) {
+        if (this.style.border) {
             battr = this.sattr(this.style.border);
             y = yi;
             if (coords.notop) y = -1;
@@ -1857,40 +1901,40 @@ class Element extends Node {
                 if (coords.noright && x === xl - 1) continue;
                 cell = lines[y][x];
                 if (!cell) continue;
-                if (this.border.type === 'line') {
+                if (this.style.border.type === 'line') {
                     if (x === xi) {
                         ch = '\u250c'; // '┌'
-                        if (!this.border.left) {
-                            if (this.border.top) {
+                        if (!this.style.border.left) {
+                            if (this.style.border.top) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
                             }
                         } else {
-                            if (!this.border.top) {
+                            if (!this.style.border.top) {
                                 ch = '\u2502'; // '│'
                             }
                         }
                     } else if (x === xl - 1) {
                         ch = '\u2510'; // '┐'
-                        if (!this.border.right) {
-                            if (this.border.top) {
+                        if (!this.style.border.right) {
+                            if (this.style.border.top) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
                             }
                         } else {
-                            if (!this.border.top) {
+                            if (!this.style.border.top) {
                                 ch = '\u2502'; // '│'
                             }
                         }
                     } else {
                         ch = '\u2500'; // '─'
                     }
-                } else if (this.border.type === 'bg') {
-                    ch = this.border.ch;
+                } else if (this.style.border.type === 'bg') {
+                    ch = this.style.border.ch;
                 }
-                if (!this.border.top && x !== xi && x !== xl - 1) {
+                if (!this.style.border.top && x !== xi && x !== xl - 1) {
                     ch = ' ';
                     if (dattr !== cell[0] || ch !== cell[1]) {
                         lines[y][x][0] = dattr;
@@ -1910,11 +1954,11 @@ class Element extends Node {
                 if (!lines[y]) continue;
                 cell = lines[y][xi];
                 if (cell) {
-                    if (this.border.left) {
-                        if (this.border.type === 'line') {
+                    if (this.style.border.left) {
+                        if (this.style.border.type === 'line') {
                             ch = '\u2502'; // '│'
-                        } else if (this.border.type === 'bg') {
-                            ch = this.border.ch;
+                        } else if (this.style.border.type === 'bg') {
+                            ch = this.style.border.ch;
                         }
                         if (!coords.noleft)
                             if (battr !== cell[0] || ch !== cell[1]) {
@@ -1933,11 +1977,11 @@ class Element extends Node {
                 }
                 cell = lines[y][xl - 1];
                 if (cell) {
-                    if (this.border.right) {
-                        if (this.border.type === 'line') {
+                    if (this.style.border.right) {
+                        if (this.style.border.type === 'line') {
                             ch = '\u2502'; // '│'
-                        } else if (this.border.type === 'bg') {
-                            ch = this.border.ch;
+                        } else if (this.style.border.type === 'bg') {
+                            ch = this.style.border.ch;
                         }
                         if (!coords.noright)
                             if (battr !== cell[0] || ch !== cell[1]) {
@@ -1963,40 +2007,40 @@ class Element extends Node {
                 if (coords.noright && x === xl - 1) continue;
                 cell = lines[y][x];
                 if (!cell) continue;
-                if (this.border.type === 'line') {
+                if (this.style.border.type === 'line') {
                     if (x === xi) {
                         ch = '\u2514'; // '└'
-                        if (!this.border.left) {
-                            if (this.border.bottom) {
+                        if (!this.style.border.left) {
+                            if (this.style.border.bottom) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
                             }
                         } else {
-                            if (!this.border.bottom) {
+                            if (!this.style.border.bottom) {
                                 ch = '\u2502'; // '│'
                             }
                         }
                     } else if (x === xl - 1) {
                         ch = '\u2518'; // '┘'
-                        if (!this.border.right) {
-                            if (this.border.bottom) {
+                        if (!this.style.border.right) {
+                            if (this.style.border.bottom) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
                             }
                         } else {
-                            if (!this.border.bottom) {
+                            if (!this.style.border.bottom) {
                                 ch = '\u2502'; // '│'
                             }
                         }
                     } else {
                         ch = '\u2500'; // '─'
                     }
-                } else if (this.border.type === 'bg') {
-                    ch = this.border.ch;
+                } else if (this.style.border.type === 'bg') {
+                    ch = this.style.border.ch;
                 }
-                if (!this.border.bottom && x !== xi && x !== xl - 1) {
+                if (!this.style.border.bottom && x !== xi && x !== xl - 1) {
                     ch = ' ';
                     if (dattr !== cell[0] || ch !== cell[1]) {
                         lines[y][x][0] = dattr;
@@ -2467,37 +2511,37 @@ Element.prototype.__defineSetter__('rbottom', function (val) {
 });
 
 Element.prototype.__defineGetter__('ileft', function () {
-    return (this.border ? 1 : 0) + this.padding.left;
-    // return (this.border && this.border.left ? 1 : 0) + this.padding.left;
+    return (this.style.border ? 1 : 0) + this.padding.left;
+    // return (this.style.border && this.style.border.left ? 1 : 0) + this.padding.left;
 });
 
 Element.prototype.__defineGetter__('itop', function () {
-    return (this.border ? 1 : 0) + this.padding.top;
-    // return (this.border && this.border.top ? 1 : 0) + this.padding.top;
+    return (this.style.border ? 1 : 0) + this.padding.top;
+    // return (this.style.border && this.style.border.top ? 1 : 0) + this.padding.top;
 });
 
 Element.prototype.__defineGetter__('iright', function () {
-    return (this.border ? 1 : 0) + this.padding.right;
-    // return (this.border && this.border.right ? 1 : 0) + this.padding.right;
+    return (this.style.border ? 1 : 0) + this.padding.right;
+    // return (this.style.border && this.style.border.right ? 1 : 0) + this.padding.right;
 });
 
 Element.prototype.__defineGetter__('ibottom', function () {
-    return (this.border ? 1 : 0) + this.padding.bottom;
-    // return (this.border && this.border.bottom ? 1 : 0) + this.padding.bottom;
+    return (this.style.border ? 1 : 0) + this.padding.bottom;
+    // return (this.style.border && this.style.border.bottom ? 1 : 0) + this.padding.bottom;
 });
 
 Element.prototype.__defineGetter__('iwidth', function () {
-    // return (this.border
-    //   ? ((this.border.left ? 1 : 0) + (this.border.right ? 1 : 0)) : 0)
+    // return (this.style.border
+    //   ? ((this.style.border.left ? 1 : 0) + (this.style.border.right ? 1 : 0)) : 0)
     //   + this.padding.left + this.padding.right;
-    return (this.border ? 2 : 0) + this.padding.left + this.padding.right;
+    return (this.style.border ? 2 : 0) + this.padding.left + this.padding.right;
 });
 
 Element.prototype.__defineGetter__('iheight', function () {
-    // return (this.border
-    //   ? ((this.border.top ? 1 : 0) + (this.border.bottom ? 1 : 0)) : 0)
+    // return (this.style.border
+    //   ? ((this.style.border.top ? 1 : 0) + (this.style.border.bottom ? 1 : 0)) : 0)
     //   + this.padding.top + this.padding.bottom;
-    return (this.border ? 2 : 0) + this.padding.top + this.padding.bottom;
+    return (this.style.border ? 2 : 0) + this.padding.top + this.padding.bottom;
 });
 
 Element.prototype.__defineGetter__('tpadding', function () {
@@ -2544,5 +2588,3 @@ Element.prototype.__defineSetter__('bottom', function (val) {
 /**
  * Expose
  */
-
-export default Element
