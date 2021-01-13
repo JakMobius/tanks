@@ -76,10 +76,10 @@ class ConsoleWindow extends EventEmitter {
 
         this.scrollView = new blessed.ScrollableText({
             position: {
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 1,
+                x: 0,
+                y: 0,
+                width: 60,
+                height: 20
             },
             scrollable: true,
             mouse: true,
@@ -92,9 +92,9 @@ class ConsoleWindow extends EventEmitter {
 
         this.consoleTextbox = new blessed.Prompt({
             position: {
-                bottom: 0,
-                left: 0,
-                right: 0,
+                x: 0,
+                y: 20,
+                width: 60,
                 height: 1,
             },
             style: {
@@ -106,9 +106,9 @@ class ConsoleWindow extends EventEmitter {
 
         this.promptLabel = new blessed.Text({
             position: {
-                bottom: 0,
-                left: 0,
-                width: 10,
+                x: 0,
+                y: 20,
+                width: 0,
                 height: 1,
             },
             style: {
@@ -209,7 +209,7 @@ class ConsoleWindow extends EventEmitter {
 
         prompt += "> "
         this.promptLabel.content = prompt
-        this.promptLabel.width = prompt.length
+        this.promptLabel.setwidth(prompt.length)
         this.consoleTextbox.left = prompt.length
     }
 

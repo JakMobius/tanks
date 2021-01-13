@@ -11,16 +11,28 @@
 import EventEmitter from '../events';
 let Screen; import('./screen').then(module => Screen = module.Screen)
 
+export interface ElementPosition {
+    x?: number
+    y?: number
+    width?: number
+    height?: number
+}
+
+export interface NodeConfig {
+    position?: ElementPosition
+}
+
 export class Node extends EventEmitter {
     public options: any;
     public screen: any;
-    public parent: any;
+    public parent: Node;
     public children: any;
     public data: any;
     public uid: any;
     public index: any;
     public detached: any;
     public type: any;
+    public position: ElementPosition
 
     /**
      * Node
@@ -31,6 +43,7 @@ export class Node extends EventEmitter {
 
         options = options || {};
         this.options = options;
+        this.position = options.position
 
         this.screen = this.screen || options.screen;
 
@@ -63,11 +76,17 @@ export class Node extends EventEmitter {
             }
         }
 
+        this.position = options.position
         this.parent = options.parent || null;
         this.children = [];
         this.$ = this._ = this.data = {};
         this.uid = Node.uid++;
-        this.index = this.index != null ? this.index : -1;
+
+        if (this.index == null) {
+            this.index = -1;
+        } else {
+            this.index = this.index;
+        }
 
         if (!(this instanceof Screen)) {
             this.detached = true;
@@ -273,6 +292,30 @@ export class Node extends EventEmitter {
 
     set(name, value) {
         return this.data[name] = value;
+    }
+
+    getwidth(): number {
+        return this.position.width
+    }
+
+    getheight(): number {
+        return this.position.height
+    }
+
+    getaleft() {
+        return this.position.x;
+    }
+
+    getaright() {
+        return this.position.x + this.position.width
+    }
+
+    getatop() {
+        return this.position.y;
+    }
+
+    getabottom() {
+        return this.position.y + this.position.height
     }
 }
 

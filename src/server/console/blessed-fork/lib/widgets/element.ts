@@ -12,7 +12,7 @@ import assert from 'assert';
 import colors from '../colors'
 import unicode from '../unicode';
 import helpers from '../helpers';
-import {Node} from "./node"
+import {Node, NodeConfig} from "./node"
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
@@ -31,15 +31,6 @@ interface ElementStyle {
     border?: ElementBorder
 }
 
-interface ElementPosition {
-    left?: number
-    right?: number
-    top?: number
-    bottom?: number
-    width?: number | "shrink"
-    height?: number | "shrink"
-}
-
 interface ElementEdgeOffset {
     left: number
     top: number
@@ -55,11 +46,9 @@ interface ElementBorder {
     type: string
 }
 
-export interface ElementConfig {
+export interface ElementConfig extends NodeConfig {
     noOverflow?: boolean;
     name?: string,
-    position?: ElementPosition
-    shrink?: boolean
     style?: ElementStyle
     shadow?: boolean
     dockBorders?: boolean
@@ -75,14 +64,20 @@ export interface ElementConfig {
     keyable?: boolean
     parseTags?: boolean
     content?: string
-    label?: string
-    hoverText?: string
+    focused?: boolean
+}
+
+interface WrappedContent extends Array<string> {
+    rtof?: number[];
+    ftor?: number[][];
+    fake?: string[];
+    mwidth?: number;
+    width?: number;
 }
 
 export class Element extends Node {
 
     public name: string
-    public position: ElementPosition
     public noOverflow: boolean
     public style: ElementStyle;
     public dockBorders: boolean
@@ -92,7 +87,6 @@ export class Element extends Node {
     public align: ElementHAlign
     public valign: ElementVAlign
     public wrap: boolean
-    public shrink: boolean
     public ch: string
     public padding: ElementEdgeOffset
     public border: ElementBorder
@@ -102,6 +96,8 @@ export class Element extends Node {
     public parseTags: boolean
     public draggable: boolean
     public content: string
+    private _slisteners: any[] = [];
+    private _clines: WrappedContent;
 
     constructor(options?: ElementConfig) {
         super(options);
@@ -111,22 +107,6 @@ export class Element extends Node {
         options = options || {};
 
         this.name = options.name;
-        this.position = options.position
-
-        if (options.position && (options.position.width === 'shrink'
-            || options.position.height === 'shrink')) {
-            if (options.position.width === 'shrink') {
-                delete options.position.width;
-            }
-            if (options.position.height === 'shrink') {
-                delete options.position.height;
-            }
-            this.shrink = true;
-        } else {
-            this.shrink = options.shrink
-        }
-
-        this.position = options.position;
 
         this.noOverflow = options.noOverflow;
         this.dockBorders = options.dockBorders;
@@ -168,17 +148,9 @@ export class Element extends Node {
             this.screen._listenKeys(this);
         }
 
-        this.parseTags = options.parseTags || options.tags;
+        this.parseTags = options.parseTags;
 
         this.setContent(options.content || '', true);
-
-        if (options.label) {
-            this.setLabel(options.label);
-        }
-
-        if (options.hoverText) {
-            this.setHover(options.hoverText);
-        }
 
         // TODO: Possibly move this to Node for onScreenEvent('mouse', ...).
         this.on('newListener', function fn(type: string) {
@@ -211,30 +183,6 @@ export class Element extends Node {
             delete self.lpos;
         });
 
-        if (options.hoverBg != null) {
-            options.hoverEffects = options.hoverEffects || {};
-            options.hoverEffects.bg = options.hoverBg;
-        }
-
-        if (this.style.hover) {
-            options.hoverEffects = this.style.hover;
-        }
-
-        if (this.style.focus) {
-            options.focusEffects = this.style.focus;
-        }
-
-        if (options.effects) {
-            if (options.effects.hover) options.hoverEffects = options.effects.hover;
-            if (options.effects.focus) options.focusEffects = options.effects.focus;
-        }
-
-        for (const props of [['hoverEffects', 'mouseover', 'mouseout', '_htemp'],
-            ['focusEffects', 'focus', 'blur', '_ftemp']]) {
-            var pname = props[0], over = props[1], out = props[2], temp = props[3];
-            self.screen.setEffects(self, self, over, out, self.options[pname], temp);
-        }
-
         if (this.options.draggable) {
             this.draggable = true;
         }
@@ -242,6 +190,7 @@ export class Element extends Node {
         if (options.focused) {
             this.focus();
         }
+
         this.type = 'element';
         this._render = Element.prototype.render;
     }
@@ -282,13 +231,13 @@ export class Element extends Node {
     }
 
     onScreenEvent(type, handler) {
-        var listeners = this._slisteners = this._slisteners || [];
+        var listeners = this._slisteners
         listeners.push({type: type, handler: handler});
         this.screen.on(type, handler);
     }
 
     onceScreenEvent(type, handler) {
-        var listeners = this._slisteners = this._slisteners || [];
+        var listeners = this._slisteners
         var entry = {type: type, handler: handler};
         listeners.push(entry);
         this.screen.once(type, function () {
@@ -299,14 +248,11 @@ export class Element extends Node {
     }
 
     removeScreenEvent(type, handler) {
-        var listeners = this._slisteners = this._slisteners || [];
+        var listeners = this._slisteners;
         for (var i = 0; i < listeners.length; i++) {
             var listener = listeners[i];
             if (listener.type === type && listener.handler === handler) {
                 listeners.splice(i, 1);
-                if (this._slisteners.length === 0) {
-                    delete this._slisteners;
-                }
                 break;
             }
         }
@@ -314,12 +260,14 @@ export class Element extends Node {
     }
 
     free() {
-        var listeners = this._slisteners = this._slisteners || [];
-        for (var i = 0; i < listeners.length; i++) {
-            var listener = listeners[i];
+        if(!this._slisteners) return
+
+        const listeners = this._slisteners;
+        for (let i = 0; i < listeners.length; i++) {
+            const listener = listeners[i];
             this.screen.removeListener(listener.type, listener.handler);
         }
-        delete this._slisteners;
+        this._slisteners = [];
     }
 
     hide() {
@@ -371,7 +319,7 @@ export class Element extends Node {
     parseContent(noTags?: boolean) {
         if (this.detached) return false;
 
-        var width = this.width - this.iwidth;
+        var width = this.getwidth() - this.getiwidth();
         if (this._clines == null
             || this._clines.width !== width
             || this._clines.content !== this.content) {
@@ -575,57 +523,42 @@ export class Element extends Node {
             , len = cline.length
             , s = width - len;
 
-        if (this.shrink) {
-            s = 0;
-        }
-
         if (len === 0) return line;
         if (s < 0) return line;
 
         if (align === 'center') {
-            s = Array(((s / 2) | 0) + 1).join(' ');
-            return s + line + s;
+            let pad = Array(((s / 2) | 0) + 1).join(' ');
+            return pad + line + pad
         } else if (align === 'right') {
-            s = Array(s + 1).join(' ');
-            return s + line;
+            let pad = Array(s + 1).join(' ');
+            return pad + line;
         } else if (this.parseTags && ~line.indexOf('{|}')) {
-            var parts = line.split('{|}');
-            var cparts = cline.split('{|}');
+            let parts = line.split('{|}');
+            let cparts = cline.split('{|}');
             s = Math.max(width - cparts[0].length - cparts[1].length, 0);
-            s = Array(s + 1).join(' ');
-            return parts[0] + s + parts[1];
+            let pad = Array(s + 1).join(' ');
+            return parts[0] + pad + parts[1];
         }
 
         return line;
     }
 
-    _wrapContent(content, width) {
-        var tags = this.parseTags
-            , state = this.align
-            , wrap = this.wrap
-            , margin = 0
-            , rtof = []
-            , ftor = []
-            , out = []
-            , no = 0
-            , line
-            , align
-            , cap
-            , total
-            , i
-            , part
-            , j
-            , lines
-            , rest;
+    _wrapContent(content: string, width: number): WrappedContent {
+        let state = this.align
+        let wrap = this.wrap
+        let margin = 0
+        let rtof = []
+        let ftor = []
+        let out: WrappedContent = []
+        let no = 0
+            ;
 
-        lines = content.split('\n');
-
+        let lines = content.split('\n');
         if (!content) {
             out.push(content);
             out.rtof = [0];
             out.ftor = [[0]];
             out.fake = lines;
-            out.real = out;
             out.mwidth = 0;
             return out;
         }
@@ -636,30 +569,17 @@ export class Element extends Node {
 
         main:
             for (; no < lines.length; no++) {
-                line = lines[no];
-                align = state;
-
+                var line = lines[no];
+                var align = state;
                 ftor.push([]);
-
-                // Handle alignment tags.
-                if (tags) {
-                    if (cap = /^{(left|center|right)}/.exec(line)) {
-                        line = line.substring(cap[0].length);
-                        align = state = cap[1] !== 'left'
-                            ? cap[1]
-                            : null;
-                    }
-                    if (cap = /{\/(left|center|right)}$/.exec(line)) {
-                        line = line.slice(0, -cap[0].length);
-                        //state = null;
-                        state = this.align;
-                    }
-                }
 
                 // If the string is apparently too long, wrap it.
                 while (line.length > width) {
                     // Measure the real width of the string.
-                    for (i = 0, total = 0; i < line.length; i++) {
+                    let total = 0;
+                    let i = 0
+
+                    for (; i < line.length; i++) {
                         while (line[i] === '\x1b') {
                             while (line[i] && line[i++] !== 'm') ;
                         }
@@ -669,21 +589,14 @@ export class Element extends Node {
                             // the control sequences before cutting off the line.
                             i++;
                             if (!wrap) {
-                                rest = line.substring(i).match(/\x1b\[[^m]*m/g);
+                                var rest = line.substring(i).match(/\x1b\[[^m]*m/g);
                                 rest = rest ? rest.join('') : '';
                                 out.push(this._align(line.substring(0, i) + rest, width, align));
                                 ftor[no].push(out.length - 1);
                                 rtof.push(no);
                                 continue main;
                             }
-                            if (!this.screen.fullUnicode) {
-                                // Try to find a space to break on.
-                                if (i !== line.length) {
-                                    j = i;
-                                    while (j > i - 10 && j > 0 && line[--j] !== ' ') ;
-                                    if (line[j] === ' ') i = j + 1;
-                                }
-                            } else {
+                            if (this.screen.fullUnicode) {
                                 // Try to find a character to break on.
                                 if (i !== line.length) {
                                     // <XXX>
@@ -697,11 +610,7 @@ export class Element extends Node {
                                     }
                                     i += s;
                                     // </XXX>
-                                    j = i;
-                                    // Break _past_ space.
-                                    // Break _past_ double-width chars.
-                                    // Break _past_ surrogate pairs.
-                                    // Break _past_ combining chars.
+                                    var j = i; // Break _past_ space. // Break _past_ double-width chars. // Break _past_ surrogate pairs. // Break _past_ combining chars.
                                     while (j > i - 10 && j > 0) {
                                         j--;
                                         if (line[j] === ' '
@@ -718,12 +627,19 @@ export class Element extends Node {
                                         i = j + 1;
                                     }
                                 }
+                            } else {
+                                // Try to find a space to break on.
+                                if (i !== line.length) {
+                                    j = i;
+                                    while (j > i - 10 && j > 0 && line[--j] !== ' ') ;
+                                    if (line[j] === ' ') i = j + 1;
+                                }
                             }
                             break;
                         }
                     }
 
-                    part = line.substring(0, i);
+                    var part = line.substring(0, i);
                     line = line.substring(i);
 
                     out.push(this._align(part, width, align));
@@ -749,7 +665,6 @@ export class Element extends Node {
         out.rtof = rtof;
         out.ftor = ftor;
         out.fake = lines;
-        out.real = out;
 
         out.mwidth = out.reduce(function (current, line) {
             line = line.replace(/\x1b\[[\d;]*m/g, '');
@@ -772,82 +687,6 @@ export class Element extends Node {
     enableInput() {
         this.screen._listenMouse(this);
         this.screen._listenKeys(this);
-    }
-
-    enableDrag(verify) {
-        var self = this;
-
-        if (this._draggable) return true;
-
-        if (typeof verify !== 'function') {
-            verify = function () {
-                return true;
-            };
-        }
-
-        this.enableMouse();
-
-        this.on('mousedown', this._dragMD = function (data) {
-            if (self.screen._dragging) return;
-            if (!verify(data)) return;
-            self.screen._dragging = self;
-            self._drag = {
-                x: data.x - self.aleft,
-                y: data.y - self.atop
-            };
-            self.setFront();
-        });
-
-        this.onScreenEvent('mouse', this._dragM = function (data) {
-            if (self.screen._dragging !== self) return;
-
-            if (data.action !== 'mousedown' && data.action !== 'mousemove') {
-                delete self.screen._dragging;
-                delete self._drag;
-                return;
-            }
-
-            // This can happen in edge cases where the user is
-            // already dragging and element when it is detached.
-            if (!self.parent) return;
-
-            var ox = self._drag.x
-                , oy = self._drag.y
-                , px = self.parent.aleft
-                , py = self.parent.atop
-                , x = data.x - px - ox
-                , y = data.y - py - oy;
-
-            if (self.position.right != null) {
-                if (self.position.left != null) {
-                    self.width = '100%-' + (self.parent.width - self.width);
-                }
-                self.position.right = null;
-            }
-
-            if (self.position.bottom != null) {
-                if (self.position.top != null) {
-                    self.height = '100%-' + (self.parent.height - self.height);
-                }
-                self.position.bottom = null;
-            }
-
-            self.rleft = x;
-            self.rtop = y;
-
-            self.screen.render();
-        });
-
-        return this._draggable = true;
-    }
-
-    disableDrag() {
-        if (!this._draggable) return false;
-        delete this.screen._dragging;
-        delete this._drag;
-        this.removeListener('mousedown', this._dragMD);
-        this.removeScreenEvent('mouse', this._dragM);
-        return this._draggable = false;
     }
 
     key() {
@@ -901,105 +740,6 @@ export class Element extends Node {
             override);
     }
 
-    setLabel(options) {
-        var self = this;
-        var Box = require('./box');
-
-        if (typeof options === 'string') {
-            options = {text: options};
-        }
-
-        if (this._label) {
-            this._label.setContent(options.text);
-            if (options.side !== 'right') {
-                this._label.rleft = 2 + (this.style.border ? -1 : 0);
-                this._label.position.right = undefined;
-                if (!this.screen.autoPadding) {
-                    this._label.rleft = 2;
-                }
-            } else {
-                this._label.rright = 2 + (this.style.border ? -1 : 0);
-                this._label.position.left = undefined;
-                if (!this.screen.autoPadding) {
-                    this._label.rright = 2;
-                }
-            }
-            return;
-        }
-
-        this._label = new Box({
-            screen: this.screen,
-            parent: this,
-            content: options.text,
-            top: -this.itop,
-            tags: this.parseTags,
-            shrink: true,
-            style: this.style.label
-        });
-
-        if (options.side !== 'right') {
-            this._label.rleft = 2 - this.ileft;
-        } else {
-            this._label.rright = 2 - this.iright;
-        }
-
-        this._label._isLabel = true;
-
-        if (!this.screen.autoPadding) {
-            if (options.side !== 'right') {
-                this._label.rleft = 2;
-            } else {
-                this._label.rright = 2;
-            }
-            this._label.rtop = 0;
-        }
-
-        var reposition = function () {
-            self._label.rtop = (self.childBase || 0) - self.itop;
-            if (!self.screen.autoPadding) {
-                self._label.rtop = (self.childBase || 0);
-            }
-            self.screen.render();
-        };
-
-        this.on('scroll', this._labelScroll = function () {
-            reposition();
-        });
-
-        this.on('resize', this._labelResize = function () {
-            nextTick(function () {
-                reposition();
-            });
-        });
-    }
-
-    removeLabel() {
-        if (!this._label) return;
-        this.removeListener('scroll', this._labelScroll);
-        this.removeListener('resize', this._labelResize);
-        this._label.detach();
-        delete this._labelScroll;
-        delete this._labelResize;
-        delete this._label;
-    }
-
-    setHover(options) {
-        if (typeof options === 'string') {
-            options = {text: options};
-        }
-
-        this._hoverOptions = options;
-        this.enableMouse();
-        this.screen._initHover();
-    }
-
-    removeHover() {
-        delete this._hoverOptions;
-        if (!this.screen._hoverText || this.screen._hoverText.detached) return;
-        this.screen._hoverText.detach();
-        this.screen.render();
-    }
-
 // The below methods are a bit confusing: basically
 // whenever Box.render is called `lpos` gets set on
 // the element, an object containing the rendered
@@ -1021,12 +761,12 @@ export class Element extends Node {
 
         if (pos.aleft != null) return pos;
 
-        pos.aleft = pos.xi;
-        pos.atop = pos.yi;
-        pos.aright = this.screen.cols - pos.xl;
-        pos.abottom = this.screen.rows - pos.yl;
-        pos.width = pos.xl - pos.xi;
-        pos.height = pos.yl - pos.yi;
+        pos.setaleft(pos.xi);
+        pos.setatop(pos.yi);
+        pos.setaright(this.screen.cols - pos.xl);
+        pos.setabottom(this.screen.rows - pos.yl);
+        pos.setwidth(pos.xl - pos.xi);
+        pos.setheight(pos.yl - pos.yi);
 
         return pos;
     }
@@ -1034,429 +774,47 @@ export class Element extends Node {
     /**
      * Position Getters
      */
-    _getWidth(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , width = this.position.width
-            , left
-            , expr;
-
-        if (typeof width === 'string') {
-            if (width === 'half') width = '50%';
-            expr = width.split(/(?=\+|-)/);
-            width = expr[0];
-            width = +width.slice(0, -1) / 100;
-            width = parent.width * width | 0;
-            width += +(expr[1] || 0);
-            return width;
-        }
-
-        // This is for if the element is being streched or shrunken.
-        // Although the width for shrunken elements is calculated
-        // in the render function, it may be calculated based on
-        // the content width, and the content width is initially
-        // decided by the width the element, so it needs to be
-        // calculated here.
-        if (width == null) {
-            left = this.position.left || 0;
-            if (typeof left === 'string') {
-                if (left === 'center') left = '50%';
-                expr = left.split(/(?=\+|-)/);
-                left = expr[0];
-                left = +left.slice(0, -1) / 100;
-                left = parent.width * left | 0;
-                left += +(expr[1] || 0);
-            }
-            width = parent.width - (this.position.right || 0) - left;
-            if (this.screen.autoPadding) {
-                if ((this.position.left != null || this.position.right == null)
-                    && this.position.left !== 'center') {
-                    width -= this.parent.ileft;
-                }
-                width -= this.parent.iright;
-            }
-        }
-
-        return width;
+    _getWidth() {
+        return this.position.width
     }
 
-    _getHeight(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , height = this.position.height
-            , top
-            , expr;
-
-        if (typeof height === 'string') {
-            if (height === 'half') height = '50%';
-            expr = height.split(/(?=\+|-)/);
-            height = expr[0];
-            height = +height.slice(0, -1) / 100;
-            height = parent.height * height | 0;
-            height += +(expr[1] || 0);
-            return height;
-        }
-
-        // This is for if the element is being streched or shrunken.
-        // Although the width for shrunken elements is calculated
-        // in the render function, it may be calculated based on
-        // the content width, and the content width is initially
-        // decided by the width the element, so it needs to be
-        // calculated here.
-        if (height == null) {
-            top = this.position.top || 0;
-            if (typeof top === 'string') {
-                if (top === 'center') top = '50%';
-                expr = top.split(/(?=\+|-)/);
-                top = expr[0];
-                top = +top.slice(0, -1) / 100;
-                top = parent.height * top | 0;
-                top += +(expr[1] || 0);
-            }
-            height = parent.height - (this.position.bottom || 0) - top;
-            if (this.screen.autoPadding) {
-                if ((this.position.top != null
-                    || this.position.bottom == null)
-                    && this.position.top !== 'center') {
-                    height -= this.parent.itop;
-                }
-                height -= this.parent.ibottom;
-            }
-        }
-
-        return height;
+    _getHeight() {
+        return this.position.height;
     }
 
-    _getLeft(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , left = this.position.left || 0
-            , expr;
-
-        if (typeof left === 'string') {
-            if (left === 'center') left = '50%';
-            expr = left.split(/(?=\+|-)/);
-            left = expr[0];
-            left = +left.slice(0, -1) / 100;
-            left = parent.width * left | 0;
-            left += +(expr[1] || 0);
-            if (this.position.left === 'center') {
-                left -= this._getWidth(get) / 2 | 0;
-            }
-        }
-
-        if (this.position.left == null && this.position.right != null) {
-            return this.screen.cols - this._getWidth(get) - this._getRight(get);
-        }
-
-        if (this.screen.autoPadding) {
-            if ((this.position.left != null
-                || this.position.right == null)
-                && this.position.left !== 'center') {
-                left += this.parent.ileft;
-            }
-        }
-
-        return (parent.aleft || 0) + left;
+    _getLeft() {
+        return this.position.x
     }
 
-    _getRight(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , right;
-
-        if (this.position.right == null && this.position.left != null) {
-            right = this.screen.cols - (this._getLeft(get) + this._getWidth(get));
-            if (this.screen.autoPadding) {
-                right += this.parent.iright;
-            }
-            return right;
-        }
-
-        right = (parent.aright || 0) + (this.position.right || 0);
-
-        if (this.screen.autoPadding) {
-            right += this.parent.iright;
-        }
-
-        return right;
+    _getRight() {
+        return this.position.x + this.position.width
     }
 
-    _getTop(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , top = this.position.top || 0
-            , expr;
-
-        if (typeof top === 'string') {
-            if (top === 'center') top = '50%';
-            expr = top.split(/(?=\+|-)/);
-            top = expr[0];
-            top = +top.slice(0, -1) / 100;
-            top = parent.height * top | 0;
-            top += +(expr[1] || 0);
-            if (this.position.top === 'center') {
-                top -= this._getHeight(get) / 2 | 0;
-            }
-        }
-
-        if (this.position.top == null && this.position.bottom != null) {
-            return this.screen.rows - this._getHeight(get) - this._getBottom(get);
-        }
-
-        if (this.screen.autoPadding) {
-            if ((this.position.top != null
-                || this.position.bottom == null)
-                && this.position.top !== 'center') {
-                top += this.parent.itop;
-            }
-        }
-
-        return (parent.atop || 0) + top;
+    _getTop() {
+        return this.position.y
     }
 
-    _getBottom(get) {
-        var parent = get ? this.parent._getPos() : this.parent
-            , bottom;
-
-        if (this.position.bottom == null && this.position.top != null) {
-            bottom = this.screen.rows - (this._getTop(get) + this._getHeight(get));
-            if (this.screen.autoPadding) {
-                bottom += this.parent.ibottom;
-            }
-            return bottom;
-        }
-
-        bottom = (parent.abottom || 0) + (this.position.bottom || 0);
-
-        if (this.screen.autoPadding) {
-            bottom += this.parent.ibottom;
-        }
-
-        return bottom;
+    _getBottom() {
+        return this.position.y + this.position.height
     }
 
-    /**
-     * Rendering - here be dragons
-     */
-    _getShrinkBox(xi, xl, yi, yl, get) {
-        if (!this.children.length) {
-            return {xi: xi, xl: xi + 1, yi: yi, yl: yi + 1};
-        }
-
-        var i, el, ret, mxi = xi, mxl = xi + 1, myi = yi, myl = yi + 1;
-
-        // This is a chicken and egg problem. We need to determine how the children
-        // will render in order to determine how this element renders, but it in
-        // order to figure out how the children will render, they need to know
-        // exactly how their parent renders, so, we can give them what we have so
-        // far.
-        var _lpos;
-        if (get) {
-            _lpos = this.lpos;
-            this.lpos = {xi: xi, xl: xl, yi: yi, yl: yl};
-            //this.shrink = false;
-        }
-
-        for (i = 0; i < this.children.length; i++) {
-            el = this.children[i];
-
-            ret = el._getCoords(get);
-
-            // Or just (seemed to work, but probably not good):
-            // ret = el.lpos || this.lpos;
-
-            if (!ret) continue;
-
-            // Since the parent element is shrunk, and the child elements think it's
-            // going to take up as much space as possible, an element anchored to the
-            // right or bottom will inadvertantly make the parent's shrunken size as
-            // large as possible. So, we can just use the height and/or width the of
-            // element.
-            // if (get) {
-            if (el.position.left == null && el.position.right != null) {
-                ret.xl = xi + (ret.xl - ret.xi);
-                ret.xi = xi;
-                if (this.screen.autoPadding) {
-                    // Maybe just do this no matter what.
-                    ret.xl += this.ileft;
-                    ret.xi += this.ileft;
-                }
-            }
-            if (el.position.top == null && el.position.bottom != null) {
-                ret.yl = yi + (ret.yl - ret.yi);
-                ret.yi = yi;
-                if (this.screen.autoPadding) {
-                    // Maybe just do this no matter what.
-                    ret.yl += this.itop;
-                    ret.yi += this.itop;
-                }
-            }
-
-            if (ret.xi < mxi) mxi = ret.xi;
-            if (ret.xl > mxl) mxl = ret.xl;
-            if (ret.yi < myi) myi = ret.yi;
-            if (ret.yl > myl) myl = ret.yl;
-        }
-
-        if (get) {
-            this.lpos = _lpos;
-            //this.shrink = true;
-        }
-
-        if (this.position.width == null
-            && (this.position.left == null
-                || this.position.right == null)) {
-            if (this.position.left == null && this.position.right != null) {
-                xi = xl - (mxl - mxi);
-                if (!this.screen.autoPadding) {
-                    xi -= this.padding.left + this.padding.right;
-                } else {
-                    xi -= this.ileft;
-                }
-            } else {
-                xl = mxl;
-                if (!this.screen.autoPadding) {
-                    xl += this.padding.left + this.padding.right;
-                    // XXX Temporary workaround until we decide to make autoPadding default.
-                    // See widget-listtable.js for an example of why this is necessary.
-                    // XXX Maybe just to this for all this being that this would affect
-                    // width shrunken normal shrunken lists as well.
-                    // if (this._isList) {
-                    if (this.type === 'list-table') {
-                        xl -= this.padding.left + this.padding.right;
-                        xl += this.iright;
-                    }
-                } else {
-                    //xl += this.padding.right;
-                    xl += this.iright;
-                }
-            }
-        }
-
-        if (this.position.height == null
-            && (this.position.top == null
-                || this.position.bottom == null)
-            && (!this.scrollable || this._isList)) {
-            // NOTE: Lists get special treatment if they are shrunken - assume they
-            // want all list items showing. This is one case we can calculate the
-            // height based on items/boxes.
-            if (this._isList) {
-                myi = 0 - this.itop;
-                myl = this.items.length + this.ibottom;
-            }
-            if (this.position.top == null && this.position.bottom != null) {
-                yi = yl - (myl - myi);
-                if (!this.screen.autoPadding) {
-                    yi -= this.padding.top + this.padding.bottom;
-                } else {
-                    yi -= this.itop;
-                }
-            } else {
-                yl = myl;
-                if (!this.screen.autoPadding) {
-                    yl += this.padding.top + this.padding.bottom;
-                } else {
-                    yl += this.ibottom;
-                }
-            }
-        }
-
-        return {xi: xi, xl: xl, yi: yi, yl: yl};
-    }
-
-    _getShrinkContent(xi, xl, yi, yl) {
-        var h = this._clines.length
-            , w = this._clines.mwidth || 1;
-
-        if (this.position.width == null
-            && (this.position.left == null
-                || this.position.right == null)) {
-            if (this.position.left == null && this.position.right != null) {
-                xi = xl - w - this.iwidth;
-            } else {
-                xl = xi + w + this.iwidth;
-            }
-        }
-
-        if (this.position.height == null
-            && (this.position.top == null
-                || this.position.bottom == null)
-            && (!this.scrollable || this._isList)) {
-            if (this.position.top == null && this.position.bottom != null) {
-                yi = yl - h - this.iheight;
-            } else {
-                yl = yi + h + this.iheight;
-            }
-        }
-
-        return {xi: xi, xl: xl, yi: yi, yl: yl};
-    }
-
-    _getShrink(xi, xl, yi, yl, get) {
-        var shrinkBox = this._getShrinkBox(xi, xl, yi, yl, get)
-            , shrinkContent = this._getShrinkContent(xi, xl, yi, yl, get)
-            , xll = xl
-            , yll = yl;
-
-        // Figure out which one is bigger and use it.
-        if (shrinkBox.xl - shrinkBox.xi > shrinkContent.xl - shrinkContent.xi) {
-            xi = shrinkBox.xi;
-            xl = shrinkBox.xl;
-        } else {
-            xi = shrinkContent.xi;
-            xl = shrinkContent.xl;
-        }
-
-        if (shrinkBox.yl - shrinkBox.yi > shrinkContent.yl - shrinkContent.yi) {
-            yi = shrinkBox.yi;
-            yl = shrinkBox.yl;
-        } else {
-            yi = shrinkContent.yi;
-            yl = shrinkContent.yl;
-        }
-
-        // Recenter shrunken elements.
-        if (xl < xll && this.position.left === 'center') {
-            xll = (xll - xl) / 2 | 0;
-            xi += xll;
-            xl += xll;
-        }
-
-        if (yl < yll && this.position.top === 'center') {
-            yll = (yll - yl) / 2 | 0;
-            yi += yll;
-            yl += yll;
-        }
-
-        return {xi: xi, xl: xl, yi: yi, yl: yl};
-    }
-
-    _getCoords(get, noscroll) {
+    _getCoords(noscroll?: boolean) {
         if (this.hidden) return;
 
-        // if (this.parent._rendering) {
-        //   get = true;
-        // }
-
-        var xi = this._getLeft(get)
-            , xl = xi + this._getWidth(get)
-            , yi = this._getTop(get)
-            , yl = yi + this._getHeight(get)
-            , base = this.childBase || 0
-            , el = this
-            , fixed = this.fixed
-            , coords
-            , v
-            , noleft
-            , noright
-            , notop
-            , nobot
-            , ppos
-            , b;
-
-        // Attempt to shrink the element base on the
-        // size of the content and child elements.
-        if (this.shrink) {
-            coords = this._getShrink(xi, xl, yi, yl, get);
-            xi = coords.xi, xl = coords.xl;
-            yi = coords.yi, yl = coords.yl;
-        }
+        let xi = this._getLeft()
+        let xl = xi + this._getWidth()
+        let yi = this._getTop()
+        let yl = yi + this._getHeight()
+        let base = this.childBase || 0
+        let el: Node = this
+        let fixed = this.fixed
+        let v
+        let noleft
+        let noright
+        let notop
+        let nobot
+        let ppos
+        let b;
 
         // Find a scrollable ancestor if we have one.
         while (el = el.parent) {
@@ -1489,7 +847,7 @@ export class Element extends Node {
             //   ppos = thisparent._getCoords();
             // }
 
-            if (!ppos) return;
+            if (!ppos) return null;
 
             // TODO: Figure out how to fix base (and cbase to only
             // take into account the *parent's* padding.
@@ -1499,20 +857,10 @@ export class Element extends Node {
 
             b = thisparent.border ? 1 : 0;
 
-            // XXX
-            // Fixes non-`fixed` labels to work with scrolling (they're ON the border):
-            // if (this.position.left < 0
-            //     || this.position.right < 0
-            //     || this.position.top < 0
-            //     || this.position.bottom < 0) {
-            if (this._isLabel) {
-                b = 0;
-            }
-
             if (yi < ppos.yi + b) {
                 if (yl - 1 < ppos.yi + b) {
                     // Is above.
-                    return;
+                    return null;
                 } else {
                     // Is partially covered above.
                     notop = true;
@@ -1525,7 +873,7 @@ export class Element extends Node {
             } else if (yl > ppos.yl - b) {
                 if (yi > ppos.yl - 1 - b) {
                     // Is below.
-                    return;
+                    return null;
                 } else {
                     // Is partially covered below.
                     nobot = true;
@@ -1538,7 +886,7 @@ export class Element extends Node {
 
             // Shouldn't be necessary.
             // assert.ok(yi < yl);
-            if (yi >= yl) return;
+            if (yi >= yl) return null;
 
             // Could allow overlapping stuff in scrolling elements
             // if we cleared the pending buffer before every draw.
@@ -1559,17 +907,17 @@ export class Element extends Node {
         }
 
         if (this.noOverflow && this.parent.lpos) {
-            if (xi < this.parent.lpos.xi + this.parent.ileft) {
-                xi = this.parent.lpos.xi + this.parent.ileft;
+            if (xi < this.parent.lpos.xi + this.parent.getileft()) {
+                xi = this.parent.lpos.xi + this.parent.getileft();
             }
-            if (xl > this.parent.lpos.xl - this.parent.iright) {
-                xl = this.parent.lpos.xl - this.parent.iright;
+            if (xl > this.parent.lpos.xl - this.parent.getirignt()) {
+                xl = this.parent.lpos.xl - this.parent.getirignt();
             }
-            if (yi < this.parent.lpos.yi + this.parent.itop) {
-                yi = this.parent.lpos.yi + this.parent.itop;
+            if (yi < this.parent.lpos.yi + this.parent.getitop()) {
+                yi = this.parent.lpos.yi + this.parent.getitop();
             }
-            if (yl > this.parent.lpos.yl - this.parent.ibottom) {
-                yl = this.parent.lpos.yl - this.parent.ibottom;
+            if (yl > this.parent.lpos.yl - this.parent.getibottom()) {
+                yl = this.parent.lpos.yl - this.parent.getibottom();
             }
         }
 
@@ -1597,7 +945,7 @@ export class Element extends Node {
 
         this.parseContent();
 
-        var coords = this._getCoords(true);
+        var coords = this._getCoords();
         if (!coords) {
             delete this.lpos;
             return;
@@ -1732,7 +1080,7 @@ export class Element extends Node {
         // Draw the content and background.
         for (y = yi; y < yl; y++) {
             if (!lines[y]) {
-                if (y >= this.screen.height || yl < this.ibottom) {
+                if (y >= this.screen.getheight() || yl < this.getibottom()) {
                     break;
                 } else {
                     continue;
@@ -1741,7 +1089,7 @@ export class Element extends Node {
             for (x = xi; x < xl; x++) {
                 cell = lines[y][x];
                 if (!cell) {
-                    if (x >= this.screen.width || xl < this.iright) {
+                    if (x >= this.screen.getwidth() || xl < this.getirignt()) {
                         break;
                     } else {
                         continue;
@@ -2144,15 +1492,15 @@ export class Element extends Node {
             var pos = this._getCoords();
             if (!pos) return;
 
-            var height = pos.yl - pos.yi - this.iheight
+            var height = pos.yl - pos.yi - this.getiheight()
                 , base = this.childBase || 0
                 , visible = real >= base && real - base < height;
 
             if (pos && visible && this.screen.cleanSides(this)) {
                 this.screen.insertLine(diff,
-                    pos.yi + this.itop + real - base,
+                    pos.yi + this.getitop() + real - base,
                     pos.yi,
-                    pos.yl - this.ibottom - 1);
+                    pos.yl - this.getibottom() - 1);
             }
         }
     }
@@ -2188,16 +1536,16 @@ export class Element extends Node {
             var pos = this._getCoords();
             if (!pos) return;
 
-            height = pos.yl - pos.yi - this.iheight;
+            height = pos.yl - pos.yi - this.getiheight();
 
             var base = this.childBase || 0
                 , visible = real >= base && real - base < height;
 
             if (pos && visible && this.screen.cleanSides(this)) {
                 this.screen.deleteLine(diff,
-                    pos.yi + this.itop + real - base,
+                    pos.yi + this.getitop() + real - base,
                     pos.yi,
-                    pos.yl - this.ibottom - 1);
+                    pos.yl - this.getibottom() - 1);
             }
         }
 
@@ -2212,7 +1560,7 @@ export class Element extends Node {
     }
 
     insertBottom(line) {
-        var h = (this.childBase || 0) + this.height - this.iheight
+        var h = (this.childBase || 0) + this.height - this.getiheight()
             , i = Math.min(h, this._clines.length)
             , fake = this._clines.rtof[i - 1] + 1;
 
@@ -2225,7 +1573,7 @@ export class Element extends Node {
     }
 
     deleteBottom(n) {
-        var h = (this.childBase || 0) + this.height - 1 - this.iheight
+        var h = (this.childBase || 0) + this.height - 1 - this.getiheight()
             , i = Math.min(h, this._clines.length - 1)
             , fake = this._clines.rtof[i];
 
@@ -2303,20 +1651,138 @@ export class Element extends Node {
             : helpers.dropUnicode(text).length;
     }
 
-    screenshot(xi, xl, yi, yl) {
-        xi = this.lpos.xi + this.ileft + (xi || 0);
-        if (xl != null) {
-            xl = this.lpos.xi + this.ileft + (xl || 0);
-        } else {
-            xl = this.lpos.xl - this.iright;
-        }
-        yi = this.lpos.yi + this.itop + (yi || 0);
-        if (yl != null) {
-            yl = this.lpos.yi + this.itop + (yl || 0);
-        } else {
-            yl = this.lpos.yl - this.ibottom;
-        }
-        return this.screen.screenshot(xi, xl, yi, yl);
+    getileft(){
+        return (this.style.border ? 1 : 0) + this.padding.left;
+        // return (this.style.border && this.style.border.left ? 1 : 0) + this.padding.left;
+    }
+
+    getitop() {
+        return (this.style.border ? 1 : 0) + this.padding.top;
+        // return (this.style.border && this.style.border.top ? 1 : 0) + this.padding.top;
+    }
+
+    getiright(){
+        return (this.style.border ? 1 : 0) + this.padding.right;
+        // return (this.style.border && this.style.border.right ? 1 : 0) + this.padding.right;
+    }
+
+    getibottom(){
+        return (this.style.border ? 1 : 0) + this.padding.bottom;
+        // return (this.style.border && this.style.border.bottom ? 1 : 0) + this.padding.bottom;
+    }
+
+    getiwidth() {
+        // return (this.style.border
+        //   ? ((this.style.border.left ? 1 : 0) + (this.style.border.right ? 1 : 0)) : 0)
+        //   + this.padding.left + this.padding.right;
+        return (this.style.border ? 2 : 0) + this.padding.left + this.padding.right;
+    }
+
+    getiheight(){
+        // return (this.style.border
+        //   ? ((this.style.border.top ? 1 : 0) + (this.style.border.bottom ? 1 : 0)) : 0)
+        //   + this.padding.top + this.padding.bottom;
+        return (this.style.border ? 2 : 0) + this.padding.top + this.padding.bottom;
+    }
+
+    getrleft() {
+        return this.getaleft() - this.parent.getaleft();
+    }
+
+    getrright() {
+        return this.getaright() - this.parent.getaright();
+    }
+
+    getrtop() {
+        return this.getatop() - this.parent.getatop();
+    }
+
+    getrbottom() {
+        return this.getabottom() - this.parent.getabottom();
+    }
+
+    // NOTE:
+    // For aright, abottom, right, and bottom:
+    // If position.bottom is null, we could simply set top instead.
+    // But it wouldn't replicate bottom behavior appropriately if
+    // the parent was resized, etc.
+    setwidth(val: number) {
+        if (this.position.width === val) return;
+        this.emit('resize');
+        this.clearPos();
+        return this.position.width = val;
+    }
+
+    setheight(val: number) {
+        if (this.position.height === val) return;
+        this.emit('resize');
+        this.clearPos();
+        this.position.height = val;
+    }
+
+    setaleft(val: number) {
+        val -= this.parent.getaleft();
+        if (this.position.x === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val;
+    }
+
+    setaright(val: number) {
+        val -= this.parent.getaright();
+        if (this.position.x + this.position.width === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val - this.position.width;
+    }
+
+    setatop(val: number) {
+        val -= this.parent.getatop();
+        if (this.getatop() === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.setrtop(val)
+    }
+
+    setabottom(val: number) {
+        val -= this.parent.getabottom();
+        if (this.getabottom() === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.setrbottom(val)
+    }
+
+    setrleft(val: number) {
+        if (this.position.x === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val;
+    }
+
+    setrright(val: number) {
+        if (this.position.x + this.position.width === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val - this.position.width;
+    }
+
+    setrtop(val: number) {
+        if (this.position.y === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.y = val;
+    }
+
+    setrbottom(val: number) {
+        if (this.position.y + this.position.height === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.y = val - this.position.height;
+    }
+
+    gettpadding(): number {
+        return this.padding.left + this.padding.top
+            + this.padding.right + this.padding.bottom;
     }
 }
 
@@ -2345,245 +1811,6 @@ Element.prototype.__defineGetter__('_detached', function () {
     return false;
 });
 
-Element.prototype.__defineGetter__('draggable', function () {
-    return this._draggable === true;
-});
-
-Element.prototype.__defineSetter__('draggable', function (draggable) {
-    return draggable ? this.enableDrag(draggable) : this.disableDrag();
-});
-
-/**
- * Positioning
- */
-
-Element.prototype.__defineGetter__('width', function () {
-    return this._getWidth(false);
-});
-
-Element.prototype.__defineGetter__('height', function () {
-    return this._getHeight(false);
-});
-
-Element.prototype.__defineGetter__('aleft', function () {
-    return this._getLeft(false);
-});
-
-Element.prototype.__defineGetter__('aright', function () {
-    return this._getRight(false);
-});
-
-Element.prototype.__defineGetter__('atop', function () {
-    return this._getTop(false);
-});
-
-Element.prototype.__defineGetter__('abottom', function () {
-    return this._getBottom(false);
-});
-
-Element.prototype.__defineGetter__('rleft', function () {
-    return this.aleft - this.parent.aleft;
-});
-
-Element.prototype.__defineGetter__('rright', function () {
-    return this.aright - this.parent.aright;
-});
-
-Element.prototype.__defineGetter__('rtop', function () {
-    return this.atop - this.parent.atop;
-});
-
-Element.prototype.__defineGetter__('rbottom', function () {
-    return this.abottom - this.parent.abottom;
-});
-
-/**
- * Position Setters
- */
-
-// NOTE:
-// For aright, abottom, right, and bottom:
-// If position.bottom is null, we could simply set top instead.
-// But it wouldn't replicate bottom behavior appropriately if
-// the parent was resized, etc.
-Element.prototype.__defineSetter__('width', function (val) {
-    if (this.position.width === val) return;
-    if (/^\d+$/.test(val)) val = +val;
-    this.emit('resize');
-    this.clearPos();
-    return this.position.width = val;
-});
-
-Element.prototype.__defineSetter__('height', function (val) {
-    if (this.position.height === val) return;
-    if (/^\d+$/.test(val)) val = +val;
-    this.emit('resize');
-    this.clearPos();
-    return this.position.height = val;
-});
-
-Element.prototype.__defineSetter__('aleft', function (val) {
-    var expr;
-    if (typeof val === 'string') {
-        if (val === 'center') {
-            val = this.screen.width / 2 | 0;
-            val -= this.width / 2 | 0;
-        } else {
-            expr = val.split(/(?=\+|-)/);
-            val = expr[0];
-            val = +val.slice(0, -1) / 100;
-            val = this.screen.width * val | 0;
-            val += +(expr[1] || 0);
-        }
-    }
-    val -= this.parent.aleft;
-    if (this.position.left === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.left = val;
-});
-
-Element.prototype.__defineSetter__('aright', function (val) {
-    val -= this.parent.aright;
-    if (this.position.right === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.right = val;
-});
-
-Element.prototype.__defineSetter__('atop', function (val) {
-    var expr;
-    if (typeof val === 'string') {
-        if (val === 'center') {
-            val = this.screen.height / 2 | 0;
-            val -= this.height / 2 | 0;
-        } else {
-            expr = val.split(/(?=\+|-)/);
-            val = expr[0];
-            val = +val.slice(0, -1) / 100;
-            val = this.screen.height * val | 0;
-            val += +(expr[1] || 0);
-        }
-    }
-    val -= this.parent.atop;
-    if (this.position.top === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.top = val;
-});
-
-Element.prototype.__defineSetter__('abottom', function (val) {
-    val -= this.parent.abottom;
-    if (this.position.bottom === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.bottom = val;
-});
-
-Element.prototype.__defineSetter__('rleft', function (val) {
-    if (this.position.left === val) return;
-    if (/^\d+$/.test(val)) val = +val;
-    this.emit('move');
-    this.clearPos();
-    return this.position.left = val;
-});
-
-Element.prototype.__defineSetter__('rright', function (val) {
-    if (this.position.right === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.right = val;
-});
-
-Element.prototype.__defineSetter__('rtop', function (val) {
-    if (this.position.top === val) return;
-    if (/^\d+$/.test(val)) val = +val;
-    this.emit('move');
-    this.clearPos();
-    return this.position.top = val;
-});
-
-Element.prototype.__defineSetter__('rbottom', function (val) {
-    if (this.position.bottom === val) return;
-    this.emit('move');
-    this.clearPos();
-    return this.position.bottom = val;
-});
-
-Element.prototype.__defineGetter__('ileft', function () {
-    return (this.style.border ? 1 : 0) + this.padding.left;
-    // return (this.style.border && this.style.border.left ? 1 : 0) + this.padding.left;
-});
-
-Element.prototype.__defineGetter__('itop', function () {
-    return (this.style.border ? 1 : 0) + this.padding.top;
-    // return (this.style.border && this.style.border.top ? 1 : 0) + this.padding.top;
-});
-
-Element.prototype.__defineGetter__('iright', function () {
-    return (this.style.border ? 1 : 0) + this.padding.right;
-    // return (this.style.border && this.style.border.right ? 1 : 0) + this.padding.right;
-});
-
-Element.prototype.__defineGetter__('ibottom', function () {
-    return (this.style.border ? 1 : 0) + this.padding.bottom;
-    // return (this.style.border && this.style.border.bottom ? 1 : 0) + this.padding.bottom;
-});
-
-Element.prototype.__defineGetter__('iwidth', function () {
-    // return (this.style.border
-    //   ? ((this.style.border.left ? 1 : 0) + (this.style.border.right ? 1 : 0)) : 0)
-    //   + this.padding.left + this.padding.right;
-    return (this.style.border ? 2 : 0) + this.padding.left + this.padding.right;
-});
-
-Element.prototype.__defineGetter__('iheight', function () {
-    // return (this.style.border
-    //   ? ((this.style.border.top ? 1 : 0) + (this.style.border.bottom ? 1 : 0)) : 0)
-    //   + this.padding.top + this.padding.bottom;
-    return (this.style.border ? 2 : 0) + this.padding.top + this.padding.bottom;
-});
-
-Element.prototype.__defineGetter__('tpadding', function () {
-    return this.padding.left + this.padding.top
-        + this.padding.right + this.padding.bottom;
-});
-
-/**
- * Relative coordinates as default properties
- */
-
-Element.prototype.__defineGetter__('left', function () {
-    return this.rleft;
-});
-
-Element.prototype.__defineGetter__('right', function () {
-    return this.rright;
-});
-
-Element.prototype.__defineGetter__('top', function () {
-    return this.rtop;
-});
-
-Element.prototype.__defineGetter__('bottom', function () {
-    return this.rbottom;
-});
-
-Element.prototype.__defineSetter__('left', function (val) {
-    return this.rleft = val;
-});
-
-Element.prototype.__defineSetter__('right', function (val) {
-    return this.rright = val;
-});
-
-Element.prototype.__defineSetter__('top', function (val) {
-    return this.rtop = val;
-});
-
-Element.prototype.__defineSetter__('bottom', function (val) {
-    return this.rbottom = val;
-});
 
 /**
  * Expose

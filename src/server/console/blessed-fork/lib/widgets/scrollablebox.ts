@@ -73,20 +73,20 @@ export class ScrollableBox extends Box {
                         delete self._drag;
                         return;
                     }
-                    var x = data.x - self.aleft;
-                    var y = data.y - self.atop;
-                    if (x === self.width - self.iright - 1) {
+                    var x = data.x - self.getaleft();
+                    var y = data.y - self.getatop();
+                    if (x === self.getwidth() - self.getirignt() - 1) {
                         // Do not allow dragging on the scrollbar:
                         delete self.screen._dragging;
                         delete self._drag;
-                        var perc = (y - self.itop) / (self.height - self.iheight);
+                        var perc = (y - self.getitop()) / (self.getheight() - self.getiheight());
                         self.setScrollPerc(perc * 100 | 0);
                         self.screen.render();
                         var smd, smu;
                         self._scrollingBar = true;
                         self.onScreenEvent('mousedown', smd = function (data) {
-                            var y = data.y - self.atop;
-                            var perc = y / self.height;
+                            var y = data.y - self.getaop();
+                            var perc = y / self.getheight();
                             self.setScrollPerc(perc * 100 | 0);
                             self.screen.render();
                         });
@@ -127,22 +127,22 @@ export class ScrollableBox extends Box {
                     return;
                 }
                 if (options.vi && key.name === 'u' && key.ctrl) {
-                    self.scroll(-(self.height / 2 | 0) || -1);
+                    self.scroll(-(self.getheight() / 2 | 0) || -1);
                     self.screen.render();
                     return;
                 }
                 if (options.vi && key.name === 'd' && key.ctrl) {
-                    self.scroll(self.height / 2 | 0 || 1);
+                    self.scroll(self.getheight() / 2 | 0 || 1);
                     self.screen.render();
                     return;
                 }
                 if (options.vi && key.name === 'b' && key.ctrl) {
-                    self.scroll(-self.height || -1);
+                    self.scroll(-self.getheight() || -1);
                     self.screen.render();
                     return;
                 }
                 if (options.vi && key.name === 'f' && key.ctrl) {
-                    self.scroll(self.height || 1);
+                    self.scroll(self.getheight() || 1);
                     self.screen.render();
                     return;
                 }
@@ -188,7 +188,7 @@ export class ScrollableBox extends Box {
             // without the scrollable calculation):
             // See: $ node test/widget-shrink-fail-2.js
             if (!el.detached) {
-                var lpos = el._getCoords(false, true);
+                var lpos = el._getCoords(false);
                 if (lpos) {
                     return Math.max(current, el.rtop + (lpos.yl - lpos.yi));
                 }
@@ -228,7 +228,7 @@ export class ScrollableBox extends Box {
         if (this.detached) return;
 
         // Handle scrolling.
-        var visible = this.height - this.iheight
+        var visible = this.getheight() - this.getiheight()
             , base = this.childBase
             , d
             , p
@@ -277,9 +277,9 @@ export class ScrollableBox extends Box {
         // XXX
         // max = this.getScrollHeight() - (this.height - this.iheight);
 
-        max = this._clines.length - (this.height - this.iheight);
+        max = this._clines.length - (this.height - this.getiheight());
         if (max < 0) max = 0;
-        emax = this._scrollBottom() - (this.height - this.iheight);
+        emax = this._scrollBottom() - (this.height - this.getiheight());
         if (emax < 0) emax = 0;
 
         this.childBase = Math.min(this.childBase, Math.max(emax, max));
@@ -298,8 +298,8 @@ export class ScrollableBox extends Box {
         // scrolling elements.
         // p = this._getCoords();
         if (p && this.childBase !== base && this.screen.cleanSides(this)) {
-            t = p.yi + this.itop;
-            b = p.yl - this.ibottom - 1;
+            t = p.yi + this.getitop();
+            b = p.yl - this.getibottom() - 1;
             d = this.childBase - base;
 
             if (d > 0 && d < visible) {
@@ -325,9 +325,9 @@ export class ScrollableBox extends Box {
         // XXX
         // max = this.getScrollHeight() - (this.height - this.iheight);
 
-        max = this._clines.length - (this.height - this.iheight);
+        max = this._clines.length - (this.height - this.getiheight());
         if (max < 0) max = 0;
-        emax = this._scrollBottom() - (this.height - this.iheight);
+        emax = this._scrollBottom() - (this.height - this.getiheight());
         if (emax < 0) emax = 0;
 
         this.childBase = Math.min(this.childBase, Math.max(emax, max));
@@ -354,7 +354,7 @@ export class ScrollableBox extends Box {
         var pos = this.lpos || this._getCoords();
         if (!pos) return s ? -1 : 0;
 
-        var height = (pos.yl - pos.yi) - this.iheight
+        var height = (pos.yl - pos.yi) - this.getiheight()
             , i = this.getScrollHeight()
             , p;
 

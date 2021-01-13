@@ -40,7 +40,7 @@ interface ScreenCursorConfig extends Required<CursorConfig> {
     _hidden: boolean
 }
 
-interface ScreenConfig {
+interface ScreenConfig extends NodeConfig {
     title?: string;
     tabSize?: number;
     autoPadding?: boolean;
@@ -53,6 +53,30 @@ interface ScreenConfig {
     forceUnicode?: boolean;
     program?: Program;
     cursor?: CursorConfig
+}
+
+export interface BlessedMouseEvent {
+
+    page: number;
+
+    /// Event name
+    name?: string
+
+    /// Terminal type
+    type?: string
+
+    raw?: any
+    buf?: Buffer
+
+    ctrl?: boolean
+    meta?: boolean
+    shift?: boolean
+
+    x?: number
+    y?: number
+
+    button?: string
+    action?: action
 }
 
 export class Screen extends Node {
@@ -71,12 +95,9 @@ export class Screen extends Node {
     public fullUnicode: any;
     public dattr: any;
     public renders: any;
-    public position: any;
     public left: any;
-    public aleft: any;
     public rleft: any;
     public right: any;
-    public aright: any;
     public rright: any;
     public top: any;
     public atop: any;
@@ -84,12 +105,6 @@ export class Screen extends Node {
     public bottom: any;
     public abottom: any;
     public rbottom: any;
-    public ileft: any;
-    public itop: any;
-    public iright: any;
-    public ibottom: any;
-    public iheight: any;
-    public iwidth: any;
     public padding: any;
     public hover: any;
     public history: any;
@@ -112,11 +127,7 @@ export class Screen extends Node {
     public _cursorBlink: any;
     public _needsClickableSort: any;
     public mouseDown: any;
-    public width: number
-    public height: number
-    public title: string
     public cursor: ScreenCursorConfig
-    public rows: number;
 
     /**
      * Screen
@@ -127,7 +138,7 @@ export class Screen extends Node {
 
         super(options);
 
-        var self = this;
+        let self = this;
 
         Screen.bind(this);
 
@@ -166,21 +177,13 @@ export class Screen extends Node {
         this.dattr = ((0 << 18) | (0x1ff << 9)) | 0x1ff;
 
         this.renders = 0;
-        this.position = {
-            left: this.left = this.aleft = this.rleft = 0,
-            right: this.right = this.aright = this.rright = 0,
-            top: this.top = this.atop = this.rtop = 0,
-            bottom: this.bottom = this.abottom = this.rbottom = 0,
-            get height() { return self.height; },
-            get width() { return self.width; }
-        };
 
-        this.ileft = 0;
-        this.itop = 0;
-        this.iright = 0;
-        this.ibottom = 0;
-        this.iheight = 0;
-        this.iwidth = 0;
+        this.position = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        };
 
         this.padding = {
             left: 0,
@@ -271,7 +274,7 @@ export class Screen extends Node {
         }
         this.program.setTerminal(terminal);
         this.tput = this.program.tput;
-        if (entered) {
+        if (entered) {x
             this.enter();
         }
     }
@@ -279,11 +282,13 @@ export class Screen extends Node {
     enter() {
         if (this.program.isAlt) return;
         if (!this.cursor._set) {
-            if (this.options.cursor.shape) {
-                this.cursorShape(this.cursor.shape, this.cursor.blink);
-            }
-            if (this.options.cursor.color) {
-                this.cursorColor(this.cursor.color);
+            if(this.options.cursor) {
+                if (this.options.cursor.shape) {
+                    this.cursorShape(this.cursor.shape, this.cursor.blink);
+                }
+                if (this.options.cursor.color) {
+                    this.cursorColor(this.cursor.color);
+                }
             }
         }
         if (process.platform === 'win32') {
@@ -391,7 +396,7 @@ export class Screen extends Node {
             self._needsClickableSort = true;
         });
 
-        this.program.on('mouse', function(data) {
+        this.program.on('mouse', function(data: BlessedMouseEvent) {
             if (self.lockKeys) return;
 
             if (self._needsClickableSort) {
@@ -735,7 +740,7 @@ export class Screen extends Node {
     }
 
     deleteBottom(top, bottom) {
-        return this.clearRegion(0, this.width, bottom, bottom);
+        return this.clearRegion(0, this.getwidth(), bottom, bottom);
     }
 
     deleteTop(top, bottom) {
@@ -763,15 +768,15 @@ export class Screen extends Node {
             return pos._cleanSides;
         }
 
-        if (pos.xi <= 0 && pos.xl >= this.width) {
+        if (pos.xi <= 0 && pos.xl >= this.getwidth()) {
             return pos._cleanSides = true;
         }
 
         if (this.options.fastCSR) {
             // Maybe just do this instead of parsing.
             if (pos.yi < 0) return pos._cleanSides = false;
-            if (pos.yl > this.height) return pos._cleanSides = false;
-            if (this.width - (pos.xl - pos.xi) < 40) {
+            if (pos.yl > this.getheight()) return pos._cleanSides = false;
+            if (this.getwidth() - (pos.xl - pos.xi) < 40) {
                 return pos._cleanSides = true;
             }
             return pos._cleanSides = false;
@@ -793,17 +798,17 @@ export class Screen extends Node {
         //   return pos._cleanSides = false;
         // }
 
-        var yi = pos.yi + el.itop
-            , yl = pos.yl - el.ibottom
+        var yi = pos.yi + el.getitop()
+            , yl = pos.yl - el.getibottom()
             , first
             , ch
             , x
             , y;
 
         if (pos.yi < 0) return pos._cleanSides = false;
-        if (pos.yl > this.height) return pos._cleanSides = false;
+        if (pos.yl > this.getheight()) return pos._cleanSides = false;
         if (pos.xi - 1 < 0) return pos._cleanSides = true;
-        if (pos.xl > this.width) return pos._cleanSides = true;
+        if (pos.xl > this.getwidth()) return pos._cleanSides = true;
 
         for (x = pos.xi - 1; x >= 0; x--) {
             if (!this.olines[yi]) break;
@@ -817,7 +822,7 @@ export class Screen extends Node {
             }
         }
 
-        for (x = pos.xl; x < this.width; x++) {
+        for (x = pos.xl; x < this.getwidth(); x++) {
             if (!this.olines[yi]) break;
             first = this.olines[yi][x];
             for (y = yi; y < yl; y++) {
@@ -1455,14 +1460,14 @@ export class Screen extends Node {
             // NOTE: This is different from the other "visible" values - it needs the
             // visible height of the scrolling element itself, not the element within
             // it.
-            var visible = self.screen.height - el.atop - el.itop - el.abottom - el.ibottom;
+            var visible = self.screen.height - el.atop - el.getitop() - el.abottom - el.getibottom();
             if (self.rtop < el.childBase) {
                 el.scrollTo(self.rtop);
                 self.screen.render();
-            } else if (self.rtop + self.height - self.ibottom > el.childBase + visible) {
+            } else if (self.rtop + self.height - self.getibottom() > el.childBase + visible) {
                 // Explanation for el.itop here: takes into account scrollable elements
                 // with borders otherwise the element gets covered by the bottom border:
-                el.scrollTo(self.rtop - (el.height - self.height) + el.itop, true);
+                el.scrollTo(self.rtop - (el.height - self.height) + el.getitop(), true);
                 self.screen.render();
             }
         }
@@ -1991,6 +1996,10 @@ export class Screen extends Node {
                 screen.destroy();
             });
         });
+    }
+
+    _getPos() {
+        return this;
     }
 
     static _exceptionHandler(err) {
