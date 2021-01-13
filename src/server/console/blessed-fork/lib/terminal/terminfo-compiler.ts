@@ -225,7 +225,7 @@ export default class TerminfoCompiler {
             // $<5> -> padding
             // e.g. flash_screen: '\u001b[?5h$<100/>\u001b[?5l',
             if (this.read(/^\$<(\d+)([*\/]{0,2})>/, true)) {
-                if (this.config.tputOptions.padding) this.print(this.cap[0]);
+                //if (this.config.tputOptions.padding) this.print(this.cap[0]);
                 continue;
             }
 

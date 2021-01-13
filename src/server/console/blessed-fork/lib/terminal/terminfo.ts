@@ -303,7 +303,6 @@ export default class TerminfoParser {
             brokenACS: this.detectBrokenACS(info),
             PCRomSet: this.detectPCRomSet(info),
             magicCookie: this.detectMagicCookie(),
-            padding: this.detectPadding(),
             setbuf: this.detectSetbuf(),
             acsc: data.acsc,
             acscr: data.acscr
@@ -375,10 +374,6 @@ export default class TerminfoParser {
 
     static detectMagicCookie() {
         return process.env.NCURSES_NO_MAGIC_COOKIE == null;
-    }
-
-    static detectPadding() {
-        return process.env.NCURSES_NO_PADDING == null;
     }
 
     static detectSetbuf() {

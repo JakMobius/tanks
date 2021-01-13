@@ -25,12 +25,14 @@ class EventEmitter {
 
   addListener(type: string, listener: () => void)
   {
-    if (!this._events[type]) {
-      this._events[type] = listener;
-    } else if (typeof this._events[type] === 'function') {
-      this._events[type] = [this._events[type], listener];
+    if (this._events[type]) {
+      if (typeof this._events[type] === 'function') {
+        this._events[type] = [this._events[type], listener];
+      } else {
+        this._events[type].push(listener);
+      }
     } else {
-      this._events[type].push(listener);
+      this._events[type] = listener;
     }
     this._emit('newListener', [type, listener]);
   }
@@ -107,14 +109,13 @@ class EventEmitter {
     return ret !== false;
   }
 
-  emit(type, ...params: any[]) {
+  emit(type: string, ...values: any[]) {
     var args = slice.call(arguments, 1)
         , params = slice.call(arguments)
         , el = this;
 
     this._emit('event', params);
 
-    // @ts-ignore
     if (this.type === 'screen') {
       return this._emit(type, args);
     }

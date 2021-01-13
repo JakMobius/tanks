@@ -26,6 +26,8 @@
 // IN THE SOFTWARE.
 
 import { EventEmitter } from 'events';
+import {BlessedMouseEvent} from "./widgets/screen";
+import {StringDecoder} from "string_decoder";
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
 function listenerCount(stream, event) {
@@ -40,7 +42,6 @@ function listenerCount(stream, event) {
 
 function emitKeypressEvents(stream) {
   if (stream._keypressDecoder) return;
-  var StringDecoder = require('string_decoder').StringDecoder; // lazy load
   stream._keypressDecoder = new StringDecoder('utf8');
 
   function onData(b) {
@@ -133,7 +134,7 @@ function emitKeys(stream, s) {
 
   buffer.forEach(function(s) {
     var ch,
-        key = {
+        key: BlessedMouseEvent = {
           sequence: s,
           name: undefined,
           ctrl: false,
@@ -343,6 +344,6 @@ function isMouse(s) {
     || /\x1b\[(\d+;\d+;\d+)M/.test(s)
     || /\x1b\[<(\d+;\d+;\d+)([mM])/.test(s)
     || /\x1b\[<(\d+;\d+;\d+;\d+)&w/.test(s)
-    || /\x1b\[24([0135])~\[(\d+),(\d+)\]\r/.test(s)
-    || /\x1b\[(O|I)/.test(s);
+    || /\x1b\[24([0135])~\[(\d+),(\d+)]\r/.test(s)
+    || /\x1b\[([OI])/.test(s);
 }

@@ -56,8 +56,8 @@ export class Prompt extends Input {
         var lpos = this._getCoords();
         if (!lpos) return;
 
-        const cy = lpos.yi + this.itop;
-        const cx = lpos.xi + this.ileft + this.cursorPosition - this.scrollPosition;
+        const cy = lpos.yi + this.getitop();
+        const cx = lpos.xi + this.getileft() + this.cursorPosition - this.scrollPosition;
         const program = this.screen.program;
 
         if (cy === program.y && cx === program.x) {
@@ -254,12 +254,12 @@ export class Prompt extends Input {
     }
 
     trimViewport() {
-        this.setContent(this.value.substr(this.scrollPosition, this.width), true, true);
+        this.setContent(this.value.substr(this.scrollPosition, this.getwidth()), true, true);
     }
 
     scrollToMatchCursor() {
 
-        let trailingSpaceLength = this.width - this.value.length + this.scrollPosition
+        let trailingSpaceLength = this.getwidth() - this.value.length + this.scrollPosition
         if(trailingSpaceLength < 0) trailingSpaceLength = 0
         this.scrollPosition -= trailingSpaceLength
         if(this.scrollPosition < 0) {
@@ -267,14 +267,14 @@ export class Prompt extends Input {
         }
 
         const leftBound = this.scrollPosition
-        const rightBound = this.scrollPosition + this.width
+        const rightBound = this.scrollPosition + this.getwidth()
 
         if(leftBound > this.cursorPosition) {
             this.scrollPosition = this.cursorPosition
             return true;
         }
         if(rightBound < this.cursorPosition) {
-            this.scrollPosition = this.cursorPosition - this.width
+            this.scrollPosition = this.cursorPosition - this.getwidth()
             return true;
         }
 

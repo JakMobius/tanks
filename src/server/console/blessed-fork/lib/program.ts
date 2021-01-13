@@ -17,6 +17,8 @@ import fs from 'fs';
 import Tput from './terminal/tput';
 import colors from './colors';
 import * as tty from "tty";
+import {BlessedMouseEvent} from "./widgets/screen";
+import GpmClient from "./gpmclient";
 
 var slice = Array.prototype.slice;
 
@@ -76,6 +78,8 @@ class Program extends EventEmitter {
   
   private _tputSetup: boolean;
   private tput: Tput;
+  private _lastButton: string;
+  private gpm: GpmClient;
 
   constructor(options?: ProgramConfig) {
     super()
@@ -539,39 +543,33 @@ class Program extends EventEmitter {
     });
   }
 
-  _bindMouse(s, buf) {
-    var self = this
-      , key
-      , parts
-      , b
-      , x
-      , y
-      , mod
-      , params
-      , down
-      , page
-      , button;
+  _bindMouse(data: string | Buffer, buf: Buffer) {
+    let button: number;
+    let y: number;
+    let x: number;
+    let b: number;
+    let mod: number;
+    const self = this;
 
-    key = {
+    let key: BlessedMouseEvent = {
       name: undefined,
       ctrl: false,
       meta: false,
       shift: false
     };
 
-    if (Buffer.isBuffer(s)) {
-      if (s[0] > 127 && s[1] === undefined) {
-        s[0] -= 128;
-        s = '\x1b' + s.toString('utf-8');
-      } else {
-        s = s.toString('utf-8');
-      }
-    }
+    let s: string;
 
-    // if (this.8bit) {
-    //   s = s.replace(/\233/g, '\x1b[');
-    //   buf = new Buffer(s, 'utf8');
-    // }
+    if (Buffer.isBuffer(data)) {
+      if (data[0] > 127 && data[1] === undefined) {
+        data[0] -= 128;
+        s = '\x1b' + data.toString('utf-8');
+      } else {
+        s = data.toString('utf-8');
+      }
+    } else {
+      s = data
+    }
 
     // XTerm / X10 for buggy VTE
     // VTE can only send unsigned chars and no unicode for coords. This limits
@@ -585,8 +583,8 @@ class Program extends EventEmitter {
     // protocol. This method of detecting VTE is only 99% reliable because we
     // can't check if the coords are 0x00 (255) since that is a valid x10 coord
     // technically.
-    var bx = s.charCodeAt(4);
-    var by = s.charCodeAt(5);
+    const bx = s.charCodeAt(4);
+    const by = s.charCodeAt(5);
     if (buf[0] === 0x1b && buf[1] === 0x5b && buf[2] === 0x4d
         && (this.isVTE
         || bx >= 65533 || by >= 65533
@@ -596,9 +594,7 @@ class Program extends EventEmitter {
         || (buf[5] > 223 && buf[5] < 248 && buf.length === 6))) {
       b = buf[3];
       x = buf[4];
-      y = buf[5];
-
-      // unsigned char overflow.
+      y = buf[5]; // unsigned char overflow.
       if (x < 0x20) x += 0xff;
       if (y < 0x20) y += 0xff;
 
@@ -611,7 +607,8 @@ class Program extends EventEmitter {
     }
 
     // XTerm / X10
-    if (parts = /^\x1b\[M([\x00\u0020-\uffff]{3})/.exec(s)) {
+    let parts = /^\x1b\[M([\x00\u0020-\uffff]{3})/.exec(s);
+    if (parts) {
       b = parts[1].charCodeAt(0);
       x = parts[1].charCodeAt(1);
       y = parts[1].charCodeAt(2);
@@ -624,7 +621,10 @@ class Program extends EventEmitter {
       key.x = x - 32;
       key.y = y - 32;
 
-      if (this.zero) key.x--, key.y--;
+      if (this.zero) {
+        key.x--
+        key.y--
+      }
 
       if (x === 0) key.x = 255;
       if (y === 0) key.y = 255;
@@ -648,11 +648,15 @@ class Program extends EventEmitter {
       } else {
         key.action = 'mousedown';
         button = b & 3;
-        key.button =
-          button === 0 ? 'left'
-          : button === 1 ? 'middle'
-          : button === 2 ? 'right'
-          : 'unknown';
+        if (button === 0) {
+          key.button = 'left';
+        } else if (button === 1) {
+          key.button = 'middle';
+        } else if (button === 2) {
+            key.button = 'right';
+        } else {
+          key.button = 'unknown';
+        }
         this._lastButton = key.button;
       }
 
@@ -679,7 +683,7 @@ class Program extends EventEmitter {
 
     // URxvt
     if (parts = /^\x1b\[(\d+;\d+;\d+)M/.exec(s)) {
-      params = parts[1].split(';');
+      let params = parts[1].split(';');
       b = +params[0];
       x = +params[1];
       y = +params[2];
@@ -692,7 +696,10 @@ class Program extends EventEmitter {
       key.x = x;
       key.y = y;
 
-      if (this.zero) key.x--, key.y--;
+      if (this.zero) {
+        key.x--
+        key.y--
+      }
 
       mod = b >> 2;
       key.shift = !!(mod & 1);
@@ -720,11 +727,15 @@ class Program extends EventEmitter {
       } else {
         key.action = 'mousedown';
         button = b & 3;
-        key.button =
-          button === 0 ? 'left'
-          : button === 1 ? 'middle'
-          : button === 2 ? 'right'
-          : 'unknown';
+        if (button === 0) {
+          key.button = 'left';
+        } else if (button === 1) {
+            key.button = 'middle';
+        } else if (button === 2) {
+            key.button = 'right';
+        } else {
+          key.button = 'unknown';
+        }
         // NOTE: 0/32 = mousemove, 32/64 = mousemove with left down
         // if ((b >> 1) === 32)
         this._lastButton = key.button;
@@ -752,8 +763,8 @@ class Program extends EventEmitter {
 
     // SGR
     if (parts = /^\x1b\[<(\d+;\d+;\d+)([mM])/.exec(s)) {
-      down = parts[2] === 'M';
-      params = parts[1].split(';');
+      const down = parts[2] === 'M';
+      let params = parts[1].split(';');
       b = +params[0];
       x = +params[1];
       y = +params[2];
@@ -766,7 +777,10 @@ class Program extends EventEmitter {
       key.x = x;
       key.y = y;
 
-      if (this.zero) key.x--, key.y--;
+      if (this.zero) {
+        key.x--
+        key.y--
+      }
 
       mod = b >> 2;
       key.shift = !!(mod & 1);
@@ -781,11 +795,15 @@ class Program extends EventEmitter {
           ? 'mousedown'
           : 'mouseup';
         button = b & 3;
-        key.button =
-          button === 0 ? 'left'
-          : button === 1 ? 'middle'
-          : button === 2 ? 'right'
-          : 'unknown';
+        if (button === 0) {
+          key.button = 'left';
+        } else if (button === 1) {
+          key.button = 'middle';
+        } else if (button === 2) {
+          key.button = 'right';
+        } else {
+          key.button = 'unknown';
+        }
       }
 
       // Probably a movement.
@@ -812,12 +830,11 @@ class Program extends EventEmitter {
     // The xterm mouse documentation says there is a
     // `<` prefix, the DECRQLP says there is no prefix.
     if (parts = /^\x1b\[<(\d+;\d+;\d+;\d+)&w/.exec(s)) {
-      params = parts[1].split(';');
+      let params = parts[1].split(';');
       b = +params[0];
       x = +params[1];
       y = +params[2];
-      page = +params[3];
-
+      const page = +params[3];
       key.name = 'mouse';
       key.type = 'dec';
 
@@ -827,17 +844,24 @@ class Program extends EventEmitter {
       key.y = y;
       key.page = page;
 
-      if (this.zero) key.x--, key.y--;
+      if (this.zero) {
+        key.x--
+        key.y--
+      }
 
       key.action = b === 3
         ? 'mouseup'
         : 'mousedown';
 
-      key.button =
-        b === 2 ? 'left'
-        : b === 4 ? 'middle'
-        : b === 6 ? 'right'
-        : 'unknown';
+      if (b === 2) {
+        key.button = 'left';
+      } else if (b === 4) {
+        key.button = 'middle';
+      } else if (b === 6) {
+        key.button = 'right';
+      } else {
+        key.button = 'unknown';
+      }
 
       self.emit('mouse', key);
 
@@ -845,7 +869,7 @@ class Program extends EventEmitter {
     }
 
     // vt300
-    if (parts = /^\x1b\[24([0135])~\[(\d+),(\d+)\]\r/.exec(s)) {
+    if (parts = /^\x1b\[24([0135])~\[(\d+),(\d+)]\r/.exec(s)) {
       b = +parts[1];
       x = +parts[2];
       y = +parts[3];
@@ -858,21 +882,28 @@ class Program extends EventEmitter {
       key.x = x;
       key.y = y;
 
-      if (this.zero) key.x--, key.y--;
+      if (this.zero) {
+        key.x--
+        key.y--;
+      }
 
       key.action = 'mousedown';
-      key.button =
-        b === 1 ? 'left'
-        : b === 2 ? 'middle'
-        : b === 5 ? 'right'
-        : 'unknown';
+      if (b === 1) {
+        key.button = 'left';
+      } else if (b === 2) {
+        key.button = 'middle';
+      } else if (b === 5) {
+        key.button = 'right';
+      } else {
+        key.button = 'unknown';
+      }
 
       self.emit('mouse', key);
 
       return;
     }
 
-    if (parts = /^\x1b\[(O|I)/.exec(s)) {
+    if (parts = /^\x1b\[([OI])/.exec(s)) {
       key.action = parts[1] === 'I'
         ? 'focus'
         : 'blur';
@@ -887,11 +918,10 @@ class Program extends EventEmitter {
 // gpm support for linux vc
   enableGpm() {
     var self = this;
-    var gpmclient = require('./gpmclient');
 
     if (this.gpm) return;
 
-    this.gpm = gpmclient();
+    this.gpm = new GpmClient();
 
     this.gpm.on('btndown', function(btn, modifier, x, y) {
       x--, y--;
