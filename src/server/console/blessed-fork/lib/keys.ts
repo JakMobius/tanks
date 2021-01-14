@@ -26,7 +26,7 @@
 // IN THE SOFTWARE.
 
 import { EventEmitter } from 'events';
-import {BlessedMouseEvent} from "./widgets/screen";
+import {BlessedKeyEvent, BlessedMouseEvent} from "./widgets/screen";
 import {StringDecoder} from "string_decoder";
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
@@ -134,7 +134,7 @@ function emitKeys(stream, s) {
 
   buffer.forEach(function(s) {
     var ch,
-        key: BlessedMouseEvent = {
+        key: BlessedKeyEvent = {
           sequence: s,
           name: undefined,
           ctrl: false,
@@ -208,7 +208,7 @@ function emitKeys(stream, s) {
       // the modifier key bitflag and any meaningless "1;" sequence
       var code = (parts[1] || '') + (parts[2] || '') +
                  (parts[4] || '') + (parts[9] || ''),
-          modifier = (parts[3] || parts[8] || 1) - 1;
+          modifier = (parts[3] || parts[8] || 1) as any as number - 1;
 
       // Parse the key modifier
       key.ctrl = !!(modifier & 4);
@@ -326,19 +326,11 @@ function emitKeys(stream, s) {
 
     if (key || ch) {
       stream.emit('keypress', ch, key);
-      // if (key && key.name === 'return') {
-      //   var nkey = {};
-      //   Object.keys(key).forEach(function(k) {
-      //     nkey[k] = key[k];
-      //   });
-      //   nkey.name = 'enter';
-      //   stream.emit('keypress', ch, nkey);
-      // }
     }
   });
 }
 
-function isMouse(s) {
+function isMouse(s: string) {
   return /\x1b\[M/.test(s)
     || /\x1b\[M([\x00\u0020-\uffff]{3})/.test(s)
     || /\x1b\[(\d+;\d+;\d+)M/.test(s)

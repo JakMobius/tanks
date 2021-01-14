@@ -8,10 +8,10 @@
  * Modules
  */
 
-import {ScrollableBox} from './scrollablebox';
+import {ScrollableBox, ScrollableBoxConfig} from './scrollablebox';
 
 export class Input extends ScrollableBox {
-    constructor(options) {
+    constructor(options: ScrollableBoxConfig) {
         options = options || {};
         super(options);
         this.type = 'input';

@@ -9,7 +9,7 @@
  */
 
 import EventEmitter from '../events';
-let Screen; import('./screen').then(module => Screen = module.Screen)
+import { Screen } from "./screen";
 
 export interface ElementPosition {
     x?: number
@@ -20,67 +20,37 @@ export interface ElementPosition {
 
 export interface NodeConfig {
     position?: ElementPosition
+    screen?: Screen
 }
 
 export class Node extends EventEmitter {
     public options: any;
-    public screen: any;
+    public screen: Screen;
     public parent: Node;
     public children: any;
     public data: any;
     public uid: any;
     public index: any;
-    public detached: any;
+    public detached: boolean;
     public type: any;
     public position: ElementPosition
+    public destroyed: boolean;
+    public clickable: boolean;
 
     /**
      * Node
      */
-    constructor(options) {
+    constructor(options: NodeConfig) {
         super();
-        var self = this;
 
         options = options || {};
         this.options = options;
         this.position = options.position
 
-        this.screen = this.screen || options.screen;
-
-        if (!this.screen) {
-            if (this instanceof Screen) {
-                this.screen = this;
-            } else if (Screen.total === 1) {
-                this.screen = Screen.global;
-            } else if (options.parent) {
-                this.screen = options.parent;
-                while (this.screen && this.screen.type !== 'screen') {
-                    this.screen = this.screen.parent;
-                }
-            } else if (Screen.total) {
-                // This _should_ work in most cases as long as the element is appended
-                // synchronously after the screen's creation. Throw error if not.
-                this.screen = Screen.instances[Screen.instances.length - 1];
-                process.nextTick(function () {
-                    if (!self.parent) {
-                        throw new Error('Element (' + self.type + ')'
-                            + ' was not appended synchronously after the'
-                            + ' screen\'s creation. Please set a `parent`'
-                            + ' or `screen` option in the element\'s constructor'
-                            + ' if you are going to use multiple screens and'
-                            + ' append the element later.');
-                    }
-                });
-            } else {
-                throw new Error('No active screen.');
-            }
-        }
-
         this.position = options.position
-        this.parent = options.parent || null;
+        this.parent = null;
         this.children = [];
-        this.$ = this._ = this.data = {};
-        this.uid = Node.uid++;
+        this.data = {};
 
         if (this.index == null) {
             this.index = -1;
@@ -88,19 +58,18 @@ export class Node extends EventEmitter {
             this.index = this.index;
         }
 
-        if (!(this instanceof Screen)) {
-            this.detached = true;
-        }
-
-        if (this.parent) {
-            this.parent.append(this);
-        }
-
-        (options.children || []).forEach(this.append.bind(this));
         this.type = 'node';
     }
 
-    insert(element, i) {
+    setScreen(screen: Screen) {
+        this.screen = screen
+        this.detached = !!this.screen
+        this.forAncestors(node => {
+            node.setScreen(screen)
+        })
+    }
+
+    insert(element: Node, i: number) {
         var self = this;
 
         if (element.screen && element.screen !== this.screen) {
@@ -109,7 +78,7 @@ export class Node extends EventEmitter {
 
         element.detach();
         element.parent = this;
-        element.screen = this.screen;
+        element.setScreen(this.screen);
 
         if (i === 0) {
             this.children.unshift(element);
@@ -121,38 +90,27 @@ export class Node extends EventEmitter {
 
         element.emit('reparent', this);
         this.emit('adopt', element);
-
-        (function emit(el) {
-            var n = el.detached !== self.detached;
-            el.detached = self.detached;
-            if (n) el.emit('attach');
-            el.children.forEach(emit);
-        })(element);
-
-        if (!this.screen.focused) {
-            this.screen.focused = element;
-        }
     }
 
-    prepend(element) {
+    prepend(element: Node) {
         this.insert(element, 0);
     }
 
-    append(element) {
+    append(element: Node) {
         this.insert(element, this.children.length);
     }
 
-    insertBefore(element, other) {
+    insertBefore(element: Node, other: Node) {
         var i = this.children.indexOf(other);
         if (~i) this.insert(element, i);
     }
 
-    insertAfter(element, other) {
+    insertAfter(element: Node, other: Node) {
         var i = this.children.indexOf(other);
         if (~i) this.insert(element, i + 1);
     }
 
-    remove(element) {
+    remove(element: Node) {
         if (element.parent !== this) return;
 
         var i = this.children.indexOf(element);
@@ -198,99 +156,80 @@ export class Node extends EventEmitter {
             el.free();
             el.destroyed = true;
             el.emit('destroy');
-        }, this);
+        }, true);
     }
 
-    forDescendants(iter, s) {
+    forDescendants(iter: (node: Node) => void, s?: boolean) {
         if (s) iter(this);
-        this.children.forEach(function emit(el) {
+        this.children.forEach(function emit(el: Node) {
             iter(el);
             el.children.forEach(emit);
         });
     }
 
-    forAncestors(iter, s) {
-        var el = this;
+    forAncestors(iter: (node: Node) => void, s?: boolean) {
+        let el: Node = this;
         if (s) iter(this);
         while (el = el.parent) {
             iter(el);
         }
     }
 
-    collectDescendants(s) {
-        var out = [];
+    collectDescendants(s: boolean) {
+        let out: Node[] = [];
         this.forDescendants(function (el) {
             out.push(el);
         }, s);
         return out;
     }
 
-    collectAncestors(s) {
-        var out = [];
+    collectAncestors(s: boolean) {
+        let out: Node[] = [];
         this.forAncestors(function (el) {
             out.push(el);
         }, s);
         return out;
     }
 
-    emitDescendants() {
-        var args = Array.prototype.slice(arguments)
-            , iter;
-
-        if (typeof args[args.length - 1] === 'function') {
-            iter = args.pop();
-        }
-
+    emitDescendants(parameters: [string, ...any[]], callback?: (node: Node) => void) {
         return this.forDescendants(function (el) {
-            if (iter) iter(el);
-            el.emit.apply(el, args);
+            if (callback) callback(el);
+            el.emit.apply(el, parameters);
         }, true);
     }
 
-    emitAncestors() {
-        var args = Array.prototype.slice(arguments)
-            , iter;
+    emitAncestors(parameters: [string, ...any[]], callback?: (node: Node) => void) {
 
-        if (typeof args[args.length - 1] === 'function') {
-            iter = args.pop();
+        return this.forAncestors(function (el: Node) {
+            if (callback) callback(el);
+            el.emit.apply(el, parameters);
+        }, true);
+    }
+
+    hasDescendant(target: Node) {
+        for (let child of this.children) {
+            if (child === target) return true;
+            if (child.hasDescendant(target)) return true;
         }
-
-        return this.forAncestors(function (el) {
-            if (iter) iter(el);
-            el.emit.apply(el, args);
-        }, true);
+        return false;
     }
 
-    hasDescendant(target) {
-        return (function find(el) {
-            for (var i = 0; i < el.children.length; i++) {
-                if (el.children[i] === target) {
-                    return true;
-                }
-                if (find(el.children[i]) === true) {
-                    return true;
-                }
-            }
-            return false;
-        })(this);
-    }
-
-    hasAncestor(target) {
-        var el = this;
+    hasAncestor(target: Node) {
+        var el: Node = this;
         while (el = el.parent) {
             if (el === target) return true;
         }
         return false;
     }
 
-    get(name, value) {
+    get(name: string, value: any) {
         if (this.data.hasOwnProperty(name)) {
             return this.data[name];
         }
         return value;
     }
 
-    set(name, value) {
+    set(name: string, value: any) {
         return this.data[name] = value;
     }
 
@@ -317,6 +256,8 @@ export class Node extends EventEmitter {
     getabottom() {
         return this.position.y + this.position.height
     }
-}
 
-Node.uid = 0;
+    clearPos(get?: boolean, override?: boolean) {
+
+    }
+}

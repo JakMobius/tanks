@@ -9,12 +9,11 @@
  */
 
 
-import {Element} from './element';
+import {Element, ElementConfig} from './element';
 
 export class Text extends Element {
-    constructor(options) {
+    constructor(options: ElementConfig) {
         options = options || {};
-        options.shrink = true;
         super(options);
         this.type = 'text';
     }

@@ -4,6 +4,9 @@
  * https://github.com/chjj/blessed
  */
 
+import {BlessedKeyEvent} from "./screen";
+import {Screen} from "./screen";
+
 /**
  * Modules
  */
@@ -11,22 +14,26 @@
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
 import {Input} from './input';
+import unicode from "../unicode";
+import {ScrollableBoxConfig} from "./scrollablebox";
+
+export interface PromptConfig extends ScrollableBoxConfig {
+    value?: string
+}
 
 export class Prompt extends Input {
 	public value: any;
-	public cursorPosition: any;
-	public scrollPosition: any;
+	public cursorPosition: number;
+	public scrollPosition: number;
 	public backspaceVisiblePadding: any;
 
     /**
      * Textarea
      */
-    constructor(options) {
+    constructor(options: PromptConfig) {
         options = options || {};
 
         super(options);
-
-        this.screen._listenKeys(this);
 
         this.value = options.value || '';
 
@@ -40,6 +47,14 @@ export class Prompt extends Input {
         this.backspaceVisiblePadding = 3
 
         this.type = 'textarea';
+    }
+
+    setScreen(screen: Screen) {
+        super.setScreen(screen);
+
+        if(screen) {
+            this.screen._listenKeys(this);
+        }
     }
 
     resize() {
@@ -105,7 +120,7 @@ export class Prompt extends Input {
         this.screen.grabKeys = false;
     }
 
-    insert(string, index, count?, insertion?) {
+    insertString(string: string, index: number, count?: number, insertion?: string) {
         let result = string.substr(0, index - count);
         if(insertion) {
             result += insertion
@@ -116,7 +131,7 @@ export class Prompt extends Input {
         return result
     }
 
-    isWhitespace(ch) {
+    isWhitespace(ch: string) {
         return ch === ' ' || ch === "'" || ch === '"' || ch === "-" || ch === "/" || ch === "," || ch === "." || ch === ";"
     }
 
@@ -176,7 +191,7 @@ export class Prompt extends Input {
         this.updateCursor();
     }
 
-    onKey(ch, key) {
+    onKey(ch: string, key: BlessedKeyEvent) {
         var updated = false;
 
         if (key.name === 'return') return;
@@ -200,12 +215,12 @@ export class Prompt extends Input {
             if (this.value.length) {
                 if (this.screen.fullUnicode) {
                     if (unicode.isSurrogate(this.value, this.value.length - 2)) {
-                        this.value = this.insert(this.value, this.cursorPosition, 2)
+                        this.value = this.insertString(this.value, this.cursorPosition, 2)
                     } else {
-                        this.value = this.insert(this.value, this.cursorPosition, 1)
+                        this.value = this.insertString(this.value, this.cursorPosition, 1)
                     }
                 } else {
-                    this.value = this.insert(this.value, this.cursorPosition, 1)
+                    this.value = this.insertString(this.value, this.cursorPosition, 1)
                 }
                 this.cursorPosition--;
                 if(this.cursorPosition <= this.scrollPosition + this.backspaceVisiblePadding) {
@@ -218,7 +233,7 @@ export class Prompt extends Input {
             }
         } else if (ch) {
             if (!/^[\x00-\x08\x0b-\x0c\x0e-\x1f\x7f]$/.test(ch)) {
-                this.value = this.insert(this.value, this.cursorPosition, 0, ch)
+                this.value = this.insertString(this.value, this.cursorPosition, 0, ch)
                 updated = true;
 
                 this.cursorPosition++;
@@ -237,7 +252,7 @@ export class Prompt extends Input {
         return this.value;
     }
 
-    setValue(value) {
+    setValue(value: string) {
         if (this.value !== value) {
             this.value = value;
             this.cursorPosition = this.value.length
@@ -248,7 +263,7 @@ export class Prompt extends Input {
         }
     }
 
-    setCursorPosition(pos) {
+    setCursorPosition(pos: number) {
         this.cursorPosition = pos
         this.cursorMoved()
     }
@@ -283,7 +298,7 @@ export class Prompt extends Input {
 
     render() {
         this.trimViewport()
-        return this._render();
+        return super.render();
     }
 }
 

@@ -19,7 +19,7 @@ import unicode from '../unicode';
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
 import helpers from '../helpers';
-import { Node } from './node';
+import {Node, NodeConfig} from './node';
 import { Element } from './element';
 import { Box } from './box';
 import Tput from "../terminal/tput";
@@ -55,28 +55,32 @@ interface ScreenConfig extends NodeConfig {
     cursor?: CursorConfig
 }
 
-export interface BlessedMouseEvent {
-
-    page: number;
-
+export interface BlessedEvent {
+    event?: string
+    code?: string
     /// Event name
     name?: string
 
     /// Terminal type
     type?: string
 
-    raw?: any
-    buf?: Buffer
-
     ctrl?: boolean
     meta?: boolean
     shift?: boolean
+}
 
+export interface BlessedKeyEvent extends BlessedEvent {
+    sequence?: string
+}
+
+export interface BlessedMouseEvent extends BlessedEvent {
+    page?: number;
+    raw?: any
+    buf?: Buffer
     x?: number
     y?: number
-
     button?: string
-    action?: action
+    action?: string
 }
 
 export class Screen extends Node {
@@ -95,16 +99,6 @@ export class Screen extends Node {
     public fullUnicode: any;
     public dattr: any;
     public renders: any;
-    public left: any;
-    public rleft: any;
-    public right: any;
-    public rright: any;
-    public top: any;
-    public atop: any;
-    public rtop: any;
-    public bottom: any;
-    public abottom: any;
-    public rbottom: any;
     public padding: any;
     public hover: any;
     public history: any;
@@ -118,7 +112,6 @@ export class Screen extends Node {
     public _destroy: any;
     public _listenedMouse: any;
     public debugLog: any;
-    public destroyed: any;
     public _listenedKeys: any;
     public lines: any;
     public olines: any;
@@ -137,6 +130,8 @@ export class Screen extends Node {
         options = options || {};
 
         super(options);
+
+        this.detached = false
 
         let self = this;
 
@@ -202,7 +197,7 @@ export class Screen extends Node {
         this._ci = -1;
 
         if (options.title) {
-            this.title = options.title;
+            this.setTitle(options.title);
         }
 
         let cursorConfig = options.cursor || {}
@@ -262,7 +257,6 @@ export class Screen extends Node {
         this.enter();
 
         this.type = 'screen';
-        this._destroy = Screen.prototype.destroy;
     }
 
     setTerminal(terminal: string) {
@@ -274,7 +268,7 @@ export class Screen extends Node {
         }
         this.program.setTerminal(terminal);
         this.tput = this.program.tput;
-        if (entered) {x
+        if (entered) {
             this.enter();
         }
     }
@@ -300,9 +294,9 @@ export class Screen extends Node {
         }
         this.program.alternateBuffer();
         this.program.put.keypad_xmit();
-        this.program.csr(0, this.height - 1);
+        this.program.setScrollRegion(0, this.getheight() - 1);
         this.program.hideCursor();
-        this.program.cup(0, 0);
+        this.program.cursorPos(0, 0);
         // We need this for tmux now:
         if (this.tput.terminfo.strings.ena_acs) {
             this.program._write(this.tput.terminfo.methods.enacs());
@@ -314,8 +308,8 @@ export class Screen extends Node {
         if (!this.program.isAlt) return;
         this.program.put.keypad_local();
         if (this.program.scrollTop !== 0
-            || this.program.scrollBottom !== this.rows - 1) {
-            this.program.csr(0, this.height - 1);
+            || this.program.scrollBottom !== this.getheight() - 1) {
+            this.program.setScrollRegion(0, this.getheight() - 1);
         }
         // XXX For some reason if alloc/clear() is before this
         // line, it doesn't work on linux console.
@@ -351,15 +345,11 @@ export class Screen extends Node {
 
                 process.removeListener('uncaughtException', Screen._exceptionHandler);
                 process.removeListener('exit', Screen._exitHandler);
-                delete Screen._exceptionHandler;
-                delete Screen._exitHandler;
-
-                delete Screen._bound;
             }
 
             this.destroyed = true;
             this.emit('destroy');
-            this._destroy();
+            super.destroy();
         }
 
         this.program.destroy();
@@ -376,7 +366,7 @@ export class Screen extends Node {
         return this.program.debug.apply(this.program, arguments);
     }
 
-    _listenMouse(el?) {
+    _listenMouse(el?: Node) {
         var self = this;
 
         if (el && !~this.clickable.indexOf(el)) {
@@ -511,80 +501,25 @@ export class Screen extends Node {
         this._listenKeys(el);
     }
 
-    _initHover() {
-        var self = this;
-
-        if (this._hoverText) {
-            return;
-        }
-
-        this._hoverText = new Box({
-            screen: this,
-            left: 0,
-            top: 0,
-            tags: false,
-            height: 'shrink',
-            width: 'shrink',
-            border: 'line',
-            style: {
-                border: {
-                    fg: 'default'
-                },
-                bg: 'default',
-                fg: 'default'
-            }
-        });
-
-        this.on('mousemove', function(data) {
-            if (self._hoverText.detached) return;
-            self._hoverText.rleft = data.x + 1;
-            self._hoverText.rtop = data.y;
-            self.render();
-        });
-
-        this.on('element mouseover', function(el, data) {
-            if (!el._hoverOptions) return;
-            self._hoverText.parseTags = el.parseTags;
-            self._hoverText.setContent(el._hoverOptions.text);
-            self.append(self._hoverText);
-            self._hoverText.rleft = data.x + 1;
-            self._hoverText.rtop = data.y;
-            self.render();
-        });
-
-        this.on('element mouseout', function() {
-            if (self._hoverText.detached) return;
-            self._hoverText.detach();
-            self.render();
-        });
-
-        // XXX This can cause problems if the
-        // terminal does not support allMotion.
-        // Workaround: check to see if content is set.
-        this.on('element mouseup', function(el) {
-            if (!self._hoverText.getContent()) return;
-            if (!el._hoverOptions) return;
-            self.append(self._hoverText);
-            self.render();
-        });
-    }
-
     alloc(dirty?) {
         var x, y;
 
+        let width = this.getwidth()
+        let height = this.getheight()
+
         this.lines = [];
-        for (y = 0; y < this.rows; y++) {
+        for (y = 0; y < height; y++) {
             this.lines[y] = [];
-            for (x = 0; x < this.cols; x++) {
+            for (x = 0; x < width; x++) {
                 this.lines[y][x] = [this.dattr, ' '];
             }
             this.lines[y].dirty = !!dirty;
         }
 
         this.olines = [];
-        for (y = 0; y < this.rows; y++) {
+        for (y = 0; y < height; y++) {
             this.olines[y] = [];
-            for (x = 0; x < this.cols; x++) {
+            for (x = 0; x < width; x++) {
                 this.olines[y][x] = [this.dattr, ' '];
             }
         }
@@ -634,9 +569,10 @@ export class Screen extends Node {
         this.emit('render');
     }
 
-    blankLine(ch?, dirty?) {
+    blankLine(ch?: string, dirty?: boolean) {
         var out = [];
-        for (var x = 0; x < this.cols; x++) {
+        let width = this.getwidth()
+        for (var x = 0; x < width; x++) {
             out[x] = [this.dattr, ch || ' '];
         }
         out.dirty = dirty;
@@ -653,7 +589,7 @@ export class Screen extends Node {
         this._buf += this.tput.terminfo.methods.csr(top, bottom);
         this._buf += this.tput.terminfo.methods.cup(y, 0);
         this._buf += this.tput.terminfo.methods.il(n);
-        this._buf += this.tput.terminfo.methods.csr(0, this.height - 1);
+        this._buf += this.tput.terminfo.methods.csr(0, this.getheight() - 1);
 
         var j = bottom + 1;
 
@@ -675,7 +611,7 @@ export class Screen extends Node {
         this._buf += this.tput.terminfo.methods.csr(top, bottom);
         this._buf += this.tput.terminfo.methods.cup(y, 0);
         this._buf += this.tput.terminfo.methods.dl(n);
-        this._buf += this.tput.terminfo.methods.csr(0, this.height - 1);
+        this._buf += this.tput.terminfo.methods.csr(0, this.getheight() - 1);
 
         var j = bottom + 1;
 
@@ -697,7 +633,7 @@ export class Screen extends Node {
         this._buf += this.tput.terminfo.methods.csr(top, bottom);
         this._buf += this.tput.terminfo.methods.cup(top, 0);
         this._buf += this.tput.terminfo.methods.dl(n);
-        this._buf += this.tput.terminfo.methods.csr(0, this.height - 1);
+        this._buf += this.tput.terminfo.methods.csr(0, this.getheight() - 1);
 
         var j = bottom + 1;
 
@@ -719,7 +655,7 @@ export class Screen extends Node {
         this._buf += this.tput.terminfo.methods.csr(top, bottom);
         this._buf += this.tput.terminfo.methods.cup(bottom, 0);
         this._buf += Array(n + 1).join('\n');
-        this._buf += this.tput.terminfo.methods.csr(0, this.height - 1);
+        this._buf += this.tput.terminfo.methods.csr(0, this.getheight() - 1);
 
         var j = bottom + 1;
 
@@ -1460,14 +1396,14 @@ export class Screen extends Node {
             // NOTE: This is different from the other "visible" values - it needs the
             // visible height of the scrolling element itself, not the element within
             // it.
-            var visible = self.screen.height - el.atop - el.getitop() - el.abottom - el.getibottom();
+            var visible = self.screen.getheight() - el.atop - el.getitop() - el.abottom - el.getibottom();
             if (self.rtop < el.childBase) {
                 el.scrollTo(self.rtop);
                 self.screen.render();
-            } else if (self.rtop + self.height - self.getibottom() > el.childBase + visible) {
+            } else if (self.rtop + self.getheight() - self.getibottom() > el.childBase + visible) {
                 // Explanation for el.itop here: takes into account scrollable elements
                 // with borders otherwise the element gets covered by the bottom border:
-                el.scrollTo(self.rtop - (el.height - self.height) + el.getitop(), true);
+                el.scrollTo(self.rtop - (el.getheight() - self.getheight()) + el.getitop(), true);
                 self.screen.render();
             }
         }
@@ -1747,9 +1683,11 @@ export class Screen extends Node {
     }
 
     cursorColor(color) {
-        this.cursor.color = color != null
-            ? colors.convert(color)
-            : null;
+        if (color == null) {
+            this.cursor.color = null;
+        } else {
+            this.cursor.color = colors.convert(color);
+        }
         this.cursor._set = true;
 
         if (this.cursor.artificial) {
@@ -1864,93 +1802,6 @@ export class Screen extends Node {
         };
     }
 
-    screenshot(xi, xl, yi, yl, term) {
-        if (xi == null) xi = 0;
-        if (xl == null) xl = this.cols;
-        if (yi == null) yi = 0;
-        if (yl == null) yl = this.rows;
-
-        if (xi < 0) xi = 0;
-        if (yi < 0) yi = 0;
-
-        var x
-            , y
-            , line
-            , out
-            , ch
-            , data
-            , attr;
-
-        var sdattr = this.dattr;
-
-        if (term) {
-            this.dattr = term.defAttr;
-        }
-
-        var main = '';
-
-        for (y = yi; y < yl; y++) {
-            line = term
-                ? term.lines[y]
-                : this.lines[y];
-
-            if (!line) break;
-
-            out = '';
-            attr = this.dattr;
-
-            for (x = xi; x < xl; x++) {
-                if (!line[x]) break;
-
-                data = line[x][0];
-                ch = line[x][1];
-
-                if (data !== attr) {
-                    if (attr !== this.dattr) {
-                        out += '\x1b[m';
-                    }
-                    if (data !== this.dattr) {
-                        var _data = data;
-                        if (term) {
-                            if (((_data >> 9) & 0x1ff) === 257) _data |= 0x1ff << 9;
-                            if ((_data & 0x1ff) === 256) _data |= 0x1ff;
-                        }
-                        out += this.codeAttr(_data);
-                    }
-                }
-
-                if (this.fullUnicode) {
-                    if (unicode.charWidth(line[x][1]) === 2) {
-                        if (x === xl - 1) {
-                            ch = ' ';
-                        } else {
-                            x++;
-                        }
-                    }
-                }
-
-                out += ch;
-                attr = data;
-            }
-
-            if (attr !== this.dattr) {
-                out += '\x1b[m';
-            }
-
-            if (out) {
-                main += (y > 0 ? '\n' : '') + out;
-            }
-        }
-
-        main = main.replace(/(?:\s*\x1b\[40m\s*\x1b\[m\s*)*$/, '') + '\n';
-
-        if (term) {
-            this.dattr = sdattr;
-        }
-
-        return main;
-    }
-
     static bind(screen: Screen) {
         if (!Screen.global) {
             Screen.global = screen;
@@ -2021,41 +1872,31 @@ export class Screen extends Node {
             screen.destroy();
         });
     }
+
+    getwidth(): number {
+        return this.program.cols
+    }
+
+    getheight(): number {
+        return this.program.rows
+    }
+
+    gettitle(): string {
+        return this.program.title
+    }
+
+    settitle(title: string): string {
+        this.program.title = title
+    }
+
+    getterminal() {
+        return this.program.terminal
+    }
+
+    setterminal(terminal: string) {
+        this.program.terminal = terminal
+    }
 }
-
-
-Screen.prototype.__defineGetter__('title', function() {
-    return this.program.title;
-});
-
-Screen.prototype.__defineSetter__('title', function(title) {
-    return this.program.title = title;
-});
-
-Screen.prototype.__defineGetter__('terminal', function() {
-    return this.program.terminal;
-});
-
-Screen.prototype.__defineSetter__('terminal', function(terminal) {
-    this.setTerminal(terminal);
-    return this.program.terminal;
-});
-
-Screen.prototype.__defineGetter__('cols', function() {
-    return this.program.cols;
-});
-
-Screen.prototype.__defineGetter__('rows', function() {
-    return this.program.rows;
-});
-
-Screen.prototype.__defineGetter__('width', function() {
-    return this.program.cols;
-});
-
-Screen.prototype.__defineGetter__('height', function() {
-    return this.program.rows;
-});
 
 Screen.prototype.__defineGetter__('focused', function() {
     return this.history[this.history.length - 1];

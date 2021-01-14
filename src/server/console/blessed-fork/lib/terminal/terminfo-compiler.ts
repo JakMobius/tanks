@@ -260,6 +260,7 @@ export default class TerminfoCompiler {
             // %p[1-9]
             //   push i'th parameter
             if (this.read(/^%p([1-9])/)) {
+                //this.expr('(Number.isNaN(params[' + (Number(this.ch) - 1) + '])) && (function(){throw "ouch"})()')
                 this.expr('(stack.push(v = params[' + (Number(this.ch) - 1) + ']), v)');
                 continue;
             }

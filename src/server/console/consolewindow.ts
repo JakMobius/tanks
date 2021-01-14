@@ -43,7 +43,7 @@ class ConsoleWindow extends EventEmitter {
 	public historyIndex: any;
 	public currentHistoryEntry: any;
 	public lines: any;
-	public screen: any;
+	public screen: blessed.Screen;
 	public consoleTextbox: any;
 	public scrollView: any;
 	public promptLabel: any;

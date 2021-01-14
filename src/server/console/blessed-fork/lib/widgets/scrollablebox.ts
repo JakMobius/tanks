@@ -10,14 +10,23 @@
 
 
 import {Box} from './box';
+import {NodeConfig} from "./node";
+import {Screen} from "./screen";
+
+export interface ScrollableBoxConfig extends NodeConfig {
+    scrollable?: boolean
+    mouse?: boolean
+}
 
 export class ScrollableBox extends Box {
 	public baseLimit: any;
+    private childOffset: number;
+    private scrollable: boolean;
 
     /**
      * ScrollableBox
      */
-    constructor(options) {
+    constructor(options: ScrollableBoxConfig) {
         super(options);
 
         var self = this;
@@ -31,77 +40,8 @@ export class ScrollableBox extends Box {
         this.scrollable = true;
         this.childOffset = 0;
         this.childBase = 0;
-        this.baseLimit = options.baseLimit || Infinity;
+        this.baseLimit = Infinity;
         this.alwaysScroll = options.alwaysScroll;
-
-        this.scrollbar = options.scrollbar;
-        if (this.scrollbar) {
-            this.scrollbar.ch = this.scrollbar.ch || ' ';
-            this.style.scrollbar = this.style.scrollbar || this.scrollbar.style;
-            if (!this.style.scrollbar) {
-                this.style.scrollbar = {};
-                this.style.scrollbar.fg = this.scrollbar.fg;
-                this.style.scrollbar.bg = this.scrollbar.bg;
-                this.style.scrollbar.bold = this.scrollbar.bold;
-                this.style.scrollbar.underline = this.scrollbar.underline;
-                this.style.scrollbar.inverse = this.scrollbar.inverse;
-                this.style.scrollbar.invisible = this.scrollbar.invisible;
-            }
-            //this.scrollbar.style = this.style.scrollbar;
-            if (this.track || this.scrollbar.track) {
-                this.track = this.scrollbar.track || this.track;
-                this.style.track = this.style.scrollbar.track || this.style.track;
-                this.track.ch = this.track.ch || ' ';
-                this.style.track = this.style.track || this.track.style;
-                if (!this.style.track) {
-                    this.style.track = {};
-                    this.style.track.fg = this.track.fg;
-                    this.style.track.bg = this.track.bg;
-                    this.style.track.bold = this.track.bold;
-                    this.style.track.underline = this.track.underline;
-                    this.style.track.inverse = this.track.inverse;
-                    this.style.track.invisible = this.track.invisible;
-                }
-                this.track.style = this.style.track;
-            }
-            // Allow controlling of the scrollbar via the mouse:
-            if (options.mouse) {
-                this.on('mousedown', function (data) {
-                    if (self._scrollingBar) {
-                        // Do not allow dragging on the scrollbar:
-                        delete self.screen._dragging;
-                        delete self._drag;
-                        return;
-                    }
-                    var x = data.x - self.getaleft();
-                    var y = data.y - self.getatop();
-                    if (x === self.getwidth() - self.getirignt() - 1) {
-                        // Do not allow dragging on the scrollbar:
-                        delete self.screen._dragging;
-                        delete self._drag;
-                        var perc = (y - self.getitop()) / (self.getheight() - self.getiheight());
-                        self.setScrollPerc(perc * 100 | 0);
-                        self.screen.render();
-                        var smd, smu;
-                        self._scrollingBar = true;
-                        self.onScreenEvent('mousedown', smd = function (data) {
-                            var y = data.y - self.getaop();
-                            var perc = y / self.getheight();
-                            self.setScrollPerc(perc * 100 | 0);
-                            self.screen.render();
-                        });
-                        // If mouseup occurs out of the window, no mouseup event fires, and
-                        // scrollbar will drag again on mousedown until another mouseup
-                        // occurs.
-                        self.onScreenEvent('mouseup', smu = function () {
-                            self._scrollingBar = false;
-                            self.removeScreenEvent('mousedown', smd);
-                            self.removeScreenEvent('mouseup', smu);
-                        });
-                    }
-                });
-            }
-        }
 
         if (options.mouse) {
             this.on('wheeldown', function () {
@@ -114,57 +54,17 @@ export class ScrollableBox extends Box {
             });
         }
 
-        if (options.keys && !options.ignoreKeys) {
-            this.on('keypress', function (ch, key) {
-                if (key.name === 'up' || (options.vi && key.name === 'k')) {
-                    self.scroll(-1);
-                    self.screen.render();
-                    return;
-                }
-                if (key.name === 'down' || (options.vi && key.name === 'j')) {
-                    self.scroll(1);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'u' && key.ctrl) {
-                    self.scroll(-(self.getheight() / 2 | 0) || -1);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'd' && key.ctrl) {
-                    self.scroll(self.getheight() / 2 | 0 || 1);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'b' && key.ctrl) {
-                    self.scroll(-self.getheight() || -1);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'f' && key.ctrl) {
-                    self.scroll(self.getheight() || 1);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'g' && !key.shift) {
-                    self.scrollTo(0);
-                    self.screen.render();
-                    return;
-                }
-                if (options.vi && key.name === 'g' && key.shift) {
-                    self.scrollTo(self.getScrollHeight());
-                    self.screen.render();
-                    return;
-                }
-            });
-        }
-
         this.on('parsed content', function () {
             self._recalculateIndex();
         });
 
-        self._recalculateIndex();
         this.type = 'scrollable-box';
+    }
+
+    setScreen(screen: Screen) {
+        super.setScreen(screen);
+
+        this._recalculateIndex();
     }
 
     _scrollBottom() {
@@ -277,9 +177,9 @@ export class ScrollableBox extends Box {
         // XXX
         // max = this.getScrollHeight() - (this.height - this.iheight);
 
-        max = this._clines.length - (this.height - this.getiheight());
+        max = this._clines.length - (this.getheight() - this.getiheight());
         if (max < 0) max = 0;
-        emax = this._scrollBottom() - (this.height - this.getiheight());
+        emax = this._scrollBottom() - (this.getheight() - this.getiheight());
         if (emax < 0) emax = 0;
 
         this.childBase = Math.min(this.childBase, Math.max(emax, max));
@@ -316,18 +216,19 @@ export class ScrollableBox extends Box {
     }
 
     _recalculateIndex() {
+        if(!this._clines) return
         var max, emax;
 
         if (this.detached || !this.scrollable) {
-            return 0;
+            return;
         }
 
         // XXX
         // max = this.getScrollHeight() - (this.height - this.iheight);
 
-        max = this._clines.length - (this.height - this.getiheight());
+        max = this._clines.length - (this.getheight() - this.getiheight());
         if (max < 0) max = 0;
-        emax = this._scrollBottom() - (this.height - this.getiheight());
+        emax = this._scrollBottom() - (this.getheight() - this.getiheight());
         if (emax < 0) emax = 0;
 
         this.childBase = Math.min(this.childBase, Math.max(emax, max));
@@ -377,12 +278,3 @@ export class ScrollableBox extends Box {
         return this.scrollTo((i / 100) * m | 0);
     }
 }
-
-
-// XXX Potentially use this in place of scrollable checks elsewhere.
-ScrollableBox.prototype.__defineGetter__('reallyScrollable', function () {
-    if (this.shrink) return this.scrollable;
-    return this.getScrollHeight() > this.height;
-});
-
-

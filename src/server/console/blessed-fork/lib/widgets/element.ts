@@ -13,8 +13,7 @@ import colors from '../colors'
 import unicode from '../unicode';
 import helpers from '../helpers';
 import {Node, NodeConfig} from "./node"
-
-var nextTick = global.setImmediate || process.nextTick.bind(process);
+import { Screen } from './screen'
 
 type ElementHAlign = 'left' | 'center' | 'right'
 type ElementVAlign = 'top' | 'middle' | 'bottom'
@@ -60,8 +59,6 @@ export interface ElementConfig extends NodeConfig {
     ch?: string
     padding?: Partial<ElementEdgeOffset> | number
     clickable?: boolean
-    input?: boolean
-    keyable?: boolean
     parseTags?: boolean
     content?: string
     focused?: boolean
@@ -73,6 +70,9 @@ interface WrappedContent extends Array<string> {
     fake?: string[];
     mwidth?: number;
     width?: number;
+    content?: string
+    attr?: number[]
+    ci?: number[];
 }
 
 export class Element extends Node {
@@ -94,10 +94,9 @@ export class Element extends Node {
     public input: boolean
     public keyable: boolean
     public parseTags: boolean
-    public draggable: boolean
     public content: string
-    private _slisteners: any[] = [];
-    private _clines: WrappedContent;
+    public childBase: number
+    public _clines: WrappedContent;
 
     constructor(options?: ElementConfig) {
         super(options);
@@ -139,21 +138,12 @@ export class Element extends Node {
             };
         }
 
-        // if (options.mouse || options.clickable) {
-        if (options.clickable) {
-            this.screen._listenMouse(this);
-        }
-
-        if (options.input || options.keyable) {
-            this.screen._listenKeys(this);
-        }
-
         this.parseTags = options.parseTags;
 
         this.setContent(options.content || '', true);
 
         // TODO: Possibly move this to Node for onScreenEvent('mouse', ...).
-        this.on('newListener', function fn(type: string) {
+        this.on('newListener', (type: string) => {
 
             if (type === 'mouse'
                 || type === 'click'
@@ -165,9 +155,9 @@ export class Element extends Node {
                 || type === 'wheeldown'
                 || type === 'wheelup'
                 || type === 'mousemove') {
-                self.screen._listenMouse(self);
+                this.onMouseListener()
             } else if (type === 'keypress' || type.indexOf('key ') === 0) {
-                self.screen._listenKeys(self);
+                this.onKeyboardListener()
             }
         });
 
@@ -180,19 +170,36 @@ export class Element extends Node {
         });
 
         this.on('detach', function () {
-            delete self.lpos;
+            this.lpos = null
         });
-
-        if (this.options.draggable) {
-            this.draggable = true;
-        }
 
         if (options.focused) {
             this.focus();
         }
 
         this.type = 'element';
-        this._render = Element.prototype.render;
+    }
+
+    onMouseListener() {
+        if(this.clickable) return
+        if(this.screen) this.screen._listenKeys(this)
+    }
+
+    onKeyboardListener() {
+        if(this.keyable) return
+        if(this.screen) this.screen._listenKeys(this)
+    }
+
+    setScreen(screen: Screen) {
+        super.setScreen(screen);
+
+        if (this.clickable) {
+            this.screen._listenMouse(this);
+        }
+
+        if (this.keyable) {
+            this.screen._listenKeys(this);
+        }
     }
 
     sattr(style, fg, bg) {
@@ -230,44 +237,8 @@ export class Element extends Node {
             | colors.convert(bg);
     }
 
-    onScreenEvent(type, handler) {
-        var listeners = this._slisteners
-        listeners.push({type: type, handler: handler});
-        this.screen.on(type, handler);
-    }
-
-    onceScreenEvent(type, handler) {
-        var listeners = this._slisteners
-        var entry = {type: type, handler: handler};
-        listeners.push(entry);
-        this.screen.once(type, function () {
-            var i = listeners.indexOf(entry);
-            if (~i) listeners.splice(i, 1);
-            return handler.apply(this, arguments);
-        });
-    }
-
-    removeScreenEvent(type, handler) {
-        var listeners = this._slisteners;
-        for (var i = 0; i < listeners.length; i++) {
-            var listener = listeners[i];
-            if (listener.type === type && listener.handler === handler) {
-                listeners.splice(i, 1);
-                break;
-            }
-        }
-        this.screen.removeListener(type, handler);
-    }
-
     free() {
-        if(!this._slisteners) return
 
-        const listeners = this._slisteners;
-        for (let i = 0; i < listeners.length; i++) {
-            const listener = listeners[i];
-            this.screen.removeListener(listener.type, listener.handler);
-        }
-        this._slisteners = [];
     }
 
     hide() {
@@ -306,7 +277,7 @@ export class Element extends Node {
         return this._clines.fake.join('\n');
     }
 
-    setText(content, noClear) {
+    setText(content: string, noClear: boolean) {
         content = content || '';
         content = content.replace(/\x1b\[[\d;]*m/g, '');
         return this.setContent(content, noClear, true);
@@ -316,7 +287,8 @@ export class Element extends Node {
         return this.getContent().replace(/\x1b\[[\d;]*m/g, '');
     }
 
-    parseContent(noTags?: boolean) {
+    parseContent(noTags?: boolean): boolean {
+        if(!this.screen) return false
         if (this.detached) return false;
 
         var width = this.getwidth() - this.getiwidth();
@@ -363,10 +335,10 @@ export class Element extends Node {
             this._clines.content = this.content;
             this._clines.attr = this._parseAttr(this._clines);
             this._clines.ci = [];
-            this._clines.reduce(function (total, line) {
+            this._clines.reduce((total, line) => {
                 this._clines.ci.push(total);
                 return total + line.length + 1;
-            }.bind(this), 0);
+            }, 0);
 
             this._pcontent = this._clines.join('\n');
             this.emit('parsed content');
@@ -563,7 +535,6 @@ export class Element extends Node {
             return out;
         }
 
-        if (this.scrollbar) margin++;
         if (width > margin) width -= margin;
 
 
@@ -1192,44 +1163,7 @@ export class Element extends Node {
             }
         }
 
-        // Draw the scrollbar.
-        // Could possibly draw this after all child elements.
-        if (this.scrollbar) {
-            // XXX
-            // i = this.getScrollHeight();
-            i = Math.max(this._clines.length, this._scrollBottom());
-        }
         if (coords.notop || coords.nobot) i = -Infinity;
-        if (this.scrollbar && (yl - yi) < i) {
-            x = xl - 1;
-            if (this.scrollbar.ignoreBorder && this.style.border) x++;
-            if (this.alwaysScroll) {
-                y = this.childBase / (i - (yl - yi));
-            } else {
-                y = (this.childBase + this.childOffset) / (i - 1);
-            }
-            y = yi + ((yl - yi) * y | 0);
-            if (y >= yl) y = yl - 1;
-            cell = lines[y] && lines[y][x];
-            if (cell) {
-                if (this.track) {
-                    ch = this.track.ch || ' ';
-                    attr = this.sattr(this.style.track,
-                        this.style.track.fg || this.style.fg,
-                        this.style.track.bg || this.style.bg);
-                    this.screen.fillRegion(attr, ch, x, x + 1, yi, yl);
-                }
-                ch = this.scrollbar.ch || ' ';
-                attr = this.sattr(this.style.scrollbar,
-                    this.style.scrollbar.fg || this.style.fg,
-                    this.style.scrollbar.bg || this.style.bg);
-                if (attr !== cell[0] || ch !== cell[1]) {
-                    lines[y][x][0] = attr;
-                    lines[y][x][1] = ch;
-                    lines[y].dirty = true;
-                }
-            }
-        }
 
         if (this.style.border) xi--, xl++, yi--, yl++;
 
@@ -1452,7 +1386,9 @@ export class Element extends Node {
     /**
      * Content Methods
      */
-    insertLine(i, line) {
+    insertLine(i: number, line: string): void
+    insertLine(i: number, line: string[]): void
+    insertLine(i: number, line: string | string[]) {
         if (typeof line === 'string') line = line.split('\n');
 
         if (i !== i || i == null) {
@@ -1554,26 +1490,26 @@ export class Element extends Node {
         }
     }
 
-    insertTop(line) {
+    insertTop(line: number) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.insertLine(fake, line);
     }
 
-    insertBottom(line) {
-        var h = (this.childBase || 0) + this.height - this.getiheight()
+    insertBottom(line: number) {
+        var h = (this.childBase || 0) + this.getheight() - this.getiheight()
             , i = Math.min(h, this._clines.length)
             , fake = this._clines.rtof[i - 1] + 1;
 
         return this.insertLine(fake, line);
     }
 
-    deleteTop(n) {
+    deleteTop(n: number) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.deleteLine(fake, n);
     }
 
-    deleteBottom(n) {
-        var h = (this.childBase || 0) + this.height - 1 - this.getiheight()
+    deleteBottom(n: number) {
+        var h = (this.childBase || 0) + this.getheight() - 1 - this.getiheight()
             , i = Math.min(h, this._clines.length - 1)
             , fake = this._clines.rtof[i];
 
@@ -1582,7 +1518,7 @@ export class Element extends Node {
         return this.deleteLine(fake - (n - 1), n);
     }
 
-    setLine(i, line) {
+    setLine(i: number, line: string) {
         i = Math.max(i, 0);
         while (this._clines.fake.length < i) {
             this._clines.fake.push('');
@@ -1591,33 +1527,33 @@ export class Element extends Node {
         return this.setContent(this._clines.fake.join('\n'), true);
     }
 
-    setBaseLine(i, line) {
+    setBaseLine(i: number, line: string) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.setLine(fake + i, line);
     }
 
-    getLine(i) {
+    getLine(i: number) {
         i = Math.max(i, 0);
         i = Math.min(i, this._clines.fake.length - 1);
         return this._clines.fake[i];
     }
 
-    getBaseLine(i) {
+    getBaseLine(i: number) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.getLine(fake + i);
     }
 
-    clearLine(i) {
+    clearLine(i: number) {
         i = Math.min(i, this._clines.fake.length - 1);
         return this.setLine(i, '');
     }
 
-    clearBaseLine(i) {
+    clearBaseLine(i: number) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.clearLine(fake + i);
     }
 
-    unshiftLine(line) {
+    unshiftLine(line: string) {
         return this.insertLine(0, line);
     }
 
