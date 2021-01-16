@@ -25,8 +25,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-import { EventEmitter } from 'events';
-import {BlessedKeyEvent, BlessedMouseEvent} from "./widgets/screen";
+import {EventEmitter} from 'events';
+import {BlessedKeyEvent} from "./widgets/screen";
 import {StringDecoder} from "string_decoder";
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
@@ -139,7 +139,8 @@ function emitKeys(stream, s) {
           name: undefined,
           ctrl: false,
           meta: false,
-          shift: false
+          shift: false,
+          ch: undefined
         },
         parts;
 
@@ -310,21 +311,35 @@ function emitKeys(stream, s) {
 
         /* misc. */
         case '[Z': key.name = 'tab'; key.shift = true; break;
-        default: key.name = 'undefined'; break;
+        default: key.name = undefined; break;
 
       }
-    }
-
-    // Don't emit a key if no name was found
-    if (key.name === undefined) {
-      key = undefined;
     }
 
     if (s.length === 1) {
       ch = s;
     }
 
-    if (key || ch) {
+    if (ch) {
+
+      key.ch = ch
+
+      // Moved this code here since there is no reason why 'Screen' class
+      // should handle these cases.
+
+      if (key.name === 'enter' && key.sequence === '\n') {
+        key.name = 'linefeed';
+      }
+
+      if (key.name === 'return' && key.sequence === '\r') {
+        key.name = 'enter'
+      }
+
+      key.full = (key.ctrl ? 'C-' : '')
+          + (key.meta ? 'M-' : '')
+          + (key.shift && key.name ? 'S-' : '')
+          + (key.name || ch);
+
       stream.emit('keypress', ch, key);
     }
   });

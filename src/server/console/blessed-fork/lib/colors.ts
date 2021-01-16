@@ -164,7 +164,7 @@ class colors {
         return ground
     }
 
-    static blend(attr: number, attr2: number | null, alpha: number): number {
+    static blend(attr: number, attr2?: number, alpha?: number): number {
         let bg = attr & 0x1ff;
         if (attr2 == null) {
             bg = colors.blendGround(bg)
@@ -319,7 +319,7 @@ class colors {
         7: "white",
     }
 
-    static convert(color: string | number[]) {
+    static convert(color: string | number | number[]) {
         let result: number
         if(typeof color != 'number') {
             if (typeof color === 'string') {
@@ -370,6 +370,17 @@ class colors {
         return result
     })()
     static ncolors: string[] = colors.ccolorsOrigin.map(color => colors.colorCodes[color])
+}
+
+export class TTYColor {
+    public readonly code: number;
+
+    constructor(colorCode: number)
+    constructor(colorName: string)
+    constructor(colorComponents: [number, number, number])
+    constructor(color: string | number | number[]) {
+        this.code = colors.convert(color)
+    }
 }
 
 export default colors

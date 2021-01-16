@@ -12,8 +12,10 @@
 import {Box} from './box';
 import {NodeConfig} from "./node";
 import {Screen} from "./screen";
+import {Node} from "./node";
 
 export interface ScrollableBoxConfig extends NodeConfig {
+    alwaysScroll?: boolean;
     scrollable?: boolean
     mouse?: boolean
 }
@@ -22,6 +24,7 @@ export class ScrollableBox extends Box {
 	public baseLimit: any;
     private childOffset: number;
     private scrollable: boolean;
+    private alwaysScroll: boolean;
 
     /**
      * ScrollableBox
@@ -61,26 +64,18 @@ export class ScrollableBox extends Box {
         this.type = 'scrollable-box';
     }
 
-    setScreen(screen: Screen) {
-        super.setScreen(screen);
-
-        this._recalculateIndex();
-    }
-
     _scrollBottom() {
         if (!this.scrollable) return 0;
-
-        // We could just calculate the children, but we can
-        // optimize for lists by just returning the items.length.
-        if (this._isList) {
-            return this.items ? this.items.length : 0;
-        }
 
         if (this.lpos && this.lpos._scrollBottom) {
             return this.lpos._scrollBottom;
         }
 
-        var bottom = this.children.reduce(function (current, el) {
+        this.children.reduce((previousValue, currentValue) => {
+            return 0
+        }, 0)
+
+        let bottom = this.children.reduce((current: number, el: Node) => {
             // el.height alone does not calculate the shrunken height, we need to use
             // getCoords. A shrunken box inside a scrollable element will not grow any
             // larger than the scrollable element's context regardless of how much
@@ -90,10 +85,10 @@ export class ScrollableBox extends Box {
             if (!el.detached) {
                 var lpos = el._getCoords(false);
                 if (lpos) {
-                    return Math.max(current, el.rtop + (lpos.yl - lpos.yi));
+                    return Math.max(current, el.getrtop() + (lpos.yl - lpos.yi));
                 }
             }
-            return Math.max(current, el.rtop + el.height);
+            return Math.max(current, el.getrtop() + el.getheight());
         }, 0);
 
         // XXX Use this? Makes .getScrollHeight() useless!
@@ -104,14 +99,14 @@ export class ScrollableBox extends Box {
         return bottom;
     }
 
-    setScroll(offset, always) {
+    setScroll(offset: number, always?: boolean) {
         // XXX
         // At first, this appeared to account for the first new calculation of childBase:
         this.scroll(0);
         return this.scroll(offset - (this.childBase + this.childOffset), always);
     }
 
-    scrollTo(offset, always?) {
+    scrollTo(offset: number, always?: boolean) {
         // XXX
         // At first, this appeared to account for the first new calculation of childBase:
         this.scroll(0);
@@ -122,20 +117,20 @@ export class ScrollableBox extends Box {
         return this.childBase + this.childOffset;
     }
 
-    scroll(offset, always?) {
+    scroll(offset: number, always?: boolean) {
         if (!this.scrollable) return;
 
         if (this.detached) return;
 
         // Handle scrolling.
-        var visible = this.getheight() - this.getiheight()
-            , base = this.childBase
-            , d
-            , p
-            , t
-            , b
-            , max
-            , emax;
+        let visible = this.getheight() - this.getiheight()
+        let base = this.childBase
+        let d
+        let p
+        let t
+        let b
+        let max
+        let emax;
 
         if (this.alwaysScroll || always) {
             // Semi-workaround
@@ -251,7 +246,7 @@ export class ScrollableBox extends Box {
         return Math.max(this._clines.length, this._scrollBottom());
     }
 
-    getScrollPerc(s) {
+    getScrollPerc(s: boolean) {
         var pos = this.lpos || this._getCoords();
         if (!pos) return s ? -1 : 0;
 
@@ -271,7 +266,7 @@ export class ScrollableBox extends Box {
         return s ? -1 : 0;
     }
 
-    setScrollPerc(i) {
+    setScrollPerc(i: number) {
         // XXX
         // var m = this.getScrollHeight();
         var m = Math.max(this._clines.length, this._scrollBottom());

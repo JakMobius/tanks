@@ -8,37 +8,19 @@
  * Modules
  */
 
-import path from 'path';
-
-import fs from 'fs';
 import cp from 'child_process';
-import colors from '../colors';
-import program from '../program';
-import unicode from '../unicode';
+import colors, {TTYColor} from '../colors';
+import * as unicode from '../unicode';
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
-import helpers from '../helpers';
 import {Node, NodeConfig} from './node';
 import { Element } from './element';
-import { Box } from './box';
 import Tput from "../terminal/tput";
 import {utoa} from "../terminal/characters";
 import Program from "../program";
 import * as tty from "tty"
-
-interface CursorConfig {
-    artificial?: boolean
-    shape?: 'block' | 'line' | 'underline'
-    blink?: boolean
-    color?: string
-}
-
-interface ScreenCursorConfig extends Required<CursorConfig> {
-    _set: boolean,
-    _state: number,
-    _hidden: boolean
-}
+import {BlessedCursorShape, BlessedCursorConfig} from "../cursor";
 
 interface ScreenConfig extends NodeConfig {
     title?: string;
@@ -52,7 +34,7 @@ interface ScreenConfig extends NodeConfig {
     input?: tty.ReadStream;
     forceUnicode?: boolean;
     program?: Program;
-    cursor?: CursorConfig
+    cursor?: BlessedCursorConfig
 }
 
 export interface BlessedEvent {
@@ -71,6 +53,8 @@ export interface BlessedEvent {
 
 export interface BlessedKeyEvent extends BlessedEvent {
     sequence?: string
+    ch?: string
+    full?: string
 }
 
 export interface BlessedMouseEvent extends BlessedEvent {
@@ -83,6 +67,8 @@ export interface BlessedMouseEvent extends BlessedEvent {
     action?: string
 }
 
+export type ScreenLine = [number, string][] & { dirty: boolean }
+
 export class Screen extends Node {
 
     static instances: Screen[] = []
@@ -90,37 +76,33 @@ export class Screen extends Node {
     static global: Screen = null
     static _bound: boolean
 
-    public program: any;
+    public program: Program;
     public tput: Tput;
     public autoPadding: boolean;
     public tabc: any;
     public dockBorders: any;
     public _unicode: any;
     public fullUnicode: any;
-    public dattr: any;
+    public dattr: number;
     public renders: any;
     public padding: any;
     public hover: any;
-    public history: any;
-    public clickable: any;
-    public keyable: any;
+    public history: Element[];
     public grabKeys: any;
     public lockKeys: any;
-    public focused: any;
     public _buf: any;
     public _ci: any;
-    public _destroy: any;
     public _listenedMouse: any;
     public debugLog: any;
     public _listenedKeys: any;
-    public lines: any;
+    public lines: ScreenLine[];
     public olines: any;
-    public _borderStops: any;
-    public _savedFocus: any;
     public _cursorBlink: any;
     public _needsClickableSort: any;
     public mouseDown: any;
-    public cursor: ScreenCursorConfig
+    public cursor: BlessedCursorConfig
+    public clickableElements: Element[];
+    public keyableElements: Element[];
 
     /**
      * Screen
@@ -132,12 +114,13 @@ export class Screen extends Node {
         super(options);
 
         this.detached = false
+        this.screen = this
 
         let self = this;
 
         Screen.bind(this);
 
-        this.program = options.program;
+        this.program = options.program;``
 
         if (this.program) {
             this.program.setupTput();
@@ -148,7 +131,7 @@ export class Screen extends Node {
                 this.program.tput.unicode = options.forceUnicode;
             }
         } else {
-            this.program = new program({
+            this.program = new Program({
                 input: options.input,
                 output: options.output,
                 log: options.log,
@@ -188,8 +171,8 @@ export class Screen extends Node {
         };
 
         this.history = [];
-        this.clickable = [];
-        this.keyable = [];
+        this.clickableElements = [];
+        this.keyableElements = [];
         this.grabKeys = false;
         this.lockKeys = false;
         this._buf = '';
@@ -197,26 +180,16 @@ export class Screen extends Node {
         this._ci = -1;
 
         if (options.title) {
-            this.setTitle(options.title);
+            this.settitle(options.title);
         }
 
-        let cursorConfig = options.cursor || {}
-
-        this.cursor = {
-            artificial: cursorConfig.artificial || false,
-            shape: cursorConfig.shape || 'block',
-            blink: cursorConfig.blink || false,
-            color: cursorConfig.color || null,
-            _set: false,
-            _state: 1,
-            _hidden: true
-        };
+        this.cursor = options.cursor
 
         this.program.on('resize', function() {
             self.alloc();
             self.render();
             (function emit(el) {
-                el.emit('resize');
+                el.onResize()
                 el.children.forEach(emit);
             })(self);
         });
@@ -259,20 +232,6 @@ export class Screen extends Node {
         this.type = 'screen';
     }
 
-    setTerminal(terminal: string) {
-        var entered = !!this.program.isAlt;
-        if (entered) {
-            this._buf = '';
-            this.program._buf = '';
-            this.leave();
-        }
-        this.program.setTerminal(terminal);
-        this.tput = this.program.tput;
-        if (entered) {
-            this.enter();
-        }
-    }
-
     enter() {
         if (this.program.isAlt) return;
         if (!this.cursor._set) {
@@ -293,7 +252,7 @@ export class Screen extends Node {
             }
         }
         this.program.alternateBuffer();
-        this.program.put.keypad_xmit();
+        this.program._write(this.program.tput.terminfo.methods.keypad_xmit())
         this.program.setScrollRegion(0, this.getheight() - 1);
         this.program.hideCursor();
         this.program.cursorPos(0, 0);
@@ -306,7 +265,7 @@ export class Screen extends Node {
 
     leave() {
         if (!this.program.isAlt) return;
-        this.program.put.keypad_local();
+        this.program._write(this.program.tput.terminfo.methods.keypad_local())
         if (this.program.scrollTop !== 0
             || this.program.scrollBottom !== this.getheight() - 1) {
             this.program.setScrollRegion(0, this.getheight() - 1);
@@ -319,7 +278,7 @@ export class Screen extends Node {
             this.program.disableMouse();
         }
         this.program.normalBuffer();
-        if (this.cursor._set) this.cursorReset();
+        this.resetCursor();
         this.program.flush();
         if (process.platform === 'win32') {
             try {
@@ -366,12 +325,17 @@ export class Screen extends Node {
         return this.program.debug.apply(this.program, arguments);
     }
 
-    _listenMouse(el?: Node) {
+    _unlistenMouse(el?: Element) {
+        let i = this.clickableElements.indexOf(el);
+        if (~i) this.clickableElements.splice(i, 1);
+    }
+
+    _listenMouse(el?: Element) {
         var self = this;
 
-        if (el && !~this.clickable.indexOf(el)) {
-            el.clickable = true;
-            this.clickable.push(el);
+        if (el && !~this.clickableElements.indexOf(el)) {
+            el.isClickable = true;
+            this.clickableElements.push(el);
         }
 
         if (this._listenedMouse) return;
@@ -390,7 +354,10 @@ export class Screen extends Node {
             if (self.lockKeys) return;
 
             if (self._needsClickableSort) {
-                self.clickable = helpers.hsort(self.clickable);
+
+                self.clickableElements = self.clickableElements.sort(function(a, b) {
+                    return b.index - a.index;
+                });
                 self._needsClickableSort = false;
             }
 
@@ -399,10 +366,10 @@ export class Screen extends Node {
                 , set
                 , pos;
 
-            for (; i < self.clickable.length; i++) {
-                el = self.clickable[i];
+            for (; i < self.clickableElements.length; i++) {
+                el = self.clickableElements[i];
 
-                if (el.detached || !el.visible) {
+                if (el.detached || !el.isVisible()) {
                     continue;
                 }
 
@@ -453,16 +420,19 @@ export class Screen extends Node {
         });
     }
 
-    enableMouse(el) {
+    enableMouse(el: Element) {
         this._listenMouse(el);
     }
 
-    _listenKeys(el?) {
-        var self = this;
+    _unlistenKeys(el?: Element) {
+        let i = this.keyableElements.indexOf(el);
+        if (~i) this.keyableElements.splice(i, 1);
+    }
 
-        if (el && !~this.keyable.indexOf(el)) {
-            el.keyable = true;
-            this.keyable.push(el);
+    _listenKeys(el?: Element) {
+        if (el && !~this.keyableElements.indexOf(el)) {
+            el.isKeyable = true;
+            this.keyableElements.push(el);
         }
 
         if (this._listenedKeys) return;
@@ -475,33 +445,33 @@ export class Screen extends Node {
         // After the first keypress emitted, the handler
         // checks to make sure grabKeys, lockKeys, and focused
         // weren't changed, and handles those situations appropriately.
-        this.program.on('keypress', function(ch, key) {
+        this.program.on('keypress', (ch: string, key: BlessedKeyEvent) => {
 
-            var focused = self.focused
-                , grabKeys = self.grabKeys;
+            let focused = this.getfocused()
+            let grabKeys = this.grabKeys;
 
             // If something changed from the screen key handler, stop.
-            if (self.grabKeys !== grabKeys || self.lockKeys) {
+            if (this.grabKeys !== grabKeys || this.lockKeys) {
                 return;
             }
 
-            if (focused && focused.keyable) {
+            if (focused && focused.isKeyable) {
                 focused.emit('keypress', ch, key);
                 focused.emit('key ' + key.full, ch, key);
             }
         });
     }
 
-    enableKeys(el) {
+    enableKeys(el: Element) {
         this._listenKeys(el);
     }
 
-    enableInput(el) {
+    enableInput(el: Element) {
         this._listenMouse(el);
         this._listenKeys(el);
     }
 
-    alloc(dirty?) {
+    alloc(dirty?: boolean) {
         var x, y;
 
         let width = this.getwidth()
@@ -509,7 +479,7 @@ export class Screen extends Node {
 
         this.lines = [];
         for (y = 0; y < height; y++) {
-            this.lines[y] = [];
+            this.lines[y] = [] as ScreenLine;
             for (x = 0; x < width; x++) {
                 this.lines[y][x] = [this.dattr, ' '];
             }
@@ -527,18 +497,12 @@ export class Screen extends Node {
         this.program.clear();
     }
 
-    realloc() {
-        return this.alloc(true);
-    }
-
     render() {
         var self = this;
 
         if (this.destroyed) return;
 
         this.emit('prerender');
-
-        this._borderStops = {};
 
         // TODO: Possibly get rid of .dirty altogether.
         // TODO: Could possibly drop .dirty and just clear the `lines` buffer every
@@ -560,8 +524,9 @@ export class Screen extends Node {
 
         // XXX Workaround to deal with cursor pos before the screen has rendered and
         // lpos is not reliable (stale).
-        if (this.focused && this.focused._updateCursor) {
-            this.focused._updateCursor(true);
+        let focused = this.getfocused()
+        if (focused && focused._updateCursor) {
+            focused._updateCursor(true);
         }
 
         this.renders++;
@@ -569,8 +534,8 @@ export class Screen extends Node {
         this.emit('render');
     }
 
-    blankLine(ch?: string, dirty?: boolean) {
-        var out = [];
+    blankLine(ch?: string, dirty?: boolean): ScreenLine {
+        let out: ScreenLine = [] as ScreenLine;
         let width = this.getwidth()
         for (var x = 0; x < width; x++) {
             out[x] = [this.dattr, ch || ' '];
@@ -579,7 +544,7 @@ export class Screen extends Node {
         return out;
     }
 
-    insertLine(n, y, top, bottom) {
+    insertLine(n: number, y: number, top: number, bottom: number) {
         // if (y === top) return this.insertLineNC(n, y, top, bottom);
 
         if (!this.tput.terminfo.strings.change_scroll_region
@@ -601,7 +566,7 @@ export class Screen extends Node {
         }
     }
 
-    deleteLine(n, y, top, bottom) {
+    deleteLine(n: number, y: number, top: number, bottom: number) {
         // if (y === top) return this.deleteLineNC(n, y, top, bottom);
 
         if (!this.tput.terminfo.strings.change_scroll_region
@@ -623,10 +588,10 @@ export class Screen extends Node {
         }
     }
 
-// This is how ncurses does it.
-// Scroll down (up cursor-wise).
-// This will only work for top line deletion as opposed to arbitrary lines.
-    insertLineNC(n, y, top, bottom) {
+    // This is how ncurses does it.
+    // Scroll down (up cursor-wise).
+    // This will only work for top line deletion as opposed to arbitrary lines.
+    insertLineNC(n: number, y: number, top: number, bottom: number) {
         if (!this.tput.terminfo.strings.change_scroll_region
             || !this.tput.terminfo.strings.delete_line) return;
 
@@ -645,10 +610,10 @@ export class Screen extends Node {
         }
     }
 
-// This is how ncurses does it.
-// Scroll up (down cursor-wise).
-// This will only work for bottom line deletion as opposed to arbitrary lines.
-    deleteLineNC(n, y, top, bottom) {
+    // This is how ncurses does it.
+    // Scroll up (down cursor-wise).
+    // This will only work for bottom line deletion as opposed to arbitrary lines.
+    deleteLineNC(n: number, y: number, top: number, bottom: number) {
         if (!this.tput.terminfo.strings.change_scroll_region
             || !this.tput.terminfo.strings.delete_line) return;
 
@@ -667,33 +632,33 @@ export class Screen extends Node {
         }
     }
 
-    insertBottom(top, bottom) {
-        return this.deleteLine(1, top, top, bottom);
+    insertBottom(top: number, bottom: number): void {
+        this.deleteLine(1, top, top, bottom);
     }
 
-    insertTop(top, bottom) {
-        return this.insertLine(1, top, top, bottom);
+    insertTop(top: number, bottom: number): void {
+        this.insertLine(1, top, top, bottom);
     }
 
-    deleteBottom(top, bottom) {
-        return this.clearRegion(0, this.getwidth(), bottom, bottom);
+    deleteBottom(top: number, bottom: number): void {
+        this.clearRegion(0, this.getwidth(), bottom, bottom);
     }
 
-    deleteTop(top, bottom) {
+    deleteTop(top: number, bottom: number): void {
         // Same as: return this.insertBottom(top, bottom);
-        return this.deleteLine(1, top, top, bottom);
+        this.deleteLine(1, top, top, bottom);
     }
 
-// Parse the sides of an element to determine
-// whether an element has uniform cells on
-// both sides. If it does, we can use CSR to
-// optimize scrolling on a scrollable element.
-// Not exactly sure how worthwile this is.
-// This will cause a performance/cpu-usage hit,
-// but will it be less or greater than the
-// performance hit of slow-rendering scrollable
-// boxes with clean sides?
-    cleanSides(el) {
+    // Parse the sides of an element to determine
+    // whether an element has uniform cells on
+    // both sides. If it does, we can use CSR to
+    // optimize scrolling on a scrollable element.
+    // Not exactly sure how worthwile this is.
+    // This will cause a performance/cpu-usage hit,
+    // but will it be less or greater than the
+    // performance hit of slow-rendering scrollable
+    // boxes with clean sides?
+    cleanSides(el: Element) {
         var pos = el.lpos;
 
         if (!pos) {
@@ -734,22 +699,20 @@ export class Screen extends Node {
         //   return pos._cleanSides = false;
         // }
 
-        var yi = pos.yi + el.getitop()
-            , yl = pos.yl - el.getibottom()
-            , first
-            , ch
-            , x
-            , y;
+        let yi = pos.yi + el.getitop()
+        let yl = pos.yl - el.getibottom()
+        let first
+        let ch
 
         if (pos.yi < 0) return pos._cleanSides = false;
         if (pos.yl > this.getheight()) return pos._cleanSides = false;
         if (pos.xi - 1 < 0) return pos._cleanSides = true;
         if (pos.xl > this.getwidth()) return pos._cleanSides = true;
 
-        for (x = pos.xi - 1; x >= 0; x--) {
+        for (let x = pos.xi - 1; x >= 0; x--) {
             if (!this.olines[yi]) break;
             first = this.olines[yi][x];
-            for (y = yi; y < yl; y++) {
+            for (let y = yi; y < yl; y++) {
                 if (!this.olines[y] || !this.olines[y][x]) break;
                 ch = this.olines[y][x];
                 if (ch[0] !== first[0] || ch[1] !== first[1]) {
@@ -758,10 +721,10 @@ export class Screen extends Node {
             }
         }
 
-        for (x = pos.xl; x < this.getwidth(); x++) {
+        for (let x = pos.xl; x < this.getwidth(); x++) {
             if (!this.olines[yi]) break;
             first = this.olines[yi][x];
-            for (y = yi; y < yl; y++) {
+            for (let y = yi; y < yl; y++) {
                 if (!this.olines[y] || !this.olines[y][x]) break;
                 ch = this.olines[y][x];
                 if (ch[0] !== first[0] || ch[1] !== first[1]) {
@@ -773,33 +736,33 @@ export class Screen extends Node {
         return pos._cleanSides = true;
     }
 
-    draw(start, end) {
+    draw(start: number, end: number) {
         // this.emit('predraw');
 
-        var x
-            , y
-            , line
-            , out
-            , ch
-            , data
-            , attr
-            , fg
-            , bg
-            , flags;
+        let x
+        let y
+        let line
+        let out
+        let ch
+        let data
+        let attr
+        let fg
+        let bg
+        let flags;
 
-        var main = ''
-            , pre
-            , post;
+        let main = ''
+        let pre
+        let post;
 
-        var clr
-            , neq
-            , xx;
+        let clr
+        let neq
+        let xx;
 
-        var lx = -1
-            , ly = -1
-            , o;
+        let lx = -1
+        let ly = -1
+        let o;
 
-        var acs;
+        let acs;
 
         if (this._buf) {
             main += this._buf;
@@ -855,7 +818,8 @@ export class Screen extends Node {
                     }
 
                     if (clr && neq) {
-                        lx = -1, ly = -1;
+                        lx = -1
+                        ly = -1;
                         if (data !== attr) {
                             out += this.codeAttr(data);
                             attr = data;
@@ -1018,7 +982,7 @@ export class Screen extends Node {
                         // by the angles check occurs in widget-unicode:
                         // Might also need: `line[x + 1][0] !== line[x][0]`
                         // for borderless boxes?
-                        if (x === line.length - 1 || angles[line[x + 1][1]]) {
+                        if (x === line.length - 1) {
                             // If we're at the end, we don't have enough space for a
                             // double-width. Overwrite it with a space and ignore.
                             ch = ' ';
@@ -1119,7 +1083,7 @@ export class Screen extends Node {
         // this.emit('draw');
     }
 
-    _reduceColor(color) {
+    _reduceColor(color: number) {
         return colors.reduce(color, this.tput.terminfo.numbers.max_colors);
     }
 
@@ -1230,7 +1194,7 @@ export class Screen extends Node {
     }
 
 // Convert our own attribute format to an SGR string.
-    codeAttr(code) {
+    codeAttr(code: number) {
         var flags = (code >> 18) & 0x1ff
             , fg = (code >> 9) & 0x1ff
             , bg = code & 0x1ff
@@ -1297,31 +1261,31 @@ export class Screen extends Node {
     }
 
     focusOffset(offset) {
-        var shown = this.keyable.filter(function(el) {
-            return !el.detached && el.visible;
+        var shown = this.keyableElements.filter(function(el) {
+            return !el.detached && el.isVisible();
         }).length;
 
         if (!shown || !offset) {
             return;
         }
 
-        var i = this.keyable.indexOf(this.focused);
+        var i = this.keyableElements.indexOf(this.getfocused());
         if (!~i) return;
 
         if (offset > 0) {
             while (offset--) {
-                if (++i > this.keyable.length - 1) i = 0;
-                if (this.keyable[i].detached || !this.keyable[i].visible) offset++;
+                if (++i > this.keyableElements.length - 1) i = 0;
+                if (this.keyableElements[i].detached || !this.keyableElements[i].isVisible()) offset++;
             }
         } else {
             offset = -offset;
             while (offset--) {
-                if (--i < 0) i = this.keyable.length - 1;
-                if (this.keyable[i].detached || !this.keyable[i].visible) offset++;
+                if (--i < 0) i = this.keyableElements.length - 1;
+                if (this.keyableElements[i].detached || !this.keyableElements[i].isVisible()) offset++;
             }
         }
 
-        return this.keyable[i].focus();
+        return this.keyableElements[i].focus();
     }
 
     focusPrev() {
@@ -1336,7 +1300,7 @@ export class Screen extends Node {
         return this.focusOffset(1);
     }
 
-    focusPush(el) {
+    focusPush(el: Element) {
         if (!el) return;
         var old = this.history[this.history.length - 1];
         if (this.history.length === 10) {
@@ -1354,24 +1318,13 @@ export class Screen extends Node {
         return old;
     }
 
-    saveFocus() {
-        return this._savedFocus = this.focused;
-    }
-
-    restoreFocus() {
-        if (!this._savedFocus) return;
-        this._savedFocus.focus();
-        delete this._savedFocus;
-        return this.focused;
-    }
-
     rewindFocus() {
         var old = this.history.pop()
             , el;
 
         while (this.history.length) {
             el = this.history.pop();
-            if (!el.detached && el.visible) {
+            if (!el.detached && el.isVisible()) {
                 this.history.push(el);
                 this._focus(el, old);
                 return el;
@@ -1381,6 +1334,8 @@ export class Screen extends Node {
         if (old) {
             old.emit('blur');
         }
+
+        return null
     }
 
     _focus(self, old) {
@@ -1419,7 +1374,7 @@ export class Screen extends Node {
         return this.fillRegion(this.dattr, ' ', xi, xl, yi, yl, override);
     }
 
-    fillRegion(attr, ch: string, xi: number, xl: number, yi: number, yl: number, override: boolean) {
+    fillRegion(attr: number, ch: string, xi: number, xl: number, yi: number, yl: number, override: boolean) {
         let lines = this.lines
             , cell
             , xx;
@@ -1457,176 +1412,7 @@ export class Screen extends Node {
         return this.program.unkey.apply(this, arguments);
     }
 
-    spawn(file, args, options) {
-        if (!Array.isArray(args)) {
-            options = args;
-            args = [];
-        }
-
-        var screen = this
-            , program = screen.program
-            , spawn = require('child_process').spawn
-            , mouse = program.mouseEnabled
-            , ps;
-
-        options = options || {};
-
-        options.stdio = options.stdio || 'inherit';
-
-        program.lsaveCursor('spawn');
-        // program.csr(0, program.rows - 1);
-        program.normalBuffer();
-        program.showCursor();
-        if (mouse) program.disableMouse();
-
-        var write = program.output.write;
-        program.output.write = function() {};
-        program.input.pause();
-        if (program.input.setRawMode) {
-            program.input.setRawMode(false);
-        }
-
-        var resume = function() {
-            if (resume.done) return;
-            resume.done = true;
-
-            if (program.input.setRawMode) {
-                program.input.setRawMode(true);
-            }
-            program.input.resume();
-            program.output.write = write;
-
-            program.alternateBuffer();
-            // program.csr(0, program.rows - 1);
-            if (mouse) {
-                program.enableMouse();
-                if (screen.options.sendFocus) {
-                    screen.program.setMouse({ sendFocus: true }, true);
-                }
-            }
-
-            screen.alloc();
-            screen.render();
-
-            screen.program.lrestoreCursor('spawn', true);
-        };
-
-        ps = spawn(file, args, options);
-
-        ps.on('error', resume);
-
-        ps.on('exit', resume);
-
-        return ps;
-    }
-
-    exec(file, args, options, callback) {
-        var ps = this.spawn(file, args, options);
-
-        ps.on('error', function(err) {
-            if (!callback) return;
-            return callback(err, false);
-        });
-
-        ps.on('exit', function(code) {
-            if (!callback) return;
-            return callback(null, code === 0);
-        });
-
-        return ps;
-    }
-
-    readEditor(options, callback) {
-        if (typeof options === 'string') {
-            options = { editor: options };
-        }
-
-        if (!callback) {
-            callback = options;
-            options = null;
-        }
-
-        if (!callback) {
-            callback = function() {};
-        }
-
-        options = options || {};
-
-        var self = this
-            , editor = options.editor || process.env.EDITOR || 'vi'
-            , name = options.name || process.title || 'blessed'
-            , rnd = Math.random().toString(36).split('.').pop()
-            , file = '/tmp/' + name + '.' + rnd
-            , args = [file]
-            , opt;
-
-        opt = {
-            stdio: 'inherit',
-            env: process.env,
-            cwd: process.env.HOME
-        };
-
-        function writeFile(callback) {
-            if (!options.value) return callback();
-            return fs.writeFile(file, options.value, callback);
-        }
-
-        return writeFile(function(err) {
-            if (err) return callback(err);
-            return self.exec(editor, args, opt, function(err, success) {
-                if (err) return callback(err);
-                return fs.readFile(file, 'utf8', function(err, data) {
-                    return fs.unlink(file, function() {
-                        if (!success) return callback(new Error('Unsuccessful.'));
-                        if (err) return callback(err);
-                        return callback(null, data);
-                    });
-                });
-            });
-        });
-    }
-
-    displayImage(file, callback) {
-        if (!file) {
-            if (!callback) return;
-            return callback(new Error('No image.'));
-        }
-
-        file = path.resolve(process.cwd(), file);
-
-        if (!~file.indexOf('://')) {
-            file = 'file://' + file;
-        }
-
-        var args = ['w3m', '-T', 'text/html'];
-
-        var input = '<title>press q to exit</title>'
-            + '<img align="center" src="' + file + '">';
-
-        var opt = {
-            stdio: ['pipe', 1, 2],
-            env: process.env,
-            cwd: process.env.HOME
-        };
-
-        var ps = this.spawn(args[0], args.slice(1), opt);
-
-        ps.on('error', function(err) {
-            if (!callback) return;
-            return callback(err);
-        });
-
-        ps.on('exit', function(code) {
-            if (!callback) return;
-            if (code !== 0) return callback(new Error('Exit Code: ' + code));
-            return callback(null, code === 0);
-        });
-
-        ps.stdin.write(input + '\n');
-        ps.stdin.end();
-    }
-
-    sigtstp(callback) {
+    sigtstp(callback: () => void) {
         var self = this;
         this.program.sigtstp(function() {
             self.alloc();
@@ -1636,16 +1422,15 @@ export class Screen extends Node {
         });
     }
 
-    copyToClipboard(text) {
+    copyToClipboard(text: string) {
         return this.program.copyToClipboard(text);
     }
 
-    cursorShape(shape, blink) {
-        var self = this;
+    cursorShape(shape: BlessedCursorShape, blink: boolean) {
+        let self = this;
 
         this.cursor.shape = shape || 'block';
         this.cursor.blink = blink || false;
-        this.cursor._set = true;
 
         if (this.cursor.artificial) {
             if (!this.program.hideCursor_old) {
@@ -1672,9 +1457,6 @@ export class Screen extends Node {
                     self.cursor._state ^= 1;
                     if (self.renders) self.render();
                 }, 500);
-                if (this._cursorBlink.unref) {
-                    this._cursorBlink.unref();
-                }
             }
             return true;
         }
@@ -1682,77 +1464,42 @@ export class Screen extends Node {
         return this.program.cursorShape(this.cursor.shape, this.cursor.blink);
     }
 
-    cursorColor(color) {
+    cursorColor(color: TTYColor) {
         if (color == null) {
             this.cursor.color = null;
+            return true
         } else {
-            this.cursor.color = colors.convert(color);
+            this.cursor.color = color
         }
-        this.cursor._set = true;
 
         if (this.cursor.artificial) {
             return true;
         }
 
-        return this.program.cursorColor(colors.ncolors[this.cursor.color]);
-    }
-
-    cursorReset() {
-        this.cursor.shape = 'block';
-        this.cursor.blink = false;
-        this.cursor.color = null;
-        this.cursor._set = false;
-
-        if (this.cursor.artificial) {
-            this.cursor.artificial = false;
-            if (this.program.hideCursor_old) {
-                this.program.hideCursor = this.program.hideCursor_old;
-                delete this.program.hideCursor_old;
-            }
-            if (this.program.showCursor_old) {
-                this.program.showCursor = this.program.showCursor_old;
-                delete this.program.showCursor_old;
-            }
-            if (this._cursorBlink) {
-                clearInterval(this._cursorBlink);
-                delete this._cursorBlink;
-            }
-            return true;
-        }
-
-        return this.program.cursorReset();
+        return this.program.cursorColor(colors.ncolors[this.cursor.color.code]);
     }
 
     resetCursor() {
         this.cursor.shape = 'block';
         this.cursor.blink = false;
         this.cursor.color = null;
-        this.cursor._set = false;
 
         if (this.cursor.artificial) {
             this.cursor.artificial = false;
-            if (this.program.hideCursor_old) {
-                this.program.hideCursor = this.program.hideCursor_old;
-                delete this.program.hideCursor_old;
-            }
-            if (this.program.showCursor_old) {
-                this.program.showCursor = this.program.showCursor_old;
-                delete this.program.showCursor_old;
-            }
+
             if (this._cursorBlink) {
                 clearInterval(this._cursorBlink);
-                delete this._cursorBlink;
             }
             return true;
         }
 
-        return this.program.cursorReset();
+        return this.program.resetCursor()
     }
 
-    _cursorAttr(cursor, dattr) {
-        var attr = dattr || this.dattr
-            , cattr
-            , ch;
+    _cursorAttr(cursor: BlessedCursorConfig, dattr: number) {
+        let attr = dattr || this.dattr
+        let cattr
+        let ch;
 
         if (cursor.shape === 'line') {
             attr &= ~(0x1ff << 9);
@@ -1793,7 +1540,7 @@ export class Screen extends Node {
 
         if (cursor.color != null) {
             attr &= ~(0x1ff << 9);
-            attr |= cursor.color << 9;
+            attr |= cursor.color.code << 9;
         }
 
         return {
@@ -1830,18 +1577,6 @@ export class Screen extends Node {
             });
         });
 
-        ['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach(function(signal) {
-            var name = '_' + signal.toLowerCase() + 'Handler';
-            process.on(signal, Screen[name] = function() {
-                if (process.listeners(signal).length > 1) {
-                    return;
-                }
-                nextTick(function() {
-                    process.exit(0);
-                });
-            });
-        });
-
         process.on('exit', Screen._exitHandler = function() {
             Screen.instances.slice().forEach(function(screen) {
                 screen.destroy();
@@ -1853,18 +1588,11 @@ export class Screen extends Node {
         return this;
     }
 
-    static _exceptionHandler(err) {
+    static _exceptionHandler(err: Error) {
         if (process.listeners('uncaughtException').length > 1) {
             return;
         }
-        Screen.instances.slice().forEach(function(screen) {
-            screen.destroy();
-        });
-        err = err || new Error('Uncaught Exception.');
-        console.log(err.stack ? err.stack + '' : err + '');
-        nextTick(function() {
-            process.exit(1);
-        });
+        this._exitHandler()
     }
 
     static _exitHandler() {
@@ -1885,23 +1613,19 @@ export class Screen extends Node {
         return this.program.title
     }
 
-    settitle(title: string): string {
-        this.program.title = title
+    settitle(title: string) {
+        this.program.setTitle(title)
     }
 
     getterminal() {
         return this.program.terminal
     }
 
-    setterminal(terminal: string) {
-        this.program.terminal = terminal
+    getfocused() {
+        return this.history[this.history.length - 1];
+    }
+
+    setfocused(el: Element) {
+        return this.focusPush(el);
     }
 }
-
-Screen.prototype.__defineGetter__('focused', function() {
-    return this.history[this.history.length - 1];
-});
-
-Screen.prototype.__defineSetter__('focused', function(el) {
-    return this.focusPush(el);
-});

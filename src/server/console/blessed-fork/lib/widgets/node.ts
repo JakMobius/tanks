@@ -10,6 +10,7 @@
 
 import EventEmitter from '../events';
 import { Screen } from "./screen";
+import {Element} from "./element";
 
 export interface ElementPosition {
     x?: number
@@ -27,15 +28,14 @@ export class Node extends EventEmitter {
     public options: any;
     public screen: Screen;
     public parent: Node;
-    public children: any;
+    public children: Node[];
     public data: any;
     public uid: any;
-    public index: any;
+    public index: number;
     public detached: boolean;
-    public type: any;
+    public type: string;
     public position: ElementPosition
     public destroyed: boolean;
-    public clickable: boolean;
 
     /**
      * Node
@@ -46,6 +46,7 @@ export class Node extends EventEmitter {
         options = options || {};
         this.options = options;
         this.position = options.position
+        this.detached = true
 
         this.position = options.position
         this.parent = null;
@@ -63,14 +64,16 @@ export class Node extends EventEmitter {
 
     setScreen(screen: Screen) {
         this.screen = screen
-        this.detached = !!this.screen
+        let oldDetached = this.detached
+        this.detached = !this.screen
+        if(oldDetached && screen) this.onAttach()
+        if(!oldDetached && !screen) this.onDetach()
         this.forAncestors(node => {
             node.setScreen(screen)
         })
     }
 
     insert(element: Node, i: number) {
-        var self = this;
 
         if (element.screen && element.screen !== this.screen) {
             throw new Error('Cannot switch a node\'s screen.');
@@ -119,25 +122,14 @@ export class Node extends EventEmitter {
         element.clearPos();
 
         element.parent = null;
+        element.setScreen(null)
 
         this.children.splice(i, 1);
-
-        i = this.screen.clickable.indexOf(element);
-        if (~i) this.screen.clickable.splice(i, 1);
-        i = this.screen.keyable.indexOf(element);
-        if (~i) this.screen.keyable.splice(i, 1);
 
         element.emit('reparent', null);
         this.emit('remove', element);
 
-        (function emit(el) {
-            var n = el.detached !== true;
-            el.detached = true;
-            if (n) el.emit('detach');
-            el.children.forEach(emit);
-        })(element);
-
-        if (this.screen.focused === element) {
+        if (this.screen.getfocused() === element) {
             this.screen.rewindFocus();
         }
     }
@@ -257,7 +249,143 @@ export class Node extends EventEmitter {
         return this.position.y + this.position.height
     }
 
+    getitop() {
+        return 0
+    }
+
+    getileft(){
+        return 0
+    }
+
+    getiright(){
+        return 0
+    }
+
+    getibottom(){
+        return 0
+    }
+
+    getiwidth() {
+        return 0
+    }
+
+    getiheight(){
+        return 0
+    }
+
+    getrleft() {
+        return this.getaleft() - this.parent.getaleft();
+    }
+
+    getrright() {
+        return this.getaright() - this.parent.getaright();
+    }
+
+    getrtop() {
+        return this.getatop() - this.parent.getatop();
+    }
+
+    getrbottom() {
+        return this.getabottom() - this.parent.getabottom();
+    }
+
+    // NOTE:
+    // For aright, abottom, right, and bottom:
+    // If position.bottom is null, we could simply set top instead.
+    // But it wouldn't replicate bottom behavior appropriately if
+    // the parent was resized, etc.
+    setwidth(val: number) {
+        if (this.position.width === val) return;
+        this.onResize()
+        this.clearPos();
+        this.position.width = val;
+    }
+
+    setheight(val: number) {
+        if (this.position.height === val) return;
+        this.onResize()
+        this.clearPos();
+        this.position.height = val;
+    }
+
+    setaleft(val: number) {
+        val -= this.parent.getaleft();
+        if (this.position.x === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val;
+    }
+
+    setaright(val: number) {
+        val -= this.parent.getaright();
+        if (this.position.x + this.position.width === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val - this.position.width;
+    }
+
+    setatop(val: number) {
+        val -= this.parent.getatop();
+        if (this.getatop() === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.setrtop(val)
+    }
+
+    setabottom(val: number) {
+        val -= this.parent.getabottom();
+        if (this.getabottom() === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.setrbottom(val)
+    }
+
+    setrleft(val: number) {
+        if (this.position.x === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val;
+    }
+
+    setrright(val: number) {
+        if (this.position.x + this.position.width === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.x = val - this.position.width;
+    }
+
+    setrtop(val: number) {
+        if (this.position.y === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.y = val;
+    }
+
+    setrbottom(val: number) {
+        if (this.position.y + this.position.height === val) return;
+        this.emit('move');
+        this.clearPos();
+        this.position.y = val - this.position.height;
+    }
+
+    gettpadding(): number {
+        return this.padding.left + this.padding.top
+            + this.padding.right + this.padding.bottom;
+    }
+
     clearPos(get?: boolean, override?: boolean) {
 
+    }
+
+    onAttach() {
+        this.emit('attach')
+    }
+
+    onDetach() {
+        this.emit('detach')
+    }
+
+    onResize() {
+        this.emit('resize');
     }
 }

@@ -14,7 +14,7 @@ import {Screen} from "./screen";
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
 import {Input} from './input';
-import unicode from "../unicode";
+import * as unicode from "../unicode";
 import {ScrollableBoxConfig} from "./scrollablebox";
 
 export interface PromptConfig extends ScrollableBoxConfig {
@@ -64,7 +64,7 @@ export class Prompt extends Input {
     }
 
     updateCursor() {
-        if (this.screen.focused !== this) {
+        if (this.screen.getfocused() !== this) {
             return;
         }
 
@@ -269,7 +269,7 @@ export class Prompt extends Input {
     }
 
     trimViewport() {
-        this.setContent(this.value.substr(this.scrollPosition, this.getwidth()), true, true);
+        this.setContent(this.value.substr(this.scrollPosition, this.getwidth()), true);
     }
 
     scrollToMatchCursor() {

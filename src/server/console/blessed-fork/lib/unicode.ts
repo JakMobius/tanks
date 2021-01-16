@@ -107,13 +107,14 @@ import blessed from './blessed'
 
 let stringFromCharCode = String.fromCharCode;
 let floor = Math.floor;
-let exports = {}
 
 /**
  * Wide, Surrogates, and Combining
  */
 
-exports.charWidth = function(str, i) {
+export function charWidth(string: string, i?: number): number
+export function charWidth(point: number): number
+export function charWidth(str: string | number, i?: number): number {
   let point = typeof str === 'number' ? str : codePointAt(str, i || 0);
 
   // nul
@@ -122,9 +123,10 @@ exports.charWidth = function(str, i) {
   // tab
   if (point === 0x09) {
 
-    return blessed.screen.global
-      ? blessed.screen.global.tabc.length
-      : 8;
+    //return blessed.screen.global
+    //  ? blessed.screen.global.tabc.length
+    //  : 8;
+    return 8
   }
 
   // 8-bit control characters (2-width according to unicode??)
@@ -385,21 +387,21 @@ exports.charWidth = function(str, i) {
   }
 
   return 1;
-};
+}
 
-exports.strWidth = function(str) {
+export function strWidth(str: string) {
   let width = 0;
   for (let i = 0; i < str.length; i++) {
     width += charWidth(str, i);
     if (isSurrogate(str, i)) i++;
   }
   return width;
-};
+}
 
-exports.isSurrogate = function(str, i) {
+export function isSurrogate(str: string, i: number) {
   let point = typeof str === 'number' ? str : codePointAt(str, i || 0);
   return point > 0x00ffff;
-};
+}
 
 export const combiningTable = [
   [0x0300, 0x036F],   [0x0483, 0x0486],   [0x0488, 0x0489],
@@ -452,12 +454,14 @@ export const combiningTable = [
   [0xE0100, 0xE01EF]
 ];
 
-exports.isCombining = function(str, i) {
+export function isCombining(point: number): boolean
+export function isCombining(str: string, i: number): boolean
+export function isCombining(str: string | number, i?: number) {
   let point = typeof str === 'number' ? str : codePointAt(str, i || 0);
-  return combiningTable[point] === true;
-};
+  return combining[point] === true;
+}
 
-exports.combining = combiningTable.reduce(function(out, row) {
+export const combining = combiningTable.reduce<{ [key: number]: boolean }>(function(out, row) {
   for (let i = row[0]; i <= row[1]; i++) {
     out[i] = true;
   }
@@ -468,7 +472,7 @@ exports.combining = combiningTable.reduce(function(out, row) {
  * Code Point Helpers
  */
 
-exports.codePointAt = function(str, position) {
+export function codePointAt(str: string, position: number) {
   if (str == null) {
     throw TypeError();
   }
@@ -500,23 +504,9 @@ exports.codePointAt = function(str, position) {
     }
   }
   return first;
-};
+}
 
-// exports.codePointAt = function(str, position) {
-//   position = +position || 0;
-//   var x = str.charCodeAt(position);
-//   var y = str.length > 1 ? str.charCodeAt(position + 1) : 0;
-//   var point = x;
-//   if ((0xD800 <= x && x <= 0xDBFF) && (0xDC00 <= y && y <= 0xDFFF)) {
-//     x &= 0x3FF;
-//     y &= 0x3FF;
-//     point = (x << 10) | y;
-//     point += 0x10000;
-//   }
-//   return point;
-// };
-
-exports.fromCodePoint = function() {
+export function fromCodePoint() {
   if (String.fromCodePoint) {
     return String.fromCodePoint.apply(String, arguments);
   }
@@ -581,7 +571,7 @@ const wideCharacters = new RegExp('(['
     + '\\uffe0-\\uffe6'
     + '])', 'g')
 
-exports.chars = {
+export const chars = {
   // Double width characters that are _not_ surrogate pairs.
   // NOTE: 0x20000 - 0x2fffd and 0x30000 - 0x3fffd are not necessary for this
   // regex anyway. This regex is used to put a blank char after wide chars to
@@ -632,10 +622,8 @@ exports.chars = {
 };
 
 
-function hexify(n) {
+function hexify(n: number) {
   let s = n.toString(16);
   while (s.length < 4) s = '0' + s;
   return s;
 }
-
-export default exports;

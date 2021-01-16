@@ -61,7 +61,12 @@ class ConsoleWindow extends EventEmitter {
         this.lines = 0
 
         this.screen = new blessed.Screen({
-            smartCSR: true
+            smartCSR: true,
+            cursor: {
+                //artificial: true,
+                blink: true,
+                shape: "line"
+            }
         })
 
         this.screen.program.on("keypress", (_: any, data: any) => {
@@ -224,7 +229,8 @@ class ConsoleWindow extends EventEmitter {
     }
 
     refocus() {
-        if (!this.screen.focused || !(this.screen.focused instanceof blessed.Prompt))
+        let focused = this.screen.getfocused()
+        if (!focused || !(focused instanceof blessed.Prompt))
             this.consoleTextbox.focus()
     }
 

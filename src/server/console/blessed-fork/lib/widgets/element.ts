@@ -10,7 +10,7 @@
 
 import assert from 'assert';
 import colors from '../colors'
-import unicode from '../unicode';
+import * as unicode from '../unicode';
 import helpers from '../helpers';
 import {Node, NodeConfig} from "./node"
 import { Screen } from './screen'
@@ -43,6 +43,7 @@ interface ElementBorder {
     bottom?: boolean
     right?: boolean
     type: string
+    ch?: string
 }
 
 export interface ElementConfig extends NodeConfig {
@@ -59,7 +60,6 @@ export interface ElementConfig extends NodeConfig {
     ch?: string
     padding?: Partial<ElementEdgeOffset> | number
     clickable?: boolean
-    parseTags?: boolean
     content?: string
     focused?: boolean
 }
@@ -84,19 +84,19 @@ export class Element extends Node {
     public shadow: boolean
     public hidden: boolean
     public fixed: boolean
-    public align: ElementHAlign
-    public valign: ElementVAlign
     public wrap: boolean
     public ch: string
     public padding: ElementEdgeOffset
     public border: ElementBorder
-    public clickable: boolean
     public input: boolean
-    public keyable: boolean
-    public parseTags: boolean
     public content: string
     public childBase: number
     public _clines: WrappedContent;
+    public isClickable: boolean;
+    public isKeyable: boolean
+    public align: ElementHAlign
+    public valign: ElementVAlign
+    public lpos: any;
 
     constructor(options?: ElementConfig) {
         super(options);
@@ -138,8 +138,6 @@ export class Element extends Node {
             };
         }
 
-        this.parseTags = options.parseTags;
-
         this.setContent(options.content || '', true);
 
         // TODO: Possibly move this to Node for onScreenEvent('mouse', ...).
@@ -161,48 +159,47 @@ export class Element extends Node {
             }
         });
 
-        this.on('resize', function () {
-            self.parseContent();
-        });
-
-        this.on('attach', function () {
-            self.parseContent();
-        });
-
-        this.on('detach', function () {
-            this.lpos = null
-        });
-
-        if (options.focused) {
-            this.focus();
-        }
-
         this.type = 'element';
     }
 
+    onAttach() {
+        super.onAttach()
+        this.parseContent();
+    }
+
+    onDetach() {
+        super.onDetach()
+        this.lpos = null
+    }
+
+    onResize() {
+        super.onResize()
+        this.parseContent();
+    }
+
     onMouseListener() {
-        if(this.clickable) return
+        if(this.isClickable) return
         if(this.screen) this.screen._listenKeys(this)
     }
 
     onKeyboardListener() {
-        if(this.keyable) return
+        if(this.isKeyable) return
         if(this.screen) this.screen._listenKeys(this)
     }
 
     setScreen(screen: Screen) {
         super.setScreen(screen);
 
-        if (this.clickable) {
-            this.screen._listenMouse(this);
-        }
-
-        if (this.keyable) {
-            this.screen._listenKeys(this);
+        if(screen) {
+            if (this.isClickable) this.screen._listenMouse(this);
+            if (this.isKeyable) this.screen._listenKeys(this);
+        } else {
+            if(this.isClickable) this.screen._unlistenMouse(this)
+            if(this.isKeyable) this.screen._unlistenKeys(this)
         }
     }
 
-    sattr(style, fg, bg) {
+    sattr(style, fg, bg): number {
         var bold = style.bold
             , underline = style.underline
             , blink = style.blink
@@ -246,7 +243,7 @@ export class Element extends Node {
         this.clearPos();
         this.hidden = true;
         this.emit('hide');
-        if (this.screen.focused === this) {
+        if (this.screen.getfocused() === this) {
             this.screen.rewindFocus();
         }
     }
@@ -262,13 +259,13 @@ export class Element extends Node {
     }
 
     focus() {
-        return this.screen.focused = this;
+        return this.screen.setfocused(this);
     }
 
-    setContent(content: string, noClear?: boolean, noTags?: boolean) {
+    setContent(content: string, noClear?: boolean) {
         if (!noClear) this.clearPos();
         this.content = content || '';
-        this.parseContent(noTags);
+        this.parseContent();
         this.emit('set content');
     }
 
@@ -287,7 +284,7 @@ export class Element extends Node {
         return this.getContent().replace(/\x1b\[[\d;]*m/g, '');
     }
 
-    parseContent(noTags?: boolean): boolean {
+    parseContent(): boolean {
         if(!this.screen) return false
         if (this.detached) return false;
 
@@ -326,10 +323,6 @@ export class Element extends Node {
                 // content = helpers.dropUnicode(content);
             }
 
-            if (!noTags) {
-                content = this._parseTags(content);
-            }
-
             this._clines = this._wrapContent(content, width);
             this._clines.width = width;
             this._clines.content = this.content;
@@ -352,120 +345,14 @@ export class Element extends Node {
         return false;
     }
 
-// Convert `{red-fg}foo{/red-fg}` to `\x1b[31mfoo\x1b[39m`.
-    _parseTags(text) {
-        if (!this.parseTags) return text;
-        if (!/{\/?[\w\-,;!#]*}/.test(text)) return text;
-
-        var program = this.screen.program
-            , out = ''
-            , state
-            , bg = []
-            , fg = []
-            , flag = []
-            , cap
-            , slash
-            , param
-            , attr
-            , esc;
-
-        for (; ;) {
-            if (!esc && (cap = /^{escape}/.exec(text))) {
-                text = text.substring(cap[0].length);
-                esc = true;
-                continue;
-            }
-
-            if (esc && (cap = /^([\s\S]+?){\/escape}/.exec(text))) {
-                text = text.substring(cap[0].length);
-                out += cap[1];
-                esc = false;
-                continue;
-            }
-
-            if (esc) {
-                // throw new Error('Unterminated escape tag.');
-                out += text;
-                break;
-            }
-
-            if (cap = /^{(\/?)([\w\-,;!#]*)}/.exec(text)) {
-                text = text.substring(cap[0].length);
-                slash = cap[1] === '/';
-                param = cap[2].replace(/-/g, ' ');
-
-                if (param === 'open') {
-                    out += '{';
-                    continue;
-                } else if (param === 'close') {
-                    out += '}';
-                    continue;
-                }
-
-                if (param.slice(-3) === ' bg') state = bg;
-                else if (param.slice(-3) === ' fg') state = fg;
-                else state = flag;
-
-                if (slash) {
-                    if (!param) {
-                        out += program._attr('normal');
-                        bg.length = 0;
-                        fg.length = 0;
-                        flag.length = 0;
-                    } else {
-                        attr = program._attr(param, false);
-                        if (attr == null) {
-                            out += cap[0];
-                        } else {
-                            // if (param !== state[state.length - 1]) {
-                            //   throw new Error('Misnested tags.');
-                            // }
-                            state.pop();
-                            if (state.length) {
-                                out += program._attr(state[state.length - 1]);
-                            } else {
-                                out += attr;
-                            }
-                        }
-                    }
-                } else {
-                    if (!param) {
-                        out += cap[0];
-                    } else {
-                        attr = program._attr(param);
-                        if (attr == null) {
-                            out += cap[0];
-                        } else {
-                            state.push(param);
-                            out += attr;
-                        }
-                    }
-                }
-
-                continue;
-            }
-
-            if (cap = /^[\s\S]+?(?={\/?[\w\-,;!#]*})/.exec(text)) {
-                text = text.substring(cap[0].length);
-                out += cap[0];
-                continue;
-            }
-
-            out += text;
-            break;
-        }
-
-        return out;
-    }
-
     _parseAttr(lines) {
-        var dattr = this.sattr(this.style)
-            , attr = dattr
-            , attrs = []
-            , line
-            , i
-            , j
-            , c;
+        let dattr = this.sattr(this.style)
+        let attr = dattr
+        let attrs = []
+        let line
+        let i
+        let j
+        let c;
 
         if (lines[0].attr === attr) {
             return;
@@ -504,12 +391,6 @@ export class Element extends Node {
         } else if (align === 'right') {
             let pad = Array(s + 1).join(' ');
             return pad + line;
-        } else if (this.parseTags && ~line.indexOf('{|}')) {
-            let parts = line.split('{|}');
-            let cparts = cline.split('{|}');
-            s = Math.max(width - cparts[0].length - cparts[1].length, 0);
-            let pad = Array(s + 1).join(' ');
-            return parts[0] + pad + parts[1];
         }
 
         return line;
@@ -676,7 +557,7 @@ export class Element extends Node {
         return this.screen.program.unkey.apply(this, arguments);
     }
 
-    setIndex(index) {
+    setIndex(index: number) {
         if (!this.parent) return;
 
         if (index < 0) {
@@ -881,8 +762,8 @@ export class Element extends Node {
             if (xi < this.parent.lpos.xi + this.parent.getileft()) {
                 xi = this.parent.lpos.xi + this.parent.getileft();
             }
-            if (xl > this.parent.lpos.xl - this.parent.getirignt()) {
-                xl = this.parent.lpos.xl - this.parent.getirignt();
+            if (xl > this.parent.lpos.xl - this.parent.getiright()) {
+                xl = this.parent.lpos.xl - this.parent.getiright();
             }
             if (yi < this.parent.lpos.yi + this.parent.getitop()) {
                 yi = this.parent.lpos.yi + this.parent.getitop();
@@ -951,52 +832,11 @@ export class Element extends Node {
             , i
             , bch = this.ch;
 
-        // Clip content if it's off the edge of the screen
-        // if (xi + this.ileft < 0 || yi + this.itop < 0) {
-        //   var clines = this._clines.slice();
-        //   if (xi + this.ileft < 0) {
-        //     for (var i = 0; i < clines.length; i++) {
-        //       var t = 0;
-        //       var csi = '';
-        //       var csis = '';
-        //       for (var j = 0; j < clines[i].length; j++) {
-        //         while (clines[i][j] === '\x1b') {
-        //           csi = '\x1b';
-        //           while (clines[i][j++] !== 'm') csi += clines[i][j];
-        //           csis += csi;
-        //         }
-        //         if (++t === -(xi + this.ileft) + 1) break;
-        //       }
-        //       clines[i] = csis + clines[i].substring(j);
-        //     }
-        //   }
-        //   if (yi + this.itop < 0) {
-        //     clines = clines.slice(-(yi + this.itop));
-        //   }
-        //   content = clines.join('\n');
-        // }
-
         if (coords.base >= this._clines.ci.length) {
             ci = this._pcontent.length;
         }
 
         this.lpos = coords;
-
-        if (this.style.border && this.style.border.type === 'line') {
-            this.screen._borderStops[coords.yi] = true;
-            this.screen._borderStops[coords.yl - 1] = true;
-            // if (!this.screen._borderStops[coords.yi]) {
-            //   this.screen._borderStops[coords.yi] = { xi: coords.xi, xl: coords.xl };
-            // } else {
-            //   if (this.screen._borderStops[coords.yi].xi > coords.xi) {
-            //     this.screen._borderStops[coords.yi].xi = coords.xi;
-            //   }
-            //   if (this.screen._borderStops[coords.yi].xl < coords.xl) {
-            //     this.screen._borderStops[coords.yi].xl = coords.xl;
-            //   }
-            // }
-            // this.screen._borderStops[coords.yl - 1] = this.screen._borderStops[coords.yi];
-        }
 
         dattr = this.sattr(this.style);
         attr = dattr;
@@ -1186,28 +1026,28 @@ export class Element extends Node {
                 if (this.style.border.type === 'line') {
                     if (x === xi) {
                         ch = '\u250c'; // '┌'
-                        if (!this.style.border.left) {
+                        if (this.style.border.left) {
+                            if (!this.style.border.top) {
+                                ch = '\u2502'; // '│'
+                            }
+                        } else {
                             if (this.style.border.top) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
-                            }
-                        } else {
-                            if (!this.style.border.top) {
-                                ch = '\u2502'; // '│'
                             }
                         }
                     } else if (x === xl - 1) {
                         ch = '\u2510'; // '┐'
-                        if (!this.style.border.right) {
+                        if (this.style.border.right) {
+                            if (!this.style.border.top) {
+                                ch = '\u2502'; // '│'
+                            }
+                        } else {
                             if (this.style.border.top) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
-                            }
-                        } else {
-                            if (!this.style.border.top) {
-                                ch = '\u2502'; // '│'
                             }
                         }
                     } else {
@@ -1292,28 +1132,28 @@ export class Element extends Node {
                 if (this.style.border.type === 'line') {
                     if (x === xi) {
                         ch = '\u2514'; // '└'
-                        if (!this.style.border.left) {
+                        if (this.style.border.left) {
+                            if (!this.style.border.bottom) {
+                                ch = '\u2502'; // '│'
+                            }
+                        } else {
                             if (this.style.border.bottom) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
-                            }
-                        } else {
-                            if (!this.style.border.bottom) {
-                                ch = '\u2502'; // '│'
                             }
                         }
                     } else if (x === xl - 1) {
                         ch = '\u2518'; // '┘'
-                        if (!this.style.border.right) {
+                        if (this.style.border.right) {
+                            if (!this.style.border.bottom) {
+                                ch = '\u2502'; // '│'
+                            }
+                        } else {
                             if (this.style.border.bottom) {
                                 ch = '\u2500'; // '─'
                             } else {
                                 continue;
-                            }
-                        } else {
-                            if (!this.style.border.bottom) {
-                                ch = '\u2502'; // '│'
                             }
                         }
                     } else {
@@ -1579,9 +1419,6 @@ export class Element extends Node {
     }
 
     strWidth(text) {
-        text = this.parseTags
-            ? helpers.stripTags(text)
-            : text;
         return this.screen.fullUnicode
             ? unicode.strWidth(text)
             : helpers.dropUnicode(text).length;
@@ -1590,11 +1427,6 @@ export class Element extends Node {
     getileft(){
         return (this.style.border ? 1 : 0) + this.padding.left;
         // return (this.style.border && this.style.border.left ? 1 : 0) + this.padding.left;
-    }
-
-    getitop() {
-        return (this.style.border ? 1 : 0) + this.padding.top;
-        // return (this.style.border && this.style.border.top ? 1 : 0) + this.padding.top;
     }
 
     getiright(){
@@ -1621,133 +1453,18 @@ export class Element extends Node {
         return (this.style.border ? 2 : 0) + this.padding.top + this.padding.bottom;
     }
 
-    getrleft() {
-        return this.getaleft() - this.parent.getaleft();
+    isFocused() {
+        return this.screen.getfocused() === this;
     }
 
-    getrright() {
-        return this.getaright() - this.parent.getaright();
-    }
-
-    getrtop() {
-        return this.getatop() - this.parent.getatop();
-    }
-
-    getrbottom() {
-        return this.getabottom() - this.parent.getabottom();
-    }
-
-    // NOTE:
-    // For aright, abottom, right, and bottom:
-    // If position.bottom is null, we could simply set top instead.
-    // But it wouldn't replicate bottom behavior appropriately if
-    // the parent was resized, etc.
-    setwidth(val: number) {
-        if (this.position.width === val) return;
-        this.emit('resize');
-        this.clearPos();
-        return this.position.width = val;
-    }
-
-    setheight(val: number) {
-        if (this.position.height === val) return;
-        this.emit('resize');
-        this.clearPos();
-        this.position.height = val;
-    }
-
-    setaleft(val: number) {
-        val -= this.parent.getaleft();
-        if (this.position.x === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.x = val;
-    }
-
-    setaright(val: number) {
-        val -= this.parent.getaright();
-        if (this.position.x + this.position.width === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.x = val - this.position.width;
-    }
-
-    setatop(val: number) {
-        val -= this.parent.getatop();
-        if (this.getatop() === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.setrtop(val)
-    }
-
-    setabottom(val: number) {
-        val -= this.parent.getabottom();
-        if (this.getabottom() === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.setrbottom(val)
-    }
-
-    setrleft(val: number) {
-        if (this.position.x === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.x = val;
-    }
-
-    setrright(val: number) {
-        if (this.position.x + this.position.width === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.x = val - this.position.width;
-    }
-
-    setrtop(val: number) {
-        if (this.position.y === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.y = val;
-    }
-
-    setrbottom(val: number) {
-        if (this.position.y + this.position.height === val) return;
-        this.emit('move');
-        this.clearPos();
-        this.position.y = val - this.position.height;
-    }
-
-    gettpadding(): number {
-        return this.padding.left + this.padding.top
-            + this.padding.right + this.padding.bottom;
+    isVisible() {
+        var el = this;
+        do {
+            if (el.detached) return false;
+            if (el.hidden) return false;
+            // if (!el.lpos) return false;
+            // if (el.position.width === 0 || el.position.height === 0) return false;
+        } while (el = el.parent);
+        return true;
     }
 }
-
-
-Element.prototype.__defineGetter__('focused', function () {
-    return this.screen.focused === this;
-});
-
-Element.prototype.__defineGetter__('visible', function () {
-    var el = this;
-    do {
-        if (el.detached) return false;
-        if (el.hidden) return false;
-        // if (!el.lpos) return false;
-        // if (el.position.width === 0 || el.position.height === 0) return false;
-    } while (el = el.parent);
-    return true;
-});
-
-Element.prototype.__defineGetter__('_detached', function () {
-    var el = this;
-    do {
-        if (el.type === 'screen') return false;
-        if (!el.parent) return true;
-    } while (el = el.parent);
-    return false;
-});
-
-
-/**
- * Expose
- */
