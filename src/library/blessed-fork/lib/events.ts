@@ -81,7 +81,7 @@ class EventEmitter {
     return this.on(type, on);
   }
 
-  _emit(type: string, args: any[]) {
+  _emit(type: string, args?: any[]) {
     var handler = this._events[type]
         , ret;
 

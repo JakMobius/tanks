@@ -43,7 +43,7 @@ class colors {
         let hash = (r1 << 16) | (g1 << 8) | b1;
 
         let cached = colors.matchCache.get(hash)
-        if (cached !== null) return cached
+        if (cached !== undefined) return cached
 
         let ldiff = Infinity
         let li = -1

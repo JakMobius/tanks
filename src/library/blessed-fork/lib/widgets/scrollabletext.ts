@@ -8,10 +8,10 @@
  * Modules
  */
 
-import {ScrollableBox} from './scrollablebox';
+import {ScrollableBox, ScrollableBoxConfig} from './scrollablebox';
 
 export class ScrollableText extends ScrollableBox {
-    constructor(options) {
+    constructor(options: ScrollableBoxConfig) {
         options = options || {};
         options.alwaysScroll = true;
         super(options);

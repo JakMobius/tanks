@@ -32,9 +32,13 @@ interface ScreenConfig extends NodeConfig {
     log?: string;
     output?: tty.WriteStream;
     input?: tty.ReadStream;
-    forceUnicode?: boolean;
     program?: Program;
     cursor?: BlessedCursorConfig
+    smartCSR?: boolean
+    fastCSR?: boolean
+    useBCE?: boolean
+    fullUnicode?: boolean
+    sendFocus?: boolean
 }
 
 export interface BlessedEvent {
@@ -103,6 +107,7 @@ export class Screen extends Node {
     public cursor: BlessedCursorConfig
     public clickableElements: Element[];
     public keyableElements: Element[];
+    public options: ScreenConfig
 
     /**
      * Screen
@@ -113,6 +118,7 @@ export class Screen extends Node {
 
         super(options);
 
+        this.options = options
         this.detached = false
         this.screen = this
 
@@ -126,10 +132,6 @@ export class Screen extends Node {
             this.program.setupTput();
             this.program.useBuffer = true;
             this.program.zero = true;
-            if (options.forceUnicode != null) {
-                this.program.tput.features.unicode = options.forceUnicode;
-                this.program.tput.unicode = options.forceUnicode;
-            }
         } else {
             this.program = new Program({
                 input: options.input,
@@ -138,7 +140,6 @@ export class Screen extends Node {
                 debug: options.debug,
                 dump: options.dump,
                 terminal: options.terminal,
-                forceUnicode: options.forceUnicode,
                 tput: true,
                 buffer: true,
                 zero: true
@@ -185,13 +186,15 @@ export class Screen extends Node {
 
         this.cursor = options.cursor
 
-        this.program.on('resize', function() {
-            self.alloc();
-            self.render();
-            (function emit(el) {
-                el.onResize()
-                el.children.forEach(emit);
-            })(self);
+        this.program.on('resize', () => {
+            this.alloc();
+            this.render();
+            this.position.width = this.getwidth()
+            this.position.height = this.getheight()
+
+            for(let child of this.children) {
+                child.onResize()
+            }
         });
 
         this.program.on('focus', function() {
@@ -224,6 +227,18 @@ export class Screen extends Node {
                 self._listenMouse();
             }
         });
+
+        this.program.on("cursorHide", () => {
+            if(this.cursor.artificial) {
+                if(this.renders) this.render()
+            }
+        })
+
+        this.program.on("cursorShow", () => {
+            if(this.cursor.artificial) {
+                if(this.renders) this.render()
+            }
+        })
 
         this.setMaxListeners(Infinity);
 
@@ -261,6 +276,8 @@ export class Screen extends Node {
             this.program._write(this.tput.terminfo.methods.enacs());
         }
         this.alloc();
+        this.position.width = this.getwidth()
+        this.position.height = this.getheight()
     }
 
     leave() {
@@ -781,13 +798,17 @@ export class Screen extends Node {
             out = '';
             attr = this.dattr;
 
+            // Unicode, meh
+
+            let terminalX = 0
+
             for (x = 0; x < line.length; x++) {
                 data = line[x][0];
                 ch = line[x][1];
 
                 // Render the artificial cursor.
                 if (this.cursor.artificial
-                    && !this.cursor._hidden
+                    && !this.program.cursorHidden
                     && this.cursor._state
                     && x === this.program.x
                     && y === this.program.y) {
@@ -879,26 +900,41 @@ export class Screen extends Node {
                     // }
                 }
 
+                let chLength = unicode.isSurrogate(ch) ? 2 : 1
+
                 // Optimize by comparing the real output
                 // buffer to the pending output buffer.
                 if (data === o[x][0] && ch === o[x][1]) {
                     if (lx === -1) {
-                        lx = x;
+                        lx = terminalX;
                         ly = y;
                     }
+
+                    terminalX += chLength
                     continue;
                 } else if (lx !== -1) {
                     if (this.tput.terminfo.strings.parm_right_cursor) {
                         out += y === ly
-                            ? this.tput.terminfo.methods.cuf(x - lx)
-                            : this.tput.terminfo.methods.cup(y, x);
+                            ? this.tput.terminfo.methods.cuf(terminalX - lx)
+                            : this.tput.terminfo.methods.cup(y, terminalX);
                     } else {
-                        out += this.tput.terminfo.methods.cup(y, x);
+                        out += this.tput.terminfo.methods.cup(y, terminalX);
                     }
-                    lx = -1, ly = -1;
+                    lx = -1
+                    ly = -1;
                 }
+
+                let oldChLength = unicode.isSurrogate(o[x][1]) ? 2 : 1
+
+                if(oldChLength > chLength) {
+                    out += this.tput.terminfo.methods.cuf(1)
+                    out += this.tput.terminfo.methods.ech(1)
+                }
+
                 o[x][0] = data;
                 o[x][1] = ch;
+
+                terminalX += chLength
 
                 if (data !== attr) {
                     if (attr !== this.dattr) {
@@ -967,6 +1003,7 @@ export class Screen extends Node {
                         }
 
                         if (out[out.length - 1] === ';') out = out.slice(0, -1);
+
 
                         out += 'm';
                     }
@@ -1088,18 +1125,18 @@ export class Screen extends Node {
     }
 
 // Convert an SGR string to our own attribute format.
-    attrCode(code, cur, def) {
+    attrCode(code: string, cur: number, def: number) {
         var flags = (cur >> 18) & 0x1ff
             , fg = (cur >> 9) & 0x1ff
             , bg = cur & 0x1ff
             , c
             , i;
 
-        code = code.slice(2, -1).split(';');
-        if (!code[0]) code[0] = '0';
+        let parts = code.slice(2, -1).split(';');
+        if (!parts[0]) parts[0] = '0';
 
-        for (i = 0; i < code.length; i++) {
-            c = +code[i] || 0;
+        for (i = 0; i < parts.length; i++) {
+            c = +parts[i] || 0;
             switch (c) {
                 case 0: // normal
                     bg = def & 0x1ff;
@@ -1147,23 +1184,23 @@ export class Screen extends Node {
                     bg = def & 0x1ff;
                     break;
                 default: // color
-                    if (c === 48 && +code[i+1] === 5) {
+                    if (c === 48 && +parts[i+1] === 5) {
                         i += 2;
-                        bg = +code[i];
+                        bg = +parts[i];
                         break;
-                    } else if (c === 48 && +code[i+1] === 2) {
+                    } else if (c === 48 && +parts[i+1] === 2) {
                         i += 2;
-                        bg = colors.match(+code[i], +code[i+1], +code[i+2]);
+                        bg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
                         if (bg === -1) bg = def & 0x1ff;
                         i += 2;
                         break;
-                    } else if (c === 38 && +code[i+1] === 5) {
+                    } else if (c === 38 && +parts[i+1] === 5) {
                         i += 2;
-                        fg = +code[i];
+                        fg = +parts[i];
                         break;
-                    } else if (c === 38 && +code[i+1] === 2) {
+                    } else if (c === 38 && +parts[i+1] === 2) {
                         i += 2;
-                        fg = colors.match(+code[i], +code[i+1], +code[i+2]);
+                        fg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
                         if (fg === -1) fg = (def >> 9) & 0x1ff;
                         i += 2;
                         break;
@@ -1260,7 +1297,7 @@ export class Screen extends Node {
         return '\x1b[' + out + 'm';
     }
 
-    focusOffset(offset) {
+    focusOffset(offset: number) {
         var shown = this.keyableElements.filter(function(el) {
             return !el.detached && el.isVisible();
         }).length;
@@ -1374,7 +1411,7 @@ export class Screen extends Node {
         return this.fillRegion(this.dattr, ' ', xi, xl, yi, yl, override);
     }
 
-    fillRegion(attr: number, ch: string, xi: number, xl: number, yi: number, yl: number, override: boolean) {
+    fillRegion(attr: number, ch: string, xi: number, xl: number, yi: number, yl: number, override?: boolean) {
         let lines = this.lines
             , cell
             , xx;
@@ -1412,16 +1449,6 @@ export class Screen extends Node {
         return this.program.unkey.apply(this, arguments);
     }
 
-    sigtstp(callback: () => void) {
-        var self = this;
-        this.program.sigtstp(function() {
-            self.alloc();
-            self.render();
-            self.program.lrestoreCursor('pause', true);
-            if (callback) callback();
-        });
-    }
-
     copyToClipboard(text: string) {
         return this.program.copyToClipboard(text);
     }
@@ -1433,24 +1460,6 @@ export class Screen extends Node {
         this.cursor.blink = blink || false;
 
         if (this.cursor.artificial) {
-            if (!this.program.hideCursor_old) {
-                var hideCursor = this.program.hideCursor;
-                this.program.hideCursor_old = this.program.hideCursor;
-                this.program.hideCursor = function() {
-                    hideCursor.call(self.program);
-                    self.cursor._hidden = true;
-                    if (self.renders) self.render();
-                };
-            }
-            if (!this.program.showCursor_old) {
-                var showCursor = this.program.showCursor;
-                this.program.showCursor_old = this.program.showCursor;
-                this.program.showCursor = function() {
-                    self.cursor._hidden = false;
-                    if (self.program._exiting) showCursor.call(self.program);
-                    if (self.renders) self.render();
-                };
-            }
             if (!this._cursorBlink) {
                 this._cursorBlink = setInterval(function() {
                     if (!self.cursor.blink) return;
@@ -1627,5 +1636,21 @@ export class Screen extends Node {
 
     setfocused(el: Element) {
         return this.focusPush(el);
+    }
+
+    getaleft(): number {
+        return 0
+    }
+
+    getaright(): number {
+        return 0
+    }
+
+    getatop(): number {
+        return 0
+    }
+
+    getabottom(): number {
+        return 0
     }
 }

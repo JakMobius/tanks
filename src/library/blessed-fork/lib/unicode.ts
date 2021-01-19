@@ -398,7 +398,7 @@ export function strWidth(str: string) {
   return width;
 }
 
-export function isSurrogate(str: string, i: number) {
+export function isSurrogate(str: string, i?: number) {
   let point = typeof str === 'number' ? str : codePointAt(str, i || 0);
   return point > 0x00ffff;
 }

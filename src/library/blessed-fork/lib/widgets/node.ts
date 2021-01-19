@@ -33,6 +33,7 @@ export class Node extends EventEmitter {
     public uid: any;
     public index: number;
     public detached: boolean;
+    public hidden: boolean;
     public type: string;
     public position: ElementPosition
     public destroyed: boolean;
@@ -45,10 +46,9 @@ export class Node extends EventEmitter {
 
         options = options || {};
         this.options = options;
-        this.position = options.position
+        this.position = options.position || {}
         this.detached = true
 
-        this.position = options.position
         this.parent = null;
         this.children = [];
         this.data = {};
@@ -68,9 +68,9 @@ export class Node extends EventEmitter {
         this.detached = !this.screen
         if(oldDetached && screen) this.onAttach()
         if(!oldDetached && !screen) this.onDetach()
-        this.forAncestors(node => {
-            node.setScreen(screen)
-        })
+        for(let children of this.children) {
+            children.setScreen(screen)
+        }
     }
 
     insert(element: Node, i: number) {
@@ -233,20 +233,20 @@ export class Node extends EventEmitter {
         return this.position.height
     }
 
-    getaleft() {
-        return this.position.x;
+    getaleft(): number {
+        return this.position.x + this.parent.getaleft();
     }
 
-    getaright() {
-        return this.position.x + this.position.width
+    getaright(): number {
+        return this.position.x + this.position.width + this.parent.getaleft()
     }
 
-    getatop() {
-        return this.position.y;
+    getatop(): number {
+        return this.position.y + this.parent.getatop();
     }
 
-    getabottom() {
-        return this.position.y + this.position.height
+    getabottom(): number {
+        return this.position.y + this.position.height + this.parent.getatop()
     }
 
     getitop() {
@@ -368,9 +368,8 @@ export class Node extends EventEmitter {
         this.position.y = val - this.position.height;
     }
 
-    gettpadding(): number {
-        return this.padding.left + this.padding.top
-            + this.padding.right + this.padding.bottom;
+    render() {
+
     }
 
     clearPos(get?: boolean, override?: boolean) {

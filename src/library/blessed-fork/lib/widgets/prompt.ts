@@ -64,6 +64,7 @@ export class Prompt extends Input {
     }
 
     updateCursor() {
+        if(this.detached) return
         if (this.screen.getfocused() !== this) {
             return;
         }
@@ -216,13 +217,16 @@ export class Prompt extends Input {
                 if (this.screen.fullUnicode) {
                     if (unicode.isSurrogate(this.value, this.value.length - 2)) {
                         this.value = this.insertString(this.value, this.cursorPosition, 2)
+                        this.cursorPosition -= 2;
                     } else {
                         this.value = this.insertString(this.value, this.cursorPosition, 1)
+                        this.cursorPosition--;
                     }
                 } else {
                     this.value = this.insertString(this.value, this.cursorPosition, 1)
+                    this.cursorPosition--;
                 }
-                this.cursorPosition--;
+
                 if(this.cursorPosition <= this.scrollPosition + this.backspaceVisiblePadding) {
                     this.scrollPosition = this.cursorPosition - this.backspaceVisiblePadding;
                     if(this.scrollPosition < 0) {

@@ -116,13 +116,14 @@ dist/*
 src/server/preferences.json
 
 # Not sharing hub and game builds
-src/client/game/page/scripts/
-src/client/game/page/styles/
-src/client/game/page/img/
+src/client/game/page/scripts/*
+src/client/game/page/styles/*
+src/client/game/page/img/*
 
-src/client/hub/page/scripts/
-src/client/hub/page/styles/
-src/client/hub/page/img/
+src/client/hub/page/scripts/*
+src/client/hub/page/styles/*
+src/client/hub/page/img/*
+temp/*
 
 =======
 >>>>>>> 29049a358fa30822ec23580ff7098db9e7ef1544

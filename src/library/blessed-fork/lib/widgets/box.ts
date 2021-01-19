@@ -4,13 +4,13 @@
  * https://github.com/chjj/blessed
  */
 
-import {Element} from './element';
+import {Element, ElementConfig} from './element';
 
 export class Box extends Element {
     /**
      * Box
      */
-    constructor(options) {
+    constructor(options: ElementConfig) {
         options = options || {};
         super(options);
         this.type = 'box';

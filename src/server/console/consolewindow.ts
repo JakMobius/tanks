@@ -1,7 +1,8 @@
 
 import EventEmitter from '../../utils/eventemitter';
 import LoggerDestination from '../log/logger-destination';
-import * as blessed from './blessed-fork/lib/blessed';
+import * as blessed from '../../library/blessed-fork/lib/blessed';
+import {TTYColor} from "../../library/blessed-fork/lib/blessed";
 
 class WindowDestination extends LoggerDestination {
 	public window: any;
@@ -44,8 +45,8 @@ class ConsoleWindow extends EventEmitter {
 	public currentHistoryEntry: any;
 	public lines: any;
 	public screen: blessed.Screen;
-	public consoleTextbox: any;
-	public scrollView: any;
+	public consoleTextbox: blessed.Prompt;
+	public scrollView: blessed.ScrollableText;
 	public promptLabel: any;
 	public prompt: any;
 
@@ -66,7 +67,8 @@ class ConsoleWindow extends EventEmitter {
                 //artificial: true,
                 blink: true,
                 shape: "line"
-            }
+            },
+            fullUnicode: true
         })
 
         this.screen.program.on("keypress", (_: any, data: any) => {
@@ -87,11 +89,9 @@ class ConsoleWindow extends EventEmitter {
                 height: 20
             },
             scrollable: true,
-            mouse: true,
-            keys: true,
             style: {
-                fg: 'white',
-                bg: 'black'
+                fg: new TTYColor('white'),
+                bg: new TTYColor('black')
             }
         })
 
@@ -103,10 +103,9 @@ class ConsoleWindow extends EventEmitter {
                 height: 1,
             },
             style: {
-                fg: 'white',
-                bg: 'black'
-            },
-            keys: true
+                fg: new TTYColor('white'),
+                bg: new TTYColor('black')
+            }
         });
 
         this.promptLabel = new blessed.Text({
@@ -117,8 +116,8 @@ class ConsoleWindow extends EventEmitter {
                 height: 1,
             },
             style: {
-                fg: 'white',
-                bg: 'black'
+                fg: new TTYColor('white'),
+                bg: new TTYColor('black')
             }
         })
 
@@ -214,8 +213,8 @@ class ConsoleWindow extends EventEmitter {
 
         prompt += "> "
         this.promptLabel.content = prompt
-        this.promptLabel.setwidth(prompt.length)
-        this.consoleTextbox.left = prompt.length
+        this.promptLabel.position.width = prompt.length
+        this.consoleTextbox.position.left = prompt.length
     }
 
     render() {

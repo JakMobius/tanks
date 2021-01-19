@@ -9,24 +9,25 @@
  */
 
 import assert from 'assert';
-import colors from '../colors'
+import colors, {TTYColor} from '../colors'
 import * as unicode from '../unicode';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 import {Node, NodeConfig} from "./node"
 import { Screen } from './screen'
+import {BlessedCursorShapeConfig} from "../cursor";
 
 type ElementHAlign = 'left' | 'center' | 'right'
 type ElementVAlign = 'top' | 'middle' | 'bottom'
 
 interface ElementStyle {
-    fg?: boolean
-    bg?: boolean
+    transparent?: boolean;
     bold?: boolean
     underline?: boolean
     blink?: boolean
     inverse?: boolean
     invisible?: boolean
-    transparent?: boolean
+    fg?: TTYColor
+    bg?: TTYColor
     border?: ElementBorder
 }
 
@@ -101,8 +102,6 @@ export class Element extends Node {
     constructor(options?: ElementConfig) {
         super(options);
 
-        let self = this;
-
         options = options || {};
 
         this.name = options.name;
@@ -111,7 +110,7 @@ export class Element extends Node {
         this.dockBorders = options.dockBorders;
         this.shadow = options.shadow;
 
-        this.style = options.style;
+        this.style = options.style || {};
 
         this.hidden = options.hidden || false;
         this.fixed = options.fixed || false;
@@ -162,16 +161,6 @@ export class Element extends Node {
         this.type = 'element';
     }
 
-    onAttach() {
-        super.onAttach()
-        this.parseContent();
-    }
-
-    onDetach() {
-        super.onDetach()
-        this.lpos = null
-    }
-
     onResize() {
         super.onResize()
         this.parseContent();
@@ -179,27 +168,31 @@ export class Element extends Node {
 
     onMouseListener() {
         if(this.isClickable) return
-        if(this.screen) this.screen._listenKeys(this)
+        this.isClickable = true
+        if(this.screen) this.screen._listenMouse(this)
     }
 
     onKeyboardListener() {
         if(this.isKeyable) return
+        this.isKeyable = true
         if(this.screen) this.screen._listenKeys(this)
     }
 
-    setScreen(screen: Screen) {
-        super.setScreen(screen);
-
-        if(screen) {
-            if (this.isClickable) this.screen._listenMouse(this);
-            if (this.isKeyable) this.screen._listenKeys(this);
-        } else {
-            if(this.isClickable) this.screen._unlistenMouse(this)
-            if(this.isKeyable) this.screen._unlistenKeys(this)
-        }
+    onAttach() {
+        super.onAttach()
+        this.parseContent();
+        if (this.isClickable) this.screen._listenMouse(this);
+        if (this.isKeyable) this.screen._listenKeys(this);
+    }
+c
+    onDetach() {
+        super.onDetach()
+        this.lpos = null
+        if(this.isClickable) this.screen._unlistenMouse(this)
+        if(this.isKeyable) this.screen._unlistenKeys(this)
     }
 
-    sattr(style, fg, bg): number {
+    sattr(style: BlessedCursorShapeConfig, fg?: TTYColor, bg?: TTYColor): number {
         var bold = style.bold
             , underline = style.underline
             , blink = style.blink
@@ -207,31 +200,28 @@ export class Element extends Node {
             , invisible = style.invisible;
 
         // if (arguments.length === 1) {
-        if (fg == null && bg == null) {
+        if (fg == null) {
             fg = style.fg;
+        }
+
+        if(bg == null) {
             bg = style.bg;
         }
 
-        // This used to be a loop, but I decided
-        // to unroll it for performance's sake.
-        if (typeof bold === 'function') bold = bold(this);
-        if (typeof underline === 'function') underline = underline(this);
-        if (typeof blink === 'function') blink = blink(this);
-        if (typeof inverse === 'function') inverse = inverse(this);
-        if (typeof invisible === 'function') invisible = invisible(this);
-
-        if (typeof fg === 'function') fg = fg(this);
-        if (typeof bg === 'function') bg = bg(this);
+        let fgCode = fg ? fg.code : 0
+        let bgCode = bg ? bg.code : 0
 
         // return (this.uid << 24)
         //   | ((this.dockBorders ? 32 : 0) << 18)
-        return ((invisible ? 16 : 0) << 18)
+        let result = ((invisible ? 16 : 0) << 18)
             | ((inverse ? 8 : 0) << 18)
             | ((blink ? 4 : 0) << 18)
             | ((underline ? 2 : 0) << 18)
             | ((bold ? 1 : 0) << 18)
-            | (colors.convert(fg) << 9)
-            | colors.convert(bg);
+            | (fgCode << 9)
+            | bgCode
+
+        return result
     }
 
     free() {
@@ -277,7 +267,7 @@ export class Element extends Node {
     setText(content: string, noClear: boolean) {
         content = content || '';
         content = content.replace(/\x1b\[[\d;]*m/g, '');
-        return this.setContent(content, noClear, true);
+        return this.setContent(content, noClear);
     }
 
     getText() {
@@ -345,7 +335,7 @@ export class Element extends Node {
         return false;
     }
 
-    _parseAttr(lines) {
+    _parseAttr(lines: string[]) {
         let dattr = this.sattr(this.style)
         let attr = dattr
         let attrs = []
@@ -355,7 +345,7 @@ export class Element extends Node {
         let c;
 
         if (lines[0].attr === attr) {
-            return;
+            return null;
         }
 
         for (j = 0; j < lines.length; j++) {
@@ -441,9 +431,9 @@ export class Element extends Node {
                             // the control sequences before cutting off the line.
                             i++;
                             if (!wrap) {
-                                var rest = line.substring(i).match(/\x1b\[[^m]*m/g);
-                                rest = rest ? rest.join('') : '';
-                                out.push(this._align(line.substring(0, i) + rest, width, align));
+                                let rest = line.substring(i).match(/\x1b\[[^m]*m/g);
+                                let joined = rest ? rest.join('') : '';
+                                out.push(this._align(line.substring(0, i) + joined, width, align));
                                 ftor[no].push(out.length - 1);
                                 rtof.push(no);
                                 continue main;
@@ -456,8 +446,10 @@ export class Element extends Node {
                                     // counts on wrapping (experimental):
                                     // NOTE: Could optimize this by putting
                                     // it in the parent for loop.
+                                    let s = 0
+                                    let n = 0
                                     if (unicode.isSurrogate(line, i)) i--;
-                                    for (var s = 0, n = 0; n < i; n++) {
+                                    for (; n < i; n++) {
                                         if (unicode.isSurrogate(line, n)) s++, n++;
                                     }
                                     i += s;
@@ -541,19 +533,19 @@ export class Element extends Node {
         this.screen._listenKeys(this);
     }
 
-    key() {
+    key(key: string | string[], listener: () => void) {
         return this.screen.program.key.apply(this, arguments);
     }
 
-    onceKey() {
+    onceKey(key: string | string[], listener: () => void) {
         return this.screen.program.onceKey.apply(this, arguments);
     }
 
-    unkey() {
+    unkey(key: string | string[], listener: () => void) {
         return this.screen.program.unkey.apply(this, arguments);
     }
 
-    removeKey() {
+    removeKey(key: string | string[], listener: () => void) {
         return this.screen.program.unkey.apply(this, arguments);
     }
 
@@ -651,12 +643,12 @@ export class Element extends Node {
     }
 
     _getCoords(noscroll?: boolean) {
-        if (this.hidden) return;
+        if (this.hidden) return null;
 
-        let xi = this._getLeft()
-        let xl = xi + this._getWidth()
-        let yi = this._getTop()
-        let yl = yi + this._getHeight()
+        let xi = this.getaleft()
+        let xl = xi + this.getwidth()
+        let yi = this.getatop()
+        let yl = yi + this.getheight()
         let base = this.childBase || 0
         let el: Node = this
         let fixed = this.fixed
@@ -755,7 +747,7 @@ export class Element extends Node {
                 if (thisparent.border) xl--;
             }
             //if (xi > xl) return;
-            if (xi >= xl) return;
+            if (xi >= xl) return null;
         }
 
         if (this.noOverflow && this.parent.lpos) {
@@ -847,13 +839,26 @@ export class Element extends Node {
             attr = this._clines.attr[Math.min(coords.base, this._clines.length - 1)];
         }
 
-        if (this.style.border) xi++, xl--, yi++, yl--;
+        if (this.style.border) {
+            xi++
+            xl--
+            yi++
+            yl--
+        }
 
         // If we have padding/valign, that means the
         // content-drawing loop will skip a few cells/lines.
         // To deal with this, we can just fill the whole thing
         // ahead of time. This could be optimized.
-        if (this.tpadding || (this.valign && this.valign !== 'top')) {
+
+        let padding = this.padding
+
+        let paddingExists = padding.left ||
+                            padding.top ||
+                            padding.right ||
+                            padding.bottom
+
+        if (paddingExists || (this.valign && this.valign !== 'top')) {
             if (this.style.transparent) {
                 for (y = Math.max(yi, 0); y < yl; y++) {
                     if (!lines[y]) break;
@@ -869,9 +874,11 @@ export class Element extends Node {
             }
         }
 
-        if (this.tpadding) {
-            xi += this.padding.left, xl -= this.padding.right;
-            yi += this.padding.top, yl -= this.padding.bottom;
+        if(paddingExists) {
+            xi += padding.left
+            xl -= padding.right;
+            yi += padding.top
+            yl -= padding.bottom;
         }
 
         // Determine where to place the text if it's vertically aligned.
@@ -918,12 +925,7 @@ export class Element extends Node {
                     if (c = /^\x1b\[[\d;]*m/.exec(content.substring(ci - 1))) {
                         ci += c[0].length - 1;
                         attr = this.screen.attrCode(c[0], attr, dattr);
-                        // Ignore foreground changes for selected items.
-                        if (this.parent._isList && this.parent.interactive
-                            && this.parent.items[this.parent.selected] === this
-                            && this.parent.options.invertSelected !== false) {
-                            attr = (attr & ~(0x1ff << 9)) | (dattr & (0x1ff << 9));
-                        }
+
                         ch = content[ci] || bch;
                         ci++;
                     } else {
@@ -1007,10 +1009,10 @@ export class Element extends Node {
 
         if (this.style.border) xi--, xl++, yi--, yl++;
 
-        if (this.tpadding) {
-            xi -= this.padding.left, xl += this.padding.right;
-            yi -= this.padding.top, yl += this.padding.bottom;
-        }
+        xi -= this.padding.left
+        xl += this.padding.right;
+        yi -= this.padding.top
+        yl += this.padding.bottom;
 
         // Draw the border.
         if (this.style.border) {
@@ -1219,8 +1221,6 @@ export class Element extends Node {
         });
 
         this._emit('render', [coords]);
-
-        return coords;
     }
 
     /**
@@ -1281,8 +1281,7 @@ export class Element extends Node {
         }
     }
 
-    deleteLine(i, n) {
-        n = n || 1;
+    deleteLine(i: number, n: number = 1) {
 
         if (i !== i || i == null) {
             i = this._clines.ftor.length - 1;
@@ -1330,12 +1329,12 @@ export class Element extends Node {
         }
     }
 
-    insertTop(line: number) {
+    insertTop(line: string) {
         var fake = this._clines.rtof[this.childBase || 0];
         return this.insertLine(fake, line);
     }
 
-    insertBottom(line: number) {
+    insertBottom(line: string) {
         var h = (this.childBase || 0) + this.getheight() - this.getiheight()
             , i = Math.min(h, this._clines.length)
             , fake = this._clines.rtof[i - 1] + 1;
@@ -1397,16 +1396,16 @@ export class Element extends Node {
         return this.insertLine(0, line);
     }
 
-    shiftLine(n) {
+    shiftLine(n: number) {
         return this.deleteLine(0, n);
     }
 
-    pushLine(line) {
+    pushLine(line: string) {
         if (!this.content) return this.setLine(0, line);
         return this.insertLine(this._clines.fake.length, line);
     }
 
-    popLine(n) {
+    popLine(n: number) {
         return this.deleteLine(this._clines.fake.length - 1, n);
     }
 
@@ -1418,7 +1417,7 @@ export class Element extends Node {
         return this._clines.slice();
     }
 
-    strWidth(text) {
+    strWidth(text: string) {
         return this.screen.fullUnicode
             ? unicode.strWidth(text)
             : helpers.dropUnicode(text).length;
@@ -1458,7 +1457,7 @@ export class Element extends Node {
     }
 
     isVisible() {
-        var el = this;
+        var el: Node = this;
         do {
             if (el.detached) return false;
             if (el.hidden) return false;

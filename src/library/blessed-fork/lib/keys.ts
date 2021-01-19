@@ -25,7 +25,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-import {EventEmitter} from 'events';
+import EventEmitter from './events';
 import {BlessedKeyEvent} from "./widgets/screen";
 import {StringDecoder} from "string_decoder";
 
@@ -320,9 +320,9 @@ function emitKeys(stream, s) {
       ch = s;
     }
 
-    if (ch) {
+    if (ch || key.name) {
 
-      key.ch = ch
+      if(ch) key.ch = ch
 
       // Moved this code here since there is no reason why 'Screen' class
       // should handle these cases.

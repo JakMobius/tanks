@@ -155,7 +155,7 @@ class Compiler {
                 cacheFile: cacheFile
             })
 
-            let isError = false
+            let compileError = null
 
             this.result = ""
 
@@ -190,11 +190,15 @@ class Compiler {
                 .on('error', (error) => {
                     console.error(error.message)
                     if(error.annotated) console.error(error.annotated)
-                    isError = true
+                    compileError = error
                 })
                 //.pipe(fs.createWriteStream('server.js', 'utf8'))
                 .on('end', async () => {
                     Timings.end()
+                    if(compileError) {
+                        reject(compileError)
+                        return
+                    }
                     await this.finished()
                     resolve()
                 })

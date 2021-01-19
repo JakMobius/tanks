@@ -8,8 +8,7 @@
  * Modules
  */
 
-import {EventEmitter} from 'events';
-
+import EventEmitter from './events';
 import {StringDecoder} from 'string_decoder';
 import cp from 'child_process';
 import util from 'util';
@@ -20,6 +19,7 @@ import * as tty from "tty";
 import {BlessedEvent, BlessedKeyEvent, BlessedMouseEvent} from "./widgets/screen";
 import GpmClient from "./gpmclient";
 import {RequestHub} from "./terminal/request-hub";
+import {BlessedCursorShapes} from "./cursor";
 
 var slice = Array.prototype.slice;
 
@@ -40,13 +40,32 @@ export interface ProgramConfig {
     debug?: boolean
 }
 
+interface BlessedMouseOptions {
+    gpmMouse?: boolean;
+    jsbtermMouse?: boolean;
+    ptermMouse?: boolean;
+    decMouse?: boolean;
+    urxvtMouse?: boolean;
+    sgrMouse?: boolean;
+    utfMouse?: boolean;
+    sendFocus?: boolean;
+    cellMotion?: boolean;
+    x10Mouse?: boolean;
+    vt200Hilite?: boolean;
+    hiliteTracking?: boolean;
+    allMotion?: boolean;
+    vt200Mouse?: boolean;
+    normalMouse?: boolean;
+
+}
+
 class Program extends EventEmitter {
     private readonly options: ProgramConfig;
     private readonly input: tty.ReadStream;
     private readonly output: tty.WriteStream
     private _logger: fs.WriteStream;
-    private zero: boolean;
-    private useBuffer: boolean
+    public zero: boolean;
+    public useBuffer: boolean
 
     static instances: Program[] = []
     static global: Program
@@ -59,18 +78,18 @@ class Program extends EventEmitter {
 
     public cols: number;
     public rows: number
-    private scrollTop: number;
-    private scrollBottom: number;
+    public scrollTop: number;
+    public scrollBottom: number;
     public terminal: string;
 
-    private isOSXTerm: boolean;
-    private isiTerm2: boolean
-    private isXFCE: boolean
-    private isTerminator: boolean
-    private isLXDE: boolean
-    private isVTE: boolean
-    private isRxvt: boolean
-    private isXterm: boolean
+    public isOSXTerm: boolean;
+    public isiTerm2: boolean
+    public isXFCE: boolean
+    public isTerminator: boolean
+    public isLXDE: boolean
+    public isVTE: boolean
+    public isRxvt: boolean
+    public isXterm: boolean
     private tmux: boolean
     private tmuxVersion: number
 
@@ -82,19 +101,20 @@ class Program extends EventEmitter {
     private _lastButton: string;
     private gpm: GpmClient;
     public title: string;
-    private _resume?: () => void;
-    private isAlt: boolean;
+    public isAlt: boolean;
     private _boundResponse: boolean;
     private mouseEnabled: boolean;
-    private cursorHidden: boolean;
+    public cursorHidden: boolean;
+    private _boundMouse: boolean;
+    private _exiting: boolean;
+    private destroyed: boolean;
+    private _currentMouse: BlessedMouseOptions;
 
     constructor(options?: ProgramConfig) {
         super()
         var self = this;
 
         Program.bind(this);
-
-        EventEmitter.call(this);
 
         if (!options) {
             options = {
@@ -156,7 +176,7 @@ class Program extends EventEmitter {
         this.tmuxVersion = (function () {
             if (!self.tmux) return 2;
             try {
-                var version = cp.execFileSync('tmux', ['-V'], {encoding: 'utf8'});
+                let version = cp.execFileSync('tmux', ['-V'], {encoding: 'utf8'});
                 return +/^tmux ([\d.]+)/i.exec(version.trim().split('\n')[0])[1];
             } catch (e) {
                 return 2;
@@ -439,28 +459,28 @@ class Program extends EventEmitter {
         }
     }
 
-    key(key, listener) {
+    key(key: string | string[], listener: () => void) {
         if (typeof key === 'string') key = key.split(/\s*,\s*/);
         key.forEach(function (key) {
             return this.on('key ' + key, listener);
         }, this);
     }
 
-    onceKey(key, listener) {
+    onceKey(key: string | string[], listener: () => void) {
         if (typeof key === 'string') key = key.split(/\s*,\s*/);
         key.forEach(function (key) {
             return this.once('key ' + key, listener);
         }, this);
     }
 
-    unkey(key, listener) {
+    unkey(key: string | string[], listener: () => void) {
         if (typeof key === 'string') key = key.split(/\s*,\s*/);
         key.forEach(function (key) {
             return this.removeListener('key ' + key, listener);
         }, this);
     }
 
-    removeKey(key, listener) {
+    removeKey(key: string | string[], listener: () => void) {
         if (typeof key === 'string') key = key.split(/\s*,\s*/);
         key.forEach(function (key) {
             return this.removeListener('key ' + key, listener);
@@ -987,16 +1007,27 @@ class Program extends EventEmitter {
         })
     }
 
-    response(name: string, callback?: (err: Error, result?: any) => void): void
-    response(name: string, text: string, callback?: (err: Error, result?: any) => void): void
-    response(name: string, text: string, callback?: (err: Error, result?: any) => void, noBypass?: boolean): void
-    response(name: string, text: string | ((err: Error, result?: any) => void), callback?: (err: Error, result?: any) => void, noBypass?: boolean): void {
+    response(text: string, callback?: (err: Error, result?: any) => void): boolean
+    response(name: string, text: string, callback?: (err: Error, result?: any) => void): boolean
+    response(name: string, text: string, callback?: (err: Error, result?: any) => void, noBypass?: boolean): boolean
+    response(arg1: string, arg2: string | ((err: Error, result?: any) => void), arg3?: (err: Error, result?: any) => void, arg4?: boolean): boolean {
         var self = this;
 
+        let name: string
+        let text: string
+        let callback: (err: Error, result?: any) => void
+        let noBypass: boolean
+
         if (arguments.length === 2) {
-            callback = text as (err: Error, result?: any) => void;
-            text = name;
+            callback = arg2 as (err: Error, result?: any) => void;
+            text = arg1;
             name = null;
+            noBypass = false
+        } else {
+            name = arg1
+            text = arg2 as string
+            callback = arg3
+            noBypass = arg4
         }
 
         this.bindResponse();
@@ -1029,7 +1060,7 @@ class Program extends EventEmitter {
     }
 
     _owrite(text: string) {
-        if (!this.output.writable) return;
+        if (!this.output.writable) return false;
         return this.output.write(text);
     }
 
@@ -1067,10 +1098,10 @@ class Program extends EventEmitter {
 
 // Example: `DCS tmux; ESC Pt ST`
 // Real: `DCS tmux; ESC Pt ESC \`
-    _twrite(data) {
-        var self = this
-            , iterations = 0
-            , timer;
+    _twrite(data: string) {
+        let self = this
+        let iterations = 0
+        let timer: NodeJS.Timeout;
 
         if (this.tmux) {
             // Replace all STs with BELs so they can be nested within the DCS code.
@@ -1103,16 +1134,14 @@ class Program extends EventEmitter {
         return this._write(data);
     }
 
-    echo(text, attr) {
-        return attr
-            ? this._write(this.text(text, attr))
-            : this._write(text);
-    }
-
-    print(text, attr) {
-        return attr
-            ? this._write(this.text(text, attr))
-            : this._write(text);
+    print(text: string): boolean
+    print(text: string, attr: string): boolean
+    print(text: string, attr?: string) {
+        if (attr) {
+            return this._write(this.text(text, attr));
+        } else {
+            return this._write(text);
+        }
     }
 
     _ncoords() {
@@ -1120,19 +1149,6 @@ class Program extends EventEmitter {
         else if (this.x >= this.cols) this.x = this.cols - 1;
         if (this.y < 0) this.y = 0;
         else if (this.y >= this.rows) this.y = this.rows - 1;
-    }
-
-    setx(x) {
-        return this.cursorCharAbsolute(x);
-        // return this.charPosAbsolute(x);
-    }
-
-    sety(y) {
-        return this.linePosAbsolute(y);
-    }
-
-    move(x, y) {
-        return this.cursorPos(y, x);
     }
 
 // TODO: Fix cud and cuu calls.
@@ -1169,17 +1185,21 @@ class Program extends EventEmitter {
     }
 
     cursorMoveX(x: number) {
-        if (!x) return;
-        return x > 0
-            ? this.cursorForward(x)
-            : this.cursorBackward(-x);
+        if (!x) return false;
+        if (x > 0) {
+            return this.cursorForward(x);
+        } else {
+            return this.cursorBackward(-x);
+        }
     }
 
     cursorMoveY(y: number) {
-        if (!y) return;
-        return y > 0
-            ? this.cursorUp(y)
-            : this.cursorDown(-y);
+        if (!y) return false;
+        if (y > 0) {
+            return this.cursorUp(y);
+        } else {
+            return this.cursorDown(-y);
+        }
     }
 
     cursorMove(x: number, y: number) {
@@ -1196,11 +1216,11 @@ class Program extends EventEmitter {
         return Array(i + 1).join(ch);
     }
 
-// Specific to iTerm2, but I think it's really cool.
-// Example:
-//  if (!screen.copyToClipboard(text)) {
-//    execClipboardProgram(text);
-//  }
+    // Specific to iTerm2, but I think it's really cool.
+    // Example:
+    //  if (!screen.copyToClipboard(text)) {
+    //    execClipboardProgram(text);
+    //  }
     copyToClipboard(text: string) {
         if (this.isiTerm2) {
             this._twrite('\x1b]50;CopyToCliboard=' + text + '\x07');
@@ -1209,8 +1229,8 @@ class Program extends EventEmitter {
         return false;
     }
 
-// Only XTerm and iTerm2. If you know of any others, post them.
-    cursorShape(shape, blink) {
+    // Only XTerm and iTerm2. If you know of any others, post them.
+    cursorShape(shape: BlessedCursorShapes, blink: boolean) {
         if (this.isiTerm2) {
             switch (shape) {
                 case 'block':
@@ -1286,7 +1306,7 @@ class Program extends EventEmitter {
         return false;
     }
 
-    getTextParams(param: string, callback: (err: Error, result: any) => void) {
+    getTextParams(param: number, callback: (err: Error, result: any) => void) {
         return this.response('text-params', '\x1b]' + param + ';?\x07', function (err, data) {
             if (err) return callback(err, null);
             return callback(null, data.pt);
@@ -1354,7 +1374,7 @@ class Program extends EventEmitter {
 
     newline() {
         if (this.tput && this.tput.terminfo.bools.eat_newline_glitch && this.x >= this.cols) {
-            return;
+            return false;
         }
         this.x = 0;
         this.y++;
@@ -1408,61 +1428,13 @@ class Program extends EventEmitter {
         return this._write('\x1bH');
     }
 
-// ESC 7 Save Cursor (DECSC).
-
-    saveCursor(key) {
-        if (key) return this.lsaveCursor(key);
-        this.savedX = this.x || 0;
-        this.savedY = this.y || 0;
-        if (this.tput) return this._write(this.tput.terminfo.methods.sc());
-        return this._write('\x1b7');
-    }
-
-// ESC 8 Restore Cursor (DECRC).
-
-    restoreCursor(key, hide) {
-        if (key) return this.lrestoreCursor(key, hide);
-        this.x = this.savedX || 0;
-        this.y = this.savedY || 0;
-        if (this.tput) return this._write(this.tput.terminfo.methods.rc());
-        return this._write('\x1b8');
-    }
-
-// Save Cursor Locally
-    lsaveCursor(key) {
-        key = key || 'local';
-        this._saved = this._saved || {};
-        this._saved[key] = this._saved[key] || {};
-        this._saved[key].x = this.x;
-        this._saved[key].y = this.y;
-        this._saved[key].hidden = this.cursorHidden;
-    }
-
-// Restore Cursor Locally
-    lrestoreCursor(key, hide) {
-        var pos;
-        key = key || 'local';
-        if (!this._saved || !this._saved[key]) return;
-        pos = this._saved[key];
-        //delete this._saved[key];
-        this.cursorPos(pos.y, pos.x);
-        if (hide && pos.hidden !== this.cursorHidden) {
-            if (pos.hidden) {
-                this.hideCursor();
-            } else {
-                this.showCursor();
-            }
-        }
-    }
-
 // ESC # 3 DEC line height/width
     lineHeight() {
         return this._write('\x1b#');
     }
 
 // ESC (,),*,+,-,. Designate G0-G2 Character Set.
-    charset(val, level) {
-        level = level || 0;
+    charset(val: string) {
 
         // See also:
         // acs_chars / acsc / ac
@@ -1471,24 +1443,12 @@ class Program extends EventEmitter {
         // enter_pc_charset_mode / smpch / S2
         // exit_pc_charset_mode / rmpch / S3
 
-        switch (level) {
-            case 0:
-                level = '(';
-                break;
-            case 1:
-                level = ')';
-                break;
-            case 2:
-                level = '*';
-                break;
-            case 3:
-                level = '+';
-                break;
+        let name: string;
+        if (typeof val === 'string') {
+            name = val.toLowerCase();
+        } else {
+            name = val;
         }
-
-        var name = typeof val === 'string'
-            ? val.toLowerCase()
-            : val;
 
         switch (name) {
             case 'acs':
@@ -1577,25 +1537,26 @@ class Program extends EventEmitter {
 // Invoke the G2 Character Set as GR (LS2R).
 // ESC ~
 // Invoke the G1 Character Set as GR (LS1R).
-    setG(val) {
+    setG(val: number) {
         // if (this.tput) return this.put.S2();
         // if (this.tput) return this.put.S3();
+        let param: string
         switch (val) {
             case 1:
-                val = '~'; // GR
+                param = '~'; // GR
                 break;
             case 2:
-                val = 'n'; // GL
-                val = '}'; // GR
-                val = 'N'; // Next Char Only
+                param = 'n'; // GL
+                param = '}'; // GR
+                param = 'N'; // Next Char Only
                 break;
             case 3:
-                val = 'o'; // GL
-                val = '|'; // GR
-                val = 'O'; // Next Char Only
+                param = 'o'; // GL
+                param = '|'; // GR
+                param = 'O'; // Next Char Only
                 break;
         }
-        return this._write('\x1b' + val);
+        return this._write('\x1b' + param);
     }
 
 // OSC Ps ; Pt ST
@@ -1738,42 +1699,11 @@ class Program extends EventEmitter {
 //     Ps = 0  -> Selective Erase Below (default).
 //     Ps = 1  -> Selective Erase Above.
 //     Ps = 2  -> Selective Erase All.
-    ed(param) {
-        if (this.tput) {
-            switch (param) {
-                case 'above':
-                    param = 1;
-                    break;
-                case 'all':
-                    param = 2;
-                    break;
-                case 'saved':
-                    param = 3;
-                    break;
-                case 'below':
-                default:
-                    param = 0;
-                    break;
-            }
-            // extended tput.E3 = ^[[3;J
-            return this._write(this.tput.terminfo.methods.ed(param));
-        }
-        switch (param) {
-            case 'above':
-                return this._write('\X1b[1J');
-            case 'all':
-                return this._write('\x1b[2J');
-            case 'saved':
-                return this._write('\x1b[3J');
-            case 'below':
-            default:
-                return this._write('\x1b[J');
-        }
-    }
 
-    eraseInDisplay(param) {
+    eraseInDisplay(sides: string) {
         if (this.tput) {
-            switch (param) {
+            let param: number
+            switch (sides) {
                 case 'above':
                     param = 1;
                     break;
@@ -1791,7 +1721,7 @@ class Program extends EventEmitter {
             // extended tput.E3 = ^[[3;J
             return this._write(this.tput.terminfo.methods.ed(param));
         }
-        switch (param) {
+        switch (sides) {
             case 'above':
                 return this._write('\X1b[1J');
             case 'all':
@@ -1823,38 +1753,12 @@ class Program extends EventEmitter {
 //     Ps = 0  -> Selective Erase to Right (default).
 //     Ps = 1  -> Selective Erase to Left.
 //     Ps = 2  -> Selective Erase All.
-    el(param) {
-        if (this.tput) {
-            //if (this.tput.back_color_erase) ...
-            switch (param) {
-                case 'left':
-                    param = 1;
-                    break;
-                case 'all':
-                    param = 2;
-                    break;
-                case 'right':
-                default:
-                    param = 0;
-                    break;
-            }
-            return this._write(this.tput.terminfo.methods.el(param));
-        }
-        switch (param) {
-            case 'left':
-                return this._write('\x1b[1K');
-            case 'all':
-                return this._write('\x1b[2K');
-            case 'right':
-            default:
-                return this._write('\x1b[K');
-        }
-    }
 
-    eraseInLine(param) {
+    eraseInLine(sides: string) {
         if (this.tput) {
             //if (this.tput.back_color_erase) ...
-            switch (param) {
+            let param: number
+            switch (sides) {
                 case 'left':
                     param = 1;
                     break;
@@ -1868,7 +1772,7 @@ class Program extends EventEmitter {
             }
             return this._write(this.tput.terminfo.methods.el(param));
         }
-        switch (param) {
+        switch (sides) {
             case 'left':
                 return this._write('\x1b[1K');
             case 'all':
@@ -1885,7 +1789,7 @@ class Program extends EventEmitter {
 //     Ps = 4 8  ; 5  ; Ps -> Set background color to the second
 //     Ps.
 
-    charAttributes(param: string, val: boolean) {
+    charAttributes(param: string, val: number) {
         return this._write(this._attr(param, val));
     }
 
@@ -1893,14 +1797,14 @@ class Program extends EventEmitter {
 //   supports the following, from rxvt:
 //     Ps = 1 0 0  -> Set foreground and background color to
 //     default.
-    text(text, attr) {
+    text(text: string, attr: string) {
         return this._attr(attr, true) + text + this._attr(attr, false);
     }
 
 // NOTE: sun-color may not allow multiple params for SGR.
-    _attr(param: string, val?: boolean): string
-    _attr(param: string[], val?: boolean): string
-    _attr(param: string | string[], val?: boolean): string {
+    _attr(param: string, val?: number | boolean): string
+    _attr(param: string[], val?: number | boolean): string
+    _attr(param: string | string[], val?: number | boolean): string {
         let self = this
         let parts: string[]
         let color
@@ -2146,7 +2050,7 @@ class Program extends EventEmitter {
             default:
                 // 256-color fg and bg
                 if (param[0] === '#') {
-                    param = param.replace(/#(?:[0-9a-f]{3}){1,2}/i, colors.match);
+                    param = param.replace(/#(?:[0-9a-f]{3}){1,2}/i, substring => String(colors.match(substring)));
                 }
 
                 m = /^(-?\d+) (fg|bg)$/.exec(param);
@@ -2216,7 +2120,7 @@ class Program extends EventEmitter {
 //     Ps = 1 0 6  -> Set background color to Cyan.
 //     Ps = 1 0 7  -> Set background color to White.
 
-    setForeground(color: string, val: boolean) {
+    setForeground(color: string, val: number) {
         color = color.split(/\s*[,;]\s*/).join(' fg, ') + ' fg';
         return this.charAttributes(color, val);
     }
@@ -2280,7 +2184,7 @@ class Program extends EventEmitter {
 //   CSI ? 5 0  n  No Locator, if not.
 
 
-    deviceStatus(param: string, callback: (err: Error, result: any) => void, dec?: boolean, noBypass?: boolean) {
+    deviceStatus(param: number, callback: (err: Error, result: any) => void, dec?: boolean, noBypass?: boolean) {
         if (dec) {
             return this.response('device-status',
                 '\x1b[?' + (param || '0') + 'n', callback, noBypass);
@@ -2606,7 +2510,7 @@ class Program extends EventEmitter {
     alternateBuffer() {
         this.isAlt = true;
         if (this.tput) return this._write(this.tput.terminfo.methods.smcup());
-        if (this.term('vt') || this.term('linux')) return;
+        if (this.term('vt') || this.term('linux')) return false;
         this.setMode('?47');
         return this.setMode('?1049');
     }
@@ -2777,17 +2681,15 @@ class Program extends EventEmitter {
     disableMouse() {
         if (!this._currentMouse) return;
 
-        var obj = {};
+        let obj = {};
 
-        Object.keys(this._currentMouse).forEach(function (key) {
-            obj[key] = false;
-        });
+        Object.assign(obj, this._currentMouse)
 
         return this.setMouse(obj, false);
     }
 
 // Set Mouse
-    setMouse(opt, enable) {
+    setMouse(opt: BlessedMouseOptions, enable?: boolean) {
         if (opt.normalMouse != null) {
             opt.vt200Mouse = opt.normalMouse;
             opt.allMotion = opt.normalMouse;
@@ -2800,15 +2702,13 @@ class Program extends EventEmitter {
         if (enable === true) {
             if (this._currentMouse) {
                 this.setMouse(opt);
-                Object.keys(opt).forEach(function (key) {
-                    this._currentMouse[key] = opt[key];
-                }, this);
+                Object.assign(this._currentMouse, opt)
                 return;
             }
             this._currentMouse = opt;
             this.mouseEnabled = true;
         } else if (enable === false) {
-            delete this._currentMouse;
+            this._currentMouse = null;
             this.mouseEnabled = false;
         }
 
@@ -2919,7 +2819,6 @@ class Program extends EventEmitter {
 // CSI ? Pm r
 
     setScrollRegion(top: number, bottom: number) {
-        return
         if (this.zero) {
             top = top || 0;
             bottom = bottom || (this.rows - 1);
@@ -3511,70 +3410,7 @@ class Program extends EventEmitter {
         return this._write('\x1b[' + slice.call(arguments).join(';') + ' ~');
     }
 
-//   If Locator Reporting has been enabled by a DECELR, xterm will
-//   respond with a DECLRP Locator Report.  This report is also
-//   generated on button up and down events if they have been
-//   enabled with a DECSLE, or when the locator is detected outside
-//   of a filter rectangle, if filter rectangles have been enabled
-//   with a DECEFR.
-    sigtstp(callback: () => void) {
-        var resume = this.pause();
-
-        process.once('SIGCONT', function () {
-            resume();
-            if (callback) callback();
-        });
-
-        process.kill(process.pid, 'SIGTSTP');
-    }
-
-// CSI Ps ' |
-//   Request Locator Position (DECRQLP).
-//   Valid values for the parameter are:
-//     Ps = 0 , 1 or omitted -> transmit a single DECLRP locator
-//     report.
-    pause(callback?: () => void) {
-        var self = this
-            , isAlt = this.isAlt
-            , mouseEnabled = this.mouseEnabled;
-
-        this.lsaveCursor('pause');
-        //this.csr(0, screen.height - 1);
-        if (isAlt) this.normalBuffer();
-        this.showCursor();
-        if (mouseEnabled) this.disableMouse();
-
-        var write = this.output.write;
-        this.output.write = function () {
-        };
-        if (this.input.setRawMode) {
-            this.input.setRawMode(false);
-        }
-        this.input.pause();
-
-        return this._resume = function () {
-            delete self._resume;
-
-            if (self.input.setRawMode) {
-                self.input.setRawMode(true);
-            }
-            self.input.resume();
-            self.output.write = write;
-
-            if (isAlt) self.alternateBuffer();
-            //self.csr(0, screen.height - 1);
-            if (mouseEnabled) self.enableMouse();
-            self.lrestoreCursor('pause', true);
-
-            if (callback) callback();
-        };
-    }
-
-    resume() {
-        if (this._resume) return this._resume();
-    }
-
-    static bind(program) {
+    static bind(program: Program) {
         let bound = !!Program.global
 
         if (!Program.global) {
@@ -3583,13 +3419,12 @@ class Program extends EventEmitter {
 
         if (!~Program.instances.indexOf(program)) {
             Program.instances.push(program);
-            program.index = Program.total;
             Program.total++;
         }
 
         if (bound) return;
 
-        unshiftEvent(process, 'exit', Program._exitHandler);
+        process.on('exit', () => Program._exitHandler())
     }
 
     static _exitHandler() {
@@ -3606,22 +3441,6 @@ class Program extends EventEmitter {
             program._exiting = true;
         });
     }
-}
-
-/**
- * Helpers
- */
-
-// We could do this easier by just manipulating the _events object, or for
-// older versions of node, manipulating the array returned by listeners(), but
-// neither of these methods are guaranteed to work in future versions of node.
-function unshiftEvent(obj, event, listener) {
-    var listeners = obj.listeners(event);
-    obj.removeAllListeners(event);
-    obj.on(event, listener);
-    listeners.forEach(function (listener) {
-        obj.on(event, listener);
-    });
 }
 
 /**

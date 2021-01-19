@@ -10,11 +10,10 @@
 
 
 import {Box} from './box';
-import {NodeConfig} from "./node";
-import {Screen} from "./screen";
 import {Node} from "./node";
+import {ElementConfig} from "./element";
 
-export interface ScrollableBoxConfig extends NodeConfig {
+export interface ScrollableBoxConfig extends ElementConfig {
     alwaysScroll?: boolean;
     scrollable?: boolean
     mouse?: boolean
