@@ -137,7 +137,7 @@ class colors {
         return colors.match([r1, g1, b1]);
     }
 
-    private static blendCache: any
+    private static blendCache: any = {}
 
     private static blendGround(ground: number): number {
         if (colors.blendCache[ground] != null) {

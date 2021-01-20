@@ -21,6 +21,7 @@ import {utoa} from "../terminal/characters";
 import Program from "../program";
 import * as tty from "tty"
 import {BlessedCursorShape, BlessedCursorConfig} from "../cursor";
+import {Framebuffer} from "../framebuffer";
 
 interface ScreenConfig extends NodeConfig {
     title?: string;
@@ -94,13 +95,11 @@ export class Screen extends Node {
     public history: Element[];
     public grabKeys: any;
     public lockKeys: any;
-    public _buf: any;
+    public _buf: string;
     public _ci: any;
     public _listenedMouse: any;
     public debugLog: any;
     public _listenedKeys: any;
-    public lines: ScreenLine[];
-    public olines: any;
     public _cursorBlink: any;
     public _needsClickableSort: any;
     public mouseDown: any;
@@ -108,6 +107,7 @@ export class Screen extends Node {
     public clickableElements: Element[];
     public keyableElements: Element[];
     public options: ScreenConfig
+    public framebuffer: Framebuffer
 
     /**
      * Screen
@@ -118,6 +118,7 @@ export class Screen extends Node {
 
         super(options);
 
+        this.framebuffer = new Framebuffer(this)
         this.options = options
         this.detached = false
         this.screen = this
@@ -126,7 +127,7 @@ export class Screen extends Node {
 
         Screen.bind(this);
 
-        this.program = options.program;``
+        this.program = options.program;
 
         if (this.program) {
             this.program.setupTput();
@@ -184,17 +185,18 @@ export class Screen extends Node {
             this.settitle(options.title);
         }
 
-        this.cursor = options.cursor
+        this.cursor = options.cursor || { shape: 'block' }
 
         this.program.on('resize', () => {
-            this.alloc();
-            this.render();
             this.position.width = this.getwidth()
             this.position.height = this.getheight()
+            this.framebuffer.resize(this.position.width, this.position.height)
 
             for(let child of this.children) {
                 child.onResize()
             }
+
+            this.render();
         });
 
         this.program.on('focus', function() {
@@ -249,16 +251,16 @@ export class Screen extends Node {
 
     enter() {
         if (this.program.isAlt) return;
-        if (!this.cursor._set) {
-            if(this.options.cursor) {
-                if (this.options.cursor.shape) {
-                    this.cursorShape(this.cursor.shape, this.cursor.blink);
-                }
-                if (this.options.cursor.color) {
-                    this.cursorColor(this.cursor.color);
-                }
+
+        if(this.options.cursor) {
+            if (this.options.cursor.shape) {
+                this.cursorShape(this.cursor.shape, this.cursor.blink);
+            }
+            if (this.options.cursor.color) {
+                this.cursorColor(this.cursor.color);
             }
         }
+
         if (process.platform === 'win32') {
             try {
                 cp.execSync('cls', { stdio: 'ignore', timeout: 1000 });
@@ -275,9 +277,11 @@ export class Screen extends Node {
         if (this.tput.terminfo.strings.ena_acs) {
             this.program._write(this.tput.terminfo.methods.enacs());
         }
-        this.alloc();
+
         this.position.width = this.getwidth()
         this.position.height = this.getheight()
+        this.framebuffer.resize(this.position.width, this.position.height)
+
     }
 
     leave() {
@@ -290,7 +294,7 @@ export class Screen extends Node {
         // XXX For some reason if alloc/clear() is before this
         // line, it doesn't work on linux console.
         this.program.showCursor();
-        this.alloc();
+        this.framebuffer.resize(this.position.width, this.position.height)
         if (this._listenedMouse) {
             this.program.disableMouse();
         }
@@ -381,7 +385,6 @@ export class Screen extends Node {
             var i = 0
                 , el
                 , set
-                , pos;
 
             for (; i < self.clickableElements.length; i++) {
                 el = self.clickableElements[i];
@@ -390,14 +393,8 @@ export class Screen extends Node {
                     continue;
                 }
 
-                // if (self.grabMouse && self.focused !== el
-                //     && !el.hasAncestor(self.focused)) continue;
-
-                pos = el.lpos;
-                if (!pos) continue;
-
-                if (data.x >= pos.xi && data.x < pos.xl
-                    && data.y >= pos.yi && data.y < pos.yl) {
+                if (data.x >= el.getaleft() && data.x < el.getaright()
+                    && data.y >= el.getatop() && data.y < el.getaright()) {
                     el.emit('mouse', data);
                     if (data.action === 'mousedown') {
                         self.mouseDown = el;
@@ -467,6 +464,9 @@ export class Screen extends Node {
             let focused = this.getfocused()
             let grabKeys = this.grabKeys;
 
+            this.emit('keypress', ch, key)
+            this.emit('key ' + key.full, ch, key)
+
             // If something changed from the screen key handler, stop.
             if (this.grabKeys !== grabKeys || this.lockKeys) {
                 return;
@@ -486,32 +486,6 @@ export class Screen extends Node {
     enableInput(el: Element) {
         this._listenMouse(el);
         this._listenKeys(el);
-    }
-
-    alloc(dirty?: boolean) {
-        var x, y;
-
-        let width = this.getwidth()
-        let height = this.getheight()
-
-        this.lines = [];
-        for (y = 0; y < height; y++) {
-            this.lines[y] = [] as ScreenLine;
-            for (x = 0; x < width; x++) {
-                this.lines[y][x] = [this.dattr, ' '];
-            }
-            this.lines[y].dirty = !!dirty;
-        }
-
-        this.olines = [];
-        for (y = 0; y < height; y++) {
-            this.olines[y] = [];
-            for (x = 0; x < width; x++) {
-                this.olines[y][x] = [this.dattr, ' '];
-            }
-        }
-
-        this.program.clear();
     }
 
     render() {
@@ -537,14 +511,11 @@ export class Screen extends Node {
         });
         this._ci = -1;
 
-        this.draw(0, this.lines.length - 1);
+        this.framebuffer.draw(0, this.framebuffer.lines.length - 1);
 
         // XXX Workaround to deal with cursor pos before the screen has rendered and
         // lpos is not reliable (stale).
         let focused = this.getfocused()
-        if (focused && focused._updateCursor) {
-            focused._updateCursor(true);
-        }
 
         this.renders++;
 
@@ -576,10 +547,10 @@ export class Screen extends Node {
         var j = bottom + 1;
 
         while (n--) {
-            this.lines.splice(y, 0, this.blankLine());
-            this.lines.splice(j, 1);
-            this.olines.splice(y, 0, this.blankLine());
-            this.olines.splice(j, 1);
+            this.framebuffer.lines.splice(y, 0, this.blankLine());
+            this.framebuffer.lines.splice(j, 1);
+            this.framebuffer.oldlines.splice(y, 0, this.blankLine());
+            this.framebuffer.oldlines.splice(j, 1);
         }
     }
 
@@ -598,10 +569,10 @@ export class Screen extends Node {
         var j = bottom + 1;
 
         while (n--) {
-            this.lines.splice(j, 0, this.blankLine());
-            this.lines.splice(y, 1);
-            this.olines.splice(j, 0, this.blankLine());
-            this.olines.splice(y, 1);
+            this.framebuffer.lines.splice(j, 0, this.blankLine());
+            this.framebuffer.lines.splice(y, 1);
+            this.framebuffer.oldlines.splice(j, 0, this.blankLine());
+            this.framebuffer.oldlines.splice(y, 1);
         }
     }
 
@@ -620,10 +591,10 @@ export class Screen extends Node {
         var j = bottom + 1;
 
         while (n--) {
-            this.lines.splice(j, 0, this.blankLine());
-            this.lines.splice(y, 1);
-            this.olines.splice(j, 0, this.blankLine());
-            this.olines.splice(y, 1);
+            this.framebuffer.lines.splice(j, 0, this.blankLine());
+            this.framebuffer.lines.splice(y, 1);
+            this.framebuffer.oldlines.splice(j, 0, this.blankLine());
+            this.framebuffer.oldlines.splice(y, 1);
         }
     }
 
@@ -642,10 +613,10 @@ export class Screen extends Node {
         var j = bottom + 1;
 
         while (n--) {
-            this.lines.splice(j, 0, this.blankLine());
-            this.lines.splice(y, 1);
-            this.olines.splice(j, 0, this.blankLine());
-            this.olines.splice(y, 1);
+            this.framebuffer.lines.splice(j, 0, this.blankLine());
+            this.framebuffer.lines.splice(y, 1);
+            this.framebuffer.oldlines.splice(j, 0, this.blankLine());
+            this.framebuffer.oldlines.splice(y, 1);
         }
     }
 
@@ -676,28 +647,21 @@ export class Screen extends Node {
     // performance hit of slow-rendering scrollable
     // boxes with clean sides?
     cleanSides(el: Element) {
-        var pos = el.lpos;
 
-        if (!pos) {
-            return false;
-        }
+        let x1 = el.getaleft()
+        let x2 = el.getaright()
+        let y1 = el.getatop()
+        let y2 = el.getabottom()
 
-        if (pos._cleanSides != null) {
-            return pos._cleanSides;
-        }
-
-        if (pos.xi <= 0 && pos.xl >= this.getwidth()) {
-            return pos._cleanSides = true;
+        if (x1 <= 0 && x2 >= this.getwidth()) {
+            return true;
         }
 
         if (this.options.fastCSR) {
             // Maybe just do this instead of parsing.
-            if (pos.yi < 0) return pos._cleanSides = false;
-            if (pos.yl > this.getheight()) return pos._cleanSides = false;
-            if (this.getwidth() - (pos.xl - pos.xi) < 40) {
-                return pos._cleanSides = true;
-            }
-            return pos._cleanSides = false;
+            if (y1 < 0) return false;
+            if (y2 > this.getheight()) return false;
+            return this.getwidth() - (x2 - x1) < 40;
         }
 
         if (!this.options.smartCSR) {
@@ -712,589 +676,45 @@ export class Screen extends Node {
         // }
 
         // Doesn't matter if we're only a height of 1.
-        // if ((pos.yl - el.ibottom) - (pos.yi + el.itop) <= 1) {
+        // if ((pos.y2 - el.ibottom) - (pos.y1 + el.itop) <= 1) {
         //   return pos._cleanSides = false;
         // }
 
-        let yi = pos.yi + el.getitop()
-        let yl = pos.yl - el.getibottom()
+        let contentTop = y1 + el.getitop()
+        let contentBottom = y2 - el.getibottom()
         let first
         let ch
 
-        if (pos.yi < 0) return pos._cleanSides = false;
-        if (pos.yl > this.getheight()) return pos._cleanSides = false;
-        if (pos.xi - 1 < 0) return pos._cleanSides = true;
-        if (pos.xl > this.getwidth()) return pos._cleanSides = true;
+        if (y1 < 0) return false;
+        if (y2 > this.getheight()) return false;
+        if (x1 - 1 < 0) return true;
+        if (x2 > this.getwidth()) return true;
 
-        for (let x = pos.xi - 1; x >= 0; x--) {
-            if (!this.olines[yi]) break;
-            first = this.olines[yi][x];
-            for (let y = yi; y < yl; y++) {
-                if (!this.olines[y] || !this.olines[y][x]) break;
-                ch = this.olines[y][x];
+        for (let x = x1 - 1; x >= 0; x--) {
+            if (!this.framebuffer.oldlines[contentTop]) break;
+            first = this.framebuffer.oldlines[contentTop][x];
+            for (let y = contentTop; y < contentBottom; y++) {
+                if (!this.framebuffer.oldlines[y] || !this.framebuffer.oldlines[y][x]) break;
+                ch = this.framebuffer.oldlines[y][x];
                 if (ch[0] !== first[0] || ch[1] !== first[1]) {
-                    return pos._cleanSides = false;
+                    return false;
                 }
             }
         }
 
-        for (let x = pos.xl; x < this.getwidth(); x++) {
-            if (!this.olines[yi]) break;
-            first = this.olines[yi][x];
-            for (let y = yi; y < yl; y++) {
-                if (!this.olines[y] || !this.olines[y][x]) break;
-                ch = this.olines[y][x];
+        for (let x = x2; x < this.getwidth(); x++) {
+            if (!this.framebuffer.oldlines[contentTop]) break;
+            first = this.framebuffer.oldlines[y1][x];
+            for (let y = contentTop; y < contentBottom; y++) {
+                if (!this.framebuffer.oldlines[y] || !this.framebuffer.oldlines[y][x]) break;
+                ch = this.framebuffer.oldlines[y][x];
                 if (ch[0] !== first[0] || ch[1] !== first[1]) {
-                    return pos._cleanSides = false;
+                    return false;
                 }
             }
         }
 
-        return pos._cleanSides = true;
-    }
-
-    draw(start: number, end: number) {
-        // this.emit('predraw');
-
-        let x
-        let y
-        let line
-        let out
-        let ch
-        let data
-        let attr
-        let fg
-        let bg
-        let flags;
-
-        let main = ''
-        let pre
-        let post;
-
-        let clr
-        let neq
-        let xx;
-
-        let lx = -1
-        let ly = -1
-        let o;
-
-        let acs;
-
-        if (this._buf) {
-            main += this._buf;
-            this._buf = '';
-        }
-
-        for (y = start; y <= end; y++) {
-            line = this.lines[y];
-            o = this.olines[y];
-
-            if (!line.dirty && !(this.cursor.artificial && y === this.program.y)) {
-                continue;
-            }
-            line.dirty = false;
-
-            out = '';
-            attr = this.dattr;
-
-            // Unicode, meh
-
-            let terminalX = 0
-
-            for (x = 0; x < line.length; x++) {
-                data = line[x][0];
-                ch = line[x][1];
-
-                // Render the artificial cursor.
-                if (this.cursor.artificial
-                    && !this.program.cursorHidden
-                    && this.cursor._state
-                    && x === this.program.x
-                    && y === this.program.y) {
-                    var cattr = this._cursorAttr(this.cursor, data);
-                    if (cattr.ch) ch = cattr.ch;
-                    data = cattr.attr;
-                }
-
-                // Take advantage of xterm's back_color_erase feature by using a
-                // lookahead. Stop spitting out so many damn spaces. NOTE: Is checking
-                // the bg for non BCE terminals worth the overhead?
-                if (this.options.useBCE
-                    && ch === ' '
-                    && (this.tput.terminfo.bools.back_color_erase
-                        || (data & 0x1ff) === (this.dattr & 0x1ff))
-                    && ((data >> 18) & 8) === ((this.dattr >> 18) & 8)) {
-                    clr = true;
-                    neq = false;
-
-                    for (xx = x; xx < line.length; xx++) {
-                        if (line[xx][0] !== data || line[xx][1] !== ' ') {
-                            clr = false;
-                            break;
-                        }
-                        if (line[xx][0] !== o[xx][0] || line[xx][1] !== o[xx][1]) {
-                            neq = true;
-                        }
-                    }
-
-                    if (clr && neq) {
-                        lx = -1
-                        ly = -1;
-                        if (data !== attr) {
-                            out += this.codeAttr(data);
-                            attr = data;
-                        }
-                        out += this.tput.terminfo.methods.cup(y, x);
-                        out += this.tput.terminfo.methods.el();
-                        for (xx = x; xx < line.length; xx++) {
-                            o[xx][0] = data;
-                            o[xx][1] = ' ';
-                        }
-                        break;
-                    }
-
-                    // If there's more than 10 spaces, use EL regardless
-                    // and start over drawing the rest of line. Might
-                    // not be worth it. Try to use ECH if the terminal
-                    // supports it. Maybe only try to use ECH here.
-                    // //if (this.tput.terminfo.strings.erase_chars)
-                    // if (!clr && neq && (xx - x) > 10) {
-                    //   lx = -1, ly = -1;
-                    //   if (data !== attr) {
-                    //     out += this.codeAttr(data);
-                    //     attr = data;
-                    //   }
-                    //   out += this.tput.cup(y, x);
-                    //   if (this.tput.terminfo.strings.erase_chars) {
-                    //     // Use erase_chars to avoid erasing the whole line.
-                    //     out += this.tput.ech(xx - x);
-                    //   } else {
-                    //     out += this.tput.el();
-                    //   }
-                    //   if (this.tput.terminfo.strings.parm_right_cursor) {
-                    //     out += this.tput.cuf(xx - x);
-                    //   } else {
-                    //     out += this.tput.cup(y, xx);
-                    //   }
-                    //   this.fillRegion(data, ' ',
-                    //     x, this.tput.terminfo.strings.erase_chars ? xx : line.length,
-                    //     y, y + 1);
-                    //   x = xx - 1;
-                    //   continue;
-                    // }
-
-                    // Skip to the next line if the
-                    // rest of the line is already drawn.
-                    // if (!neq) {
-                    //   for (; xx < line.length; xx++) {
-                    //     if (line[xx][0] !== o[xx][0] || line[xx][1] !== o[xx][1]) {
-                    //       neq = true;
-                    //       break;
-                    //     }
-                    //   }
-                    //   if (!neq) {
-                    //     attr = data;
-                    //     break;
-                    //   }
-                    // }
-                }
-
-                let chLength = unicode.isSurrogate(ch) ? 2 : 1
-
-                // Optimize by comparing the real output
-                // buffer to the pending output buffer.
-                if (data === o[x][0] && ch === o[x][1]) {
-                    if (lx === -1) {
-                        lx = terminalX;
-                        ly = y;
-                    }
-
-                    terminalX += chLength
-                    continue;
-                } else if (lx !== -1) {
-                    if (this.tput.terminfo.strings.parm_right_cursor) {
-                        out += y === ly
-                            ? this.tput.terminfo.methods.cuf(terminalX - lx)
-                            : this.tput.terminfo.methods.cup(y, terminalX);
-                    } else {
-                        out += this.tput.terminfo.methods.cup(y, terminalX);
-                    }
-                    lx = -1
-                    ly = -1;
-                }
-
-                let oldChLength = unicode.isSurrogate(o[x][1]) ? 2 : 1
-
-                if(oldChLength > chLength) {
-                    out += this.tput.terminfo.methods.cuf(1)
-                    out += this.tput.terminfo.methods.ech(1)
-                }
-
-                o[x][0] = data;
-                o[x][1] = ch;
-
-                terminalX += chLength
-
-                if (data !== attr) {
-                    if (attr !== this.dattr) {
-                        out += '\x1b[m';
-                    }
-                    if (data !== this.dattr) {
-                        out += '\x1b[';
-
-                        bg = data & 0x1ff;
-                        fg = (data >> 9) & 0x1ff;
-                        flags = data >> 18;
-
-                        // bold
-                        if (flags & 1) {
-                            out += '1;';
-                        }
-
-                        // underline
-                        if (flags & 2) {
-                            out += '4;';
-                        }
-
-                        // blink
-                        if (flags & 4) {
-                            out += '5;';
-                        }
-
-                        // inverse
-                        if (flags & 8) {
-                            out += '7;';
-                        }
-
-                        // invisible
-                        if (flags & 16) {
-                            out += '8;';
-                        }
-
-                        if (bg !== 0x1ff) {
-                            bg = this._reduceColor(bg);
-                            if (bg < 16) {
-                                if (bg < 8) {
-                                    bg += 40;
-                                } else if (bg < 16) {
-                                    bg -= 8;
-                                    bg += 100;
-                                }
-                                out += bg + ';';
-                            } else {
-                                out += '48;5;' + bg + ';';
-                            }
-                        }
-
-                        if (fg !== 0x1ff) {
-                            fg = this._reduceColor(fg);
-                            if (fg < 16) {
-                                if (fg < 8) {
-                                    fg += 30;
-                                } else if (fg < 16) {
-                                    fg -= 8;
-                                    fg += 90;
-                                }
-                                out += fg + ';';
-                            } else {
-                                out += '38;5;' + fg + ';';
-                            }
-                        }
-
-                        if (out[out.length - 1] === ';') out = out.slice(0, -1);
-
-
-                        out += 'm';
-                    }
-                }
-
-                // If we find a double-width char, eat the next character which should be
-                // a space due to parseContent's behavior.
-                if (this.fullUnicode) {
-                    // If this is a surrogate pair double-width char, we can ignore it
-                    // because parseContent already counted it as length=2.
-                    if (unicode.charWidth(line[x][1]) === 2) {
-                        // NOTE: At cols=44, the bug that is avoided
-                        // by the angles check occurs in widget-unicode:
-                        // Might also need: `line[x + 1][0] !== line[x][0]`
-                        // for borderless boxes?
-                        if (x === line.length - 1) {
-                            // If we're at the end, we don't have enough space for a
-                            // double-width. Overwrite it with a space and ignore.
-                            ch = ' ';
-                            o[x][1] = '\0';
-                        } else {
-                            // ALWAYS refresh double-width chars because this special cursor
-                            // behavior is needed. There may be a more efficient way of doing
-                            // this. See above.
-                            o[x][1] = '\0';
-                            // Eat the next character by moving forward and marking as a
-                            // space (which it is).
-                            o[++x][1] = '\0';
-                        }
-                    }
-                }
-
-                // Attempt to use ACS for supported characters.
-                // This is not ideal, but it's how ncurses works.
-                // There are a lot of terminals that support ACS
-                // *and UTF8, but do not declare U8. So ACS ends
-                // up being used (slower than utf8). Terminals
-                // that do not support ACS and do not explicitly
-                // support UTF8 get their unicode characters
-                // replaced with really ugly ascii characters.
-                // It is possible there is a terminal out there
-                // somewhere that does not support ACS, but
-                // supports UTF8, but I imagine it's unlikely.
-                // Maybe remove !this.tput.unicode check, however,
-                // this seems to be the way ncurses does it.
-                if (this.tput.terminfo.strings.enter_alt_charset_mode
-                    && !this.tput.terminfo.features.brokenACS && (this.tput.terminfo.features.acscr[ch] || acs)) {
-                    // Fun fact: even if this.tput.brokenACS wasn't checked here,
-                    // the linux console would still work fine because the acs
-                    // table would fail the check of: this.tput.terminfo.methods.acscr[ch]
-                    if (this.tput.terminfo.features.acscr[ch]) {
-                        if (acs) {
-                            ch = this.tput.terminfo.features.acscr[ch];
-                        } else {
-                            ch = this.tput.terminfo.methods.smacs()
-                                + this.tput.terminfo.features.acscr[ch];
-                            acs = true;
-                        }
-                    } else if (acs) {
-                        ch = this.tput.terminfo.methods.rmacs() + ch;
-                        acs = false;
-                    }
-                } else {
-                    // U8 is not consistently correct. Some terminfo's
-                    // terminals that do not declare it may actually
-                    // support utf8 (e.g. urxvt), but if the terminal
-                    // does not declare support for ACS (and U8), chances
-                    // are it does not support UTF8. This is probably
-                    // the "safest" way to do this. Should fix things
-                    // like sun-color.
-                    // NOTE: It could be the case that the $LANG
-                    // is all that matters in some cases:
-                    // if (!this.tput.terminfo.unicode && ch > '~') {
-                    if (!this.tput.terminfo.features.unicode && this.tput.terminfo.numbers["U8"] !== 1 && ch > '~') {
-                        ch = utoa[ch] || '?';
-                    }
-                }
-
-                out += ch;
-                attr = data;
-            }
-
-            if (attr !== this.dattr) {
-                out += '\x1b[m';
-            }
-
-            if (out) {
-                main += this.tput.terminfo.methods.cup(y, 0) + out;
-            }
-        }
-
-        if (acs) {
-            main += this.tput.terminfo.methods.rmacs();
-            acs = false;
-        }
-
-        if (main) {
-            pre = '';
-            post = '';
-
-            pre += this.tput.terminfo.methods.sc();
-            post += this.tput.terminfo.methods.rc();
-
-            if (!this.program.cursorHidden) {
-                pre += this.tput.terminfo.methods.civis();
-                post += this.tput.terminfo.methods.cnorm();
-            }
-
-            // this.program.flush();
-            // this.program._owrite(pre + main + post);
-            this.program._write(pre + main + post);
-        }
-
-        // this.emit('draw');
-    }
-
-    _reduceColor(color: number) {
-        return colors.reduce(color, this.tput.terminfo.numbers.max_colors);
-    }
-
-// Convert an SGR string to our own attribute format.
-    attrCode(code: string, cur: number, def: number) {
-        var flags = (cur >> 18) & 0x1ff
-            , fg = (cur >> 9) & 0x1ff
-            , bg = cur & 0x1ff
-            , c
-            , i;
-
-        let parts = code.slice(2, -1).split(';');
-        if (!parts[0]) parts[0] = '0';
-
-        for (i = 0; i < parts.length; i++) {
-            c = +parts[i] || 0;
-            switch (c) {
-                case 0: // normal
-                    bg = def & 0x1ff;
-                    fg = (def >> 9) & 0x1ff;
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 1: // bold
-                    flags |= 1;
-                    break;
-                case 22:
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 4: // underline
-                    flags |= 2;
-                    break;
-                case 24:
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 5: // blink
-                    flags |= 4;
-                    break;
-                case 25:
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 7: // inverse
-                    flags |= 8;
-                    break;
-                case 27:
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 8: // invisible
-                    flags |= 16;
-                    break;
-                case 28:
-                    flags = (def >> 18) & 0x1ff;
-                    break;
-                case 39: // default fg
-                    fg = (def >> 9) & 0x1ff;
-                    break;
-                case 49: // default bg
-                    bg = def & 0x1ff;
-                    break;
-                case 100: // default fg/bg
-                    fg = (def >> 9) & 0x1ff;
-                    bg = def & 0x1ff;
-                    break;
-                default: // color
-                    if (c === 48 && +parts[i+1] === 5) {
-                        i += 2;
-                        bg = +parts[i];
-                        break;
-                    } else if (c === 48 && +parts[i+1] === 2) {
-                        i += 2;
-                        bg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
-                        if (bg === -1) bg = def & 0x1ff;
-                        i += 2;
-                        break;
-                    } else if (c === 38 && +parts[i+1] === 5) {
-                        i += 2;
-                        fg = +parts[i];
-                        break;
-                    } else if (c === 38 && +parts[i+1] === 2) {
-                        i += 2;
-                        fg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
-                        if (fg === -1) fg = (def >> 9) & 0x1ff;
-                        i += 2;
-                        break;
-                    }
-                    if (c >= 40 && c <= 47) {
-                        bg = c - 40;
-                    } else if (c >= 100 && c <= 107) {
-                        bg = c - 100;
-                        bg += 8;
-                    } else if (c === 49) {
-                        bg = def & 0x1ff;
-                    } else if (c >= 30 && c <= 37) {
-                        fg = c - 30;
-                    } else if (c >= 90 && c <= 97) {
-                        fg = c - 90;
-                        fg += 8;
-                    } else if (c === 39) {
-                        fg = (def >> 9) & 0x1ff;
-                    } else if (c === 100) {
-                        fg = (def >> 9) & 0x1ff;
-                        bg = def & 0x1ff;
-                    }
-                    break;
-            }
-        }
-
-        return (flags << 18) | (fg << 9) | bg;
-    }
-
-// Convert our own attribute format to an SGR string.
-    codeAttr(code: number) {
-        var flags = (code >> 18) & 0x1ff
-            , fg = (code >> 9) & 0x1ff
-            , bg = code & 0x1ff
-            , out = '';
-
-        // bold
-        if (flags & 1) {
-            out += '1;';
-        }
-
-        // underline
-        if (flags & 2) {
-            out += '4;';
-        }
-
-        // blink
-        if (flags & 4) {
-            out += '5;';
-        }
-
-        // inverse
-        if (flags & 8) {
-            out += '7;';
-        }
-
-        // invisible
-        if (flags & 16) {
-            out += '8;';
-        }
-
-        if (bg !== 0x1ff) {
-            bg = this._reduceColor(bg);
-            if (bg < 16) {
-                if (bg < 8) {
-                    bg += 40;
-                } else if (bg < 16) {
-                    bg -= 8;
-                    bg += 100;
-                }
-                out += bg + ';';
-            } else {
-                out += '48;5;' + bg + ';';
-            }
-        }
-
-        if (fg !== 0x1ff) {
-            fg = this._reduceColor(fg);
-            if (fg < 16) {
-                if (fg < 8) {
-                    fg += 30;
-                } else if (fg < 16) {
-                    fg -= 8;
-                    fg += 90;
-                }
-                out += fg + ';';
-            } else {
-                out += '38;5;' + fg + ';';
-            }
-        }
-
-        if (out[out.length - 1] === ';') out = out.slice(0, -1);
-
-        return '\x1b[' + out + 'm';
+        return true;
     }
 
     focusOffset(offset: number) {
@@ -1375,30 +795,30 @@ export class Screen extends Node {
         return null
     }
 
-    _focus(self, old) {
-        // Find a scrollable ancestor if we have one.
-        var el = self;
-        while (el = el.parent) {
-            if (el.scrollable) break;
-        }
-
-        // If we're in a scrollable element,
-        // automatically scroll to the focused element.
-        if (el && !el.detached) {
-            // NOTE: This is different from the other "visible" values - it needs the
-            // visible height of the scrolling element itself, not the element within
-            // it.
-            var visible = self.screen.getheight() - el.atop - el.getitop() - el.abottom - el.getibottom();
-            if (self.rtop < el.childBase) {
-                el.scrollTo(self.rtop);
-                self.screen.render();
-            } else if (self.rtop + self.getheight() - self.getibottom() > el.childBase + visible) {
-                // Explanation for el.itop here: takes into account scrollable elements
-                // with borders otherwise the element gets covered by the bottom border:
-                el.scrollTo(self.rtop - (el.getheight() - self.getheight()) + el.getitop(), true);
-                self.screen.render();
-            }
-        }
+    _focus(self: Element, old: Element) {
+        // // Find a scrollable ancestor if we have one.
+        // var el = self;
+        // while (el = el.parent) {
+        //     if (el) break;
+        // }
+        //
+        // // If we're in a scrollable element,
+        // // automatically scroll to the focused element.
+        // if (el && !el.detached) {
+        //     // NOTE: This is different from the other "visible" values - it needs the
+        //     // visible height of the scrolling element itself, not the element within
+        //     // it.
+        //     var visible = self.screen.getheight() - el.getatop() - el.getitop() - el.getabottom() - el.getibottom();
+        //     if (self.getrtop() < el.childBase) {
+        //         el.scrollTo(self.getrtop());
+        //         self.screen.render();
+        //     } else if (self.getrtop() + self.getheight() - self.getibottom() > el.childBase + visible) {
+        //         // Explanation for el.itop here: takes into account scrollable elements
+        //         // with borders otherwise the element gets covered by the bottom border:
+        //         el.scrollTo(self.getrbottom() - (el.getheight() - self.getheight()) + el.getitop(), true);
+        //         self.screen.render();
+        //     }
+        // }
 
         if (old) {
             old.emit('blur', self);
@@ -1407,45 +827,45 @@ export class Screen extends Node {
         self.emit('focus', old);
     }
 
-    clearRegion(xi: number, xl: any, yi: any, yl: any, override?: boolean) {
-        return this.fillRegion(this.dattr, ' ', xi, xl, yi, yl, override);
+    clearRegion(x1: number, x2: any, y1: any, y2: any, override?: boolean) {
+        return this.fillRegion(this.dattr, ' ', x1, x2, y1, y2, override);
     }
 
-    fillRegion(attr: number, ch: string, xi: number, xl: number, yi: number, yl: number, override?: boolean) {
-        let lines = this.lines
+    fillRegion(attr: number, ch: string, x1: number, x2: number, y1: number, y2: number, override?: boolean) {
+        let lines = this.framebuffer.lines
             , cell
             , xx;
 
-        if (xi < 0) xi = 0;
-        if (yi < 0) yi = 0;
+        if (x1 < 0) x1 = 0;
+        if (y1 < 0) y1 = 0;
 
-        for (; yi < yl; yi++) {
-            if (!lines[yi]) break;
-            for (xx = xi; xx < xl; xx++) {
-                cell = lines[yi][xx];
+        for (; y1 < y2; y1++) {
+            if (!lines[y1]) break;
+            for (xx = x1; xx < x2; xx++) {
+                cell = lines[y1][xx];
                 if (!cell) break;
                 if (override || attr !== cell[0] || ch !== cell[1]) {
-                    lines[yi][xx][0] = attr;
-                    lines[yi][xx][1] = ch;
-                    lines[yi].dirty = true;
+                    lines[y1][xx][0] = attr;
+                    lines[y1][xx][1] = ch;
+                    lines[y1].dirty = true;
                 }
             }
         }
     }
 
-    key() {
+    key(key: string | string[], listener: () => void) {
         return this.program.key.apply(this, arguments);
     }
 
-    onceKey() {
+    onceKey(key: string | string[], listener: () => void) {
         return this.program.onceKey.apply(this, arguments);
     }
 
-    unkey() {
+    unkey(key: string | string[], listener: () => void) {
         return this.program.unkey.apply(this, arguments);
     }
 
-    removeKey() {
+    removeKey(key: string | string[], listener: () => void) {
         return this.program.unkey.apply(this, arguments);
     }
 
@@ -1591,10 +1011,6 @@ export class Screen extends Node {
                 screen.destroy();
             });
         });
-    }
-
-    _getPos() {
-        return this;
     }
 
     static _exceptionHandler(err: Error) {

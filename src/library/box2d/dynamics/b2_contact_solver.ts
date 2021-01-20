@@ -764,7 +764,7 @@ export class b2ContactSolver {
             b2Vec2.SubVV(x, a, d);
 
             // Apply incremental impulse
-            // b2Vec2 P1 = d.x * normal;
+            // b2Vec2 P1 = d.cursorX * normal;
             b2Vec2.MulSV(d.x, normal, P1);
             // b2Vec2 P2 = d.y * normal;
             b2Vec2.MulSV(d.y, normal, P2);
@@ -809,11 +809,11 @@ export class b2ContactSolver {
 
           if (vn1 >= 0 && vn2 >= 0) {
             // Resubstitute for the incremental impulse
-            // b2Vec2 d = x - a;
+            // b2Vec2 d = cursorX - a;
             b2Vec2.SubVV(x, a, d);
 
             // Apply incremental impulse
-            // b2Vec2 P1 = d.x * normal;
+            // b2Vec2 P1 = d.cursorX * normal;
             b2Vec2.MulSV(d.x, normal, P1);
             // b2Vec2 P2 = d.y * normal;
             b2Vec2.MulSV(d.y, normal, P2);

@@ -69,28 +69,25 @@ export class Prompt extends Input {
             return;
         }
 
-        var lpos = this._getCoords();
-        if (!lpos) return;
-
-        const cy = lpos.yi + this.getitop();
-        const cx = lpos.xi + this.getileft() + this.cursorPosition - this.scrollPosition;
+        const cy = this.getatop() + this.getitop();
+        const cx = this.getaleft() + this.getileft() + this.cursorPosition - this.scrollPosition;
         const program = this.screen.program;
 
-        if (cy === program.y && cx === program.x) {
+        if (cy === program.cursorY && cx === program.cursorX) {
             return;
         }
 
-        if (cy === program.y) {
-            if (cx > program.x) {
-                program.cursorForward(cx - program.x);
-            } else if (cx < program.x) {
-                program.cursorBackward(program.x - cx);
+        if (cy === program.cursorY) {
+            if (cx > program.cursorX) {
+                program.cursorForward(cx - program.cursorX);
+            } else if (cx < program.cursorX) {
+                program.cursorBackward(program.cursorX - cx);
             }
-        } else if (cx === program.x) {
-            if (cy > program.y) {
-                program.cursorDown(cy - program.y);
-            } else if (cy < program.y) {
-                program.cursorUp(program.y - cy);
+        } else if (cx === program.cursorX) {
+            if (cy > program.cursorY) {
+                program.cursorDown(cy - program.cursorY);
+            } else if (cy < program.cursorY) {
+                program.cursorUp(program.cursorY - cy);
             }
         } else {
             program.cursorPos(cy, cx);

@@ -669,9 +669,9 @@ export class b2PolygonShape extends b2Shape {
         const center_x: number = 0.5 * (lowerX + upperX);
         const center_y: number = 0.5 * (lowerY + upperY);
         const tMat = obb.R;
-        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.x * center_y);
+        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.cursorX * center_y);
         obb.center.y = root.y + (tMat.ex.y * center_x + tMat.ey.y * center_y);
-        obb.extents.x = 0.5 * (upperX - lowerX);
+        obb.extents.cursorX = 0.5 * (upperX - lowerX);
         obb.extents.y = 0.5 * (upperY - lowerY);
       }
     }

@@ -19,7 +19,7 @@ import {BlessedCursorShapeConfig} from "../cursor";
 type ElementHAlign = 'left' | 'center' | 'right'
 type ElementVAlign = 'top' | 'middle' | 'bottom'
 
-interface ElementStyle {
+interface CharStyle {
     transparent?: boolean;
     bold?: boolean
     underline?: boolean
@@ -28,6 +28,9 @@ interface ElementStyle {
     invisible?: boolean
     fg?: TTYColor
     bg?: TTYColor
+}
+
+interface ElementStyle extends CharStyle {
     border?: ElementBorder
 }
 
@@ -38,7 +41,7 @@ interface ElementEdgeOffset {
     right: number
 }
 
-interface ElementBorder {
+interface ElementBorder extends CharStyle {
     left?: boolean
     top?: boolean
     bottom?: boolean
@@ -88,7 +91,6 @@ export class Element extends Node {
     public wrap: boolean
     public ch: string
     public padding: ElementEdgeOffset
-    public border: ElementBorder
     public input: boolean
     public content: string
     public childBase: number
@@ -97,7 +99,6 @@ export class Element extends Node {
     public isKeyable: boolean
     public align: ElementHAlign
     public valign: ElementVAlign
-    public lpos: any;
 
     constructor(options?: ElementConfig) {
         super(options);
@@ -187,12 +188,11 @@ export class Element extends Node {
 c
     onDetach() {
         super.onDetach()
-        this.lpos = null
         if(this.isClickable) this.screen._unlistenMouse(this)
         if(this.isKeyable) this.screen._unlistenKeys(this)
     }
 
-    sattr(style: BlessedCursorShapeConfig, fg?: TTYColor, bg?: TTYColor): number {
+    sattr(style: CharStyle, fg?: TTYColor, bg?: TTYColor): number {
         var bold = style.bold
             , underline = style.underline
             , blink = style.blink
@@ -574,249 +574,37 @@ c
         return this.setIndex(0);
     }
 
-    clearPos(get?: boolean, override?: boolean) {
+    clearPos() {
         if (this.detached) return;
-        var lpos = this._getCoords(get);
-        if (!lpos) return;
-        this.screen.clearRegion(
-            lpos.xi, lpos.xl,
-            lpos.yi, lpos.yl,
-            override);
-    }
 
-// The below methods are a bit confusing: basically
-// whenever Box.render is called `lpos` gets set on
-// the element, an object containing the rendered
-// coordinates. Since these don't update if the
-// element is moved somehow, they're unreliable in
-// that situation. However, if we can guarantee that
-// lpos is good and up to date, it can be more
-// accurate than the calculated positions below.
-// In this case, if the element is being rendered,
-// it's guaranteed that the parent will have been
-// rendered first, in which case we can use the
-// parant's lpos instead of recalculating it's
-// position (since that might be wrong because
-// it doesn't handle content shrinkage).
-    _getPos() {
-        var pos = this.lpos;
+        let x1 = this.getaleft()
+        let x2 = x1 + this.getwidth()
+        let y1 = this.getatop()
+        let y2 = y1 + this.getheight()
 
-        assert.ok(pos);
-
-        if (pos.aleft != null) return pos;
-
-        pos.setaleft(pos.xi);
-        pos.setatop(pos.yi);
-        pos.setaright(this.screen.cols - pos.xl);
-        pos.setabottom(this.screen.rows - pos.yl);
-        pos.setwidth(pos.xl - pos.xi);
-        pos.setheight(pos.yl - pos.yi);
-
-        return pos;
-    }
-
-    /**
-     * Position Getters
-     */
-    _getWidth() {
-        return this.position.width
-    }
-
-    _getHeight() {
-        return this.position.height;
-    }
-
-    _getLeft() {
-        return this.position.x
-    }
-
-    _getRight() {
-        return this.position.x + this.position.width
-    }
-
-    _getTop() {
-        return this.position.y
-    }
-
-    _getBottom() {
-        return this.position.y + this.position.height
-    }
-
-    _getCoords(noscroll?: boolean) {
-        if (this.hidden) return null;
-
-        let xi = this.getaleft()
-        let xl = xi + this.getwidth()
-        let yi = this.getatop()
-        let yl = yi + this.getheight()
-        let base = this.childBase || 0
-        let el: Node = this
-        let fixed = this.fixed
-        let v
-        let noleft
-        let noright
-        let notop
-        let nobot
-        let ppos
-        let b;
-
-        // Find a scrollable ancestor if we have one.
-        while (el = el.parent) {
-            if (el.scrollable) {
-                if (fixed) {
-                    fixed = false;
-                    continue;
-                }
-                break;
-            }
-        }
-
-        // Check to make sure we're visible and
-        // inside of the visible scroll area.
-        // NOTE: Lists have a property where only
-        // the list items are obfuscated.
-
-        // Old way of doing things, this would not render right if a shrunken element
-        // with lots of boxes in it was within a scrollable element.
-        // See: $ node test/widget-shrink-fail.js
-        // var thisparent = this.parent;
-
-        var thisparent = el;
-        if (el && !noscroll) {
-            ppos = thisparent.lpos;
-
-            // The shrink option can cause a stack overflow
-            // by calling _getCoords on the child again.
-            // if (!get && !thisparent.shrink) {
-            //   ppos = thisparent._getCoords();
-            // }
-
-            if (!ppos) return null;
-
-            // TODO: Figure out how to fix base (and cbase to only
-            // take into account the *parent's* padding.
-
-            yi -= ppos.base;
-            yl -= ppos.base;
-
-            b = thisparent.border ? 1 : 0;
-
-            if (yi < ppos.yi + b) {
-                if (yl - 1 < ppos.yi + b) {
-                    // Is above.
-                    return null;
-                } else {
-                    // Is partially covered above.
-                    notop = true;
-                    v = ppos.yi - yi;
-                    if (this.style.border) v--;
-                    if (thisparent.border) v++;
-                    base += v;
-                    yi += v;
-                }
-            } else if (yl > ppos.yl - b) {
-                if (yi > ppos.yl - 1 - b) {
-                    // Is below.
-                    return null;
-                } else {
-                    // Is partially covered below.
-                    nobot = true;
-                    v = yl - ppos.yl;
-                    if (this.style.border) v--;
-                    if (thisparent.border) v++;
-                    yl -= v;
-                }
-            }
-
-            // Shouldn't be necessary.
-            // assert.ok(yi < yl);
-            if (yi >= yl) return null;
-
-            // Could allow overlapping stuff in scrolling elements
-            // if we cleared the pending buffer before every draw.
-            if (xi < el.lpos.xi) {
-                xi = el.lpos.xi;
-                noleft = true;
-                if (this.style.border) xi--;
-                if (thisparent.border) xi++;
-            }
-            if (xl > el.lpos.xl) {
-                xl = el.lpos.xl;
-                noright = true;
-                if (this.style.border) xl++;
-                if (thisparent.border) xl--;
-            }
-            //if (xi > xl) return;
-            if (xi >= xl) return null;
-        }
-
-        if (this.noOverflow && this.parent.lpos) {
-            if (xi < this.parent.lpos.xi + this.parent.getileft()) {
-                xi = this.parent.lpos.xi + this.parent.getileft();
-            }
-            if (xl > this.parent.lpos.xl - this.parent.getiright()) {
-                xl = this.parent.lpos.xl - this.parent.getiright();
-            }
-            if (yi < this.parent.lpos.yi + this.parent.getitop()) {
-                yi = this.parent.lpos.yi + this.parent.getitop();
-            }
-            if (yl > this.parent.lpos.yl - this.parent.getibottom()) {
-                yl = this.parent.lpos.yl - this.parent.getibottom();
-            }
-        }
-
-        // if (this.parent.lpos) {
-        //   this.parent.lpos._scrollBottom = Math.max(
-        //     this.parent.lpos._scrollBottom, yl);
-        // }
-
-        return {
-            xi: xi,
-            xl: xl,
-            yi: yi,
-            yl: yl,
-            base: base,
-            noleft: noleft,
-            noright: noright,
-            notop: notop,
-            nobot: nobot,
-            renders: this.screen.renders
-        };
+        this.screen.clearRegion(x1, x2, y1, y2);
     }
 
     render() {
+        if(this.detached) return
+
         this._emit('prerender');
 
         this.parseContent();
 
-        var coords = this._getCoords();
-        if (!coords) {
-            delete this.lpos;
-            return;
-        }
-
-        if (coords.xl - coords.xi <= 0) {
-            coords.xl = Math.max(coords.xl, coords.xi);
-            return;
-        }
-
-        if (coords.yl - coords.yi <= 0) {
-            coords.yl = Math.max(coords.yl, coords.yi);
-            return;
-        }
-
-        var lines = this.screen.lines
-            , xi = coords.xi
-            , xl = coords.xl
-            , yi = coords.yi
-            , yl = coords.yl
+        var lines = this.screen.framebuffer.lines
+            , x1 = this.getaleft()
+            , x2 = this.getaright()
+            , y1 = this.getatop()
+            , y2 = this.getabottom()
             , x
             , y
             , cell
             , attr
             , ch
             , content = this._pcontent
-            , ci = this._clines.ci[coords.base]
+            , base = this.childBase || 0
+            , ci = this._clines.ci[this.childBase || 0]
             , battr
             , dattr
             , c
@@ -824,11 +612,9 @@ c
             , i
             , bch = this.ch;
 
-        if (coords.base >= this._clines.ci.length) {
+        if (base >= this._clines.ci.length) {
             ci = this._pcontent.length;
         }
-
-        this.lpos = coords;
 
         dattr = this.sattr(this.style);
         attr = dattr;
@@ -836,14 +622,14 @@ c
         // If we're in a scrollable text box, check to
         // see which attributes this line starts with.
         if (ci > 0) {
-            attr = this._clines.attr[Math.min(coords.base, this._clines.length - 1)];
+            attr = this._clines.attr[Math.min(base, this._clines.length - 1)];
         }
 
         if (this.style.border) {
-            xi++
-            xl--
-            yi++
-            yl--
+            x1++
+            x2--
+            y1++
+            y2--
         }
 
         // If we have padding/valign, that means the
@@ -860,30 +646,30 @@ c
 
         if (paddingExists || (this.valign && this.valign !== 'top')) {
             if (this.style.transparent) {
-                for (y = Math.max(yi, 0); y < yl; y++) {
+                for (y = Math.max(y1, 0); y < y2; y++) {
                     if (!lines[y]) break;
-                    for (x = Math.max(xi, 0); x < xl; x++) {
+                    for (x = Math.max(x1, 0); x < x2; x++) {
                         if (!lines[y][x]) break;
                         lines[y][x][0] = colors.blend(attr, lines[y][x][0]);
-                        // lines[y][x][1] = bch;
+                        // lines[y][cursorX][1] = bch;
                         lines[y].dirty = true;
                     }
                 }
             } else {
-                this.screen.fillRegion(dattr, bch, xi, xl, yi, yl);
+                this.screen.fillRegion(dattr, bch, x1, x2, y1, y2);
             }
         }
 
         if(paddingExists) {
-            xi += padding.left
-            xl -= padding.right;
-            yi += padding.top
-            yl -= padding.bottom;
+            x1 += padding.left
+            x2 -= padding.right;
+            y1 += padding.top
+            y2 -= padding.bottom;
         }
 
         // Determine where to place the text if it's vertically aligned.
         if (this.valign === 'middle' || this.valign === 'bottom') {
-            visible = yl - yi;
+            visible = y2 - y1;
             if (this._clines.length < visible) {
                 if (this.valign === 'middle') {
                     visible = visible / 2 | 0;
@@ -891,23 +677,23 @@ c
                 } else if (this.valign === 'bottom') {
                     visible -= this._clines.length;
                 }
-                ci -= visible * (xl - xi);
+                ci -= visible * (x2 - x1);
             }
         }
 
         // Draw the content and background.
-        for (y = yi; y < yl; y++) {
+        for (y = y1; y < y2; y++) {
             if (!lines[y]) {
-                if (y >= this.screen.getheight() || yl < this.getibottom()) {
+                if (y >= this.screen.getheight() || y2 < this.getibottom()) {
                     break;
                 } else {
                     continue;
                 }
             }
-            for (x = xi; x < xl; x++) {
+            for (x = x1; x < x2; x++) {
                 cell = lines[y][x];
                 if (!cell) {
-                    if (x >= this.screen.getwidth() || xl < this.getirignt()) {
+                    if (x >= this.screen.getwidth() || x2 < this.getiright()) {
                         break;
                     } else {
                         continue;
@@ -917,7 +703,7 @@ c
                 ch = content[ci++] || bch;
 
                 // if (!content[ci] && !coords._contentEnd) {
-                //   coords._contentEnd = { x: x - xi, y: y - yi };
+                //   coords._contentEnd = { cursorX: cursorX - x1, y: y - y1 };
                 // }
 
                 // Handle escape codes.
@@ -939,14 +725,14 @@ c
                     // If we're on the first cell and we find a newline and the last cell
                     // of the last line was not a newline, let's just treat this like the
                     // newline was already "counted".
-                    if (x === xi && y !== yi && content[ci - 2] !== '\n') {
+                    if (x === x1 && y !== y1 && content[ci - 2] !== '\n') {
                         x--;
                         continue;
                     }
                     // We could use fillRegion here, name the
                     // outer loop, and continue to it instead.
                     ch = bch;
-                    for (; x < xl; x++) {
+                    for (; x < x2; x++) {
                         cell = lines[y][x];
                         if (!cell) break;
                         if (this.style.transparent) {
@@ -973,10 +759,10 @@ c
                             ch = content[ci - 1] + content[ci];
                             ci++;
                         }
-                        if (x - 1 >= xi) {
+                        if (x - 1 >= x1) {
                             lines[y][x - 1][1] += ch;
-                        } else if (y - 1 >= yi) {
-                            lines[y - 1][xl - 1][1] += ch;
+                        } else if (y - 1 >= y1) {
+                            lines[y - 1][x2 - 1][1] += ch;
                         }
                         x--;
                         continue;
@@ -1005,28 +791,29 @@ c
             }
         }
 
-        if (coords.notop || coords.nobot) i = -Infinity;
+        if (this.style.border) {
+            x1--
+            x2++
+            y1--
+            y2++
+        }
 
-        if (this.style.border) xi--, xl++, yi--, yl++;
-
-        xi -= this.padding.left
-        xl += this.padding.right;
-        yi -= this.padding.top
-        yl += this.padding.bottom;
+        x1 -= this.padding.left
+        x2 += this.padding.right;
+        y1 -= this.padding.top
+        y2 += this.padding.bottom;
 
         // Draw the border.
         if (this.style.border) {
             battr = this.sattr(this.style.border);
-            y = yi;
-            if (coords.notop) y = -1;
-            for (x = xi; x < xl; x++) {
+            y = y1;
+
+            for (x = x1; x < x2; x++) {
                 if (!lines[y]) break;
-                if (coords.noleft && x === xi) continue;
-                if (coords.noright && x === xl - 1) continue;
                 cell = lines[y][x];
                 if (!cell) continue;
                 if (this.style.border.type === 'line') {
-                    if (x === xi) {
+                    if (x === x1) {
                         ch = '\u250c'; // '┌'
                         if (this.style.border.left) {
                             if (!this.style.border.top) {
@@ -1039,7 +826,7 @@ c
                                 continue;
                             }
                         }
-                    } else if (x === xl - 1) {
+                    } else if (x === x2 - 1) {
                         ch = '\u2510'; // '┐'
                         if (this.style.border.right) {
                             if (!this.style.border.top) {
@@ -1058,7 +845,7 @@ c
                 } else if (this.style.border.type === 'bg') {
                     ch = this.style.border.ch;
                 }
-                if (!this.style.border.top && x !== xi && x !== xl - 1) {
+                if (!this.style.border.top && x !== x1 && x !== x2 - 1) {
                     ch = ' ';
                     if (dattr !== cell[0] || ch !== cell[1]) {
                         lines[y][x][0] = dattr;
@@ -1073,66 +860,45 @@ c
                     lines[y].dirty = true;
                 }
             }
-            y = yi + 1;
-            for (; y < yl - 1; y++) {
+            y = y1 + 1;
+            for (; y < y2 - 1; y++) {
                 if (!lines[y]) continue;
-                cell = lines[y][xi];
-                if (cell) {
-                    if (this.style.border.left) {
-                        if (this.style.border.type === 'line') {
-                            ch = '\u2502'; // '│'
-                        } else if (this.style.border.type === 'bg') {
-                            ch = this.style.border.ch;
-                        }
-                        if (!coords.noleft)
-                            if (battr !== cell[0] || ch !== cell[1]) {
-                                lines[y][xi][0] = battr;
-                                lines[y][xi][1] = ch;
+                let x = x1
+                while(true) {
+                    cell = lines[y][x];
+                    if (cell) {
+                        if (this.style.border.left) {
+                            if (this.style.border.type === 'line') {
+                                ch = '\u2502'; // '│'
+                            } else if (this.style.border.type === 'bg') {
+                                ch = this.style.border.ch;
+                            }
+                            if (dattr !== cell[0] || ch !== cell[1]) {
+                                lines[y][x][0] = battr;
+                                lines[y][x][1] = ch;
                                 lines[y].dirty = true;
                             }
-                    } else {
-                        ch = ' ';
-                        if (dattr !== cell[0] || ch !== cell[1]) {
-                            lines[y][xi][0] = dattr;
-                            lines[y][xi][1] = ch;
-                            lines[y].dirty = true;
-                        }
-                    }
-                }
-                cell = lines[y][xl - 1];
-                if (cell) {
-                    if (this.style.border.right) {
-                        if (this.style.border.type === 'line') {
-                            ch = '\u2502'; // '│'
-                        } else if (this.style.border.type === 'bg') {
-                            ch = this.style.border.ch;
-                        }
-                        if (!coords.noright)
-                            if (battr !== cell[0] || ch !== cell[1]) {
-                                lines[y][xl - 1][0] = battr;
-                                lines[y][xl - 1][1] = ch;
+                        } else {
+                            ch = ' ';
+                            if (dattr !== cell[0] || ch !== cell[1]) {
+                                lines[y][x][0] = dattr;
+                                lines[y][x][1] = ch;
                                 lines[y].dirty = true;
                             }
-                    } else {
-                        ch = ' ';
-                        if (dattr !== cell[0] || ch !== cell[1]) {
-                            lines[y][xl - 1][0] = dattr;
-                            lines[y][xl - 1][1] = ch;
-                            lines[y].dirty = true;
                         }
                     }
+                    if(x != x1) break;
+                    x = x2 - 1
                 }
             }
-            y = yl - 1;
-            if (coords.nobot) y = -1;
-            for (x = xi; x < xl; x++) {
+            y = y2 - 1;
+
+            for (x = x1; x < x2; x++) {
                 if (!lines[y]) break;
-                if (coords.noleft && x === xi) continue;
-                if (coords.noright && x === xl - 1) continue;
                 cell = lines[y][x];
                 if (!cell) continue;
                 if (this.style.border.type === 'line') {
-                    if (x === xi) {
+                    if (x === x1) {
                         ch = '\u2514'; // '└'
                         if (this.style.border.left) {
                             if (!this.style.border.bottom) {
@@ -1145,7 +911,7 @@ c
                                 continue;
                             }
                         }
-                    } else if (x === xl - 1) {
+                    } else if (x === x2 - 1) {
                         ch = '\u2518'; // '┘'
                         if (this.style.border.right) {
                             if (!this.style.border.bottom) {
@@ -1164,7 +930,7 @@ c
                 } else if (this.style.border.type === 'bg') {
                     ch = this.style.border.ch;
                 }
-                if (!this.style.border.bottom && x !== xi && x !== xl - 1) {
+                if (!this.style.border.bottom && x !== x1 && x !== x2 - 1) {
                     ch = ' ';
                     if (dattr !== cell[0] || ch !== cell[1]) {
                         lines[y][x][0] = dattr;
@@ -1183,24 +949,24 @@ c
 
         if (this.shadow) {
             // right
-            y = Math.max(yi + 1, 0);
-            for (; y < yl + 1; y++) {
+            y = Math.max(y1 + 1, 0);
+            for (; y < y2 + 1; y++) {
                 if (!lines[y]) break;
-                x = xl;
-                for (; x < xl + 2; x++) {
+                x = x2;
+                for (; x < x2 + 2; x++) {
                     if (!lines[y][x]) break;
-                    // lines[y][x][0] = colors.blend(this.dattr, lines[y][x][0]);
+                    // lines[y][cursorX][0] = colors.blend(this.dattr, lines[y][cursorX][0]);
                     lines[y][x][0] = colors.blend(lines[y][x][0]);
                     lines[y].dirty = true;
                 }
             }
             // bottom
-            y = yl;
-            for (; y < yl + 1; y++) {
+            y = y2;
+            for (; y < y2 + 1; y++) {
                 if (!lines[y]) break;
-                for (x = Math.max(xi + 1, 0); x < xl; x++) {
+                for (x = Math.max(x1 + 1, 0); x < x2; x++) {
                     if (!lines[y][x]) break;
-                    // lines[y][x][0] = colors.blend(this.dattr, lines[y][x][0]);
+                    // lines[y][cursorX][0] = colors.blend(this.dattr, lines[y][cursorX][0]);
                     lines[y][x][0] = colors.blend(lines[y][x][0]);
                     lines[y].dirty = true;
                 }
@@ -1220,7 +986,7 @@ c
             // }
         });
 
-        this._emit('render', [coords]);
+        this._emit('render');
     }
 
     /**
@@ -1262,21 +1028,21 @@ c
 
         this.setContent(this._clines.fake.join('\n'), true);
 
+        if(this.detached) return
+
         diff = this._clines.length - start;
 
         if (diff > 0) {
-            var pos = this._getCoords();
-            if (!pos) return;
 
-            var height = pos.yl - pos.yi - this.getiheight()
-                , base = this.childBase || 0
-                , visible = real >= base && real - base < height;
+            let height = this.getheight() - this.getiheight()
+            let base = this.childBase || 0
+            let visible = real >= base && real - base < height;
 
-            if (pos && visible && this.screen.cleanSides(this)) {
+            if (visible && this.screen.cleanSides(this)) {
                 this.screen.insertLine(diff,
-                    pos.yi + this.getitop() + real - base,
-                    pos.yi,
-                    pos.yl - this.getibottom() - 1);
+                    this.getatop() + this.getitop() + real - base,
+                    this.getatop(),
+                    this.getabottom() - this.getibottom() - 1);
             }
         }
     }
@@ -1302,25 +1068,25 @@ c
 
         this.setContent(this._clines.fake.join('\n'), true);
 
+        if(this.detached) return
+
         diff = start - this._clines.length;
 
         // XXX clearPos() without diff statement?
         var height = 0;
 
         if (diff > 0) {
-            var pos = this._getCoords();
-            if (!pos) return;
 
-            height = pos.yl - pos.yi - this.getiheight();
+            height = this.getheight() - this.getiheight();
 
             var base = this.childBase || 0
                 , visible = real >= base && real - base < height;
 
-            if (pos && visible && this.screen.cleanSides(this)) {
+            if (visible && this.screen.cleanSides(this)) {
                 this.screen.deleteLine(diff,
-                    pos.yi + this.getitop() + real - base,
-                    pos.yi,
-                    pos.yl - this.getibottom() - 1);
+                    this.getatop() + this.getitop() + real - base,
+                    this.getatop(),
+                    this.getabottom() - this.getibottom() - 1);
             }
         }
 

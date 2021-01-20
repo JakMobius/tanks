@@ -66,7 +66,7 @@ function send_config(socket: net.Socket, Gpm_Connect: GPMConfig, callback?: (() 
 //   // clicks e.g. double click are determined by time-based processing
 //   int clicks;
 //   enum Gpm_Margin margin;
-//   // wdx/y: displacement of wheels in this event. Absolute values are not
+//   // wdx/cursorY: displacement of wheels in this event. Absolute values are not
 //   // required, because wheel movement is typically used for scrolling
 //   // or selecting fields, not for cursor positioning. The application
 //   // can determine when the end of file or form is reached, and not

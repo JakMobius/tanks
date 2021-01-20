@@ -21,7 +21,6 @@ export interface ElementPosition {
 
 export interface NodeConfig {
     position?: ElementPosition
-    screen?: Screen
 }
 
 export class Node extends EventEmitter {
@@ -372,7 +371,7 @@ export class Node extends EventEmitter {
 
     }
 
-    clearPos(get?: boolean, override?: boolean) {
+    clearPos() {
 
     }
 

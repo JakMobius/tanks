@@ -60,7 +60,7 @@ class EventEmitter {
     }
   }
 
-  off(type: string, listener: () => void) {
+  off(type: string, listener: (...params: any[]) => any) {
     return this.removeListener(type, listener)
   }
 
@@ -72,7 +72,7 @@ class EventEmitter {
     }
   }
 
-  once(type: string, listener: () => void) {
+  once(type: string, listener: (...params: any[]) => any) {
     function on() {
       this.removeListener(type, on);
       return listener.apply(this, arguments);

@@ -16,16 +16,18 @@ import fs from 'fs';
 import Tput from './terminal/tput';
 import colors from './colors';
 import * as tty from "tty";
-import {BlessedEvent, BlessedKeyEvent, BlessedMouseEvent} from "./widgets/screen";
+import {BlessedKeyEvent, BlessedMouseEvent} from "./widgets/screen";
 import GpmClient from "./gpmclient";
 import {RequestHub} from "./terminal/request-hub";
-import {BlessedCursorShapes} from "./cursor";
+import {BlessedCursorShape} from "./cursor";
+import * as keys from './keys'
 
 var slice = Array.prototype.slice;
 
 var nextTick = global.setImmediate || process.nextTick.bind(process);
 
 export interface ProgramConfig {
+    resizeTimeout?: number;
     forceUnicode?: boolean;
     printf?: boolean;
     extended?: boolean;
@@ -71,8 +73,8 @@ class Program extends EventEmitter {
     static global: Program
     static total: number
 
-    public x = 0;
-    public y = 0;
+    public cursorX = 0;
+    public cursorY = 0;
     public savedX = 0;
     public savedY = 0;
 
@@ -109,6 +111,11 @@ class Program extends EventEmitter {
     private _exiting: boolean;
     private destroyed: boolean;
     private _currentMouse: BlessedMouseOptions;
+    private _keypressHandler: (ch: string, key: BlessedKeyEvent) => void;
+    private _newHandler: (type: string) => void;
+    private _resizeHandler: () => void;
+    private _resizeTimer: NodeJS.Timeout;
+    private _dataHandler: (data: string) => void;
 
     constructor(options?: ProgramConfig) {
         super()
@@ -136,8 +143,8 @@ class Program extends EventEmitter {
         this.zero = options.zero !== false;
         this.useBuffer = options.buffer;
 
-        this.x = 0;
-        this.y = 0;
+        this.cursorX = 0;
+        this.cursorY = 0;
         this.savedX = 0;
         this.savedY = 0;
 
@@ -315,101 +322,68 @@ class Program extends EventEmitter {
         var self = this;
 
         // Listen for keys/mouse on input
-        if (this.input._blessedInput) {
-            this.input._blessedInput++;
-        } else {
-            this.input._blessedInput = 1;
-            this._listenInput();
-        }
+        this._listenInput();
+        // Listen for resize on output
+        this._listenOutput();
 
-        this.on('newListener', this._newHandler = function fn(type) {
-            if (type === 'keypress' || type === 'mouse') {
-                self.removeListener('newListener', fn);
-                if (self.input.setRawMode && !self.input.isRaw) {
+        this.on('newListener', this._newHandler = (type: string) => {
+            if (self.input.setRawMode && !self.input.isRaw) {
+                if (type === 'keypress' || type === 'mouse') {
                     self.input.setRawMode(true);
                     self.input.resume();
                 }
             }
-        });
-
-        this.on('newListener', function fn(type) {
-            if (type === 'mouse') {
-                self.removeListener('newListener', fn);
+            if (!this._boundMouse && type === 'mouse') {
                 self.bindMouse();
             }
         });
-
-        // Listen for resize on output
-        if (this.output._blessedOutput) {
-            this.output._blessedOutput++;
-        } else {
-            this.output._blessedOutput = 1;
-            this._listenOutput();
-        }
     }
 
     _listenInput() {
-        var keys = require('./keys')
-            , self = this;
 
         // Input
-        this.input.on('keypress', this.input._keypressHandler = function (ch: string, key: BlessedKeyEvent) {
-            Program.instances.forEach(function (program) {
-                if (program.input !== self.input) return;
-                program.emit('keypress', ch, key);
-                program.emit('key ' + key.name, ch, key);
-            });
+        this.input.on('keypress', this._keypressHandler = (ch: string, key: BlessedKeyEvent) => {
+            this.emit('keypress', ch, key);
+            this.emit('key ' + key.full, ch, key);
         });
 
-        this.input.on('data', this.input._dataHandler = function (data) {
-            Program.instances.forEach(function (program) {
-                if (program.input !== self.input) return;
-                program.emit('data', data);
-            });
+        this.input.on('data', this._dataHandler = (data: string) => {
+            this.emit('data', data);
         });
 
         keys.emitKeypressEvents(this.input);
     }
 
     _listenOutput() {
-        var self = this;
-
         if (!this.output.isTTY) {
-            nextTick(function () {
-                self.emit('warning', 'Output is not a TTY');
+            nextTick(() => {
+                this.emit('warning', 'Output is not a TTY');
             });
         }
 
         // Output
-        function resize() {
-            Program.instances.forEach(function (program) {
-                if (program.output !== self.output) return;
-                program.cols = program.output.columns;
-                program.rows = program.output.rows;
-                program.emit('resize');
-            });
+        const resize = () => {
+            this.cols = this.output.columns;
+            this.rows = this.output.rows;
+            this.emit('resize');
         }
 
-        this.output.on('resize', this.output._resizeHandler = function () {
-            Program.instances.forEach(function (program) {
-                if (program.output !== self.output) return;
-                if (!program.options.resizeTimeout) {
-                    return resize();
-                }
-                if (program._resizeTimer) {
-                    clearTimeout(program._resizeTimer);
-                    delete program._resizeTimer;
-                }
-                var time = typeof program.options.resizeTimeout === 'number'
-                    ? program.options.resizeTimeout
-                    : 300;
-                program._resizeTimer = setTimeout(resize, time);
-            });
+        this.output.on('resize', this._resizeHandler = () => {
+            if (!this.options.resizeTimeout) {
+                return resize();
+            }
+            if (this._resizeTimer) {
+                clearTimeout(this._resizeTimer);
+                this._resizeTimer = null;
+            }
+
+            let time = this.options.resizeTimeout || 300
+            this._resizeTimer = setTimeout(resize, time);
         });
     }
 
     destroy() {
-        var index = Program.instances.indexOf(this);
+        let index = Program.instances.indexOf(this);
 
         if (~index) {
             Program.instances.splice(index, 1);
@@ -424,35 +398,28 @@ class Program extends EventEmitter {
                 Program.global = null;
 
                 process.removeListener('exit', Program._exitHandler);
-                delete Program._exitHandler;
+                Program._exitHandler = null;
             }
 
-            this.input._blessedInput--;
-            this.output._blessedOutput--;
+            this.input.removeListener('keypress', this._keypressHandler);
+            this.input.removeListener('data', this._dataHandler);
+            this._keypressHandler = null
+            this._dataHandler = null
 
-            if (this.input._blessedInput === 0) {
-                this.input.removeListener('keypress', this.input._keypressHandler);
-                this.input.removeListener('data', this.input._dataHandler);
-                delete this.input._keypressHandler;
-                delete this.input._dataHandler;
-
-                if (this.input.setRawMode) {
-                    if (this.input.isRaw) {
-                        this.input.setRawMode(false);
-                    }
-                    if (!this.input.destroyed) {
-                        this.input.pause();
-                    }
+            if (this.input.setRawMode) {
+                if (this.input.isRaw) {
+                    this.input.setRawMode(false);
+                }
+                if (!this.input.destroyed) {
+                    this.input.pause();
                 }
             }
 
-            if (this.output._blessedOutput === 0) {
-                this.output.removeListener('resize', this.output._resizeHandler);
-                delete this.output._resizeHandler;
-            }
+            this.output.removeListener('resize', this._resizeHandler);
+            this._resizeHandler = null;
 
             this.removeListener('newListener', this._newHandler);
-            delete this._newHandler;
+            this._newHandler = null;
 
             this.destroyed = true;
             this.emit('destroy');
@@ -511,12 +478,11 @@ class Program extends EventEmitter {
         this._boundMouse = true;
 
         let decoder = new StringDecoder('utf8')
-        let self = this;
 
-        this.on('data', function (data) {
+        this.on('data', (data) => {
             let text = decoder.write(data);
             if (!text) return;
-            self._bindMouse(text, data);
+            this._bindMouse(text, data);
         });
     }
 
@@ -1145,10 +1111,10 @@ class Program extends EventEmitter {
     }
 
     _ncoords() {
-        if (this.x < 0) this.x = 0;
-        else if (this.x >= this.cols) this.x = this.cols - 1;
-        if (this.y < 0) this.y = 0;
-        else if (this.y >= this.rows) this.y = this.rows - 1;
+        if (this.cursorX < 0) this.cursorX = 0;
+        else if (this.cursorX >= this.cols) this.cursorX = this.cols - 1;
+        if (this.cursorY < 0) this.cursorY = 0;
+        else if (this.cursorY >= this.rows) this.cursorY = this.rows - 1;
     }
 
 // TODO: Fix cud and cuu calls.
@@ -1160,20 +1126,20 @@ class Program extends EventEmitter {
             x = (x || 1) - 1;
             y = (y || 1) - 1;
         }
-        if (y === this.y && x === this.x) {
+        if (y === this.cursorY && x === this.cursorX) {
             return;
         }
-        if (y === this.y) {
-            if (x > this.x) {
-                this.cursorForward(x - this.x);
-            } else if (x < this.x) {
-                this.cursorBackward(this.x - x);
+        if (y === this.cursorY) {
+            if (x > this.cursorX) {
+                this.cursorForward(x - this.cursorX);
+            } else if (x < this.cursorX) {
+                this.cursorBackward(this.cursorX - x);
             }
-        } else if (x === this.x) {
-            if (y > this.y) {
-                this.cursorDown(y - this.y);
-            } else if (y < this.y) {
-                this.cursorUp(this.y - y);
+        } else if (x === this.cursorX) {
+            if (y > this.cursorY) {
+                this.cursorDown(y - this.cursorY);
+            } else if (y < this.cursorY) {
+                this.cursorUp(this.cursorY - y);
             }
         } else {
             if (!this.zero) {
@@ -1230,7 +1196,7 @@ class Program extends EventEmitter {
     }
 
     // Only XTerm and iTerm2. If you know of any others, post them.
-    cursorShape(shape: BlessedCursorShapes, blink: boolean) {
+    cursorShape(shape: BlessedCursorShape, blink: boolean) {
         if (this.isiTerm2) {
             switch (shape) {
                 case 'block':
@@ -1332,7 +1298,7 @@ class Program extends EventEmitter {
     }
 
     vtab() {
-        this.y++;
+        this.cursorY++;
         this._ncoords();
         return this._write('\x0b');
     }
@@ -1343,14 +1309,14 @@ class Program extends EventEmitter {
     }
 
     backspace() {
-        this.x--;
+        this.cursorX--;
         this._ncoords();
         if (this.has('kbs')) return this._write(this.tput.terminfo.methods.kbs());
         return this._write('\x08');
     }
 
     tab() {
-        this.x += 8;
+        this.cursorX += 8;
         this._ncoords();
         if (this.has('ht')) return this._write(this.tput.terminfo.methods.ht());
         return this._write('\t');
@@ -1367,17 +1333,17 @@ class Program extends EventEmitter {
     }
 
     return() {
-        this.x = 0;
+        this.cursorX = 0;
         if (this.has('cr')) return this._write(this.tput.terminfo.methods.cr());
         return this._write('\r');
     }
 
     newline() {
-        if (this.tput && this.tput.terminfo.bools.eat_newline_glitch && this.x >= this.cols) {
+        if (this.tput && this.tput.terminfo.bools.eat_newline_glitch && this.cursorX >= this.cols) {
             return false;
         }
-        this.x = 0;
-        this.y++;
+        this.cursorX = 0;
+        this.cursorY++;
         this._ncoords();
         if (this.has('nel')) return this._write(this.tput.terminfo.methods.nel());
         return this._write('\n');
@@ -1385,7 +1351,7 @@ class Program extends EventEmitter {
 
 // ESC D Index (IND is 0x84).
     index() {
-        this.y++;
+        this.cursorY++;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.ind());
         return this._write('\x1bD');
@@ -1394,7 +1360,7 @@ class Program extends EventEmitter {
 // ESC M Reverse Index (RI is 0x8d).
 
     reverseIndex() {
-        this.y--;
+        this.cursorY--;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.ri());
         return this._write('\x1bM');
@@ -1402,8 +1368,8 @@ class Program extends EventEmitter {
 
 // ESC E Next Line (NEL is 0x85).
     nextLine() {
-        this.y++;
-        this.x = 0;
+        this.cursorY++;
+        this.cursorX = 0;
         this._ncoords();
         if (this.has('nel')) return this._write(this.tput.terminfo.methods.nel());
         return this._write('\x1bE');
@@ -1411,7 +1377,7 @@ class Program extends EventEmitter {
 
 // ESC c Full Reset (RIS).
     reset() {
-        this.x = this.y = 0;
+        this.cursorX = this.cursorY = 0;
         if (this.has('rs1') || this.has('ris')) {
             if (this.has('rs1')) {
                 return this._write(this.tput.terminfo.methods.rs1());
@@ -1615,7 +1581,7 @@ class Program extends EventEmitter {
 // Cursor Up Ps Times (default = 1) (CUU).
 
     cursorUp(param: number) {
-        this.y -= param || 1;
+        this.cursorY -= param || 1;
         this._ncoords();
         if (this.tput) {
             if (!this.tput.terminfo.strings.parm_up_cursor) {
@@ -1630,7 +1596,7 @@ class Program extends EventEmitter {
 // Cursor Down Ps Times (default = 1) (CUD).
 
     cursorDown(param: number) {
-        this.y += param || 1;
+        this.cursorY += param || 1;
         this._ncoords();
         if (this.tput) {
             if (!this.tput.terminfo.strings.parm_down_cursor) {
@@ -1645,7 +1611,7 @@ class Program extends EventEmitter {
 // Cursor Forward Ps Times (default = 1) (CUF).
 
     cursorForward(param: number) {
-        this.x += param || 1;
+        this.cursorX += param || 1;
         this._ncoords();
         if (this.tput) {
             if (!this.tput.terminfo.strings.parm_right_cursor) {
@@ -1660,7 +1626,7 @@ class Program extends EventEmitter {
 // Cursor Backward Ps Times (default = 1) (CUB).
 
     cursorBackward(param: number) {
-        this.x -= param || 1;
+        this.cursorX -= param || 1;
         this._ncoords();
         if (this.tput) {
             if (!this.tput.terminfo.strings.parm_left_cursor) {
@@ -1682,8 +1648,8 @@ class Program extends EventEmitter {
             row = (row || 1) - 1;
             col = (col || 1) - 1;
         }
-        this.x = col;
-        this.y = row;
+        this.cursorX = col;
+        this.cursorY = row;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.cup(row, col));
         return this._write('\x1b[' + (row + 1) + ';' + (col + 1) + 'H');
@@ -1738,8 +1704,8 @@ class Program extends EventEmitter {
      * CSI
      */
     clear() {
-        this.x = 0;
-        this.y = 0;
+        this.cursorX = 0;
+        this.cursorY = 0;
         if (this.tput) return this._write(this.tput.terminfo.methods.clear());
         return this._write('\x1b[H\x1b[J');
     }
@@ -2204,7 +2170,7 @@ class Program extends EventEmitter {
 // Insert Ps (Blank) Character(s) (default = 1) (ICH).
 
     insertChars(param: number) {
-        this.x += param || 1;
+        this.cursorX += param || 1;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.ich(param));
         return this._write('\x1b[' + (param || 1) + '@');
@@ -2215,7 +2181,7 @@ class Program extends EventEmitter {
 // same as CSI Ps B ?
 
     cursorNextLine(param: number) {
-        this.y += param || 1;
+        this.cursorY += param || 1;
         this._ncoords();
         return this._write('\x1b[' + (param || '') + 'E');
     }
@@ -2225,7 +2191,7 @@ class Program extends EventEmitter {
 // reuse CSI Ps A ?
 
     cursorPrecedingLine(param: number) {
-        this.y -= param || 1;
+        this.cursorY -= param || 1;
         this._ncoords();
         return this._write('\x1b[' + (param || '') + 'F');
     }
@@ -2240,8 +2206,8 @@ class Program extends EventEmitter {
         } else {
             param = (param || 1) - 1;
         }
-        this.x = param;
-        this.y = 0;
+        this.cursorX = param;
+        this.cursorY = 0;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.hpa(param));
         return this._write('\x1b[' + (param + 1) + 'G');
@@ -2283,7 +2249,7 @@ class Program extends EventEmitter {
 //   [column] (default = [row,1]) (HPA).
 
     charPosAbsolute(param: number) {
-        this.x = param || 0;
+        this.cursorX = param || 0;
         this._ncoords();
         if (this.tput) {
             return this._write(this.tput.terminfo.methods.hpa(param));
@@ -2298,7 +2264,7 @@ class Program extends EventEmitter {
 
     HPositionRelative(param: number) {
         if (this.tput) return this.cursorForward(param);
-        this.x += param || 1;
+        this.cursorX += param || 1;
         this._ncoords();
         // Does not exist:
         // if (this.tput) return this.put.hpr(param);
@@ -2351,7 +2317,7 @@ class Program extends EventEmitter {
 // NOTE: Can't find in terminfo, no idea why it has multiple params.
 
     linePosAbsolute(param: number) {
-        this.y = param || 1;
+        this.cursorY = param || 1;
         this._ncoords();
         if (this.tput) {
             return this._write(this.tput.terminfo.methods.vpa(param));
@@ -2365,7 +2331,7 @@ class Program extends EventEmitter {
 
     VPositionRelative(param: number) {
         if (this.tput) return this.cursorDown(param);
-        this.y += param || 1;
+        this.cursorY += param || 1;
         this._ncoords();
         // Does not exist:
         // if (this.tput) return this.put.vpr(param);
@@ -2384,8 +2350,8 @@ class Program extends EventEmitter {
             row = (row || 1) - 1;
             col = (col || 1) - 1;
         }
-        this.y = row;
-        this.x = col;
+        this.cursorY = row;
+        this.cursorX = col;
         this._ncoords();
         // Does not exist (?):
         // if (this.tput) return this.put.hvp(row, col);
@@ -2598,13 +2564,8 @@ class Program extends EventEmitter {
 
 
     resetMode(...args: string[]) {
-        var param = slice.call(arguments).join(';');
+        let param = slice.call(arguments).join(';');
         return this._write('\x1b[' + (param || '') + 'l');
-    }
-
-    decrst() {
-        var param = slice.call(arguments).join(';');
-        return this.resetMode('?' + param);
     }
 
     hideCursor() {
@@ -2680,12 +2641,7 @@ class Program extends EventEmitter {
 
     disableMouse() {
         if (!this._currentMouse) return;
-
-        let obj = {};
-
-        Object.assign(obj, this._currentMouse)
-
-        return this.setMouse(obj, false);
+        return this.setMouse(this._currentMouse, false);
     }
 
 // Set Mouse
@@ -2717,7 +2673,7 @@ class Program extends EventEmitter {
         //     Ps = 9  -> Don't send Mouse X & Y on button press.
         // x10 mouse
         if (opt.x10Mouse != null) {
-            if (opt.x10Mouse) this.setMode('?9');
+            if (enable) this.setMode('?9');
             else this.resetMode('?9');
         }
 
@@ -2727,14 +2683,14 @@ class Program extends EventEmitter {
         //     release.  See the section Mouse Tracking.
         // vt200 mouse
         if (opt.vt200Mouse != null) {
-            if (opt.vt200Mouse) this.setMode('?1000');
+            if (enable) this.setMode('?1000');
             else this.resetMode('?1000');
         }
 
         //     Ps = 1 0 0 1  -> Use Hilite Mouse Tracking.
         //     Ps = 1 0 0 1  -> Don't use Hilite Mouse Tracking.
         if (opt.vt200Hilite != null) {
-            if (opt.vt200Hilite) this.setMode('?1001');
+            if (enable) this.setMode('?1001');
             else this.resetMode('?1001');
         }
 
@@ -2742,7 +2698,7 @@ class Program extends EventEmitter {
         //     Ps = 1 0 0 2  -> Don't use Cell Motion Mouse Tracking.
         // button event mouse
         if (opt.cellMotion != null) {
-            if (opt.cellMotion) this.setMode('?1002');
+            if (enable) this.setMode('?1002');
             else this.resetMode('?1002');
         }
 
@@ -2753,10 +2709,10 @@ class Program extends EventEmitter {
             // NOTE: Latest versions of tmux seem to only support cellMotion (not
             // allMotion). We pass all motion through to the terminal.
             if (this.tmux && this.tmuxVersion >= 2) {
-                if (opt.allMotion) this._twrite('\x1b[?1003h');
+                if (enable) this._twrite('\x1b[?1003h');
                 else this._twrite('\x1b[?1003l');
             } else {
-                if (opt.allMotion) this.setMode('?1003');
+                if (enable) this.setMode('?1003');
                 else this.resetMode('?1003');
             }
         }
@@ -2764,51 +2720,51 @@ class Program extends EventEmitter {
         //     Ps = 1 0 0 4  -> Send FocusIn/FocusOut events.
         //     Ps = 1 0 0 4  -> Don't send FocusIn/FocusOut events.
         if (opt.sendFocus != null) {
-            if (opt.sendFocus) this.setMode('?1004');
+            if (enable) this.setMode('?1004');
             else this.resetMode('?1004');
         }
 
         //     Ps = 1 0 0 5  -> Enable Extended Mouse Mode.
         //     Ps = 1 0 0 5  -> Disable Extended Mouse Mode.
         if (opt.utfMouse != null) {
-            if (opt.utfMouse) this.setMode('?1005');
+            if (enable) this.setMode('?1005');
             else this.resetMode('?1005');
         }
 
         // sgr mouse
         if (opt.sgrMouse != null) {
-            if (opt.sgrMouse) this.setMode('?1006');
+            if (enable) this.setMode('?1006');
             else this.resetMode('?1006');
         }
 
         // urxvt mouse
         if (opt.urxvtMouse != null) {
-            if (opt.urxvtMouse) this.setMode('?1015');
+            if (enable) this.setMode('?1015');
             else this.resetMode('?1015');
         }
 
         // dec mouse
         if (opt.decMouse != null) {
-            if (opt.decMouse) this._write('\x1b[1;2\'z\x1b[1;3\'{');
+            if (enable) this._write('\x1b[1;2\'z\x1b[1;3\'{');
             else this._write('\x1b[\'z');
         }
 
         // pterm mouse
         if (opt.ptermMouse != null) {
-            if (opt.ptermMouse) this._write('\x1b[>1h\x1b[>6h\x1b[>7h\x1b[>1h\x1b[>9l');
+            if (enable) this._write('\x1b[>1h\x1b[>6h\x1b[>7h\x1b[>1h\x1b[>9l');
             else this._write('\x1b[>1l\x1b[>6l\x1b[>7l\x1b[>1l\x1b[>9h');
         }
 
         // jsbterm mouse
         if (opt.jsbtermMouse != null) {
             // + = advanced mode
-            if (opt.jsbtermMouse) this._write('\x1b[0~ZwLMRK+1Q\x1b\\');
+            if (enable) this._write('\x1b[0~ZwLMRK+1Q\x1b\\');
             else this._write('\x1b[0~ZwQ\x1b\\');
         }
 
         // gpm mouse
         if (opt.gpmMouse != null) {
-            if (opt.gpmMouse) this.enableGpm();
+            if (enable) this.enableGpm();
             else this.disableGpm();
         }
     }
@@ -2828,8 +2784,8 @@ class Program extends EventEmitter {
         }
         this.scrollTop = top;
         this.scrollBottom = bottom;
-        this.x = 0;
-        this.y = 0;
+        this.cursorX = 0;
+        this.cursorY = 0;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.csr(top, bottom));
         return this._write('\x1b[' + (top + 1) + ';' + (bottom + 1) + 'r');
@@ -2839,8 +2795,8 @@ class Program extends EventEmitter {
 //   Save cursor (ANSI.SYS).
 
     saveCursorA() {
-        this.savedX = this.x;
-        this.savedY = this.y;
+        this.savedX = this.cursorX;
+        this.savedY = this.cursorY;
         if (this.tput) return this._write(this.tput.terminfo.methods.sc());
         return this._write('\x1b[s');
     }
@@ -2849,8 +2805,8 @@ class Program extends EventEmitter {
 //   Restore cursor (ANSI.SYS).
 
     restoreCursorA() {
-        this.x = this.savedX || 0;
-        this.y = this.savedY || 0;
+        this.cursorX = this.savedX || 0;
+        this.cursorY = this.savedY || 0;
         if (this.tput) return this._write(this.tput.terminfo.methods.rc());
         return this._write('\x1b[u');
     }
@@ -2859,7 +2815,7 @@ class Program extends EventEmitter {
 //   Cursor Forward Tabulation Ps tab stops (default = 1) (CHT).
 
     cursorForwardTab(param: number) {
-        this.x += 8;
+        this.cursorX += 8;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.tab(param));
         return this._write('\x1b[' + (param || 1) + 'I');
@@ -2868,7 +2824,7 @@ class Program extends EventEmitter {
 // CSI Ps S  Scroll up Ps lines (default = 1) (SU).
 
     scrollUp(param: number) {
-        this.y -= param || 1;
+        this.cursorY -= param || 1;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.parm_index(param));
         return this._write('\x1b[' + (param || 1) + 'S');
@@ -2877,7 +2833,7 @@ class Program extends EventEmitter {
 // CSI Ps T  Scroll down Ps lines (default = 1) (SD).
 
     scrollDown(param: number) {
-        this.y += param || 1;
+        this.cursorY += param || 1;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.parm_rindex(param));
         return this._write('\x1b[' + (param || 1) + 'T');
@@ -2909,7 +2865,7 @@ class Program extends EventEmitter {
 // CSI Ps Z  Cursor Backward Tabulation Ps tab stops (default = 1) (CBT).
 
     cursorBackwardTab(param: number) {
-        this.x -= 8;
+        this.cursorX -= 8;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.cbt(param));
         return this._write('\x1b[' + (param || 1) + 'Z');
@@ -2918,7 +2874,7 @@ class Program extends EventEmitter {
 // CSI Ps b  Repeat the preceding graphic character Ps times (REP).
 
     repeatPrecedingCharacter(param: number) {
-        this.x += param || 1;
+        this.cursorX += param || 1;
         this._ncoords();
         if (this.tput) return this._write(this.tput.terminfo.methods.rep(param));
         return this._write('\x1b[' + (param || 1) + 'b');
@@ -3146,7 +3102,7 @@ class Program extends EventEmitter {
 //   parameters) are:
 //     Ps = 1  -> De-iconify window.
 //     Ps = 2  -> Iconify window.
-//     Ps = 3  ;  x ;  y -> Move window to [x, y].
+//     Ps = 3  ;  cursorX ;  y -> Move window to [cursorX, y].
 //     Ps = 4  ;  height ;  width -> Resize the xterm window to
 //     height and width in pixels.
 //     Ps = 5  -> Raise the xterm window to the front of the stack-
@@ -3165,7 +3121,7 @@ class Program extends EventEmitter {
 //     is open (non-iconified), it returns CSI 1 t .  If the xterm
 //     window is iconified, it returns CSI 2 t .
 //     Ps = 1 3  -> Report xterm window position.  Result is CSI 3
-//     ; x ; y t
+//     ; cursorX ; y t
 //     Ps = 1 4  -> Report xterm window in pixels.  Result is CSI
 //     4  ;  height ;  width t
 //     Ps = 1 8  -> Report the size of the text area in characters.
@@ -3270,7 +3226,7 @@ class Program extends EventEmitter {
         return this._write('\x1b[' + slice.call(arguments).join(';') + '\'w');
     }
 
-// CSI Ps x  Request Terminal Parameters (DECREQTPARM).
+// CSI Ps cursorX  Request Terminal Parameters (DECREQTPARM).
 //   if Ps is a "0" (default) or "1", and xterm is emulating VT100,
 //   the control sequence elicits a response of the same form whose
 //   parameters describe the terminal:
@@ -3283,26 +3239,26 @@ class Program extends EventEmitter {
 //     Pn = 0  <- STP flags.
 
     requestParameters(param: number) {
-        return this._write('\x1b[' + (param || 0) + 'x');
+        return this._write('\x1b[' + (param || 0) + 'cursorX');
     }
 
-// CSI Ps x  Select Attribute Change Extent (DECSACE).
+// CSI Ps cursorX  Select Attribute Change Extent (DECSACE).
 //     Ps = 0  -> from start to end position, wrapped.
 //     Ps = 1  -> from start to end position, wrapped.
 //     Ps = 2  -> rectangle (exact).
 
     selectChangeExtent(param: number) {
-        return this._write('\x1b[' + (param || 0) + 'x');
+        return this._write('\x1b[' + (param || 0) + 'cursorX');
     }
 
-// CSI Pc; Pt; Pl; Pb; Pr$ x
+// CSI Pc; Pt; Pl; Pb; Pr$ cursorX
 //   Fill Rectangular Area (DECFRA), VT420 and up.
 //     Pc is the character to use.
 //     Pt; Pl; Pb; Pr denotes the rectangle.
 // NOTE: xterm doesn't enable this code by default.
 
     fillRectangle(...args: string[]) {
-        return this._write('\x1b[' + slice.call(arguments).join(';') + '$x');
+        return this._write('\x1b[' + slice.call(arguments).join(';') + '$cursorX');
     }
 
 // CSI Ps ; Pu ' z
@@ -3417,7 +3373,7 @@ class Program extends EventEmitter {
             Program.global = program;
         }
 
-        if (!~Program.instances.indexOf(program)) {
+        if (Program.instances.indexOf(program) == -1) {
             Program.instances.push(program);
             Program.total++;
         }

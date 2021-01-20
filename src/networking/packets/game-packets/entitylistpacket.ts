@@ -1,32 +1,43 @@
 
 import BinaryPacket from '../../binarypacket';
-import {BinarySerializer} from "../../../serialization/binary/serializable";
+import {BinaryDecodable, BinarySerializer} from "../../../serialization/binary/serializable";
 import BinaryEncoder from "../../../serialization/binary/binaryencoder";
 import AbstractEntity from "../../../entity/abstractentity";
+import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 
 class EntityListPacket extends BinaryPacket {
-	public entities: any;
-	public entitySize: any;
+
+    // protected static fieldCodingDeclarator = new Map([
+    //     ["entities", {
+    //         type: "map",
+    //         key: "Uint32",
+    //         value: {
+    //             read: (entity: AbstractEntity, encoder: BinaryEncoder) => entity.model.encodeDynamicData(encoder),
+    //             write: (entity: AbstractEntity, decoder: BinaryDecoder) => entity.model.decodeDynamicData(decoder)
+    //         }
+    //     }]
+    // ])
+
+	public entities: Map<Number, AbstractEntity>;
+	public entityCount: number;
 
     static typeName = 10
 
     constructor(entities: Map<Number, AbstractEntity>) {
         super();
         this.entities = entities
-        this.entitySize = 0
+        this.entityCount = 0
 
-        if(this.entities) for(let entity of this.entities) {
-            this.entitySize++
-        }
+        if(this.entities) this.entityCount = this.entities.size
     }
 
     shouldSend() {
-        return this.entitySize > 0
+        return this.entityCount > 0
     }
 
     toBinary(encoder: BinaryEncoder) {
 
-        encoder.writeUint16(this.entitySize)
+        encoder.writeUint16(this.entityCount)
 
         for(let entity of this.entities.values()) {
             encoder.writeUint32(entity.model.id)

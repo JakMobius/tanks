@@ -1,5 +1,5 @@
 
-import * as blessed from '../../src/library/blessed-fork/lib/blessed'
+import * as blessed from 'src/library/blessed-fork/lib/blessed'
 
 class HistoryEntry {
     public text: any;
