@@ -25,8 +25,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-import EventEmitter from './events';
-import {BlessedKeyEvent} from "./widgets/screen";
+import EventEmitter from 'src/utils/eventemitter';
+import {KeyEvent} from "./widgets/screen";
 import {StringDecoder} from "string_decoder";
 
 // NOTE: node <=v0.8.x has no EventEmitter.listenerCount
@@ -55,7 +55,7 @@ function emitKeypressEvents(stream) {
     }
   }
 
-  function onNewListener(event) {
+  function onNewListener(event: string) {
     if (event === 'keypress') {
       stream.on('data', onData);
       stream.removeListener('newListener', onNewListener);
@@ -134,7 +134,7 @@ function emitKeys(stream, s) {
 
   buffer.forEach(function(s) {
     var ch,
-        key: BlessedKeyEvent = {
+        key: KeyEvent = {
           sequence: s,
           name: undefined,
           ctrl: false,

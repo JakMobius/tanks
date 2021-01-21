@@ -105,20 +105,6 @@ button[disabled] {
 }
 
 /*
- * /src/client/scenes/loading/loading-scene.scss
- */
-
-.loading-text {
-  width: 100%;
-  text-align: center;
-  top: 50%;
-  margin-top: -100px;
-  user-select: none;
-  cursor: default;
-  position: absolute;
-}
-
-/*
  * /src/client/game/ui/overlay/chat/chat.scss
  */
 
@@ -201,98 +187,110 @@ button[disabled] {
 }
 
 /*
- * /src/client/game/ui/overlay/primary/tank-preview/tank-preview.scss
+ * /src/client/scenes/loading/loading-scene.scss
  */
 
-.menu.tankinfo {
-  margin-left: -400px;
-  margin-top: -235px;
-  width: 800px;
-  height: 225px;
-}
-
-.menu.tankinfo .tank-stats .stat {
-  position: relative;
-  height: 35px;
-}
-
-.menu.tankinfo .tank-stats .stat-scale {
-  position: absolute;
-  transition: width 0.5s ease-out, background 0.5s ease-out;
-  height: 23px;
-  border-radius: 5px;
-}
-
-.menu.tankinfo .tank-stats .stat-title {
-  position: absolute;
-  height: 23px;
-  line-height: 23px;
-  left: 5px;
-  font-family: Roboto, sans-serif;
-  color: white;
-}
-
-.menu.tankinfo .tank-stats .stat-value {
-  position: absolute;
-  height: 20px;
-  line-height: 20px;
-  transition: left 0.5s ease-out;
-}
-
-.menu.tankinfo .tank-stats .tankdescription {
-  position: absolute;
-  height: 30px;
-  left: 0;
-  bottom: 40px;
+.loading-text {
   width: 100%;
-  padding: 10px;
-  overflow: auto;
-  word-wrap: break-word;
-}
-
-.menu.tankinfo .tank-preview {
-  left: 20px;
-  top: 20px;
-  width: 185px;
-  height: 185px;
-  position: absolute;
-}
-
-.menu.tankinfo .tank-preview canvas {
-  position: absolute;
-  left: 15px;
-  width: 155px;
-  height: 155px;
-}
-
-.menu.tankinfo .tank-preview h1 {
-  position: absolute;
-  top: 155px;
-  left: 0;
-  right: 0;
-  margin: 0;
-  font-family: Roboto, sans-serif;
-  font-weight: normal;
-  font-size: 22px;
   text-align: center;
+  top: 50%;
+  margin-top: -100px;
+  user-select: none;
+  cursor: default;
+  position: absolute;
 }
 
-.menu.tankinfo .tank-stats {
-  position: absolute;
-  left: 230px;
-  right: 210px;
-  bottom: 30px;
-  top: 30px;
+/*
+ * /src/client/game/ui/overlay/primary/play-menu/play-menu.scss
+ */
+
+.menu.nick {
+  margin-left: 150px;
+  margin-top: 10px;
+  width: 250px;
+  height: 140px;
 }
 
-.menu.tankinfo .description {
-  right: 20px;
-  top: 20px;
-  bottom: 10px;
-  width: 170px;
+.menu.nick input.nick {
   position: absolute;
-  font-family: Roboto, sans-serif;
+  padding: 10px;
+  left: 20px;
+  top: 50px;
+  width: calc(100% - 60px);
   font-size: 15px;
+  border: 1px solid #999;
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 0 2px;
+}
+
+.menu.nick button {
+  left: 13px;
+  width: 225px;
+  top: 87px;
+}
+
+.menu.nick .header {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 10px;
+  font-family: Roboto, sans-serif;
+  font-size: 13px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #2D2D2D;
+}
+
+.menu.nick input {
+  position: absolute;
+  width: 225px;
+  left: 13px;
+  height: 40px;
+  top: 35px;
+  text-align: center;
+  font-family: Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 40px;
+  background: #F0F0F0;
+  border-radius: 5px;
+  border: none;
+}
+
+/*
+ * /src/client/ui/menu/menu.scss
+ */
+
+.menu {
+  left: 50%;
+  top: 50%;
+  position: absolute;
+  background: white;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
+  overflow: hidden;
+}
+
+.menu .title {
+  font-family: Arial, serif;
+  font-size: 20px;
+  cursor: default;
+}
+
+.menu .footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 55px;
+  border-top: solid 1px #ececec;
+  padding: 5px 6px 7px 6px;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+.menu .footer button {
+  display: inline-block;
+  position: relative;
+  height: 45px;
 }
 
 /*
@@ -357,186 +355,6 @@ button[disabled] {
   line-height: 50px;
   text-transform: uppercase;
   display: inline-block;
-}
-
-/*
- * /src/client/game/ui/overlay/primary/tank-select/tank-select.scss
- */
-
-.menu.tankselect {
-  margin-left: -400px;
-  margin-top: 10px;
-  width: 530px;
-  height: 140px;
-}
-
-.menu.tankselect .shadow {
-  background: transparent;
-  transition: opacity 0.3s;
-  width: 50px;
-  height: 100%;
-  position: absolute;
-  pointer-events: none;
-}
-
-.menu.tankselect .shadow.left {
-  background: -moz-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
-  background: -webkit-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
-  background: linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
-  left: 0;
-}
-
-.menu.tankselect .shadow.right {
-  background: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
-  background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
-  right: 0;
-}
-
-.menu.tankselect .tank-select-container {
-  overflow: auto;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 491px;
-  height: 120px;
-  padding: 20px 20px 0 20px;
-  border-right: #ddf 1px solid;
-  white-space: nowrap;
-}
-
-.menu.tankselect .tank-preview-container {
-  width: 80px;
-  height: 95px;
-  display: inline-block;
-  transition: transform 0.5s, box-shadow 0.5s, border 0.5s;
-  box-shadow: rgba(0, 0, 0, 0) 5px 5px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  border: 1px transparent solid;
-  position: absolute;
-}
-
-.menu.tankselect .tank-preview-container:hover {
-  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
-}
-
-.menu.tankselect .tank-preview-container:active {
-  transform: scale(0.9, 0.9);
-}
-
-.menu.tankselect .tank-preview-container.selected {
-  transform: scale(1.1, 1.1);
-  box-shadow: rgba(0, 0, 0, 0.15) 3px 3px 7px;
-  border: 1px #22ad22 solid;
-}
-
-.menu.tankselect .tank-preview-container .preview-canvas {
-  position: relative;
-  left: 5px;
-  top: 5px;
-  width: 70px;
-  height: 70px;
-}
-
-.menu.tankselect .tank-preview-container .tank-preview-title {
-  position: relative;
-  left: 0;
-  right: 0;
-  text-align: center;
-}
-
-/*
- * /src/client/ui/menu/menu.scss
- */
-
-.menu {
-  left: 50%;
-  top: 50%;
-  position: absolute;
-  background: white;
-  border-radius: 5px;
-  box-shadow: rgba(0, 0, 0, 0.3) 0 0 5px;
-  overflow: hidden;
-}
-
-.menu .title {
-  font-family: Arial, serif;
-  font-size: 20px;
-  cursor: default;
-}
-
-.menu .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 55px;
-  border-top: solid 1px #ececec;
-  padding: 5px 6px 7px 6px;
-  box-sizing: border-box;
-  text-align: right;
-}
-
-.menu .footer button {
-  display: inline-block;
-  position: relative;
-  height: 45px;
-}
-
-/*
- * /src/client/game/ui/overlay/primary/play-menu/play-menu.scss
- */
-
-.menu.nick {
-  margin-left: 150px;
-  margin-top: 10px;
-  width: 250px;
-  height: 140px;
-}
-
-.menu.nick input.nick {
-  position: absolute;
-  padding: 10px;
-  left: 20px;
-  top: 50px;
-  width: calc(100% - 60px);
-  font-size: 15px;
-  border: 1px solid #999;
-  border-radius: 3px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 0 2px;
-}
-
-.menu.nick button {
-  left: 13px;
-  width: 225px;
-  top: 87px;
-}
-
-.menu.nick .header {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  top: 10px;
-  font-family: Roboto, sans-serif;
-  font-size: 13px;
-  text-align: center;
-  text-transform: uppercase;
-  color: #2D2D2D;
-}
-
-.menu.nick input {
-  position: absolute;
-  width: 225px;
-  left: 13px;
-  height: 40px;
-  top: 35px;
-  text-align: center;
-  font-family: Roboto, sans-serif;
-  font-size: 17px;
-  line-height: 40px;
-  background: #F0F0F0;
-  border-radius: 5px;
-  border: none;
 }
 
 /*
@@ -644,4 +462,186 @@ button[disabled] {
 
 .menu.room-select:hover, .menu.room-select.expanded {
   opacity: 1;
+}
+
+/*
+ * /src/client/game/ui/overlay/primary/tank-preview/tank-preview.scss
+ */
+
+.menu.tankinfo {
+  margin-left: -400px;
+  margin-top: -235px;
+  width: 800px;
+  height: 225px;
+}
+
+.menu.tankinfo .tank-stats .stat {
+  position: relative;
+  height: 35px;
+}
+
+.menu.tankinfo .tank-stats .stat-scale {
+  position: absolute;
+  transition: width 0.5s ease-out, background 0.5s ease-out;
+  height: 23px;
+  border-radius: 5px;
+}
+
+.menu.tankinfo .tank-stats .stat-title {
+  position: absolute;
+  height: 23px;
+  line-height: 23px;
+  left: 5px;
+  font-family: Roboto, sans-serif;
+  color: white;
+}
+
+.menu.tankinfo .tank-stats .stat-value {
+  position: absolute;
+  height: 20px;
+  line-height: 20px;
+  transition: left 0.5s ease-out;
+}
+
+.menu.tankinfo .tank-stats .tankdescription {
+  position: absolute;
+  height: 30px;
+  left: 0;
+  bottom: 40px;
+  width: 100%;
+  padding: 10px;
+  overflow: auto;
+  word-wrap: break-word;
+}
+
+.menu.tankinfo .tank-preview {
+  left: 20px;
+  top: 20px;
+  width: 185px;
+  height: 185px;
+  position: absolute;
+}
+
+.menu.tankinfo .tank-preview canvas {
+  position: absolute;
+  left: 15px;
+  width: 155px;
+  height: 155px;
+}
+
+.menu.tankinfo .tank-preview h1 {
+  position: absolute;
+  top: 155px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  font-weight: normal;
+  font-size: 22px;
+  text-align: center;
+}
+
+.menu.tankinfo .tank-stats {
+  position: absolute;
+  left: 230px;
+  right: 210px;
+  bottom: 30px;
+  top: 30px;
+}
+
+.menu.tankinfo .description {
+  right: 20px;
+  top: 20px;
+  bottom: 10px;
+  width: 170px;
+  position: absolute;
+  font-family: Roboto, sans-serif;
+  font-size: 15px;
+}
+
+/*
+ * /src/client/game/ui/overlay/primary/tank-select/tank-select.scss
+ */
+
+.menu.tankselect {
+  margin-left: -400px;
+  margin-top: 10px;
+  width: 530px;
+  height: 140px;
+}
+
+.menu.tankselect .shadow {
+  background: transparent;
+  transition: opacity 0.3s;
+  width: 50px;
+  height: 100%;
+  position: absolute;
+  pointer-events: none;
+}
+
+.menu.tankselect .shadow.left {
+  background: -moz-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(90deg, white 0%, rgba(255, 255, 255, 0) 100%);
+  left: 0;
+}
+
+.menu.tankselect .shadow.right {
+  background: -moz-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
+  background: -webkit-linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, white 100%);
+  right: 0;
+}
+
+.menu.tankselect .tank-select-container {
+  overflow: auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 491px;
+  height: 120px;
+  padding: 20px 20px 0 20px;
+  border-right: #ddf 1px solid;
+  white-space: nowrap;
+}
+
+.menu.tankselect .tank-preview-container {
+  width: 80px;
+  height: 95px;
+  display: inline-block;
+  transition: transform 0.5s, box-shadow 0.5s, border 0.5s;
+  box-shadow: rgba(0, 0, 0, 0) 5px 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px transparent solid;
+  position: absolute;
+}
+
+.menu.tankselect .tank-preview-container:hover {
+  box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 7px;
+}
+
+.menu.tankselect .tank-preview-container:active {
+  transform: scale(0.9, 0.9);
+}
+
+.menu.tankselect .tank-preview-container.selected {
+  transform: scale(1.1, 1.1);
+  box-shadow: rgba(0, 0, 0, 0.15) 3px 3px 7px;
+  border: 1px #22ad22 solid;
+}
+
+.menu.tankselect .tank-preview-container .preview-canvas {
+  position: relative;
+  left: 5px;
+  top: 5px;
+  width: 70px;
+  height: 70px;
+}
+
+.menu.tankselect .tank-preview-container .tank-preview-title {
+  position: relative;
+  left: 0;
+  right: 0;
+  text-align: center;
 }

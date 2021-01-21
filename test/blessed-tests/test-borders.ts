@@ -91,4 +91,4 @@ screen.key("C-c", () => {
 screen.append(container)
 container.append(nestedContainer)
 nestedContainer.append(borderedBox)
-screen.render()
+screen.setNeedsRender()

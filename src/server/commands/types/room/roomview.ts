@@ -21,7 +21,6 @@ class RoomViewCommand extends Command {
         this.console.observingRoom = world
         this.console.window.setPrompt(id)
         this.console.switchToLogger(world.logger)
-        this.console.window.render()
     }
 
     onTabComplete(args: string[]) {

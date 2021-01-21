@@ -4490,14 +4490,14 @@ exports.default = void 0;
 let files = {}
 files['texture-fragment'] = "\n#version 100\nvarying highp vec2 v_texture_position;uniform sampler2D u_texture;void main(){lowp vec4 a;a=texture2D(u_texture,v_texture_position);gl_FragColor=a;}"
 files['texture-vertex'] = "\n#version 100\nattribute vec2 a_vertex_position;attribute vec2 a_texture_position;varying vec2 v_texture_position;uniform mat3 u_matrix;void main(){vec3 a;a.z=1.0;a.xy=a_vertex_position;highp vec4 b;b.zw=vec2(0.0,1.0);b.xy=(u_matrix*a).xy;gl_Position=b;v_texture_position=a_texture_position;}"
-files['post-processing-fragment'] = "\n#version 100\nvarying highp vec2 v_texture_position;uniform sampler2D u_texture;void main(){lowp vec4 a;a=texture2D(u_texture,v_texture_position);gl_FragColor=a;}"
-files['post-processing-vertex'] = "\n#version 100\nattribute vec2 a_vertex_position;varying vec2 v_texture_position;void main(){highp vec4 a;a.zw=vec2(0.0,1.0);a.xy=a_vertex_position;gl_Position=a;v_texture_position=((a_vertex_position+vec2(1.0,1.0))/2.0);}"
 files['light-mask-texture-fragment'] = "\n#version 100\nprecision mediump float;uniform float u_angle;uniform sampler2D u_texture;uniform vec2 u_texture_size;varying vec2 v_dark_texture_position;varying vec2 v_bright_texture_position;varying vec2 v_mask_position;void main(){vec2 a;vec2 b;b=(v_mask_position*u_texture_size);a=(b-floor(b));mediump vec4 c;lowp vec4 d;highp int e;highp int f;float g;g=abs((a.x-0.5));float h;h=abs((a.y-0.5));if((a.x==0.5)){f=0;}else{if((a.x>0.5)){f=1;}else{f=-1;}}if((a.y==0.5)){e=0;}else{if((a.y>0.5)){e=1;}else{e=-1;}}float i;i=(float(f)/u_texture_size.x);float j;j=(float(e)/u_texture_size.y);vec2 k;k=((vec2(0.5,0.5)-a)/u_texture_size);if((f==0)){lowp float l;lowp vec4 m;m=texture2D(u_texture,(v_dark_texture_position+k));lowp vec4 n;n=texture2D(u_texture,(v_bright_texture_position+k));lowp vec4 o;o=texture2D(u_texture,(v_mask_position+k));lowp float p;p=(o.x+u_angle);l=p;if((p>1.0)){l=(p-1.0);}if((l>0.75)){l=(1.0-l);}if((l>0.25)){l=0.25;}lowp float q;q=((1.0-(l*4.0))*o.w);d=((m*(1.0-q))+(n*q));}else{lowp vec4 r;lowp float s;lowp vec4 t;t=texture2D(u_texture,(v_dark_texture_position+k));lowp vec4 u;u=texture2D(u_texture,(v_bright_texture_position+k));lowp vec4 v;v=texture2D(u_texture,(v_mask_position+k));lowp float w;w=(v.x+u_angle);s=w;if((w>1.0)){s=(w-1.0);}if((s>0.75)){s=(1.0-s);}if((s>0.25)){s=0.25;}lowp float x;x=((1.0-(s*4.0))*v.w);r=((t*(1.0-x))+(u*x));vec2 y;y.y=0.0;y.x=i;vec2 z;z=(k+y);lowp float A;lowp vec4 B;B=texture2D(u_texture,(v_dark_texture_position+z));lowp vec4 C;C=texture2D(u_texture,(v_bright_texture_position+z));lowp vec4 D;D=texture2D(u_texture,(v_mask_position+z));lowp float E;E=(D.x+u_angle);A=E;if((E>1.0)){A=(E-1.0);}if((A>0.75)){A=(1.0-A);}if((A>0.25)){A=0.25;}lowp float F;F=((1.0-(A*4.0))*D.w);d=((r*(1.0-g))+(((B*(1.0-F))+(C*F))*g));}if((e!=0)){lowp vec4 G;if((f!=0)){vec2 H;H.x=0.0;H.y=j;lowp vec4 I;vec2 J;J=(k+H);lowp float K;lowp vec4 L;L=texture2D(u_texture,(v_dark_texture_position+J));lowp vec4 M;M=texture2D(u_texture,(v_bright_texture_position+J));lowp vec4 N;N=texture2D(u_texture,(v_mask_position+J));lowp float O;O=(N.x+u_angle);K=O;if((O>1.0)){K=(O-1.0);}if((K>0.75)){K=(1.0-K);}if((K>0.25)){K=0.25;}lowp float P;P=((1.0-(K*4.0))*N.w);I=((L*(1.0-P))+(M*P));vec2 Q;Q.x=i;Q.y=j;vec2 R;R=(k+Q);lowp float S;lowp vec4 T;T=texture2D(u_texture,(v_dark_texture_position+R));lowp vec4 U;U=texture2D(u_texture,(v_bright_texture_position+R));lowp vec4 V;V=texture2D(u_texture,(v_mask_position+R));lowp float W;W=(V.x+u_angle);S=W;if((W>1.0)){S=(W-1.0);}if((S>0.75)){S=(1.0-S);}if((S>0.25)){S=0.25;}lowp float X;X=((1.0-(S*4.0))*V.w);G=((I*(1.0-g))+(((T*(1.0-X))+(U*X))*g));}else{vec2 Y;Y.x=0.0;Y.y=j;vec2 Z;Z=(k+Y);lowp float ba;lowp vec4 bb;bb=texture2D(u_texture,(v_dark_texture_position+Z));lowp vec4 bc;bc=texture2D(u_texture,(v_bright_texture_position+Z));lowp vec4 bd;bd=texture2D(u_texture,(v_mask_position+Z));lowp float be;be=(bd.x+u_angle);ba=be;if((be>1.0)){ba=(be-1.0);}if((ba>0.75)){ba=(1.0-ba);}if((ba>0.25)){ba=0.25;}lowp float bf;bf=((1.0-(ba*4.0))*bd.w);G=((bb*(1.0-bf))+(bc*bf));}d=((d*(1.0-h))+(G*h));}c=d;gl_FragColor=c;}"
 files['light-mask-texture-vertex'] = "\n#version 100\nprecision mediump float;attribute vec2 a_vertex_position;attribute vec2 a_bright_texture_position;attribute vec2 a_dark_texture_position;attribute vec2 a_mask_position;uniform mat3 u_matrix;varying vec2 v_dark_texture_position;varying vec2 v_bright_texture_position;varying vec2 v_mask_position;void main(){vec3 a;a.z=1.0;a.xy=a_vertex_position;highp vec4 b;b.zw=vec2(0.0,1.0);b.xy=(u_matrix*a).xy;gl_Position=b;v_bright_texture_position=a_bright_texture_position;v_dark_texture_position=a_dark_texture_position;v_mask_position=a_mask_position;}"
 files['truck-fragment'] = "\n#version 100\nuniform highp vec4 u_truck_texture;uniform highp float u_radius;uniform highp float u_truck_length;uniform sampler2D u_texture;varying highp vec2 v_truck_position;varying highp float f_distance;void main(){highp vec2 a;a=v_truck_position;if((v_truck_position.y<u_radius)){highp float b;b=((u_radius-v_truck_position.y)/u_radius);a.y=(u_radius-((sign(b)*(1.570796-(sqrt((1.0-abs(b)))*(1.570796+(abs(b)*(-0.2146018+(abs(b)*(0.08656672+(abs(b)*-0.03102955)))))))))*u_radius));}if((a.y>(1.0-u_radius))){highp float c;c=(((u_radius-1.0)+a.y)/u_radius);a.y=((1.0-u_radius)+((sign(c)*(1.570796-(sqrt((1.0-abs(c)))*(1.570796+(abs(c)*(-0.2146018+(abs(c)*(0.08656672+(abs(c)*-0.03102955)))))))))*u_radius));}a.x=(u_truck_texture.x+(u_truck_texture.z*(float(mod(v_truck_position.x,1.0)))));a.y=(u_truck_texture.y+(u_truck_texture.w*(float(mod(((a.y*u_truck_length)+f_distance),1.0)))));lowp vec4 d;d=texture2D(u_texture,a);gl_FragColor=d;}"
 files['truck-vertex'] = "\n#version 100\nuniform mat3 u_matrix;attribute vec2 a_vertex_position;attribute vec2 a_truck_position;attribute float a_truck_distance;varying vec2 v_truck_position;varying float f_distance;void main(){vec3 a;a.z=1.0;a.xy=a_vertex_position;highp vec4 b;b.zw=vec2(0.0,1.0);b.xy=(u_matrix*a).xy;gl_Position=b;v_truck_position=a_truck_position;f_distance=a_truck_distance;}"
 files['particle-fragment'] = "\n#version 100\nvarying highp vec4 v_color;void main(){gl_FragColor=v_color;}"
 files['particle-vertex'] = "\n#version 100\nattribute vec2 a_vertex_position;attribute vec4 a_color;varying vec4 v_color;uniform mat3 u_matrix;void main(){vec3 a;a.z=1.0;a.xy=a_vertex_position;highp vec4 b;b.zw=vec2(0.0,1.0);b.xy=(u_matrix*a).xy;gl_Position=b;v_color=a_color;}"
+files['post-processing-fragment'] = "\n#version 100\nvarying highp vec2 v_texture_position;uniform sampler2D u_texture;void main(){lowp vec4 a;a=texture2D(u_texture,v_texture_position);gl_FragColor=a;}"
+files['post-processing-vertex'] = "\n#version 100\nattribute vec2 a_vertex_position;varying vec2 v_texture_position;void main(){highp vec4 a;a.zw=vec2(0.0,1.0);a.xy=a_vertex_position;gl_Position=a;v_texture_position=((a_vertex_position+vec2(1.0,1.0))/2.0);}"
 
 module.exports = files
 var _default = {};
@@ -6941,7 +6941,7 @@ class ExplodeEffectPool {
     const sourceY = (Math.floor(y / this.gridSize) + 0.5) * this.gridSize; // Надоело строить из себя англичанина. Короче, эта функция говорит,
     // есть ли путь из точки, куда попал снаряд, в соседнюю точку. Сам по
     // себе взрыв в начале распространяется по четырем ячейкам, так
-    // что здесь проверяются только углы (sourceX, y), (x, sourceY) А если
+    // что здесь проверяются только углы (x, y), (x, y) А если
     // что-то из этого равно исходным координатам, достаточно проверить только
     // одну точку - ту, которая дается в параметр
 
@@ -12964,9 +12964,9 @@ class b2PolygonShape extends _b2_shape.b2Shape {
         const center_x: number = 0.5 * (lowerX + upperX);
         const center_y: number = 0.5 * (lowerY + upperY);
         const tMat = obb.R;
-        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.x * center_y);
+        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.cursorX * center_y);
         obb.center.y = root.y + (tMat.ex.y * center_x + tMat.ey.y * center_y);
-        obb.extents.x = 0.5 * (upperX - lowerX);
+        obb.extents.cursorX = 0.5 * (upperX - lowerX);
         obb.extents.y = 0.5 * (upperY - lowerY);
       }
     }
@@ -19627,7 +19627,7 @@ class b2ContactSolver {
             // Resubstitute for the incremental impulse
             // b2Vec2 d = x - a;
             _b2_math.b2Vec2.SubVV(x, a, d); // Apply incremental impulse
-            // b2Vec2 P1 = d.x * normal;
+            // b2Vec2 P1 = d.cursorX * normal;
 
 
             _b2_math.b2Vec2.MulSV(d.x, normal, P1); // b2Vec2 P2 = d.y * normal;
@@ -19673,9 +19673,9 @@ class b2ContactSolver {
 
           if (vn1 >= 0 && vn2 >= 0) {
             // Resubstitute for the incremental impulse
-            // b2Vec2 d = x - a;
+            // b2Vec2 d = cursorX - a;
             _b2_math.b2Vec2.SubVV(x, a, d); // Apply incremental impulse
-            // b2Vec2 P1 = d.x * normal;
+            // b2Vec2 P1 = d.cursorX * normal;
 
 
             _b2_math.b2Vec2.MulSV(d.x, normal, P1); // b2Vec2 P2 = d.y * normal;
@@ -37996,23 +37996,31 @@ var _binarypacket = _interopRequireDefault(require(178));
 var _serializable = require(203);
 
 class EntityListPacket extends _binarypacket.default {
+  // protected static fieldCodingDeclarator = new Map([
+  //     ["entities", {
+  //         type: "map",
+  //         key: "Uint32",
+  //         value: {
+  //             read: (entity: AbstractEntity, encoder: BinaryEncoder) => entity.model.encodeDynamicData(encoder),
+  //             write: (entity: AbstractEntity, decoder: BinaryDecoder) => entity.model.decodeDynamicData(decoder)
+  //         }
+  //     }]
+  // ])
   constructor(entities) {
     super();
     this.entities = void 0;
-    this.entitySize = void 0;
+    this.entityCount = void 0;
     this.entities = entities;
-    this.entitySize = 0;
-    if (this.entities) for (let entity of this.entities) {
-      this.entitySize++;
-    }
+    this.entityCount = 0;
+    if (this.entities) this.entityCount = this.entities.size;
   }
 
   shouldSend() {
-    return this.entitySize > 0;
+    return this.entityCount > 0;
   }
 
   toBinary(encoder) {
-    encoder.writeUint16(this.entitySize);
+    encoder.writeUint16(this.entityCount);
 
     for (let entity of this.entities.values()) {
       encoder.writeUint32(entity.model.id);
@@ -41282,31 +41290,104 @@ exports.default = void 0;
 
 class EventEmitter {
   constructor() {
-    this.events = new Map();
-    this.events = new Map();
+    this.handlers = void 0;
+    this.handlers = new Map();
   }
 
-  emit(event, ...args) {
-    if (this.events.has(event)) {
-      let args = Array.prototype.slice.call(arguments, 1);
+  addListener(type, listener, priority) {
+    let priorityBlock = this.handlers.get(priority);
 
-      for (let listener of this.events.get(event)) {
-        listener.apply(null, args);
+    if (!priorityBlock) {
+      priorityBlock = new Map();
+      this.handlers.set(priority, priorityBlock);
+    }
+
+    let handlers = priorityBlock.get(type);
+
+    if (handlers) {
+      handlers.push(listener);
+    } else {
+      priorityBlock.set(type, [listener]);
+    }
+
+    this._emit('newListener', [type, listener]);
+  }
+
+  on(type, listener, priority = EventEmitter.PRIORITY_NORMAL) {
+    return this.addListener(type, listener, priority);
+  }
+
+  removeListener(type, listener) {
+    for (let [_, priorityBlock] of this.handlers.entries()) {
+      let handlers = priorityBlock.get(type);
+      if (!handlers) continue;
+      let index = handlers.indexOf(listener);
+
+      if (index !== -1) {
+        handlers.splice(index, 1);
       }
     }
   }
 
-  on(event, handler) {
-    if (this.events.has(event)) {
-      this.events.get(event).push(handler);
+  off(type, listener) {
+    return this.removeListener(type, listener);
+  }
+
+  removeAllListeners(type) {
+    if (type) {
+      for (let [_, priorityBlock] of this.handlers.entries()) {
+        if (type) {
+          priorityBlock.delete(type);
+        }
+      }
     } else {
-      this.events.set(event, [handler]);
+      this.handlers.clear();
     }
+  }
+
+  once(type, listener) {
+    function on() {
+      this.removeListener(type, on);
+      return listener.apply(this, arguments);
+    }
+
+    on.listener = listener;
+    return this.on(type, on);
+  }
+
+  _emit(type, args) {
+    let result = true;
+
+    for (let [_, priorityBlock] of this.handlers.entries()) {
+      let handlers = priorityBlock.get(type);
+      if (!handlers) continue;
+
+      for (let handler of handlers) {
+        if (handler.apply(this, args) === false) {
+          result = false;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  emit(type, ...values) {
+    let args = Array.prototype.slice.call(arguments, 1);
+    let params = Array.prototype.slice.call(arguments);
+
+    this._emit('event', params);
+
+    return this._emit(type, args) !== false;
   }
 
 }
 
 exports.default = EventEmitter;
+EventEmitter.PRIORITY_LOW = 3;
+EventEmitter.PRIORITY_MONITOR = 2;
+EventEmitter.PRIORITY_NORMAL = 1;
+EventEmitter.PRIORITY_HIGH = 0;
 },{}],230:[function(require,module,exports){
 "use strict";
 
@@ -42012,9 +42093,14 @@ class SpawnZone extends _rectangle.default {
   }
 
   static fromBinary(decoder) {
-    let zone = new this(decoder.readUint8());
-    zone.setFrom(decoder.readUint32(), decoder.readUint32());
-    zone.setTo(decoder.readUint32(), decoder.readUint32());
+    let id = decoder.readUint8();
+    let x1 = decoder.readUint32();
+    let y1 = decoder.readUint32();
+    let x2 = decoder.readUint32();
+    let y2 = decoder.readUint32();
+    let zone = new this(id);
+    zone.setFrom(x1, y1);
+    zone.setTo(x2, y2);
     return zone;
   }
 

@@ -8,9 +8,8 @@
  * Modules
  */
 
-import EventEmitter from '../events';
-import { Screen } from "./screen";
-import {Element} from "./element";
+import EventEmitter from 'src/utils/eventemitter';
+import {Screen} from "./screen";
 
 export interface ElementPosition {
     x?: number
@@ -29,17 +28,19 @@ export class Node extends EventEmitter {
     public parent: Node;
     public children: Node[];
     public data: any;
-    public uid: any;
     public index: number;
     public detached: boolean;
     public hidden: boolean;
     public type: string;
-    public position: ElementPosition
-    public destroyed: boolean;
 
     /**
-     * Node
+     * Node position relative to its parent.
+     * You *may* change it directly only if you call {@link onResize} or {@link onMove} manually.
      */
+    public position: ElementPosition
+    public destroyed: boolean;
+    public needsRender: boolean
+
     constructor(options: NodeConfig) {
         super();
 
@@ -47,6 +48,7 @@ export class Node extends EventEmitter {
         this.options = options;
         this.position = options.position || {}
         this.detached = true
+        this.needsRender = false
 
         this.parent = null;
         this.children = [];
@@ -310,7 +312,7 @@ export class Node extends EventEmitter {
     setaleft(val: number) {
         val -= this.parent.getaleft();
         if (this.position.x === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.x = val;
     }
@@ -318,7 +320,7 @@ export class Node extends EventEmitter {
     setaright(val: number) {
         val -= this.parent.getaright();
         if (this.position.x + this.position.width === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.x = val - this.position.width;
     }
@@ -326,7 +328,7 @@ export class Node extends EventEmitter {
     setatop(val: number) {
         val -= this.parent.getatop();
         if (this.getatop() === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.setrtop(val)
     }
@@ -334,35 +336,35 @@ export class Node extends EventEmitter {
     setabottom(val: number) {
         val -= this.parent.getabottom();
         if (this.getabottom() === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.setrbottom(val)
     }
 
     setrleft(val: number) {
         if (this.position.x === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.x = val;
     }
 
     setrright(val: number) {
         if (this.position.x + this.position.width === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.x = val - this.position.width;
     }
 
     setrtop(val: number) {
         if (this.position.y === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.y = val;
     }
 
     setrbottom(val: number) {
         if (this.position.y + this.position.height === val) return;
-        this.emit('move');
+        this.onMove()
         this.clearPos();
         this.position.y = val - this.position.height;
     }
@@ -375,15 +377,68 @@ export class Node extends EventEmitter {
 
     }
 
+    /**
+     * Called when node is attached to the screen
+     */
+
     onAttach() {
         this.emit('attach')
     }
+
+    /**
+     * Called when node is detached from the screen
+     */
 
     onDetach() {
         this.emit('detach')
     }
 
+    /**
+     * Called when node is moved.
+     */
+
+    onMove() {
+        this.emit('move')
+    }
+
+    /**
+     * Called when nodes is resized or moved
+     * Although this method can be called when node is moved, this
+     * may be unnecessary, as {@link onResize} may reallocate
+     * internal buffers or use other complicated update methods.
+     * Use {@link onMove} for this purpose
+     * @see onMove
+     */
+
     onResize() {
         this.emit('resize');
+    }
+
+    /**
+     * Called when node is focused
+     */
+
+    onFocus() {
+        this.emit('focus')
+    }
+
+    /**
+     * Called when node loses focus
+     */
+
+    onBlur() {
+        this.emit('blur')
+    }
+
+    /**
+     * Informs the engine that this node should be rendered on next tick.
+     * Triggers setNeedsRender for all parent nodes.
+     */
+
+    setNeedsRender() {
+        this.needsRender = true
+        if(this.parent) {
+            this.parent.setNeedsRender()
+        }
     }
 }

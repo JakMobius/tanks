@@ -1,7 +1,7 @@
 import {TTYColor} from "./colors";
 
-export type BlessedCursorShapes = 'block' | 'line' | 'underline'
-export interface BlessedCursorShapeConfig {
+export type CursorShapes = 'block' | 'line' | 'underline'
+export interface CursorShapeConfig {
     bold?: boolean
     underline?: boolean
     blink?: boolean
@@ -12,11 +12,11 @@ export interface BlessedCursorShapeConfig {
     ch?: string
 }
 
-export type BlessedCursorShape = BlessedCursorShapes | BlessedCursorShapeConfig
+export type CursorShape = CursorShapes | CursorShapeConfig
 
-export interface BlessedCursorConfig {
+export interface CursorConfig {
     artificial?: boolean
-    shape?: BlessedCursorShape
+    shape?: CursorShape
     blink?: boolean
     color?: TTYColor
 }

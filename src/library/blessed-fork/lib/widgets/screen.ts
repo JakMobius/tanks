@@ -17,10 +17,9 @@ var nextTick = global.setImmediate || process.nextTick.bind(process);
 import {Node, NodeConfig} from './node';
 import { Element } from './element';
 import Tput from "../terminal/tput";
-import {utoa} from "../terminal/characters";
 import Program from "../program";
 import * as tty from "tty"
-import {BlessedCursorShape, BlessedCursorConfig} from "../cursor";
+import {CursorShape, CursorConfig} from "../cursor";
 import {Framebuffer} from "../framebuffer";
 
 interface ScreenConfig extends NodeConfig {
@@ -34,7 +33,7 @@ interface ScreenConfig extends NodeConfig {
     output?: tty.WriteStream;
     input?: tty.ReadStream;
     program?: Program;
-    cursor?: BlessedCursorConfig
+    cursor?: CursorConfig
     smartCSR?: boolean
     fastCSR?: boolean
     useBCE?: boolean
@@ -42,7 +41,11 @@ interface ScreenConfig extends NodeConfig {
     sendFocus?: boolean
 }
 
-export interface BlessedEvent {
+export interface TTYCancellableEvent extends TTYEvent {
+    cancelled?: boolean
+}
+
+export interface TTYEvent {
     event?: string
     code?: string
     /// Event name
@@ -56,18 +59,20 @@ export interface BlessedEvent {
     shift?: boolean
 }
 
-export interface BlessedKeyEvent extends BlessedEvent {
+export interface KeyEvent extends TTYCancellableEvent {
     sequence?: string
     ch?: string
     full?: string
 }
 
-export interface BlessedMouseEvent extends BlessedEvent {
+export interface MouseEvent extends TTYCancellableEvent {
     page?: number;
     raw?: any
     buf?: Buffer
     x?: number
     y?: number
+    dx?: number
+    dy?: number
     button?: string
     action?: string
 }
@@ -103,7 +108,7 @@ export class Screen extends Node {
     public _cursorBlink: any;
     public _needsClickableSort: any;
     public mouseDown: any;
-    public cursor: BlessedCursorConfig
+    public cursor: CursorConfig
     public clickableElements: Element[];
     public keyableElements: Element[];
     public options: ScreenConfig
@@ -122,8 +127,6 @@ export class Screen extends Node {
         this.options = options
         this.detached = false
         this.screen = this
-
-        let self = this;
 
         Screen.bind(this);
 
@@ -196,25 +199,16 @@ export class Screen extends Node {
                 child.onResize()
             }
 
-            this.render();
+            this.setNeedsRender();
         });
 
-        this.program.on('focus', function() {
-            self.emit('focus');
-        });
-
-        this.program.on('blur', function() {
-            self.emit('blur');
-        });
-
-        this.program.on('warning', function(text: string) {
-            self.emit('warning', text);
-        });
-
-        this.on('newListener', function fn(type: string) {
+        this.program.on('focus', () => this.onFocus());
+        this.program.on('blur', () => this.onBlur());
+        this.program.on('warning', (text: string) => this.emit('warning', text))
+        this.on('newListener', (type: string) => {
             if (type === 'keypress' || type.indexOf('key ') === 0 || type === 'mouse') {
-                if (type === 'keypress' || type.indexOf('key ') === 0) self._listenKeys();
-                if (type === 'mouse') self._listenMouse();
+                if (type === 'keypress' || type.indexOf('key ') === 0) this._listenKeys();
+                if (type === 'mouse') this._listenMouse();
             }
             if (type === 'mouse'
                 || type === 'click'
@@ -226,23 +220,21 @@ export class Screen extends Node {
                 || type === 'wheeldown'
                 || type === 'wheelup'
                 || type === 'mousemove') {
-                self._listenMouse();
+                this._listenMouse();
             }
         });
 
         this.program.on("cursorHide", () => {
             if(this.cursor.artificial) {
-                if(this.renders) this.render()
+                if(this.renders) this.setNeedsRender()
             }
         })
 
         this.program.on("cursorShow", () => {
             if(this.cursor.artificial) {
-                if(this.renders) this.render()
+                if(this.renders) this.setNeedsRender()
             }
         })
-
-        this.setMaxListeners(Infinity);
 
         this.enter();
 
@@ -296,7 +288,7 @@ export class Screen extends Node {
         this.program.showCursor();
         this.framebuffer.resize(this.position.width, this.position.height)
         if (this._listenedMouse) {
-            this.program.disableMouse();
+            this.program.mouseController.disableMouse();
         }
         this.program.normalBuffer();
         this.resetCursor();
@@ -313,7 +305,7 @@ export class Screen extends Node {
     destroy() {
         this.leave();
 
-        var index = Screen.instances.indexOf(this);
+        let index = Screen.instances.indexOf(this);
         if (~index) {
             Screen.instances.splice(index, 1);
             Screen.total--;
@@ -362,16 +354,16 @@ export class Screen extends Node {
         if (this._listenedMouse) return;
         this._listenedMouse = true;
 
-        this.program.enableMouse();
+        this.program.mouseController.enableMouse();
         if (this.options.sendFocus) {
-            this.program.setMouse({ sendFocus: true }, true);
+            this.program.mouseController.setMouse({ sendFocus: true }, true);
         }
 
         this.on('render', function() {
             self._needsClickableSort = true;
         });
 
-        this.program.on('mouse', function(data: BlessedMouseEvent) {
+        this.program.on('mouse', function(data: MouseEvent) {
             if (self.lockKeys) return;
 
             if (self._needsClickableSort) {
@@ -459,7 +451,7 @@ export class Screen extends Node {
         // After the first keypress emitted, the handler
         // checks to make sure grabKeys, lockKeys, and focused
         // weren't changed, and handles those situations appropriately.
-        this.program.on('keypress', (ch: string, key: BlessedKeyEvent) => {
+        this.program.on('keypress', (ch: string, key: KeyEvent) => {
 
             let focused = this.getfocused()
             let grabKeys = this.grabKeys;
@@ -489,6 +481,7 @@ export class Screen extends Node {
     }
 
     render() {
+        super.render()
         var self = this;
 
         if (this.destroyed) return;
@@ -505,17 +498,13 @@ export class Screen extends Node {
         this._ci = 0;
         this.children.forEach(function(el) {
             el.index = self._ci++;
-            //el._rendering = true;
-            el.render();
-            //el._rendering = false;
+
+            if(el.needsRender)
+                el.render();
         });
         this._ci = -1;
 
         this.framebuffer.draw(0, this.framebuffer.lines.length - 1);
-
-        // XXX Workaround to deal with cursor pos before the screen has rendered and
-        // lpos is not reliable (stale).
-        let focused = this.getfocused()
 
         this.renders++;
 
@@ -525,7 +514,7 @@ export class Screen extends Node {
     blankLine(ch?: string, dirty?: boolean): ScreenLine {
         let out: ScreenLine = [] as ScreenLine;
         let width = this.getwidth()
-        for (var x = 0; x < width; x++) {
+        for (let x = 0; x < width; x++) {
             out[x] = [this.dattr, ch || ' '];
         }
         out.dirty = dirty;
@@ -820,11 +809,8 @@ export class Screen extends Node {
         //     }
         // }
 
-        if (old) {
-            old.emit('blur', self);
-        }
-
-        self.emit('focus', old);
+        if (old) old.onBlur()
+        self.onFocus()
     }
 
     clearRegion(x1: number, x2: any, y1: any, y2: any, override?: boolean) {
@@ -873,7 +859,7 @@ export class Screen extends Node {
         return this.program.copyToClipboard(text);
     }
 
-    cursorShape(shape: BlessedCursorShape, blink: boolean) {
+    cursorShape(shape: CursorShape, blink: boolean) {
         let self = this;
 
         this.cursor.shape = shape || 'block';
@@ -884,7 +870,7 @@ export class Screen extends Node {
                 this._cursorBlink = setInterval(function() {
                     if (!self.cursor.blink) return;
                     self.cursor._state ^= 1;
-                    if (self.renders) self.render();
+                    if (self.renders) self.setNeedsRender();
                 }, 500);
             }
             return true;
@@ -925,7 +911,7 @@ export class Screen extends Node {
         return this.program.resetCursor()
     }
 
-    _cursorAttr(cursor: BlessedCursorConfig, dattr: number) {
+    _cursorAttr(cursor: CursorConfig, dattr: number) {
         let attr = dattr || this.dattr
         let cattr
         let ch;
@@ -1068,5 +1054,16 @@ export class Screen extends Node {
 
     getabottom(): number {
         return 0
+    }
+
+    setNeedsRender() {
+        if(!this.needsRender) {
+            nextTick(() => {
+                this.needsRender = false
+                this.render()
+            })
+        }
+
+        super.setNeedsRender();
     }
 }

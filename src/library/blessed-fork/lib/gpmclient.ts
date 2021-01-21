@@ -6,7 +6,7 @@
 
 import net from 'net';
 import fs from 'fs';
-import EventEmitter from './events';
+import EventEmitter from 'src/utils/eventemitter';
 
 const GPM_USE_MAGIC = false;
 
@@ -97,8 +97,8 @@ function parseEvent(raw: Buffer): GPMEvent {
   evnt.vc = raw.readUInt16LE(2);
   evnt.dx = raw.readInt16LE(4);
   evnt.dy = raw.readInt16LE(6);
-  evnt.x = raw.readInt16LE(8);
-  evnt.y = raw.readInt16LE(10);
+  evnt.x = raw.readInt16LE(8) - 1;
+  evnt.y = raw.readInt16LE(10) - 1;
   evnt.type = raw.readInt16LE(12);
   evnt.clicks = raw.readInt32LE(16);
   evnt.margin = raw.readInt32LE(20);
@@ -166,34 +166,30 @@ class GpmClient extends EventEmitter {
           switch (event.type & 15) {
             case GPM_MOVE:
               if (event.dx || event.dy) {
-                self.emit('move', event.buttons, event.modifiers, event.x, event.y);
+                self.emit('move', event);
               }
               if (event.wdx || event.wdy) {
-                self.emit('mousewheel',
-                  event.buttons, event.modifiers,
-                  event.x, event.y, event.wdx, event.wdy);
+                self.emit('mousewheel', event);
               }
               break;
             case GPM_DRAG:
               if (event.dx || event.dy) {
-                self.emit('drag', event.buttons, event.modifiers, event.x, event.y);
+                self.emit('drag', event);
               }
               if (event.wdx || event.wdy) {
-                self.emit('mousewheel',
-                  event.buttons, event.modifiers,
-                  event.x, event.y, event.wdx, event.wdy);
+                self.emit('mousewheel', event);
               }
               break;
             case GPM_DOWN:
-              self.emit('btndown', event.buttons, event.modifiers, event.x, event.y);
+              self.emit('btndown', event);
               if (event.type & GPM_DOUBLE) {
-                self.emit('dblclick', event.buttons, event.modifiers, event.x, event.y);
+                self.emit('dblclick', event);
               }
               break;
             case GPM_UP:
-              self.emit('btnup', event.buttons, event.modifiers, event.x, event.y);
+              self.emit('btnup', event);
               if (!(event.type & GPM_MFLAG)) {
-                self.emit('click', event.buttons, event.modifiers, event.x, event.y);
+                self.emit('click', event);
               }
               break;
           }

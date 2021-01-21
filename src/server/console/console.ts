@@ -1,6 +1,6 @@
 import Logger from '../log/logger';
 import * as fs from 'fs';
-import ConsoleWindow from './consolewindow';
+import ConsoleWindow from './console-window';
 import * as path from 'path';
 import ArgumentParser from './argument-parser';
 
@@ -41,45 +41,36 @@ class Console {
 		// Shift-tab feature doesn't work
 		// in WebStorm internal console.
 
-		this.window.on("tab", (shift: boolean) => {
+		this.window.on("value", 	() => this.updateAutosuggestion())
+		this.window.on("value", 	() => this.tabComplete())
+		this.window.on("exit", 	() => this.commands.get("exit").onPerform([]))
+		this.window.on("command", 	(command: string) => this.evaluate(command))
+		this.window.on("tab", (shift) => {
 			if (this.tabCompletions) {
-				if(shift) {
-					this.tabCompletePrevious()
-				} else {
-					this.tabCompleteNext()
-				}
+				if(shift) this.tabCompletePrevious()
+				else this.tabCompleteNext()
 			} else {
-				this.tabCompleteBegin(this.window.consoleTextbox.value, shift)
+				this.tabCompleteBegin(this.window.getValue(), shift)
 			}
-		})
-		this.window.on("keypress", () => {
-			this.tabComplete()
-		})
-		this.window.on("exit", () => {
-			this.commands.get("exit").onPerform([])
-		})
-		this.window.on("command", (command: string) => {
-			this.evaluate(command)
 		})
 
 		this.logger.addDestination(this.window.destination)
 	}
 
-	tabCompleteBegin(line: string, shift: boolean): void {
+	private getAutocompletions(line: string): string[] {
 		let args = ArgumentParser.parseArguments(line)
 
 		if(args.length <= 1) {
 
-			this.tabCompletions = []
+			let completions = []
 			for(let command of this.commands.values()) {
 				let name = command.getName()
 
 				if(args.length === 0 || name.startsWith(args[0])) {
-					this.tabCompletions.push(name)
+					completions.push(name)
 				}
 			}
-			if(this.tabCompletions.length > 1)
-				this.logger.log(this.tabCompletions.join(", "))
+			return completions
 		} else {
 			let command = this.commands.get(args[0])
 			if (command) {
@@ -90,7 +81,7 @@ class Console {
 						this.logger.log(completions.join(", "))
 					}
 
-					this.tabCompletions = completions.map(arg => {
+					return completions.map(arg => {
 						if(arg.indexOf(" ") !== -1) {
 							arg = "'" + arg + "'"
 						}
@@ -99,6 +90,12 @@ class Console {
 				}
 			}
 		}
+
+		return null
+	}
+
+	tabCompleteBegin(line: string, shift: boolean): void {
+		this.tabCompletions = this.getAutocompletions(line)
 
 		if (this.tabCompletions && this.tabCompletions.length) {
 			if(this.tabCompletions.length > 1) {
@@ -135,6 +132,23 @@ class Console {
 	tabComplete(): void {
 		this.tabCompletions = null
 		this.tabCompleteIndex = null
+	}
+
+	updateAutosuggestion(): void {
+		let line = this.window.getValue()
+
+		if(line.length == 0) {
+			this.window.suggest(null)
+			return
+		}
+
+		let completions = this.getAutocompletions(line)
+
+		if(completions && completions.length == 1) {
+			this.window.suggest(completions[0])
+		} else {
+			this.window.suggest(null)
+		}
 	}
 
 	evaluate(line: string): void {

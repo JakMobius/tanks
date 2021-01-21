@@ -37,14 +37,14 @@ export class Framebuffer {
         this.reallocBuffer(this.lines, width, height, dirty)
         this.reallocBuffer(this.oldlines, width, height, dirty)
 
-        this.screen.program._write(this.screen.tput.terminfo.methods.clear());
+        this.screen.program.clear()
     }
 
     private reduceColor(color: number) {
         return colors.reduce(color, this.screen.tput.terminfo.numbers.max_colors);
     }
 
-    private charFlagsToString(data: number): string {
+    charFlagsToString(data: number): string {
         let out = ''
 
         let bg = data & 0x1ff;
@@ -91,6 +91,112 @@ export class Framebuffer {
 
         return '\x1b[' + out + 'm';
     }
+
+    // Convert an SGR string to our own attribute format.
+    stringToCharFlags(code: string, cur: number, def: number) {
+        var flags = (cur >> 18) & 0x1ff
+            , fg = (cur >> 9) & 0x1ff
+            , bg = cur & 0x1ff
+            , c
+            , i;
+
+        let parts = code.slice(2, -1).split(';');
+        if (!code[0]) parts[0] = '0';
+
+        for (i = 0; i < parts.length; i++) {
+            c = +parts[i] || 0;
+            switch (c) {
+                case 0: // normal
+                    bg = def & 0x1ff;
+                    fg = (def >> 9) & 0x1ff;
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 1: // bold
+                    flags |= 1;
+                    break;
+                case 22:
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 4: // underline
+                    flags |= 2;
+                    break;
+                case 24:
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 5: // blink
+                    flags |= 4;
+                    break;
+                case 25:
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 7: // inverse
+                    flags |= 8;
+                    break;
+                case 27:
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 8: // invisible
+                    flags |= 16;
+                    break;
+                case 28:
+                    flags = (def >> 18) & 0x1ff;
+                    break;
+                case 39: // default fg
+                    fg = (def >> 9) & 0x1ff;
+                    break;
+                case 49: // default bg
+                    bg = def & 0x1ff;
+                    break;
+                case 100: // default fg/bg
+                    fg = (def >> 9) & 0x1ff;
+                    bg = def & 0x1ff;
+                    break;
+                default: // color
+                    if (c === 48 && +parts[i+1] === 5) {
+                        i += 2;
+                        bg = +parts[i];
+                        break;
+                    } else if (c === 48 && +parts[i+1] === 2) {
+                        i += 2;
+                        bg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
+                        if (bg === -1) bg = def & 0x1ff;
+                        i += 2;
+                        break;
+                    } else if (c === 38 && +parts[i+1] === 5) {
+                        i += 2;
+                        fg = +parts[i];
+                        break;
+                    } else if (c === 38 && +parts[i+1] === 2) {
+                        i += 2;
+                        fg = colors.match(+parts[i], +parts[i+1], +parts[i+2]);
+                        if (fg === -1) fg = (def >> 9) & 0x1ff;
+                        i += 2;
+                        break;
+                    }
+                    if (c >= 40 && c <= 47) {
+                        bg = c - 40;
+                    } else if (c >= 100 && c <= 107) {
+                        bg = c - 100;
+                        bg += 8;
+                    } else if (c === 49) {
+                        bg = def & 0x1ff;
+                    } else if (c >= 30 && c <= 37) {
+                        fg = c - 30;
+                    } else if (c >= 90 && c <= 97) {
+                        fg = c - 90;
+                        fg += 8;
+                    } else if (c === 39) {
+                        fg = (def >> 9) & 0x1ff;
+                    } else if (c === 100) {
+                        fg = (def >> 9) & 0x1ff;
+                        bg = def & 0x1ff;
+                    }
+                    break;
+            }
+        }
+
+        return (flags << 18) | (fg << 9) | bg;
+    };
 
     draw(start: number, end: number) {
 

@@ -8,13 +8,10 @@
  * Modules
  */
 
-import assert from 'assert';
 import colors, {TTYColor} from '../colors'
 import * as unicode from '../unicode';
 import * as helpers from '../helpers';
 import {Node, NodeConfig} from "./node"
-import { Screen } from './screen'
-import {BlessedCursorShapeConfig} from "../cursor";
 
 type ElementHAlign = 'left' | 'center' | 'right'
 type ElementVAlign = 'top' | 'middle' | 'bottom'
@@ -165,6 +162,7 @@ export class Element extends Node {
     onResize() {
         super.onResize()
         this.parseContent();
+        this.setNeedsRender()
     }
 
     onMouseListener() {
@@ -185,7 +183,7 @@ export class Element extends Node {
         if (this.isClickable) this.screen._listenMouse(this);
         if (this.isKeyable) this.screen._listenKeys(this);
     }
-c
+
     onDetach() {
         super.onDetach()
         if(this.isClickable) this.screen._unlistenMouse(this)
@@ -213,15 +211,13 @@ c
 
         // return (this.uid << 24)
         //   | ((this.dockBorders ? 32 : 0) << 18)
-        let result = ((invisible ? 16 : 0) << 18)
+        return ((invisible ? 16 : 0) << 18)
             | ((inverse ? 8 : 0) << 18)
             | ((blink ? 4 : 0) << 18)
             | ((underline ? 2 : 0) << 18)
             | ((bold ? 1 : 0) << 18)
             | (fgCode << 9)
             | bgCode
-
-        return result
     }
 
     free() {
@@ -256,6 +252,7 @@ c
         if (!noClear) this.clearPos();
         this.content = content || '';
         this.parseContent();
+        this.setNeedsRender()
         this.emit('set content');
     }
 
@@ -354,7 +351,7 @@ c
             for (i = 0; i < line.length; i++) {
                 if (line[i] === '\x1b') {
                     if (c = /^\x1b\[[\d;]*m/.exec(line.substring(i))) {
-                        attr = this.screen.attrCode(c[0], attr, dattr);
+                        attr = this.screen.framebuffer.stringToCharFlags(c[0], attr, dattr);
                         i += c[0].length - 1;
                     }
                 }
@@ -364,7 +361,7 @@ c
         return attrs;
     }
 
-    _align(line, width, align) {
+    _align(line: string, width: number, align: ElementHAlign) {
         if (!align) return line;
         //if (!align && !~line.indexOf('{|}')) return line;
 
@@ -586,7 +583,8 @@ c
     }
 
     render() {
-        if(this.detached) return
+        super.render()
+        if(this.detached || this.hidden) return
 
         this._emit('prerender');
 
@@ -710,7 +708,7 @@ c
                 while (ch === '\x1b') {
                     if (c = /^\x1b\[[\d;]*m/.exec(content.substring(ci - 1))) {
                         ci += c[0].length - 1;
-                        attr = this.screen.attrCode(c[0], attr, dattr);
+                        attr = this.screen.framebuffer.stringToCharFlags(c[0], attr, dattr);
 
                         ch = content[ci] || bch;
                         ci++;
@@ -775,17 +773,17 @@ c
                     }
                 }
 
-                if (this._noFill) continue;
-
-                if (this.style.transparent) {
-                    lines[y][x][0] = colors.blend(attr, lines[y][x][0]);
-                    if (content[ci]) lines[y][x][1] = ch;
-                    lines[y].dirty = true;
-                } else {
-                    if (attr !== cell[0] || ch !== cell[1]) {
-                        lines[y][x][0] = attr;
-                        lines[y][x][1] = ch;
+                if(this.style.fg !== null) {
+                    if (this.style.transparent) {
+                        lines[y][x][0] = colors.blend(attr, lines[y][x][0]);
+                        if (content[ci]) lines[y][x][1] = ch;
                         lines[y].dirty = true;
+                    } else {
+                        if (attr !== cell[0] || ch !== cell[1]) {
+                            lines[y][x][0] = attr;
+                            lines[y][x][1] = ch;
+                            lines[y].dirty = true;
+                        }
                     }
                 }
             }
@@ -977,13 +975,9 @@ c
             if (el.screen._ci !== -1) {
                 el.index = el.screen._ci++;
             }
-            // if (el.screen._rendering) {
-            //   el._rendering = true;
-            // }
-            el.render();
-            // if (el.screen._rendering) {
-            //   el._rendering = false;
-            // }
+
+            if(el.needsRender)
+                el.render();
         });
 
         this._emit('render');

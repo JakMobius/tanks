@@ -4,14 +4,14 @@
  * https://github.com/chjj/blessed
  */
 
-import {BlessedKeyEvent} from "./screen";
+import {KeyEvent} from "./screen";
 import {Screen} from "./screen";
 
 /**
  * Modules
  */
 
-var nextTick = global.setImmediate || process.nextTick.bind(process);
+let nextTick = global.setImmediate || process.nextTick.bind(process);
 
 import {Input} from './input';
 import * as unicode from "../unicode";
@@ -25,7 +25,10 @@ export class Prompt extends Input {
 	public value: any;
 	public cursorPosition: number;
 	public scrollPosition: number;
-	public backspaceVisiblePadding: any;
+	public backspaceVisiblePadding: number;
+
+	public viewportLeft: number
+    public viewportRight: number
 
     /**
      * Textarea
@@ -37,12 +40,10 @@ export class Prompt extends Input {
 
         this.value = options.value || '';
 
-        this.on('resize', this.resize);
-        this.on('move', this.updateCursor);
-        this.on('focus', this.onFocus)
-
         this.cursorPosition = 0
         this.scrollPosition = 0
+        this.viewportLeft = null
+        this.viewportRight = null
 
         this.backspaceVisiblePadding = 3
 
@@ -57,10 +58,15 @@ export class Prompt extends Input {
         }
     }
 
-    resize() {
+    onMove() {
+        super.onMove()
+        this.updateCursor()
+    }
+
+    onResize() {
+        super.onResize()
         this.updateCursor()
         this.scrollToMatchCursor()
-        this.screen.render()
     }
 
     updateCursor() {
@@ -95,6 +101,7 @@ export class Prompt extends Input {
     }
 
     onFocus() {
+        super.onFocus()
         this.screen.grabKeys = true;
 
         this.updateCursor();
@@ -184,29 +191,22 @@ export class Prompt extends Input {
     cursorMoved() {
         if(this.scrollToMatchCursor()) {
             this.trimViewport();
-            this.screen.render();
         }
         this.updateCursor();
     }
 
-    onKey(ch: string, key: BlessedKeyEvent) {
-        var updated = false;
+    onKey(ch: string, key: KeyEvent) {
+        if(key.cancelled) return
+        let updated = false;
 
-        if (key.name === 'return') return;
-        if (key.name === 'enter') return;
-
+        if(key.name === 'return') return;
+        if(key.name === 'enter') return;
         if(key.name === 'left') {
-            if(key.meta) {
-                this.cursorWordLeft();
-            } else {
-                this.cursorLeft()
-            }
+            if(key.meta) this.cursorWordLeft();
+            else this.cursorLeft()
         } else if(key.name === 'right') {
-            if(key.meta) {
-                this.cursorWordRight()
-            } else {
-                this.cursorRight()
-            }
+            if(key.meta) this.cursorWordRight()
+            else this.cursorRight()
         }
 
         if (key.name === 'backspace') {
@@ -242,11 +242,17 @@ export class Prompt extends Input {
         }
 
         if (updated) {
+            this.onValue()
             this.scrollToMatchCursor()
             this.trimViewport()
-            this.screen.render();
             this.updateCursor();
         }
+    }
+
+    onValue() {
+        this.viewportLeft = null
+        this.viewportRight = null
+        this.emit('value')
     }
 
     getValue() {
@@ -258,6 +264,7 @@ export class Prompt extends Input {
             this.value = value;
             this.cursorPosition = this.value.length
 
+            this.onValue()
             this.scrollToMatchCursor()
             this.setContent(this.value);
             this.updateCursor();
@@ -270,7 +277,16 @@ export class Prompt extends Input {
     }
 
     trimViewport() {
-        this.setContent(this.value.substr(this.scrollPosition, this.getwidth()), true);
+        this.setViewport(this.scrollPosition, this.scrollPosition + this.getwidth())
+    }
+
+    setViewport(left: number, right: number) {
+        if(this.viewportLeft == left && this.viewportRight == right) return
+
+        this.viewportLeft = left
+        this.viewportRight = right
+
+        this.setContent(this.value.substring(this.viewportLeft, this.viewportRight), true);
     }
 
     scrollToMatchCursor() {

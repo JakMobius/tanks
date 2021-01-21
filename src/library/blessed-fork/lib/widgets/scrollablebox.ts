@@ -46,13 +46,11 @@ export class ScrollableBox extends Box {
         this.alwaysScroll = options.alwaysScroll;
 
         if (options.mouse) {
-            this.on('wheeldown', function () {
-                self.scroll(1);
-                self.screen.render();
+            this.on('wheeldown', () => {
+                this.scroll(1);
             });
-            this.on('wheelup', function () {
-                self.scroll(-1);
-                self.screen.render();
+            this.on('wheelup', () => {
+                this.scroll(-1);
             });
         }
 
@@ -147,7 +145,9 @@ export class ScrollableBox extends Box {
         // content and descendant elements.
         // Scroll the content if necessary.
         if (this.childBase === base) {
-            return this.emit('scroll');
+            this.emit('scroll');
+            this.setNeedsRender()
+            return;
         }
 
         // When scrolling text, we want to be able to handle SGR codes as well as line
@@ -192,7 +192,9 @@ export class ScrollableBox extends Box {
             }
         }
 
-        return this.emit('scroll');
+        this.emit('scroll');
+        this.setNeedsRender()
+        return
     }
 
     _recalculateIndex() {

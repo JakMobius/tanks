@@ -1,7 +1,7 @@
-import {BlessedEvent} from "../widgets/screen";
+import {TTYEvent} from "../widgets/screen";
 
 
-interface BlessedDeviceAttributes {
+interface DeviceAttributes {
     romCartridgeRegistrationNumber?: string;
     advancedVideo?: boolean;
     firmwareVersion?: string;
@@ -18,69 +18,69 @@ interface BlessedDeviceAttributes {
     ansiTextLocator?: boolean
 }
 
-interface BlessedDeviceAttributesEvent extends BlessedEvent {
-    deviceAttributes?: BlessedDeviceAttributes
+interface DeviceAttributesEvent extends TTYEvent {
+    deviceAttributes?: DeviceAttributes
 }
 
-interface BlessedDeviceStatusEvent extends BlessedEvent{
+interface DeviceStatusEvent extends TTYEvent{
     text?: string
     status?: string
     error?: string
 }
 
-interface BlessedCursorPositionStatusEvent extends BlessedDeviceStatusEvent {
+interface CursorPositionStatusEvent extends DeviceStatusEvent {
     page?: number;
     x?: number;
     y?: number;
 }
 
-interface BlessedWindowPositionEvent extends BlessedDeviceStatusEvent {
+interface WindowPositionEvent extends DeviceStatusEvent {
     x?: number;
     y?: number;
 }
 
-interface BlessedWindowSizeEvent extends BlessedDeviceStatusEvent {
+interface WindowSizeEvent extends DeviceStatusEvent {
     width?: number;
     height?: number;
 }
 
-interface BlessedTextareaSizeEvent extends BlessedDeviceStatusEvent {
+interface TextareaSizeEvent extends DeviceStatusEvent {
     width?: number;
     height?: number;
 }
 
-interface BlessedScreenSizeEvent extends BlessedDeviceStatusEvent {
+interface ScreenSizeEvent extends DeviceStatusEvent {
     width?: number;
     height?: number;
 }
 
-interface BlessedWindowStateEvent extends BlessedDeviceStatusEvent {
+interface WindowStateEvent extends DeviceStatusEvent {
     isIconified?: boolean;
 }
 
-interface BlessedWindowIconLabelEvent extends BlessedDeviceStatusEvent {
+interface WindowIconLabelEvent extends DeviceStatusEvent {
     iconLabel?: string
 }
 
-interface BlessedWindowTitleEvent extends BlessedDeviceStatusEvent {
+interface WindowTitleEvent extends DeviceStatusEvent {
     windowTitle?: string
 }
 
-interface BlessedLocatorPositionEvent extends BlessedDeviceStatusEvent {
+interface LocatorPositionEvent extends DeviceStatusEvent {
     page?: number;
     col?: number;
     row?: number;
     mask?: number;
 }
 
-interface BlessedTextParametersEvent extends BlessedDeviceStatusEvent {
+interface TextParametersEvent extends DeviceStatusEvent {
     pt?: string;
     ps?: number;
 }
 
 export class RequestHub {
     static parseResponse(s: string) {
-        let out: BlessedDeviceStatusEvent | null
+        let out: DeviceStatusEvent | null
 
         if((out = this.parseDeviceAttributes(s))) return out;
         if((out = this.parseDeviceStatusReport(s))) return out;
@@ -96,7 +96,7 @@ export class RequestHub {
         let parts = /^\x1b](\d+);([^\x07\x1b]+)(?:\x07|\x1b\\)/.exec(s)
         if(!parts) return null
 
-        let out: BlessedTextParametersEvent = {}
+        let out: TextParametersEvent = {}
 
         // OSC Ps ; Pt BEL
         // OSC Ps ; Pt ST
@@ -115,7 +115,7 @@ export class RequestHub {
         let parts = /^\x1b\[(\d+(?:;\d+){4})&w/.exec(s)
         if(!parts) return null
 
-        let out: BlessedLocatorPositionEvent = {}
+        let out: LocatorPositionEvent = {}
 
         out.event = 'locator-position';
         out.code = 'DECRQLP';
@@ -204,7 +204,7 @@ export class RequestHub {
 
     private static parseWindowManipulationEvent(s: string) {
         let parts = /^\x1b\[(\d+)(?:;(\d+);(\d+))?t/.exec(s)
-        let out: BlessedDeviceStatusEvent = {}
+        let out: DeviceStatusEvent = {}
         out.event = 'window-manipulation';
         out.code = '';
 
@@ -268,28 +268,28 @@ export class RequestHub {
         return this.errorEvent(parts, out)
     }
 
-    private static parseWindowTitleEvent(parts: string[], out: BlessedWindowTitleEvent) {
+    private static parseWindowTitleEvent(parts: string[], out: WindowTitleEvent) {
         out.type = 'window-title';
         out.windowTitle = parts[2];
 
         return out
     }
 
-    private static parseWindowIconLabelEvent(parts: string[], out: BlessedWindowIconLabelEvent) {
+    private static parseWindowIconLabelEvent(parts: string[], out: WindowIconLabelEvent) {
         out.type = 'window-icon-label';
         out.iconLabel = parts[2];
 
         return out
     }
 
-    private static parseWindowStateEvent(parts: string[], out: BlessedWindowStateEvent) {
+    private static parseWindowStateEvent(parts: string[], out: WindowStateEvent) {
         out.type = 'window-state';
         out.isIconified = parts[1] !== '1'
 
         return out
     }
 
-    private static parseScreenSizeEvent(parts: string[], out: BlessedScreenSizeEvent) {
+    private static parseScreenSizeEvent(parts: string[], out: ScreenSizeEvent) {
         out.type = 'screen-size';
 
         out.width = +parts[3]
@@ -298,7 +298,7 @@ export class RequestHub {
         return out
     }
 
-    private static parseWindowSizeEvent(parts: string[], out: BlessedWindowSizeEvent) {
+    private static parseWindowSizeEvent(parts: string[], out: WindowSizeEvent) {
         out.type = 'window-size-pixels';
 
         out.width = +parts[3]
@@ -307,7 +307,7 @@ export class RequestHub {
         return out
     }
 
-    private static parseWindowPositionEvent(parts: string[], out: BlessedWindowPositionEvent) {
+    private static parseWindowPositionEvent(parts: string[], out: WindowPositionEvent) {
         out.type = 'window-position';
 
         out.x = +parts[2]
@@ -316,7 +316,7 @@ export class RequestHub {
         return out
     }
 
-    private static parseTextareaSizeEvent(parts: string[], out: BlessedTextareaSizeEvent) {
+    private static parseTextareaSizeEvent(parts: string[], out: TextareaSizeEvent) {
         out.type = 'textarea-size';
 
         out.width = +parts[3]
@@ -339,7 +339,7 @@ export class RequestHub {
         //     Ps = 6  -> Report Cursor Position (CPR) [row;column] as CSI
         //     ? r ; c R (assumes page is zero).
 
-        let out: BlessedCursorPositionStatusEvent = {}
+        let out: CursorPositionStatusEvent = {}
 
         out.event = 'device-status';
         out.code = 'DSR';
@@ -357,7 +357,7 @@ export class RequestHub {
         let parts = /^\x1b\[(\?)?(\d+)(?:;(\d+);(\d+);(\d+))?n/.exec(s)
         if(!parts) return null
 
-        let out: BlessedDeviceStatusEvent = {}
+        let out: DeviceStatusEvent = {}
 
         // CSI Ps n  Device Status Report (DSR).
         //     Ps = 5  -> Status Report.  Result (``OK'') is
@@ -445,8 +445,8 @@ export class RequestHub {
             return +ch || 0;
         });
 
-        let out: BlessedDeviceAttributesEvent = {}
-        let deviceAttributes: BlessedDeviceAttributes = {}
+        let out: DeviceAttributesEvent = {}
+        let deviceAttributes: DeviceAttributes = {}
 
         out.event = 'device-attributes';
         out.code = 'DA';
@@ -547,7 +547,7 @@ export class RequestHub {
         return out
     }
 
-    private static errorEvent(parts: string[], out: BlessedDeviceStatusEvent) {
+    private static errorEvent(parts: string[], out: DeviceStatusEvent) {
         out.type = 'error';
         out.error = 'Unhandled: ' + JSON.stringify(parts);
 
