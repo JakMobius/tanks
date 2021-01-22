@@ -1,7 +1,7 @@
 
 export default class EventEmitter {
 
-    private handlers: Map<number, Map<string, Array<(...params: any[]) => any>>>
+    private handlers: Map<string, Array<(...params: any[]) => any>>[]
 
     public static PRIORITY_LOW = 3
     public static PRIORITY_MONITOR = 2
@@ -9,16 +9,16 @@ export default class EventEmitter {
     public static PRIORITY_HIGH = 0
 
     constructor() {
-        this.handlers = new Map()
+        this.handlers = []
     }
 
     addListener(type: string, listener: () => void, priority: number)
     {
-        let priorityBlock = this.handlers.get(priority)
+        let priorityBlock = this.handlers[priority]
 
         if(!priorityBlock) {
             priorityBlock = new Map()
-            this.handlers.set(priority, priorityBlock)
+            this.handlers[priority] = priorityBlock
         }
 
         let handlers = priorityBlock.get(type)
@@ -37,7 +37,8 @@ export default class EventEmitter {
 
     removeListener(type: string, listener: (...params: any[]) => any) {
 
-        for(let [_, priorityBlock] of this.handlers.entries()) {
+        for(let priorityBlock of this.handlers) {
+            if(!priorityBlock) continue
             let handlers = priorityBlock.get(type)
             if(!handlers) continue
             let index = handlers.indexOf(listener)
@@ -54,13 +55,13 @@ export default class EventEmitter {
     removeAllListeners(): void
     removeAllListeners(type?: string): void {
         if(type) {
-            for (let [_, priorityBlock] of this.handlers.entries()) {
-                if (type) {
+            for (let priorityBlock of this.handlers) {
+                if (type && priorityBlock) {
                     priorityBlock.delete(type)
                 }
             }
         } else {
-            this.handlers.clear()
+            this.handlers = []
         }
     }
 
@@ -77,7 +78,8 @@ export default class EventEmitter {
     _emit(type: string, args?: any[]) {
         let result = true;
 
-        for(let [_, priorityBlock] of this.handlers.entries()) {
+        for(let priorityBlock of this.handlers) {
+            if(!priorityBlock) continue
             let handlers = priorityBlock.get(type)
             if(!handlers) continue
             for(let handler of handlers) {

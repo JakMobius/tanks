@@ -41,8 +41,8 @@ class Console {
 		// Shift-tab feature doesn't work
 		// in WebStorm internal console.
 
-		this.window.on("value", 	() => this.updateAutosuggestion())
-		this.window.on("value", 	() => this.tabComplete())
+		this.window.on("keypress", () => this.updateAutosuggestion())
+		this.window.on("keypress", () => this.tabComplete())
 		this.window.on("exit", 	() => this.commands.get("exit").onPerform([]))
 		this.window.on("command", 	(command: string) => this.evaluate(command))
 		this.window.on("tab", (shift) => {
@@ -57,8 +57,7 @@ class Console {
 		this.logger.addDestination(this.window.destination)
 	}
 
-	private getAutocompletions(line: string): string[] {
-		let args = ArgumentParser.parseArguments(line)
+	private getAutocompletions(args: string[]): string[] {
 
 		if(args.length <= 1) {
 
@@ -74,30 +73,36 @@ class Console {
 		} else {
 			let command = this.commands.get(args[0])
 			if (command) {
-				let prefix = ArgumentParser.parseArguments(line, true).slice(0, -1).join(" ") + " "
-				let completions = command.onTabComplete(args.slice(1))
-				if(completions.length) {
-					if(completions.length > 1) {
-						this.logger.log(completions.join(", "))
-					}
 
-					return completions.map(arg => {
-						if(arg.indexOf(" ") !== -1) {
-							arg = "'" + arg + "'"
-						}
-						return prefix + arg
-					})
-				}
+				let completions = command.onTabComplete(args.slice(1))
+
+				if(completions) return completions
 			}
 		}
 
 		return null
 	}
-
 	tabCompleteBegin(line: string, shift: boolean): void {
-		this.tabCompletions = this.getAutocompletions(line)
+		let args = ArgumentParser.parseArguments(line)
+		this.tabCompletions = this.getAutocompletions(args)
 
 		if (this.tabCompletions && this.tabCompletions.length) {
+			this.updateAutosuggestion()
+
+			if(this.tabCompletions.length > 1) {
+				this.logger.log(this.tabCompletions.join(", "))
+			}
+
+			let prefix = ArgumentParser.trimLastArgument(line, false)
+
+			this.tabCompletions = this.tabCompletions.map((completion: string) => {
+				if(completion.indexOf(' ') != -1) {
+					completion = "'" + completion + "'"
+				}
+
+				return prefix + completion
+			})
+
 			if(this.tabCompletions.length > 1) {
 				if(shift) {
 					this.tabCompleteIndex = this.tabCompletions.length
@@ -135,17 +140,26 @@ class Console {
 	}
 
 	updateAutosuggestion(): void {
-		let line = this.window.getValue()
 
-		if(line.length == 0) {
+		if(this.tabCompletions) {
 			this.window.suggest(null)
 			return
 		}
 
-		let completions = this.getAutocompletions(line)
+		let cursorPosition = this.window.consoleBox.consoleTextbox.cursorPosition
+		let line = this.window.getValue()
+
+		if(line.length == 0 || cursorPosition != line.length) {
+			this.window.suggest(null)
+			return
+		}
+
+		let args = ArgumentParser.parseArguments(line)
+		let completions = this.getAutocompletions(args)
 
 		if(completions && completions.length == 1) {
-			this.window.suggest(completions[0])
+			let lastArgument = args[args.length - 1]
+			this.window.suggest(completions[0].substr(lastArgument.length), false)
 		} else {
 			this.window.suggest(null)
 		}

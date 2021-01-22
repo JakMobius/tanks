@@ -16,6 +16,7 @@ let nextTick = global.setImmediate || process.nextTick.bind(process);
 import {Input} from './input';
 import * as unicode from "../unicode";
 import {ScrollableBoxConfig} from "./scrollablebox";
+import EventEmitter from "../../../../utils/eventemitter";
 
 export interface PromptConfig extends ScrollableBoxConfig {
     value?: string
@@ -111,15 +112,12 @@ export class Prompt extends Input {
         // Put this in a nextTick so the current
         // key event doesn't trigger any keys input.
         nextTick(() => {
-            this.on('keypress', this.onKey);
+            this.on('keypress', this.onKey, EventEmitter.PRIORITY_MONITOR);
         });
-
-        this.on('blur', this.onBlur);
     }
 
     onBlur() {
         this.removeListener('keypress', this.onKey);
-        this.removeListener('blur', this.onBlur);
 
         this.screen.program.hideCursor();
         this.screen.grabKeys = false;

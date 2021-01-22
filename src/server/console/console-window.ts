@@ -52,7 +52,12 @@ class ConsoleWindow extends EventEmitter {
                 this.onTab(event.shift)
             }
         })
-        this.consoleBox.consoleTextbox.on("value", () => this.onValue())
+
+        this.consoleBox.consoleTextbox.on("keypress", (_, event: blessed.KeyEvent) => {
+            if(!event.cancelled) {
+                this.onKeypress(event)
+            }
+        }, EventEmitter.PRIORITY_LOW)
 
         this.refocus()
         this.consoleBox.setNeedsRender()
@@ -154,6 +159,10 @@ class ConsoleWindow extends EventEmitter {
         this.emit("value")
     }
 
+    onKeypress(key: blessed.KeyEvent) {
+	    this.emit("keypress", key)
+    }
+
     onExit() {
         this.emit("exit")
         this.screen.destroy()
@@ -165,9 +174,9 @@ class ConsoleWindow extends EventEmitter {
 	    return this.consoleBox.consoleTextbox.getValue()
     }
 
-    suggest(param?: string) {
+    suggest(param?: string, trim: boolean = true) {
         if(param) {
-            param = param.substr(this.consoleBox.consoleTextbox.getValue().length)
+            if(trim) param = param.substr(this.consoleBox.consoleTextbox.getValue().length)
             this.consoleBox.suggestionLabel.position.width = param.length
             this.consoleBox.suggestionLabel.setContent(param)
             this.consoleBox.suggestionLabel.hidden = false
