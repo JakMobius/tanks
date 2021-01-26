@@ -54,7 +54,7 @@ class Timings {
         this.end()
     }
 
-    static end() {
+    static end(description) {
         let task = this.stack.pop()
 
         let time = ((Date.now() - task.date) / 1000).toFixed(3)
@@ -62,7 +62,8 @@ class Timings {
         this.stdoutMarkMessage = false
 
         if (task.hasInlinedText) {
-            process.stdout.write(task.title + Chalk.gray(": ") + this.timingColor("[" + time + "s]"))
+            if(!description) description = task.title
+            process.stdout.write(description + Chalk.gray(": ") + this.timingColor("[" + time + "s]"))
             this.stdoutShouldLinefeed = true
         } else {
             this.stdoutShouldLinefeed = false

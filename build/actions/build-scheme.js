@@ -10,14 +10,17 @@ if(!process.argv[2]) {
     process.exit(1)
 }
 
-const schemeName = process.argv[2]
+const schemeName = process.argv[2];
 
-Timings.perform("Building", async () => {
+(async () => {
+    Timings.begin("Building")
     try {
         const buildConfig = require("../build-schemes.json")
         let builder = new Builder(buildConfig)
         await builder.buildScheme(schemeName)
     } catch(error) {
         console.error(error)
+        return
     }
-})
+    Timings.end("Build finished")
+})()

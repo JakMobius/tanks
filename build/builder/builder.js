@@ -111,7 +111,7 @@ class Builder {
             }
 
             await schemeCache.destroy()
-            Timings.end()
+            Timings.end("Finished running scheme '" + Chalk.magenta(schemeName) + "'")
         }
     }
 

@@ -12,6 +12,7 @@ const aliasify = require("aliasify")
 const exorcist = require('exorcist')
 const minifyStream = require('minify-stream')
 const collapse = require('bundle-collapser/plugin');
+const BabelPluginImportDir = require("./babel-plugins/babel-plugin-import-dir")
 
 const fs = require('fs')
 const path = require("path")
@@ -98,7 +99,7 @@ class Compiler {
                         "src": Compiler.path("src")
                     }
                 }],
-                "babel-plugin-import-dir",
+                BabelPluginImportDir,
                 ["@babel/plugin-syntax-dynamic-import"],
                 ["@babel/plugin-syntax-class-properties"],
                 ["@babel/plugin-proposal-class-properties", { loose: true }],

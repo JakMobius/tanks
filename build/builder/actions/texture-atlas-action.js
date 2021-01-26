@@ -96,22 +96,38 @@ class TextureAtlasAction extends BuilderAction {
         ctx.drawImage(canvas, rect.x + rect.w - 2, rect.y + rect.h - 2, 1, 1, rect.x + rect.w - 1, rect.y + rect.h - 1, 1, 1)
     }
 
-    static async shouldRefreshDirectory(directory, list) {
+    static async shouldRefreshDirectory(directory, list, base) {
         let cache = await CompileCache.readCache("texture-atlas")
-        if(!cache.directories) cache.directories = {}
+        if (!cache.directories) cache.directories = {}
+        if (!cache.modifications) cache.modifications = {}
 
-        if(cache.directories[directory]) {
-            if(this.compareArrays(cache.directories[directory], list)) {
-                Timings.end()
-                return false
+        let update = false
+
+        if (cache.directories[directory]) {
+            if (!this.compareArrays(cache.directories[directory], list)) {
+                update = true
             }
+        } else {
+            update = true
         }
 
         cache.directories[directory] = list
 
-        await CompileCache.writeCache("texture-atlas", cache)
+        for (let file of list) {
+            if (await CompileCache.shouldUpdate(path.join(base, file), cache.modifications)) {
+                update = true
+                break
+            }
+        }
 
-        return true
+        if (update) {
+            for(let file of list) {
+                CompileCache.updateFile(path.join(base, file), cache.modifications)
+            }
+            await CompileCache.writeCache("texture-atlas", cache)
+        }
+
+        return update
     }
 
     static async readImages(fileList, base) {
@@ -168,7 +184,10 @@ class TextureAtlasAction extends BuilderAction {
         let list = (await readdirDeep(config.source)).filter(file => file.endsWith(".png"))
         Timings.end()
 
-        if(!await this.shouldRefreshDirectory(config.source, list)) return
+        if(!await this.shouldRefreshDirectory(config.source, list, config.source)) {
+            Timings.end("Used cached texture atlas")
+            return
+        }
 
         Timings.begin("Allocating image buffers")
         this.createCanvases(canvases, contexts, atlases, config.atlasSize)
@@ -210,6 +229,7 @@ class TextureAtlasAction extends BuilderAction {
         Timings.begin("Writing mipmaps to " + Chalk.blueBright(config.target))
         await this.writeAtlases(canvases, atlasDescriptors, config.target)
         Timings.end()
+        Timings.end("Created texture atlas")
     }
 
     static getName() {

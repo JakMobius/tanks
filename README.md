@@ -80,7 +80,7 @@ npm install
 ### Configuring the server
 - To configure the server port and database credentials, edit the `dist/server/server-preferences.json` file. If this file does not exist, start the server once. The default configuration file will be created.
 
-  **Note: your custom preferences file is listed in .gitignore, so your, database password and other confidential data will not be shared**
+  **Note: your custom preferences file is listed in .gitignore, so your database password and other confidential data will not be shared**
 - By default, the server only binds the port specified in the configuration. To start the game room and enter the game, you must first start the corresponding server modules using the `service` command. In the future this feature will help to create distributed systems where the hub and the game server can be located on different servers. For now it is enough to enter `service on` command to start the web-server and the game socket. After that you can use the `room create` command to create a game room. Then you will be able to go to `localhost:port/game` and play the game.
 
   **Note: If you use the `-s autorun` flag when starting the server, or run the `run autorun` command in the server console, the server will automatically start all necessary modules and create several game rooms.**
