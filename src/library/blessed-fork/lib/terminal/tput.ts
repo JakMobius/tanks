@@ -119,7 +119,7 @@ class Tput {
 
         this.terminal = this.terminal.toLowerCase();
 
-        this.debug = true//options.debug;
+        this.debug = options.debug;
         this.extended = options.extended;
         this.printf = options.printf;
         this.error = null;
@@ -137,8 +137,7 @@ class Tput {
 
         try {
             this.terminfo = this.compileTerminfo()
-        } catch (e) {
-            if (this.debug) throw e;
+        } catch (ignored) {
             this.error = new Error('Terminfo parse error.');
             this._useInternalInfo(this.terminal);
         }
