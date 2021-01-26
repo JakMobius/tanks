@@ -4,7 +4,7 @@ import GameMap from './gamemap';
 import pako from 'pako';
 import path from 'path';
 import BinaryDecoder from '../../serialization/binary/binarydecoder';
-import EditorMap from '../../client/mapeditor/editormap';
+import EditorMap from '../../client/map-editor/editormap';
 import BlockState from './blockstate/blockstate';
 import SpawnZone from './spawnzone';
 import fs from 'fs';

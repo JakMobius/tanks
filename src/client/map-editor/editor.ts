@@ -7,7 +7,7 @@ import Sprite from '../sprite';
 import MapEditorScene from './scenes/mapeditorscene';
 import LoadingScene from '../scenes/loading/loadingscene';
 import RequestFrameLoop from '../../utils/loop/requestframeloop';
-import 'src/client/graphics/drawers/block/types/*';
+import 'src/client/graphics/drawers/block/type-loader';
 
 import PhysicsUtils from 'src/utils/physicsutils';
 

@@ -150,6 +150,62 @@
 					"unite-different-targets": true
 				}
 			}
+		},
+
+		"build-map-editor": {
+			"steps": [
+				{
+					"action": "compile-javascript",
+					"source": "src/client/map-editor/index.ts",
+					"target": "build/cache/map-editor/scripts/index.js",
+					"plugins": {
+						"css-plugin": "css-plugin-config",
+						"glsl-plugin": {
+							"enabled": true
+						}
+					}
+				},
+				{
+					"action": "copy",
+					"source": "src/client/web/map-editor",
+					"target": "build/cache/map-editor"
+				},
+				{
+					"action": "texture-atlas",
+					"source": "src/client/textures",
+					"target": "build/cache/map-editor/assets/img/textures",
+					"atlasSize": 2048
+				}
+			],
+			"targets": {
+				"map-editor-build": "build/cache/map-editor"
+			},
+			"configs": {
+				"css-plugin-config": {
+					"enabled": true,
+					"target": "build/cache/map-editor/styles/style.css",
+					"unite-different-targets": true
+				}
+			}
+		},
+
+		"release-map-editor": {
+			"steps": [
+				{
+					"action": "delete",
+					"target": {
+						"target-name": "map-editor"
+					}
+				},
+				{
+					"action": "copy",
+					"source": {
+						"target-name": "map-editor-build"
+					},
+					"target": "dist/map-editor",
+					"target-name": "map-editor"
+				}
+			]
 		}
 	}
 }

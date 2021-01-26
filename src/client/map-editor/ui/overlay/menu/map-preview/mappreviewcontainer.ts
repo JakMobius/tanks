@@ -2,7 +2,7 @@
 
 import Menu from 'src/client/ui/menu/menu';
 
-import MapStorage from 'src/client/mapeditor/mapstorage';
+import MapStorage from 'src/client/map-editor/mapstorage';
 import MapDrawer from 'src/client/graphics/drawers/mapdrawer';
 import Camera from 'src/client/camera';
 import GameMap from 'src/utils/map/gamemap';

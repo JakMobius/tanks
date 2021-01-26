@@ -1,6 +1,6 @@
 
 import BrowserCheckView from '../utils/browsercheck/browsercheckview';
-import MapEditor from '../mapeditor/editor'
+import MapEditor from './/editor'
 
 $(document).ready(function() {
     BrowserCheckView(downloadGameScript)
