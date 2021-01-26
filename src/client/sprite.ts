@@ -146,7 +146,7 @@ class Sprite {
                     let levelPath = "atlas-mipmap-level-" + level;
 
                     $(new Image()).attr({
-                        src: "../assets/img/" + levelPath + ".png"
+                        src: "assets/img/textures/" + levelPath + ".png"
                     }).on("load", function(){
                         if (this.complete) {
                             if(succeededMipmapLevels > level) {
@@ -166,7 +166,7 @@ class Sprite {
                     })
 
                     $.ajax({
-                        url: "../assets/img/" + levelPath + ".json",
+                        url: "assets/img/textures/" + levelPath + ".json",
                         xhr: Downloader.getXHR(null, atlasProgress)
                     }).done((data) => {
                         if(succeededMipmapLevels > level) {

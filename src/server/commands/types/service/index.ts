@@ -1,4 +1,5 @@
 import Command, {CommandConfig} from '../../command';
+import {ConsoleAutocompleteOptions} from "../../../console/console";
 
 export interface ServerServiceConfig {
     hubPage: boolean
@@ -37,7 +38,7 @@ class ServiceCommand extends Command {
 
     }
 
-    onTabComplete(args: string[]): string[] {
+    onTabComplete(args: string[], options: ConsoleAutocompleteOptions): string[] {
         if(args.length > 1) return []
         let last = args[0]
 

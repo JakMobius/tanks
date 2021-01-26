@@ -72,14 +72,11 @@
   },
   "scripts": {
     "test": "mocha --reporter list",
-    "build-server": "cd build; cd actions; node build-server.js",
+    "build-server": "node build/actions/build-scheme.js release-server",
     "start-server": "node dist/server.js -s autorun",
-    "start-server-in-game-configuration": "node src/server/main.js -pn port=25566 -s configure-game-server",
-    "start-server-in-hub-configuration": "node src/server/main.js -s configure-hub -pn port=25565",
-    "clear-cache": "cd build; cd actions; node clear-cache.js",
-    "commit-client": "cd build; cd actions; node commit-client.js",
-    "commit-mapeditor": "cd build; cd actions; node commit-mapeditor.js /Library/WebServer/Documents/new-tanks-online",
-    "commit-hub": "cd build; cd actions; node commit-hub.js",
+    "start-game-server": "node dist/server -pn port=25566 -s configure-game-server",
+    "start-hub-server": "node dist/server -pn port=25565 -s configure-hub",
+    "clear-cache": "node build/actions/clear-cache.js",
     "create-texture-atlas": "cd atlas; node atlas_creator.js"
   },
   "nyc": {

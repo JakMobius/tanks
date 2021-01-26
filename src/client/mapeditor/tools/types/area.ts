@@ -29,7 +29,7 @@ class AreaTool extends Tool {
         super(manager);
 
         this.area = new Rectangle()
-        this.image = "../assets/mapeditor/area.png"
+        this.image = "assets/mapeditor/area.png"
         this.program = new ParticleProgram("area-program", this.manager.screen.ctx)
         this.copyBufferDrawer = new MapDrawer(this.manager.camera, this.manager.screen.ctx)
 

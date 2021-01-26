@@ -1,8 +1,13 @@
 
-const Compiler = require("../compiler/compiler")
-const CompilerCache = require("../compilecache")
+const fs = require("fs")
+const path = require("path")
 
-Compiler.clearCache()
-CompilerCache.clear()
+try {
+    fs.rmdirSync(path.resolve(__dirname, "../cache"), {
+        recursive: true
+    })
+} catch(error) {
+
+}
 
 console.log("Build cache has been deleted")

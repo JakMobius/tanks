@@ -11,11 +11,6 @@ import assert from "assert";
 
 export default class TerminfoParser {
 
-    static _debug(...values: any[]) {
-        //if (!this.debug) return;
-        return console.log.apply(console, arguments);
-    }
-
     /**
      * Terminfo Parser
      * All shorts are little-endian
@@ -461,8 +456,6 @@ export default class TerminfoParser {
         }
 
         this.detectFeatures(info);
-
-        this._debug(info);
 
         info.all = {};
         info.methods = {};

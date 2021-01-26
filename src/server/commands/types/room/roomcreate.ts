@@ -8,8 +8,9 @@ import BinaryDecoder from 'src/serialization/binary/binarydecoder';
 import pako from 'pako';
 import path from 'path';
 import RoomConfig from "../../../room/room-config";
+import {ConsoleAutocompleteOptions} from "../../../console/console";
 
-const mapFolder = path.resolve(__dirname, "../../../maps")
+const mapFolder = path.resolve(__dirname, "resources/maps")
 
 class RoomCreateCommand extends Command {
 
@@ -79,51 +80,18 @@ class RoomCreateCommand extends Command {
         })
     }
 
-    onTabComplete(args: string[]) {
+    onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {
         let found = this.findFlags(args)
+
         let currentFlag = found.currentFlag
 
-        if(!currentFlag) return []
-        if(currentFlag.name === "map") {
-            let last = args[args.length - 1]
-            let mapPath = last.split("/")
-            let search = mapFolder
-            let l = mapPath.length - 1
-
-            for(let i = 0; i < l; i++) {
-                search = path.resolve(search, mapPath[i])
-            }
-
-            let unfinished = mapPath[l]
-
-            try {
-                let result = []
-
-                for(let file of fs.readdirSync(search)) {
-                    if(!file.startsWith(unfinished)) continue
-                    let name = file
-                    let stats = fs.statSync(path.resolve(search, name))
-                    let isDirectory = stats.isDirectory()
-
-                    if(!isDirectory) {
-                        if (name.endsWith(".map")) {
-                            name = name.slice(0, -4);
-                        } else {
-                            continue
-                        }
-                    }
-
-                    name = path.resolve(search, name)
-                    if(name.startsWith(mapFolder)) name = path.relative(mapFolder, name)
-
-                    result.push(name)
-                }
-
-                return result
-            } catch(ignored) { return [] }
+        if(currentFlag && currentFlag.name === "map") {
+            return this.autocompletePath(args[args.length - 1], mapFolder, ".map", options)
+        } else if(found.incompleteFlag) {
+            return super.autocompleteFlags(found.incompleteFlag, options)
+        } else {
+            return []
         }
-
-        return []
     }
 
     getName() {

@@ -11,7 +11,7 @@ class BlockSelectButton extends View {
     }
 
     previewBlock(block: BlockState) {
-        this.element.css("background-image", "url(../assets/mapeditor/blocks/" + (block.constructor as typeof BlockState).typeName + ".png)")
+        this.element.css("background-image", "url(assets/mapeditor/blocks/" + (block.constructor as typeof BlockState).typeName + ".png)")
     }
 }
 

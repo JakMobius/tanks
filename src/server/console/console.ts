@@ -9,6 +9,11 @@ import CommandList from "../commands/types/*"
 import Command from "../commands/command";
 import Server from "../server";
 
+export interface ConsoleAutocompleteOptions {
+	/// Indicates whether only one completion unit is required
+	single?: boolean
+}
+
 class Console {
 	public observingRoom: any;
 	public visible: any;
@@ -57,7 +62,7 @@ class Console {
 		this.logger.addDestination(this.window.destination)
 	}
 
-	private getAutocompletions(args: string[]): string[] {
+	private getAutocompletes(args: string[], options: ConsoleAutocompleteOptions): string[] {
 
 		if(args.length <= 1) {
 
@@ -74,7 +79,7 @@ class Console {
 			let command = this.commands.get(args[0])
 			if (command) {
 
-				let completions = command.onTabComplete(args.slice(1))
+				let completions = command.onTabComplete(args.slice(1), options)
 
 				if(completions) return completions
 			}
@@ -84,7 +89,9 @@ class Console {
 	}
 	tabCompleteBegin(line: string, shift: boolean): void {
 		let args = ArgumentParser.parseArguments(line)
-		this.tabCompletions = this.getAutocompletions(args)
+		this.tabCompletions = this.getAutocompletes(args, {
+			single: false
+		})
 
 		if (this.tabCompletions && this.tabCompletions.length) {
 			this.updateAutosuggestion()
@@ -155,7 +162,9 @@ class Console {
 		}
 
 		let args = ArgumentParser.parseArguments(line)
-		let completions = this.getAutocompletions(args)
+		let completions = this.getAutocompletes(args, {
+			single: true
+		})
 
 		if(completions && completions.length == 1) {
 			let lastArgument = args[args.length - 1]
@@ -203,7 +212,7 @@ class Console {
 	}
 
 	runScript(name: string, index: number = 0) {
-		const file = path.resolve(__dirname, "..", "scripts", name + ".script")
+		const file = path.resolve(__dirname, "resources/scripts", name + ".script")
 
 		if(!fs.existsSync(file)) {
 			this.logger.log("§F00;Could not find script named '" + name + "'.")

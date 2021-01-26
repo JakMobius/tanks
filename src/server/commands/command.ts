@@ -1,18 +1,21 @@
 
 import StringRepeat from '../../utils/stringrepeat';
 import CommandFlag from "./commandflag";
-import Console from '../console/console'
+import Console, {ConsoleAutocompleteOptions} from '../console/console'
 import Logger from "../log/logger";
+import path from "path";
+import fs from "fs";
 
 export interface CommandConfig {
 	console: Console
 }
 
 export interface CommandParsedFlags {
-	flags: Map<string, string[] | boolean>
+    flags: Map<string, string[] | boolean>
 	unknown: string[]
 	errors: string[] | null
 	currentFlag: CommandFlag | null
+    incompleteFlag: string
 }
 
 class Command {
@@ -65,10 +68,11 @@ class Command {
 		let knownFlags = new Map<string, string[] | boolean>()
 		let unknownFlags: string[] = []
 		let currentFlagName: string | null = null
+        let incompleteFlag: string
 
 		/**
 		 * This variable is intended to indicate if
-		 * flag value is being readen. We cannot
+		 * flag value is currenyly being read. We cannot
 		 * use `currentFlag === null` comparsion here
 		 * because we want to keep `currentFlag`
 		 * after the last cycle.
@@ -89,6 +93,8 @@ class Command {
 				let name = arg.substr(1)
 				let flag = this.getFlag(name)
 
+                incompleteFlag = arg
+
 				if(!flag) {
 					unknownFlags.push(name)
 					continue
@@ -108,6 +114,8 @@ class Command {
 				continue
 			}
 
+            incompleteFlag = null
+
 			if(currentFlag !== null) {
 				(knownFlags.get(currentFlag.name) as string[]).push(arg)
 			}
@@ -117,13 +125,15 @@ class Command {
 
 		if(readFlag) {
 			errors.push(`'-${currentFlagName}' flag requires value`)
+            currentFlag = null
 		}
 
 		return {
 			flags: knownFlags,
 			unknown: unknownFlags,
 			errors: errors.length ? errors : null,
-			currentFlag: currentFlag
+			currentFlag: currentFlag,
+            incompleteFlag: incompleteFlag
 		}
 	}
 
@@ -194,7 +204,7 @@ class Command {
 	 * Tries to found commands that could be tab-completed
 	 */
 
-	protected tryTabCompleteSubcommand(args: string[]): string[] {
+	protected tryTabCompleteSubcommand(args: string[], options: ConsoleAutocompleteOptions): string[] {
 		if(args.length === 0) return []
 
 		let subcommand = args[0]
@@ -208,7 +218,7 @@ class Command {
 		let found = this.getSubcommand(subcommand)
 
 		if(found) {
-			return found.onTabComplete(args.slice(1))
+			return found.onTabComplete(args.slice(1), options)
 		}
 
 		return []
@@ -217,10 +227,20 @@ class Command {
 	/**
 	 * Called when user tab-complete the command.
 	 * @param args Command arguments array
+	 * @param options Autocompletion gathering options
 	 */
 
-	public onTabComplete(args: string[]) : string[] {
-		return this.tryTabCompleteSubcommand(args)
+	public onTabComplete(args: string[], options: ConsoleAutocompleteOptions) : string[] {
+
+	    let argumentCount = args.length
+        if(argumentCount > 0 && !this.subcommands.length) {
+            let lastFlag = args[argumentCount - 1]
+            if(lastFlag.startsWith("-")) {
+                return this.autocompleteFlags(args[argumentCount - 1], options)
+            }
+        }
+
+        return this.tryTabCompleteSubcommand(args, options)
 	}
 
 	/**
@@ -334,6 +354,65 @@ class Command {
 
 		return result
 	}
+
+	protected autocompletePath(pathToComplete: string, base: string, extension?: string, options: ConsoleAutocompleteOptions): string[] {
+
+		let mapPath = pathToComplete.split("/")
+		let search = base
+		let incompletePathFragmentIndex = mapPath.length - 1
+
+		for(let i = 0; i < incompletePathFragmentIndex; i++) {
+			search = path.resolve(search, mapPath[i])
+		}
+
+		let incompletePathFragment = mapPath[incompletePathFragmentIndex]
+
+		try {
+			let autocompletes = []
+
+			for(let file of fs.readdirSync(search)) {
+				if(!file.startsWith(incompletePathFragment)) continue
+				let autocompletion = file
+				let stats = fs.statSync(path.resolve(search, file))
+				let isDirectory = stats.isDirectory()
+
+				if(!isDirectory && extension) {
+					if (autocompletion.endsWith(extension)) {
+						autocompletion = autocompletion.slice(0, -extension.length);
+					} else {
+						continue
+					}
+				}
+
+				// Console will not display two autocompletes
+                // if options.single is set.
+
+                if(options.single && autocompletes.length) return []
+
+				autocompletion = path.resolve(search, autocompletion)
+				if(autocompletion.startsWith(base)) autocompletion = path.relative(base, autocompletion)
+
+				autocompletes.push(autocompletion)
+			}
+
+			return autocompletes
+		} catch(ignored) { return [] }
+	}
+
+    autocompleteFlags(flagToComplete: string, options: ConsoleAutocompleteOptions): string[] {
+
+        flagToComplete = flagToComplete.substr(1)
+	    let autocompletes = []
+
+        for(let flag of this.flags) {
+            if(flag.name.startsWith(flagToComplete)) {
+                if(options.single && autocompletes.length) return []
+                autocompletes.push("-" + flag.name)
+            }
+        }
+
+        return autocompletes
+    }
 }
 
 export default Command;

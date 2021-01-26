@@ -42,12 +42,20 @@ class Compiler {
         this.options = options
 
          /**
-         * @type {Plugin[]}
-         */
-
+          * @type {Plugin[]}
+          */
         this.plugins = []
         this.babelify = null
         this.resourcify = null
+
+        /**
+         * @type {string[]}
+         */
+        this.projectFiles = []
+    }
+
+    addProjectFile(file) {
+        this.projectFiles.push(file)
     }
 
     /**
@@ -60,7 +68,7 @@ class Compiler {
     }
 
     static path(s) {
-        return path.resolve(this.projectDirectory, s)
+        return path.join(this.projectDirectory, s)
     }
 
     /**
@@ -95,7 +103,6 @@ class Compiler {
                 ["@babel/plugin-syntax-class-properties"],
                 ["@babel/plugin-proposal-class-properties", { loose: true }],
                 ["@babel/plugin-transform-typescript"],
-                ["transform-dirname-filename"],
                 ["@babel/plugin-transform-runtime"],
                 ["@babel/plugin-proposal-export-default-from"]
             ],
@@ -215,14 +222,14 @@ class Compiler {
 
         Timings.begin("Reading resources")
 
-        await this.resourcify.readResources()
+        await this.resourcify.readResources(this)
 
         Timings.end()
 
         for(let plugin of this.plugins) {
             await plugin.perform(this.resourcify.resources)
         }
-        //
+
         let destination = Compiler.path(this.options.destination)
         let dirname = path.dirname(destination)
         try {

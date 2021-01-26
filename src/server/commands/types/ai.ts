@@ -70,10 +70,6 @@ class AICommand extends Command {
         }
     }
 
-    onTabComplete(args: string[]) {
-        return super.onTabComplete(args);
-    }
-
     getDescription(): string {
         return "AI control command"
     }

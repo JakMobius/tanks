@@ -26,6 +26,7 @@ export default class TerminfoCompiler {
     private static footer = ';return out.join("");'
 
     _debug(...values: any[]) {
+        if(!this.debug) return
         return console.log.apply(console, arguments);
     }
 
@@ -41,7 +42,7 @@ export default class TerminfoCompiler {
         this.buff = ""
     }
 
-    static noop() {}
+    static noop() { return "" }
 
     static compile(config: TerminfoCompilerConfig): any {
 
@@ -472,8 +473,6 @@ export default class TerminfoCompiler {
                 .replace(/\n/g, '\\n');
             process.stdout.write(v + '\n');
         }
-
-        console.log(this.code)
 
         try {
             if (this.config.tputOptions.stringify && this.code.indexOf('return ') === 0) {

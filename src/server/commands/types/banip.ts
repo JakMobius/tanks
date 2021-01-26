@@ -34,10 +34,6 @@ class BanIPCommand extends Command {
         }
     }
 
-    onTabComplete(args: string[]): string[] {
-        return super.onTabComplete(args);
-    }
-
     getDescription(): string {
         return "Забанить игрока по айпи (до перезагрузки сервера)"
     }

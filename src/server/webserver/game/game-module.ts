@@ -7,14 +7,15 @@ class GameModule extends WebserverModule {
     constructor() {
         super();
 
-        this.resourcesDirectory = path.resolve(__dirname, "../../html-pages/game-page")
+        this.resourcesDirectory = path.resolve(__dirname, "resources/web/game/")
 
         this.router.get("/game/", (req, res, next) => {
-            res.render("game-page/page/index")
+            res.render("game/views/index")
         })
 
         this.router.use("/game/styles/", express.static(this.resourcePath("styles")))
         this.router.use("/game/scripts/", express.static(this.resourcePath("scripts")))
+        this.router.use("/game/assets/", express.static(this.resourcePath("assets")))
     }
 }
 

@@ -1,6 +1,7 @@
 
 import Command from '../../command';
 import Game from "../../../room/game";
+import {ConsoleAutocompleteOptions} from "../../../console/console";
 
 class RoomViewCommand extends Command {
     onPerform(args: string[]) {
@@ -23,7 +24,7 @@ class RoomViewCommand extends Command {
         this.console.switchToLogger(world.logger)
     }
 
-    onTabComplete(args: string[]) {
+    onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {
         if(args.length === 1) {
             let result = []
 

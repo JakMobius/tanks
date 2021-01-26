@@ -29,10 +29,11 @@ module.exports = function() {
         plugin: null
     }
 
-    result.readResources = async function() {
+    result.readResources = async function(compiler) {
         let cache = await CompilerCache.readCache("resourceify")
 
         for(let entry of result.entries) {
+            compiler.addProjectFile(entry.file)
             let name = entry.file
 
             let resources
@@ -49,6 +50,10 @@ module.exports = function() {
         }
 
         await CompilerCache.writeCache("resourceify", cache)
+
+        for(let resource of result.resources) {
+            compiler.addProjectFile(resource.resource)
+        }
 
         return result.resources
     }

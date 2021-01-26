@@ -11,6 +11,10 @@ class Plugin {
     async perform(resources) {
 
     }
+
+    async finish() {
+
+    }
 }
 
 module.exports = Plugin

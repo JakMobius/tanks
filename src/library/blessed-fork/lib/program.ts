@@ -2055,7 +2055,7 @@ class Program extends EventEmitter {
 
     normalBuffer() {
         this.isAlt = false;
-        if (this.tput) return this._write(this.tput.terminfo.methods.pad());
+        if (this.tput) return this._write(this.tput.terminfo.methods.rmcup());
         this.resetMode('?47');
         return this.resetMode('?1049');
     }

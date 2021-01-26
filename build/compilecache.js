@@ -48,6 +48,12 @@ class CompileCache {
             return true
         }
 
+        try {
+            await fs.access(file)
+        } catch(error) {
+            return true
+        }
+
         let stats = await fs.stat(file)
 
         return cacheEntry.modificationTime < stats.mtime

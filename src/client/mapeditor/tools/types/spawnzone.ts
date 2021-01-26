@@ -8,7 +8,7 @@ import GameMap from '../../../../utils/map/gamemap';
 import ToolManager from "../toolmanager";
 
 class SpawnZoneTool extends Tool {
-    public image = "../assets/mapeditor/spawnzones.png"
+    public image = "assets/mapeditor/spawnzones.png"
 	public actionName = "Зона спавна";
 	public selectedTeam: number | null = null;
 	public program: ParticleProgram;

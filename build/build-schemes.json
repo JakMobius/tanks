@@ -1,0 +1,155 @@
+{
+	"schemes": {
+		"release-server": {
+			"steps": [
+				{
+					"action": "delete",
+					"target": "dist/server/index.js"
+				},
+				{
+					"action": "delete",
+					"target": "dist/server/index.js.map"
+				},
+				{
+					"action": "delete",
+					"target": "dist/server/resources"
+				},
+				{
+					"action": "copy",
+					"source": {
+						"target-name": "server-build"
+					},
+					"target": "dist/",
+					"target-name": "server"
+				}
+			]
+		},
+
+		"build-server": {
+			"steps": [
+				{
+					"action": "compile-javascript",
+					"source": "src/server/main.ts",
+					"target": "build/cache/server/index.js"
+				},
+				{
+					"action": "copy",
+					"source": {
+						"target-name": "game"
+					},
+					"target": "build/cache/server/resources/web/"
+				},
+				{
+					"action": "copy",
+					"source": {
+						"target-name": "hub"
+					},
+					"target": "build/cache/server/resources/web/"
+				},
+				{
+					"action": "copy",
+					"source": "src/client/web/default",
+					"target": "build/cache/server/resources/web/"
+				},
+				{
+					"action": "copy",
+					"source": "src/library/blessed-fork/usr",
+					"target": "build/cache/server/resources/terminal/"
+				},
+				{
+					"action": "copy",
+					"source": "src/server/maps",
+					"target": "build/cache/server/resources/"
+				},
+				{
+					"action": "copy",
+					"source": "src/server/preferences/default.json",
+					"target": "build/cache/server/resources/default-preferences.json"
+				},
+				{
+					"action": "copy",
+					"source": "src/server/scripts",
+					"target": "build/cache/server/resources/"
+				}
+			],
+			"targets": {
+				"server-build": "build/cache/server"
+			}
+		},
+
+		"build-game": {
+			"steps": [
+				{
+					"action": "compile-javascript",
+					"source": "src/client/game/index.ts",
+					"target": "build/cache/game/scripts/game.js",
+					"target-name": "game-executable",
+					"plugins": {
+						"css-plugin": "css-plugin-config",
+						"glsl-plugin": {
+							"enabled": true
+						}
+					}
+				},
+				{
+					"action": "compile-javascript",
+					"source": "src/client/game-launcher/index.ts",
+					"target": "build/cache/game/scripts/index.js",
+					"target-name": "game-launcher",
+					"plugins": {
+						"css-plugin": "css-plugin-config"
+					}
+				},
+				{
+					"action": "copy",
+					"source": "src/client/web/game",
+					"target": "build/cache/game"
+				},
+				{
+					"action": "texture-atlas",
+					"source": "src/client/textures",
+					"target": "build/cache/game/assets/img/textures",
+					"atlasSize": 2048
+				}
+			],
+			"targets": {
+				"game": "build/cache/game"
+			},
+			"configs": {
+				"css-plugin-config": {
+					"enabled": true,
+					"target": "build/cache/game/styles/style.css",
+					"unite-different-targets": true
+				}
+			}
+		},
+
+		"build-hub": {
+			"steps": [
+				{
+					"action": "compile-javascript",
+					"source": "src/client/hub/index.ts",
+					"target": "build/cache/hub/scripts/index.js",
+					"plugins": {
+						"css-plugin": "css-plugin-config"
+					}
+				},
+				{
+					"action": "copy",
+					"source": "src/client/web/hub",
+					"target": "build/cache/hub"
+				}
+			],
+			"targets": {
+				"hub": "build/cache/hub"
+			},
+			"configs": {
+				"css-plugin-config": {
+					"enabled": true,
+					"target": "build/cache/hub/styles/style.css",
+					"unite-different-targets": true
+				}
+			}
+		}
+	}
+}

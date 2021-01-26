@@ -63,13 +63,13 @@ export default function(callback: () => void){
             browserLink(
                 footer,
                 "Google Chrome",
-                "../assets/browser/chrome.png",
+                "assets/browser/chrome.png",
                 "https://www.google.com/chrome/browser/desktop/"
             )
             browserLink(
                 footer,
                 "Firefox",
-                "../assets/browser/firefox.png",
+                "assets/browser/firefox.png",
                 "https://www.mozilla.org/firefox/new"
             )
         }

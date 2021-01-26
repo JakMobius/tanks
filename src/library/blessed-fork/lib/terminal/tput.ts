@@ -154,7 +154,7 @@ class Tput {
 
     _useInternalInfo(name: string) {
         name = path.basename(name);
-        this.terminfo = this.compileTerminfo(__dirname + '/../usr/' + name);
+        this.terminfo = this.compileTerminfo(__dirname + 'resources/terminal/usr/' + name);
     }
 
     readTerminfo(term: string) {

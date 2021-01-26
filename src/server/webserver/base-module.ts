@@ -7,7 +7,7 @@ class BaseModule extends WebserverModule {
     constructor() {
         super();
 
-        this.resourcesDirectory = path.resolve(__dirname, "../html-pages/")
+        this.resourcesDirectory = path.resolve(__dirname, "resources/web/default")
         this.priority = WebserverModule.PRIORITY_LOWEST
 
         this.router.use("/assets/", express.static(this.resourcePath("assets")))
@@ -23,7 +23,7 @@ class BaseModule extends WebserverModule {
         res.status(404);
 
         if (req.accepts('html')) {
-            res.render('views/404.hbs', undefined, (err, html) => {
+            res.render('default/views/404.hbs', undefined, (err, html) => {
                 if(err) next(err)
                 res.send(html)
             });
@@ -40,7 +40,7 @@ class BaseModule extends WebserverModule {
         console.log(err)
 
         if (req.accepts('html')) {
-            res.render('views/500.hbs');
+            res.render('default/views/500.hbs');
         } else if (req.accepts('json')) {
             res.send({ error: 'Internal server error' });
         } else {

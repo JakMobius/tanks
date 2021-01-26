@@ -69,7 +69,7 @@ class WebServer {
 
     setupApp() {
         this.app.set('view engine', 'hbs')
-        this.app.set('views', path.resolve(__dirname, "../html-pages/"))
+        this.app.set('views', path.resolve(__dirname, "resources/web"))
 
         this.app.use(function(req, res, next) {
             res.header("Access-Control-Allow-Origin", "*");

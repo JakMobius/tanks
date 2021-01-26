@@ -123,7 +123,7 @@ class MapConverter {
     }
 }
 
-const mapsPath = path.resolve(__dirname, '..', '..', 'server/maps/')
+const mapsPath = path.resolve(__dirname, 'resources/maps')
 let files = fs.readdirSync(mapsPath)
 
 for(let file of files) {
