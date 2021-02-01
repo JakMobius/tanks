@@ -72,10 +72,28 @@ class Compiler {
         return path.join(this.projectDirectory, s)
     }
 
+    defaultBabelPlugins(options) {
+        return [
+            ["module-resolver", {
+                extensions: [".js", ".ts", ".json"],
+                alias: {
+                    "src": Compiler.path("src")
+                }
+            }],
+            BabelPluginImportDir,
+            ["@babel/plugin-syntax-dynamic-import"],
+            ["@babel/plugin-syntax-class-properties"],
+            ["@babel/plugin-proposal-class-properties", { loose: true }],
+            ["@babel/plugin-transform-typescript"],
+            ["@babel/plugin-transform-runtime"],
+            ["@babel/plugin-proposal-export-default-from"]
+        ]
+    }
+
     /**
      * @private
      * @param options Compiler options
-     * @return {Browserify}
+     * @return {browserify}
      */
     createCompiler(options) {
 
@@ -91,22 +109,12 @@ class Compiler {
         incremental(compiler, { cacheFile: options.cacheFile })
         this.resourcify = resourceify()
 
+        let babelPlugins = this.defaultBabelPlugins(options)
+
+
+
         this.babelify = babelify.configure({
-            plugins: [
-                ["module-resolver", {
-                    extensions: [".js", ".ts", ".json"],
-                    alias: {
-                        "src": Compiler.path("src")
-                    }
-                }],
-                BabelPluginImportDir,
-                ["@babel/plugin-syntax-dynamic-import"],
-                ["@babel/plugin-syntax-class-properties"],
-                ["@babel/plugin-proposal-class-properties", { loose: true }],
-                ["@babel/plugin-transform-typescript"],
-                ["@babel/plugin-transform-runtime"],
-                ["@babel/plugin-proposal-export-default-from"]
-            ],
+            plugins: babelPlugins,
             "presets": [
                 ['@babel/preset-env', {
                     // "debug": true,
@@ -120,7 +128,6 @@ class Compiler {
         compiler.transform(this.babelify)
         compiler.plugin(collapse)
         compiler.plugin(this.resourcify.plugin)
-        //
 
         if(options.targetPlatform === "node") {
             for (let library of Compiler.externalNodeLibraries) {
@@ -218,10 +225,10 @@ class Compiler {
     /**
      * @async
      * @private
-     * @return {Promise>}
+     * @return {Promise}
      */
 
-    async finished(src, map) {
+    async finished() {
 
         Timings.begin("Reading resources")
 
