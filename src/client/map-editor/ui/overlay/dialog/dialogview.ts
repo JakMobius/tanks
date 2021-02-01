@@ -1,4 +1,6 @@
 
+/* @load-resource: './dialog.scss' */
+
 import Menu from '../../../../ui/menu/menu';
 
 export interface DialogButtonConfig {

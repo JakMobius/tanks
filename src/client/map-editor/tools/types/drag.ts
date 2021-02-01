@@ -6,7 +6,7 @@ class Drag extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/mapeditor/drag.png"
+        this.image = "assets/img/drag.png"
         this.locksDragging = false
     }
 

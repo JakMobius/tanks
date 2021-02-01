@@ -10,7 +10,7 @@ class Fill extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/mapeditor/fill.png"
+        this.image = "assets/img/fill.png"
         this.actionName = "Заливка"
     }
 

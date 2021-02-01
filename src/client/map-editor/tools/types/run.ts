@@ -20,7 +20,7 @@ class RunTool extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/mapeditor/tank.png"
+        this.image = "assets/img/tank.png"
         this.setupMenu()
         this.selectingLocation = false
 
@@ -44,12 +44,12 @@ class RunTool extends Tool {
 
         this.runButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/mapeditor/start.png)")
+            .css("background-image", "url(assets/img/start.png)")
             .on("click",() => this.toggle())
 
         this.locationButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/mapeditor/locate.png)")
+            .css("background-image", "url(assets/img/locate.png)")
             .on("click",() => this.selectLocation())
 
         this.settingsView = $("<div>")

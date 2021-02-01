@@ -28,7 +28,7 @@ class ToolbarView extends View {
         this.element.append(this.toolList)
         this.element.append(this.blockSelector.element)
 
-        this.blockSelector.element.click(() => {
+        this.blockSelector.element.on("click", () => {
             this.blockSelectOverlay.show()
         })
 
@@ -36,7 +36,7 @@ class ToolbarView extends View {
             root: options.root
         })
 
-        this.blockSelectOverlay.on("select", (name: string, block: BlockState) => {
+        this.blockSelectOverlay.on("select", (block: BlockState) => {
             this.selectBlock(block)
         })
 

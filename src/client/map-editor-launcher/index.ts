@@ -1,8 +1,8 @@
+/* @load-resource: '../web/base-style.css' */
 
 import BrowserCheckView from '../utils/browsercheck/browsercheckview';
-import MapEditor from './/editor'
 
-$(document).ready(function() {
+window.addEventListener("load", function() {
     BrowserCheckView(downloadGameScript)
 })
 
@@ -10,6 +10,7 @@ function startGame() {
     var root = $("<div>").addClass("game-root")
     $(document.body).append(root)
 
+    // @ts-ignore
     var editor = new MapEditor({
         root: root
     })
@@ -22,7 +23,7 @@ function startGame() {
 
 function downloadGameScript() {
     var script = document.createElement("script")
-    script.src = "./editor.js"
+    script.src = "scripts/map-editor.js"
     script.onload = startGame
     document.head.appendChild(script)
 }

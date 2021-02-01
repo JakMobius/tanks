@@ -23,7 +23,7 @@ class BlockSelectMenu extends View {
 
             this.list.append($("<div>")
                 .addClass("block-button")
-                .css("background-image", "url(assets/mapeditor/blocks/" + name + ".png)")
+                .css("background-image", "url(assets/img/blocks/" + name + ".png)")
                 .on("click", { id: id, name: name }, (event) => {
                     const Block = BlockState.getBlockStateClass(event.data.id)
                     const block = new Block()

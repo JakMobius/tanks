@@ -153,12 +153,17 @@ class TextureAtlasAction extends BuilderAction {
         return img2.image.width * img2.image.height - img1.image.width * img1.image.height
     }
 
-    static writeAtlases(canvases, atlasDescriptors, destination) {
+    static async writeAtlases(canvases, atlasDescriptors, destination) {
+        try {
+            await fs.promises.access(destination)
+        } catch(ignored) {
+            await fs.promises.mkdir(destination)
+        }
         for(let j = 0; j < canvases.length; j++) {
             if(!canvases[j]) break
 
-            fs.writeFileSync(path.resolve(destination, "atlas-mipmap-level-" + j + ".png"), canvases[j].toBuffer());
-            fs.writeFileSync(path.resolve(destination, "atlas-mipmap-level-" + j + ".json"), JSON.stringify(atlasDescriptors[j]));
+            await fs.promises.writeFile(path.resolve(destination, "atlas-mipmap-level-" + j + ".png"), canvases[j].toBuffer());
+            await fs.promises.writeFile(path.resolve(destination, "atlas-mipmap-level-" + j + ".json"), JSON.stringify(atlasDescriptors[j]));
         }
     }
 

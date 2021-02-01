@@ -140,7 +140,7 @@ class MapEditorScene extends Scene {
         this.toolSettingsView = new ToolSettingsView()
         this.toolManager = new ToolManager(this.screen, this.camera, this.map)
         this.toolManager.on("redraw", (force) => this.setNeedsRedraw(force))
-        this.toolManager.on("event", (text) => this.eventContainer.createEvent(text))
+        this.toolManager.on("user-event", (text) => this.eventContainer.createEvent(text))
         this.toolbar = new ToolbarView({
             root: this.overlayContainer
         })

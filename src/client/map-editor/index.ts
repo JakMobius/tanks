@@ -8,8 +8,8 @@ import MapEditorScene from './scenes/mapeditorscene';
 import LoadingScene from '../scenes/loading/loadingscene';
 import RequestFrameLoop from '../../utils/loop/requestframeloop';
 import 'src/client/graphics/drawers/block/type-loader';
+import 'src/utils/map/blockstate/type-loader';
 
-import PhysicsUtils from 'src/utils/physicsutils';
 
 class MapEditor extends Screen {
     constructor(config: ScreenConfig) {
@@ -21,10 +21,14 @@ class MapEditor extends Screen {
     }
 
     initialize() {
+        this.loadGame()
+    }
+
+    async loadGame() {
         let spriteDownloadProgress = new Progress()
         // let soundDownloadProgress = new Progress()
         let totalProgress = new Progress()
-        //
+
         totalProgress.addSubtask(spriteDownloadProgress)
         // totalProgress.addSubtask(soundDownloadProgress)
 
@@ -33,19 +37,16 @@ class MapEditor extends Screen {
             progress: totalProgress
         }))
 
-        Sprite.download(spriteDownloadProgress, this.ctx).then(() => {
-            Sprite.applyTexture(this.ctx)
-            this.setScene(new MapEditorScene({
-                screen: this
-            }))
-            //    return this.soundEngine.download(soundDownloadProgress)
-        })
-        //     .then(() => {
-        //     this.setScene(new GameScene({
-        //         screen: this
-        //     }))
-        // })
+        await Sprite.download(spriteDownloadProgress, this.ctx)
+        //await this.soundEngine.download(soundDownloadProgress)
+
+        Sprite.applyTexture(this.ctx)
+        this.setScene(new MapEditorScene({
+            screen: this
+        }))
     }
 }
+
+(window as any).MapEditor = MapEditor
 
 export default MapEditor

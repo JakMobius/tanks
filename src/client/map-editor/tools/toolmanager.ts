@@ -108,7 +108,7 @@ class ToolManager extends DocumentEventHandler {
     }
 
     createEvent(name: string) {
-        this.emit("event", name)
+        this.emit("user-event", name)
     }
 }
 

@@ -8,7 +8,7 @@ import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class Pencil extends Tool {
 	public actionName = "Карандаш";
-    public image = "assets/mapeditor/pencil.png"
+    public image = "assets/img/pencil.png"
 
 	public decorationProgram: BrushProgram;
 	public brushX = 0;
@@ -46,7 +46,7 @@ class Pencil extends Tool {
 
         this.roundModeButton = $("<div>")
             .addClass("tool inline selected")
-            .css("background-image", "url(assets/mapeditor/round-brush.png)")
+            .css("background-image", "url(assets/img/round-brush.png)")
             .click(() => {
                 this.roundModeButton.addClass("selected")
                 this.squareModeButton.removeClass("selected")
@@ -55,7 +55,7 @@ class Pencil extends Tool {
 
         this.squareModeButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/mapeditor/square-brush.png)")
+            .css("background-image", "url(assets/img/square-brush.png)")
             .click(() => {
                 this.roundModeButton.removeClass("selected")
                 this.squareModeButton.addClass("selected")
@@ -186,7 +186,7 @@ class Pencil extends Tool {
     }
 
     becomeActive() {
-        this.setCursor("url(assets/mapeditor/cursors/pencil.png) 0 32, auto")
+        this.setCursor("url(assets/img/cursors/pencil.png) 0 32, auto")
         this.brushPositionKnown = false
     }
 

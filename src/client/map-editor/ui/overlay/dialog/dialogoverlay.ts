@@ -17,11 +17,11 @@ class DialogOverlay extends Overlay {
 
     show() {
         this.overlay.attr("tabindex", 1)
-        this.overlay.focus()
+        this.overlay.trigger("focus")
 
         if(!this.requiresDecision) {
             this.overlay.on("click", (event) => {
-                if(this.overlay.has(event.target).length) {
+                if(this.overlay[0] == event.target) {
                     this.hide()
                 }
             })

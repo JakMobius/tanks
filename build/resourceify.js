@@ -32,7 +32,12 @@ module.exports = function() {
     result.readResources = async function(compiler) {
         let cache = await CompilerCache.readCache("resourceify")
 
-        for(let entry of result.entries) {
+        // Iterating in reverse order because depencencies are added
+        // with post-order, which ends up in reverse order of
+        // included resources
+
+        for(let i = result.entries.length - 1; i >= 0; i--) {
+            let entry = result.entries[i]
             compiler.addProjectFile(entry.file)
             let name = entry.file
 

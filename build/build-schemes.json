@@ -30,7 +30,10 @@
 				{
 					"action": "compile-javascript",
 					"source": "src/server/main.ts",
-					"target": "build/cache/server/index.js"
+					"target": "build/cache/server/index.js",
+					"compiler-options": {
+						"targetPlatform": "node"
+					}
 				},
 				{
 					"action": "copy",
@@ -77,8 +80,29 @@
 			}
 		},
 
+		"build-texture-atlas": {
+			"steps": [
+				{
+					"action": "texture-atlas",
+					"source": "src/client/textures",
+					"target": "build/cache/textures",
+					"atlasSize": 2048,
+					"target-name": "texture-atlas"
+				}
+			]
+		},
+
 		"build-game": {
 			"steps": [
+				{
+					"action": "compile-javascript",
+					"source": "src/client/game-launcher/index.ts",
+					"target": "build/cache/game/scripts/index.js",
+					"target-name": "game-launcher",
+					"plugins": {
+						"css-plugin": "css-plugin-config"
+					}
+				},
 				{
 					"action": "compile-javascript",
 					"source": "src/client/game/index.ts",
@@ -92,22 +116,15 @@
 					}
 				},
 				{
-					"action": "compile-javascript",
-					"source": "src/client/game-launcher/index.ts",
-					"target": "build/cache/game/scripts/index.js",
-					"target-name": "game-launcher",
-					"plugins": {
-						"css-plugin": "css-plugin-config"
-					}
-				},
-				{
 					"action": "copy",
 					"source": "src/client/web/game",
 					"target": "build/cache/game"
 				},
 				{
-					"action": "texture-atlas",
-					"source": "src/client/textures",
+					"action": "copy",
+					"source": {
+						"target-name": "texture-atlas"
+					},
 					"target": "build/cache/game/assets/img/textures",
 					"atlasSize": 2048
 				}
@@ -156,14 +173,24 @@
 			"steps": [
 				{
 					"action": "compile-javascript",
-					"source": "src/client/map-editor/index.ts",
+					"source": "src/client/map-editor-launcher/index.ts",
 					"target": "build/cache/map-editor/scripts/index.js",
+					"plugins": {
+						"css-plugin": "css-plugin-config"
+					},
+					"target-name": "map-editor-launcher"
+				},
+				{
+					"action": "compile-javascript",
+					"source": "src/client/map-editor/index.ts",
+					"target": "build/cache/map-editor/scripts/map-editor.js",
 					"plugins": {
 						"css-plugin": "css-plugin-config",
 						"glsl-plugin": {
 							"enabled": true
 						}
-					}
+					},
+					"target-name": "map-editor-executable"
 				},
 				{
 					"action": "copy",
@@ -171,8 +198,10 @@
 					"target": "build/cache/map-editor"
 				},
 				{
-					"action": "texture-atlas",
-					"source": "src/client/textures",
+					"action": "copy",
+					"source": {
+						"target-name": "texture-atlas"
+					},
 					"target": "build/cache/map-editor/assets/img/textures",
 					"atlasSize": 2048
 				}

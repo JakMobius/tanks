@@ -21,7 +21,7 @@ const cacheFile = path.resolve(__dirname, '../cache/browserify-cache.json')
 
 class Compiler {
 
-    static externalLibraries = [
+    static externalNodeLibraries = [
         "fs",
         "http",
         "express",
@@ -39,20 +39,20 @@ class Compiler {
     ]
     static projectDirectory = path.resolve(__dirname, "../..")
 
+    /** @type {Plugin[]} */
+    plugins = []
+
+    /** @type {babelify} */
+    babelify = null
+
+    /** @type {resourcify} */
+    resourcify = null
+
+    /** @type {string[]} */
+    projectFiles = []
+
     constructor(options) {
         this.options = options
-
-         /**
-          * @type {Plugin[]}
-          */
-        this.plugins = []
-        this.babelify = null
-        this.resourcify = null
-
-        /**
-         * @type {string[]}
-         */
-        this.projectFiles = []
     }
 
     addProjectFile(file) {
@@ -122,8 +122,10 @@ class Compiler {
         compiler.plugin(this.resourcify.plugin)
         //
 
-        for(let library of Compiler.externalLibraries) {
-            compiler.external(library)
+        if(options.targetPlatform === "node") {
+            for (let library of Compiler.externalNodeLibraries) {
+                compiler.external(library)
+            }
         }
 
         compiler.require(options.source, { entry: true })
@@ -169,7 +171,7 @@ class Compiler {
 
             // let terserIgnoreList = []
             //
-            // for(let libraryName of Compiler.externalLibraries) {
+            // for(let libraryName of Compiler.externalNodeLibraries) {
             //     let library = require(libraryName)
             //
             //     for(let key in library) {

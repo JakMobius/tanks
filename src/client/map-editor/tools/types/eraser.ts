@@ -8,7 +8,7 @@ class Eraser extends Pencil {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/mapeditor/eraser.png"
+        this.image = "assets/img/eraser.png"
         this.actionName = "Ластик"
     }
 
@@ -19,7 +19,7 @@ class Eraser extends Pencil {
     }
 
     becomeActive() {
-        this.setCursor("url(assets/mapeditor/cursors/eraser.png) 0 32, auto")
+        this.setCursor("url(assets/img/cursors/eraser.png) 0 32, auto")
     }
 }
 

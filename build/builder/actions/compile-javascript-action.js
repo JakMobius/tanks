@@ -128,8 +128,8 @@ class CompileJavascriptAction extends BuilderAction {
                 cacheFile: "build/cache/browserify-cache.json"
             }
 
-            if (config.compilerOptions) {
-                Object.assign(compilerOptions, config.compilerOptions)
+            if (config["compiler-options"]) {
+                Object.assign(compilerOptions, config["compiler-options"])
             }
 
             let compiler = new Compiler(compilerOptions)
@@ -179,11 +179,11 @@ class CompileJavascriptAction extends BuilderAction {
             }
 
             schemeCache.cache.schemeFileList = schemeCache.cache.schemeFileList.concat(compiler.projectFiles)
+            Timings.end("Finished building " + logFileName)
         } else {
             Timings.begin("Skipping " + logFileName)
+            Timings.end()
         }
-
-        Timings.end()
     }
 
     static getName() {
