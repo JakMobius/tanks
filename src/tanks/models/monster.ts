@@ -3,6 +3,8 @@ import PhysicsUtils from '../../utils/physicsutils';
 import WheeledTankBehaviour from '../physics/wheeledtankbehaviour';
 import * as Box2D from '../../library/box2d';
 import WeaponMachineGun from '../../weapon/models/machinegun';
+import {b2World} from "../../library/box2d/dynamics/b2_world";
+import {Vec2} from "../../library/box2d";
 
 class MonsterTankModel extends TankModel {
 
@@ -25,20 +27,26 @@ class MonsterTankModel extends TankModel {
         return 10
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: b2World) {
         this.world = world
 
-        let size = 9
+        let size = 10
 
-        let bodyFixture = PhysicsUtils.squareFixture(size * 0.6, size, new Box2D.Vec2(0, -size * 0.25))
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(size * 0.18, size * 0.9, new Box2D.Vec2(-size * 0.78 , 0))
+        let bodyFixture = PhysicsUtils.squareFixture(size * 0.6, size, new Vec2())
 
         this.body = PhysicsUtils.dynamicBody(world, {
             linearDamping: 0.3
         });
 
         this.body.CreateFixture(bodyFixture)
-        for(let fixture of trackFixtures)
+
+        for (let axleOffset of this.behaviour.axleOffsetList) {
+            this.addWheels(PhysicsUtils.horizontalSquareFixtures(size * 0.07, size * 0.2, new Vec2(this.behaviour.axleWidth, axleOffset)))
+        }
+    }
+
+    addWheels(wheels: Box2D.IFixtureDef[]) {
+        for(let fixture of wheels)
             this.body.CreateFixture(fixture)
     }
 }

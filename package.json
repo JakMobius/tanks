@@ -11,6 +11,7 @@
     "json5": "^2.1.3",
     "mongodb": "^3.1.0",
     "mongodb-client-encryption": "^1.1.0",
+    "node": "^14.15.2",
     "pako": "^1.0.11",
     "readable-stream": "^3.6.0",
     "through2": "^4.0.2",
@@ -19,6 +20,7 @@
     "websocket": "^1.0.32"
   },
   "devDependencies": {
+    "beelder": "beelder",
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
     "@babel/plugin-proposal-class-properties": "^7.10.1",
@@ -50,7 +52,7 @@
     "bundle-collapser": "^1.4.0",
     "canvas": "^2.6.1",
     "chai": "^4.2.0",
-    "exorcist": "^1.0.1",
+    "exorcist": "^2.0.0",
     "glsl-deparser": "^1.0.0",
     "glsl-min-stream": "^1.0.0",
     "glsl-parser": "^2.0.1",
@@ -70,12 +72,9 @@
   },
   "scripts": {
     "test": "mocha --reporter list",
-    "build-server": "node build/actions/build-scheme.js release-server",
-    "start-server": "node dist/server.js -s autorun",
+    "release-server": "node ./node_modules/beelder/bin/beelder/cli.js release-server",
     "start-game-server": "node dist/server -pn port=25566 -s configure-game-server",
-    "start-hub-server": "node dist/server -pn port=25565 -s configure-hub",
-    "clear-cache": "node build/actions/clear-cache.js",
-    "create-texture-atlas": "cd atlas; node atlas_creator.js"
+    "start-hub-server": "node dist/server -pn port=25565 -s configure-hub"
   },
   "nyc": {
     "instrument": true,

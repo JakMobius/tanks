@@ -13,7 +13,9 @@ class SniperTank extends TankModel {
         super();
 
         this.behaviour = new BasicTankBehaviour(this, {
-            power: 20000
+            power: 12000,
+            truckbase: 7.5,
+            angularFriction: 3.0
         });
     }
 
@@ -31,7 +33,10 @@ class SniperTank extends TankModel {
         let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.45, new Box2D.Vec2(0, 0))
         let trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.Vec2(-size / 2 - segment, size * 0.2))
 
-        this.body = PhysicsUtils.dynamicBody(world);
+        this.body = PhysicsUtils.dynamicBody(world, {
+            angularDamping: 1.0,
+            linearDamping: 0.5
+        });
 
         this.body.CreateFixture(bodyFixture)
         for (let fixture of trackFixtures)

@@ -40,12 +40,7 @@ abstract class AbstractClient {
         }
     }
 
-    /**
-     * @abstract
-     */
-    connectToServer() {
-
-    }
+    abstract connectToServer(): void
 
     onOpen() {
         this.connected = true

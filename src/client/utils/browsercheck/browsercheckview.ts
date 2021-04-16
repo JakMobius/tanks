@@ -50,9 +50,7 @@ export default function(callback: () => void){
                 $("<p>").text("Необходимо разрешить использование WebGL в настройках " +
                     "вашего браузера, прежде чем страница сможет быть загружена")
             )
-            return
-        }
-        if(webGl == "unavailable") {
+        } else if(webGl == "unavailable") {
             header.text("Ваш браузер устарел")
             text.append(
                 $("<p>").text("Страница не может быть загружена, поскольку ваш браузер " +

@@ -4,7 +4,6 @@ import * as Box2D from '../library/box2d';
 import GameWorld from "../gameworld";
 import AbstractTank from "../tanks/abstracttank";
 import Team from "../server/team";
-import Effect from "../server/bonuses/effect";
 import BonusModel from "../server/bonuses/bonus";
 
 export interface PlayerConfig {

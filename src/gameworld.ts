@@ -6,12 +6,8 @@ import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effec
 import AbstractEffect from 'src/effects/abstract-effect';
 import AbstractEntity from 'src/entity/abstractentity';
 import Player from 'src/utils/player';
-import ClientEffect from "./client/effects/clienteffect";
-import ClientTank from "./client/tanks/clienttank";
-import ClientTankEffect from "./client/effects/tank/clienttankeffect";
 import AbstractTank from './tanks/abstracttank';
 import BlockState from "./utils/map/blockstate/blockstate";
-import EntityModel from "./entity/entitymodel";
 import ExplodeEffectPool from "src/effects/world/explode/explode-effect-pool";
 
 export interface GameWorldConfig {
@@ -40,7 +36,7 @@ class GameWorld extends EventEmitter {
 
         options = Object.assign({
             physicsTick: 0.002,
-            maxTicks: 10,
+            maxTicks: 30,
             positionSteps: 1,
             velocitySteps: 1
         }, options)
@@ -111,14 +107,16 @@ class GameWorld extends EventEmitter {
 
         let steps = Math.floor(dt / this.physicsTick);
         if (steps > this.maxTicks) steps = this.maxTicks;
-        for (let i = 0; i < steps; i++) this.world.Step(this.physicsTick, 1, 1);
+
+        for (let i = 0; i < steps; i++) {
+            this.world.Step(this.physicsTick, 1, 1);
+            for (let player of this.players.values()) {
+                if(player.tank) player.tank.tick(this.physicsTick)
+            }
+        }
 
         this.rebuildBlockPhysics()
         this.world.ClearForces()
-
-        for (let player of this.players.values()) {
-            if(player.tank) player.tank.tick(dt)
-        }
     }
 
     processEntities(dt: number): void {

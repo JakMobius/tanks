@@ -67,8 +67,9 @@ export default class EventEmitter {
 
 
     once(type: string, listener: (...params: any[]) => any) {
+        let self = this
         function on() {
-            this.removeListener(type, on);
+            self.removeListener(type, on);
             return listener.apply(this, arguments);
         }
         on.listener = listener;

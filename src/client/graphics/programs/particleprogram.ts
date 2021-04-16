@@ -19,8 +19,8 @@ class ParticleProgram extends Program {
 
     constructor(name: string, ctx: WebGLRenderingContext) {
 
-        let vertexShader = new Shader("particle-vertex", Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader("particle-fragment", Shader.FRAGMENT).compile(ctx)
+        let vertexShader = new Shader("src/client/graphics/shaders/vertex/particle-vertex.glsl", Shader.VERTEX).compile(ctx)
+        let fragmentShader = new Shader("src/client/graphics/shaders/fragment/particle-fragment.glsl", Shader.FRAGMENT).compile(ctx)
         super(name, vertexShader, fragmentShader)
 
         this.link(ctx)

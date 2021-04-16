@@ -1,5 +1,5 @@
 
-const shaders = require('./shaderloader') as { [key: string]: string }
+import { Shaders } from './shaderloader'
 
 class Shader {
 	public name: string;
@@ -17,11 +17,11 @@ class Shader {
     compile(gl: WebGLRenderingContext) {
         this.raw = gl.createShader(this.type === Shader.VERTEX ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER)
 
-        if(!shaders[this.name]) {
+        if(!Shaders[this.name]) {
             throw new Error("No such shader: " + this.name)
         }
 
-        gl.shaderSource(this.raw, shaders[this.name]);
+        gl.shaderSource(this.raw, Shaders[this.name]);
         gl.compileShader(this.raw);
 
         if (!gl.getShaderParameter(this.raw, gl.COMPILE_STATUS)) {

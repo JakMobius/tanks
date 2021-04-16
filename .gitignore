@@ -105,24 +105,11 @@ dist
 <<<<<<< HEAD
 
 # Custom
-.nyc_output
 .idea
 out
 *.DS_Store
-build/cache/*
+beelder-cache/*
 dist/*
-
-# Not sharing server properties via github
-src/server/preferences.json
-
-# Not sharing hub and game builds
-src/client/game/page/scripts/*
-src/client/game/page/styles/*
-src/client/game/page/img/*
-
-src/client/hub/page/scripts/*
-src/client/hub/page/styles/*
-src/client/hub/page/img/*
 temp/*
 
 =======

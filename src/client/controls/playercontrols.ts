@@ -5,7 +5,7 @@ import TankControls from "../../tanks/controls/tankcontrols";
 import GamepadManager from "./interact/gamepadmanager";
 import KeyboardController from "./interact/keyboardcontroller";
 
-class PlayerControls extends EventEmitter {
+export default class PlayerControls extends EventEmitter {
 	public axles: any;
 	public respawning: any;
 
@@ -78,5 +78,3 @@ class PlayerControls extends EventEmitter {
         }
     }
 }
-
-export default PlayerControls;

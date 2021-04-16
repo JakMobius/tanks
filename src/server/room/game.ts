@@ -70,10 +70,6 @@ class Game extends Room {
 
         this.world = new ServerGameWorld({
             map: options.map,
-            physicsTick: this.spt,
-            maxTicks: 1,
-            velocitySteps: 7,
-            positionSteps: 5,
             room: this
         })
 

@@ -1,4 +1,5 @@
 #version 100
+precision mediump float;
 
 uniform int u_brush_diameter;
 uniform float u_brush_square_radius;

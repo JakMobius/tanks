@@ -24,8 +24,8 @@ class TruckProgram extends Program {
 
     constructor(name: string, ctx: WebGLRenderingContext) {
 
-        let vertexShader = new Shader("truck-vertex", Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader("truck-fragment", Shader.FRAGMENT).compile(ctx)
+        let vertexShader = new Shader("src/client/graphics/shaders/vertex/truck-vertex.glsl", Shader.VERTEX).compile(ctx)
+        let fragmentShader = new Shader("src/client/graphics/shaders/fragment/truck-fragment.glsl", Shader.FRAGMENT).compile(ctx)
         super(name, vertexShader, fragmentShader)
 
         this.link(ctx)

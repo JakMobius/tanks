@@ -21,8 +21,8 @@ class BrushProgram extends Program {
 	public particles: any;
 
     constructor(name: string, ctx: WebGLRenderingContext) {
-        let vertexShader = new Shader("brush-vertex", Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader("brush-fragment", Shader.FRAGMENT).compile(ctx)
+        let vertexShader = new Shader("src/client/graphics/shaders/vertex/brush-vertex.glsl", Shader.VERTEX).compile(ctx)
+        let fragmentShader = new Shader("src/client/graphics/shaders/fragment/brush-fragment.glsl", Shader.FRAGMENT).compile(ctx)
         super(name, vertexShader, fragmentShader)
 
         this.link(ctx)

@@ -4,7 +4,6 @@ import TankControls from './controls/tankcontrols';
 import RotationalMatrix from '../utils/rotationalmatrix';
 import BinarySerializable, {Constructor} from '../serialization/binary/serializable';
 import * as Box2D from '../library/box2d';
-import GameWorld from "../gameworld";
 import BinaryEncoder from "../serialization/binary/binaryencoder";
 import BinaryDecoder from "../serialization/binary/binarydecoder";
 import Weapon from "../weapon/weapon";

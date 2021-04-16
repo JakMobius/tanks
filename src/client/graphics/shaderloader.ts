@@ -1,4 +1,2 @@
 
-/* #shader-loader-placeholder# */
-
-export default {}
+export const Shaders = { /* @shader-loader-placeholder */ } as { [ key: string ]: string }

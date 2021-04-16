@@ -9,6 +9,7 @@ import {TankStat} from "./tank-stat";
 import Engine from "../engine";
 import BinaryDecoder from "../../serialization/binary/binarydecoder";
 import BinaryEncoder from "../../serialization/binary/binaryencoder";
+import {Vec2} from "../../library/box2d";
 
 export interface TankConfig {
     model?: TankModel
@@ -17,8 +18,10 @@ export interface TankConfig {
 
 class ClientTank extends AbstractTank {
 	public engine: Engine;
-	public serverPosition: Box2D.Vec2;
-	public health: any;
+	public serverVelocity: Vec2 = new Vec2();
+	public serverPosition: Vec2 = new Vec2();
+	public serverPositionUpdateDate: number = 0
+	public health: number;
 	public Types: any;
 
     drawer: TankDrawer = null
@@ -29,7 +32,6 @@ class ClientTank extends AbstractTank {
         super(options)
         this.drawer = null
         this.engine = null
-        this.serverPosition = null
     }
 
     setupModel(model: TankModel) {
@@ -55,21 +57,34 @@ class ClientTank extends AbstractTank {
     }
 
     tick(dt: number) {
-        if(this.serverPosition) {
-            let pos = this.model.body.GetTransform().p
-            let target = this.serverPosition
+        if(this.serverPositionUpdateDate) {
+            let pos = this.model.body.GetPosition()
 
-            let diffX = (target.x - pos.x)
-            let diffY = (target.y - pos.y)
+            let targetX = this.serverPosition.x
+            let targetY = this.serverPosition.y
+
+            let timePassedSinceUpdate = (Date.now() - this.serverPositionUpdateDate) / 1000
+
+            if(timePassedSinceUpdate < 0.1) {
+                targetX += this.serverVelocity.x * timePassedSinceUpdate
+                targetY += this.serverVelocity.y * timePassedSinceUpdate
+            }
+
+            let diffX = (targetX - pos.x)
+            let diffY = (targetY - pos.y)
+
+            let newX = 0;
+            let newY = 0;
 
             if(diffX * diffX + diffY * diffY > 400) {
-                pos.x = target.x
-                pos.y = target.y
+                newX = targetX
+                newY = targetY
             } else {
-                pos.x += (target.x - pos.x) / 20
-                pos.y += (target.y - pos.y) / 20
+                newX = pos.x + diffX / 20
+                newY = pos.y + diffY / 20
             }
-            this.model.body.SetPosition(pos)
+
+            this.model.body.SetPositionXY(newX, newY)
         }
         for(let effect of this.effects.values()) {
             effect.tick(dt)
@@ -106,12 +121,14 @@ class ClientTank extends AbstractTank {
 
         if (teleport) {
             position.Set(x, y)
-        } else {
-            if (this.serverPosition)
-                this.serverPosition.Set(x, y)
-            else this.serverPosition = new Box2D.Vec2(x, y)
         }
-        this.model.body.GetTransform().SetPositionAngle(position, rotation)
+
+        this.serverPosition.Set(x, y)
+        this.serverVelocity.Set(vx, vy)
+        this.serverPositionUpdateDate = Date.now()
+
+        this.model.body.SetPosition(position)
+        this.model.body.SetAngle(rotation)
 
         this.health = decoder.readFloat32()
     }

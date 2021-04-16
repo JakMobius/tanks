@@ -59,31 +59,22 @@ class Drawer extends TankDrawer {
 
         const scale = this.size;
 
-        let leftWheelsDist = this.tank.model.behaviour.details.leftWheelsDist
-        let rightWheelsDist = this.tank.model.behaviour.details.rightWheelsDist
-        let leftWheelsAngle = this.tank.model.behaviour.details.leftWheelsAngle
-        let rightWheelsAngle = this.tank.model.behaviour.details.rightWheelsAngle
-
         let position = this.tank.model.body.GetPosition()
 
         camera.matrix.translate(position.x, position.y)
         camera.matrix.rotate(-angle)
 
-        let l = Math.floor(leftWheelsDist % this.wheelSpriteCount);
-        let r = Math.floor(rightWheelsDist % this.wheelSpriteCount);
-
-        if(l < 0) l = this.wheelSpriteCount + l;
-        if(r < 0) r = this.wheelSpriteCount + r;
-
         this.wheelProgram.use()
         this.wheelProgram.prepare()
 
-        this.drawWheel(l, 0.82, -0.85, leftWheelsAngle)
-        this.drawWheel(l, 0.82, -0.18, 0)
-        this.drawWheel(l, 0.82, 0.48, -leftWheelsAngle)
-        this.drawWheel(r, -0.82, -0.85, rightWheelsAngle)
-        this.drawWheel(r, -0.82, -0.18, 0)
-        this.drawWheel(r, -0.82, 0.48, -rightWheelsAngle)
+        for(let wheel of this.tank.model.behaviour.wheels) {
+
+            let spriteIndex = Math.floor(-wheel.distance * 8 % this.wheelSpriteCount);
+
+            if(spriteIndex < 0) spriteIndex = this.wheelSpriteCount + spriteIndex;
+
+            this.drawWheel(spriteIndex, wheel.position.x, -wheel.position.y, wheel.angle)
+        }
 
         this.wheelProgram.matrixUniform.setMatrix(camera.matrix.m)
         this.wheelProgram.draw()
@@ -92,7 +83,7 @@ class Drawer extends TankDrawer {
         this.bodyProgram.use()
 
         this.bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask,
-            -scale * 0.8, -scale * 1.15, scale * 1.6, scale * 2
+            -scale * 0.8, -scale, scale * 1.6, scale * 2
         )
 
         this.bodyProgram.setLightAngle(-angle)
@@ -105,7 +96,7 @@ class Drawer extends TankDrawer {
     private drawWheel(sprite: number, x: number, y: number, angle: number): void {
         let scale = this.size
         this.spriteMatrix.save()
-        this.spriteMatrix.translate(scale * x, scale * y)
+        this.spriteMatrix.translate(x, y)
         if(angle) this.spriteMatrix.rotate(angle)
         this.wheelProgram.drawSprite(this.wheelSprites[sprite], -scale * 0.18, -scale * 0.3, scale * 0.36, scale * 0.6)
         this.spriteMatrix.restore()

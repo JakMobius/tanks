@@ -56,7 +56,7 @@ export interface GameSceneConfig extends SceneConfig {
     ip: string
 }
 
-class GameScene extends Scene {
+export default class GameScene extends Scene {
 	public config: GameSceneConfig;
 	public controlsUpdateInterval: number;
 	public camera: Camera;
@@ -410,5 +410,3 @@ class GameScene extends Scene {
         }
     }
 }
-
-export default GameScene;

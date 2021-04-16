@@ -23,9 +23,6 @@ class AirbagTankModel extends TankBehaviour {
         clutch: 0
     }
 
-    private preallocatedVector = new Box2D.Vec2()
-    private preallocatedPoint = new Box2D.Vec2()
-
     constructor(tank: TankModel, config: AirbagBehaviourConfig) {
         super(tank, config)
 
@@ -61,10 +58,10 @@ class AirbagTankModel extends TankBehaviour {
         const throttle = this.power * this.tank.controls.getThrottle();
         const rotation = this.torque * this.tank.controls.getSteer() * this.tank.controls.getThrottle();
 
-        body.GetWorldVector(new Box2D.Vec2(0, throttle), this.preallocatedVector)
-        body.GetWorldPoint(new Box2D.Vec2(0, 0), this.preallocatedPoint)
+        body.GetWorldVector(new Box2D.Vec2(0, throttle), this.localVector1)
+        body.GetWorldPoint(new Box2D.Vec2(0, 0), this.localVector2)
 
-        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
+        body.ApplyForce(this.localVector1, this.localVector2)
         body.ApplyTorque(rotation)
     }
 

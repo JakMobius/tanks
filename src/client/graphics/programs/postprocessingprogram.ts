@@ -20,8 +20,8 @@ class PostProcessingProgram extends Program {
 	public textures: number;
 
     constructor(name: string, ctx: WebGLRenderingContext) {
-        let vertexShader = new Shader("post-processing-vertex", Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader("post-processing-fragment", Shader.FRAGMENT).compile(ctx)
+        let vertexShader = new Shader("src/client/graphics/shaders/vertex/post-processing-vertex.glsl", Shader.VERTEX).compile(ctx)
+        let fragmentShader = new Shader("src/client/graphics/shaders/fragment/post-processing-fragment.glsl", Shader.FRAGMENT).compile(ctx)
 
         super(name, vertexShader, fragmentShader)
 

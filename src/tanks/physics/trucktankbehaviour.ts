@@ -1,11 +1,13 @@
 import * as Box2D from '../../library/box2d';
 import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
 import TankModel from "../tankmodel";
+import Utils from "../../utils/utils";
 
 export interface TruckTankBehaviourConfig extends TankBehaviourConfig {
     truckbase?: number
     truckSlipperness?: number
     truckSlipperySpeed?: number
+    truckMaxSpeed?: number
     [others: string]: any;
 }
 
@@ -17,9 +19,9 @@ export interface TruckTankDetails extends TankBehaviourDetails {
 }
 
 class TruckTankBehaviour extends TankBehaviour {
-	public truckbase: any;
-	public truckSlipperness: any;
-	public truckSlipperySpeed: any;
+	public truckbase: number;
+	public truckSlipperness: number;
+	public truckSlipperySpeed: number;
 
 	public details: TruckTankDetails = {
         leftTrackSpeed: 0,
@@ -30,13 +32,12 @@ class TruckTankBehaviour extends TankBehaviour {
         transmissionSpeed: 0
     }
 
-    private preallocatedVector = new Box2D.Vec2()
     private preallocatedPoint = new Box2D.Vec2()
 
     constructor(tank: TankModel, config: TruckTankBehaviourConfig) {
         super(tank, config)
 
-        this.truckbase = config.truckbase || 30
+        this.truckbase = config.truckbase || 10
         this.truckSlipperness = config.truckSlipperness || 15
         this.truckSlipperySpeed = config.truckSlipperySpeed || 30
     }
@@ -49,22 +50,36 @@ class TruckTankBehaviour extends TankBehaviour {
         let x = tank.controls.getSteer()
         let y = tank.controls.getThrottle()
 
-        let leftTrackSpeed = Math.max(Math.min(y - x, 1), -1)
-        let rightTrackSpeed = Math.max(Math.min(y + x, 1), -1)
+        let perfectLeftTrackSpeed = Math.max(Math.min(y - x, 1), -1)
+        let perfectRightTrackSpeed = Math.max(Math.min(y + x, 1), -1)
 
+        // let perfectLeftTrackSpeed = Math.max(Math.min(y - x, 1), -1) * this.truckMaxSpeed
+        // let perfectRightTrackSpeed = Math.max(Math.min(y + x, 1), -1) * this.truckMaxSpeed
 
-        const ls = leftTrackSpeed * this.power;
-        const rs = rightTrackSpeed * this.power;
+        // const velocity = body.GetLinearVelocity()
+        // const tankForwardVelocity = -tank.matrix.sin * velocity.x + tank.matrix.cos * velocity.y;
+        // const angularVelocity = body.GetAngularVelocity()
+        //
+        // let currentLeftTrackSpeed = tankForwardVelocity - angularVelocity * this.truckbase;
+        // let currentRightTrackSpeed = tankForwardVelocity + angularVelocity * this.truckbase;
 
-        body.GetWorldVector(new Box2D.Vec2(0, ls), this.preallocatedVector)
+        // let gradient = 50
+        //
+        // let diffLeftSpeed = Utils.clamp(perfectLeftTrackSpeed - currentLeftTrackSpeed, -gradient, gradient) / gradient
+        // let diffRightSpeed = Utils.clamp(perfectRightTrackSpeed - currentRightTrackSpeed, -gradient, gradient) / gradient
+
+        const ls = perfectLeftTrackSpeed * this.power;
+        const rs = perfectRightTrackSpeed * this.power;
+
+        body.GetWorldVector(new Box2D.Vec2(0, ls), this.localVector1)
         body.GetWorldPoint(new Box2D.Vec2(-this.truckbase, 0), this.preallocatedPoint)
 
-        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
+        body.ApplyForce(this.localVector1, this.preallocatedPoint)
 
-        body.GetWorldVector(new Box2D.Vec2(0, rs), this.preallocatedVector)
+        body.GetWorldVector(new Box2D.Vec2(0, rs), this.localVector1)
         body.GetWorldPoint(new Box2D.Vec2(this.truckbase, 0), this.preallocatedPoint)
 
-        body.ApplyForce(this.preallocatedVector, this.preallocatedPoint)
+        body.ApplyForce(this.localVector1, this.preallocatedPoint)
     }
 
     countDetails(dt: number) {

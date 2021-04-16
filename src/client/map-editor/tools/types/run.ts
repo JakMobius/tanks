@@ -5,6 +5,7 @@ import * as Box2D from '../../../../library/box2d';
 import PlayerControls from '../../../controls/playercontrols';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
 import ToolManager from "../toolmanager";
+import MonsterTank from "../../../tanks/models/monster";
 
 class RunTool extends Tool {
 	public selectingLocation: any;
@@ -16,6 +17,10 @@ class RunTool extends Tool {
 	public timer: any;
 	public runButton: any;
 	public locationButton: any;
+    private physicsTick: number;
+    private maxTicks: number;
+    private positionSteps: number;
+    velocitySteps: number;
 
     constructor(manager: ToolManager) {
         super(manager);
@@ -25,7 +30,8 @@ class RunTool extends Tool {
         this.selectingLocation = false
 
         this.world = new Box2D.World(new Box2D.Vec2(0, 0))
-        this.tank = new SniperTank()
+        //this.tank = new SniperTank()
+        this.tank = new MonsterTank()
         this.tank.setupDrawer(this.manager.screen.ctx)
         this.tank.model.initPhysics(this.world)
 
@@ -38,6 +44,11 @@ class RunTool extends Tool {
 
         this.running = false
         this.timer = 0
+
+        this.physicsTick = 0.002
+        this.maxTicks = 10
+        this.positionSteps = 1
+        this.velocitySteps = 1
     }
 
     setupMenu() {
@@ -102,15 +113,17 @@ class RunTool extends Tool {
 
         if(dt > 0.1) dt = 0.1
 
-        let steps = Math.floor(dt * 500)
-        if(steps > 10) steps = 10
+        let steps = Math.floor(dt / this.physicsTick);
+        if (steps > this.maxTicks) steps = this.maxTicks;
+        for (let i = 0; i < steps; i++) {
+            this.tank.tick(this.physicsTick)
+            this.world.Step(this.physicsTick, 1, 1);
+        }
 
-        for(let i = 0; i < steps; i++)
-            this.world.Step(1 / 500, 1, 1)
+        //this.world.Step(1 / 60, 1, 1);
 
         this.world.ClearForces()
 
-        this.tank.tick(dt)
         this.tank.drawer.draw(this.manager.camera, dt)
     }
 

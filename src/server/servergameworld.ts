@@ -8,7 +8,7 @@ export interface ServerGameWorldConfig extends GameWorldConfig {
     room: Game
 }
 
-class ServerGameWorld extends GameWorld {
+export default class ServerGameWorld extends GameWorld {
 
     room: Game
 
@@ -24,5 +24,3 @@ class ServerGameWorld extends GameWorld {
         })
     }
 }
-
-export default ServerGameWorld;
