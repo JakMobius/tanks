@@ -12,7 +12,6 @@ import Matrix3 from 'src/client/graphics/matrix3';
 import Camera from "../../camera";
 import TankModel from "../../../tanks/tankmodel";
 import {TankStat} from "../tank-stat";
-import BigBoiTankModel from "../../../tanks/models/bigboi";
 
 class Drawer extends TankDrawer {
 	public size: number = 9;
@@ -65,7 +64,7 @@ class Drawer extends TankDrawer {
         camera.matrix.translate(position.x, position.y)
         camera.matrix.rotate(-angle)
 
-        let propellerDist = this.tank.model.behaviour.details.propellerDist
+        let propellerDist = this.tank.model.behaviour.propellerDist
         let ruderAngle = this.tank.model.controls.getSteer() * this.ruderAngle
 
         const propeller = this.propellerSprites[Math.round(propellerDist) % 4]

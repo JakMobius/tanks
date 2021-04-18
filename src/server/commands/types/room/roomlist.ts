@@ -1,5 +1,7 @@
 import Chalk from 'chalk';
 import Command from '../../command';
+import ConsoleTableDrawer from "../../../console/console-table-drawer";
+import CLIStyle from "../../cli-style";
 
 class RoomListCommand extends Command {
     onPerform(args: string[]) {
@@ -9,24 +11,34 @@ class RoomListCommand extends Command {
 
         if (roomCount === 0) {
             logger.log(
-                "§F77;Нет активных комнат\n" +
-                "§777; ⭑ §;Для создания новой комнаты используйте команду room create"
+                "§F77;No active rooms\n" +
+                CLIStyle.tip("To create a room, use 'room create' command")
         );
 
         } else {
-            let string = "Активных комнат: §7FF;" + roomCount + "\n"
+            let string = ""
 
             let totalOnline = 0
             let dot = Chalk.gray(" • ")
+            let lines: string[][] = []
+
+            lines.push([Chalk.bold("Room name"), Chalk.bold("Players online")])
 
             for (let [id, room] of rooms.entries()) {
                 let online = room.clients.size
                 totalOnline += online
 
-                string += dot + id + ": " + online + " онлайн\n"
+                lines.push([dot + id, Chalk.cyanBright(online)])
             }
 
-            string += "Суммарный онлайн: : §7FF;" + totalOnline
+            string += new ConsoleTableDrawer({
+                lines: lines,
+                rowPadding: 1
+            }).draw()
+
+            string += "\n"
+                    + "Active rooms: §7FF;" + roomCount + "\n"
+                    + "Total players online: §7FF;" + totalOnline
 
             logger.log(string)
         }

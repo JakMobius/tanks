@@ -56,8 +56,6 @@ utils.prependDotSlash = function(moduleInfo) {
     });
 };
 
-const camelCase = require('lodash.camelcase')
-
 class ImportDeclarationHandler {
     constructor({ path, state, t } = { path: {}, state: {} }) {
         this.setContext(path, state, t);

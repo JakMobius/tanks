@@ -56,7 +56,7 @@ class Color {
     }
 
     static replace(text: string, replace: (color: string, bold: boolean, text: string) => string) {
-        return text.replace(/(§!?[0-9A-F]{0,6};)?[^§\n]*/gi, function(a) {
+        return text.replace(/§(!?[0-9A-F]{0,6};)?[^§\n]*/gi, function(a) {
             let prefix = ""
 
             let index = a.indexOf(";")

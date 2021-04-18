@@ -22,9 +22,9 @@ class Console {
 	public tabCompletions: any;
 	public window: ConsoleWindow;
 	public currentLogger: Logger;
-	commands = new Map<string, Command>();
-	server: Server = null
-	logger: Logger = null
+	public commands = new Map<string, Command>();
+	public server: Server = null
+	public logger: Logger = null
 
 	constructor() {
 		this.server = null
@@ -47,7 +47,11 @@ class Console {
 		// in WebStorm internal console.
 
 		this.window.on("keypress", () => this.updateAutosuggestion())
-		this.window.on("keypress", () => this.tabComplete())
+		this.window.on("keypress", () => this.tabCompleteClear())
+		this.window.on("history-walk", () => {
+			this.tabCompleteClear()
+			this.window.suggest(null)
+		})
 		this.window.on("exit", 	() => this.commands.get("exit").onPerform([]))
 		this.window.on("command", 	(command: string) => this.evaluate(command))
 		this.window.on("tab", (shift) => {
@@ -141,7 +145,7 @@ class Console {
 		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
 	}
 
-	tabComplete(): void {
+	tabCompleteClear(): void {
 		this.tabCompletions = null
 		this.tabCompleteIndex = null
 	}

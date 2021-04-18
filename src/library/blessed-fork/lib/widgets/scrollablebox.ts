@@ -31,8 +31,6 @@ export class ScrollableBox extends Box {
     constructor(options: ScrollableBoxConfig) {
         super(options);
 
-        var self = this;
-
         options = options || {};
 
         if (options.scrollable === false) {
@@ -54,8 +52,8 @@ export class ScrollableBox extends Box {
             });
         }
 
-        this.on('parsed content', function () {
-            self._recalculateIndex();
+        this.on('parsed content', () => {
+            this._recalculateIndex();
         });
 
         this.type = 'scrollable-box';
@@ -66,7 +64,10 @@ export class ScrollableBox extends Box {
         
         // Todo: cache results
 
-        let bottom = this.children.reduce((current: number, el: Node) => {
+        // XXX Use this? Makes .getScrollHeight() useless!
+        // if (bottom < this._clines.length) bottom = this._clines.length;
+
+        return this.children.reduce((current: number, el: Node) => {
             // el.height alone does not calculate the shrunken height, we need to use
             // getCoords. A shrunken box inside a scrollable element will not grow any
             // larger than the scrollable element's context regardless of how much
@@ -76,11 +77,6 @@ export class ScrollableBox extends Box {
 
             return Math.max(current, el.getrtop() + el.getheight());
         }, 0);
-
-        // XXX Use this? Makes .getScrollHeight() useless!
-        // if (bottom < this._clines.length) bottom = this._clines.length;
-
-        return bottom;
     }
 
     setScroll(offset: number, always?: boolean) {
@@ -223,7 +219,7 @@ export class ScrollableBox extends Box {
     }
 
     resetScroll() {
-        if (!this.scrollable) return;
+        if (!this.scrollable) return false
         this.childOffset = 0;
         this.childBase = 0;
         return this.emit('scroll');

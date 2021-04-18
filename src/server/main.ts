@@ -1,3 +1,4 @@
+import CLIStyle from "./commands/cli-style";
 
 const serverStartupTime = Date.now()
 
@@ -95,7 +96,7 @@ const serverInitializeTime = Date.now()
 initialize().then(() => {
     Logger.global.log(
         `§0F0;Server v${packageJson.version} has been started successfully §444;(${(Date.now() - serverInitializeTime) / 1000}s)\n` +
-        `"777; ⭑ §;Type \"help\" for more information`
+        CLIStyle.tip("Type \"help\" for more information")
     )
 }).catch(e => {
     console.error("Failed to start server")

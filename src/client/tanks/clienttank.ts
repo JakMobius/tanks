@@ -91,7 +91,6 @@ class ClientTank extends AbstractTank {
         }
         this.model.rotation = this.model.body.GetAngle()
         this.model.behaviour.tick(dt)
-        this.model.behaviour.countDetails(dt)
     }
 
     decodeDynamicData(decoder: BinaryDecoder) {

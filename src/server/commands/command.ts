@@ -1,10 +1,10 @@
 
-import StringRepeat from '../../utils/stringrepeat';
 import CommandFlag from "./commandflag";
 import Console, {ConsoleAutocompleteOptions} from '../console/console'
 import Logger from "../log/logger";
 import path from "path";
 import fs from "fs";
+import ConsoleTableDrawer from "../console/console-table-drawer";
 
 export interface CommandConfig {
 	console: Console
@@ -308,54 +308,40 @@ class Command {
 		let result = "Usage: " + this.getUsage()
 
 		if(this.subcommands.length) {
-			result += "\n"
+			let tableLines: string[][] = this.subcommands.map((command) => {
+				return [" - " + command.getUsage(), " - " + command.getDescription()]
+			})
 
-			let commandUsages = this.subcommands.map(a => " - " + a.getUsage())
-
-			let length = commandUsages.reduce((a, b) => Math.max(a, b.length), 0)
-			let i = 0
-
-			for(let command of this.subcommands) {
-				let usage = commandUsages[i++]
-				let description = command.getDescription()
-
-				if(description) {
-					result += usage + StringRepeat(" ", length - usage.length) + " - " + description + "\n"
-				} else {
-					result += usage + "\n"
-				}
-			}
+			result += "\n" + new ConsoleTableDrawer({
+				rowPadding: 1,
+				lines: tableLines
+			}).draw()
 		}
 
 		if(this.flags.length) {
-			result += "\n\nФлаги:\n"
+			if(this.subcommands.length) {
+				result += "\n\nФлаги:"
+			}
 
-			let flagUsages = this.flags.map(flag => {
+			let tableLines: string[][] = this.flags.map((flag) => {
 				let usage = " -" + flag.name
 				if(flag.aliases.length) {
 					usage += " (-" + flag.aliases.join(", -") + ")"
 				}
-				return usage
+
+				return [usage, flag.description || ""]
 			})
 
-			let length = flagUsages.reduce((a, b) => Math.max(a, b.length), 0)
-			let i = 0
-
-			for(let flag of this.flags) {
-				let usage = flagUsages[i++]
-
-				if(flag.description) {
-					result += usage + StringRepeat(" ", length - usage.length) + " - " + flag.description + "\n"
-				} else {
-					result += usage + "\n"
-				}
-			}
+			result += "\n" + new ConsoleTableDrawer({
+				rowPadding: 1,
+				lines: tableLines
+			}).draw()
 		}
 
 		return result
 	}
 
-	protected autocompletePath(pathToComplete: string, base: string, extension?: string, options: ConsoleAutocompleteOptions): string[] {
+	protected autocompletePath(pathToComplete: string, base: string, extension?: string, options?: ConsoleAutocompleteOptions): string[] {
 
 		let mapPath = pathToComplete.split("/")
 		let search = base

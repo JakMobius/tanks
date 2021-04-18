@@ -1,37 +1,26 @@
 
 import Command from '../command';
-import Chalk from 'chalk';
+import ConsoleTableDrawer from "../../console/console-table-drawer";
 
-class HelpCommand extends Command {
+export default class HelpCommand extends Command {
 
     onPerform(args: string[]): void {
         let logger = this.console.logger
 
-        logger.log("§!;Commands:")
-
-        let length = 0
+        let lines: string[][] = []
 
         for(let command of this.console.commands.values()) {
-            let usage = command.getUsage()
-            if (length < usage.length) {
-                length = usage.length
-            }
+            let firstRow = " " + (command.getUsage() || command)
+            let secondRow = "§777; - " + (command.getDescription() || "No description")
+            lines.push([firstRow, secondRow])
         }
 
-        let dash = "§777; - "
+        let string = "§!;Commands:\n" + new ConsoleTableDrawer({
+            lines: lines,
+            rowPadding: 1
+        }).draw()
 
-        for(let command of this.console.commands.values()) {
-
-            let str = " " + (command.getUsage() || command)
-
-            for (let i = str.length; i <= length; i++) {
-                str += " "
-            }
-
-            let desc = command.getDescription() || "No description"
-
-            logger.log(str + dash + desc)
-        }
+        logger.log(string)
     }
 
     getName(): string {
@@ -46,5 +35,3 @@ class HelpCommand extends Command {
         return "help"
     }
 }
-
-export default HelpCommand;

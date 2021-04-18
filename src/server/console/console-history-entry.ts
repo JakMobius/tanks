@@ -15,7 +15,7 @@ export default class HistoryEntry {
     }
 
     restoreState(console: ConsoleWindow) {
-        console.consoleBox.consoleTextbox.setValue(this.text)
-        console.consoleBox.consoleTextbox.setCursorPosition(this.cursorPos)
+        console.setLine(this.text)
+        console.setCursorPosition(this.cursorPos)
     }
 }

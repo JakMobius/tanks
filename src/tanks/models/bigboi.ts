@@ -13,11 +13,7 @@ class BigBoiTank extends TankModel {
         super();
 
         this.behaviour = new BasicTankBehaviour(this, {
-            lateralFriction: 150,
-            power: 40000,
-            angularDamping: 2,
-            angularFriction: 0.1,
-            truckSlipperness: 0
+            power: 40000
         });
     }
 

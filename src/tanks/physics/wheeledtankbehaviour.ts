@@ -1,15 +1,6 @@
 import {Vec2} from '../../library/box2d'
-import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
+import TankBehaviour, {TankBehaviourConfig} from './tankbehaviour';
 import TankModel from "../tankmodel";
-
-interface WheeledTankDetails extends TankBehaviourDetails {
-    leftWheelsAngle: number
-    rightWheelsAngle: number
-    leftWheelsSpeed: number
-    rightWheelsSpeed: number
-    leftWheelsDist: number
-    rightWheelsDist: number
-}
 
 export interface TankWheelConfig {
     x: number
@@ -120,17 +111,6 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public perWheelPower: number;
     public lateralTensionLossPerMeter: number;
 
-    public details: WheeledTankDetails = {
-        clutch: 0,
-        transmissionSpeed: 0,
-        leftWheelsAngle: 0,
-        rightWheelsAngle: 0,
-        leftWheelsSpeed: 0,
-        rightWheelsSpeed: 0,
-        leftWheelsDist: 0,
-        rightWheelsDist: 0
-    }
-
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
         super(tank, config)
 
@@ -139,7 +119,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.wheelSpeed = 9.8
         this.minSteerRadius = config.minSteerRadius || 20
         this.axles = config.axles || 3
-        this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList()
+        this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList(config.wheelSlideFriction)
         this.axleOffsetList = config.axleOffsets || this.defaultAxleOffsets()
         this.driveAxleList = config.driveAxleList || this.defaultDriveAxleList()
         this.steerAnchorOffset = config.steerAnchorOffset || 0
@@ -159,9 +139,9 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         return amount;
     }
 
-    private defaultAxleFrictionList() {
+    private defaultAxleFrictionList(friction?: number) {
         let result = []
-        let defaultFriction = 25000
+        let defaultFriction = friction ?? 25000
 
         for(let i = 0; i < this.axles; i++) result.push(defaultFriction)
 
@@ -247,7 +227,12 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         }
 
         this.localVector3.Copy(wheel.tensionVector)
-        this.localVector3.SelfMulAdd(0.1, this.localVector2)
+
+        // Decreasing wheel reaction if car is moving backwards
+        let projection = this.localVector2.x / wheel.tensionVector.x
+        if(projection < 0) {
+            this.localVector3.x /= (1 - projection * 10);
+        }
 
         this.localVector3.SelfMul(wheel.friction / this.wheelTensionLimit);
         this.localVector3.SelfRotate(angle)
@@ -256,9 +241,14 @@ export default class WheeledTankBehaviour extends TankBehaviour {
 
     tick(dt: number) {
         super.tick(dt)
-        const tank = this.tank
 
-        let steerY = tank.controls.getThrottle()
+        this.updateWheelThrottle()
+        this.updateWheelAngles()
+        this.applyWheelForces(dt)
+    }
+
+    protected updateWheelThrottle() {
+        let steerY = this.tank.controls.getThrottle()
 
         const throttle = this.perWheelPower * steerY
 
@@ -268,12 +258,9 @@ export default class WheeledTankBehaviour extends TankBehaviour {
                 this.wheels[i * 2 + 1].throttle = throttle
             }
         }
-
-        this.updateWheelAngles()
-        this.applyWheelForces(dt)
     }
 
-    updateWheelAngles() {
+    protected updateWheelAngles() {
         const steerX = this.tank.controls.getSteer()
         let radius = 0
         if(steerX != 0) {
@@ -290,49 +277,16 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         }
     }
 
-    applyWheelForces(dt: number) {
+    protected applyWheelForces(dt: number) {
         const body = this.tank.body
 
         for(let wheel of this.wheels) {
             this.getWheelReaction(wheel, this.localVector1, dt)
             body.GetWorldVector(wheel.position, this.localVector2)
+
             this.localVector2.SelfAdd(body.GetPosition())
             this.localVector1.SelfNeg()
             body.ApplyForce(this.localVector1, this.localVector2)
         }
-    }
-
-    countDetails(dt: number) {
-        let tank = this.tank
-        let body = tank.body
-        let steer = tank.controls.getSteer()
-
-        if (steer === 0) {
-            this.details.leftWheelsAngle = 0
-            this.details.rightWheelsAngle = 0
-        } else {
-            let radius = 1 / steer * 2
-
-            this.details.leftWheelsAngle = Math.atan2(this.axleDistance, radius + this.axleWidth / 2)
-            this.details.rightWheelsAngle = Math.atan2(this.axleDistance, radius - this.axleWidth / 2)
-
-            if (steer < 0) {
-                this.details.rightWheelsAngle += Math.PI
-                this.details.leftWheelsAngle += Math.PI
-            }
-        }
-
-        let speed = tank.body.GetLinearVelocity()
-
-        let y2 = -tank.matrix.sin * speed.x + tank.matrix.cos * speed.y
-        let angularVelocity = body.GetAngularVelocity()
-
-        let left = (y2 + angularVelocity * this.axleWidth / 2) * this.wheelSpeed
-        let right = (y2 - angularVelocity * this.axleWidth / 2) * this.wheelSpeed
-
-        this.details.leftWheelsSpeed = left * dt
-        this.details.rightWheelsSpeed = right * dt
-        this.details.leftWheelsDist -= left * dt
-        this.details.rightWheelsDist -= right * dt
     }
 }

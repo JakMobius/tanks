@@ -1,27 +1,19 @@
 import * as Box2D from '../../library/box2d';
-import TankBehaviour, {TankBehaviourConfig, TankBehaviourDetails} from './tankbehaviour';
+import TankBehaviour, {TankBehaviourConfig} from './tankbehaviour';
 import TankModel from "../tankmodel";
-
-interface AirbagBehaviourDetails extends TankBehaviourDetails {
-    propellerDist: number,
-}
 
 interface AirbagBehaviourConfig extends TankBehaviourConfig {
     torque?: number
     friction?: number
-    propellerSpeed?: number
+    maxPropellerSpeed?: number
 }
 
 class AirbagTankModel extends TankBehaviour {
-	public torque: any;
-	public friction: any;
-	public propellerSpeed: any;
-
-	public details: AirbagBehaviourDetails = {
-        transmissionSpeed: 0,
-        propellerDist: 0,
-        clutch: 0
-    }
+	public torque: number
+	public friction: number
+    public maxPropellerSpeed: number
+	public propellerSpeed: number = 0
+	public propellerDist: number = 0
 
     constructor(tank: TankModel, config: AirbagBehaviourConfig) {
         super(tank, config)
@@ -29,7 +21,7 @@ class AirbagTankModel extends TankBehaviour {
         this.power = config.power || 50000
         this.torque = config.torque || 120000
         this.friction = config.friction || 0.1
-        this.propellerSpeed = config.propellerSpeed || 40
+        this.maxPropellerSpeed = config.maxPropellerSpeed || 40
     }
 
     tick(dt: number) {
@@ -55,7 +47,9 @@ class AirbagTankModel extends TankBehaviour {
         velocity.x = x * coefficient
         velocity.y = y * coefficient
 
-        const throttle = this.power * this.tank.controls.getThrottle();
+        const throttleInput = this.tank.controls.getThrottle()
+
+        const throttle = this.power * throttleInput;
         const rotation = this.torque * this.tank.controls.getSteer() * this.tank.controls.getThrottle();
 
         body.GetWorldVector(new Box2D.Vec2(0, throttle), this.localVector1)
@@ -63,21 +57,24 @@ class AirbagTankModel extends TankBehaviour {
 
         body.ApplyForce(this.localVector1, this.localVector2)
         body.ApplyTorque(rotation)
+
+        this.propellerSpeed = (Math.abs(throttleInput) + 0.5) * this.maxPropellerSpeed;
+        this.propellerDist += this.propellerSpeed * dt
     }
 
-    countDetails(dt: number) {
-        const tank = this.tank
-        const speed = (Math.abs(tank.controls.getThrottle()) + 0.5) * this.propellerSpeed;
-
-        if(tank.health > 0) {
-            this.details.propellerDist += speed * dt
-            this.details.transmissionSpeed = (speed * dt) / 2 + 0.3
-        } else {
-            this.details.transmissionSpeed = 0
-        }
-
-        this.details.clutch = Math.abs(tank.controls.getThrottle())
-    }
+    // countDetails(dt: number) {
+    //     const tank = this.tank
+    //     const speed = (Math.abs(tank.controls.getThrottle()) + 0.5) * this.propellerSpeed;
+    //
+    //     if(tank.health > 0) {
+    //         this.details.propellerDist += speed * dt
+    //         this.details.transmissionSpeed = (speed * dt) / 2 + 0.3
+    //     } else {
+    //         this.details.transmissionSpeed = 0
+    //     }
+    //
+    //     this.details.clutch = Math.abs(tank.controls.getThrottle())
+    // }
 }
 
 export default AirbagTankModel;

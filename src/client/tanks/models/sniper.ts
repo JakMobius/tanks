@@ -57,8 +57,8 @@ class Drawer extends TankDrawer {
         const dscale = scale * 2;
         const segment = dscale / 4;
 
-        let leftTrackDist = this.tank.model.behaviour.details.leftTrackDist
-        let rightTrackDist = this.tank.model.behaviour.details.rightTrackDist
+        let leftTrackDist = this.tank.model.behaviour.getLeftTrackDistance()
+        let rightTrackDist = this.tank.model.behaviour.getRightTrackDistance()
         let position = this.tank.model.body.GetPosition()
 
         camera.matrix.translate(position.x, position.y)

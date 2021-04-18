@@ -53,8 +53,8 @@ class Drawer extends TankDrawer {
         const scale = this.size;
         const dscale = scale * 2;
 
-        let leftTrackDist = this.tank.model.behaviour.details.leftTrackDist
-        let rightTrackDist = this.tank.model.behaviour.details.rightTrackDist
+        let leftTrackDist = this.tank.model.behaviour.getLeftTrackDistance()
+        let rightTrackDist = this.tank.model.behaviour.getRightTrackDistance()
 
         let position = this.tank.model.body.GetPosition()
 
@@ -64,8 +64,8 @@ class Drawer extends TankDrawer {
         this.truckProgram.use()
         this.truckProgram.prepare()
 
-        this.truckProgram.drawTruck(scale/ 2, -scale, scale, dscale, 4, leftTrackDist)
-        this.truckProgram.drawTruck(-scale * 3 / 2, -scale, scale, dscale, 4, rightTrackDist)
+        this.truckProgram.drawTruck(scale / 2, -scale, scale, dscale, 2, leftTrackDist)
+        this.truckProgram.drawTruck(-scale * 3 / 2, -scale, scale, dscale, 2, rightTrackDist)
         this.truckProgram.matrixUniform.setMatrix(camera.matrix.m)
 
         this.truckProgram.draw()

@@ -4,15 +4,13 @@ import Color from 'src/utils/color';
 import LoggerDestination from "./logger-destination";
 
 class Logger implements LoggerDestination {
-	public destinations: any;
-	public redirectToGlobal: any;
-	public prefix: any;
+	public destinations: LoggerDestination[] = []
+	public redirectToGlobal: boolean = true
+	public prefix: string = null
 	static global = new Logger()
 
 	constructor() {
-		this.destinations = []
-		this.redirectToGlobal = true
-		this.prefix = null
+
 	}
 
 	setPrefix(prefix: string) {
@@ -50,7 +48,7 @@ class Logger implements LoggerDestination {
 		})
 	}
 
-	log(text: string) {
+	log(text: any) {
 
 		if(typeof text == "string") {
 			text = Logger.convertChatColors(text)

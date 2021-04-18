@@ -72,7 +72,7 @@ class TruckProgram extends Program {
 
     drawTruck(x: number, y: number, width: number, height: number, scale: number, distance: number) {
 
-        distance = (distance % height) / height
+        distance = -((distance * scale) % height) / height
 
         this.vertexBuffer.appendArray([
             x + width, y + height, 1, 1, distance,

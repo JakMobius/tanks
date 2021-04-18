@@ -9,6 +9,7 @@ import pako from 'pako';
 import path from 'path';
 import RoomConfig from "../../../room/room-config";
 import {ConsoleAutocompleteOptions} from "../../../console/console";
+import CLIStyle from "../../cli-style";
 
 const mapFolder = path.resolve(__dirname, "resources/maps")
 
@@ -37,7 +38,7 @@ class RoomCreateCommand extends Command {
 
         if(!this.console.server.gameSocket) {
             logger.log("§F00;This command requires game socket to be running")
-            logger.log("§777; ⭑ §;To manage server modules, use 'service' command")
+            logger.log(CLIStyle.tip("To manage server modules, use 'service' command"))
             return;
         }
 
@@ -57,8 +58,8 @@ class RoomCreateCommand extends Command {
 
         if (this.console.server.gameSocket.games.get(gameName)) {
             logger.log( `§F00; Room '${gameName}' already exists\n` +
-                        `§777; ⭑ §;To control existing room, use 'room view' command\n` +
-                        `§777; ⭑ §;To delete existing room, use 'room delete' command`)
+                        CLIStyle.tip(`To control existing room, use 'room view' command\n`) +
+                        CLIStyle.tip(`To delete existing room, use 'room delete' command`))
             return
         }
 
@@ -76,7 +77,7 @@ class RoomCreateCommand extends Command {
 
         this.console.server.gameSocket.createRoom(roomConfig).then(() => {
             logger.log( `§0F0; Room '${gameName}' has been sucessfully created\n` +
-                        `§777; ⭑ §;To control this room, use 'room view "${gameName}"' command`)
+                    CLIStyle.tip(`To control this room, use 'room view "${gameName}"' command`))
         })
     }
 

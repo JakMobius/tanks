@@ -1,21 +1,22 @@
 import TankModel from '../tankmodel';
 import PhysicsUtils from '../../utils/physicsutils';
-import BasicTankBehaviour from '../physics/trucktankbehaviour';
+import TruckTankBehaviour from '../physics/trucktankbehaviour';
 import * as Box2D from '../../library/box2d';
-import Weapon42mm from '../../weapon/models/42mm';
+import Weapon42mm from "../../weapon/models/42mm";
 
-class SniperTank extends TankModel {
+export default class SniperTank extends TankModel {
 
     public static typeName = 1
-    public behaviour: BasicTankBehaviour
+    public behaviour: TruckTankBehaviour
 
     constructor() {
         super();
 
-        this.behaviour = new BasicTankBehaviour(this, {
-            power: 12000,
-            truckbase: 7.5,
-            angularFriction: 3.0
+        this.behaviour = new TruckTankBehaviour(this, {
+            power: 50000,
+            axleWidth: 7.5,
+            truckLength: 15,
+            truckFriction: 30000
         });
     }
 
@@ -30,7 +31,11 @@ class SniperTank extends TankModel {
         let size = 9
         const segment = size / 4;
 
-        let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.45, new Box2D.Vec2(0, 0))
+        // Sniper is a tank. Tank should be massive
+
+        let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.45, new Box2D.Vec2(0, 0), {
+            density: 3
+        })
         let trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.Vec2(-size / 2 - segment, size * 0.2))
 
         this.body = PhysicsUtils.dynamicBody(world, {
@@ -49,5 +54,3 @@ class SniperTank extends TankModel {
         return 10
     }
 }
-
-export default SniperTank;

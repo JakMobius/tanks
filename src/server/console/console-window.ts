@@ -5,7 +5,7 @@ import ConsoleBox from "./console-box";
 import HistoryEntry from "./console-history-entry";
 import ConsoleLogger from "./console-logger";
 
-class ConsoleWindow extends EventEmitter {
+export default class ConsoleWindow extends EventEmitter {
 	public destination: ConsoleLogger;
 	public history: HistoryEntry[];
 	public historyIndex: number;
@@ -100,6 +100,8 @@ class ConsoleWindow extends EventEmitter {
         if(this.historyIndex < 0) this.historyIndex = 0
 
         this.history[this.historyIndex].restoreState(this)
+
+        this.onHistoryWalk()
     }
 
     historyGoDown() {
@@ -115,6 +117,12 @@ class ConsoleWindow extends EventEmitter {
         } else {
             this.history[this.historyIndex].restoreState(this)
         }
+
+        this.onHistoryWalk()
+    }
+
+    onHistoryWalk() {
+	    this.emit("history-walk")
     }
 
     write(text: string) {
@@ -130,10 +138,8 @@ class ConsoleWindow extends EventEmitter {
         prompt += "> "
         this.consoleBox.promptLabel.content = prompt
         this.consoleBox.promptLabel.position.width = prompt.length
-        this.consoleBox.promptLabel.onResize()
-
         this.consoleBox.consoleTextbox.position.x = prompt.length
-        this.consoleBox.consoleTextbox.onMove()
+        this.consoleBox.promptLabel.onResize()
     }
 
     refocus() {
@@ -145,18 +151,19 @@ class ConsoleWindow extends EventEmitter {
         this.consoleBox.consoleTextbox.setValue(text)
     }
 
+    setCursorPosition(position: number) {
+        this.consoleBox.consoleTextbox.setCursorPosition(position)
+    }
+
     onCommand(text: string) {
         this.addHistoryEntry(text)
         this.emit("command", text)
-        this.consoleBox.consoleTextbox.setValue("")
+        this.setLine("")
+        this.onHistoryWalk()
     }
 
     onTab(shift: boolean) {
         this.emit("tab", shift)
-    }
-
-    onValue() {
-        this.emit("value")
     }
 
     onKeypress(key: blessed.KeyEvent) {
@@ -192,5 +199,3 @@ class ConsoleWindow extends EventEmitter {
         }
     }
 }
-
-export default ConsoleWindow;
