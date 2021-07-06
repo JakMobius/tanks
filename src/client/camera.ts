@@ -13,15 +13,15 @@ export interface CameraConfig {
 }
 
 class Camera {
-	public baseScale: any;
-	public viewport: any;
-	public defaultPosition: any;
-	public velocity: any;
-	public realTarget: any;
-	public targetVelocity: any;
-	public limit: any;
-	public viewportLimit: any;
-	public scale: any;
+	public baseScale: number;
+	public viewport: Box2D.Vec2
+	public defaultPosition: Box2D.Vec2
+	public velocity: Box2D.Vec2
+	public realTarget: Box2D.Vec2
+	public targetVelocity: Box2D.Vec2
+	public limit: boolean
+	public viewportLimit: Box2D.Vec2
+	public scale: number
 
     matrix: Matrix3 = null
 

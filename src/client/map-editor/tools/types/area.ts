@@ -5,23 +5,23 @@ import ParticleProgram from '../../../graphics/programs/particleprogram';
 import Particle from '../../../particles/particle';
 import Color from '../../../../utils/color';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
-import MapDrawer from '../../../graphics/drawers/mapdrawer';
+import MapDrawer from '../../../graphics/drawers/map-drawer';
 import EditorMap from '../../editormap';
 import MapAreaModification from '../../history/modification/mapareamodification';
 import ToolManager from "../toolmanager";
 import BlockState from "../../../../utils/map/blockstate/blockstate";
 
 class AreaTool extends Tool {
-	public area: any;
-	public program: any;
-	public copyBufferDrawer: any;
+	public area: Rectangle;
+	public program: ParticleProgram;
+	public copyBufferDrawer: MapDrawer;
 	public decoration: Particle;
 	public copyBuffer: EditorMap;
-	public keyboard: any;
-	public initialAreaState: any;
-	public movingArea: any;
-	public pasting: any;
-	public hover: any;
+	public keyboard: KeyboardController;
+	public initialAreaState: boolean;
+	public movingArea: boolean;
+	public pasting: boolean;
+	public hover: boolean;
 	public oldX: number;
 	public oldY: number;
 
@@ -31,7 +31,7 @@ class AreaTool extends Tool {
         this.area = new Rectangle()
         this.image = "assets/img/area.png"
         this.program = new ParticleProgram("area-program", this.manager.screen.ctx)
-        this.copyBufferDrawer = new MapDrawer(this.manager.camera, this.manager.screen.ctx)
+        this.copyBufferDrawer = new MapDrawer(this.manager.screen)
 
         this.decoration = new Particle({
             x: 0, y: 0,
@@ -256,7 +256,7 @@ class AreaTool extends Tool {
             this.manager.camera.position.y -= y
 
             this.manager.camera.matrix.translate(x, y)
-            this.copyBufferDrawer.draw(this.copyBuffer)
+            this.copyBufferDrawer.drawMap(this.copyBuffer, this.manager.camera)
             this.manager.camera.matrix.restore()
 
             this.manager.camera.position.x += x

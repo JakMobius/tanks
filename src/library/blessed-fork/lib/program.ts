@@ -110,7 +110,6 @@ class Program extends EventEmitter {
         this.input = options.input || process.stdin;
         this.output = options.output || process.stdout;
 
-        options.log = options.log;
         if (options.log) {
             this._logger = fs.createWriteStream(options.log);
             if (options.dump) this.setupDump();
@@ -503,7 +502,10 @@ class Program extends EventEmitter {
 
     _owrite(text: string) {
         if (!this.output.writable) return false;
-        return this.output.write(text);
+        this.emit("preflush")
+        let result = this.output.write(text);
+        this.emit("flush")
+        return result
     }
 
     _buffer(text: string) {

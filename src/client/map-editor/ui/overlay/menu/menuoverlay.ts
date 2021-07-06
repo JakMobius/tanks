@@ -6,14 +6,11 @@ import DialogOverlay from '../../overlay/dialog/dialogoverlay';
 import EditorMap from '../../../editormap';
 
 class MenuOverlay extends Overlay {
-	public mapSelect: any;
-	public mapPreview: any;
+	public mapSelect = new MapSelectContainer();
+	public mapPreview = new MapPreviewContainer();
 
     constructor(options: OverlayConfig) {
         super(options);
-
-        this.mapSelect = new MapSelectContainer()
-        this.mapPreview = new MapPreviewContainer()
 
         this.overlay.append(this.mapPreview.element)
         this.overlay.append(this.mapSelect.element)

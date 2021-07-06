@@ -9,8 +9,10 @@ class View extends EventEmitter {
 
     constructor() {
         super()
-        this.element = $("<div>")
+        this.element = $((this.constructor as typeof View).tagName)
     }
+
+    static tagName = "<div>"
 }
 
 export default View;

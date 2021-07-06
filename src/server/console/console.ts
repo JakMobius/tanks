@@ -8,6 +8,7 @@ import ArgumentParser from './argument-parser';
 import CommandList from "../commands/types/*"
 import Command from "../commands/command";
 import Server from "../server";
+import StdCatchLogger from "../log/std-catch-logger";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required
@@ -23,6 +24,7 @@ class Console {
 	public window: ConsoleWindow;
 	public currentLogger: Logger;
 	public commands = new Map<string, Command>();
+	public stdLogger: StdCatchLogger
 	public server: Server = null
 	public logger: Logger = null
 

@@ -2,7 +2,7 @@
 
 import Scene, {SceneConfig} from '../../scenes/scene';
 
-import MapDrawer from '../../graphics/drawers/mapdrawer';
+import WorldDrawer from '../../graphics/drawers/world-drawer';
 import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
 import * as Box2D from '../../../library/box2d';
@@ -13,16 +13,18 @@ import ToolbarView from '../ui/overlay/workspace/toolbar/toolbar';
 import ToolManager from '../tools/toolmanager';
 import EventContainer from '../../ui/overlay/events/eventcontainer';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
-import EditorMap from "../editormap";
 import Tools from "../tools/type-loader"
+import EditorMap from "../editormap";
+import ClientGameWorld from "../../clientgameworld";
 
 class MapEditorScene extends Scene {
 
 	public keyboard = new KeyboardController();
-	public map: EditorMap;
+	public world: ClientGameWorld
+    public map: EditorMap
 	public dragHandler: DragHandler;
 	public camera: Camera;
-	public mapDrawer: MapDrawer;
+	public worldDrawer: WorldDrawer;
 	public menuOverlay: MenuOverlay;
 	public toolManager: ToolManager;
 	public eventContainer: EventContainer;
@@ -34,7 +36,7 @@ class MapEditorScene extends Scene {
 
 
         this.keyboard.startListening()
-        this.map = null
+        this.world = new ClientGameWorld({})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
         this.dragHandler.draggingEnabled = false
@@ -48,9 +50,9 @@ class MapEditorScene extends Scene {
             inertial: false
         })
 
-        this.setupWorkspace()
+        this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.world)
 
-        this.mapDrawer = new MapDrawer(this.camera, this.screen.ctx)
+        this.setupWorkspace()
 
         this.menuOverlay = new MenuOverlay({
             root: this.overlayContainer
@@ -58,10 +60,10 @@ class MapEditorScene extends Scene {
 
         this.menuOverlay.on("open", (map) => {
             this.map = map
+            this.world.setMap(map)
             this.toolManager.map = map
-            this.mapDrawer.reset()
 
-            if(this.map) {
+            if(map) {
                 if(!this.camera.target) {
                     this.camera.target = new Box2D.Vec2(0, 0)
                 }
@@ -105,8 +107,6 @@ class MapEditorScene extends Scene {
 
             if(entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
             else this.eventContainer.createEvent("Нечего отменять")
-
-            this.setNeedsRedraw(true)
         })
 
         this.keyboard.keybinding("Cmd-Y", (event) => {
@@ -114,8 +114,6 @@ class MapEditorScene extends Scene {
 
             if(entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
             else this.eventContainer.createEvent("Нечего повторять")
-
-            this.setNeedsRedraw(true)
         })
 
         this.keyboard.keybinding("Cmd-S", (event) => {
@@ -130,8 +128,7 @@ class MapEditorScene extends Scene {
         this.layout()
     }
 
-    setNeedsRedraw(force: boolean) {
-        if(force) this.mapDrawer.reset()
+    setNeedsRedraw() {
         this.screen.loop.start()
     }
 
@@ -139,7 +136,6 @@ class MapEditorScene extends Scene {
         this.eventContainer = new EventContainer()
         this.toolSettingsView = new ToolSettingsView()
         this.toolManager = new ToolManager(this.screen, this.camera, this.map)
-        this.toolManager.on("redraw", (force) => this.setNeedsRedraw(force))
         this.toolManager.on("user-event", (text) => this.eventContainer.createEvent(text))
         this.toolbar = new ToolbarView({
             root: this.overlayContainer
@@ -176,7 +172,7 @@ class MapEditorScene extends Scene {
         if(!this.map) return
 
         this.camera.tick(dt)
-        this.mapDrawer.draw(this.map)
+        this.worldDrawer.draw(dt)
         if(this.toolManager.selectedTool) {
             this.toolManager.selectedTool.drawDecorations()
         }

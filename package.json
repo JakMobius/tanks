@@ -4,7 +4,10 @@
   "description": "Browser action game project",
   "main": "main.js",
   "dependencies": {
+    "beelder": "^0.0.9",
     "chalk": "^4.1.0",
+    "connect-mongo": "^4.4.1",
+    "connect-mongodb-session": "^2.4.1",
     "express": "^4.16.0",
     "express-session": "^1.17.1",
     "hbs": "^4.1.1",
@@ -16,7 +19,6 @@
     "readable-stream": "^3.6.0",
     "through2": "^4.0.2",
     "util": "^0.12.3",
-    "vinyl-fs": "^3.0.3",
     "websocket": "^1.0.32"
   },
   "devDependencies": {
@@ -29,7 +31,6 @@
     "@types/pako": "^1.0.1",
     "@types/websocket": "^1.0.1",
     "babel-plugin-module-resolver": "^4.1.0",
-    "beelder": "^0.0.8",
     "canvas": "^2.6.1",
     "chai": "^4.2.0",
     "mocha": "^7.2.0",

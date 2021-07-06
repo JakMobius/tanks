@@ -5,8 +5,8 @@ import {BinarySerializer, Constructor} from "../../../serialization/binary/seria
 import BinaryEncoder from "../../../serialization/binary/binaryencoder";
 import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 
-class MapPacket extends BinaryPacket {
-	public map: any;
+export default class MapPacket extends BinaryPacket {
+	public map: GameMap;
 
     static typeName = 1
 
@@ -33,5 +33,3 @@ class MapPacket extends BinaryPacket {
 }
 
 BinarySerializer.register(MapPacket)
-
-export default MapPacket;

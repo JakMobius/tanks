@@ -14,7 +14,7 @@ class PlayMenuContainer extends Menu {
         this.titleLabel = $("<div>").css("text-align", "center").addClass("header")
         this.titleLabel.text("ВВЕДИТЕ НИК")
         this.nickInput = $("<input>")
-        this.playButton = $("<button></button>").text("ИГРАТЬ")
+        this.playButton = $("<button>").addClass("large").text("ИГРАТЬ")
 
         this.element.append(this.titleLabel)
         this.element.append(this.nickInput)

@@ -4,22 +4,18 @@ import WheeledTankBehaviour, {WheeledTankBehaviourConfig} from "./wheeledtankbeh
 import Utils from "../../utils/utils";
 
 export interface TruckTankBehaviourConfig extends WheeledTankBehaviourConfig {
-    truckFriction: number,
-    truckLength: number
+    truckFriction?: number,
+    truckLength?: number
 }
 
 export default class TruckTankBehaviour extends WheeledTankBehaviour {
 
     constructor(tank: TankModel, config: TruckTankBehaviourConfig) {
 
-        let axles = 5
-
-        config = Object.assign({
-            axles: axles,
-            wheelTensionLimit: 0.05,
-            wheelSlideFriction: config.truckFriction / axles,
-            axleDistance: config.truckLength / axles
-        }, config)
+        if(config.axles === undefined) config.axles = 5
+        if(config.truckLength) config.axleDistance = config.truckLength / config.axles
+        if(config.wheelTensionLimit === undefined) config.wheelTensionLimit = 0.05
+        if(config.truckFriction) config.wheelSlideFriction = config.wheelTensionLimit / config.axles
 
         super(tank, config)
     }

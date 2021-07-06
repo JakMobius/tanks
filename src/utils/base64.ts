@@ -14,7 +14,7 @@ if(typeof TextDecoder == "undefined") {
     Decoder = TextDecoder
 }
 
-const base64abc = [
+export const base64abc = [
     "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
     "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
@@ -22,7 +22,7 @@ const base64abc = [
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "+", "/"
 ];
 
-const base64codes = [
+export const base64codes = [
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 62, 255, 255, 255, 63,
@@ -33,7 +33,7 @@ const base64codes = [
     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
 ];
 
-function getBase64Code(charCode: number) {
+export function getBase64Code(charCode: number) {
     if (charCode >= base64codes.length) {
         throw new Error("Unable to parse base64 string.");
     }
@@ -44,7 +44,7 @@ function getBase64Code(charCode: number) {
     return code;
 }
 
-function bytesToBase64(bytes: Uint8Array) {
+export function bytesToBase64(bytes: Uint8Array): string {
     let result = '', i, l = bytes.length;
     for (i = 2; i < l; i += 3) {
         result += base64abc[bytes[i - 2] >> 2];
@@ -66,7 +66,7 @@ function bytesToBase64(bytes: Uint8Array) {
     return result;
 }
 
-function base64ToBytes(str: string) {
+export function base64ToBytes(str: string): Uint8Array {
     if (str.length % 4 !== 0) {
         throw new Error("Unable to parse base64 string.");
     }
@@ -99,19 +99,12 @@ function base64ToBytes(str: string) {
     return result.subarray(0, result.length - missingOctets);
 }
 
-function base64encode(str: string, encoder?: TextEncoder) {
+export function base64encode(str: string, encoder?: TextEncoder) {
     encoder = encoder || new Encoder()
     return bytesToBase64(encoder.encode(str));
 }
 
-function base64decode(str: string, decoder?: TextDecoder) {
+export function base64decode(str: string, decoder?: TextDecoder) {
     decoder = decoder || new Decoder()
     return decoder.decode(base64ToBytes(str));
 }
-
-export default {
-    base64ToBytes: base64ToBytes,
-    bytesToBase64: bytesToBase64,
-    base64encode: base64encode,
-    base64decode: base64decode
-};

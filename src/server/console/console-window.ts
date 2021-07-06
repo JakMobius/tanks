@@ -4,6 +4,7 @@ import * as blessed from '../../library/blessed-fork/lib/blessed';
 import ConsoleBox from "./console-box";
 import HistoryEntry from "./console-history-entry";
 import ConsoleLogger from "./console-logger";
+import StdinCatchLogger from "../log/std-catch-logger";
 
 export default class ConsoleWindow extends EventEmitter {
 	public destination: ConsoleLogger;
@@ -14,11 +15,15 @@ export default class ConsoleWindow extends EventEmitter {
 	public screen: blessed.Screen;
 	public prompt: string;
 	public consoleBox: ConsoleBox
+    private stdLogger: StdinCatchLogger;
 
     constructor() {
         super()
 
         this.destination = new ConsoleLogger(this)
+        this.stdLogger = new StdinCatchLogger()
+        this.stdLogger.addDestination(this.destination)
+        this.stdLogger.catchStd()
         this.history = []
         this.historyIndex = null
 
@@ -37,6 +42,9 @@ export default class ConsoleWindow extends EventEmitter {
 
         this.consoleBox = new ConsoleBox({})
         this.screen.append(this.consoleBox)
+
+        this.screen.program.on("preflush", () => this.stdLogger.releaseStd())
+        this.screen.program.on("flush", () => this.stdLogger.catchStd())
 
         this.consoleBox.consoleTextbox.key("C-c", () => this.onExit())
         this.consoleBox.consoleTextbox.key("enter", () => {
@@ -61,6 +69,7 @@ export default class ConsoleWindow extends EventEmitter {
 
         this.refocus()
         this.consoleBox.setNeedsRender()
+        this.stdLogger.catchStd()
     }
 
     addHistoryEntry(command: string) {
@@ -171,6 +180,7 @@ export default class ConsoleWindow extends EventEmitter {
     }
 
     onExit() {
+        this.stdLogger.releaseStd()
         this.emit("exit")
         this.screen.destroy()
         // TODO: remove this

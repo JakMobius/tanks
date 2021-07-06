@@ -1,4 +1,4 @@
-/* @load-resource: '../web/base-style.css' */
+/* @load-resource: '../web/base-style.scss' */
 
 import BrowserCheckView from '../utils/browsercheck/browsercheckview';
 

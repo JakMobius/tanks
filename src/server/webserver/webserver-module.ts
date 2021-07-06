@@ -1,10 +1,12 @@
 
 import * as express from 'express';
 import * as path from 'path';
+import AjaxHandler from "./ajax/ajax-handler";
 
 class WebserverModule {
 	public priority: number;
 	public router = express.Router();
+
     // The lower priority, the later the handler is called.
     static PRIORITY_LOWEST = 0
     static PRIORITY_NORMAL = 1
@@ -25,6 +27,13 @@ class WebserverModule {
 
     resourcePath(resourcePath: string) {
         return path.resolve(this.resourcesDirectory, resourcePath)
+    }
+
+    addAjaxHandler(ajaxHandler: AjaxHandler) {
+	    ajaxHandler.setModule(this)
+        let ctor = ajaxHandler.constructor as typeof AjaxHandler
+
+        this.router.all(ctor.url, (req, res, next) => ajaxHandler.onRequest(req, res, next))
     }
 }
 

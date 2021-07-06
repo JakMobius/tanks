@@ -32,13 +32,11 @@ class MapSelectContainer extends Menu {
         this.mapContainer = $("<div>").addClass("map-list-container")
         this.mapList = $("<div>").addClass("map-list")
         this.footer = $("<div>").addClass("footer")
-        this.createNewMapButton = $("<button>").text("Создать новую карту").click(() => this.emit("create"))
+        this.createNewMapButton = $("<button>").addClass("large").text("Создать новую карту").click(() => this.emit("create"))
 
-        this.mapContainer.append(this.mapList)
-        this.element.append(this.mapContainer)
-        this.element.append(this.footer)
+        this.element.append(this.mapContainer, this.footer)
         this.footer.append(this.createNewMapButton)
-        this.mapContainer.append(this.noMapsLabel)
+        this.mapContainer.append(this.mapList, this.noMapsLabel)
 
         this.maps = []
 
@@ -93,6 +91,8 @@ class MapSelectContainer extends Menu {
         this.mapList.find(".map-row").remove()
 
         if(this.maps.length) {
+            let rows = []
+
             this.noMapsLabel.hide()
 
             const self = this
@@ -112,7 +112,7 @@ class MapSelectContainer extends Menu {
                         .append($("<span>").addClass("text").text(" байт."))
                     )
 
-                block.click({
+                block.on("click",{
                     map: map
                 }, function(event) {
                     const block = $(this)
@@ -123,8 +123,9 @@ class MapSelectContainer extends Menu {
                     self.selected(event.data.map)
                 })
 
-                this.mapList.append(row)
+                rows.push(row)
             }
+            this.mapList.append(rows)
         } else {
             this.noMapsLabel.show()
         }

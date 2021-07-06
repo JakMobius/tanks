@@ -1,17 +1,15 @@
 
-import RenderLoop from '../utils/loop/renderloop';
-import Loop from '../utils/loop/loop';
-import CanvasFactory from './utils/canvasfactory';
-import Scene from "./scenes/scene";
-import "./animation-frame-polyfill"
-import SoundEngine from "./sound/soundengine";
+import "../animation-frame-polyfill"
+import SoundEngine from "../sound/soundengine";
+import CanvasFactory from '../utils/canvasfactory'
+import Sprite from "../sprite";
 
 export interface ScreenConfig {
     scale?: number
     root: JQuery
 }
 
-class Screen {
+export default class Screen {
 	public config: ScreenConfig;
 	public root: JQuery;
 	public width: number;
@@ -23,10 +21,9 @@ class Screen {
 
     public canvas: HTMLCanvasElement = null
     public ctx: WebGLRenderingContext = null
-    public loop: Loop = null
-    public scene: Scene
     private resizeHandler: () => void;
     soundEngine: SoundEngine;
+    private _be: boolean;
 
     constructor(config: ScreenConfig) {
         config = Object.assign({
@@ -35,8 +32,6 @@ class Screen {
 
         this.config = config
         this.root = config.root
-        this.initLoop()
-        this.scene = null
         //this.soundEngine = new SoundEngine()
 
         this.width = null
@@ -45,12 +40,6 @@ class Screen {
         this.initCanvas()
         this.initResizeHandling()
         this.initialize()
-
-        this.loop.run = (dt: number) => this.tick(dt)
-    }
-
-    initLoop(): void {
-        this.loop = new RenderLoop()
     }
 
     initialize(): void {
@@ -64,17 +53,6 @@ class Screen {
         this.setScreenFramebuffer()
     }
 
-    setScene(scene: Scene): void {
-        if(this.scene) {
-            this.scene.disappear()
-            this.scene.overlayContainer.remove()
-        }
-
-        this.scene = scene
-        this.scene.appear()
-        this.root.append(this.scene.overlayContainer)
-    }
-
     initCanvas(): void {
         Object.assign(this, CanvasFactory())
 
@@ -83,10 +61,10 @@ class Screen {
         this.framebufferTextures = []
         this.framebuffers = []
 
-        for(let i = 0; i < 2; i++) {
-            let texture = this.ctx.createTexture()
-            this.framebufferTextures.push(texture)
-        }
+        // for(let i = 0; i < 2; i++) {
+        //     let texture = this.ctx.createTexture()
+        //     this.framebufferTextures.push(texture)
+        // }
 
         this.activeFramebufferIndex = null
         this.inactiveFramebufferIndex = null
@@ -125,27 +103,7 @@ class Screen {
 
     initResizeHandling(): void {
         const handler = () => {
-            this.width = this.root.width()
-            this.height = this.root.height()
-
-            this.canvas.width = this.width * this.config.scale
-            this.canvas.height = this.height * this.config.scale
-
-            this.canvas.style.width = this.width + "px"
-            this.canvas.style.height = this.height + "px"
-
-            this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
-
-            for(let texture of this.framebufferTextures) {
-                this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
-                this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
-
-                this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
-                this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
-                this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
-            }
-
-            if(this.scene) this.scene.layout()
+            this.resized()
         }
         window.addEventListener("resize", handler)
         handler()
@@ -153,15 +111,31 @@ class Screen {
         this.resizeHandler = handler
     }
 
-    tick(dt: number): void {
-        if(this.scene) {
-            this.scene.draw(this.ctx, dt)
+    resized() {
+        this.width = this.root.width()
+        this.height = this.root.height()
+
+        this.canvas.width = this.width * this.config.scale
+        this.canvas.height = this.height * this.config.scale
+
+        this.canvas.style.width = this.width + "px"
+        this.canvas.style.height = this.height + "px"
+
+        this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
+
+        if(!this._be)  for(let texture of this.framebufferTextures) {
+            this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
+            this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
+
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
         }
+        
+        this._be = true
     }
 
     destroy() {
         window.removeEventListener("resize", this.resizeHandler)
     }
 }
-
-export default Screen;

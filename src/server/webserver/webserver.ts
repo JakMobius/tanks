@@ -7,6 +7,9 @@ import HubModule from './hub/hub-module';
 import BaseModule from './base-module';
 import WebserverModule from "./webserver-module";
 import * as HTTP from "http";
+import Preferences from "../preferences/preferences";
+import MongoStore from "connect-mongo";
+import DB from "../db/db";
 
 class WebServer {
 	public app: express.Application;
@@ -19,6 +22,7 @@ class WebServer {
     hubModule = new HubModule()
     gameModule = new GameModule()
     baseModule = new BaseModule()
+    staticModule = new GameModule()
 
     constructor() {
         this.app = express()
@@ -29,8 +33,10 @@ class WebServer {
         this.addModule(this.hubModule)
         this.addModule(this.gameModule)
         this.addModule(this.baseModule)
+        this.addModule(this.staticModule)
 
         this.baseModule.enabled = true
+        this.staticModule.enabled = true
     }
 
     addModule(module: WebserverModule) {
@@ -72,15 +78,19 @@ class WebServer {
         this.app.set('views', path.resolve(__dirname, "resources/web"))
 
         this.app.use(function(req, res, next) {
-            res.header("Access-Control-Allow-Origin", "*");
+            //res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             next();
         });
 
         this.session = session({
-            secret: "f1qbc248ecd09bdh0j5r7o8",
+            secret: Preferences.string("webserver.session-key"),
+            store: MongoStore.create({
+                client: DB.instance.client,
+                dbName: DB.instance.db
+            }),
             resave: true,
-            saveUninitialized: true
+            saveUninitialized: false
         })
 
         this.app.use(express.urlencoded({ extended: true }));
@@ -89,7 +99,11 @@ class WebServer {
         this.app.use((req, res, next) => {
             let iterator = this.getModules()
 
-            const iterate = () => {
+            const iterate = (err: Error = null) => {
+                if(err) {
+                    next(err)
+                    return
+                }
                 let handle = iterator.next()
                 if(handle.done) {
                     next()
@@ -102,22 +116,24 @@ class WebServer {
             iterate()
         })
 
-        let self = this
-        this.app.use(function(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
-            let iterator = self.getModules()
 
-            const iterate = () => {
-                let handle = iterator.next()
-                if(handle.done) {
-                    next()
-                    return
-                }
-
-                handle.value.router(err, req, res, iterate)
-            }
-
-            iterate()
+        this.app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+            this.onError(err, req, res, next)
         })
+    }
+
+    onError(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
+        res.status(500);
+
+        console.log(err)
+
+        if (req.accepts('html')) {
+            res.render('default/views/500.hbs');
+        } else if (req.accepts('json')) {
+            res.send({ error: 'Internal server error' });
+        } else {
+            res.type('txt').send('Internal server error');
+        }
     }
 
     listen(server: HTTP.Server) {

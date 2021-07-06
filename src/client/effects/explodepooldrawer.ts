@@ -1,15 +1,12 @@
+import Camera from "../camera";
+import PostProcessingProgram from "../graphics/programs/postprocessingprogram";
+import ExplodeEffectPool from "../../effects/world/explode/explode-effect-pool";
+import Screen from "../graphics/screen";
+import ExplodeParticle from "../particles/explodeparticle";
+import ClientGameWorld from "../clientgameworld";
 
-import Color from 'src/utils/color';
-import ExplodeParticle from '../../particles/explodeparticle';
-import PostProcessingProgram from '../programs/postprocessingprogram';
-import Particle from '../../particles/particle';
-import Screen from "../../screen";
-import Camera from "../../camera";
-import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
-import ClientGameWorld from "../../clientgameworld";
-
-class ExplodePoolDrawer {
-	public screen: any;
+export default class ExplodePoolDrawer {
+	public screen: Screen;
 	public camera: any;
 	public program: any;
 
@@ -23,13 +20,13 @@ class ExplodePoolDrawer {
     draw(pool: ExplodeEffectPool, dt: number) {
         if(dt === 0) return
 
-        this.program.use()
-        this.program.prepare()
+        //this.program.use()
+        //this.program.prepare()
 
-        this.screen.ctx.activeTexture(this.screen.ctx.TEXTURE15)
-        this.screen.ctx.bindTexture(this.screen.ctx.TEXTURE_2D, this.screen.inactiveFramebufferTexture())
+        //this.screen.ctx.activeTexture(this.screen.ctx.TEXTURE15)
+        //this.screen.ctx.bindTexture(this.screen.ctx.TEXTURE_2D, this.screen.inactiveFramebufferTexture())
 
-        this.program.textureUniform.set1i(15)
+        //this.program.textureUniform.set1i(15)
 
         for(let row of pool.walkers.values()) {
             for(let walker of row.values()) {
@@ -75,8 +72,6 @@ class ExplodePoolDrawer {
             }
         }
 
-        this.program.draw()
+        //this.program.draw()
     }
 }
-
-export default ExplodePoolDrawer;

@@ -121,14 +121,14 @@ class TankSelectContainer extends Menu {
         for(let container of this.containers) {
             let offset = container.position
 
-            if(upperBound < offset.x) {
+            if(upperBound < offset) {
                 if(!container.hidden) container.hide()
                 continue
             }
 
             let width = container.width
 
-            if(lowerBound > offset.x + width) {
+            if(lowerBound > offset + width) {
                 if(!container.hidden) container.hide()
                 continue
             }

@@ -1,10 +1,9 @@
 
-import Base64 from '../../utils/base64';
+import {base64ToBytes, bytesToBase64} from '../../utils/base64';
 import BinaryDecoder from '../../serialization/binary/binarydecoder';
 import BinaryEncoder from '../../serialization/binary/binaryencoder';
 import pako from 'pako';
 import EditorMap from './editormap';
-import GameMap from "../../utils/map/gamemap";
 
 class MapStorage {
 	public dataDecoder: any;
@@ -23,7 +22,7 @@ class MapStorage {
         if (base64) {
             let result = []
             try {
-                let data = Base64.base64ToBytes(base64)
+                let data = base64ToBytes(base64)
 
                 this.dataDecoder.reset()
                 this.dataDecoder.readData(data.buffer)
@@ -60,7 +59,7 @@ class MapStorage {
         }
 
         let buffer = this.dataEncoder.compile()
-        window.localStorage.setItem("editor-maps", Base64.bytesToBase64(new Uint8Array(buffer)))
+        window.localStorage.setItem("editor-maps", bytesToBase64(new Uint8Array(buffer)))
     }
 
     static readMap(buffer: Uint8Array) {

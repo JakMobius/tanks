@@ -3,46 +3,31 @@
 import Menu from 'src/client/ui/menu/menu';
 
 import MapStorage from 'src/client/map-editor/mapstorage';
-import MapDrawer from 'src/client/graphics/drawers/mapdrawer';
 import Camera from 'src/client/camera';
 import GameMap from 'src/utils/map/gamemap';
 import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
 import EditorMap from "../../../../editormap";
+import MapDrawer from "src/client/graphics/drawers/map-drawer";
+import Screen from "src/client/graphics/screen";
 
 class MapPreviewContainer extends Menu {
-	public map: any;
-	public mapDrawer: any;
-	public canvas: any;
-	public ctx: any;
-	public camera: any;
-	public noMapSelectedLabel: any;
-	public preview: any;
-	public header: any;
-	public footer: any;
-	public downloadButton: any;
-	public editButton: any;
-	public deleteButton: any;
-	public value: any;
-	public canvasContainer: any;
+	public map: EditorMap;
+	public mapDrawer: MapDrawer;
+	public camera: Camera;
+	public noMapSelectedLabel: JQuery;
+	public preview: JQuery;
+	public header: JQuery<HTMLInputElement>;
+	public footer: JQuery;
+	public downloadButton: JQuery;
+	public editButton: JQuery;
+	public deleteButton: JQuery;
+	public value: string;
+	public canvasContainer: JQuery;
+    private previewScreen: Screen;
 
     constructor() {
         super();
-
-        /** @type GameMap */
-        this.map = null
-
-        /** @type MapDrawer */
-        this.mapDrawer = null
-
-        /** @type HTMLCanvasElement */
-        this.canvas = null
-
-        /** @type WebGLRenderingContextBase */
-        this.ctx = null
-
-        /** @type Camera */
-        this.camera = null
 
         this.element.addClass("menu editor-map-preview")
 
@@ -54,17 +39,18 @@ class MapPreviewContainer extends Menu {
                 )
 
         this.preview = $("<div>").addClass("map-preview-container")
-        this.header = $("<input>").addClass("map-title")
+        this.header = $("<input>").addClass("map-title") as JQuery<HTMLInputElement>
         this.footer = $("<div>").addClass("footer")
 
-        this.downloadButton = $("<button>").text("Скачать").click(() => this.downloadMap())
-        this.editButton = $("<button>").text("Открыть").click(() => this.openMap())
+        this.downloadButton = $("<button>").addClass("large").text("Скачать").on("click", () => this.downloadMap())
+        this.editButton = $("<button>").addClass("large").text("Открыть").on("click",() => this.openMap())
         this.deleteButton = $("<button>")
+            .addClass("large")
             .css("background-color", "#bb2b19")
             .css("position", "absolute")
             .css("left", "6px")
             .text("Удалить")
-            .click(() => this.deleteMap())
+            .on("click", () => this.deleteMap())
 
         this.footer.append(this.downloadButton)
         this.footer.append(this.editButton)
@@ -72,22 +58,22 @@ class MapPreviewContainer extends Menu {
 
         const self = this
 
-        this.header.on("change", function() {
+        this.header.on("change", () => {
             if(self.map) {
-                self.map.name = this.value
+                self.map.name = this.header.val()
                 self.emit("rename-commit", self.map)
             }
         })
 
-        this.header.on("input", function() {
+        this.header.on("input", () => {
             if(self.map) {
-                self.map.name = this.value
+                self.map.name = this.header.val()
                 self.emit("rename", self.map)
             }
         })
 
         this.header.on("keyup", (event: JQuery.KeyboardEventBase) => {
-            if(event.originalEvent.code === "Enter") this.header.blur()
+            if(event.originalEvent.code === "Enter") this.header.trigger("blur")
         })
 
         this.initCanvas()
@@ -103,26 +89,20 @@ class MapPreviewContainer extends Menu {
 
     initCanvas() {
         this.canvasContainer = $("<div>").addClass("map-canvas-container")
-        this.canvas = document.createElement("canvas")
-        this.canvas.classList.add("map-preview-canvas")
-        this.canvasContainer.append($(this.canvas))
+        this.previewScreen = new Screen({
+            root: this.canvasContainer
+        })
         this.preview.append(this.canvasContainer)
 
-        this.ctx = this.canvas.getContext("webgl")
-        this.ctx.clearColor(1.0, 1.0, 1.0, 1.0);
-        this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
-        this.ctx.blendFunc(this.ctx.SRC_ALPHA, this.ctx.ONE_MINUS_SRC_ALPHA);
-        this.ctx.enable(this.ctx.BLEND);
-
-        Sprite.applyTexture(this.ctx)
+        Sprite.applyTexture(this.previewScreen.ctx)
 
         this.camera = new Camera({
             baseScale: 1,
-            viewport: new Box2D.Vec2(this.canvas.clientWidth, this.canvas.clientHeight),
+            viewport: new Box2D.Vec2(0, 0),
             defaultPosition: new Box2D.Vec2(0, 0)
         })
 
-        this.mapDrawer = new MapDrawer(this.camera, this.ctx)
+        this.mapDrawer = new MapDrawer(this.previewScreen)
     }
 
     deleteMap() {
@@ -169,7 +149,7 @@ class MapPreviewContainer extends Menu {
             map.update()
         }
 
-        this.header.blur()
+        this.header.trigger("blur")
         this.map = map
         if(this.map) {
             if(this.map.name)
@@ -182,18 +162,15 @@ class MapPreviewContainer extends Menu {
     }
 
     drawMap() {
+        const ctx = this.previewScreen.ctx
+
+        this.camera.viewport.x = this.previewScreen.width
+        this.camera.viewport.y = this.previewScreen.height
+
         this.mapDrawer.reset()
-        this.ctx.clear(this.ctx.COLOR_BUFFER_BIT)
+        ctx.clear(ctx.COLOR_BUFFER_BIT)
 
         if(this.map != null) {
-            if(this.camera.viewport.x === 0) {
-                this.camera.viewport.x = this.canvas.clientWidth
-                this.camera.viewport.y = this.canvas.clientHeight
-                this.canvas.width = this.canvas.clientWidth * window.devicePixelRatio
-                this.canvas.height = this.canvas.clientHeight * window.devicePixelRatio
-                this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
-            }
-
             let mapWidth = this.map.width * GameMap.BLOCK_SIZE
             let mapHeight = this.map.height * GameMap.BLOCK_SIZE
 
@@ -201,7 +178,7 @@ class MapPreviewContainer extends Menu {
             this.camera.defaultPosition.Set(mapWidth / 2, mapHeight / 2)
             this.camera.reset()
             this.camera.tick(0)
-            this.mapDrawer.draw(this.map)
+            this.mapDrawer.drawMap(this.map, this.camera)
         }
     }
 }

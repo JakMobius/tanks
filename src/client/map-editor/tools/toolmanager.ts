@@ -1,7 +1,7 @@
 
 import DocumentEventHandler from '../../controls/interact/documenteventhandler';
 import Camera from '../../camera';
-import Screen from '../../screen';
+import Screen from "../../graphics/screen";
 import Tool from '../tools/tool';
 import KeyboardController from "../../controls/interact/keyboardcontroller";
 import EditorMap from "../editormap";

@@ -21,7 +21,7 @@ class Preferences {
     static async read() {
 
         await fs.access(preferencesPath).catch(async (err) => {
-            if(err.code = "ENOENT") {
+            if(err.code == "ENOENT") {
                 await Preferences.resetPreferences()
             } else {
                 throw err

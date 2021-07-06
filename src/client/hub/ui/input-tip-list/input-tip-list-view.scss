@@ -1,0 +1,25 @@
+
+.tip-list {
+  position:absolute;
+  left:100%;
+  width: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+
+  .tip {
+    color: white;
+    border-radius: 5px;
+    padding: 4px;
+    margin-left: 10px;
+    font-size: 10px;
+    font-weight: bold;
+
+    &.error { background: #EC4040; }
+    &.warning { background: #EC7E40; }
+    &.weak-warning { background: #ECC640; }
+    &.fine { background: #40EC66; }
+  }
+}

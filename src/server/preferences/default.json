@@ -9,11 +9,18 @@
 
 	// Credentials for mongodb database
 	"database": {
-		"enabled": false,
 		"url": "mongodb://localhost:27017/",
 		"user": "admin",
 		"password": "admin",
 		"db": "tanks"
+	},
+
+	// Settings passed to express.js
+	"webserver": {
+		// The following option is passed as session.SessionOptions.secret
+		// option to express.js session constructor. You should probably
+		// change it to something else.
+		"session-key": "f1qbc248ecd09bdh0j5r7o8"
 	},
 
 	// Settings for the cluster communication mechanism
@@ -39,7 +46,7 @@
 		// Type "inherit-game-port" if you wish to use the same port as your
 		// websocket and express server use. Please, note that this is less
 		// secure way as any client will be able to connect to your socket and
-		// only a 64-bit access key will be the only security layer
+		// a 64-bit access key will be the only security layer
 
 		// If you like to use different port, type it here as a number.
 		// This way is much more secure because you can set up your

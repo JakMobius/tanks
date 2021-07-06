@@ -12,10 +12,7 @@ class BomberTank extends TankModel {
     constructor() {
         super()
 
-        this.behaviour = new PhysicalTankModel(this, {
-            lineardamping: 0.93,
-            angulardamping: 0.75
-        });
+        this.behaviour = new PhysicalTankModel(this, {});
     }
 
     static getWeapon() {

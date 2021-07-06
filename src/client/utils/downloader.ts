@@ -19,7 +19,7 @@ class Downloader {
         return () => xhr
     }
 
-    static download(urls: string[], handler: ((response: ArrayBuffer, index: number) => void), dataType: any, progress: Progress) {
+    static download(urls: string[], handler: ((response: ArrayBuffer, index: number) => void), dataType: any, progress: Progress): Promise<void> {
         return new Promise((resolve, reject) => {
             let requests: JQuery.jqXHR[] = []
             let awaiting = urls.length

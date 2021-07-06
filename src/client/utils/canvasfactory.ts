@@ -1,5 +1,5 @@
 
-export default function() {
+export default function CanvasFactory() {
     const canvas = document.createElement("canvas")
 
     let ctx: WebGLRenderingContext

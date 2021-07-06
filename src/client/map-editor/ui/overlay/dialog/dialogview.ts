@@ -38,7 +38,7 @@ class DialogView extends Menu {
     }
 
     addButton(config: DialogButtonConfig) {
-        let button = $("<button>")
+        let button = $("<button>").addClass("large")
         button.text(config.title)
         if(config.color) button.css("background-color", config.color)
         if(config.side === "left") {

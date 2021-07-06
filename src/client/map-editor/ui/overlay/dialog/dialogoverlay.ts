@@ -2,16 +2,20 @@
 import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import DialogView from './dialogview';
 
-class DialogOverlay extends Overlay {
-	public dialog: any;
-	public requiresDecision: any;
+export interface DialogOverlayConfig extends OverlayConfig {
+    requiresDecision?: boolean
+}
 
-    constructor(options: OverlayConfig) {
+class DialogOverlay extends Overlay {
+	public dialog: DialogView;
+	public requiresDecision: boolean;
+
+    constructor(options: DialogOverlayConfig) {
         super(options)
 
         this.dialog = new DialogView()
         this.overlay.append(this.dialog.element)
-        this.requiresDecision = false
+        this.requiresDecision = options.requiresDecision ?? false
         this.dialog.on("decision", () => this.hide())
     }
 

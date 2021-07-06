@@ -1,12 +1,12 @@
-import Screen from '../screen';
+import SceneScreen from '../graphics/scene-screen';
 
 export interface SceneConfig {
-    screen: Screen
+    screen: SceneScreen
 }
 
 class Scene {
 
-    screen: Screen = null
+    screen: SceneScreen = null
     overlayContainer: JQuery = null
 
     constructor(config: SceneConfig) {

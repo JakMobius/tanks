@@ -1,5 +1,6 @@
+import EventEmitter from "../../utils/eventemitter";
 
-class Progress {
+class Progress extends EventEmitter {
 	public completed: number = 0;
 	public target: number = 0;
 	public subtasks: Progress[] = [];
@@ -8,7 +9,7 @@ class Progress {
 	public parent?: Progress = null;
 
     constructor() {
-
+        super()
     }
 
     addSubtask(task: Progress) {
@@ -45,6 +46,7 @@ class Progress {
         }
         this.completed = this.target
         this.setNeedsUpdate()
+        this.checkCompleted()
     }
 
     setNeedsUpdate() {
@@ -67,6 +69,10 @@ class Progress {
     setCompleted(completed: number) {
         this.completed = completed
         this.setNeedsUpdate()
+
+        if(this.completed == this.target) {
+            this.checkCompleted()
+        }
     }
 
     getCompleted() {
@@ -78,6 +84,18 @@ class Progress {
             this.refreshFraction()
         }
         return this.fraction
+    }
+
+    private checkCompleted() {
+        let fraction = this.completeFraction()
+        if(fraction == 1.0) this.emit("completed")
+        if(this.parent)this.parent.checkCompleted()
+    }
+
+    toPromise(): Promise<void> {
+        return new Promise(resolve => {
+            this.on("completed", resolve)
+        })
     }
 }
 

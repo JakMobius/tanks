@@ -1,8 +1,8 @@
 /* @load-resource: './event-view.scss' */
 
-import View from '../../view';
+import Menu from "../../menu/menu";
 
-class EventView extends View {
+class EventView extends Menu {
     constructor(text: string) {
         super();
 

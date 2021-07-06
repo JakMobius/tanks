@@ -4,7 +4,7 @@ import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 /**
  * This packet represents player spawn interact.
- * The difference to the `PlayerSpawnPacket`
+ * The difference to the `PlayerJoinPacket`
  * package is that this package is only sent
  * to the player who entered the screen.
  */

@@ -106,84 +106,88 @@ class Sprite {
         }
     }
 
-    static download(progress: Progress, gl: WebGLRenderingContext, options?: SpriteDownloadOptions): Promise<void> {
+    static download(options?: SpriteDownloadOptions): Progress {
+        let progress = new Progress()
+        progress.setTarget(0.01)
+
         options = Object.assign( {
             mipMapLevels: 3
         }, options)
 
-        return new Promise((resolve, reject) => {
-            let mipMapLevels = options.mipMapLevels
-            let succeededMipmapLevels = mipMapLevels
-            let awaiting = succeededMipmapLevels * 2
 
-            const assetReady = () => {
-                if(!--awaiting) {
-                    let root = Sprite.mipmapatlases[0]
+        let mipMapLevels = options.mipMapLevels
+        let succeededMipmapLevels = mipMapLevels
+        let awaiting = succeededMipmapLevels * 2
 
-                    for(let key in root) {
-                        if(root.hasOwnProperty(key)) {
-                            Sprite.sprites.set(key, new Sprite(key))
-                        }
+        const assetReady = () => {
+            if(!--awaiting) {
+                let root = Sprite.mipmapatlases[0]
+
+                for(let key in root) {
+                    if(root.hasOwnProperty(key)) {
+                        Sprite.sprites.set(key, new Sprite(key))
                     }
-
-                    resolve()
                 }
+
+                progress.complete()
             }
+        }
 
-            for(let level = 0; level < mipMapLevels; level++) {
-                (function(level) {
-                    let textureProgress: Progress = null
-                    let atlasProgress: Progress = null
+        for(let level = 0; level < mipMapLevels; level++) {
+            (function(level) {
+                let textureProgress: Progress = null
+                let atlasProgress: Progress = null
 
-                    if(progress) {
-                        textureProgress = new Progress()
-                        atlasProgress = new Progress()
+                if(progress) {
+                    textureProgress = new Progress()
+                    atlasProgress = new Progress()
 
-                        progress.addSubtask(textureProgress)
-                        progress.addSubtask(atlasProgress)
-                    }
+                    progress.addSubtask(textureProgress)
+                    progress.addSubtask(atlasProgress)
+                }
 
-                    let levelPath = "atlas-mipmap-level-" + level;
+                let levelPath = "atlas-mipmap-level-" + level;
 
-                    $(new Image()).attr({
-                        src: "assets/img/textures/" + levelPath + ".png"
-                    }).on("load", function(){
-                        if (this.complete) {
-                            if(succeededMipmapLevels > level) {
-                                Sprite.mipmapimages[level] = this
-                                textureProgress.complete()
-                            }
-
-                            assetReady()
-                        } else {
-                            if(level === 0) {
-                                reject("Failed to load first mipmap level")
-                            } else {
-                                succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
-                                assetReady()
-                            }
-                        }
-                    })
-
-                    $.ajax({
-                        url: "assets/img/textures/" + levelPath + ".json",
-                        xhr: Downloader.getXHR(null, atlasProgress)
-                    }).done((data) => {
+                $(new Image()).attr({
+                    src: "assets/img/textures/" + levelPath + ".png"
+                }).on("load", function(){
+                    if (this.complete) {
                         if(succeededMipmapLevels > level) {
-                            Sprite.mipmapatlases[level] = data
+                            Sprite.mipmapimages[level] = this
+                            textureProgress.complete()
                         }
+
                         assetReady()
-                    }).fail((response, status, error) => {
+                    } else {
                         if(level === 0) {
-                            reject("Failed to load first mipmap level atlas descriptor: " + error)
+                            throw new Error("Failed to load first mipmap level")
                         } else {
                             succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
                             assetReady()
                         }
-                    })
-                })(level)
-            }
-        })
+                    }
+                })
+
+                $.ajax({
+                    url: "assets/img/textures/" + levelPath + ".json",
+                    xhr: Downloader.getXHR(null, atlasProgress)
+                }).done((data) => {
+                    if(succeededMipmapLevels > level) {
+                        Sprite.mipmapatlases[level] = data
+                    }
+                    assetReady()
+                }).fail((response, status, error) => {
+                    if(level === 0) {
+                        throw new Error("Failed to load first mipmap level atlas descriptor: " + error)
+                    } else {
+                        succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
+                        assetReady()
+                    }
+                })
+            })(level)
+        }
+
+        return progress
     }
 
     /**

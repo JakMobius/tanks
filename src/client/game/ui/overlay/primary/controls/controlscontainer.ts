@@ -3,7 +3,7 @@
 import Menu from 'src/client/ui/menu/menu';
 
 class ControlsContainer extends Menu {
-	public checkbox: JQuery;
+	public checkbox: JQuery<HTMLInputElement>;
 	public button: JQuery;
 
     constructor() {
@@ -13,8 +13,8 @@ class ControlsContainer extends Menu {
 
         let header = $("<div>").addClass("header").text("Управление")
 
-        this.checkbox = $("<input>").prop("type", "checkbox")
-        this.button = $("<button>").text("ИГРАТЬ")
+        this.checkbox = $("<input>").prop("type", "checkbox") as JQuery<HTMLInputElement>
+        this.button = $("<button>").addClass("large").text("ИГРАТЬ")
 
         this.element
             .append(header)
@@ -42,7 +42,7 @@ class ControlsContainer extends Menu {
             .append(this.button)
 
         this.button.on("click", () => {
-            this.emit("confirm", this.checkbox.checked)
+            this.emit("confirm", this.checkbox[0].checked)
         })
     }
 

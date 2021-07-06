@@ -11,18 +11,20 @@ import Preferences from './preferences/preferences';
 import * as packageJson from '../../package.json';
 import { URL } from 'url';
 
-async function initDatabase() {
-    if(Preferences.boolean("database.enabled")) {
-        Logger.global.log("Connecting to database")
+function initDatabase() {
+    Logger.global.log("Connecting to database")
+    DB.instance = new DB()
 
-        DB.instance = new DB()
-        try {
-            await DB.instance.connect()
-        } catch (error) {
-            Logger.global.log("Failed to connect to database")
-            Logger.global.log(error)
+    return new Promise((resolve) => {
+        const connect = () => {
+            DB.instance.connect().then(resolve).catch((error) => {
+                Logger.global.log("Failed to connect to database. Retrying in 5 seconds")
+                Logger.global.log(error)
+                setTimeout(connect, 5000)
+            })
         }
-    }
+        connect()
+    })
 }
 
 async function configureClusterCommunication(server: Server) {

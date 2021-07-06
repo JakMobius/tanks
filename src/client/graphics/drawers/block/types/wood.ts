@@ -1,8 +1,7 @@
 
 import EdgedBlockDrawer from '../edgedblockdrawer';
-import MapDrawer from '../../mapdrawer';
 
-class WoodBlockDrawer extends EdgedBlockDrawer {
+export default class WoodBlockDrawer extends EdgedBlockDrawer {
 
     id = 3
 
@@ -16,5 +15,3 @@ class WoodBlockDrawer extends EdgedBlockDrawer {
         }
     }
 }
-
-export default WoodBlockDrawer;

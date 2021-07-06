@@ -46,7 +46,7 @@ class SpawnZoneTool extends Tool {
     }
 
     setupMenu() {
-        this.clearZoneButton = $("<button>")
+        this.clearZoneButton = $("<button>").addClass("large")
             .text("Очистить")
             .attr("disabled", "true")
             .on("click", () => {

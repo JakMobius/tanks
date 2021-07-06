@@ -1,14 +1,14 @@
 
 
-import { MongoClient } from 'mongodb';
+import {Db, MongoClient} from 'mongodb';
 import Preferences from '../preferences/preferences';
 
 class DB {
 	public url: string;
 	public client: MongoClient;
+    public db: string
+    public dbHandle: Db;
     static instance: DB
-
-    db: string
 
     constructor() {
 
@@ -33,13 +33,13 @@ class DB {
         this.client = new MongoClient(this.url, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            auth: auth,
+            auth: auth
         })
     }
 
     async connect() {
         await this.client.connect()
-        this.client.db(this.db)
+        this.dbHandle = this.client.db(this.db)
     }
 
     async disconnect(force: boolean) {

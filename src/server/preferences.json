@@ -1,6 +1,5 @@
 /*
-  Server preferences file.
-  JSON5 parser is used for parsing this file,
+  Server preferences file. JSON5 parser is used for parsing this file,
   so C-style comments are allowed here.
 */
 
@@ -10,23 +9,30 @@
 
 	// Credentials for mongodb database
 	"database": {
-		"enabled": true,
 		"url": "mongodb://localhost:27017/",
-		"user": null,
-		"password": null,
+		"user": "admin",
+		"password": "admin",
 		"db": "tanks"
+	},
+
+	// Settings passed to express.js
+	"webserver": {
+		// The following option is passed as session.SessionOptions.secret
+		// option to express.js session constructor. You should probably
+		// change it to something else.
+		"session-key": "f1qbc248ecd09bdh0j5r7o8"
 	},
 
 	// Settings for the cluster communication mechanism
 	"cluster": {
 		// If your system consists of several servers, enable this option.
-		"enabled": true,
+		"enabled": false,
 
 		// When your servers runs in "game-only" or "socket-only" mode,
 		// it will try to communicate with the hub with this address.
 		// When the port is not specified, the port specified in the
 		// hub-port option will be used
-		"hub-address": "ws://localhost:25565",
+		"hub-address": "ws://localhost",
 
 		// In order to prevent unauthorised access to the cluster
 		// communication system, specify here the unique key. It must match

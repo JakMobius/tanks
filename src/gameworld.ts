@@ -15,7 +15,7 @@ export interface GameWorldConfig {
     maxTicks?: number
     positionSteps?: number
     velocitySteps?: number
-    map: GameMap
+    map?: GameMap
 }
 
 class GameWorld extends EventEmitter {
@@ -194,6 +194,13 @@ class GameWorld extends EventEmitter {
         if(this.effects.delete(effect.model.id)) {
             this.emit("effect-remove", effect)
         }
+    }
+
+    setMap(map: GameMap) {
+        this.effects.clear()
+        this.players.clear()
+        this.map = map
+        this.emit("map-change", map)
     }
 }
 

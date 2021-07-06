@@ -14,9 +14,7 @@ class ShotgunTank extends TankModel {
         super();
 
         this.behaviour = new BasicTankBehaviour(this, {
-            lateralFriction: 2,
             power: 20000,
-            lineardamping: 0.93,
         });
     }
 

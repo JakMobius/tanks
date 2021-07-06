@@ -1,6 +1,5 @@
 
 import EdgedBlockDrawer from '../edgedblockdrawer';
-import MapDrawer from '../../mapdrawer';
 
 class ConcreteBlockDrawer extends EdgedBlockDrawer {
 

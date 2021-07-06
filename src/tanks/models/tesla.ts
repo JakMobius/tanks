@@ -13,8 +13,6 @@ class TeslaTank extends TankModel {
         super()
 
         new BasicTankBehaviour(this, {
-            lineardamping: 0.93,
-            angulardamping: 0.75,
             power: 20000
         })
     }

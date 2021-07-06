@@ -1,6 +1,7 @@
-/* @load-resource: '../web/base-style.css' */
+/* @load-resource: '../web/base-style.scss' */
 
 import BrowserCheckView from '../utils/browsercheck/browsercheckview';
+import BrowserClient from "../networking/browser-client";
 
 window.addEventListener("load", function() {
     BrowserCheckView(downloadGameScript)
@@ -9,6 +10,7 @@ window.addEventListener("load", function() {
 function startGame() {
     var root = $("<div>").addClass("game-root")
     $(document.body).append(root)
+
     var Game = (window as any)['Game']
     var game = new Game({
         scale: window.devicePixelRatio,

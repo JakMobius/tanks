@@ -1,8 +1,7 @@
 
 import EdgedBlockDrawer from '../edgedblockdrawer';
-import MapDrawer from '../../mapdrawer';
 
-class TrophephngoldBlockDrawer extends EdgedBlockDrawer {
+export default class TrophephngoldBlockDrawer extends EdgedBlockDrawer {
 
     id = 4
 
@@ -12,5 +11,3 @@ class TrophephngoldBlockDrawer extends EdgedBlockDrawer {
         this.spritePath = "blocks/trophephngold"
     }
 }
-
-export default TrophephngoldBlockDrawer;
