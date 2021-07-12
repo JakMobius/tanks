@@ -10,7 +10,6 @@ import ServerGameWorld from "../servergameworld";
 
 export interface ServerTankConfig {
     type: typeof TankModel
-    world: ServerGameWorld
 }
 
 class ServerTank extends AbstractTank {
@@ -24,7 +23,7 @@ class ServerTank extends AbstractTank {
     world: ServerGameWorld = null
 
     constructor(options: ServerTankConfig) {
-        super(options);
+        super();
 
         this.model = new (options.type);
 
@@ -33,7 +32,7 @@ class ServerTank extends AbstractTank {
         this.primaryWeapon = new Weapon({
             tank: this,
             triggerAxle: this.model.controls.getPrimaryWeaponAxle()
-        });
+        })
 
         if(options.type.canPlaceMines()) {
             this.minerWeapon = new MinerWeapon({
@@ -42,9 +41,7 @@ class ServerTank extends AbstractTank {
             })
         }
 
-        this.world = options.world
-
-        if(this.world) {
+        if(this.player.getWorld()) {
             this.model.initPhysics(this.world.world)
         }
 
@@ -93,12 +90,12 @@ class ServerTank extends AbstractTank {
         // TODO: Это криво
         effect.model.tankId = this.player.id
         this.effects.set(effect.model.id, effect)
-        this.world.addTankEffect(effect, this)
+        this.player.getWorld().addTankEffect(effect, this)
     }
 
     removeEffect(effect: ServerTankEffect): void {
         if(this.effects.delete(effect.model.id)) {
-            this.world.removeTankEffect(effect, this)
+            this.player.getWorld().removeTankEffect(effect, this)
         }
     }
 }

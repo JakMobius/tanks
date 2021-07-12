@@ -43,7 +43,7 @@ class ServerTankEffect extends ServerEffect {
      * @param tank Tank, on which this effect will be applied on
      */
     static fromModelAndTank(model: TankEffectModel, tank: ServerTank): ServerTankEffect {
-        let clazz = this.Types.get(model.constructor as typeof TankEffectModel) as typeof ServerTankEffect
+        let clazz = this.Types.get(model.constructor as typeof TankEffectModel) as unknown as typeof ServerTankEffect
 
         if(clazz) return new clazz(model, tank)
 

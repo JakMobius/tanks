@@ -6,24 +6,38 @@ import AbstractTank from "../tanks/abstracttank";
 import Team from "../server/team";
 import BonusModel from "../server/bonuses/bonus";
 
-export interface PlayerConfig {
+export interface PlayerConfig<WorldClass extends GameWorld = GameWorld> {
     nick?: string
     id?: number
-    world?: GameWorld
+    world?: WorldClass
     team?: Team
 }
 
-class Player {
-	public nick: any;
-	public id: any;
-	public team: any;
-	public blockMap: any;
-	public bonuses: BonusModel[]
+export type PlayerTankType<P extends Player> = P extends Player<infer T> ? T : never
+export type PlayerWorldType<P extends Player> = P extends Player<any, infer W> ? W : never
 
-    tank: AbstractTank
-    world: GameWorld
+export default class Player<
+        TankClass extends AbstractTank = AbstractTank,
+        WorldClass extends GameWorld = any
+    > {
 
-    constructor(config?: PlayerConfig) {
+    protected world: WorldClass
+    public tank: TankClass
+
+    /* Ugly stuff to get around "circular default generic" problem */
+
+    public getWorld(): WorldClass & GameWorld { return this.world }
+    public setWorld(world: WorldClass & GameWorld) { this.world = world }
+
+    //public banana(): WorldClass & GameWorld { return this.world }
+
+    public nick: string;
+    public id: number;
+    public team: Team;
+    public blockMap: Box2D.Body[];
+    public bonuses: BonusModel[]
+
+    constructor(config?: PlayerConfig<WorldClass>) {
         config = config || {}
         this.nick = config.nick
         this.id = config.id
@@ -33,7 +47,7 @@ class Player {
         this.blockMap = []
     }
 
-    setTank(tank: AbstractTank) {
+    setTank(tank: TankClass) {
         this.tank = tank
         tank.player = this
     }
@@ -72,5 +86,3 @@ class Player {
         this.blockMap = []
     }
 }
-
-export default Player;

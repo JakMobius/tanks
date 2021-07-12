@@ -25,7 +25,7 @@ class RoomListCommand extends Command {
             lines.push([Chalk.bold("Room name"), Chalk.bold("Players online")])
 
             for (let [id, room] of rooms.entries()) {
-                let online = room.clients.size
+                let online = room.getCurrentOnline()
                 totalOnline += online
 
                 lines.push([dot + id, Chalk.cyanBright(online)])

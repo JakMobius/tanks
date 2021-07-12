@@ -6,21 +6,22 @@ import PlayerControls from '../../../controls/playercontrols';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
 import ToolManager from "../toolmanager";
 import MonsterTank from "../../../tanks/models/monster";
+import Player from "../../../../utils/player";
+import ClientTank from "../../../tanks/clienttank";
+import MonsterTankModel from "../../../../tanks/models/monster";
+import ClientPlayer from "../../../client-player";
 
-class RunTool extends Tool {
+export default class RunTool extends Tool {
 	public selectingLocation: any;
-	public world: any;
-	public tank: any;
-	public keyboard: any;
-	public playerControls: any;
-	public running: any;
+	public tank: ClientTank;
+	public keyboard: KeyboardController;
+	public playerControls: PlayerControls;
+	public running: boolean;
 	public timer: any;
 	public runButton: any;
 	public locationButton: any;
-    private physicsTick: number;
-    private maxTicks: number;
-    private positionSteps: number;
-    velocitySteps: number;
+    private player: ClientPlayer;
+    private spawnPoint = new Box2D.Vec2(10, 10)
 
     constructor(manager: ToolManager) {
         super(manager);
@@ -29,26 +30,21 @@ class RunTool extends Tool {
         this.setupMenu()
         this.selectingLocation = false
 
-        this.world = new Box2D.World(new Box2D.Vec2(0, 0))
-        //this.tank = new SniperTank()
-        this.tank = new MonsterTank()
-        this.tank.setupDrawer(this.manager.screen.ctx)
-        this.tank.model.initPhysics(this.world)
-
         this.keyboard = new KeyboardController()
 
         this.playerControls = new PlayerControls()
         this.playerControls.setupKeyboard(this.keyboard)
 
+        this.tank = new MonsterTank()
+        this.tank.setupDrawer(this.manager.screen.ctx)
         this.playerControls.connectTankControls(this.tank.model.controls)
+        
+        this.player = new ClientPlayer({
+            id: 0,
+            nick: "Вы"
+        })
 
-        this.running = false
-        this.timer = 0
-
-        this.physicsTick = 0.002
-        this.maxTicks = 10
-        this.positionSteps = 1
-        this.velocitySteps = 1
+        this.player.setTank(this.tank)
     }
 
     setupMenu() {
@@ -61,7 +57,7 @@ class RunTool extends Tool {
         this.locationButton = $("<div>")
             .addClass("tool inline")
             .css("background-image", "url(assets/img/locate.png)")
-            .on("click",() => this.selectLocation())
+            .on("click",() => this.toggleSelectLocation())
 
         this.settingsView = $("<div>")
             .append(this.locationButton)
@@ -73,64 +69,45 @@ class RunTool extends Tool {
     toggle() {
         this.running = !this.running
         if(this.running) {
-            this.bindCamera()
+            this.onRun()
         } else {
-            this.unbindCamera()
+            this.onStop()
         }
     }
 
-    bindCamera() {
+    onRun() {
         this.manager.setNeedsRedraw()
+        this.manager.setWorldAlive(true)
+        this.manager.setCameraMovementEnabled(false)
+
+        let world = this.manager.world
+
+        world.createPlayer(this.player)
+
+        this.player.tank.model.body.SetPosition(this.spawnPoint)
+
+        this.playerControls.connectTankControls(this.player.tank.model.controls)
+
         this.manager.camera.inertial = true
         this.manager.camera.target = this.tank.model.body.GetPosition()
+        this.manager.camera.targetVelocity = this.tank.model.body.GetLinearVelocity()
     }
 
-    unbindCamera() {
+    onStop() {
+        this.manager.setWorldAlive(false)
+        this.manager.setCameraMovementEnabled(true)
+
         this.manager.camera.target = this.manager.camera.getPosition()
         this.manager.camera.shaking.Set(0, 0)
         this.manager.camera.shakeVelocity.Set(0, 0)
         this.manager.camera.inertial = false
+
+        this.manager.world.removePlayer(this.player)
     }
 
-    selectLocation() {
+    toggleSelectLocation() {
         this.locationButton.toggleClass("selected")
         this.selectingLocation = !this.selectingLocation
-    }
-
-    drawDecorations() {
-        if(this.running) {
-            this.tick()
-            this.manager.setNeedsRedraw()
-        } else {
-            this.tank.drawer.draw(this.manager.camera, 0)
-        }
-    }
-
-    tick() {
-        let now = Date.now() / 1000
-        let dt = now - this.timer
-        this.timer = now
-
-        if(dt > 0.1) dt = 0.1
-
-        let steps = Math.floor(dt / this.physicsTick);
-        if (steps > this.maxTicks) steps = this.maxTicks;
-        for (let i = 0; i < steps; i++) {
-            this.tank.tick(this.physicsTick)
-            this.world.Step(this.physicsTick, 1, 1);
-        }
-
-        //this.world.Step(1 / 60, 1, 1);
-
-        this.world.ClearForces()
-
-        this.tank.drawer.draw(this.manager.camera, dt)
-    }
-
-    mouseMove(x: number, y: number) {
-        super.mouseMove(x, y);
-
-
     }
 
     becomeActive() {
@@ -145,9 +122,16 @@ class RunTool extends Tool {
         this.keyboard.stopListening()
 
         if(this.running) {
-            this.unbindCamera()
+            this.onStop()
+        }
+    }
+
+    mouseDown(x: number, y: number) {
+        super.mouseDown(x, y);
+
+        if(this.selectingLocation) {
+            this.toggleSelectLocation()
+            this.spawnPoint.Set(x, y)
         }
     }
 }
-
-export default RunTool;

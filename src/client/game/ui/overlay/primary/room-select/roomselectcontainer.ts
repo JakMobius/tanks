@@ -2,9 +2,8 @@
 
 import Menu from 'src/client/ui/menu/menu';
 
-import Dropdown from '../../../../../ui/elements/dropdown/dropdown';
-import Room from "../../../../../../server/room/room";
-import {ClientRoomInformation} from "../../../../../../networking/packets/game-packets/roomlistpacket";
+import Dropdown from 'src/client/ui/elements/dropdown/dropdown';
+import {ClientRoomInformant} from "src/networking/packets/game-packets/roomlistpacket";
 
 class RoomSelectContainer extends Menu {
 	public selectedRoom: string;
@@ -16,7 +15,7 @@ class RoomSelectContainer extends Menu {
         this.selectedRoom = null
         this.dropdown = new Dropdown()
         this.element.append(this.dropdown.element)
-        this.element.addClass("menu room-select")
+        this.element.addClass("room-select")
 
         this.dropdown.on("expand", () => {
             this.element.addClass("expanded")
@@ -57,24 +56,24 @@ class RoomSelectContainer extends Menu {
         })
     }
 
-    updateRooms(rooms: ClientRoomInformation[]): void {
+    updateRooms(rooms: ClientRoomInformant[]): void {
         this.dropdown.setOptionCount(rooms.length)
 
         this.dropdown.getOptions().each((index: number, element: HTMLElement) => {
             let option = $(element)
             const room = rooms[index]
-            const disabled = room.currentOnline >= room.maxOnline;
+            const disabled = room.getCurrentOnline() >= room.getMaxOnline();
 
-            option.data("value", room.name)
+            option.data("value", room.getName())
 
             if(disabled) option.addClass("disabled")
             else option.removeClass("disabled")
 
-            option.find(".room-name").text(room.name)
-            option.find(".room-playersOnline").text(room.currentOnline)
-            option.find(".room-max-playersOnline").text(room.maxOnline)
+            option.find(".room-name").text(room.getName)
+            option.find(".room-playersOnline").text(room.getCurrentOnline())
+            option.find(".room-max-playersOnline").text(room.getMaxOnline())
 
-            if(this.selectedRoom === room.name) {
+            if(this.selectedRoom === room.getName()) {
                 this.dropdown.selectOption(option)
             }
         })

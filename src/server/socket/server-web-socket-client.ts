@@ -2,7 +2,8 @@
 import AbstractClient from '../../networking/abstract-client';
 import Logger from '../log/logger';
 import * as WebSocket from 'websocket';
-import ServerParticipantConnection from './participant-client/server-participant-connection';
+import BinaryPacket from "../../networking/binarypacket";
+import {BinarySerializer} from "../../serialization/binary/serializable";
 
 export interface ServerWebSocketClientConfig {
     ip: string
@@ -15,10 +16,10 @@ export interface ServerWebSocketClientConfig {
  * This class implements a websocket client on Node.js side
  */
 class ServerWebSocketClient extends AbstractClient {
-	public webSocketConnection: any;
-	public reconnect: any;
-	public reconnectionDelay: any;
-	public logger: any;
+	public webSocketConnection: WebSocket.connection;
+	public reconnect: boolean;
+	public reconnectionDelay: number;
+	public logger: Logger;
 	public ip: string
 
     public client: WebSocket.client
@@ -61,7 +62,10 @@ class ServerWebSocketClient extends AbstractClient {
                 return
             }
 
-            super.onData(new Uint8Array(message.binaryData).buffer);
+            let decoder = BinaryPacket.binaryDecoder
+            decoder.reset()
+            decoder.readData(new Uint8Array(message.binaryData).buffer)
+            super.handlePacket(BinarySerializer.deserialize(decoder, BinaryPacket))
         } catch(e) {
             this.logger.log("Exception while handling packet")
             this.logger.log(e)
@@ -76,8 +80,8 @@ class ServerWebSocketClient extends AbstractClient {
         return !!this.webSocketConnection
     }
 
-    writePacket(packet: ArrayBuffer) {
-        this.webSocketConnection.sendBytes(Buffer.from(packet))
+    writePacket(packet: BinaryPacket) {
+        this.webSocketConnection.sendBytes(Buffer.from(packet.getData()))
     }
 
     disconnect(reason?: string) {

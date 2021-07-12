@@ -294,7 +294,7 @@ export class Node extends EventEmitter {
     // For aright, abottom, right, and bottom:
     // If position.bottom is null, we could simply set top instead.
     // But it wouldn't replicate bottom behavior appropriately if
-    // the parent was resized, etc.
+    // the parent was fitRoot, etc.
     setwidth(val: number) {
         if (this.position.width === val) return;
         this.onResize()
@@ -402,7 +402,7 @@ export class Node extends EventEmitter {
     }
 
     /**
-     * Called when nodes is resized or moved
+     * Called when nodes is fitRoot or moved
      * Although this method can be called when node is moved, this
      * may be unnecessary, as {@link onResize} may reallocate
      * internal buffers or use other complicated update methods.

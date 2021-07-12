@@ -10,6 +10,8 @@ function startGame() {
     var root = $("<div>").addClass("game-root")
     $(document.body).append(root)
 
+    const MapEditor = (window as any)["MapEditor"]
+
     // @ts-ignore
     var editor = new MapEditor({
         root: root

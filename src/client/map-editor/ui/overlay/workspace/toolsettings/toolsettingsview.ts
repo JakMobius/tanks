@@ -1,15 +1,15 @@
 /* @load-resource: './tool-settings.scss' */
 
-import View from 'src/client/ui/view';
 import Tool from "../../../../tools/tool";
+import Menu from "../../../../../ui/menu/menu";
 
-class ToolSettingsView extends View {
+class ToolSettingsView extends Menu {
 	public hidden: boolean;
 
     constructor() {
         super();
 
-        this.element.addClass("menu editor-tool-settings")
+        this.element.addClass("editor-tool-settings")
         this.element.css("opacity", "0")
         this.element.hide()
         this.hidden = true

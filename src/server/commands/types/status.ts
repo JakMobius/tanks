@@ -180,7 +180,7 @@ class StatusCommand extends Command {
             this.beginStatusGroup()
             this.printStatus("active games", Chalk.green(server.gameSocket.games.size))
             let totalPlayers = 0
-            for(let game of server.gameSocket.games.values()) totalPlayers += game.clients.size
+            for(let game of server.gameSocket.games.values()) totalPlayers += game.getCurrentOnline()
             this.printStatus("total players", Chalk.green(totalPlayers))
             this.endStatusGroup()
         }

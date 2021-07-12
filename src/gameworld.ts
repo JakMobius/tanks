@@ -5,33 +5,39 @@ import EventEmitter from 'src/utils/eventemitter';
 import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
 import AbstractEffect from 'src/effects/abstract-effect';
 import AbstractEntity from 'src/entity/abstractentity';
-import Player from 'src/utils/player';
+import Player, {PlayerTankType} from 'src/utils/player';
 import AbstractTank from './tanks/abstracttank';
 import BlockState from "./utils/map/blockstate/blockstate";
 import ExplodeEffectPool from "src/effects/world/explode/explode-effect-pool";
 
-export interface GameWorldConfig {
+export interface GameWorldConfig<MapClass extends GameMap = GameMap> {
     physicsTick?: number
     maxTicks?: number
     positionSteps?: number
     velocitySteps?: number
-    map?: GameMap
+    map?: MapClass
 }
 
-class GameWorld extends EventEmitter {
+class GameWorld<
+    MapClass extends GameMap = GameMap,
+    EntityClass extends AbstractEntity = AbstractEntity,
+    EffectClass extends AbstractEffect = AbstractEffect,
+    PlayerClass extends Player = Player,
+    TankClass extends AbstractTank = PlayerTankType<PlayerClass>
+> extends EventEmitter {
 	public physicsTick: number;
 	public maxTicks: number;
 	public positionSteps: number;
 	public velocitySteps: number;
 
     world: Box2D.World
-    map: GameMap
-    players = new Map<number, Player>()
-    entities = new Map<number, AbstractEntity>()
-    effects = new Map<number, AbstractEffect>()
+    map: MapClass
+    players = new Map<number, PlayerClass>()
+    entities = new Map<number, EntityClass>()
+    effects = new Map<number, EffectClass>()
     explosionEffectPool: ExplodeEffectPool
 
-    constructor(options: GameWorldConfig) {
+    constructor(options: GameWorldConfig<MapClass>) {
         super()
 
         options = Object.assign({
@@ -62,8 +68,9 @@ class GameWorld extends EventEmitter {
     rebuildBlockPhysics(): void {
 
         for (let player of this.players.values()) {
-            if(!player.tank) continue
-            let position = player.tank.model.body.GetPosition()
+            let tank = player.tank
+            if(!tank) continue
+            let position = tank.model.body.GetPosition()
 
             const x = Math.floor(position.x / GameMap.BLOCK_SIZE)
             const y = Math.floor(position.y / GameMap.BLOCK_SIZE)
@@ -79,11 +86,12 @@ class GameWorld extends EventEmitter {
                     let block = player.blockMap[n]
                     let mapBlock = this.map.getBlock(i, j)
 
-                    if ((mapBlock && (mapBlock.constructor as typeof BlockState).isSolid) || (i < 0) || (j < 0) || (i >= this.map.width) || (j >= this.map.height)) {
+                    const isSolid = (mapBlock && (mapBlock.constructor as typeof BlockState).isSolid)
+
+                    if (isSolid || (i < 0) || (j < 0) || (i >= this.map.width) || (j >= this.map.height)) {
                         let pos = block.GetPosition()
 
-                        pos.x = (i + 0.5) * GameMap.BLOCK_SIZE
-                        pos.y = (j + 0.5) * GameMap.BLOCK_SIZE
+                        pos.Set((i + 0.5) * GameMap.BLOCK_SIZE, (j + 0.5) * GameMap.BLOCK_SIZE)
 
                         block.SetPosition(pos)
 
@@ -111,7 +119,7 @@ class GameWorld extends EventEmitter {
         for (let i = 0; i < steps; i++) {
             this.world.Step(this.physicsTick, 1, 1);
             for (let player of this.players.values()) {
-                if(player.tank) player.tank.tick(this.physicsTick)
+                player.tank.tick(this.physicsTick)
             }
         }
 
@@ -137,6 +145,8 @@ class GameWorld extends EventEmitter {
     }
 
     tick(dt: number): void {
+
+        this.emit("before-tick")
         // Processing entities first because
         // otherwise processPhysics method
         // does an excessive initial tick
@@ -145,58 +155,63 @@ class GameWorld extends EventEmitter {
         this.processEntities(dt)
         this.processPhysics(dt)
         this.processEffects(dt)
+
+        this.emit("tick")
     }
 
-    createEntity(entity: AbstractEntity): void {
-        entity.game = this
+    createEntity(entity: EntityClass): void {
+        entity.setGame(this)
         this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
 
-    removeEntity(entity: AbstractEntity): void {
+    removeEntity(entity: EntityClass): void {
         this.entities.delete(entity.model.id)
         this.emit("entity-remove", entity)
     }
 
-    createPlayer(player: Player) {
+    createPlayer(player: PlayerClass) {
         if(this.players.has(player.id)) {
             this.players.get(player.id).destroy()
         }
-        player.world = this
+
+        const tank = player.tank
+        tank.model.initPhysics(this.world)
+        player.setWorld(this)
         this.players.set(player.id, player)
         player.setupPhysics()
         this.emit("player-create", player)
     }
 
-    removePlayer(player: Player) {
+    removePlayer(player: PlayerClass) {
         player.destroy()
         //player.team.remove(player);
         this.players.delete(player.id)
         this.emit("player-remove", player)
     }
 
-    addTankEffect(effect: AbstractEffect, tank: AbstractTank) {
+    addTankEffect(effect: EffectClass, tank: TankClass) {
         this.emit("effect-create", effect, tank)
     }
 
-    removeTankEffect(effect: AbstractEffect, tank: AbstractTank) {
+    removeTankEffect(effect: EffectClass, tank: TankClass) {
         this.emit("effect-remove", effect, tank)
     }
 
-    addEffect(effect: AbstractEffect) {
+    addEffect(effect: EffectClass) {
         if(this.effects.has(effect.model.id)) return
 
         this.effects.set(effect.model.id, effect)
         this.emit("effect-create", effect)
     }
 
-    removeEffect(effect: AbstractEffect) {
+    removeEffect(effect: EffectClass) {
         if(this.effects.delete(effect.model.id)) {
             this.emit("effect-remove", effect)
         }
     }
 
-    setMap(map: GameMap) {
+    setMap(map: MapClass) {
         this.effects.clear()
         this.players.clear()
         this.map = map

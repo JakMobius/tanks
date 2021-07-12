@@ -1,11 +1,11 @@
 
 import DocumentEventHandler from '../../controls/interact/documenteventhandler';
 import Camera from '../../camera';
-import Screen from "../../graphics/screen";
 import Tool from '../tools/tool';
 import KeyboardController from "../../controls/interact/keyboardcontroller";
-import EditorMap from "../editormap";
 import BlockState from "../../../utils/map/blockstate/blockstate";
+import SceneScreen from "../../graphics/scene-screen";
+import EditorWorld from "../editor-world";
 
 class ToolManager extends DocumentEventHandler {
 
@@ -13,15 +13,15 @@ class ToolManager extends DocumentEventHandler {
     canvas: HTMLCanvasElement = null
     keyboard: KeyboardController = null
     selectedTool: Tool = null
-    map: EditorMap = null
-    screen: Screen = null
+    world: EditorWorld = null
+    screen: SceneScreen = null
     selectedBlock: BlockState = null
 
-    constructor(screen: Screen, camera: Camera, map: EditorMap) {
+    constructor(screen: SceneScreen, camera: Camera, world: EditorWorld) {
         super()
         this.screen = screen
         this.camera = camera
-        this.map = map
+        this.world = world
         this.selectedTool = null
         this.selectedBlock = null
 
@@ -29,8 +29,8 @@ class ToolManager extends DocumentEventHandler {
         this.startListening()
     }
 
-    setNeedsRedraw(force = false) {
-        this.emit("redraw", force)
+    setNeedsRedraw() {
+        this.emit("redraw")
     }
 
     startListening() {
@@ -42,7 +42,7 @@ class ToolManager extends DocumentEventHandler {
     mouseDown(event: MouseEvent) {
         event.preventDefault()
 
-        if(this.selectedTool && event.which === 1) {
+        if(this.selectedTool && event.button === 0) {
             let x = event.pageX / this.screen.width * 2 - 1
             let y = -(event.pageY / this.screen.height * 2 - 1)
             this.camera.matrix.save()
@@ -110,6 +110,15 @@ class ToolManager extends DocumentEventHandler {
     createEvent(name: string) {
         this.emit("user-event", name)
     }
+
+    setWorldAlive(alive: boolean) {
+        this.emit("world-alive", alive)
+    }
+
+    setCameraMovementEnabled(enabled: boolean) {
+        this.emit("camera-movement", enabled)
+    }
+
 }
 
 export default ToolManager;

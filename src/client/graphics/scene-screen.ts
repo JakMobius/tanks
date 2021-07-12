@@ -22,8 +22,8 @@ export default class SceneScreen extends Screen {
         }
     }
 
-    resized() {
-        super.resized();
+    fitRoot() {
+        super.fitRoot();
         if(this.scene) this.scene.layout()
     }
 

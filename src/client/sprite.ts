@@ -106,6 +106,8 @@ class Sprite {
         }
     }
 
+    // TODO: rewrite this
+
     static download(options?: SpriteDownloadOptions): Progress {
         let progress = new Progress()
         progress.setTarget(0.01)
@@ -160,11 +162,18 @@ class Sprite {
                         assetReady()
                     } else {
                         if(level === 0) {
-                            throw new Error("Failed to load first mipmap level")
+                            progress.emit("error", "Failed to load first mipmap level")
                         } else {
                             succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
                             assetReady()
                         }
+                    }
+                }).on("error", () => {
+                    if(level === 0) {
+                        progress.emit("error", "Failed to load first mipmap level")
+                    } else {
+                        succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
+                        assetReady()
                     }
                 })
 
@@ -178,7 +187,7 @@ class Sprite {
                     assetReady()
                 }).fail((response, status, error) => {
                     if(level === 0) {
-                        throw new Error("Failed to load first mipmap level atlas descriptor: " + error)
+                        progress.emit("error", "Failed to load first mipmap level atlas descriptor: " + error)
                     } else {
                         succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
                         assetReady()

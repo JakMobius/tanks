@@ -2,8 +2,8 @@
 import Loop from './loop';
 
 class HighPreciseLoop extends Loop {
-	public interval: any;
-	public totalTime: any;
+	public interval: number;
+	public totalTime: number;
 
     constructor() {
         super();

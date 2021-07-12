@@ -20,7 +20,7 @@ class MapSelectContainer extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu editor-map-list")
+        this.element.addClass("editor-map-list")
 
         this.noMapsLabel =
             $("<div>").addClass("center-text-container")

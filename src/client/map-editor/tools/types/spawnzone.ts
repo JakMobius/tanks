@@ -82,11 +82,12 @@ class SpawnZoneTool extends Tool {
 
     drawDecorations() {
         super.drawDecorations();
+        const map = this.manager.world.map
 
         this.program.use()
         this.program.prepare()
 
-        for(let zone of this.manager.map.spawnZones) {
+        for(let zone of map.spawnZones) {
             let decoration = this.decorations.get(zone.id)
             decoration.x = zone.centerX() * GameMap.BLOCK_SIZE
             decoration.y = zone.centerY() * GameMap.BLOCK_SIZE
@@ -113,11 +114,13 @@ class SpawnZoneTool extends Tool {
     }
 
     deleteZone(id: number) {
+        const map = this.manager.world.map
+
         let i = 0;
-        for(let zone of this.manager.map.spawnZones) {
+        for(let zone of map.spawnZones) {
 
             if(zone.id === id) {
-                this.manager.map.spawnZones.splice(i, 1)
+                map.spawnZones.splice(i, 1)
                 break
             }
             i++
@@ -125,7 +128,9 @@ class SpawnZoneTool extends Tool {
     }
 
     getZone(id: number) {
-        for(let zone of this.manager.map.spawnZones) {
+        const map = this.manager.world.map
+
+        for(let zone of map.spawnZones) {
             if(zone.id === id) {
                 return zone
             }
@@ -136,12 +141,13 @@ class SpawnZoneTool extends Tool {
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
+        const map = this.manager.world.map
 
         if(this.selectedTeam === null) return
         let zone = this.getZone(this.selectedTeam)
         if(!zone) {
             zone = new SpawnZone(this.selectedTeam)
-            this.manager.map.spawnZones.push(zone)
+            map.spawnZones.push(zone)
         }
 
         zone.x1 = Math.floor(x / GameMap.BLOCK_SIZE)

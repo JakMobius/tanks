@@ -23,7 +23,7 @@ class ServerBulletMine extends ServerBullet {
     tick(dt: number) {
         const a = this.model.x, b = this.model.y;
 
-        for(let player of this.shooter.world.players.values()) {
+        for(let player of this.shooter.getWorld().players.values()) {
 
             if(this.shooter === player) continue
 

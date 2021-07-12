@@ -29,7 +29,7 @@ class WeaponStungun extends Weapon {
     shoot() {
         let tank = this.tank
         let player = tank.player
-        let game = player.game
+        let game = player.getWorld()
         const position = tank.model.body.GetPosition()
         const matrix = tank.model.matrix
 
@@ -52,7 +52,7 @@ class WeaponStungun extends Weapon {
 
 const near = function (x: number, y: number, tplayer: Player, game: Game, distance: number) {
     const result = [];
-    for (let client of game.clients.values()) {
+    for (let client of game.portal.clients.values()) {
         const player = client.data.player;
 
         if (!player) continue

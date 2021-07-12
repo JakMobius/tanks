@@ -49,7 +49,7 @@ class DragHandler extends DocumentEventHandler {
 
     mouseDown(event: MouseEvent) {
         event.preventDefault()
-        if((event.which === 1 && this.draggingEnabled) || event.which === 2) {
+        if((event.button === 0 && this.draggingEnabled) || event.button === 1) {
             this.dragging = true
         }
 

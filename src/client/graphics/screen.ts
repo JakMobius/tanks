@@ -7,6 +7,9 @@ import Sprite from "../sprite";
 export interface ScreenConfig {
     scale?: number
     root: JQuery
+    fitRoot?: boolean
+    width?: number
+    height?: number
 }
 
 export default class Screen {
@@ -23,11 +26,11 @@ export default class Screen {
     public ctx: WebGLRenderingContext = null
     private resizeHandler: () => void;
     soundEngine: SoundEngine;
-    private _be: boolean;
 
     constructor(config: ScreenConfig) {
         config = Object.assign({
-            scale: window.devicePixelRatio
+            scale: window.devicePixelRatio,
+            fitRoot: true
         }, config)
 
         this.config = config
@@ -38,7 +41,11 @@ export default class Screen {
         this.height = null
 
         this.initCanvas()
-        this.initResizeHandling()
+        if(this.config.fitRoot) {
+            this.initResizeHandling()
+        } else {
+            this.setSize(this.config.width ?? 300, this.config.height ?? 150)
+        }
         this.initialize()
     }
 
@@ -102,18 +109,15 @@ export default class Screen {
     }
 
     initResizeHandling(): void {
-        const handler = () => {
-            this.resized()
-        }
-        window.addEventListener("resize", handler)
-        handler()
-        
-        this.resizeHandler = handler
+        this.resizeHandler = () => this.fitRoot()
+
+        window.addEventListener("resize", this.resizeHandler)
+        this.resizeHandler()
     }
 
-    resized() {
-        this.width = this.root.width()
-        this.height = this.root.height()
+    setSize(width: number, height: number) {
+        this.width = width
+        this.height = height
 
         this.canvas.width = this.width * this.config.scale
         this.canvas.height = this.height * this.config.scale
@@ -123,7 +127,7 @@ export default class Screen {
 
         this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
 
-        if(!this._be)  for(let texture of this.framebufferTextures) {
+        for(let texture of this.framebufferTextures) {
             this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
             this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
 
@@ -131,8 +135,10 @@ export default class Screen {
             this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
             this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
         }
-        
-        this._be = true
+    }
+
+    fitRoot() {
+        this.setSize(this.root.width(), this.root.height())
     }
 
     destroy() {

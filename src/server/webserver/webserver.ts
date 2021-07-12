@@ -99,7 +99,7 @@ class WebServer {
         this.app.use((req, res, next) => {
             let iterator = this.getModules()
 
-            const iterate = (err: Error = null) => {
+            const iterate = (err: any = null) => {
                 if(err) {
                     next(err)
                     return

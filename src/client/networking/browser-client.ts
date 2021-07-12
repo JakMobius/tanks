@@ -1,11 +1,13 @@
 
 import AbstractClient from '../../networking/abstract-client';
+import BinaryPacket from "../../networking/binarypacket";
+import {BinarySerializer} from "../../serialization/binary/serializable";
 
 export interface BrowserClientConfig {
     ip: string
 }
 
-class BrowserClient extends AbstractClient {
+export default class BrowserSocketClient extends AbstractClient {
 
     public ip: string
     public socket: WebSocket
@@ -31,7 +33,10 @@ class BrowserClient extends AbstractClient {
 
     onMessage(event: MessageEvent) {
         if(event.data instanceof ArrayBuffer) {
-            this.onData(event.data)
+            let decoder = BinaryPacket.binaryDecoder
+            decoder.reset()
+            decoder.readData(event.data)
+            this.handlePacket(BinarySerializer.deserialize(decoder, BinaryPacket))
         }
     }
 
@@ -43,8 +48,8 @@ class BrowserClient extends AbstractClient {
         return this.socket.readyState === WebSocket.OPEN;
     }
 
-    writePacket(packet: ArrayBuffer) {
-        this.socket.send(packet)
+    writePacket(packet: BinaryPacket) {
+        this.socket.send(packet.getData())
     }
 
     onClose(code: number, reason: string) {
@@ -64,5 +69,3 @@ class BrowserClient extends AbstractClient {
         }
     }
 }
-
-export default BrowserClient;

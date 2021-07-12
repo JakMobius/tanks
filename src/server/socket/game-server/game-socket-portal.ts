@@ -69,7 +69,7 @@ class GameSocketPortal extends SocketPortal {
 
         this.logger.log("Клиент " + client.id + " подключен к игре " + game.name)
 
-        game.clientConnected(client)
+        game.portal.clientConnected(client)
         client.game = game
     }
 
@@ -90,7 +90,7 @@ class GameSocketPortal extends SocketPortal {
             const room = this.games.get(packet.room);
 
             if (room) {
-                if(room.clients.size >= room.maxOnline) {
+                if(room.portal.clients.size >= room.maxOnline) {
                     PlayerRoomChangePacket.deny(
                         packet.room,
                         "Эта комната переполнена"
@@ -113,7 +113,7 @@ class GameSocketPortal extends SocketPortal {
         let game, online = -1
 
         for(let eachGame of this.games.values()) {
-            const eachOnline = eachGame.clients.size
+            const eachOnline = eachGame.portal.clients.size
 
             if(eachOnline < eachGame.maxOnline) {
                 if(eachOnline > online) {

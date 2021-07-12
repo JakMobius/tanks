@@ -1,16 +1,16 @@
 /* @load-resource: './block-select.scss' */
 
-import View from 'src/client/ui/view';
 
 import BlockState from 'src/utils/map/blockstate/blockstate';
+import Menu from "../../../../../ui/menu/menu";
 
-class BlockSelectMenu extends View {
+export default class BlockSelectMenu extends Menu {
 	public list: JQuery;
 
     constructor() {
         super();
 
-        this.element.addClass("menu editor-block-select-menu")
+        this.element.addClass("editor-block-select-menu")
 
         this.element.append($("<div>").addClass("title").text("Выбор блока"))
         this.list = $("<div>").addClass("block-list")
@@ -33,5 +33,3 @@ class BlockSelectMenu extends View {
         }
     }
 }
-
-export default BlockSelectMenu;

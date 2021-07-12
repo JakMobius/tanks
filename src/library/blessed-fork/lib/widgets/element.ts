@@ -586,7 +586,7 @@ export class Element extends Node {
         super.render()
         if(this.detached || this.hidden) return
 
-        this._emit('prerender');
+        this.emitArgs('prerender');
 
         this.parseContent();
 
@@ -980,7 +980,7 @@ export class Element extends Node {
                 el.render();
         });
 
-        this._emit('render');
+        this.emitArgs('render');
     }
 
     /**

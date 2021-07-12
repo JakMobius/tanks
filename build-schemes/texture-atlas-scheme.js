@@ -7,6 +7,7 @@ module.exports = {
             "action": "texture-atlas",
             "source": "src/client/textures",
             "target": `#texture-atlas = ${constants.cacheFolder}/textures`,
+            "atlasSize": 2048
         }]
-    },
+    }
 }

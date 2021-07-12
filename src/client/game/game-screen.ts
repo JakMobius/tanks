@@ -2,7 +2,7 @@
 
 import GameScene from './scenes/gamescene';
 import './game-loader'
-import BrowserClient from "../networking/browser-client";
+import BrowserSocketClient from "../networking/browser-client";
 import {ScreenConfig} from "../graphics/screen";
 import GeneralGameScreen from "./general-game-screen";
 
@@ -32,7 +32,7 @@ export default class GameScreen extends GeneralGameScreen {
     async startGame() {
         await super.startGame()
 
-        let client = new BrowserClient({ ip: this.config.ip })
+        let client = new BrowserSocketClient({ ip: this.config.ip })
 
         this.setScene(new GameScene({
             screen: this,

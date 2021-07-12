@@ -2,14 +2,21 @@
 import Progress from "../utils/progress";
 import Sprite from "../sprite";
 
-export function downloadAssets(): Progress {
+export interface AssetDownloadConfig {
+    mipMapLevels: number
+}
+
+export function downloadAssets(config?: AssetDownloadConfig): Progress {
+    config = Object.assign({
+        mipMapLevels: 1
+    }, config)
 
     let totalProgress = new Progress()
 
     let soundDownloadProgress = new Progress()
 
     totalProgress.addSubtask(Sprite.download({
-        mipMapLevels: 1
+        mipMapLevels: config.mipMapLevels
     }))
     totalProgress.addSubtask(soundDownloadProgress)
 

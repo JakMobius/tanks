@@ -47,7 +47,7 @@ class Pencil extends Tool {
         this.roundModeButton = $("<div>")
             .addClass("tool inline selected")
             .css("background-image", "url(assets/img/round-brush.png)")
-            .click(() => {
+            .on("click",() => {
                 this.roundModeButton.addClass("selected")
                 this.squareModeButton.removeClass("selected")
                 this.isSquare = false
@@ -56,7 +56,7 @@ class Pencil extends Tool {
         this.squareModeButton = $("<div>")
             .addClass("tool inline")
             .css("background-image", "url(assets/img/square-brush.png)")
-            .click(() => {
+            .on("click", () => {
                 this.roundModeButton.removeClass("selected")
                 this.squareModeButton.addClass("selected")
                 this.isSquare = true
@@ -109,7 +109,7 @@ class Pencil extends Tool {
             if(this.dragging) {
                 this.performDrawing(this.brushX, this.brushY, continuous)
             } else {
-                this.manager.setNeedsRedraw(false)
+                this.manager.setNeedsRedraw()
             }
         }
     }
@@ -130,18 +130,20 @@ class Pencil extends Tool {
 
     mouseUp() {
         super.mouseUp();
+        const map = this.manager.world.map
 
-        this.manager.map.history.commitActions(this.actionName)
+        map.history.commitActions(this.actionName)
     }
 
     draw(x: number, y: number) {
+        const map = this.manager.world.map
         const radius = this.thickness / 2
         const area = Math.ceil(radius)
 
         let lowX = x - area
         let lowY = y - area
-        let highX = Math.min(this.manager.map.width - 1, x + area - 1)
-        let highY = Math.min(this.manager.map.height - 1, y + area - 1)
+        let highX = Math.min(map.width - 1, x + area - 1)
+        let highY = Math.min(map.height - 1, y + area - 1)
 
         if(this.thickness % 2 !== 0) {
             lowX++
@@ -152,7 +154,7 @@ class Pencil extends Tool {
         lowY = Math.max(0, y - area)
 
 
-        if(highX < 0 || highY < 0 || lowX >= this.manager.map.width || lowY >= this.manager.map.height) return
+        if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
 
         let squareThickness = radius ** 2;
 
@@ -172,17 +174,19 @@ class Pencil extends Tool {
             }
         }
 
-        this.manager.setNeedsRedraw(true)
+        this.manager.setNeedsRedraw()
     }
 
     fragment(x: number, y: number) {
-        if((this.manager.map.getBlock(x, y).constructor as typeof BlockState).typeId ===
+        const map = this.manager.world.map
+
+        if((map.getBlock(x, y).constructor as typeof BlockState).typeId ===
             (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
             return
 
         let block = this.manager.selectedBlock.clone()
 
-        this.manager.map.setBlock(x, y, block)
+        map.setBlock(x, y, block)
     }
 
     becomeActive() {
@@ -191,6 +195,7 @@ class Pencil extends Tool {
     }
 
     drawDecorations() {
+        const map = this.manager.world.map
 
         const s = GameMap.BLOCK_SIZE
         const x = this.brushX / s
@@ -200,10 +205,10 @@ class Pencil extends Tool {
 
         const lowX = Math.max(0, x - radius)
         const lowY = Math.max(0, y - radius)
-        const highX = Math.min(this.manager.map.width, x + radius)
-        const highY = Math.min(this.manager.map.height, y + radius)
+        const highX = Math.min(map.width, x + radius)
+        const highY = Math.min(map.height, y + radius)
 
-        if(highX < 0 || highY < 0 || lowX >= this.manager.map.width || lowY >= this.manager.map.height) return
+        if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
 
         this.decorationProgram.use()
         this.decorationProgram.prepare()

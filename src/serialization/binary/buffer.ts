@@ -18,6 +18,7 @@ export interface ByteArrayConstructor<T> extends Constructor<T> {
 export interface BufferConfig<T> {
     capacity?: number
     clazz: ByteArrayConstructor<T>
+    reallocationFactor?: number
 }
 
 class Buffer<T extends ByteArray = Uint8Array> {
@@ -43,7 +44,14 @@ class Buffer<T extends ByteArray = Uint8Array> {
      */
     pointer: number = 0
 
+    /**
+     * The value by which the buffer capacity
+     * is multiplied during expansion
+     */
+    reallocationFactor: number;
+
     constructor(options: BufferConfig<T>) {
+        this.reallocationFactor = options.reallocationFactor || 2
         this.initialCapacity = options.capacity || 128
         this.capacity = 0
         this.clazz = options.clazz
@@ -76,7 +84,7 @@ class Buffer<T extends ByteArray = Uint8Array> {
 
     extend(minimumCapacity?: number) {
         if (minimumCapacity === undefined) {
-            this.capacity += this.initialCapacity
+            this.capacity *= this.reallocationFactor
         } else {
             if (minimumCapacity <= this.capacity)
                 return false

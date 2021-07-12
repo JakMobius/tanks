@@ -41,7 +41,7 @@ class TankControls implements BinaryEncodable {
         }
 
         if (this.axles.get("y").needsUpdate()) {
-            this.updateAxises()
+            this.updateAxes()
         }
         return this.throttle
     }
@@ -52,7 +52,7 @@ class TankControls implements BinaryEncodable {
         }
 
         if (this.axles.get("x").needsUpdate()) {
-            this.updateAxises()
+            this.updateAxes()
         }
         return this.steer
     }
@@ -93,7 +93,7 @@ class TankControls implements BinaryEncodable {
         return this.minerActive
     }
 
-    updateAxises() {
+    updateAxes() {
         let x = this.axles.get("x").getValue()
         let y = this.axles.get("y").getValue()
 
@@ -116,7 +116,7 @@ class TankControls implements BinaryEncodable {
         this.axles.get("primary-weapon").setValue(weapons & 0b00000001)
         this.axles.get("miner").setValue(weapons & 0b00000010)
 
-        this.updateAxises()
+        this.updateAxes()
     }
 
     toBinary(encoder: BinaryEncoder): void {

@@ -42,11 +42,13 @@ class Flamethrower extends Weapon {
 		// const player = tank.player
 		const pAngle = (tank.model.rotation + Math.PI) % (Math.PI * 2) - Math.PI;
 
-		for (let p of tank.world.players.values()) {
+		const world = tank.player.getWorld()
 
-			if(!p || p.tank === tank) continue
+		for (let player of world.players.values()) {
 
-			const anotherTank = p.tank;
+			if(!player || player.tank === tank) continue
+
+			const anotherTank = player.tank;
 			const x = anotherTank.model.x - tank.model.x;
 			const y = anotherTank.model.y - tank.model.y;
 

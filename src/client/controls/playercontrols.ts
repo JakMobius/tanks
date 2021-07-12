@@ -6,8 +6,8 @@ import GamepadManager from "./interact/gamepadmanager";
 import KeyboardController from "./interact/keyboardcontroller";
 
 export default class PlayerControls extends EventEmitter {
-	public axles: any;
-	public respawning: any;
+	public axles: Map<string, Axle>;
+	public respawning: boolean;
 
     constructor() {
         super()

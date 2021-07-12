@@ -11,7 +11,7 @@ import MapAreaModification from '../../history/modification/mapareamodification'
 import ToolManager from "../toolmanager";
 import BlockState from "../../../../utils/map/blockstate/blockstate";
 
-class AreaTool extends Tool {
+export default class AreaTool extends Tool {
 	public area: Rectangle;
 	public program: ParticleProgram;
 	public copyBufferDrawer: MapDrawer;
@@ -60,18 +60,20 @@ class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        let areaModification = new MapAreaModification(this.manager.map, this.area.clone(), void 0)
+        let areaModification = new MapAreaModification(this.manager.world.map, this.area.clone(), void 0)
         areaModification.perform()
-        this.manager.map.history.registerModification(areaModification)
-        this.manager.map.history.commitActions("Удаление")
+        this.manager.world.map.history.registerModification(areaModification)
+        this.manager.world.map.history.commitActions("Удаление")
         this.resetSelection()
-        this.manager.setNeedsRedraw(true)
+        this.manager.setNeedsRedraw()
     }
 
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        let bound = this.area.bounding(0, 0, this.manager.map.width, this.manager.map.height)
+        const map = this.manager.world.map
+
+        let bound = this.area.bounding(0, 0, map.width, map.height)
 
         if(bound.minX >= bound.maxX || bound.minY >= bound.maxY) return
 
@@ -85,28 +87,30 @@ class AreaTool extends Tool {
             name: "Буфер обмена"
         })
 
-        let sourceIndex = bound.minX + bound.minY * this.manager.map.width
+        let sourceIndex = bound.minX + bound.minY * map.width
         let destinationIndex = 0
 
         for(let y = bound.minY; y < bound.maxY; y++) {
             for(let x = bound.minX; x < bound.maxX; x++) {
-                this.copyBuffer.data[destinationIndex++] = this.manager.map.data[sourceIndex++]
+                this.copyBuffer.data[destinationIndex++] = map.data[sourceIndex++]
             }
 
-            sourceIndex -= (width - this.manager.map.height);
+            sourceIndex -= (width - map.height);
         }
 
         if(cut) {
             this.manager.createEvent(width * height + " блок(-ов) вырезано")
 
-            let bound = this.area.bounding(0, 0, this.manager.map.width, this.manager.map.height)
+            let bound = this.area.bounding(0, 0, map.width, map.height)
 
-            let areaModification = new MapAreaModification(this.manager.map, bound, void 0)
+            let areaModification = new MapAreaModification(map, bound, void 0)
             areaModification.perform()
-            this.manager.map.history.registerModification(areaModification)
-            this.manager.map.history.commitActions("Вырезание")
+            map.history.registerModification(areaModification)
+            map.history.commitActions("Вырезание")
 
             this.resetSelection()
+
+            this.manager.setNeedsRedraw()
         } else {
             this.manager.createEvent(width * height + " блок(-ов) скопировано")
         }
@@ -144,13 +148,13 @@ class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        let modification = new MapAreaModification(this.manager.map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
+        let modification = new MapAreaModification(this.manager.world.map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
 
         modification.perform()
-        this.manager.map.history.registerModification(modification)
-        this.manager.map.history.commitActions("Вставка")
+        this.manager.world.map.history.registerModification(modification)
+        this.manager.world.map.history.commitActions("Вставка")
 
-        this.manager.setNeedsRedraw(true)
+        this.manager.setNeedsRedraw()
     }
 
     mouseDown(x: number, y: number) {
@@ -278,5 +282,3 @@ class AreaTool extends Tool {
         this.keyboard.stopListening()
     }
 }
-
-export default AreaTool;

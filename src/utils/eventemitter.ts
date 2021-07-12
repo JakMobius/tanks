@@ -28,7 +28,7 @@ export default class EventEmitter {
             priorityBlock.set(type, [listener])
         }
 
-        this._emit('newListener', [type, listener]);
+        this.emitArgs('newListener', [type, listener]);
     }
 
     on(type: string, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL){
@@ -76,7 +76,7 @@ export default class EventEmitter {
         return this.on(type, on);
     }
 
-    _emit(type: string, args?: any[]) {
+    emitArgs(type: string, args?: any[]) {
         let result = true;
 
         for(let priorityBlock of this.handlers) {
@@ -97,8 +97,8 @@ export default class EventEmitter {
         let args = Array.prototype.slice.call(arguments, 1)
         let params = Array.prototype.slice.call(arguments)
 
-        this._emit('event', params);
+        this.emitArgs('event', params);
 
-        return this._emit(type, args) !== false;
+        return this.emitArgs(type, args) !== false;
     }
 }

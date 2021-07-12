@@ -37,7 +37,7 @@ class Fill extends Tool {
     }
 
     fill(x: number, y: number) {
-        const map = this.manager.map
+        const map = this.manager.world.map
         let baseBlock = map.getBlock(x, y)
 
         if(!baseBlock) return
@@ -77,7 +77,7 @@ class Fill extends Tool {
             carets = newCarets
         }
 
-        this.manager.setNeedsRedraw(true)
+        this.manager.setNeedsRedraw()
         map.history.commitActions(this.actionName)
     }
 }

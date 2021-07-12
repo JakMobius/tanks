@@ -10,9 +10,9 @@ import KeyboardController from "src/client/controls/interact/keyboardcontroller"
 import ClientGameWorld from "../../clientgameworld";
 import ControlPanel from "../../game/ui/controlpanel";
 import {getTutorialMap} from "../tutorial-map";
-import Player from "../../../utils/player";
 import ClientTank from "../../tanks/clienttank";
 import MonsterTankModel from "../../../tanks/models/monster";
+import ClientPlayer from "../../client-player";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -80,7 +80,7 @@ export default class TutorialScene extends Scene {
     }
 
     private createPlayer() {
-        let player = new Player({
+        let player = new ClientPlayer({
             id: 0,
             nick: "Вы"
         })
@@ -90,8 +90,6 @@ export default class TutorialScene extends Scene {
         tank.setupDrawer(this.screen.ctx)
 
         player.setTank(tank)
-        player.tank.world = this.world
-        player.tank.model.initPhysics(this.world.world)
         player.tank.model.body.SetPositionXY(70, 850)
         player.tank.model.body.SetAngle(4)
 

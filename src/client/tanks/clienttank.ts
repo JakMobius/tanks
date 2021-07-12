@@ -26,10 +26,9 @@ class ClientTank extends AbstractTank {
 
     drawer: TankDrawer = null
     effects = new Map<number, ClientTankEffect>()
-    world: ClientGameWorld
 
     constructor(options?: TankConfig) {
-        super(options)
+        super()
         this.drawer = null
         this.engine = null
     }

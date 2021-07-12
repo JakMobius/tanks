@@ -13,6 +13,6 @@
 		"resolveJsonModule": true,
 		"noImplicitAny": true,
 		"noImplicitReturns": true,
-		"esModuleInterop": true
+		"esModuleInterop": true,
 	}
 }

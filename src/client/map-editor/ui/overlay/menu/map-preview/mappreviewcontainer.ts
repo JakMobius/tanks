@@ -11,7 +11,7 @@ import EditorMap from "../../../../editormap";
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
 import Screen from "src/client/graphics/screen";
 
-class MapPreviewContainer extends Menu {
+export default class MapPreviewContainer extends Menu {
 	public map: EditorMap;
 	public mapDrawer: MapDrawer;
 	public camera: Camera;
@@ -29,7 +29,7 @@ class MapPreviewContainer extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu editor-map-preview")
+        this.element.addClass("editor-map-preview")
 
         this.noMapSelectedLabel =
             $("<div>").addClass("center-text-container")
@@ -56,19 +56,17 @@ class MapPreviewContainer extends Menu {
         this.footer.append(this.editButton)
         this.footer.append(this.deleteButton)
 
-        const self = this
-
         this.header.on("change", () => {
-            if(self.map) {
-                self.map.name = this.header.val()
-                self.emit("rename-commit", self.map)
+            if(this.map) {
+                this.map.name = this.header.val()
+                this.emit("rename-commit", this.map)
             }
         })
 
         this.header.on("input", () => {
-            if(self.map) {
-                self.map.name = this.header.val()
-                self.emit("rename", self.map)
+            if(this.map) {
+                this.map.name = this.header.val()
+                this.emit("rename", this.map)
             }
         })
 
@@ -76,10 +74,11 @@ class MapPreviewContainer extends Menu {
             if(event.originalEvent.code === "Enter") this.header.trigger("blur")
         })
 
-        this.initCanvas()
         this.preview.append(this.header)
         this.preview.append(this.footer)
         this.element.append(this.preview)
+
+        this.initCanvas()
 
         this.element.append(this.noMapSelectedLabel)
 
@@ -89,10 +88,14 @@ class MapPreviewContainer extends Menu {
 
     initCanvas() {
         this.canvasContainer = $("<div>").addClass("map-canvas-container")
-        this.previewScreen = new Screen({
-            root: this.canvasContainer
-        })
         this.preview.append(this.canvasContainer)
+
+        this.previewScreen = new Screen({
+            root: this.canvasContainer,
+            fitRoot: false,
+            width: 500,
+            height: 375
+        })
 
         Sprite.applyTexture(this.previewScreen.ctx)
 
@@ -182,5 +185,3 @@ class MapPreviewContainer extends Menu {
         }
     }
 }
-
-export default MapPreviewContainer;

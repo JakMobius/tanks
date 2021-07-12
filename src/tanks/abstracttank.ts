@@ -1,14 +1,12 @@
 
 import TankModel from './tankmodel';
 import GameWorld from 'src/gameworld';
-import Player from 'src/utils/player';
+import Player, {PlayerWorldType} from 'src/utils/player';
 import AbstractEffect from 'src/effects/abstract-effect';
 import BinaryEncoder from 'src/serialization/binary/binaryencoder';
 import BinaryDecoder from 'src/serialization/binary/binarydecoder';
+import Game from "../server/room/game";
 
-interface AbstractTankConfig {
-    world?: GameWorld
-}
 
 /**
  * Tank class, abstracted from code
@@ -19,21 +17,16 @@ interface AbstractTankConfig {
  * client side)
  */
 
-abstract class AbstractTank {
+export default abstract class AbstractTank<PlayerClass extends Player = any> {
     static Types = new Map()
 
     // Player that owns this tank
     public player: Player = null
     public model: TankModel = null
-    public world: GameWorld = null
     public effects = new Map<number, AbstractEffect>()
 
-    protected constructor(options?: AbstractTankConfig) {
-        if (options) {
-            if (options.world) {
-                this.world = options.world
-            }
-        }
+    protected constructor() {
+
     }
 
     static getModel(): typeof TankModel {
@@ -49,5 +42,3 @@ abstract class AbstractTank {
 
     abstract tick(dt: number): void
 }
-
-export default AbstractTank;

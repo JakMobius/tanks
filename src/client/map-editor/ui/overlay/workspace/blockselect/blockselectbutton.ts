@@ -1,18 +1,16 @@
 /* @load-resource: './block-select.scss' */
 
-import View from 'src/client/ui/view';
-import BlockState from "../../../../../../utils/map/blockstate/blockstate";
+import BlockState from "src/utils/map/blockstate/blockstate";
+import Menu from "src/client/ui/menu/menu";
 
-class BlockSelectButton extends View {
+export default class BlockSelectButton extends Menu {
     constructor() {
         super();
 
-        this.element.addClass("menu editor-block-select")
+        this.element.addClass("editor-block-select")
     }
 
     previewBlock(block: BlockState) {
         this.element.css("background-image", "url(assets/img/blocks/" + (block.constructor as typeof BlockState).typeName + ".png)")
     }
 }
-
-export default BlockSelectButton;

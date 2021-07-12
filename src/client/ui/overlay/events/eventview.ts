@@ -6,7 +6,7 @@ class EventView extends Menu {
     constructor(text: string) {
         super();
 
-        this.element.addClass("menu event-view")
+        this.element.addClass("event-view")
         this.element.css("opacity", "0")
         this.element.text(text)
     }

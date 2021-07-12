@@ -53,7 +53,7 @@ class TextureProgram extends Program {
             clazz: Float32Array,
             gl: ctx,
             drawMode: this.ctx.STATIC_DRAW,
-            capacity: options.largeIndices ? 16384 : 128 // Rare reallocation
+            capacity: options.largeIndices ? 16384 : 128
         }).createBuffer()
 
         this.indexBuffer = new GLBuffer<ByteArray>({

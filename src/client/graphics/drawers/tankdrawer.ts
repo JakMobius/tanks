@@ -47,7 +47,7 @@ import Camera from "../../camera";
                 color: color
             });
 
-            this.tank.player.game.particles.push(smoke)
+            this.tank.player.getWorld().particles.push(smoke)
         }
     }
 

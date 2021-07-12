@@ -24,7 +24,8 @@ import AbstractTank from "src/tanks/abstracttank";
 import AbstractClient from "src/networking/abstract-client";
 import Player from "src/utils/player";
 import KeyboardController from "src/client/controls/interact/keyboardcontroller";
-import RemoteWorld from "../remote-world";
+import ClientGameWorld from "../../clientgameworld";
+import ClientWorldBridge from "../client-world-bridge";
 
 export interface GameSceneConfig extends SceneConfig {
     client: AbstractClient
@@ -45,7 +46,7 @@ export default class GameScene extends Scene {
 	public eventContainer: EventContainer;
 	public chatContainer: ChatContainer;
 	public timer: number;
-	public world: RemoteWorld
+	public world: ClientGameWorld
     public worldDrawer: WorldDrawer
 
     constructor(config: GameSceneConfig) {
@@ -62,9 +63,8 @@ export default class GameScene extends Scene {
             inertial: true
         })
 
-        this.world = new RemoteWorld({
-            client: this.client
-        })
+        this.world = new ClientGameWorld({})
+        ClientWorldBridge.buildBridge(this.client, this.world)
 
         this.touchController = new TouchController(this.controls, this.screen.canvas)
         this.playerControls = new PlayerControls()
@@ -105,9 +105,9 @@ export default class GameScene extends Scene {
 
         this.overlay.on("play", (nick: string, tank: typeof AbstractTank) => {
             if(this.world && this.world.player) {
-                if(tank.getModel().getId() === (this.world.player.tank.model.constructor as typeof TankModel).getId()) {
-                    return
-                }
+                let newTankId = tank.getModel().getId()
+                let oldTankId = (this.world.player.tank.model.constructor as typeof TankModel).getId()
+                if(newTankId === oldTankId) return
             }
 
             new PlayerConfigPacket(nick, tank.getModel()).sendTo(this.client.connection)

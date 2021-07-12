@@ -10,6 +10,12 @@ class Progress extends EventEmitter {
 
     constructor() {
         super()
+
+        const self = this
+        this.on("error", function() {
+            if(self.parent)
+                self.parent.emitArgs("error", Array.prototype.slice.call(arguments))
+        })
     }
 
     addSubtask(task: Progress) {
@@ -93,8 +99,9 @@ class Progress extends EventEmitter {
     }
 
     toPromise(): Promise<void> {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             this.on("completed", resolve)
+            this.on("error", reject)
         })
     }
 }

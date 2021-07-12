@@ -7,7 +7,7 @@ import TankFireEffectModel from 'src/effects/tank/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../../tanks/clienttank";
 
-class ClientTankFireEffect extends ClientTankEffect {
+export default class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;
 	public frequency: any;
 	public sound: any;
@@ -37,6 +37,8 @@ class ClientTankFireEffect extends ClientTankEffect {
 
         this.queue += dt * this.frequency
 
+        let world = this.tank.player.getWorld()
+
         while(this.queue > 0) {
             for(let k = 0; k < 20; k++) {
                 const heading = -angle + (Math.random() - 0.5) * Math.PI / 4;
@@ -55,11 +57,9 @@ class ClientTankFireEffect extends ClientTankEffect {
                     scaling: 1.5,
                     lifetime: 0.4 + Math.random() * 0.1,
                 });
-                this.tank.world.particles.push(smoke)
+                world.particles.push(smoke)
             }
             this.queue -= 1
         }
     }
 }
-
-export default ClientTankFireEffect;

@@ -4,7 +4,7 @@ import {Constructor} from "../serialization/binary/serializable";
 class AbstractEffect {
 	public dead: boolean;
     public model: EffectModel
-    static Types = new Map<Constructor<EffectModel>, Constructor<AbstractEffect>>()
+    static Types = new Map<typeof EffectModel, typeof AbstractEffect>()
 
     constructor(model: EffectModel) {
         this.model = model
@@ -13,7 +13,7 @@ class AbstractEffect {
 
     tick(dt: number): void {}
 
-    static associate(modelClass: Constructor<EffectModel>, effectClass: Constructor<AbstractEffect>): void {
+    static associate(modelClass: typeof EffectModel, effectClass: typeof AbstractEffect): void {
         this.Types.set(modelClass, effectClass)
     }
 

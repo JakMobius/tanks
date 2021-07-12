@@ -9,6 +9,13 @@ module.exports = {
         }, {
             "action": "delete",
             "target": "dist/server/index.js.map"
+        }, {
+            "action": "delete",
+            "target": "dist/server/resources"
+        }, {
+            "action": "copy",
+            "source": "#server-build",
+            "target": "#server = dist/"
         }]
     },
 
@@ -19,7 +26,7 @@ module.exports = {
         }, {
             "action": "copy",
             "source": "#server-build",
-            "target": "#server = dist/"
+            "target": "dist/"
         }]
     },
 

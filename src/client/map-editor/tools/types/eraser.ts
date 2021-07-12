@@ -13,8 +13,9 @@ class Eraser extends Pencil {
     }
 
     fragment(x: number, y: number) {
-        if((this.manager.map.getBlock(x, y).constructor as typeof BlockState).typeId) {
-            this.manager.map.setBlock(x, y, new AirBlockState())
+        const map = this.manager.world.map
+        if((map.getBlock(x, y).constructor as typeof BlockState).typeId) {
+            map.setBlock(x, y, new AirBlockState())
         }
     }
 

@@ -4,16 +4,15 @@ import Particle from "./particles/particle";
 import Player from "../utils/player";
 import ClientEntity from "./entity/cliententity";
 import ClientEffect from "./effects/clienteffect";
+import GameMap from "../utils/map/gamemap";
+import ClientPlayer from "./client-player";
 
-class ClientGameWorld extends GameWorld {
+export default class ClientGameWorld<T extends GameMap = GameMap> extends GameWorld<T, ClientEntity, ClientEffect, ClientPlayer> {
 
-    public player: Player = null
+    public player: ClientPlayer = null
     public particles: Particle[] = []
 
-    //public entities: Map<number, ClientEntity>
-    //public effects: Map<number, ClientEffect>
-
-    constructor(options: GameWorldConfig) {
+    constructor(options: GameWorldConfig<T>) {
         super(options);
     }
 
@@ -35,5 +34,3 @@ class ClientGameWorld extends GameWorld {
         this.processParticles(dt)
     }
 }
-
-export default ClientGameWorld;

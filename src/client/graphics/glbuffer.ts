@@ -9,12 +9,12 @@ export interface GLBufferConfig<T> extends BufferConfig<T> {
 }
 
 class GLBuffer<T extends ByteArray> extends Buffer<T> {
-	public gl: any;
-	public index: any;
-	public drawMode: any;
-	public bufferType: any;
-	public glBuffer: any;
-	public shouldUpdate: any;
+	public gl: WebGLRenderingContext;
+	public index: number;
+	public drawMode: GLenum;
+	public bufferType: GLenum;
+	public glBuffer: WebGLBuffer;
+	public shouldUpdate: boolean;
 
     constructor(config: GLBufferConfig<T>) {
         super(config);
@@ -50,7 +50,7 @@ class GLBuffer<T extends ByteArray> extends Buffer<T> {
         this.bind()
         if(this.shouldUpdate) {
             this.shouldUpdate = false
-            this.gl.bufferData(this.bufferType, this.array, this.drawMode, this.array.length);
+            this.gl.bufferData(this.bufferType, this.array, this.drawMode);
         } else {
             this.gl.bufferSubData(this.bufferType, 0, this.array)
         }

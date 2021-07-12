@@ -9,7 +9,7 @@ export interface AIConfig {
 	tank: ServerTank
 }
 
-class AI {
+export default class AI {
 	public server: any;
 	public game: any;
 	public tank: any;
@@ -24,5 +24,3 @@ class AI {
 
 	}
 }
-
-export default AI;

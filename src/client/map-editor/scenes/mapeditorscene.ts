@@ -16,11 +16,13 @@ import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsv
 import Tools from "../tools/type-loader"
 import EditorMap from "../editormap";
 import ClientGameWorld from "../../clientgameworld";
+import EditorWorld from "../editor-world";
+import Room from "../../../server/room/room";
 
-class MapEditorScene extends Scene {
+export default class MapEditorScene extends Scene {
 
 	public keyboard = new KeyboardController();
-	public world: ClientGameWorld
+	public world: EditorWorld
     public map: EditorMap
 	public dragHandler: DragHandler;
 	public camera: Camera;
@@ -30,13 +32,15 @@ class MapEditorScene extends Scene {
 	public eventContainer: EventContainer;
 	public toolSettingsView: ToolSettingsView;
 	public toolbar: ToolbarView;
+    private worldAlive: boolean;
+    private cameraMovementEnabled = true
+    private cameraZoomEnabled = true
 
     constructor(config: SceneConfig) {
         super(config)
 
-
         this.keyboard.startListening()
-        this.world = new ClientGameWorld({})
+        this.world = new ClientGameWorld<EditorMap>({})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
         this.dragHandler.draggingEnabled = false
@@ -61,7 +65,7 @@ class MapEditorScene extends Scene {
         this.menuOverlay.on("open", (map) => {
             this.map = map
             this.world.setMap(map)
-            this.toolManager.map = map
+            this.toolManager.world.setMap(map)
 
             if(map) {
                 if(!this.camera.target) {
@@ -79,7 +83,7 @@ class MapEditorScene extends Scene {
         })
 
         this.dragHandler.on("drag", (dx, dy) => {
-            if(this.map) {
+            if(this.map && this.cameraMovementEnabled) {
                 this.camera.target.x += dx / this.camera.baseScale
                 this.camera.target.y += dy / this.camera.baseScale
                 this.screen.loop.start()
@@ -87,7 +91,7 @@ class MapEditorScene extends Scene {
         })
 
         this.dragHandler.on("zoom", (zoom) => {
-            if(this.map) {
+            if(this.map && this.cameraZoomEnabled) {
                 this.camera.baseScale *= zoom;
                 this.screen.loop.start()
             }
@@ -135,8 +139,12 @@ class MapEditorScene extends Scene {
     setupWorkspace() {
         this.eventContainer = new EventContainer()
         this.toolSettingsView = new ToolSettingsView()
-        this.toolManager = new ToolManager(this.screen, this.camera, this.map)
+        this.toolManager = new ToolManager(this.screen, this.camera, this.world)
+        this.toolManager.on("camera-movement", (enabled) => this.setCameraMovementEnabled(enabled))
+        this.toolManager.on("world-alive", (alive) => this.setWorldAlive(alive))
         this.toolManager.on("user-event", (text) => this.eventContainer.createEvent(text))
+        this.toolManager.on("redraw", () => this.setNeedsRedraw())
+        this.worldDrawer.on("redraw", () => this.setNeedsRedraw())
         this.toolbar = new ToolbarView({
             root: this.overlayContainer
         })
@@ -171,12 +179,23 @@ class MapEditorScene extends Scene {
     draw(ctx: WebGLRenderingContext, dt: number) {
         if(!this.map) return
 
+        if(this.worldAlive) {
+            this.world.tick(dt)
+        }
         this.camera.tick(dt)
         this.worldDrawer.draw(dt)
         if(this.toolManager.selectedTool) {
             this.toolManager.selectedTool.drawDecorations()
         }
+        if(this.worldAlive) this.setNeedsRedraw()
+    }
+
+    setWorldAlive(alive: boolean) {
+        this.worldAlive = alive
+        this.setNeedsRedraw()
+    }
+
+    setCameraMovementEnabled(enabled: boolean) {
+        this.cameraMovementEnabled = enabled
     }
 }
-
-export default MapEditorScene;
