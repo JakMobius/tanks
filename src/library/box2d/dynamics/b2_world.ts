@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_epsilon, b2_maxSubSteps, b2_maxTOIContacts } from "../common/b2_common";
+import { b2_epsilon, b2_maxSubSteps, b2_maxTOIContacts } from "../common/b2_settings";
 import { b2Min, b2Vec2, b2Transform, b2Sweep, XY } from "../common/b2_math";
 import { b2Timer } from "../common/b2_timer";
 import { b2Color, b2Draw, b2DrawFlags } from "../common/b2_draw";

@@ -1,7 +1,7 @@
-import ServerGameWorld from "./servergameworld";
-import Player from "../utils/player";
-import ServerTank from "./tanks/servertank";
+import ServerGameWorld from "./server-game-world";
+import AbstractPlayer from "../abstract-player";
+import ServerTank from "./entity/tank/servertank";
 
-export default class ServerPlayer extends Player<ServerTank, ServerGameWorld> {
+export default class ServerPlayer extends AbstractPlayer<ServerTank, ServerGameWorld> {
 
 }

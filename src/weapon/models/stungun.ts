@@ -1,13 +1,14 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import Game from "../../server/room/game";
-import Player from "../../utils/player";
+import AbstractPlayer from "../../abstract-player";
+import ServerGameWorld from "../../server/server-game-world";
+import ServerEntity from "../../server/entity/serverentity";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
     radius: number
 }
 
-class WeaponStungun extends Weapon {
+export default class WeaponStungun extends Weapon {
 	public damage: number;
 	public radius: number;
 	public squareRadius: number;
@@ -19,59 +20,50 @@ class WeaponStungun extends Weapon {
         this.radius = config.radius || 50
         this.squareRadius = this.radius ** 2
         this.points = [[-7.5, 2], [7.5, 2]]
-        this.id = 8
     }
 
     ready() {
         return true
     }
 
-    shoot() {
+    tick(dt: number) {
+        super.tick(dt)
+        if(!this.engaged) return
+
         let tank = this.tank
         let player = tank.player
         let game = player.getWorld()
-        const position = tank.model.body.GetPosition()
         const matrix = tank.model.matrix
 
         for (let i = this.points.length - 1; i >= 0; i--)
         {
             const point = this.points[i];
 
-            const px = point[0];
-            const py = point[1];
+            const px = matrix.transformX(point[0], point[1]);
+            const py = matrix.transformY(point[0], point[1]);
 
-            const absX = position.x + (px * matrix.cos + py * matrix.sin);
-            const absY = position.y + (-px * matrix.sin + py * matrix.cos);
-
-            for(let each of near(absX, absY, player, game, this.squareRadius)) {
-                each.tank.damage(this.damage / game.tps, player.id)
+            for(let each of near(px, py, player, game, this.squareRadius)) {
+                each.damage(this.damage * dt)
             }
         }
     }
 }
 
-const near = function (x: number, y: number, tplayer: Player, game: Game, distance: number) {
+const near = function (x: number, y: number, tplayer: AbstractPlayer, world: ServerGameWorld, distance: number): ServerEntity[] {
     const result = [];
-    for (let client of game.portal.clients.values()) {
-        const player = client.data.player;
+    for (let entity of world.entities.values()) {
 
-        if (!player) continue
-        const tank = player.tank;
-        if (!tank) continue
+        if (entity.model.id === tplayer.id) continue
 
-        if (player.id === tplayer.id) continue
-
-        const pos = tank.model.body.GetPosition();
+        const pos = entity.model.getBody().GetPosition();
         const dx = pos.x - x;
         const dy = pos.y - y;
 
         const dist = dx * dx + dy * dy;
 
         if (dist < distance) {
-            result.push(player)
+            result.push(entity)
         }
     }
     return result
 };
-
-export default WeaponStungun;

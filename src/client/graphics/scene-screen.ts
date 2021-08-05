@@ -39,6 +39,8 @@ export default class SceneScreen extends Screen {
     }
 
     initLoop(): void {
-        this.loop = new RenderLoop()
+        this.loop = new RenderLoop({
+            timeMultiplier: 0.001
+        })
     }
 }

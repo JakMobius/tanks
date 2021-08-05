@@ -3,7 +3,7 @@
 import {Db, MongoClient} from 'mongodb';
 import Preferences from '../preferences/preferences';
 
-class DB {
+export default class DB {
 	public url: string;
 	public client: MongoClient;
     public db: string
@@ -46,5 +46,3 @@ class DB {
         await this.client.close(force)
     }
 }
-
-export default DB;

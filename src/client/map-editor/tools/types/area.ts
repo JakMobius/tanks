@@ -1,21 +1,18 @@
 
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import ParticleProgram from '../../../graphics/programs/particleprogram';
-import Particle from '../../../particles/particle';
-import Color from '../../../../utils/color';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
 import MapDrawer from '../../../graphics/drawers/map-drawer';
 import EditorMap from '../../editormap';
 import MapAreaModification from '../../history/modification/mapareamodification';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../map/blockstate/blockstate";
+import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 
 export default class AreaTool extends Tool {
 	public area: Rectangle;
-	public program: ParticleProgram;
+	public program: ConvexShapeProgram;
 	public copyBufferDrawer: MapDrawer;
-	public decoration: Particle;
 	public copyBuffer: EditorMap;
 	public keyboard: KeyboardController;
 	public initialAreaState: boolean;
@@ -30,13 +27,8 @@ export default class AreaTool extends Tool {
 
         this.area = new Rectangle()
         this.image = "assets/img/area.png"
-        this.program = new ParticleProgram("area-program", this.manager.screen.ctx)
+        this.program = new ConvexShapeProgram(this.manager.screen.ctx)
         this.copyBufferDrawer = new MapDrawer(this.manager.screen)
-
-        this.decoration = new Particle({
-            x: 0, y: 0,
-            color: new Color(127, 127, 127, 0.5),
-        })
 
         this.copyBuffer = null
         this.keyboard = new KeyboardController()
@@ -235,19 +227,21 @@ export default class AreaTool extends Tool {
     drawDecorations() {
         super.drawDecorations();
 
-        this.program.use()
-        this.program.prepare()
+        this.program.reset()
 
         if(this.area.isValid()) {
-            this.decoration.x = this.area.centerX() * EditorMap.BLOCK_SIZE
-            this.decoration.y = this.area.centerY() * EditorMap.BLOCK_SIZE
-            this.decoration.width = this.area.width() * EditorMap.BLOCK_SIZE
-            this.decoration.height = this.area.height() * EditorMap.BLOCK_SIZE
 
-            this.program.drawParticle(this.decoration)
+            this.program.drawRectangle(
+                this.area.minX * EditorMap.BLOCK_SIZE,
+                this.area.minY * EditorMap.BLOCK_SIZE,
+                this.area.maxX * EditorMap.BLOCK_SIZE,
+                this.area.maxY * EditorMap.BLOCK_SIZE,
+                0x7F7F7F7F
+            )
         }
 
-        this.program.matrixUniform.setMatrix(this.manager.camera.matrix.m)
+        this.program.bind()
+        this.program.setCamera(this.manager.camera)
         this.program.draw()
 
         if(this.pasting) {

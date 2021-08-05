@@ -1,5 +1,5 @@
 import Color from "../utils/color";
-import Player from "../utils/player";
+import AbstractPlayer from "../abstract-player";
 
 class Team {
 	public id: any;
@@ -12,7 +12,7 @@ class Team {
         this.players = new Set()
     }
 
-    remove(player: Player) {
+    remove(player: AbstractPlayer) {
         this.players.delete(player.id)
     }
 }

@@ -1,7 +1,5 @@
-import FX from "./sound/fx";
-import ClientTank from "./tanks/clienttank";
-import ClientGameWorld from "./clientgameworld";
-import TankModel from "../tanks/tankmodel";
+import ClientGameWorld from "./client-game-world";
+import TankModel from "../entity/tanks/tank-model";
 import Sound from "./sound/sound";
 
 
@@ -41,10 +39,11 @@ class Engine {
     configure(game: ClientGameWorld, tank: TankModel) {
         this.game = game
         this.tank = tank
+        let tankPosition = tank.getBody().GetPosition()
         this.sound = this.game.playSound(this.config.sound, {
             loop: true,
-            mapX: tank.x,
-            mapY: tank.y
+            mapX: tankPosition.x,
+            mapY: tankPosition.y
         })
         this.rpm = 1
         this.gear = 0

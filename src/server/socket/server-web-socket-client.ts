@@ -2,8 +2,9 @@
 import AbstractClient from '../../networking/abstract-client';
 import Logger from '../log/logger';
 import * as WebSocket from 'websocket';
-import BinaryPacket from "../../networking/binarypacket";
+import BinaryPacket from "../../networking/binary-packet";
 import {BinarySerializer} from "../../serialization/binary/serializable";
+import WebsocketConnection from "../websocket-connection";
 
 export interface ServerWebSocketClientConfig {
     ip: string
@@ -15,73 +16,52 @@ export interface ServerWebSocketClientConfig {
 /**
  * This class implements a websocket client on Node.js side
  */
-class ServerWebSocketClient extends AbstractClient {
-	public webSocketConnection: WebSocket.connection;
+export default class ServerWebSocketClient extends AbstractClient {
+    private connecting = false
+	public connection: WebsocketConnection | null = null;
 	public reconnect: boolean;
 	public reconnectionDelay: number;
 	public logger: Logger;
 	public ip: string
 
-    public client: WebSocket.client
-
     constructor(config: ServerWebSocketClientConfig) {
         super()
         this.ip = config.ip
-        this.client = null
-        this.webSocketConnection = null
         this.reconnect = false
         this.reconnectionDelay = 5000 // ms
         this.logger = new Logger()
     }
 
     connectToServer() {
-        if(this.client != null) return;
+	    if(this.connecting || this.connection) return
         this.reconnect = true
+        this.connecting = true
 
-        this.client = new WebSocket.client()
+        const client = new WebSocket.client()
 
-        this.client.on("connectFailed", (error) => this.onError(error))
-        this.client.on("connect", (connection) => {
-            this.webSocketConnection = connection
+        client.on("connectFailed", (error) => this.onError(error))
+        client.on("connect", (connection) => {
+            this.connection = new WebsocketConnection(connection)
 
             this.onConnection()
 
-            connection.on('error', (error) => this.onError(error));
-            connection.on('close', (code, reason) => this.onClose(code, reason));
-            connection.on('message', (message) => this.onMessage(message));
+            this.connection.on('close', (code: number, desc: string) => this.onClose(code, desc));
+            this.connection.on('packet', (packet) => this.handlePacket(packet));
         })
 
-        this.client.connect(this.ip)
-    }
-
-    onMessage(message: WebSocket.IMessage) {
-        try {
-            if(message.type !== "binary") {
-                this.logger.log("Received invalid packet")
-                this.logger.log("Binary message expected, " + message.type + " received.")
-                return
-            }
-
-            let decoder = BinaryPacket.binaryDecoder
-            decoder.reset()
-            decoder.readData(new Uint8Array(message.binaryData).buffer)
-            super.handlePacket(BinarySerializer.deserialize(decoder, BinaryPacket))
-        } catch(e) {
-            this.logger.log("Exception while handling packet")
-            this.logger.log(e)
-        }
+        client.connect(this.ip)
     }
 
     isConnecting() {
-        return !!this.client
+        return this.connecting
     }
 
     isOpen() {
-        return !!this.webSocketConnection
+        return this.connection && this.connection.isReady()
     }
 
     writePacket(packet: BinaryPacket) {
-        this.webSocketConnection.sendBytes(Buffer.from(packet.getData()))
+        this.connection.send(packet)
     }
 
     disconnect(reason?: string) {
@@ -90,9 +70,10 @@ class ServerWebSocketClient extends AbstractClient {
     }
 
     closeConnection(reason: string) {
-        if(this.webSocketConnection) this.webSocketConnection.close(WebSocket.connection.CLOSE_REASON_NORMAL, reason)
-        if(this.client) this.client.abort()
+        if(this.connection) this.connection.close(reason)
+    }
+
+    getIpAddress(): string {
+        return this.ip;
     }
 }
-
-export default ServerWebSocketClient;

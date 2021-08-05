@@ -1,10 +1,9 @@
 
-import ClientWorldEffect from '../clientworldeffect';
-import WorldExplodeEffectModel from 'src/effects/world/explode/world-explode-effect-model';
-import ClientGameWorld from "../../../clientgameworld";
+import ClientWorldEffect from '../client-world-effect';
+import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
+import ClientGameWorld from "../../../client-game-world";
 
-class ClientWorldExplodeEffect extends ClientWorldEffect {
-	public die: any;
+export default class ClientWorldExplodeEffect extends ClientWorldEffect {
 	public model: WorldExplodeEffectModel
 
 	static Model = WorldExplodeEffectModel
@@ -20,5 +19,3 @@ class ClientWorldExplodeEffect extends ClientWorldEffect {
         this.die()
     }
 }
-
-export default ClientWorldExplodeEffect;

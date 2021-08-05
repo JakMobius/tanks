@@ -1,6 +1,5 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import * as Box2D from '../../library/box2d';
-import ServerTank from "../../server/tanks/servertank";
+import {WeaponConfig} from '../weapon';
+import ReloadableWeapon from "../reloadable-weapon";
 
 export interface ShotgunConfig extends WeaponConfig {
     damage?: number
@@ -8,12 +7,13 @@ export interface ShotgunConfig extends WeaponConfig {
     angle?: number
 }
 
-class Shotgun extends Weapon {
-	public name: any;
-	public damage: any;
-	public radius: any;
-	public squareRadius: any;
-	public angle: any;
+export default class Shotgun extends ReloadableWeapon {
+
+	public readonly damage: number;
+	public readonly radius: number;
+	public readonly angle: number;
+
+    private squareRadius: number;
 
     constructor(config: ShotgunConfig) {
 
@@ -28,11 +28,7 @@ class Shotgun extends Weapon {
 
         super(config);
         this.squareRadius = this.radius ** 2
-        this.shootRate = config.shootRate
-        this.reloadTime = config.reloadTime
-        this.maxAmmo = config.maxAmmo
         this.angle = config.angle
-        this.id = 7
     }
 
     clone() {
@@ -97,5 +93,3 @@ class Shotgun extends Weapon {
         // screen.broadcast(msg)
     }
 }
-
-export default Shotgun;

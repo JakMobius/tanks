@@ -17,10 +17,10 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxFloat, b2_timeToSleep } from "../common/b2_common";
-import { b2_maxTranslation, b2_maxTranslationSquared } from "../common/b2_common";
-import { b2_maxRotation, b2_maxRotationSquared } from "../common/b2_common";
-import { b2_linearSleepTolerance, b2_angularSleepTolerance } from "../common/b2_common";
+import { b2_maxFloat, b2_timeToSleep } from "../common/b2_settings";
+import { b2_maxTranslation, b2_maxTranslationSquared } from "../common/b2_settings";
+import { b2_maxRotation, b2_maxRotationSquared } from "../common/b2_settings";
+import { b2_linearSleepTolerance, b2_angularSleepTolerance } from "../common/b2_settings";
 import { b2Abs, b2Min, b2Max, b2Vec2 } from "../common/b2_math";
 import { b2Timer } from "../common/b2_timer";
 import { b2Contact } from "./b2_contact";
@@ -146,7 +146,7 @@ q2_new = q2_old + dt * w * q1
 then normalize.
 
 This might be faster than computing sin+cos.
-However, we can compute sin+cos of the same setAngle fast.
+However, we can compute sin+cos of the same angle fast.
 */
 
 export class b2Island {

@@ -8,9 +8,9 @@ export interface GLBufferConfig<T> extends BufferConfig<T> {
     bufferType?: GLenum
 }
 
-class GLBuffer<T extends ByteArray> extends Buffer<T> {
+export default class GLBuffer<T extends ByteArray> extends Buffer<T> {
 	public gl: WebGLRenderingContext;
-	public index: number;
+	//public index: number;
 	public drawMode: GLenum;
 	public bufferType: GLenum;
 	public glBuffer: WebGLBuffer;
@@ -20,7 +20,7 @@ class GLBuffer<T extends ByteArray> extends Buffer<T> {
         super(config);
 
         this.gl = config.gl
-        this.index = config.index
+        //this.index = config.index
         this.clazz = config.clazz
         this.drawMode = config.drawMode || this.gl.STATIC_DRAW
         this.bufferType = config.bufferType || this.gl.ARRAY_BUFFER
@@ -56,5 +56,3 @@ class GLBuffer<T extends ByteArray> extends Buffer<T> {
         }
     }
 }
-
-export default GLBuffer;

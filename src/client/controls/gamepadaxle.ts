@@ -1,5 +1,5 @@
 
-import Axle from '../../tanks/controls/axle';
+import Axle from '../../controls/axle';
 import GamepadManager from "./interact/gamepadmanager";
 
 class GamepadAxle extends Axle {

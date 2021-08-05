@@ -2,7 +2,7 @@
 import ClientConnection from '../../../networking/client-connection';
 import ServerWebSocketClient from "../server-web-socket-client";
 
-class ServerParticipantConnection extends ClientConnection {
+export default class ServerParticipantConnection extends ClientConnection {
 
     public client: ServerWebSocketClient;
 
@@ -15,5 +15,3 @@ class ServerParticipantConnection extends ClientConnection {
         this.client.closeConnection(reason)
     }
 }
-
-export default ServerParticipantConnection;

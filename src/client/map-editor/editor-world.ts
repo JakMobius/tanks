@@ -1,5 +1,5 @@
 import EditorMap from "./editormap";
-import ClientGameWorld from "../clientgameworld";
+import ClientGameWorld from "../client-game-world";
 
 type EditorWorld = ClientGameWorld<EditorMap>
 export default EditorWorld

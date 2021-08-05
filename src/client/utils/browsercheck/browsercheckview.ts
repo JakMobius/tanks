@@ -17,7 +17,7 @@ export default function(callback: () => void){
 
     /**
      * Chrome 8
-     * Edge 12
+     * PhysicsEdge 12
      * IE 11
      * Firefox 4
      * Safari 5.1

@@ -1,13 +1,14 @@
 
-import Axle from '../../tanks/controls/axle';
+import Axle from '../../controls/axle';
 import EventEmitter from '../../utils/eventemitter';
-import TankControls from "../../tanks/controls/tankcontrols";
+import TankControls from "../../controls/tankcontrols";
 import GamepadManager from "./interact/gamepadmanager";
 import KeyboardController from "./interact/keyboardcontroller";
 
 export default class PlayerControls extends EventEmitter {
 	public axles: Map<string, Axle>;
 	public respawning: boolean;
+    private controlledTanks = new Set<TankControls>()
 
     constructor() {
         super()
@@ -28,17 +29,28 @@ export default class PlayerControls extends EventEmitter {
     }
 
     connectTankControls(controls: TankControls) {
+        controls.localControllers++
         controls.axles.get("y").addSource(this.axles.get("tank-throttle"))
         controls.axles.get("x").addSource(this.axles.get("tank-steer"))
         controls.axles.get("primary-weapon").addSource(this.axles.get("tank-primary-weapon"))
         controls.axles.get("miner").addSource(this.axles.get("tank-miner"))
+        this.controlledTanks.add(controls)
     }
 
-    disconnectTankControls() {
-        this.axles.get("tank-throttle").disconnectAll()
-        this.axles.get("tank-steer").disconnectAll()
-        this.axles.get("tank-primary-weapon").disconnectAll()
-        this.axles.get("tank-miner").disconnectAll()
+    disconnectTankControls(controls: TankControls) {
+        if(!this.controlledTanks.has(controls)) return
+        controls.localControllers--
+        controls.axles.get("y").removeSource(this.axles.get("tank-throttle"))
+        controls.axles.get("x").removeSource(this.axles.get("tank-steer"))
+        controls.axles.get("primary-weapon").removeSource(this.axles.get("tank-primary-weapon"))
+        controls.axles.get("miner").removeSource(this.axles.get("tank-miner"))
+        this.controlledTanks.delete(controls)
+    }
+
+    disconnectAllTankControls() {
+        for(let controls of this.controlledTanks) {
+            this.disconnectTankControls(controls)
+        }
     }
 
     setupGamepad(gamepad: GamepadManager) {

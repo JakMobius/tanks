@@ -1,8 +1,8 @@
 
 import Pencil from './pencil';
-import AirBlockState from '../../../../utils/map/blockstate/types/airblockstate';
+import AirBlockState from '../../../../map/blockstate/types/airblockstate';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../map/blockstate/blockstate";
 
 class Eraser extends Pencil {
     constructor(manager: ToolManager) {

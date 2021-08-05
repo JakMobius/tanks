@@ -1,6 +1,6 @@
 
 import * as Box2D from '../library/box2d';
-import Matrix3 from './graphics/matrix3';
+import Matrix3 from "../utils/matrix3";
 
 export interface CameraConfig {
     baseScale?: number
@@ -12,7 +12,7 @@ export interface CameraConfig {
     limit?: boolean
 }
 
-class Camera {
+export default class Camera {
 	public baseScale: number;
 	public viewport: Box2D.Vec2
 	public defaultPosition: Box2D.Vec2
@@ -160,5 +160,3 @@ class Camera {
         this.matrix.translate(-this.position.x - this.shaking.x, -this.position.y - this.shaking.y)
     }
 }
-
-export default Camera;

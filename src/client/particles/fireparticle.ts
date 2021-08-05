@@ -1,10 +1,10 @@
 
 import Particle, {ParticleConfig} from './particle';
 
-class FireParticle extends Particle {
-	public scaling: any;
-	public colors: any;
-	public times: any;
+export default class FireParticle extends Particle {
+	public scaling: number;
+	public colors: number[][];
+	public times: number[];
 
     createColors(config: ParticleConfig) {
         let varying = 30
@@ -72,5 +72,3 @@ class FireParticle extends Particle {
         this.height += this.scaling
     }
 }
-
-export default FireParticle;

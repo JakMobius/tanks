@@ -10,6 +10,7 @@ import * as HTTP from "http";
 import Preferences from "../preferences/preferences";
 import MongoStore from "connect-mongo";
 import DB from "../db/db";
+import StaticModule from "./static/static-module";
 
 class WebServer {
 	public app: express.Application;
@@ -22,7 +23,7 @@ class WebServer {
     hubModule = new HubModule()
     gameModule = new GameModule()
     baseModule = new BaseModule()
-    staticModule = new GameModule()
+    staticModule = new StaticModule()
 
     constructor() {
         this.app = express()

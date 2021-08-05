@@ -1,22 +1,30 @@
 import SocketPortalClient from '../socket-portal-client';
 import SocketPortal from '../socket-portal';
-import RoomListRequestPacket from '../../../networking/packets/game-packets/roomlistrequestpacket';
-import RoomListPacket from '../../../networking/packets/game-packets/roomlistpacket';
-import PlayerRoomRequestPacket from '../../../networking/packets/game-packets/playerroomrequestpacket';
-import PlayerRoomChangePacket from '../../../networking/packets/game-packets/playerroomchangepacket';
+import RoomListRequestPacket from '../../../networking/packets/game-packets/room-list-request-packet';
+import RoomListPacket from '../../../networking/packets/game-packets/room-list-packet';
+import PlayerRoomRequestPacket from '../../../networking/packets/game-packets/player-room-request-packet';
+import PlayerRoomChangePacket from '../../../networking/packets/game-packets/player-room-change-packet';
 import pako from 'pako';
 import Room from "../../room/room";
 import * as Websocket from "websocket";
-import BinaryPacket from "../../../networking/binarypacket";
+import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
 import BinaryDecoder from "../../../serialization/binary/binarydecoder";
-import GameMap from "../../../utils/map/gamemap";
+import GameMap from "../../../map/gamemap";
 import Game from "../../room/game";
+import WebsocketConnection from "../../websocket-connection";
+import ServerPlayer from "../../server-player";
 
-class GameSocketPortal extends SocketPortal {
+export interface GameSocketPortalClientData {
+    listeningForRooms: boolean;
+    player: ServerPlayer | null
+}
+
+export type GameSocketPortalClient = SocketPortalClient<GameSocketPortalClientData>
+
+export default class GameSocketPortal extends SocketPortal<GameSocketPortalClientData> {
 	public roomsInterval: any;
-	public server: any;
     public games = new Map<string, Room>()
 
     constructor() {
@@ -49,7 +57,7 @@ class GameSocketPortal extends SocketPortal {
         let packet = new RoomListPacket(Array.from(this.games.values()))
 
         for(let client of this.clients.values()) {
-            if(client.data["listeningForRooms"]) {
+            if(client.data.listeningForRooms) {
                 packet.sendTo(client.connection)
             }
         }
@@ -61,10 +69,10 @@ class GameSocketPortal extends SocketPortal {
         super.terminate()
     }
 
-    configureClient(client: SocketPortalClient, game: Room) {
+    configureClient(client: GameSocketPortalClient, game: Room) {
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
-            client.game.clientDisconnected(client)
+            client.game.portal.clientDisconnected(client)
         }
 
         this.logger.log("Клиент " + client.id + " подключен к игре " + game.name)
@@ -73,15 +81,15 @@ class GameSocketPortal extends SocketPortal {
         client.game = game
     }
 
-    clientDisconnected(client: SocketPortalClient) {
+    clientDisconnected(client: GameSocketPortalClient) {
         super.clientDisconnected(client);
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
-            client.game.clientDisconnected(client)
+            client.game.portal.clientDisconnected(client)
         }
     }
 
-    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
+    handlePacket(packet: BinaryPacket, client: GameSocketPortalClient) {
         super.handlePacket(packet, client)
 
         if(packet instanceof RoomListRequestPacket) {
@@ -106,7 +114,7 @@ class GameSocketPortal extends SocketPortal {
                 ).sendTo(client.connection)
             }
         }
-        if(packet) client.game.clientMessage(client, packet)
+        if(packet) client.game.portal.receiveClientPacket(client, packet)
     }
 
     getFreeGame() {
@@ -126,7 +134,7 @@ class GameSocketPortal extends SocketPortal {
         return game
     }
 
-    clientConnected(client: SocketPortalClient) {
+    clientConnected(client: GameSocketPortalClient) {
         let connection = client.connection
 
         // if(this.banned.indexOf(connection.remoteAddress) !== -1) {
@@ -160,12 +168,19 @@ class GameSocketPortal extends SocketPortal {
 
         const game = new Game({
             name: config.name,
-            server: this.server,
             map: map
         })
 
         this.games.set(config.name, game)
     }
-}
 
-export default GameSocketPortal;
+    createClient(connection: WebsocketConnection): SocketPortalClient<GameSocketPortalClientData> {
+        return new SocketPortalClient<GameSocketPortalClientData>({
+            connection: connection,
+            data: {
+                player: null,
+                listeningForRooms: false
+            }
+        })
+    }
+}

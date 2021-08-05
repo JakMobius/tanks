@@ -1,5 +1,5 @@
 
-import BinarySerializable, { Constructor } from '../serialization/binary/serializable';
+import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
 import BinaryEncoder from "../serialization/binary/binaryencoder";
 import BinaryDecoder from "../serialization/binary/binarydecoder";
 
@@ -11,7 +11,7 @@ export interface EffectModelConfig {
  * This class represents an effect model, which contains all necessary
  * data to create an side-specific effect class instance
  */
-class EffectModel implements BinarySerializable<typeof EffectModel> {
+export default class EffectModel implements BinarySerializable<typeof EffectModel> {
 
     private static globalId = 0
 
@@ -19,12 +19,14 @@ class EffectModel implements BinarySerializable<typeof EffectModel> {
     id: number
 
     constructor(options?: EffectModelConfig) {
-        if(options) {
-            if (options.id === undefined) {
-                this.id = EffectModel.globalId++
-            } else {
-                this.id = options.id
-            }
+        options = Object.assign({
+
+        }, options)
+
+        if (options.id === undefined) {
+            this.id = EffectModel.globalId++
+        } else {
+            this.id = options.id
         }
     }
 
@@ -37,9 +39,11 @@ class EffectModel implements BinarySerializable<typeof EffectModel> {
 
     static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
         return new this({
-            id : decoder.readFloat64()
+            id: decoder.readFloat64()
         }) as T
     }
-}
 
-export default EffectModel;
+    static register(Model: typeof EffectModel) {
+        BinarySerializer.register(Model)
+    }
+}

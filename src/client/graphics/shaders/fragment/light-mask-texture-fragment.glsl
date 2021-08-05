@@ -8,6 +8,7 @@ uniform vec2 u_texture_size;
 varying vec2 v_dark_texture_position;
 varying vec2 v_bright_texture_position;
 varying vec2 v_mask_position;
+varying float v_angle;
 
 vec4 pixel(vec2 delta) {
     vec4 dark = texture2D(u_texture, v_dark_texture_position + delta);
@@ -15,7 +16,7 @@ vec4 pixel(vec2 delta) {
     vec4 mask = texture2D(u_texture, v_mask_position + delta);
 
     float intense = mask.a;
-    float angle = mask.r + u_angle;
+    float angle = mask.r + mod(u_angle - v_angle, 1.0);
 
     if(angle > 1.0) angle = angle - 1.0;
     if(angle > 0.75) angle = 1.0 - angle;

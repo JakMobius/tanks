@@ -1,6 +1,6 @@
 import * as Box2D from '../library/box2d';
 
-class PhysicsUtils {
+export default class PhysicsUtils {
     static createFixture(shape: Box2D.Shape, fixture?: Partial<Box2D.IFixtureDef>): Box2D.IFixtureDef {
         if(!fixture) fixture = {}
 
@@ -30,8 +30,8 @@ class PhysicsUtils {
 
     static horizontalSquareFixtures(width: number, height: number, offset: Box2D.XY, options?: Partial<Box2D.IFixtureDef>) {
         return [
-            this.squareFixture(width, height, new Box2D.Vec2(-offset.x, offset.y), options),
-            this.squareFixture(width, height, new Box2D.Vec2(offset.x, offset.y), options)
+            this.squareFixture(width, height, new Box2D.Vec2(-offset.x, offset.y), Object.assign({}, options)),
+            this.squareFixture(width, height, new Box2D.Vec2(offset.x, offset.y), Object.assign({}, options))
         ]
     }
 
@@ -42,5 +42,3 @@ class PhysicsUtils {
         return this.createFixture(shape, options)
     }
 }
-
-export default PhysicsUtils;

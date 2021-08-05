@@ -1,9 +1,9 @@
 
 import AbstractConnection from './abstract-connection';
 import AbstractClient from "./abstract-client";
-import BinaryPacket from "./binarypacket";
+import BinaryPacket from "./binary-packet";
 
-class ClientConnection extends AbstractConnection {
+export default class ClientConnection extends AbstractConnection {
 	public client: AbstractClient;
 
     constructor(client: AbstractClient) {
@@ -25,6 +25,8 @@ class ClientConnection extends AbstractConnection {
     close(reason: string) {
         this.client.disconnect()
     }
-}
 
-export default ClientConnection;
+    getIpAddress(): string {
+        return this.client.getIpAddress();
+    }
+}

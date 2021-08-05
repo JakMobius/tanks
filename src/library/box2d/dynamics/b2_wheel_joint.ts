@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_linearSlop, b2Maybe } from "../common/b2_common";
+import { b2_linearSlop, b2Maybe } from "../common/b2_settings";
 import { b2Abs, b2Clamp, b2Vec2, b2Rot, XY, b2Max, b2Min, b2Transform } from "../common/b2_math";
 import { b2Joint, b2JointDef, b2JointType, b2IJointDef } from "./b2_joint";
 import { b2SolverData } from "./b2_time_step";

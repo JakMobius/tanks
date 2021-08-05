@@ -1,5 +1,5 @@
 
-class ScheduledTask {
+export default class ScheduledTask {
 	public func: any;
 	public time: any;
 	public lock: any;
@@ -23,5 +23,3 @@ class ScheduledTask {
         return false
     }
 }
-
-export default ScheduledTask;

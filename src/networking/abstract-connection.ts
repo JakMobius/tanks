@@ -1,11 +1,14 @@
-import BinaryPacket from "./binarypacket";
+import BinaryPacket from "./binary-packet";
+import EventEmitter from "../utils/eventemitter";
 
-abstract class AbstractConnection {
+export default abstract class AbstractConnection extends EventEmitter {
     abstract isReady(): boolean
 
     abstract send(bytes: BinaryPacket): void
 
     abstract close(reason?: string): void
-}
 
-export default AbstractConnection;
+    abstract getIpAddress(): string
+
+    receivePacket(packet: BinaryPacket) { this.emit("packet", packet) }
+}

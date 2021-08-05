@@ -1,9 +1,9 @@
 import Chalk from 'chalk';
-import util from 'util';
+// import util from 'util';
 import Color from 'src/utils/color';
 import LoggerDestination from "./logger-destination";
 
-class Logger implements LoggerDestination {
+export default class Logger implements LoggerDestination {
 	public destinations: LoggerDestination[] = []
 	public redirectToGlobal: boolean = true
 	public prefix: string = null
@@ -53,10 +53,10 @@ class Logger implements LoggerDestination {
 		if(typeof text == "string") {
 			text = Logger.convertChatColors(text)
 		} else {
-			text = util.inspect(text, {
-				depth: 0,
-				colors: true
-			})
+			// text = util.inspect(text, {
+			// 	depth: 0,
+			// 	colors: true
+			// })
 		}
 
 		if(this.prefix) text = this.prefix + text
@@ -71,5 +71,3 @@ class Logger implements LoggerDestination {
 	close(): void {
 	}
 }
-
-export default Logger;

@@ -1,10 +1,10 @@
 
-import GameMap, {GameMapConfig} from '../../utils/map/gamemap';
+import GameMap, {GameMapConfig} from '../../map/gamemap';
 import EditorMapBinaryOptions from './editormapbinaryoptions';
 import History from './history/history';
 import MapBlockModification from './history/modification/mapblockmodification';
-import AirBlockState from '../../utils/map/blockstate/types/airblockstate';
-import BlockState from "../../utils/map/blockstate/blockstate";
+import AirBlockState from '../../map/blockstate/types/airblockstate';
+import BlockState from "../../map/blockstate/blockstate";
 
 export interface EditorMapConfig extends GameMapConfig {
     name: string

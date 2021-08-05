@@ -1,6 +1,6 @@
 /* @load-resource: './block-select.scss' */
 
-import BlockState from "src/utils/map/blockstate/blockstate";
+import BlockState from "src/map/blockstate/blockstate";
 import Menu from "src/client/ui/menu/menu";
 
 export default class BlockSelectButton extends Menu {

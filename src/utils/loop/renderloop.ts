@@ -1,10 +1,10 @@
 
-import Loop from './loop';
+import Loop, {LoopConfig} from './loop';
 
-class RenderLoop extends Loop {
+export default class RenderLoop extends Loop {
 
-    constructor() {
-        super();
+    constructor(config: LoopConfig) {
+        super(config);
         this.timeMultiplier = 0.001
     }
 
@@ -19,5 +19,3 @@ class RenderLoop extends Loop {
         });
     }
 }
-
-export default RenderLoop;

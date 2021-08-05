@@ -3,9 +3,9 @@
 import Menu from 'src/client/ui/menu/menu';
 
 import Dropdown from 'src/client/ui/elements/dropdown/dropdown';
-import {ClientRoomInformant} from "src/networking/packets/game-packets/roomlistpacket";
+import {ClientRoomInformant} from "src/networking/packets/game-packets/room-list-packet";
 
-class RoomSelectContainer extends Menu {
+export default class RoomSelectContainer extends Menu {
 	public selectedRoom: string;
 	public dropdown: Dropdown;
 
@@ -69,7 +69,7 @@ class RoomSelectContainer extends Menu {
             if(disabled) option.addClass("disabled")
             else option.removeClass("disabled")
 
-            option.find(".room-name").text(room.getName)
+            option.find(".room-name").text(room.getName())
             option.find(".room-playersOnline").text(room.getCurrentOnline())
             option.find(".room-max-playersOnline").text(room.getMaxOnline())
 
@@ -79,5 +79,3 @@ class RoomSelectContainer extends Menu {
         })
     }
 }
-
-export default RoomSelectContainer;

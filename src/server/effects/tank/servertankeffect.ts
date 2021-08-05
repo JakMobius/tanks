@@ -1,7 +1,7 @@
 
 import ServerEffect from '../servereffect';
-import TankEffectModel from 'src/effects/tank/tankeffectmodel';
-import ServerTank from "../../tanks/servertank";
+import TankEffectModel from 'src/effects/tank/tank-effect-model';
+import ServerTank from "../../entity/tank/servertank";
 import EffectModel from "../../../effects/effect-model";
 
 /**
@@ -13,7 +13,7 @@ import EffectModel from "../../../effects/effect-model";
  * directly, use {@link ServerTankEffect#fromModel fromModel} static method
  * instead
  */
-class ServerTankEffect extends ServerEffect {
+export default class ServerTankEffect extends ServerEffect {
 
     model: TankEffectModel
     tank: ServerTank
@@ -50,12 +50,6 @@ class ServerTankEffect extends ServerEffect {
         // If this model has no server-side implementation, return
         // default class
 
-        if(model instanceof TankEffectModel) {
-            return new ServerTankEffect(model, tank)
-        }
-
-        throw new TypeError("The 'model' argument should inherit TankEffectModel")
+        return new ServerTankEffect(model, tank)
     }
 }
-
-export default ServerTankEffect;

@@ -1,5 +1,5 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import TankFireEffectModel from 'src/effects/tank/tank-fire-effect-model';
+import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
 import ServerTankEffect from 'src/server/effects/tank/servertankeffect';
 
 export interface FlamethrowerConfig extends WeaponConfig {
@@ -8,19 +8,19 @@ export interface FlamethrowerConfig extends WeaponConfig {
 	angle?: number
 }
 
-class Flamethrower extends Weapon {
-	public damage: any;
-	public radius: any;
-	public angle: any;
-	public squareRadius: any;
-	public fireEffect: any;
-	public serverEffect: any;
+export default class FlamethrowerWeapon extends Weapon {
+	public damage: number;
+	public radius: number;
+	public angle: number;
+	public squareRadius: number;
+	public fireEffect: TankFireEffectModel;
+	public serverEffect: ServerTankEffect;
 
 	constructor(config: FlamethrowerConfig) {
 		config = Object.assign({
 			damage: 10,
 			radius: 90,
-			angle: Math.PI / 3,
+			angle: Math.PI / 3
 		}, config)
 		super(config)
 
@@ -33,14 +33,17 @@ class Flamethrower extends Weapon {
 		this.serverEffect = ServerTankEffect.fromModelAndTank(this.fireEffect, this.tank)
 	}
 
-	ready() {
-		return true
-	}
+	tick(dt: number) {
+		super.tick(dt)
 
-	shoot() {
+		if(!this.engaged) return
+
 		const tank = this.tank
-		// const player = tank.player
-		const pAngle = (tank.model.rotation + Math.PI) % (Math.PI * 2) - Math.PI;
+		const tankBody = tank.model.getBody()
+		const tankLocation = tankBody.GetPosition()
+		const tankAngle = tankBody.GetAngle()
+
+		const pAngle = (tankAngle + Math.PI) % (Math.PI * 2) - Math.PI;
 
 		const world = tank.player.getWorld()
 
@@ -49,8 +52,10 @@ class Flamethrower extends Weapon {
 			if(!player || player.tank === tank) continue
 
 			const anotherTank = player.tank;
-			const x = anotherTank.model.x - tank.model.x;
-			const y = anotherTank.model.y - tank.model.y;
+			const anotherTankLocation = anotherTank.model.getBody().GetPosition()
+
+			const x = anotherTankLocation.x - tankLocation.x;
+			const y = anotherTankLocation.y - tankLocation.y;
 
 			const dist = x ** 2 + y ** 2;
 
@@ -79,5 +84,3 @@ class Flamethrower extends Weapon {
 		this.tank.removeEffect(this.serverEffect)
 	}
 }
-
-export default Flamethrower;

@@ -16,7 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// import { b2_lengthUnitsPerMeter } from "./b2_settings.js";
+// import { b2_lengthUnitsPerMeter } from "./b2_settings";
 
 export function b2Assert(condition: boolean, ...args: any[]): asserts condition {
   if (!condition) {
@@ -26,7 +26,7 @@ export function b2Assert(condition: boolean, ...args: any[]): asserts condition 
 }
 
 export function b2Maybe<T>(value: T | undefined, def: T): T {
-  return value === undefined ? def : value;
+  return value !== undefined ? value : def;
 }
 
 export const b2_maxFloat: number = 1E+37; // FLT_MAX instead of Number.MAX_VALUE;
@@ -68,7 +68,7 @@ export const b2_aabbMultiplier: number = 4;
 /// chosen to be numerically significant, but visually insignificant.
 export const b2_linearSlop: number = 0.005 * b2_lengthUnitsPerMeter;
 
-/// A small setAngle used as a collision and constraint tolerance. Usually it is
+/// A small angle used as a collision and constraint tolerance. Usually it is
 /// chosen to be numerically significant, but visually insignificant.
 export const b2_angularSlop: number = 2 / 180 * b2_pi;
 
@@ -93,11 +93,9 @@ export const b2_maxLinearCorrection: number = 0.2 * b2_lengthUnitsPerMeter;
 /// prevent overshoot.
 export const b2_maxAngularCorrection: number = 8 / 180 * b2_pi;
 
-// Note: Adjusted from 2 to 10
-
 /// The maximum linear velocity of a body. This limit is very large and is used
 /// to prevent numerical problems. You shouldn't need to adjust this.
-export const b2_maxTranslation: number = 10 * b2_lengthUnitsPerMeter;
+export const b2_maxTranslation: number = 2 * b2_lengthUnitsPerMeter;
 export const b2_maxTranslationSquared: number = b2_maxTranslation * b2_maxTranslation;
 
 /// The maximum angular velocity of a body. This limit is very large and is used

@@ -7,7 +7,7 @@ export interface ExplodeParticleConfig extends ParticleConfig {
     shifting: number
 }
 
-class ExplodeParticle extends FireParticle {
+export default class ExplodeParticle extends FireParticle {
     createColors(config: ExplodeParticleConfig) {
         let varying = 30
         return [
@@ -51,5 +51,3 @@ class ExplodeParticle extends FireParticle {
         super(config);
     }
 }
-
-export default ExplodeParticle;

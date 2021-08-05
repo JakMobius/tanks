@@ -1,37 +1,30 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import Bullet16mm from '../../entity/bullet/models/16mm';
 
-class WeaponMachineGun extends Weapon {
-	public state: any;
+import Bullet16mm from '../../entity/bullets/models/16mm-bullet-model';
+import ReloadableWeapon from "../reloadable-weapon";
+import {WeaponConfig} from "../weapon";
+
+export default class WeaponMachineGun extends ReloadableWeapon {
+	public state: number;
 
 	constructor(config: WeaponConfig) {
-		config = Object.assign({
+		super({
 			maxAmmo: 50,
 			shootRate: 100,
 			reloadTime: 5000,
-			bulletType: Bullet16mm,
-		}, config)
-		super(config)
+			tank: config.tank,
+			triggerAxle: config.triggerAxle
+		})
 
 		this.state = 0
-		this.id = 4
 	}
 
 	shoot() {
-		let tank = this.tank
-		let position = tank.model.body.GetPosition()
-
 		const shift = (this.state === 0) ? -1.4 : 1.4;
 
-		this.launchBullet(tank,
-			position.x + tank.model.matrix.cos * shift - tank.model.matrix.sin * shift,
-			position.y + tank.model.matrix.sin * shift + tank.model.matrix.cos * shift
-		)
+		this.launchBullet(new Bullet16mm(), shift, 10)
 
 		this.state = 1 - this.state
 
 		this.popBullet()
 	}
 }
-
-export default WeaponMachineGun;

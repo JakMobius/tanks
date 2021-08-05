@@ -1,9 +1,9 @@
 
 import BlockDrawer from './blockdrawer';
 import Sprite, {SpriteRect} from '../../../sprite';
-import GameMap from '../../../../utils/map/gamemap';
-import TextureProgram from '../../programs/textureprogram';
-import BlockState from 'src/utils/map/blockstate/blockstate';
+import GameMap from '../../../../map/gamemap';
+import TextureProgram from '../../programs/texture-program';
+import BlockState from 'src/map/blockstate/blockstate';
 
 class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];

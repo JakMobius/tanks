@@ -20,7 +20,7 @@
 
 // DEBUG: import { b2Assert, b2_maxParticleIndex } from "../common/b2_settings";
 import { b2_linearSlop, b2_maxFloat, b2_invalidParticleIndex, b2_minParticleSystemBufferCapacity, b2_maxTriadDistanceSquared, b2_barrierCollisionTime, b2MakeArray, b2Maybe } from "../common/b2_settings";
-import { b2_maxParticlePressure, b2_minParticleWeight, b2_maxParticleForce, b2_particleStride } from "../common/b2_common";
+import { b2_maxParticlePressure, b2_minParticleWeight, b2_maxParticleForce, b2_particleStride } from "../common/b2_settings";
 import { b2Min, b2Max, b2Abs, b2Clamp, b2Sqrt, b2InvSqrt, b2Vec2, b2TypedVec2, b2Rot, b2Transform, XY } from "../common/b2_math";
 import { b2Color, b2TypedColor } from "../common/b2_draw";
 import { b2AABB, b2RayCastInput, b2RayCastOutput } from "../collision/b2_collision";
@@ -3684,7 +3684,7 @@ export class b2ParticleSystem {
         }
         r.s *= invR;
         r.c *= invR;
-        ///r.setAngle = Math.atan2(r.s, r.c); // TODO: optimize
+        ///r.angle = Math.atan2(r.s, r.c); // TODO: optimize
         const strength = elasticStrength * triad.strength;
         ///va += strength * (b2Mul(r, oa) - pa);
         b2Rot.MulRV(r, oa, s_t0);

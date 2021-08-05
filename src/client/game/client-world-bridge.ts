@@ -1,62 +1,70 @@
 import AbstractClient from "../../networking/abstract-client";
-import MapPacket from "../../networking/packets/game-packets/mappacket";
-import PlayerJoinPacket from "../../networking/packets/game-packets/playerjoinpacket";
-import PlayerSpawnPacket from "../../networking/packets/game-packets/playerspawnpacket";
-import TankLocationsPacket from "../../networking/packets/game-packets/gamestatepacket";
-import EntityListPacket from "../../networking/packets/game-packets/entitylistpacket";
-import EntityCreatePacket from "../../networking/packets/game-packets/entitycreatepacket";
-import ClientEntity from "../entity/cliententity";
-import EntityRemovePacket from "../../networking/packets/game-packets/entityremovepacket";
-import BlockUpdatePacket from "../../networking/packets/game-packets/blockupdatepacket";
-import PlayerLeavePacket from "../../networking/packets/game-packets/playerleavepacket";
-import EffectCreatePacket from "../../networking/packets/game-packets/effectcreatepacket";
-import TankEffectModel from "../../effects/tank/tankeffectmodel";
-import ClientTank from "../tanks/clienttank";
-import ClientTankEffect from "../effects/tank/clienttankeffect";
+import MapPacket from "../../networking/packets/game-packets/map-packet";
+import PlayerJoinPacket from "../../networking/packets/game-packets/player-join-packet";
+import PlayerSpawnPacket from "../../networking/packets/game-packets/player-spawn-packet";
+import EntityLocationPacket from "../../networking/packets/game-packets/entity-location-packet";
+import EntityCreatePacket from "../../networking/packets/game-packets/entity-create-packet";
+import ClientEntity from "../entity/client-entity";
+import EntityRemovePacket from "../../networking/packets/game-packets/entity-remove-packet";
+import BlockUpdatePacket from "../../networking/packets/game-packets/block-update-packet";
+import PlayerLeavePacket from "../../networking/packets/game-packets/player-leave-packet";
+import EffectCreatePacket from "../../networking/packets/game-packets/effect-create-packet";
+import TankEffectModel from "../../effects/tank/tank-effect-model";
+import ClientTankEffect from "../effects/tank/client-tank-effect";
 import WorldEffectModel from "../../effects/world/world-effect-model";
-import ClientWorldEffect from "../effects/world/clientworldeffect";
-import EffectRemovePacket from "../../networking/packets/game-packets/effectremovepacket";
-import ClientGameWorld from "../clientgameworld";
+import ClientWorldEffect from "../effects/world/client-world-effect";
+import EffectRemovePacket from "../../networking/packets/game-packets/effect-remove-packet";
+import ClientGameWorld from "../client-game-world";
+import ClientPlayer from "../client-player";
+import ClientTank from "../entity/tank/client-tank";
+import WorldPlayerControlsPacket from "../../networking/packets/game-packets/world-player-controls-packet";
+import EntityHealthPacket from "../../networking/packets/game-packets/entity-health-packet";
 
 export default class ClientWorldBridge {
     static buildBridge(client: AbstractClient, world: ClientGameWorld) {
-        client.on(MapPacket, (packet) => world.setMap(packet.map))
+        client.on(MapPacket, (packet) => {
+            world.setMap(packet.map)
+        })
 
         client.on(PlayerJoinPacket, (packet) => {
-            let newTank = ClientTank.fromModel(packet.tank)
-            packet.player.setTank(newTank)
-            world.createPlayer(packet.player)
-            world.emit("player-join", packet.player)
+            this.createPlayer(world, packet.nick, packet.id, packet.tankId)
         })
 
         client.on(PlayerSpawnPacket, (packet) => {
-            let newTank = ClientTank.fromModel(packet.tank)
-            packet.player.setTank(newTank)
-            world.createPlayer(packet.player)
-            world.emit("player-spawn", packet.player)
+            let player = this.createPlayer(world, packet.nick, packet.id, packet.tankId)
+            world.setPrimaryPlayer(player)
         })
 
-        client.on(TankLocationsPacket, (packet) => {
-            packet.updateTankLocations(world.players)
-        })
-
-        client.on(EntityListPacket, (packet) => {
-            packet.updateEntities(world.entities)
+        client.on(EntityLocationPacket, (packet) => {
+            packet.updateEntities(world)
         })
 
         client.on(EntityCreatePacket, (packet) => {
-            packet.createEntities((model) => {
-                let wrapper = ClientEntity.fromModel(model)
-                if(wrapper) world.entities.set(model.id, wrapper)
+            const entities = packet.createEntities((model) => {
+                let entity = ClientEntity.fromModel(model)
+                entity.model.initPhysics(world.world)
+                return entity
             })
+
+            for(let entity of entities) {
+                world.createEntity(entity)
+            }
         })
 
         client.on(EntityRemovePacket, (packet) => {
-            packet.updateEntities(world.entities)
+            packet.updateEntities(world)
+        })
+
+        client.on(EntityHealthPacket, (packet) => {
+            packet.updateEntities(world)
         })
 
         client.on(BlockUpdatePacket, (packet) => {
             world.map.setBlock(packet.x, packet.y, packet.block)
+        })
+
+        client.on(WorldPlayerControlsPacket, (packet) => {
+            packet.updateControls(world)
         })
 
         client.on(PlayerLeavePacket, (packet) => {
@@ -98,5 +106,23 @@ export default class ClientWorldBridge {
                 world.effects.delete(packet.id)
             }
         })
+    }
+
+    private static createPlayer(world: ClientGameWorld, nick: string, id: number, tankId: number) {
+        let tank = world.entities.get(tankId) as ClientTank
+        let player: ClientPlayer = world.players.get(id)
+
+        if(!player) {
+            player = new ClientPlayer({
+                id: id,
+                nick: nick,
+                tank: tank
+            })
+        } else {
+            player.setTank(tank)
+        }
+
+        world.createPlayer(player)
+        return player
     }
 }

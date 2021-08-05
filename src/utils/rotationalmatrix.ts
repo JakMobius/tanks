@@ -1,5 +1,5 @@
 
-class RotationalMatrix {
+export default class RotationalMatrix {
 
     /**
      * Rotation angle
@@ -31,13 +31,11 @@ class RotationalMatrix {
         }
     }
 
-    turnHorizontalAxis(x: number, y: number) {
+    turnX(x: number, y: number) {
         return x * this.cos - y * this.sin
     }
 
-    turnVerticalAxis(x: number, y: number) {
+    turnY(x: number, y: number) {
         return x * this.sin + y * this.cos
     }
 }
-
-export default RotationalMatrix;

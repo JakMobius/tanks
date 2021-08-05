@@ -1,6 +1,6 @@
 import Program from "./program";
 
-class Uniform {
+export default class Uniform {
 	public program: Program;
 	public name: string;
 	public ctx: WebGLRenderingContext;
@@ -11,10 +11,6 @@ class Uniform {
         this.name = name
         this.ctx = this.program.ctx
         this.location = this.ctx.getUniformLocation(this.program.raw, name)
-
-        if(!this.location) {
-            console.warn("Could not find uniform named '" + this.name + "' in '" + this.program.name + "'")
-        }
     }
 
     set1f(value: number) {
@@ -69,5 +65,3 @@ class Uniform {
         }
     }
 }
-
-export default Uniform;

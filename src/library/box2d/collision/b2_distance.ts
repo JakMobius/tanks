@@ -632,7 +632,7 @@ export function b2Distance(output: b2DistanceOutput, cache: b2SimplexCache, inpu
 
 // GJK-raycast
 // Algorithm by Gino van den Bergen.
-// "Smooth Mesh Contacts with GJK" in GameScreen Physics Pearls. 2010
+// "Smooth Mesh Contacts with GJK" in Game Physics Pearls. 2010
 // bool b2ShapeCast(b2ShapeCastOutput* output, const b2ShapeCastInput* input);
 const b2ShapeCast_s_n = new b2Vec2();
 const b2ShapeCast_s_simplex = new b2Simplex();

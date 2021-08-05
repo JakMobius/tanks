@@ -1,8 +1,7 @@
 
 import crypto from 'crypto';
 
-class ClusterHandshake {
-	public handshakeBytes: any;
+export default class ClusterHandshake {
     static handshakeBytes = 32
 
     static generateSalt() {
@@ -33,5 +32,3 @@ class ClusterHandshake {
         crypto.scrypt(password, salt, this.handshakeBytes, callback)
     }
 }
-
-export default ClusterHandshake;

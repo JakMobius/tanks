@@ -1,17 +1,18 @@
 
 import Tool from '../tool';
-import ParticleProgram from '../../../graphics/programs/particleprogram';
 import Particle from '../../../particles/particle';
 import Color from '../../../../utils/color';
-import SpawnZone from '../../../../utils/map/spawnzone';
-import GameMap from '../../../../utils/map/gamemap';
+import SpawnZone from '../../../../map/spawnzone';
+import GameMap from '../../../../map/gamemap';
 import ToolManager from "../toolmanager";
+import EditorMap from "../../editormap";
+import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 
 class SpawnZoneTool extends Tool {
     public image = "assets/img/spawnzones.png"
 	public actionName = "Зона спавна";
 	public selectedTeam: number | null = null;
-	public program: ParticleProgram;
+	public program: ConvexShapeProgram;
 	public clearZoneButton: JQuery;
 	public decorations = new Map<number, Particle>();
 
@@ -24,7 +25,7 @@ class SpawnZoneTool extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.program = new ParticleProgram("spawn-zones-program", this.manager.screen.ctx)
+        this.program = new ConvexShapeProgram(this.manager.screen.ctx)
 
         this.setupMenu()
         this.setupDecorations()
@@ -84,19 +85,19 @@ class SpawnZoneTool extends Tool {
         super.drawDecorations();
         const map = this.manager.world.map
 
-        this.program.use()
-        this.program.prepare()
+        this.program.reset()
 
         for(let zone of map.spawnZones) {
-            let decoration = this.decorations.get(zone.id)
-            decoration.x = zone.centerX() * GameMap.BLOCK_SIZE
-            decoration.y = zone.centerY() * GameMap.BLOCK_SIZE
-            decoration.width = zone.width() * GameMap.BLOCK_SIZE
-            decoration.height = zone.height() * GameMap.BLOCK_SIZE
-
-            this.program.drawParticle(decoration)
+            this.program.drawRectangle(
+                zone.minX * EditorMap.BLOCK_SIZE,
+                zone.minY * EditorMap.BLOCK_SIZE,
+                zone.maxX * EditorMap.BLOCK_SIZE,
+                zone.maxY * EditorMap.BLOCK_SIZE,
+                0x7F7F7F7F
+            )
         }
 
+        this.program.bind()
         this.program.matrixUniform.setMatrix(this.manager.camera.matrix.m)
         this.program.draw()
     }

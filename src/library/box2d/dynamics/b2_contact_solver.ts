@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_linearSlop, b2_maxManifoldPoints, b2_maxLinearCorrection, b2_baumgarte, b2_toiBaumgarte, b2MakeArray } from "../common/b2_common";
+import { b2_linearSlop, b2_maxManifoldPoints, b2_maxLinearCorrection, b2_baumgarte, b2_toiBaumgarte, b2MakeArray } from "../common/b2_settings";
 import { b2Min, b2Max, b2Clamp, b2Vec2, b2Mat22, b2Rot, b2Transform } from "../common/b2_math";
 import { b2Manifold } from "../collision/b2_collision";
 import { b2ManifoldPoint } from "../collision/b2_collision";
@@ -764,7 +764,7 @@ export class b2ContactSolver {
             b2Vec2.SubVV(x, a, d);
 
             // Apply incremental impulse
-            // b2Vec2 P1 = d.cursorX * normal;
+            // b2Vec2 P1 = d.x * normal;
             b2Vec2.MulSV(d.x, normal, P1);
             // b2Vec2 P2 = d.y * normal;
             b2Vec2.MulSV(d.y, normal, P2);
@@ -809,11 +809,11 @@ export class b2ContactSolver {
 
           if (vn1 >= 0 && vn2 >= 0) {
             // Resubstitute for the incremental impulse
-            // b2Vec2 d = cursorX - a;
+            // b2Vec2 d = x - a;
             b2Vec2.SubVV(x, a, d);
 
             // Apply incremental impulse
-            // b2Vec2 P1 = d.cursorX * normal;
+            // b2Vec2 P1 = d.x * normal;
             b2Vec2.MulSV(d.x, normal, P1);
             // b2Vec2 P2 = d.y * normal;
             b2Vec2.MulSV(d.y, normal, P2);

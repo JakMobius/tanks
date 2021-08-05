@@ -6,7 +6,7 @@ import WorldDrawer from '../../graphics/drawers/world-drawer';
 import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
 import * as Box2D from '../../../library/box2d';
-import GameMap from '../../../utils/map/gamemap';
+import GameMap from '../../../map/gamemap';
 import KeyboardController from '../../controls/interact/keyboardcontroller';
 import DragHandler from '../../controls/interact/draghandler';
 import ToolbarView from '../ui/overlay/workspace/toolbar/toolbar';
@@ -15,9 +15,8 @@ import EventContainer from '../../ui/overlay/events/eventcontainer';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
 import Tools from "../tools/type-loader"
 import EditorMap from "../editormap";
-import ClientGameWorld from "../../clientgameworld";
+import ClientGameWorld from "../../client-game-world";
 import EditorWorld from "../editor-world";
-import Room from "../../../server/room/room";
 
 export default class MapEditorScene extends Scene {
 

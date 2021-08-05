@@ -1,10 +1,10 @@
 import {Constructor} from "../../../serialization/binary/serializable";
 import BlockDrawer from "./block/blockdrawer";
 import Sprite from "../../sprite";
-import GameMap from "../../../utils/map/gamemap";
-import BlockState from "../../../utils/map/blockstate/blockstate";
+import GameMap from "../../../map/gamemap";
+import BlockState from "../../../map/blockstate/blockstate";
 import Camera from "../../camera";
-import TextureProgram from "../programs/textureprogram";
+import TextureProgram from "../programs/texture-program";
 import Screen from "../screen";
 
 export interface DrawerBounds {
@@ -21,7 +21,7 @@ export default class MapDrawer {
 
     constructor(screen: Screen) {
         this.screen = screen
-        this.blockProgram = new TextureProgram("map-drawer-blockProgram", this.screen.ctx, {
+        this.blockProgram = new TextureProgram(this.screen.ctx, {
             largeIndices: true
         })
         this.reset()
@@ -64,10 +64,7 @@ export default class MapDrawer {
             this.oldBounds.y0 = y0
             this.oldBounds.y1 = y1
 
-            this.blockProgram.prepare()
-            this.blockProgram.use()
-            Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
-            this.blockProgram.matrixUniform.setMatrix(camera.matrix.m)
+            this.blockProgram.reset()
 
             for(let x = x0; x <= x1; x ++) {
                 for(let y = y0; y <= y1; y++) {
@@ -77,13 +74,15 @@ export default class MapDrawer {
                 }
             }
 
+            this.blockProgram.bind()
+            Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
+            this.blockProgram.setCamera(camera)
             this.blockProgram.draw()
         } else {
-            this.blockProgram.prepare(false)
-            this.blockProgram.use()
+            this.blockProgram.bind()
             this.blockProgram.matrixUniform.setMatrix(camera.matrix.m)
             Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
-            this.blockProgram.draw(false)
+            this.blockProgram.draw()
         }
 
         if(mipmaplevel !== oldmipmaplevel) {

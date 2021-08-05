@@ -1,16 +1,15 @@
 
 import * as Box2D from 'src/library/box2d';
 import Scene, {SceneConfig} from 'src/client/scenes/scene';
-import GameMap from 'src/utils/map/gamemap';
-import ClientTank from 'src/client/tanks/clienttank';
+import GameMap from 'src/map/gamemap';
 import EventContainer from 'src/client/ui/overlay/events/eventcontainer';
-import PlayerControlsPacket from 'src/networking/packets/game-packets/playercontrolspacket';
-import PlayerConfigPacket from 'src/networking/packets/game-packets/playerconfigpacket';
-import PlayerChatPacket from 'src/networking/packets/game-packets/playerchatpacket';
-import PlayerRespawnPacket from 'src/networking/packets/game-packets/playerrespawnpacket';
-import RoomListPacket from 'src/networking/packets/game-packets/roomlistpacket';
-import PlayerRoomRequestPacket from 'src/networking/packets/game-packets/playerroomrequestpacket';
-import PlayerRoomChangePacket from 'src/networking/packets/game-packets/playerroomchangepacket';
+import PlayerControlsPacket from 'src/networking/packets/game-packets/player-controls-packet';
+import PlayerConfigPacket from 'src/networking/packets/game-packets/player-config-packet';
+import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
+import PlayerRespawnPacket from 'src/networking/packets/game-packets/player-respawn-packet';
+import RoomListPacket from 'src/networking/packets/game-packets/room-list-packet';
+import PlayerRoomRequestPacket from 'src/networking/packets/game-packets/player-room-request-packet';
+import PlayerRoomChangePacket from 'src/networking/packets/game-packets/player-room-change-packet';
 import ControlPanel from '../ui/controlpanel';
 import Camera from 'src/client/camera';
 import PrimaryOverlay from '../ui/overlay/primary/primaryoverlay';
@@ -19,13 +18,12 @@ import TouchController from 'src/client/controls/interact/touchcontroller';
 import PlayerControls from 'src/client/controls/playercontrols';
 import GamepadManager from 'src/client/controls/interact/gamepadmanager';
 import WorldDrawer from 'src/client/graphics/drawers/world-drawer';
-import TankModel from "src/tanks/tankmodel";
-import AbstractTank from "src/tanks/abstracttank";
+import TankModel from "src/entity/tanks/tank-model";
 import AbstractClient from "src/networking/abstract-client";
-import Player from "src/utils/player";
 import KeyboardController from "src/client/controls/interact/keyboardcontroller";
-import ClientGameWorld from "../../clientgameworld";
+import ClientGameWorld from "../../client-game-world";
 import ClientWorldBridge from "../client-world-bridge";
+import {ClientTankType} from "../../entity/tank/client-tank";
 
 export interface GameSceneConfig extends SceneConfig {
     client: AbstractClient
@@ -41,7 +39,6 @@ export default class GameScene extends Scene {
 	public touchController: TouchController;
 	public playerControls: PlayerControls;
 	public client: AbstractClient;
-	public alive: boolean;
 	public overlay: PrimaryOverlay;
 	public eventContainer: EventContainer;
 	public chatContainer: ChatContainer;
@@ -63,7 +60,8 @@ export default class GameScene extends Scene {
             inertial: true
         })
 
-        this.world = new ClientGameWorld({})
+        this.client = config.client
+        this.world = new ClientGameWorld()
         ClientWorldBridge.buildBridge(this.client, this.world)
 
         this.touchController = new TouchController(this.controls, this.screen.canvas)
@@ -72,7 +70,7 @@ export default class GameScene extends Scene {
         this.playerControls.setupGamepad(this.gamepad)
 
         this.playerControls.on("respawn", () => {
-            if (this.world && this.world.player.tank) {
+            if (this.world && this.world.player) {
                 new PlayerRespawnPacket().sendTo(this.client.connection)
             }
         })
@@ -82,9 +80,6 @@ export default class GameScene extends Scene {
         this.gamepad.startListening()
 
         this.setupUpdateLoop()
-
-        this.alive = false
-        this.client = config.client
 
         this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.world)
 
@@ -103,14 +98,14 @@ export default class GameScene extends Scene {
             game: this
         })
 
-        this.overlay.on("play", (nick: string, tank: typeof AbstractTank) => {
+        this.overlay.on("play", (nick: string, tank: ClientTankType) => {
             if(this.world && this.world.player) {
-                let newTankId = tank.getModel().getId()
+                let newTankId = tank.Model.getId()
                 let oldTankId = (this.world.player.tank.model.constructor as typeof TankModel).getId()
                 if(newTankId === oldTankId) return
             }
 
-            new PlayerConfigPacket(nick, tank.getModel()).sendTo(this.client.connection)
+            new PlayerConfigPacket(nick, tank.Model).sendTo(this.client.connection)
         })
 
         this.overlay.roomSelectContainer.on("select", (room: string) => {
@@ -145,21 +140,17 @@ export default class GameScene extends Scene {
     }
 
     private connect() {
-        this.client.connectToServer()
-
         this.world.on("map-change", () => {
             this.camera.defaultPosition.x = this.world.map.width / 2 * GameMap.BLOCK_SIZE
             this.camera.defaultPosition.y = this.world.map.height / 2 * GameMap.BLOCK_SIZE
         })
 
-        this.world.on("player-join", (player: Player) => {
-            (player.tank as ClientTank).setupDrawer(this.screen.ctx)
-        })
-
-        this.world.on("player-spawn", () => {
-            this.playerControls.connectTankControls(this.world.player.tank.model.controls)
-            this.camera.target = this.world.player.tank.model.body.GetPosition()
-            this.camera.targetVelocity = this.world.player.tank.model.body.GetLinearVelocity()
+        this.world.on("primary-player-set", () => {
+            const model = this.world.player.tank.model
+            const body = model.getBody()
+            this.playerControls.connectTankControls(model.controls)
+            this.camera.target = body.GetPosition()
+            this.camera.targetVelocity = body.GetLinearVelocity()
             this.overlay.hide()
         })
 
@@ -172,9 +163,8 @@ export default class GameScene extends Scene {
                 let event = "Не удалось подключиться к игре '" + packet.room + "': " + packet.error
                 this.eventContainer.createEvent(event)
             } else {
-                this.playerControls.disconnectTankControls()
+                this.playerControls.disconnectAllTankControls()
 
-                this.world = null
                 this.chatContainer.clear()
 
                 this.overlay.roomSelectContainer.selectRoom(packet.room)
@@ -201,7 +191,9 @@ export default class GameScene extends Scene {
             }
         })
 
-        this.chatContainer.on("chat", (text: string) => new PlayerChatPacket(text).sendTo(this.client.connection))
+        this.chatContainer.on("chat", (text: string) => {
+            this.onChat(text)
+        })
         this.chatContainer.on("input-focus", () => {
             this.keyboard.stopListening()
         })
@@ -226,5 +218,17 @@ export default class GameScene extends Scene {
         this.camera.tick(dt)
         this.worldDrawer.draw(dt)
         this.world.tick(dt)
+    }
+
+    private onChat(text: string) {
+	    if(text.startsWith("/")) {
+	        this.handleCommand(text)
+        } else {
+            new PlayerChatPacket(text).sendTo(this.client.connection)
+        }
+    }
+
+    private handleCommand(text: string) {
+        if(text.startsWith("/debug")) this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
     }
 }

@@ -46,4 +46,4 @@ export function b2Log(message: string, ...args: any[]): void {
   // console.log(message, ...args);
 }
 
-export * from "./b2_common";
+export * from "./b2_common"

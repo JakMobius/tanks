@@ -15,7 +15,7 @@ export interface ParticleConfig {
     scaling?: number
 }
 
-class Particle {
+export default class Particle {
 	public x: number;
 	public y: number;
 	public dx: number;
@@ -59,5 +59,3 @@ class Particle {
         }
     }
 }
-
-export default Particle;

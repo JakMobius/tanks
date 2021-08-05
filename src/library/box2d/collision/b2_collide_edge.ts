@@ -1,5 +1,5 @@
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxManifoldPoints } from "../common/b2_common";
+import { b2_maxManifoldPoints } from "../common/b2_settings";
 import { b2Min, b2Vec2, b2Rot, b2Transform } from "../common/b2_math";
 import { b2ContactFeatureType, b2ContactID } from "./b2_collision";
 import { b2Manifold, b2ManifoldType, b2ManifoldPoint, b2ClipVertex, b2ClipSegmentToLine } from "./b2_collision";

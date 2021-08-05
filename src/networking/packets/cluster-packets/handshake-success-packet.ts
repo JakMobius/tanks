@@ -1,5 +1,5 @@
 
-import BinaryPacket from '../../binarypacket';
+import BinaryPacket from '../../binary-packet';
 import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
@@ -7,11 +7,9 @@ import {BinarySerializer, Constructor} from "../../../serialization/binary/seria
  * This packet is sent by hub when handshake succeeds
  */
 
-class HandshakeSuccessPacket extends BinaryPacket {
+export default class HandshakeSuccessPacket extends BinaryPacket {
     static typeName = 1002
     static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder) { return new this() }
 }
 
 BinarySerializer.register(HandshakeSuccessPacket)
-
-export default HandshakeSuccessPacket;

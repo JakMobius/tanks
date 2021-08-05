@@ -1,17 +1,19 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import BulletModel42mm from '../../entity/bullet/models/42mm';
 
-class Weapon42mm extends Weapon {
+import BulletModel42mm from '../../entity/bullets/models/42mm-bullet-model';
+import SingleBarreledWeapon from "../single-barreled-weapon";
+import * as Box2D from "../../library/box2d"
+import {WeaponConfig} from "../weapon";
+
+export default class Weapon42mm extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
-		config = Object.assign({
+		super({
 			maxAmmo: 5,
 			shootRate: 1000,
 			reloadTime: 5000,
-			bulletType: BulletModel42mm
-		}, config)
-
-		super(config);
+			bulletType: BulletModel42mm,
+			muzzlePoint: new Box2D.Vec2(0, 10),
+			tank: config.tank,
+			triggerAxle: config.triggerAxle
+		});
 	}
 }
-
-export default Weapon42mm;

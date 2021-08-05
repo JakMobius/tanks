@@ -1,10 +1,10 @@
 
 import MapModification from './mapmodification';
-import AirBlockState from '../../../../utils/map/blockstate/types/airblockstate';
-import GameMap from "../../../../utils/map/gamemap";
+import AirBlockState from '../../../../map/blockstate/types/airblockstate';
+import GameMap from "../../../../map/gamemap";
 import EditorMap from "../../editormap";
 import Rectangle from "../../../../utils/rectangle";
-import BlockState from "../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../map/blockstate/blockstate";
 
 class MapAreaModification extends MapModification {
 	public area: any;

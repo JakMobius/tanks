@@ -1,6 +1,6 @@
 
 import Command from '../command';
-import PlayerChatPacket from 'src/networking/packets/game-packets/playerchatpacket';
+import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
 
 class SayCommand extends Command {
     onPerform(args: string[]): void {

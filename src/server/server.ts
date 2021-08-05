@@ -9,7 +9,7 @@ import GameSocketPortal from "./socket/game-server/game-socket-portal";
 import ClusterSocketPortal from "./socket/hub-server/cluster-socket-portal";
 import Console from "./console/console";
 
-class Server {
+export default class Server {
     portListeners = new Map<Number, UniversalPortListener>()
     gameSocket: GameSocketPortal | null = null
     clusterSocket: ClusterSocketPortal | null = null
@@ -178,5 +178,3 @@ class Server {
         this.setClusterSocketServerActive(false)
     }
 }
-
-export default Server;

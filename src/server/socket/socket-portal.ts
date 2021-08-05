@@ -1,9 +1,8 @@
 import SocketPortalClient from '../socket/socket-portal-client';
-import BinaryPacket from '../../networking/binarypacket';
+import BinaryPacket from '../../networking/binary-packet';
 import Logger from '../log/logger';
 import WebsocketConnection from '../websocket-connection';
 import * as Websocket from 'websocket'
-import {BinarySerializer} from "../../serialization/binary/serializable";
 
 /**
  * This class represents a specific socket portal.
@@ -12,24 +11,23 @@ import {BinarySerializer} from "../../serialization/binary/serializable";
  * {@link handleRequest} function is called. It decides
  * if specific socket portal should handle this connection or not.
  */
-class SocketPortal {
+export default abstract class SocketPortal<ClientDataClass = any> {
 	public dynamicConnectionHandler: (request: Websocket.request) => void;
 	public webSocketServer: Websocket.server;
-    static clientClass = SocketPortalClient
 
     /**
      * Clients of exactly this portal
      */
-    public clients = new Map<number, SocketPortalClient>()
+    public clients = new Map<number, SocketPortalClient<ClientDataClass>>()
 
     /**
-     * List of IPs blocked for connecting to this portal
+     * List of IPs blocked from connecting to this portal
      */
     public banned: string[] = []
 
     protected logger = new Logger()
 
-    constructor() {
+    protected constructor() {
 
         this.dynamicConnectionHandler = (request: Websocket.request) => this.handleRequest(request)
     }
@@ -40,7 +38,7 @@ class SocketPortal {
      */
     terminate() {
         for (let client of this.clients.values()) {
-            client.websocket.close()
+            client.connection.close()
         }
         this.webSocketServer.off('request', this.dynamicConnectionHandler)
     }
@@ -58,6 +56,8 @@ class SocketPortal {
         this.handleConnection(request.accept(null, request.origin));
     }
 
+    abstract createClient(connection: WebsocketConnection): SocketPortalClient<ClientDataClass>
+
     // noinspection JSValidateJSDoc
     /**
      * This method is called up when this socket instance handles and
@@ -66,52 +66,24 @@ class SocketPortal {
      */
 
     handleConnection(connection: Websocket.connection) {
-        const client = new ((this.constructor as typeof SocketPortal).clientClass)({
-            websocket: connection,
-            connection: new WebsocketConnection(connection)
-        });
+        const client = this.createClient(new WebsocketConnection(connection))
 
+        this.clientConnected(client)
         this.clients.set(client.id, client)
 
-        client.websocket.on('message', (message: Websocket.IMessage) => {
-            this.handleMessage(message, client)
+        client.connection.on('packet', (packet: BinaryPacket) => {
+            this.handlePacket(packet, client)
         })
 
-        client.websocket.on('close', () =>  {
+        client.connection.on('close', () =>  {
             this.clientDisconnected(client)
             this.clients.delete(client.id);
         });
 
-        this.clientConnected(client)
-    }
-
-    /**
-     * This method is called when portal receives a message from
-     * specific client
-     */
-    handleMessage(message: Websocket.IMessage, client: SocketPortalClient) {
-        try {
-            if(message.type !== "binary") {
-                this.logger.log("Received invalid packet from client " + client.id)
-                this.logger.log("Binary message expected, " + message.type + " received.")
-                return
-            }
-
-            let data = message.binaryData
-            let decoder = BinaryPacket.binaryDecoder
-            decoder.reset()
-            decoder.readData(new Uint8Array(data).buffer)
-
-            // BinaryPacket.deserialize may only return
-            // a BinaryPacket instance
-
-            let packet = BinarySerializer.deserialize(decoder, BinaryPacket)
-
-            this.handlePacket(packet, client);
-        } catch(e) {
-            this.logger.log("Exception while handling packet from client " + client.id)
+        client.connection.on('error', (e) => {
+            this.logger.log("Error occurred in WebsocketConnection for client " + client.id)
             this.logger.log(e)
-        }
+        })
     }
 
     /**
@@ -119,7 +91,7 @@ class SocketPortal {
      * @param packet {BinaryPacket} Received packet
      * @param client {SocketPortalClient} Packet sender
      */
-    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
+    handlePacket(packet: BinaryPacket, client: SocketPortalClient<ClientDataClass>) {
 
     }
 
@@ -127,7 +99,7 @@ class SocketPortal {
      * Called when client disconnects from the socket
      * @param client {SocketPortalClient}
      */
-    clientDisconnected(client: SocketPortalClient) {
+    clientDisconnected(client: SocketPortalClient<ClientDataClass>) {
 
     }
 
@@ -135,7 +107,7 @@ class SocketPortal {
      * Called when new client connects to the socket*
      * @param client {SocketPortalClient}
      */
-    clientConnected(client: SocketPortalClient) {
+    clientConnected(client: SocketPortalClient<ClientDataClass>) {
 
     }
 
@@ -149,5 +121,3 @@ class SocketPortal {
         this.webSocketServer.on('request', this.dynamicConnectionHandler)
     }
 }
-
-export default SocketPortal;

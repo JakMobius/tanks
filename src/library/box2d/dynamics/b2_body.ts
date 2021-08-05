@@ -19,7 +19,7 @@
 // DEBUG: import { b2Assert } from "../common/b2_settings";
 // DEBUG: import { b2IsValid } from "../common/b2_math";
 import { b2Maybe } from "../common/b2_common";
-import { b2Vec2, b2Rot, b2Transform, b2Sweep, XY } from "../common/b2_math";
+import { b2Vec2, b2Rot, b2Transform, b2Sweep, XY } from "../common/b2_math"
 import { b2Shape, b2MassData } from "../collision/b2_shape";
 import { b2ContactEdge } from "./b2_contact";
 import { b2JointEdge } from "./b2_joint";
@@ -52,7 +52,7 @@ export interface b2IBodyDef {
   /// since this can lead to many overlapping shapes.
   position?: XY;
 
-  /// The world setAngle of the body in radians.
+  /// The world angle of the body in radians.
   angle?: number;
 
   /// The linear velocity of the body's origin in world co-ordinates.
@@ -110,7 +110,7 @@ export class b2BodyDef implements b2IBodyDef {
   /// since this can lead to many overlapping shapes.
   public readonly position: b2Vec2 = new b2Vec2(0, 0);
 
-  /// The world setAngle of the body in radians.
+  /// The world angle of the body in radians.
   public angle: number = 0;
 
   /// The linear velocity of the body's origin in world co-ordinates.
@@ -402,7 +402,7 @@ export class b2Body {
   /// This breaks any contacts and wakes the other bodies.
   /// Manipulating a body's transform may cause non-physical behavior.
   /// @param position the world position of the body's local origin.
-  /// @param setAngle the world rotation in radians.
+  /// @param angle the world rotation in radians.
   public SetTransformVec(position: XY, angle: number): void {
     this.SetTransformXY(position.x, position.y, angle);
   }
@@ -454,8 +454,8 @@ export class b2Body {
     this.SetTransformXY(x, y, this.GetAngle());
   }
 
-  /// Get the setAngle in radians.
-  /// @return the current world rotation setAngle in radians.
+  /// Get the angle in radians.
+  /// @return the current world rotation angle in radians.
   public GetAngle(): number {
     return this.m_sweep.a;
   }
@@ -1074,7 +1074,7 @@ export class b2Body {
     }
     log("  bd.type = %s;\n", type_str);
     log("  bd.position.Set(%.15f, %.15f);\n", this.m_xf.p.x, this.m_xf.p.y);
-    log("  bd.setAngle = %.15f;\n", this.m_sweep.a);
+    log("  bd.angle = %.15f;\n", this.m_sweep.a);
     log("  bd.linearVelocity.Set(%.15f, %.15f);\n", this.m_linearVelocity.x, this.m_linearVelocity.y);
     log("  bd.angularVelocity = %.15f;\n", this.m_angularVelocity);
     log("  bd.linearDamping = %.15f;\n", this.m_linearDamping);

@@ -4,7 +4,7 @@ import Menu from '../../../../../ui/menu/menu';
 
 import MapStorage from '../../../../mapstorage';
 import DragListener from '../../../element/dragoverlay';
-import Utils from '../../../../../../utils/utils';
+import {trimFileExtension} from '../../../../../../utils/utils';
 import EditorMap from "../../../../editormap";
 
 class MapSelectContainer extends Menu {
@@ -47,7 +47,7 @@ class MapSelectContainer extends Menu {
             try {
                 let map = MapStorage.readMap(file.buffer)
 
-                if(!map.name) map.name = Utils.trimFileExtension(file.name)
+                if(!map.name) map.name = trimFileExtension(file.name)
 
                 this.maps.push(map)
 

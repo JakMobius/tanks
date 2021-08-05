@@ -1,10 +1,8 @@
 /* @load-resource: './tank-preview.scss' */
 
 import StatScale from './statscale';
-
 import Menu from 'src/client/ui/menu/menu';
-import TankModel from "../../../../../../tanks/tankmodel";
-import ClientTank from "../../../../../tanks/clienttank";
+import {ClientTankType} from "../../../../../entity/tank/client-tank";
 
 export interface StatConfig {
     name: string;
@@ -14,10 +12,10 @@ export interface StatConfig {
 }
 
 export class Stat implements StatConfig {
-	public name: any;
-	public color: any;
-	public maximum: any;
-	public func: any;
+	public name: string;
+	public color: string;
+	public maximum: number;
+	public func: (value: number, maximum: number) => number;
 
     constructor(options: StatConfig) {
         this.name = options.name
@@ -30,7 +28,7 @@ export class Stat implements StatConfig {
         return value / maximum
     }
 
-    static Reversive(value: number, maximum: number) {
+    static Reverse(value: number, maximum: number) {
         return maximum / value
     }
 }
@@ -66,13 +64,13 @@ class TankPreviewContainer extends Menu {
             name: "СКОРОСТРЕЛЬНОСТЬ",
             color: "#1CBCEF",
             maximum: 0.2,
-            func: Stat.Reversive,
+            func: Stat.Reverse,
         })],
         ["reload", new Stat({
             name: "ПЕРЕЗАРЯДКА",
             color: "#55D346",
             maximum: 1,
-            func: Stat.Reversive,
+            func: Stat.Reverse,
         })]
     ])
 
@@ -114,7 +112,7 @@ class TankPreviewContainer extends Menu {
         }
     }
 
-    drawTank(tank: typeof ClientTank) {
+    drawTank(tank: ClientTankType) {
         //this.previewCtx.save()
         //this.previewCtx.clearRect(0, 0, 155, 155)
         //this.previewCtx.translate(155 / 2, 155 / 2);
@@ -126,16 +124,16 @@ class TankPreviewContainer extends Menu {
         //this.previewCtx.restore()
     }
 
-    applyStats(tank: typeof ClientTank) {
-        let stats = tank.getStats()
-        for(let [key, element] of this.statElements.entries()) {
-            const statValue = stats[key];
-
-            element.setValue(statValue)
-        }
+    applyStats(tank: ClientTankType) {
+        // let stats = tank.getStats()
+        // for(let [key, element] of this.statElements.entries()) {
+        //     const statValue = stats[key];
+        //
+        //     element.setValue(statValue)
+        // }
     }
 
-    previewTank(tank: typeof ClientTank) {
+    previewTank(tank: ClientTankType) {
         this.drawTank(tank)
 
         this.previewTitle.text(tank.getName())

@@ -1,5 +1,5 @@
 
-import { Shaders } from './shaderloader'
+import { Shaders } from './shader-loader'
 
 class Shader {
 	public name: string;

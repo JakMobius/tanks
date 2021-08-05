@@ -1,23 +1,19 @@
 
-import AbstractEntity from '../../entity/abstractentity';
-import Utils from '../../utils/utils';
-import GameMap from '../../utils/map/gamemap';
-import * as Box2D from '../../library/box2d';
-import EntityModel from "../../entity/entitymodel";
-import BlockState from "../../utils/map/blockstate/blockstate";
-import Player from "../../utils/player";
+import AbstractEntity from '../../entity/abstract-entity';
+import EntityModel from "../../entity/entity-model";
+import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../serialization/binary/binaryencoder";
+import ServerGameWorld from "../server-game-world";
+import {Constructor} from "../../serialization/binary/serializable";
 
-class ServerEntity extends AbstractEntity {
-	public explodeResistance: any;
-	public shooter: Player;
-	public types: Map<typeof EntityModel, typeof ServerEntity>;
+export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
+	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;
+	public teleported: boolean = true
     static types = new Map()
     static globalId = 0
 
-    constructor(model: EntityModel) {
+    constructor(model: ModelClass) {
         super(model);
-
-        this.explodeResistance = 0.2
 
         model.id = ServerEntity.globalId++
     }
@@ -30,26 +26,57 @@ class ServerEntity extends AbstractEntity {
         this.model.tick(dt)
     }
 
-    checkPlayerHit(x: number, y: number, dx: number, dy: number) {
-
-    }
-
-    checkWallHit(x: number, y: number, dx: number, dy: number) {
-
-    }
-
-    static fromModel(model: EntityModel) {
+    static fromModel(model: EntityModel): ServerEntity | null {
         let type = this.types.get(model.constructor)
 
         if(type) {
-            return new type(model)
+            return new type({
+                model: model
+            })
         }
         return null
     }
 
-    static associate(modelClass: typeof EntityModel, serverClass: typeof ServerEntity): void {
+    static associate(serverClass: Constructor<ServerEntity>, modelClass: Constructor<EntityModel>): void {
         this.types.set(modelClass, serverClass)
     }
-}
 
-export default ServerEntity;
+    decodeInitialData(decoder: BinaryDecoder) {
+	    throw new Error("Method not implemented")
+    }
+
+    decodeDynamicData(decoder: BinaryDecoder): void {
+        throw new Error("Method not implemented")
+    }
+
+    private encodePositionVelocity(encoder: BinaryEncoder) {
+        let body = this.model.getBody()
+        let position = body.GetPosition()
+        encoder.writeFloat32(position.x)
+        encoder.writeFloat32(position.y)
+        encoder.writeFloat32(body.GetAngle())
+
+        let velocity = body.GetLinearVelocity()
+        let angular = body.GetAngularVelocity()
+
+        encoder.writeFloat32(velocity.x)
+        encoder.writeFloat32(velocity.y)
+        encoder.writeFloat32(angular)
+    }
+
+    encodeInitialData(encoder: BinaryEncoder) {
+        this.encodePositionVelocity(encoder)
+        encoder.writeFloat32(this.model.health)
+    }
+
+    encodeDynamicData(encoder: BinaryEncoder): void {
+        encoder.writeUint8(this.teleported as any as number)
+        this.teleported = false
+        this.encodePositionVelocity(encoder)
+    }
+
+    damage(damage: number): void {
+        this.model.setHealth(Math.max(0, this.model.health - damage))
+        this.world.emit("entity-damage", this, damage)
+    }
+}

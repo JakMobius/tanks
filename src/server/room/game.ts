@@ -1,29 +1,33 @@
 import Team from '../team';
 import Color from '../../utils/color';
-import ServerTank from '../tanks/servertank';
-import ServerGameWorld from '../servergameworld';
-import HighPrecisionLoop from '../../utils/loop/highpreciseloop';
+import ServerTank from '../entity/tank/servertank';
+import ServerGameWorld from '../server-game-world';
+import HighPrecisionLoop from '../../utils/loop/high-precision-loop';
 import Room from './room';
 import Logger from '../log/logger';
 import SocketPortalClient from "../socket/socket-portal-client";
-import GameMap from "../../utils/map/gamemap";
-import Server from "../server";
+import GameMap from "../../map/gamemap";
 
-import 'src/tanks/model-loader'
-import 'src/server/entity/bullet/model-loader';
+import 'src/entity/tanks/model-loader'
+import 'src/server/entity/bullet/type-loader';
+import 'src/server/entity/tank/type-loader'
 import 'src/server/effects/world/type-loader';
 import 'src/server/effects/tank/type-loader';
-import 'src/utils/map/blockstate/type-loader';
+import 'src/map/blockstate/type-loader';
+
 import HTMLEscape from "../../utils/htmlescape";
-import PlayerChatPacket from "../../networking/packets/game-packets/playerchatpacket";
-import Player from "../../utils/player";
-import TankModel from "../../tanks/tankmodel";
+import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-packet";
+import AbstractPlayer from "../../abstract-player";
+import TankModel from "../../entity/tanks/tank-model";
 import ServerPlayer from "../server-player";
+import Loop from "../../utils/loop/loop";
+import ServerWorldBridge from "../server-world-bridge";
+import ServerEntity from "../entity/serverentity";
 
 interface GameConfig {
     name: string
     map: GameMap
-    server: Server
+    loop?: Loop
 }
 
 export default class Game extends Room {
@@ -32,22 +36,19 @@ export default class Game extends Room {
         new Team(1, new Color(222, 54, 54)),
         new Team(2, new Color(14, 193, 1))
     ]
-    public loop = new HighPrecisionLoop();
+    public loop: Loop;
     public ticks: number = 0;
     public logger: Logger = new Logger();
     public world: ServerGameWorld;
+    public tps: number = 20;
     public spt: number;
-    public tps: number;
     public timer: number;
 
     constructor(options: GameConfig) {
         super()
 
-        this.loop.run = () => this.tick()
-
         this.ticks = 0
-        this.setTPS(20)
-        this.logger = new Logger()
+        this.spt = 1 / this.tps
         this.name = options.name
 
         this.world = new ServerGameWorld({
@@ -55,18 +56,26 @@ export default class Game extends Room {
             room: this
         })
 
+        ServerWorldBridge.buildBridge(this.world, this.portal)
+
         this.portal.on("client-connect", () => this.onClientConnect())
         this.portal.on("client-disconnect", (client) => this.onClientDisconnect(client))
 
+        this.world.on("player-create", (player) => this.onPlayerJoin(player))
+        this.world.on("player-changed-tank", (player) => this.onPlayerChangedTank(player))
+        this.world.on("player-remove", (player) => this.onPlayerLeave(player))
         this.world.on("player-respawn", (player) => this.onPlayerRespawn(player))
         this.world.on("player-chat", (player, text) => this.onPlayerChat(player, text))
         this.world.on("player-config", (player, tank, nick) => this.onClientConfig(player, tank, nick))
-    }
 
-    setTPS(tps: number): void {
-        this.tps = tps
-        this.spt = 1 / this.tps
-        this.loop.interval = 1000 / this.tps
+        if(options.loop) {
+            this.loop = options.loop
+        } else {
+            this.loop = new HighPrecisionLoop({
+                interval: this.spt * 1000
+            })
+        }
+        this.loop.run = () => this.tick()
     }
 
     log(line: string): void {
@@ -81,26 +90,32 @@ export default class Game extends Room {
         }
     }
 
-    onClientConnect() {
+    private onClientConnect() {
         if (!this.timer) {
             this.log("Player connected, resuming the screen...")
             this.loop.start()
         }
     }
 
-    onClientDisconnect(client: SocketPortalClient) {
+    private onClientDisconnect(client: SocketPortalClient) {
         this.log("Disconnected " + client.id)
 
         if (this.portal.clients.size === 0) {
             this.log("No players, pausing the screen...")
             this.pause()
         }
+    }
 
-        const player = client.data.player
-        if(player) {
-            client.data.player = null
-            this.world.removePlayer(player)
-        }
+    private onPlayerJoin(player: ServerPlayer) {
+        this.broadcastMessage("§!F00;" + player.nick + "§!; присоединился к игре")
+    }
+
+    private onPlayerChangedTank(player: ServerPlayer) {
+        this.broadcastMessage("§!F00;" + player.nick + "§!; сменил вооружение")
+    }
+
+    private onPlayerLeave(player: ServerPlayer) {
+        this.broadcastMessage("§!F00;" + player.nick + "§!; вышел из игры")
     }
 
     pause() {
@@ -134,7 +149,7 @@ export default class Game extends Room {
         return mostUnfilled[Math.floor(Math.random() * mostUnfilled.length)]
     }
 
-    private onPlayerChat(player: Player, text: string) {
+    private onPlayerChat(player: AbstractPlayer, text: string) {
         text = text.trim()
 
         if (!text.length) return
@@ -149,10 +164,7 @@ export default class Game extends Room {
     private onClientConfig(client: SocketPortalClient, model: typeof TankModel, nick: string) {
         let player: ServerPlayer = client.data.player
 
-        if(player) {
-            player.tank.destroy()
-            this.broadcastMessage("§!F00;" + player.nick + "§!; сменил вооружение")
-        } else {
+        if(!player) {
             const team = this.getFreeTeam()
 
             player = new ServerPlayer({
@@ -163,31 +175,35 @@ export default class Game extends Room {
 
             team.players.add(player)
             client.data.player = player
-            this.world.createPlayer(player)
-
-            this.broadcastMessage("§!F00;" + player.nick + "§!; присоединился к игре")
         }
 
-        let tank = new ServerTank({ type: model })
+        const tankModel = new model()
+        const tank = ServerEntity.fromModel(tankModel) as ServerTank
+        const oldTank = player.tank
 
+        this.world.createEntity(tank)
         player.setTank(tank)
 
+        this.world.createPlayer(player)
         this.respawnPlayer(player)
+
+        if(oldTank) this.world.removeEntity(oldTank)
     }
 
-    private respawnPlayer(player: ServerPlayer) {
+    respawnPlayer(player: ServerPlayer) {
         const team = player.team
         const tank = player.tank
 
-        tank.model.health = (player.tank.model.constructor as typeof TankModel).getMaximumHealth()
+        tank.model.setHealth((player.tank.model.constructor as typeof TankModel).getMaximumHealth())
 
         const spawnPoint = this.world.map.spawnPointForTeam(team.id)
-        tank.model.body.SetPosition(spawnPoint)
-        tank.model.body.SetAngle(0)
+        const body = tank.model.getBody()
+        body.SetPosition(spawnPoint)
+        body.SetAngle(0)
 
-        const velocity = player.tank.model.body.GetLinearVelocity()
+        const velocity = body.GetLinearVelocity()
         velocity.Set(0, 0)
         tank.teleported = true
-        tank.model.body.SetLinearVelocity(velocity)
+        body.SetLinearVelocity(velocity)
     }
 }

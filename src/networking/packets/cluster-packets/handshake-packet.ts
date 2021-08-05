@@ -1,11 +1,11 @@
 
-import BinaryPacket from '../../binarypacket';
+import BinaryPacket from '../../binary-packet';
 import ClusterHandshake from '../../../server/socket/cluster-handshake';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 import BinaryEncoder from "../../../serialization/binary/binaryencoder";
 
-class HandshakePacket extends BinaryPacket {
+export default class HandshakePacket extends BinaryPacket {
 
     handshakeData: Uint8Array
 
@@ -26,4 +26,3 @@ class HandshakePacket extends BinaryPacket {
 }
 
 BinarySerializer.register(HandshakePacket)
-export default HandshakePacket;

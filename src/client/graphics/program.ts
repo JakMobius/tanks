@@ -3,22 +3,20 @@ import Uniform from './uniform';
 import GLBuffer from './glbuffer';
 import Shader from "./shader";
 
-class Program {
-	public name: string;
-	public shaders: Shader[];
-	public raw: WebGLProgram;
-	public ctx: WebGLRenderingContext;
+export default abstract class Program {
+    public shaders: Shader[];
+    public raw: WebGLProgram;
+    public ctx: WebGLRenderingContext;
 
-    constructor(name: string, ...shaders: Shader[]) {
-        this.name = name
-        this.shaders = Array.prototype.slice.call(arguments, 1)
+    protected constructor(...shaders: Shader[]) {
+        this.shaders = Array.prototype.slice.call(arguments)
         this.raw = null
         this.ctx = null
     }
 
     link(gl: WebGLRenderingContext) {
         this.raw = gl.createProgram()
-        for(let shader of this.shaders)
+        for (let shader of this.shaders)
             gl.attachShader(this.raw, shader.raw)
         gl.linkProgram(this.raw)
 
@@ -46,13 +44,10 @@ class Program {
         return this.ctx.getAttribLocation(this.raw, name);
     }
 
-    use() {
+    bind() {
         this.ctx.useProgram(this.raw)
     }
 
-    prepare() {
-
-    }
+    abstract draw(): void
+    abstract reset(): void
 }
-
-export default Program;

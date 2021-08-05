@@ -7,7 +7,7 @@ import Logger from 'src/server/log/logger';
 import ClusterHandshake from '../cluster-handshake';
 import ServerParticipantConnection from './server-participant-connection';
 
-class ServerParticipantClient extends ServerWebSocketClient {
+export default class ServerParticipantClient extends ServerWebSocketClient {
 
     password: string
     reconnect: boolean = false
@@ -94,6 +94,8 @@ class ServerParticipantClient extends ServerWebSocketClient {
         this.reconnect = false
         super.disconnect(reason)
     }
-}
 
-export default ServerParticipantClient;
+    getIpAddress(): string {
+        return this.ip;
+    }
+}

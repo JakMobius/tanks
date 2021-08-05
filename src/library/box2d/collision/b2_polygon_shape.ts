@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert, b2_epsilon_sq } from "../common/b2_settings";
-import { b2_epsilon, b2_maxFloat, b2_linearSlop, b2_polygonRadius } from "../common/b2_common";
+import { b2_epsilon, b2_maxFloat, b2_linearSlop, b2_polygonRadius } from "../common/b2_settings";
 import { b2Vec2, b2Rot, b2Transform, XY } from "../common/b2_math";
 import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
 import { b2DistanceProxy } from "./b2_distance";
@@ -194,7 +194,7 @@ export class b2PolygonShape extends b2Shape {
   /// @param hx the half-width.
   /// @param hy the half-height.
   /// @param center the center of the box in local coordinates.
-  /// @param setAngle the rotation of the box in local coordinates.
+  /// @param angle the rotation of the box in local coordinates.
   public SetAsBox(hx: number, hy: number, center?: XY, angle: number = 0): b2PolygonShape {
     this.m_count = 4;
     this.m_vertices = b2Vec2.MakeArray(this.m_count);
@@ -669,9 +669,9 @@ export class b2PolygonShape extends b2Shape {
         const center_x: number = 0.5 * (lowerX + upperX);
         const center_y: number = 0.5 * (lowerY + upperY);
         const tMat = obb.R;
-        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.cursorX * center_y);
+        obb.center.x = root.x + (tMat.ex.x * center_x + tMat.ey.x * center_y);
         obb.center.y = root.y + (tMat.ex.y * center_x + tMat.ey.y * center_y);
-        obb.extents.cursorX = 0.5 * (upperX - lowerX);
+        obb.extents.x = 0.5 * (upperX - lowerX);
         obb.extents.y = 0.5 * (upperY - lowerY);
       }
     }

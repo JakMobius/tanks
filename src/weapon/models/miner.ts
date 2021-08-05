@@ -1,19 +1,19 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import Mine from '../../entity/bullet/models/mine';
 
-class WeaponMiner extends Weapon {
+import SingleBarreledWeapon from "../single-barreled-weapon";
+import BulletModelMine from "../../entity/bullets/models/mine-bullet-model";
+import * as Box2D from "../../library/box2d"
+import {WeaponConfig} from "../weapon";
+
+export default class WeaponMiner extends SingleBarreledWeapon {
     constructor(config: WeaponConfig) {
-        config = Object.assign({
+        super({
             maxAmmo: 1,
             shootRate: 1000,
             reloadTime: 1000,
-            bulletType: Mine,
-        }, config)
-
-        super(config);
-
-        this.id = 5
+            bulletType: BulletModelMine,
+            muzzlePoint: new Box2D.Vec2(0, 0),
+            tank: config.tank,
+            triggerAxle: config.triggerAxle
+        });
     }
 }
-
-export default WeaponMiner;

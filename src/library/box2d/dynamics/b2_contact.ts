@@ -16,7 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2_linearSlop } from "../common/b2_common";
+import { b2_linearSlop } from "../common/b2_settings";
 import { b2Sqrt, b2Transform, b2Sweep } from "../common/b2_math";
 import { b2Manifold, b2WorldManifold, b2ManifoldPoint, b2ContactID } from "../collision/b2_collision";
 import { b2TestOverlapShape } from "../collision/b2_collision";

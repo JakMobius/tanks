@@ -1,7 +1,7 @@
 
 import Particle, {ParticleConfig} from './particle';
 
-class Smoke extends Particle {
+export default class Smoke extends Particle {
 	public scaling: any;
 
     constructor(config: ParticleConfig) {
@@ -19,5 +19,3 @@ class Smoke extends Particle {
 
     }
 }
-
-export default Smoke;

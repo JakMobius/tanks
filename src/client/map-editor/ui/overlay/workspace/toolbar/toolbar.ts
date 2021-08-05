@@ -2,10 +2,10 @@
 
 import View from 'src/client/ui/view';
 
-import BrickBlockState from 'src/utils/map/blockstate/types/brickblockstate';
+import BrickBlockState from 'src/map/blockstate/types/brickblockstate';
 import BlockSelectOverlay from '../blockselect/blockselectoverlay';
 import BlockSelectButton from '../blockselect/blockselectbutton';
-import BlockState from "../../../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../../../map/blockstate/blockstate";
 import Tool from "../../../../tools/tool";
 import BlockSelectMenu from "../blockselect/blockselectmenu";
 

@@ -16,7 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2MakeArray } from "../common/b2_common";
+import { b2MakeArray } from "../common/b2_settings";
 import { b2Vec2 } from "../common/b2_math";
 
 /// Profiling data. Times are in milliseconds.

@@ -5,15 +5,19 @@ import HandshakePacket from 'src/networking/packets/cluster-packets/handshake-pa
 import HandshakeSuccessPacket from 'src/networking/packets/cluster-packets/handshake-success-packet';
 import RoomCreateRequestPacket from 'src/networking/packets/cluster-packets/room-creation-request-packet';
 import RoomConfig from 'src/server/room/room-config';
-import ClusterSocketPortalClient from './cluster-socket-portal-client';
-import Chalk from 'chalk';
 import {request} from "websocket";
 import SocketPortalClient from "../socket-portal-client";
-import BinaryPacket from "../../../networking/binarypacket";
+import BinaryPacket from "../../../networking/binary-packet";
+import WebsocketConnection from "../../websocket-connection";
 
-class ClusterSocketPortal extends SocketPortal {
+export interface ClusterSocketPortalClientData {
+    authorizationSalt: Buffer | null
+    authorized: boolean
+}
 
-    static clientClass = ClusterSocketPortalClient
+type ClusterSocketPortalClient = SocketPortalClient<ClusterSocketPortalClientData>
+
+export default class ClusterSocketPortal extends SocketPortal<ClusterSocketPortalClientData> {
 
     password: string
 
@@ -31,7 +35,7 @@ class ClusterSocketPortal extends SocketPortal {
         }
     }
 
-    authorizeClient(client: SocketPortalClient) {
+    authorizeClient(client: ClusterSocketPortalClient) {
         let salt = ClusterHandshake.generateSalt()
         client.data.authorizationSalt = salt
         new HandshakePacket(new Uint8Array(salt)).sendTo(client.connection)
@@ -59,13 +63,13 @@ class ClusterSocketPortal extends SocketPortal {
     }
 
     handleAuthorizationFail(client: ClusterSocketPortalClient) {
-        this.logger.log(`§F00;Rejected connection from origin ${client.websocket.remoteAddress} due to failed handshake`)
+        this.logger.log(`§F00;Rejected connection from origin ${client.connection.getIpAddress()} due to failed handshake`)
         client.connection.close("Access denied")
         client.data.authorizationSalt = null
     }
 
     handleAuthorizationSuccess(client: ClusterSocketPortalClient) {
-        this.logger.log(`The game server from origin ${client.websocket.remoteAddress} has been connected`)
+        this.logger.log(`The game server from origin ${client.connection.getIpAddress()} has been connected`)
         client.data.authorized = true
 
         new HandshakeSuccessPacket().sendTo(client.connection)
@@ -95,13 +99,21 @@ class ClusterSocketPortal extends SocketPortal {
     /**
      * Called when client sends packet
      * @param packet {BinaryPacket} Received packet
-     * @param client {ClusterSocketPortalClient} Packet sender
+     * @param client {SocketPortalClient} Packet sender
      */
 
-    handlePacket(packet: BinaryPacket, client: ClusterSocketPortalClient) {
+    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
         if (client.data.authorized) this.handleAuthorizedPacket(packet, client)
         else this.handleUnauthorizedPacket(packet, client)
     }
-}
 
-export default ClusterSocketPortal;
+    createClient(connection: WebsocketConnection): ClusterSocketPortalClient {
+        return new SocketPortalClient<ClusterSocketPortalClientData>({
+            connection: connection,
+            data: {
+                authorizationSalt: null,
+                authorized: false
+            }
+        })
+    }
+}

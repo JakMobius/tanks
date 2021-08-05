@@ -18,7 +18,7 @@
 
 // #if B2_ENABLE_PARTICLE
 
-import { b2_invalidParticleIndex } from "../common/b2_common";
+import { b2_invalidParticleIndex } from "../common/b2_settings";
 import { b2Clamp, b2Vec2, XY } from "../common/b2_math";
 import { b2Color, RGBA } from "../common/b2_draw";
 import { b2ParticleGroup } from "./b2_particle_group";

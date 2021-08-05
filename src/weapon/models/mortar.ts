@@ -1,19 +1,18 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import MortarBall from '../../entity/bullet/models/mortarball';
+import {WeaponConfig} from '../weapon';
+import MortarBall from '../../entity/bullets/models/mortarball-bullet-model';
+import * as Box2D from "../../library/box2d";
+import SingleBarreledWeapon from "../single-barreled-weapon";
 
-class WeaponMortar extends Weapon {
+export default class WeaponMortar extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
-		config = Object.assign({
+		super({
 			maxAmmo: 5,
 			shootRate: 1000,
 			reloadTime: 5000,
 			bulletType: MortarBall,
-		}, config)
-
-		super(config);
-
-		this.id = 6
+			muzzlePoint: new Box2D.Vec2(0, 5),
+			tank: config.tank,
+			triggerAxle: config.triggerAxle
+		});
 	}
 }
-
-export default WeaponMortar;

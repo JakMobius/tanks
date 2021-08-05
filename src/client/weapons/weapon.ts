@@ -1,5 +1,5 @@
-import BulletModel from "../../entity/bullet/bulletmodel";
-import ClientGameWorld from "../clientgameworld";
+import BulletModel from "../../entity/bullets/bullet-model";
+import ClientGameWorld from "../client-game-world";
 
 export interface WeaponConfig {
     name: string

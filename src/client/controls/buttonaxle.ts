@@ -1,13 +1,13 @@
 
-import Axle from '../../tanks/controls/axle';
+import Axle from '../../controls/axle';
 
-class ButtonAxle extends Axle {
-	public min: any;
-	public max: any;
-	public animationTime: any;
-	public target: any;
-	public keypressTimestamp: any;
-	public pressed: any;
+export default class ButtonAxle extends Axle {
+	public min: number;
+	public max: number;
+	public animationTime: number;
+	public target: number;
+	public keypressTimestamp: number;
+	public pressed: boolean;
 
     constructor(min: number, max: number) {
         super()
@@ -74,5 +74,3 @@ class ButtonAxle extends Axle {
         return this.ownValue
     }
 }
-
-export default ButtonAxle;

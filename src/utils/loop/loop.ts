@@ -1,24 +1,29 @@
 
 import ScheduledTask from './scheduledtask';
 
-class Loop {
-	public schedule = new Map<number, ScheduledTask>();
-	public schedules: any;
-	public ticks: any;
-	public loopTimestamp: any;
-	public maximumTimestep: any;
-	public timeMultiplier: any;
-	public run: any;
-	public running: any;
+export interface LoopConfig {
+    maximumTimestep?: number
+    timeMultiplier?: number
+}
 
-    constructor() {
-        this.schedule = new Map()
-        this.schedules = 0;
-        this.ticks = 0
-        this.loopTimestamp = 0
-        this.maximumTimestep = 0.1
-        this.timeMultiplier = 1
-        this.run = null
+export default class Loop {
+	public schedule = new Map<number, ScheduledTask>();
+	public schedules = 0;
+	public ticks = 0;
+	public loopTimestamp = 0;
+	public maximumTimestep: number
+	public timeMultiplier: number;
+	public run: (dt: number) => void = null;
+	public running: boolean = false;
+
+	constructor(config: LoopConfig) {
+	    config = Object.assign({
+            maximumTimestep: 0.1,
+            timeMultiplier: 1
+        }, config)
+
+	    this.maximumTimestep = config.maximumTimestep
+        this.timeMultiplier = config.timeMultiplier
     }
 
     start() {
@@ -70,7 +75,7 @@ class Loop {
         }
     }
 
-    scheduleTask(func: () => void, time: number) {
+    scheduleTask(func: () => void, time: number = 0) {
         time = time || 0
         let index = this.schedules ++
 
@@ -79,5 +84,3 @@ class Loop {
         return index
     }
 }
-
-export default Loop;

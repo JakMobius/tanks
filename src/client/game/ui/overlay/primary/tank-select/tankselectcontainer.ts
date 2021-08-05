@@ -2,21 +2,20 @@
 
 import Menu from 'src/client/ui/menu/menu';
 
-import ClientTank from 'src/client/tanks/clienttank';
-import SniperTank from 'src/client/tanks/models/sniper'; // Default selected tank
 import TankSelectElement from './tankselectelement';
 import Camera from 'src/client/camera';
 import * as Box2D from 'src/library/box2d';
 import RenderLoop from 'src/utils/loop/renderloop';
-import TankModel from "../../../../../../tanks/tankmodel";
+import ClientTank, {ClientTankType} from "../../../../../entity/tank/client-tank";
+import ClientSniperTank from "../../../../../entity/tank/types/client-sniper-tank";
 
-class TankSelectContainer extends Menu {
+export default class TankSelectContainer extends Menu {
 	public shadowLeft: JQuery;
 	public shadowRight: JQuery;
 	public container: JQuery;
 	public leftShadowHidden: boolean;
 	public rightShadowHidden: boolean;
-	public selectedTank: typeof ClientTank;
+	public selectedTank: ClientTankType
 	public previewCamera: Camera;
 	public previewWorld: Box2D.World;
 	public loop: RenderLoop;
@@ -48,7 +47,9 @@ class TankSelectContainer extends Menu {
         this.previewCamera.tick(0)
         this.previewWorld = new Box2D.World(new Box2D.Vec2())
 
-        this.loop = new RenderLoop()
+        this.loop = new RenderLoop({
+            timeMultiplier: 0.001
+        })
         this.loop.run = (dt: number) => this.renderCards(dt)
 
         this.containers = []
@@ -58,18 +59,18 @@ class TankSelectContainer extends Menu {
     }
 
     setupList() {
-        let selectedTank = Number(localStorage.getItem("tanks-selectedtank") || SniperTank.getModel().getId());
+        let selectedTank = Number(localStorage.getItem("tanks-selectedtank") || ClientSniperTank.Model.getId());
         let tankExists = false
 
-        for(let tank of ClientTank.Types.values()) {
-            if(tank.getModel().getId() === selectedTank) {
+        for(let tank of ClientTank.Tanks) {
+            if(tank.Model.getId() === selectedTank) {
                 tankExists = true
                 break
             }
         }
 
         if(!tankExists) {
-            selectedTank = SniperTank.getModel().getId()
+            selectedTank = ClientSniperTank.Model.getId()
         }
 
         // Использую forEach здесь, чтобы создать область видимости.
@@ -88,7 +89,7 @@ class TankSelectContainer extends Menu {
 
         let x = 20
 
-        ClientTank.Types.forEach((Tank) => {
+        ClientTank.Tanks.forEach((Tank) => {
             let container = new TankSelectElement({
                 Tank: Tank,
                 previewWorld: this.previewWorld,
@@ -97,7 +98,7 @@ class TankSelectContainer extends Menu {
             container.setPosition(x)
             container.on("click", () => this.selectTank(container))
             this.container.append(container.element)
-            if(Tank.getModel().getId() === selectedTank) this.selectTank(container)
+            if(Tank.Model.getId() === selectedTank) this.selectTank(container)
             this.containers.push(container)
 
             x += container.width
@@ -114,27 +115,7 @@ class TankSelectContainer extends Menu {
     }
 
     updateCards() {
-        let container = this.container.get(0)
-        let lowerBound = container.scrollLeft
-        let upperBound = lowerBound + container.clientWidth
 
-        for(let container of this.containers) {
-            let offset = container.position
-
-            if(upperBound < offset) {
-                if(!container.hidden) container.hide()
-                continue
-            }
-
-            let width = container.width
-
-            if(lowerBound > offset + width) {
-                if(!container.hidden) container.hide()
-                continue
-            }
-
-            if(container.hidden) container.show()
-        }
     }
 
     selectTank(container: TankSelectElement) {
@@ -143,7 +124,7 @@ class TankSelectContainer extends Menu {
         this.element.find(".tank-preview-container.selected").removeClass("selected")
         container.element.addClass("selected")
 
-        localStorage.setItem("tanks-selectedtank", String(Tank.getModel().getId()))
+        localStorage.setItem("tanks-selectedtank", String(Tank.Model.getId()))
         this.selectedTank = Tank
         this.emit("select", Tank)
     }
@@ -180,5 +161,3 @@ class TankSelectContainer extends Menu {
         }
     }
 }
-
-export default TankSelectContainer;

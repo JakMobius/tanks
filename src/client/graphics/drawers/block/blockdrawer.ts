@@ -1,10 +1,11 @@
 
 import Sprite from '../../../sprite';
-import GameMap from 'src/utils/map/gamemap';
-import BlockState from "../../../../utils/map/blockstate/blockstate";
-import TextureProgram from "../../programs/textureprogram";
+import GameMap from 'src/map/gamemap';
+import BlockState from "../../../../map/blockstate/blockstate";
+import TextureProgram from "../../programs/texture-program";
+import {squareQuadrangle} from "../../../../utils/quadrangle";
 
-class BlockDrawer {
+export default class BlockDrawer {
 	public id: number;
 	public crackSprites: any;
 
@@ -23,9 +24,7 @@ class BlockDrawer {
         if (!(block.constructor as typeof BlockState).typeId) return
         let crack = Math.floor(block.damage * 6)
         if(crack) {
-            program.drawSprite(this.crackSprites[crack - 1], x, y, GameMap.BLOCK_SIZE, GameMap.BLOCK_SIZE)
+            program.drawSprite(this.crackSprites[crack - 1], squareQuadrangle(x, y, GameMap.BLOCK_SIZE, GameMap.BLOCK_SIZE))
         }
     }
 }
-
-export default BlockDrawer;

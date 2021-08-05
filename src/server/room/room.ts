@@ -1,6 +1,6 @@
 
 import RoomPortal from "../room-portal";
-import {ClientRoomInformant} from "../../networking/packets/game-packets/roomlistpacket";
+import {ClientRoomInformant} from "../../networking/packets/game-packets/room-list-packet";
 
 export default class Room implements ClientRoomInformant {
 	public maxOnline: number = 10;

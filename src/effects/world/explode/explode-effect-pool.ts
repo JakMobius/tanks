@@ -1,8 +1,9 @@
 
-import GameMap from 'src/utils/map/gamemap';
+import GameMap from 'src/map/gamemap';
 import * as Box2D from 'src/library/box2d';
-import GameWorld from "../../../gameworld";
-import BlockState from "../../../utils/map/blockstate/blockstate";
+import AbstractWorld from "../../../abstract-world";
+import BlockState from "../../../map/blockstate/blockstate";
+import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -24,18 +25,17 @@ interface ExplodePoolWalker {
     power: number
 }
 
-type ExplodePoolWalkerMap = Map<number, ExplodePoolWalkerList>
-type ExplodePoolWalkerList = Map<number, ExplodePoolWalker>
+type ExplodePoolWalkerMap = TwoDimensionalMap<number, number,ExplodePoolWalker>
 
-export interface ExplodeEffectPoolConfig {
-    world: GameWorld
+export interface ExplodeEffectPoolConfig<WorldClass> {
+    world: WorldClass
 }
 
-class ExplodeEffectPool {
-	public powerDamping: 0.01
-	public stepsPerSecond: 30
-	public stepsWaiting: 0
-	public walkers: ExplodePoolWalkerMap = new Map<number, ExplodePoolWalkerList>();
+export default class ExplodeEffectPool<WorldClass extends AbstractWorld = AbstractWorld> {
+	public powerDamping = 0.01
+	public stepsPerSecond = 30
+	public stepsWaiting = 0
+	public walkers: ExplodePoolWalkerMap = new TwoDimensionalMap<number, number,ExplodePoolWalker>();
 	public gridSize = GameMap.BLOCK_SIZE;
 	public offsetMap = [
         1, 0,
@@ -57,7 +57,7 @@ class ExplodeEffectPool {
     })()
 
     // Сколько единиц скорости соответствует
-    // одной единицы энергии ячейки
+    // одной единице энергии ячейки
 	public waveCoefficient = 1
 
     // 10% энергии взрыва уходит на урон блокам
@@ -68,14 +68,21 @@ class ExplodeEffectPool {
     // Этот коэффициент настраивает силу отталкивания танков
 	public forceCoefficient = 10000
 
+    // Какому урону соответствует единица скорости волны
+    // Этот коэффициент настраивает урон танкам
+    public damageCoefficient = 2
+
+    // Минимальный порог урона
+    public damageThreshold = 1
+
     // Практика показала, что если смотреть на два блока,
     // а не на один, при рассчете разницы давления, то
     // сила отталкивания будет рассчитана более правильно.
 	public pressureDifferentialDistance = this.gridSize * 2
 
-    public world: GameWorld
+    public world: WorldClass
 
-    constructor(config: ExplodeEffectPoolConfig) {
+    constructor(config: ExplodeEffectPoolConfig<WorldClass>) {
         this.world = config.world
     }
 
@@ -89,7 +96,7 @@ class ExplodeEffectPool {
      * Adds a high pressure zone to this pool (aka an explosion source). If
      * given coordinates does not match the pool grid, the pressure will
      * be distributed among the nearest grid cells according to the
-     * linear interpolation algorhitm
+     * linear interpolation algorithm
      */
 
     start(x: number, y: number, power: number): void {
@@ -105,7 +112,7 @@ class ExplodeEffectPool {
     }
 
     private interpolateWalkers(x: number, y: number, power: number): ExplodePoolWalker[] {
-        // Linear interpolation alghoritm
+        // Linear interpolation algorithm
 
         let gridX = x / this.gridSize
         let gridY = y / this.gridSize
@@ -169,12 +176,12 @@ class ExplodeEffectPool {
         powerToSpread /= succeededWalkers.length
 
         for(let walker of succeededWalkers) {
-            let current = this.getWalker(this.walkers, walker.x, walker.y)
+            let current = this.walkers.get(walker.x, walker.y)
             if(current) {
                 current.power += powerToSpread + walker.power
             } else {
                 walker.power += powerToSpread
-                this.addWalker(this.walkers, walker)
+                this.walkers.set(walker.x, walker.y, walker)
             }
         }
     }
@@ -192,28 +199,11 @@ class ExplodeEffectPool {
         }
     }
 
-    private getWalker(map: ExplodePoolWalkerMap, x: number, y: number): ExplodePoolWalker | null {
-        let row, column
-        if((row = map.get(x)) && (column = row.get(y))) {
-            return column
-        }
-        return null
-    }
-
-    public addWalker(map: ExplodePoolWalkerMap, walker: ExplodePoolWalker): void {
-        let row: ExplodePoolWalkerList
-        if((row = map.get(walker.x))) {
-            row.set(walker.y, walker)
-        } else {
-            map.set(walker.x, new Map([[walker.y, walker]]))
-        }
-    }
-
     private step(dt: number): void {
         this.tickEntities(dt)
         this.stepsWaiting -= 1
 
-        let newWalkers = new Map()
+        let newWalkers = new TwoDimensionalMap<number, number, ExplodePoolWalker>();
 
         const walk = (walker: ExplodePoolWalker, dx: number, dy: number, power: number) => {
             let x = walker.x + dx * this.gridSize
@@ -224,20 +214,20 @@ class ExplodeEffectPool {
             let vx = walker.vx + dx * power * this.waveCoefficient
             let vy = walker.vy + dy * power * this.waveCoefficient
 
-            let current = this.getWalker(newWalkers, x, y)
+            let current = newWalkers.get(x, y)
             if(current) {
                 current.vx += vx
                 current.vy += vy
                 current.vn++
                 current.power += power
             } else {
-                this.addWalker(newWalkers, this.walker(x, y, vx, vy, power))
+                newWalkers.set(x, y, this.walker(x, y, vx, vy, power))
             }
         }
 
         let sibling = new Array(8)
 
-        for(let columns of this.walkers.values()) {
+        for(let columns of this.walkers.rows.values()) {
             for(let walker of columns.values()) {
 
                 let x = walker.x
@@ -301,7 +291,7 @@ class ExplodeEffectPool {
             }
         }
 
-        for(let columns of this.walkers.values()) {
+        for(let columns of this.walkers.rows.values()) {
             for(let walker of columns.values()) {
                 walker.vx /= walker.vn
                 walker.vy /= walker.vn
@@ -312,7 +302,7 @@ class ExplodeEffectPool {
         this.walkers = newWalkers
     }
 
-    private damageBlock(x: number, y: number, damage: number): void {}
+    protected damageBlock(x: number, y: number, damage: number): void {}
 
     private mapPower(walkers: ExplodePoolWalkerMap, x: number, y: number): number {
         const relX = (x / this.gridSize - 0.5)
@@ -326,7 +316,7 @@ class ExplodeEffectPool {
         let resultPower = 0
 
         for(let gridX = fromX; gridX <= toX; gridX += this.gridSize) {
-            let row = this.walkers.get(gridX)
+            let row = this.walkers.rows.get(gridX)
             if(!row) continue
             for(let gridY = fromY; gridY <= toY; gridY += this.gridSize) {
                 let walker = row.get(gridY)
@@ -346,12 +336,10 @@ class ExplodeEffectPool {
 
     private tickEntities(dt: number): void {
 
-        let gridDifference = this.gridSize / GameMap.BLOCK_SIZE
-
         for(let player of this.world.players.values()) {
             let tank = player.tank
             if(!tank) continue
-            let position = tank.model.body.GetPosition()
+            let position = tank.model.getBody().GetPosition()
 
             const x = position.x
             const y = position.y
@@ -377,7 +365,7 @@ class ExplodeEffectPool {
 
                     if (this.isBlock(gridX, gridY)) {
                         skip = true
-                        continue
+                        break
                     }
                 }
 
@@ -399,14 +387,18 @@ class ExplodeEffectPool {
             resultVx /= length
             resultVy /= length
 
-            maxPowerDifference *= this.forceCoefficient
-            resultVx *= maxPowerDifference
-            resultVy *= maxPowerDifference
+            const force = maxPowerDifference * this.forceCoefficient
+            resultVx *= force
+            resultVy *= force
 
-            tank.model.body.ApplyLinearImpulse(new Box2D.Vec2(
+            tank.model.getBody().ApplyLinearImpulse(new Box2D.Vec2(
                 resultVx,
                 resultVy
             ), position)
+
+            const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
+
+            if(damage > 0) tank.damage(damage)
         }
     }
 
@@ -415,12 +407,10 @@ class ExplodeEffectPool {
     }
 
     tick(dt: number): void {
-        if(this.walkers.size === 0) return
+        if(this.walkers.rows.size === 0) return
 
         this.stepsWaiting += this.stepsPerSecond * dt
 
         while(this.stepsWaiting > 1) this.step(1 / this.stepsPerSecond)
     }
 }
-
-export default ExplodeEffectPool;

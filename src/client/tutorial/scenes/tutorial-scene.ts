@@ -7,12 +7,12 @@ import PlayerControls from 'src/client/controls/playercontrols';
 import GamepadManager from 'src/client/controls/interact/gamepadmanager';
 import WorldDrawer from 'src/client/graphics/drawers/world-drawer';
 import KeyboardController from "src/client/controls/interact/keyboardcontroller";
-import ClientGameWorld from "../../clientgameworld";
 import ControlPanel from "../../game/ui/controlpanel";
 import {getTutorialMap} from "../tutorial-map";
-import ClientTank from "../../tanks/clienttank";
-import MonsterTankModel from "../../../tanks/models/monster";
 import ClientPlayer from "../../client-player";
+import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
+import TutorialWorldController from "../tutorial-world-controller";
+import NetworkLatencyImitator from "../../../networking/packet-handlers/network-latency-imitator";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -26,8 +26,9 @@ export default class TutorialScene extends Scene {
     public touchController: TouchController;
     public playerControls: PlayerControls;
     public timer: number;
-    public world: ClientGameWorld
+    public game: EmbeddedServerGame
     public worldDrawer: WorldDrawer
+    public worldController: TutorialWorldController
 
     constructor(config: TutorialSceneConfig) {
         super(config)
@@ -39,9 +40,16 @@ export default class TutorialScene extends Scene {
             inertial: true
         })
 
-        this.world = new ClientGameWorld({
-            map: getTutorialMap()
-        })
+        this.game = new EmbeddedServerGame({ map: getTutorialMap() })
+
+        const latencyImitator = new NetworkLatencyImitator(this.game.embeddedServerClient)
+        latencyImitator.ping = 100
+        latencyImitator.jitter = 50
+        //this.game.embeddedServerClient.dataHandler = latencyImitator
+
+        this.worldController = new TutorialWorldController(this.game.serverGame)
+
+        this.game.clientWorld.on("primary-player-set", (player) => this.onWorldPrimaryPlayerSet(player))
 
         this.touchController = new TouchController(this.controls, this.screen.canvas)
         this.playerControls = new PlayerControls()
@@ -54,11 +62,11 @@ export default class TutorialScene extends Scene {
         this.touchController.startListening()
         this.gamepad.startListening()
 
-        this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.world)
+        this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.game.clientWorld)
 
         this.layout()
 
-        this.createPlayer()
+        this.game.connectClient()
     }
 
     layout() {
@@ -71,33 +79,26 @@ export default class TutorialScene extends Scene {
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {
+        this.game.tick(dt)
         this.gamepad.refresh()
         this.playerControls.refresh()
         this.screen.clear()
         this.camera.tick(dt)
         this.worldDrawer.draw(dt)
-        this.world.tick(dt)
     }
 
-    private createPlayer() {
-        let player = new ClientPlayer({
-            id: 0,
-            nick: "Вы"
-        })
+    private onWorldPrimaryPlayerSet(player: ClientPlayer) {
+        this.playerControls.disconnectAllTankControls()
 
-        let tank = ClientTank.fromModel(new MonsterTankModel())
-
-        tank.setupDrawer(this.screen.ctx)
-
-        player.setTank(tank)
-        player.tank.model.body.SetPositionXY(70, 850)
-        player.tank.model.body.SetAngle(4)
-
-        this.world.createPlayer(player)
-        this.world.player = player
-
-        this.playerControls.connectTankControls(this.world.player.tank.model.controls)
-        this.camera.target = this.world.player.tank.model.body.GetPosition()
-        this.camera.targetVelocity = this.world.player.tank.model.body.GetLinearVelocity()
+        if(player) {
+            this.playerControls.connectTankControls(player.tank.model.controls)
+            // Well, at least this approach is better than updating the tank
+            // controls in a timer...
+            let serverPlayer = this.game.serverGame.world.players.get(player.id)
+            this.playerControls.connectTankControls(serverPlayer.tank.model.controls)
+            const body = player.tank.model.getBody()
+            this.camera.target = body.GetPosition()
+            this.camera.targetVelocity = body.GetLinearVelocity()
+        }
     }
 }

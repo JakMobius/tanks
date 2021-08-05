@@ -22,7 +22,7 @@
 
 import { b2Vec2, b2Atan2 } from "../common/b2_math";
 import { b2Draw, b2Color } from "../common/b2_draw";
-import { b2_pi } from "../common/b2_common";
+import { b2_pi } from "../common/b2_settings";
 
 export enum b2StretchingModel {
   b2_pbdStretchingModel,

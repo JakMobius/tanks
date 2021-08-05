@@ -4,11 +4,10 @@ import ControlsContainer from './controls/controlscontainer';
 import PlayMenuContainer from './play-menu/playmenucontainer';
 import TankPreviewContainer from './tank-preview/tankpreviewcontainer';
 import TankSelectContainer from './tank-select/tankselectcontainer';
-import RoomListRequestPacket from 'src/networking/packets/game-packets/roomlistrequestpacket';
+import RoomListRequestPacket from 'src/networking/packets/game-packets/room-list-request-packet';
 import RoomSelectContainer from './room-select/roomselectcontainer';
 import GameScene from "../../../scenes/gamescene";
-import TankModel from "../../../../../tanks/tankmodel";
-import ClientTank from "../../../../tanks/clienttank";
+import {ClientTankType} from "../../../../entity/tank/client-tank";
 
 export interface PrimaryOverlayConfig extends OverlayConfig {
     game: GameScene
@@ -24,7 +23,7 @@ class PrimaryOverlay extends Overlay {
 	public tankSelectMenu: TankSelectContainer;
 	public steeringMenu: ControlsContainer;
 	public roomSelectContainer: RoomSelectContainer;
-	public selectedTank: typeof ClientTank;
+	public selectedTank: ClientTankType;
 	public tankPreviewMenu: TankPreviewContainer;
 
     constructor(options: PrimaryOverlayConfig) {
@@ -98,12 +97,12 @@ class PrimaryOverlay extends Overlay {
 
     createTankSelectContainer(): void {
         this.tankSelectMenu = new TankSelectContainer()
-        this.tankSelectMenu.on("select", (tank: typeof ClientTank) => this.selectTank(tank))
+        this.tankSelectMenu.on("select", (tank) => this.selectTank(tank))
         this.selectTank(this.tankSelectMenu.selectedTank)
         this.menuContainer.append(this.tankSelectMenu.element)
     }
 
-    selectTank(tank: typeof ClientTank): void {
+    selectTank(tank: ClientTankType): void {
         this.selectedTank = tank
         this.tankPreviewMenu.previewTank(tank)
     }

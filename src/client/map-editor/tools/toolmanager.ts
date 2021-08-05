@@ -3,7 +3,7 @@ import DocumentEventHandler from '../../controls/interact/documenteventhandler';
 import Camera from '../../camera';
 import Tool from '../tools/tool';
 import KeyboardController from "../../controls/interact/keyboardcontroller";
-import BlockState from "../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../map/blockstate/blockstate";
 import SceneScreen from "../../graphics/scene-screen";
 import EditorWorld from "../editor-world";
 

@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_pi, b2_epsilon } from "../common/b2_common";
+import { b2_pi, b2_epsilon } from "../common/b2_settings";
 import { b2Sq, b2Sqrt, b2Asin, b2Pow, b2Vec2, b2Transform, XY } from "../common/b2_math";
 import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
 import { b2DistanceProxy } from "./b2_distance";

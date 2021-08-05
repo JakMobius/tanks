@@ -4,7 +4,7 @@ import Menu from 'src/client/ui/menu/menu';
 
 import MapStorage from 'src/client/map-editor/mapstorage';
 import Camera from 'src/client/camera';
-import GameMap from 'src/utils/map/gamemap';
+import GameMap from 'src/map/gamemap';
 import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
 import EditorMap from "../../../../editormap";
@@ -181,7 +181,7 @@ export default class MapPreviewContainer extends Menu {
             this.camera.defaultPosition.Set(mapWidth / 2, mapHeight / 2)
             this.camera.reset()
             this.camera.tick(0)
-            this.mapDrawer.drawMap(this.map, this.camera)
+            if(this.map) this.mapDrawer.drawMap(this.map, this.camera)
         }
     }
 }

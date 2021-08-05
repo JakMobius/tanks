@@ -2,26 +2,24 @@
 
 import Scene, {SceneConfig} from '../scene';
 
-import ParticleProgram from '../../graphics/programs/particleprogram';
 import Camera from '../../camera';
 import * as Box2D from '../../../library/box2d';
-import Particle from '../../particles/particle';
-import Color from '../../../utils/color';
 import Progress from "../../utils/progress";
 import phrases from "./phrases";
+import ConvexShapeProgram from "../../graphics/programs/convex-shapes/convex-shape-program";
 
 export interface LoadingSceneConfig extends SceneConfig {
     progress: Progress
 }
 
 class LoadingScene extends Scene {
+    public static scaleBackground = 0xFFC8C8C8
+    public static scaleForeground = 0xFF96F096
+
 	public time: number;
 	public progress: Progress;
 	public camera: Camera;
-	public program: ParticleProgram;
-	public decoration: Particle;
-	public scaleBackground: Color;
-	public scaleForeground: Color;
+	public program: ConvexShapeProgram;
 	public title: JQuery;
 	public phrase: number;
 	public interval: number
@@ -37,10 +35,7 @@ class LoadingScene extends Scene {
             limit: false
         })
         this.camera.tick(0)
-        this.program = new ParticleProgram("loading-program", this.screen.ctx)
-        this.decoration = new Particle({ x: 0, y: 0 })
-        this.scaleBackground = new Color(200, 200, 200);
-        this.scaleForeground = new Color(150, 240, 150);
+        this.program = new ConvexShapeProgram(this.screen.ctx)
         this.title = $("<h1>").addClass("loading-text")
 
         this.title.hide()
@@ -86,34 +81,24 @@ class LoadingScene extends Scene {
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {
-        this.program.use()
-        this.program.prepare()
+        this.program.reset()
 
         this.drawScaleBackground()
         this.drawScaleForeground()
 
-        this.program.matrixUniform.setMatrix(this.camera.matrix.m)
+        this.program.bind()
+        this.program.setCamera(this.camera)
         this.program.draw()
         this.time += dt
     }
 
     drawScaleBackground() {
-        this.decoration.x = 0
-        this.decoration.y = 0
-        this.decoration.width = 400
-        this.decoration.height = 20
-        this.decoration.color = this.scaleBackground
-        this.program.drawParticle(this.decoration)
+        this.program.drawRectangle(-200, -10, 400, 10, LoadingScene.scaleBackground)
     }
 
     drawScaleForeground() {
         const fraction = this.progress.completeFraction()
-        this.decoration.x = -200 * (1 - fraction)
-        this.decoration.y = 0
-        this.decoration.width = 400 * fraction
-        this.decoration.height = 20
-        this.decoration.color = this.scaleForeground
-        this.program.drawParticle(this.decoration)
+        this.program.drawRectangle(-200, -10, 400 * fraction, 10, LoadingScene.scaleForeground)
     }
 }
 

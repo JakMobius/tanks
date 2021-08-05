@@ -1,7 +1,7 @@
 
 import MapModification from './mapmodification';
 import EditorMap from "../../editormap";
-import BlockState from "../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../map/blockstate/blockstate";
 
 class MapBlockModification extends MapModification {
 	public x: any;

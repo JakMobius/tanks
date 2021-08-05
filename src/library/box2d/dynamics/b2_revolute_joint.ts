@@ -16,7 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2_linearSlop, b2_angularSlop, b2_maxAngularCorrection, b2Maybe } from "../common/b2_common";
+import { b2_linearSlop, b2_angularSlop, b2_maxAngularCorrection, b2Maybe } from "../common/b2_settings";
 import { b2Abs, b2Clamp, b2Vec2, b2Mat22, b2Rot, XY, b2Max, b2Transform } from "../common/b2_math";
 import { b2Body } from "./b2_body";
 import { b2Joint, b2JointDef, b2JointType, b2IJointDef } from "./b2_joint";
@@ -46,7 +46,7 @@ export interface b2IRevoluteJointDef extends b2IJointDef {
 /// Revolute joint definition. This requires defining an anchor point where the
 /// bodies are joined. The definition uses local anchor points so that the
 /// initial configuration can violate the constraint slightly. You also need to
-/// specify the initial relative setAngle for joint limits. This helps when saving
+/// specify the initial relative angle for joint limits. This helps when saving
 /// and loading a game.
 /// The local anchor points are measured from the body's origin
 /// rather than the center of mass because:
@@ -573,7 +573,7 @@ export class b2RevoluteJoint extends b2Joint {
 
     const L: number = 0.5;
 
-    // b2Vec2 r = L * b2Vec2(Math.cos(setAngle), Math.sin(setAngle));
+    // b2Vec2 r = L * b2Vec2(Math.cos(angle), Math.sin(angle));
     const r = b2RevoluteJoint.Draw_s_r.Set(L * Math.cos(angle), L * Math.sin(angle));
     // draw.DrawSegment(pB, pB + r, c1);
     draw.DrawSegment(pB, b2Vec2.AddVV(pB, r, b2Vec2.s_t0), c1);

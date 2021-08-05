@@ -30,13 +30,12 @@ export default class TypedEventHandler<Args extends Array<any> = []> {
     emit(event: string, ...rest: any[]): void
     emit(event: Object, ...rest: Args): void
     emit(event: string | Object, ...rest: any) {
-        let args = Array.prototype.slice.call(arguments, 1)
-
         if (typeof event == "string") {
+            let args = Array.prototype.slice.call(arguments, 1)
             this.emitArgs(event, args)
         } else {
             const constructor = event.constructor as Class<any>
-            this.emitArgs(constructor, args)
+            this.emitArgs(constructor, Array.prototype.slice.call(arguments))
         }
     }
 }

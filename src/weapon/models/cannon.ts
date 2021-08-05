@@ -1,19 +1,19 @@
-import Weapon, {WeaponConfig} from '../weapon';
-import CannonBall from '../../entity/bullet/models/cannonball';
 
-class WeaponCannon extends Weapon {
+import CannonBall from '../../entity/bullets/models/cannonball-bullet-model';
+import SingleBarreledWeapon from "../single-barreled-weapon";
+import * as Box2D from "../../library/box2d"
+import {WeaponConfig} from "../weapon";
+
+export default class WeaponCannon extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
-		config = Object.assign({
+		super({
 			maxAmmo: 5,
 			shootRate: 2000,
 			reloadTime: 7000,
-			bulletType: CannonBall
-		}, config)
-
-		super(config);
-
-		this.id = 2
+			bulletType: CannonBall,
+			muzzlePoint: new Box2D.Vec2(0, 10),
+			tank: config.tank,
+			triggerAxle: config.triggerAxle
+		})
 	}
 }
-
-export default WeaponCannon;

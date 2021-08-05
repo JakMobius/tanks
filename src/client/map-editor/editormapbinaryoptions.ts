@@ -1,5 +1,5 @@
 
-import MapBinaryOptions from '../../utils/map/mapbinaryoptions';
+import MapBinaryOptions from '../../map/mapbinaryoptions';
 import {FlagHandler} from "../../utils/binaryoptions";
 
 class EditorMapBinaryOptions extends MapBinaryOptions {

@@ -2,17 +2,17 @@
 import View from 'src/client/ui/view';
 import CanvasFactory from 'src/client/utils/canvasfactory';
 import Sprite from 'src/client/sprite';
-import ClientTank from 'src/client/tanks/clienttank';
 import * as Box2D from 'src/library/box2d'
 import Camera from "src/client/camera";
+import ClientTank, {ClientTankType} from "../../../../../entity/tank/client-tank";
 
 export interface TankSelectElementViewConfig {
-    Tank: typeof ClientTank
+    Tank: ClientTankType
     previewWorld: Box2D.World
     previewCamera: Camera
 }
 
-class TankSelectElement extends View {
+export default class TankSelectElement extends View {
 	public previewWorld: Box2D.World;
 	public previewCamera: Camera;
 	public width: number;
@@ -23,7 +23,7 @@ class TankSelectElement extends View {
 	public hidden: boolean;
     canvasSize = 70;
 
-    Tank: typeof ClientTank = null;
+    Tank: ClientTankType = null;
     tank: ClientTank = null
 
     constructor(options: TankSelectElementViewConfig) {
@@ -55,7 +55,6 @@ class TankSelectElement extends View {
 
         this.element.on("click", () => this.emit("click"))
         this.hidden = true
-        this.element.hide()
     }
 
     setPosition(x: number) {
@@ -74,10 +73,10 @@ class TankSelectElement extends View {
     }
 
     createTank() {
-        this.tank = new (this.Tank)()
-        this.tank.setupDrawer(this.ctx)
+        let model = new this.Tank.Model()
+        this.tank = new (this.Tank)({ model: model })
         this.tank.model.initPhysics(this.previewWorld)
-        const fixtureList = this.tank.model.body.GetFixtureList()
+        const fixtureList = this.tank.model.getBody().GetFixtureList()
 
         fixtureList.m_filter.maskBits = 0x000
         fixtureList.m_filter.categoryBits = 0x000
@@ -90,10 +89,8 @@ class TankSelectElement extends View {
 
     draw(dt: number) {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
-        let tank = this.getTank()
-        tank.model.body.SetAngle(tank.model.body.GetAngle() + dt)
-        tank.drawer.draw(this.previewCamera, dt)
+        const tank = this.getTank()
+        const body = tank.model.getBody()
+        body.SetAngle(body.GetAngle() + dt)
     }
 }
-
-export default TankSelectElement;

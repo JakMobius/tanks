@@ -9,7 +9,7 @@
 * freely, subject to the following restrictions:
 * 1. The origin of this software must not be misrepresented; you must not
 * claim that you wrote the original software. If you use this software
-* in a product, an acknowledgment in the product dumentation would be
+* in a product, an acknowledgment in the product documentation would be
 * appreciated but is not required.
 * 2. Altered source versions must be plainly marked as such, and must not be
 * misrepresented as being the original software.
@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_polygonRadius } from "../common/b2_common";
+import { b2_polygonRadius } from "../common/b2_settings";
 import { b2Vec2, b2Rot, b2Transform, XY } from "../common/b2_math";
 import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
 import { b2DistanceProxy } from "./b2_distance";

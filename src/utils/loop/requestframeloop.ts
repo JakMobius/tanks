@@ -1,19 +1,17 @@
 
-import Loop from './loop';
+import Loop, {LoopConfig} from './loop';
 
-class RequestFrameLoop extends Loop {
-	public request: any;
+export default class RequestFrameLoop extends Loop {
+	public request: boolean = false;
 
-    constructor() {
-        super();
-        this.timeMultiplier = 0.001
+    constructor(config: LoopConfig) {
+        super(config);
         this.request = false
     }
 
     start() {
-        if(this.request) {
-            return
-        }
+        if(this.request) return
+
         this.request = true
         requestAnimationFrame((time) => {
             this.request = false
@@ -24,5 +22,3 @@ class RequestFrameLoop extends Loop {
         });
     }
 }
-
-export default RequestFrameLoop;

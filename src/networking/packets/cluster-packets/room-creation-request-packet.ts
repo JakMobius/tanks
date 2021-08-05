@@ -1,11 +1,11 @@
 
-import BinaryPacket from '../../binarypacket';
+import BinaryPacket from '../../binary-packet';
 import RoomConfig from 'src/server/room/room-config';
 import BinaryEncoder from "../../../serialization/binary/binaryencoder";
 import BinaryDecoder from "../../../serialization/binary/binarydecoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
-class RoomCreationRequestPacket extends BinaryPacket {
+export default class RoomCreationRequestPacket extends BinaryPacket {
 	public config: RoomConfig;
 
     static typeName = 1003
@@ -26,4 +26,3 @@ class RoomCreationRequestPacket extends BinaryPacket {
 }
 
 BinarySerializer.register(RoomCreationRequestPacket)
-export default RoomCreationRequestPacket;

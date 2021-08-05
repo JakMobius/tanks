@@ -1,10 +1,10 @@
 
 import Tool from '../tool';
-import GameMap from '../../../../utils/map/gamemap';
+import GameMap from '../../../../map/gamemap';
 import RangeView from '../../../ui/elements/range/range';
-import BrushProgram from '../../../graphics/programs/brushprogram';
+import BrushProgram from '../../../graphics/programs/brush-program';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../utils/map/blockstate/blockstate";
+import BlockState from "../../../../map/blockstate/blockstate";
 
 class Pencil extends Tool {
 	public actionName = "Карандаш";
@@ -27,8 +27,8 @@ class Pencil extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.decorationProgram = new BrushProgram("brush-program", this.manager.screen.ctx)
-        this.decorationProgram.use()
+        this.decorationProgram = new BrushProgram(this.manager.screen.ctx)
+        this.decorationProgram.bind()
         this.decorationProgram.blockSizeUniform.set1f(GameMap.BLOCK_SIZE)
         this.decorationProgram.colorUniform.set4f(0, 1, 0, 0.5)
 
@@ -210,8 +210,7 @@ class Pencil extends Tool {
 
         if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
 
-        this.decorationProgram.use()
-        this.decorationProgram.prepare()
+        this.decorationProgram.bind()
         this.decorationProgram.setBrushBounds(lowX * s, lowY * s, highX * s, highY * s)
         this.decorationProgram.brushCenterUniform.set2f(this.brushX, this.brushY)
         this.decorationProgram.matrixUniform.setMatrix(this.manager.camera.matrix.m)

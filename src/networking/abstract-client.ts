@@ -1,12 +1,15 @@
-import BinaryPacket from './binarypacket';
+import BinaryPacket from './binary-packet';
 import ClientConnection from './client-connection';
 import AbstractConnection from "./abstract-connection";
 import TypedEventHandler from "../utils/typed-event-handler";
+import ClientPacketHandler from "./packet-handlers/client-packet-handler";
+import {BinarySerializer} from "../serialization/binary/serializable";
 
 export default abstract class AbstractClient extends TypedEventHandler {
     public queue: BinaryPacket[] = [];
-    public connected: any;
+    protected connected: boolean = false
     public connection: AbstractConnection
+    public dataHandler: ClientPacketHandler = null
 
     protected constructor() {
         super()
@@ -25,6 +28,18 @@ export default abstract class AbstractClient extends TypedEventHandler {
 
     onConnection() {
         this.onOpen()
+    }
+
+    receiveData(data: ArrayBuffer) {
+        if(!this.dataHandler) this.handleData(data)
+        else this.dataHandler.handleData(data)
+    }
+
+    handleData(data: ArrayBuffer) {
+        let decoder = BinaryPacket.binaryDecoder
+        decoder.reset()
+        decoder.readData(data)
+        this.handlePacket(BinarySerializer.deserialize(decoder, BinaryPacket))
     }
 
     handlePacket(packet: BinaryPacket) {
@@ -61,6 +76,7 @@ export default abstract class AbstractClient extends TypedEventHandler {
     abstract isOpen(): boolean
     abstract isConnecting(): boolean
     abstract disconnect(): void
+    abstract getIpAddress(): string
 
     protected abstract writePacket(packet: BinaryPacket): void
 }

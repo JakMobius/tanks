@@ -1,7 +1,7 @@
 
 import EventEmitter from '../../../utils/eventemitter';
 
-class DocumentEventHandler extends EventEmitter {
+export default class DocumentEventHandler extends EventEmitter {
 	public listeners = new Map<string, () => void>();
 	public target: GlobalEventHandlers | GlobalEventHandlers[];
 	public keys: any;
@@ -50,5 +50,3 @@ class DocumentEventHandler extends EventEmitter {
         this.listeners.clear()
     }
 }
-
-export default DocumentEventHandler;

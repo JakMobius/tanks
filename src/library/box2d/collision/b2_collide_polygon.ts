@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { b2_linearSlop, b2_maxFloat, b2_maxManifoldPoints } from "../common/b2_common";
+import { b2_linearSlop, b2_maxFloat, b2_maxManifoldPoints } from "../common/b2_settings";
 import { b2Vec2, b2Transform, b2Rot } from "../common/b2_math";
 import { b2Manifold, b2ClipVertex, b2ContactFeature, b2ContactFeatureType, b2ManifoldType, b2ClipSegmentToLine, b2ManifoldPoint } from "./b2_collision";
 import { b2PolygonShape } from "./b2_polygon_shape";

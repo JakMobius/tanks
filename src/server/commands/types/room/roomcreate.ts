@@ -3,7 +3,7 @@ import Command, {CommandConfig} from '../../command';
 import CommandFlag from '../../commandflag';
 import Game from 'src/server/room/game';
 import fs from 'fs';
-import GameMap from 'src/utils/map/gamemap';
+import GameMap from 'src/map/gamemap';
 import BinaryDecoder from 'src/serialization/binary/binarydecoder';
 import pako from 'pako';
 import path from 'path';

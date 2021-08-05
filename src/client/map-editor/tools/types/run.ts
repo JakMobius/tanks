@@ -1,15 +1,13 @@
 
 import Tool from '../tool';
-import SniperTank from '../../../tanks/models/sniper';
 import * as Box2D from '../../../../library/box2d';
 import PlayerControls from '../../../controls/playercontrols';
 import KeyboardController from '../../../controls/interact/keyboardcontroller';
 import ToolManager from "../toolmanager";
-import MonsterTank from "../../../tanks/models/monster";
-import Player from "../../../../utils/player";
-import ClientTank from "../../../tanks/clienttank";
-import MonsterTankModel from "../../../../tanks/models/monster";
 import ClientPlayer from "../../../client-player";
+import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
+import ClientTank from "../../../entity/tank/client-tank";
+import ClientMonsterTank from "../../../entity/tank/types/client-monster-tank";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
@@ -35,8 +33,10 @@ export default class RunTool extends Tool {
         this.playerControls = new PlayerControls()
         this.playerControls.setupKeyboard(this.keyboard)
 
-        this.tank = new MonsterTank()
-        this.tank.setupDrawer(this.manager.screen.ctx)
+        this.tank = new ClientMonsterTank({
+            model: new MonsterTankModel()
+        })
+        
         this.playerControls.connectTankControls(this.tank.model.controls)
         
         this.player = new ClientPlayer({
@@ -84,13 +84,15 @@ export default class RunTool extends Tool {
 
         world.createPlayer(this.player)
 
-        this.player.tank.model.body.SetPosition(this.spawnPoint)
+        const body = this.player.tank.model.getBody()
+
+        body.SetPosition(this.spawnPoint)
 
         this.playerControls.connectTankControls(this.player.tank.model.controls)
 
         this.manager.camera.inertial = true
-        this.manager.camera.target = this.tank.model.body.GetPosition()
-        this.manager.camera.targetVelocity = this.tank.model.body.GetLinearVelocity()
+        this.manager.camera.target = body.GetPosition()
+        this.manager.camera.targetVelocity = body.GetLinearVelocity()
     }
 
     onStop() {

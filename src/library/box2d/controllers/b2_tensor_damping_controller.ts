@@ -21,7 +21,7 @@
 import { b2Controller } from "./b2_controller";
 import { b2Mat22, b2Vec2, b2Max } from "../common/b2_math";
 import { b2TimeStep } from "../dynamics/b2_time_step";
-import { b2_epsilon } from "../common/b2_common";
+import { b2_epsilon } from "../common/b2_settings";
 import { b2Draw } from "../common/b2_draw";
 
 /**

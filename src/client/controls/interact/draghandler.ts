@@ -1,7 +1,7 @@
 
 import DocumentEventHandler from './documenteventhandler';
 
-class DragHandler extends DocumentEventHandler {
+export default class DragHandler extends DocumentEventHandler {
 	public dragging: any;
 	public oldX: any;
 	public oldY: any;
@@ -92,5 +92,3 @@ class DragHandler extends DocumentEventHandler {
         }
     }
 }
-
-export default DragHandler;
