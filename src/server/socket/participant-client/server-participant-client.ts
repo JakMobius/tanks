@@ -7,13 +7,19 @@ import Logger from 'src/server/log/logger';
 import ClusterHandshake from '../cluster-handshake';
 import ServerParticipantConnection from './server-participant-connection';
 
+export interface ServerParticipantClientConfig extends ServerWebSocketClientConfig {
+    password: string
+}
+
 export default class ServerParticipantClient extends ServerWebSocketClient {
 
     password: string
     reconnect: boolean = false
 
-    constructor(config: ServerWebSocketClientConfig) {
+    constructor(config: ServerParticipantClientConfig) {
         super(config)
+
+        this.password = config.password
 
         this.logger.setPrefix("CLink Client")
 
@@ -21,10 +27,8 @@ export default class ServerParticipantClient extends ServerWebSocketClient {
             this.logger.log("Performing handshake")
             let salt = packet.handshakeData
             ClusterHandshake.createKey(this.password, salt, (error, key) => {
-
                 if(error) {
                     // Something went wrong
-
                     this.connection.close("Failed to generate handshake key: " + error)
                 } else {
                     // Sending back the generated handshake key
@@ -75,8 +79,7 @@ export default class ServerParticipantClient extends ServerWebSocketClient {
 
     reconnectDelayed() {
         if(!this.reconnect) return
-        this.webSocketConnection = null
-        this.client = null
+        this.connection = null
 
         setTimeout(() => {
             if(this.reconnect) this.connectToServer()
@@ -84,7 +87,7 @@ export default class ServerParticipantClient extends ServerWebSocketClient {
     }
 
     isConnecting() {
-        // Since we don't want to drop packets,
+        // Since we don't want to drop any packets,
         // cluster client is always available to
         // enqueue them.
         return true

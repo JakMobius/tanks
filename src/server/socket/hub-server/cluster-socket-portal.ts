@@ -17,12 +17,18 @@ export interface ClusterSocketPortalClientData {
 
 type ClusterSocketPortalClient = SocketPortalClient<ClusterSocketPortalClientData>
 
+export interface ClusterSocketConfig {
+    password: string
+}
+
 export default class ClusterSocketPortal extends SocketPortal<ClusterSocketPortalClientData> {
 
     password: string
 
-    constructor() {
+    constructor(config: ClusterSocketConfig) {
         super();
+
+        this.password = config.password
 
         this.logger.setPrefix("CLink hub")
     }

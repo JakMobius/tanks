@@ -1,7 +1,7 @@
 import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import DB from "../../../db/db";
+import MongoDatabase from "../../../db/mongo/mongo-database";
 import {nickIsValid} from "../../../../utils/nick-checker";
 import {passwordIsValid} from "../../../../utils/password-checker";
 import {WebserverSession} from "../../webserver-session";
@@ -36,15 +36,8 @@ export default class RegisterAjaxHandler extends AjaxHandler<HubModule> {
             return
         }
 
-        DB.instance.dbHandle.collection('users').updateOne({
-            login: fields.login
-        }, { $set: {
-                login: fields.login,
-                password: fields.password
-            }}, {
-            upsert: true
-        }).then((result) => {
-            if(result.upsertedCount > 0) {
+        this.module.webServer.server.db.createUser(fields.login, fields.password).then((result) => {
+            if(result) {
                 res.status(200).send({ result: "ok" })
             } else {
                 res.status(200).send({ result: "login-used" })

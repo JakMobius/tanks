@@ -15,7 +15,7 @@ module.exports = {
         }, {
             "action": "copy",
             "source": "#server-build",
-            "target": "#server = dist/server/"
+            "target": "#server = dist/server"
         }]
     },
 

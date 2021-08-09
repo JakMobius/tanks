@@ -3,7 +3,6 @@ import AbstractClient from '../../networking/abstract-client';
 import Logger from '../log/logger';
 import * as WebSocket from 'websocket';
 import BinaryPacket from "../../networking/binary-packet";
-import {BinarySerializer} from "../../serialization/binary/serializable";
 import WebsocketConnection from "../websocket-connection";
 
 export interface ServerWebSocketClientConfig {

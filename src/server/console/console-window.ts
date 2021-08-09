@@ -208,4 +208,9 @@ export default class ConsoleWindow extends EventEmitter {
             this.consoleBox.setNeedsRender()
         }
     }
+
+    destroy() {
+        this.screen.destroy()
+        this.stdLogger.releaseStd()
+    }
 }

@@ -7,16 +7,15 @@ import HubModule from './hub/hub-module';
 import BaseModule from './base-module';
 import WebserverModule from "./webserver-module";
 import * as HTTP from "http";
-import Preferences from "../preferences/preferences";
-import MongoStore from "connect-mongo";
-import DB from "../db/db";
 import StaticModule from "./static/static-module";
+import Server from "../server";
 
-class WebServer {
+export default class WebServer {
 	public app: express.Application;
 	public logger: Logger;
-	public server: HTTP.Server;
+	public httpServer: HTTP.Server;
 	public session: express.RequestHandler;
+    public server: Server;
 
     modules = new Map<Number, [WebserverModule]>()
 
@@ -25,11 +24,12 @@ class WebServer {
     baseModule = new BaseModule()
     staticModule = new StaticModule()
 
-    constructor() {
+    constructor(server: Server) {
+        this.server = server
         this.app = express()
         this.setupApp()
         this.logger = Logger.global
-        this.server = null
+        this.httpServer = null
 
         this.addModule(this.hubModule)
         this.addModule(this.gameModule)
@@ -41,6 +41,7 @@ class WebServer {
     }
 
     addModule(module: WebserverModule) {
+        module.setServer(this)
         if(this.modules.has(module.priority)) {
             this.modules.get(module.priority).push(module)
         } else {
@@ -85,11 +86,8 @@ class WebServer {
         });
 
         this.session = session({
-            secret: Preferences.string("webserver.session-key"),
-            store: MongoStore.create({
-                client: DB.instance.client,
-                dbName: DB.instance.db
-            }),
+            secret: this.server.config.webServer.sessionKey,
+            store: this.server.db.getWebserverStore(),
             resave: true,
             saveUninitialized: false
         })
@@ -138,13 +136,11 @@ class WebServer {
     }
 
     listen(server: HTTP.Server) {
-        this.server = server
+        this.httpServer = server
         server.on("request", this.app)
     }
 
     disable() {
-        this.server.off("request", this.app)
+        this.httpServer.off("request", this.app)
     }
 }
-
-export default WebServer;

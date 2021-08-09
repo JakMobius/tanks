@@ -8,8 +8,30 @@ import CpuUsageWatcher from 'src/utils/cpu-usage-watcher';
 import GameSocketPortal from "./socket/game-server/game-socket-portal";
 import ClusterSocketPortal from "./socket/hub-server/cluster-socket-portal";
 import Console from "./console/console";
+import ServerDatabase from "./db/server-database";
+import {parseServerConfig} from "./server-config-parser";
+import EventEmitter from "../utils/eventemitter";
 
-export default class Server {
+export interface ServerClusterConfig {
+    url: string
+    port: number
+    password: string
+}
+
+export interface WebServerConfig {
+    sessionKey: string
+}
+
+export interface ServerConfig {
+    webServer: WebServerConfig
+    cluster?: ServerClusterConfig,
+    database: ServerDatabase,
+    port: number
+}
+
+export default class Server extends EventEmitter {
+    config: ServerConfig;
+    static configParser = parseServerConfig
     portListeners = new Map<Number, UniversalPortListener>()
     gameSocket: GameSocketPortal | null = null
     clusterSocket: ClusterSocketPortal | null = null
@@ -17,16 +39,22 @@ export default class Server {
     gamePageActive: boolean = false
     hubPageActive: boolean = false
     webServer: WebServer = null
-    clusterPort: number | null = null
-    clientPort: number | null = null
-    clusterServerIP: string | null = null
-    clusterPassword: string | null = null
     cpuUsageWatcher: CpuUsageWatcher = null
+    db: ServerDatabase
 
     console: Console = null
 
-    constructor() {
+    constructor(config: ServerConfig) {
+        super()
         this.cpuUsageWatcher = new CpuUsageWatcher()
+
+        this.config = config
+        this.db = config.database
+    }
+
+    setConsole(console: Console) {
+        this.console = console
+        console.server = this
     }
 
     setHubPageActive(active: boolean): void {
@@ -54,17 +82,17 @@ export default class Server {
         if(active) {
             if(this.webServer) return
 
-            let portListener = this.getPortListener(this.clientPort)
+            let portListener = this.getPortListener(this.config.port)
             portListener.retainHTTP()
 
-            this.webServer = new WebServer()
+            this.webServer = new WebServer(this)
             this.webServer.listen(portListener.httpServer)
         } else {
             if(!this.webServer) return
 
             this.webServer.disable()
             this.webServer = null
-            this.getPortListener(this.clientPort).retainHTTP()
+            this.getPortListener(this.config.port).retainHTTP()
         }
     }
 
@@ -72,7 +100,7 @@ export default class Server {
         if(active) {
             if (this.gameSocket) return
 
-            let portListener = this.getPortListener(this.clientPort)
+            let portListener = this.getPortListener(this.config.port)
             portListener.retainWebsocket()
 
             this.gameSocket = new GameSocket();
@@ -82,22 +110,21 @@ export default class Server {
 
             this.gameSocket.terminate()
             this.gameSocket = null
-            this.getPortListener(this.clientPort).retainWebsocket()
+            this.getPortListener(this.config.port).retainWebsocket()
         }
     }
 
     setClusterClientActive(active: boolean): void {
-
-        if(this.clusterServerIP === null) return
+        if(this.config.cluster === null) return
 
         if(active) {
             if(this.clusterClient) return
 
             this.clusterClient = new ServerParticipantClient({
-                ip: this.clusterServerIP
+                ip: this.config.cluster.url,
+                password: this.config.cluster.password
             })
 
-            this.clusterClient.password = this.clusterPassword
             this.clusterClient.connectToServer()
         } else {
             if(!this.clusterClient) return
@@ -108,22 +135,23 @@ export default class Server {
     }
 
     setClusterSocketServerActive(active: boolean): void {
-        if(this.clusterPort === null) return
+        if(this.config.cluster === null) return
 
         if(active) {
             if(this.clusterSocket) return
 
-            let portListener = this.getPortListener(this.clusterPort)
+            let portListener = this.getPortListener(this.config.cluster.port)
             portListener.retainWebsocket()
 
-            this.clusterSocket = new ClusterSocket()
-            this.clusterSocket.password = this.clusterPassword
+            this.clusterSocket = new ClusterSocket({
+                password: this.config.cluster.password
+            })
             this.clusterSocket.bindToWebsocket(portListener.webSocketServer)
         } else {
             if(!this.clusterSocket) return
 
             this.clusterSocket.terminate()
-            this.getPortListener(this.clusterPort).releaseWebsocket()
+            this.getPortListener(this.config.cluster.port).releaseWebsocket()
             this.clusterSocket = null
         }
     }
@@ -153,28 +181,13 @@ export default class Server {
         return server
     }
 
-    setClientPort(port: number): void {
-        this.clientPort = port
-    }
-
-    setClusterPort(port: number): void {
-        this.clusterPort = port
-    }
-
-    setSocketServerIP(ip: string): void {
-        this.clusterServerIP = ip
-    }
-
-    setClusterPassword(password: string): void {
-        this.clusterPassword = password
-    }
-
-    terminate(): void {
-        this.console.window.screen.destroy()
+    async terminate(): Promise<void> {
         this.setHubPageActive(false)
         this.setGamePageActive(false)
         this.setClusterClientActive(false)
         this.setWebServerActive(false)
         this.setClusterSocketServerActive(false)
+
+        this.emit("terminate")
     }
 }

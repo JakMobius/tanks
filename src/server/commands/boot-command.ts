@@ -12,9 +12,9 @@ export interface ConfigOverrideList {
     errors: string[]
 }
 
-class BootCommand extends Command {
-	public preferencesOverride: any;
-	public parsedFlags: any;
+export default class BootCommand extends Command {
+	public preferencesOverride: ConfigOverrideList;
+	public parsedFlags: Map<string, boolean | string[]>;
 
     constructor(options: CommandConfig) {
         super(options);
@@ -65,47 +65,53 @@ class BootCommand extends Command {
         }
     }
 
-    private static parsePreferencesOverrides(parsedFlags: Map<string, string>) : ConfigOverrideList {
-        let stringOverride = parsedFlags.get("preference-string")
-        let numberOverride = parsedFlags.get("preference-number")
-        let booleanOverride = parsedFlags.get("preference-boolean")
+    private static parsePreferencesOverrides(parsedFlags: Map<string, string[] | boolean>) : ConfigOverrideList {
+        let stringOverride = parsedFlags.get("preference-string") as string[]
+        let numberOverride = parsedFlags.get("preference-number") as string[]
+        let booleanOverride = parsedFlags.get("preference-boolean") as string[]
         let errors = []
         let overrides = []
 
-        if(stringOverride) for(let override of stringOverride) {
-            let flag = BootCommand.parsePreferencesFlag(override)
-            if (flag)  overrides.push(flag)
-            else errors.push(`Invalid preference flag syntax: ${flag}`)
+        if(stringOverride) {
+            for(let override of stringOverride) {
+                let flag = BootCommand.parsePreferencesFlag(override)
+                if (flag)  overrides.push(flag)
+                else errors.push(`Invalid preference flag syntax: ${flag}`)
+            }
         }
 
-        if(numberOverride) for(let override of numberOverride) {
-            let flag = BootCommand.parsePreferencesFlag(override)
-            if (flag) {
-                if (Number.isNaN(parseFloat(flag.value))) errors.push(`Invalid number for preference flag: "${flag.value}"`)
-                else {
-                    flag.value = Number(flag.value)
+        if(numberOverride) {
+            for(let override of numberOverride) {
+                let flag = BootCommand.parsePreferencesFlag(override)
+                if (flag) {
+                    if (Number.isNaN(parseFloat(flag.value))) errors.push(`Invalid number for preference flag: "${flag.value}"`)
+                    else {
+                        flag.value = Number(flag.value)
+                        overrides.push(flag)
+                    }
+                } else errors.push(`Invalid preference flag syntax: ${flag}`)
+            }
+        }
+
+        if(booleanOverride) {
+            for(let override of booleanOverride) {
+                let flag = BootCommand.parsePreferencesFlag(override)
+                if(flag) {
+                    flag.value = flag.value.toLowerCase()
+                    if(flag.value === "true") flag.value = true
+                    else if(flag.value === "false") flag.value = false
+                    else if(flag.value === "1") flag.value = true
+                    else if(flag.value === "0") flag.value = false
+                    else if(flag.value === "yes") flag.value = true
+                    else if(flag.value === "no") flag.value = false
+                    else {
+                        errors.push(`"${flag.value}" is not a valid boolean`)
+                        continue
+                    }
+
                     overrides.push(flag)
-                }
-            } else errors.push(`Invalid preference flag syntax: ${flag}`)
-        }
-
-        if(booleanOverride) for(let override of booleanOverride) {
-            let flag = BootCommand.parsePreferencesFlag(override)
-            if(flag) {
-                flag.value = flag.value.toLowerCase()
-                if(flag.value === "true") flag.value = true
-                else if(flag.value === "false") flag.value = false
-                else if(flag.value === "1") flag.value = true
-                else if(flag.value === "0") flag.value = false
-                else if(flag.value === "yes") flag.value = true
-                else if(flag.value === "no") flag.value = false
-                else {
-                    errors.push(`"${flag.value}" is not a valid boolean`)
-                    continue
-                }
-
-                overrides.push(flag)
-            } else errors.push(`Invalid preference flag syntax: ${flag}`)
+                } else errors.push(`Invalid preference flag syntax: ${flag}`)
+            }
         }
 
         return {
@@ -129,10 +135,9 @@ class BootCommand extends Command {
             for(let error of preferencesOverrideResult.errors) {
                 console.log(error)
             }
-            process.exit(-1)
         }
 
-        this.preferencesOverride = preferencesOverrideResult.overrides
+        this.preferencesOverride = preferencesOverrideResult
 
     }
 
@@ -149,5 +154,3 @@ class BootCommand extends Command {
         return "Server boot command";
     }
 }
-
-export default BootCommand;

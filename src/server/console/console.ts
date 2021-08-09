@@ -15,7 +15,7 @@ export interface ConsoleAutocompleteOptions {
 	single?: boolean
 }
 
-class Console {
+export default class Console {
 	public observingRoom: any;
 	public visible: any;
 	public prompt: any;
@@ -242,5 +242,3 @@ class Console {
 		}
 	}
 }
-
-export default Console;

@@ -1,92 +1,55 @@
-import CLIStyle from "./commands/cli-style";
 
 const serverStartupTime = Date.now()
 
+import CLIStyle from "./commands/cli-style";
 import Server from "./server";
-import DB from './db/db';
 import Logger from './log/logger';
 import Console from './console/console';
-import BootCommand from './commands/bootcommand';
+import BootCommand from './commands/boot-command';
 import Preferences from './preferences/preferences';
 import * as packageJson from '../../package.json';
-import { URL } from 'url';
-
-function initDatabase() {
-    Logger.global.log("Connecting to database")
-    DB.instance = new DB()
-
-    return new Promise((resolve) => {
-        const connect = () => {
-            DB.instance.connect().then(resolve).catch((error) => {
-                Logger.global.log("Failed to connect to database. Retrying in 5 seconds")
-                Logger.global.log(error)
-                setTimeout(connect, 5000)
-            })
-        }
-        connect()
-    })
-}
-
-async function configureClusterCommunication(server: Server) {
-    if(Preferences.boolean("cluster.enabled")) {
-        let clusterPortSettingPath = "cluster.hub-port"
-        let clusterPort
-        const clusterPortSetting = Preferences.value(clusterPortSettingPath)
-
-        if(clusterPortSetting === "inherit-game-port") {
-            clusterPort = server.clientPort
-        } else {
-            Preferences.validatePort(clusterPortSetting, clusterPortSettingPath)
-            clusterPort = Number(clusterPortSetting)
-        }
-
-        server.setClusterPort(clusterPort)
-
-        let hubUrl = new URL(Preferences.string("cluster.hub-address"))
-
-        if(hubUrl.port === "") hubUrl.port = String(clusterPort)
-        hubUrl.pathname = "/cluster-link"
-
-        server.setSocketServerIP(hubUrl.href)
-
-        server.setClusterPassword(Preferences.string("cluster.hub-access-key"))
-    }
-}
 
 async function initialize() {
 
-    await Preferences.read()
-
-    const serverConsole = new Console()
-    serverConsole.createWindow()
-    Logger.global.log(`Loaded libraries within ${(Date.now() - serverStartupTime)/1000}s`)
-
-    let server
+    let server: Server
+    let serverConsole: Console
 
     try {
+
+        await Preferences.read()
+
+        serverConsole = new Console()
+        serverConsole.createWindow()
+        Logger.global.log(`Loaded libraries within ${(Date.now() - serverStartupTime)/1000}s`)
+
+        const preferences = Preferences.root
         const bootCommand = new BootCommand({
             console: serverConsole
         })
+
         serverConsole.callHandle(bootCommand, process.argv)
+        if(bootCommand.preferencesOverride.errors.length) {
+            throw bootCommand.preferencesOverride.errors
+        }
+        preferences.override(bootCommand.preferencesOverride.overrides)
 
-        Preferences.override(bootCommand.preferencesOverride)
+        const config = Server.configParser(preferences)
+        await config.database.connect()
 
-        await initDatabase()
-
-        server = new Server()
-        server.setClientPort(Preferences.port("port"))
-        server.console = serverConsole
-        serverConsole.server = server
-
-        await configureClusterCommunication(server)
+        server = new Server(config)
+        server.setConsole(serverConsole)
+        server.on("terminate", () => {
+            serverConsole.window.screen.destroy()
+            server.db.disconnect(false)
+        })
 
         bootCommand.runPostInit()
     } catch(e) {
 
         // Cleaning up everything that would cause program to stay active
 
-        if(server) server.terminate()
-        else if(serverConsole) serverConsole.window.screen.destroy()
+        if(server) server.terminate().then()
+        else if(serverConsole) serverConsole.window.destroy()
 
         throw e
     }

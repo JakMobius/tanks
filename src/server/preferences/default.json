@@ -7,12 +7,18 @@
 	// Determines which port to bind for both websocket and express server
 	"port": 25565,
 
-	// Credentials for mongodb database
+	// The database configuration
 	"database": {
+		// You may store your user info and web sessions either in
+		// mongodb or local server files.
+
+		// "type": "file"
+
+		"type": "mongodb",
 		"url": "mongodb://localhost:27017/",
 		"user": "admin",
 		"password": "admin",
-		"db": "tanks"
+		"db": "tanks",
 	},
 
 	// Settings passed to express.js

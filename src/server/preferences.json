@@ -35,8 +35,8 @@
 		"hub-address": "ws://localhost",
 
 		// In order to prevent unauthorised access to the cluster
-		// communication system, specify here the unique key. It must match
-		// on all servers.
+		// communication system, specify a unique key here. It must match
+		// on all your servers.
 		"hub-access-key": "please change this line to your unique key",
 
 		// When your server runs in "hub-only" or "on" mode, it will receive

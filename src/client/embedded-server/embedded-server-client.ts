@@ -75,7 +75,7 @@ export default class EmbeddedServerClient extends AbstractClient {
 
     protected writePacket(packet: BinaryPacket): void {
         //console.log("C -> S", packet)
-        this.serverGame.portal.receiveClientPacket(this.socketPortalClient, BinaryPacket.getTransmitted(packet))
+        this.serverGame.portal.receiveClientData(this.socketPortalClient, packet.getData())
     }
 
     getIpAddress(): string {

@@ -1,7 +1,7 @@
 
 import Command from '../command';
 
-class ExitCommand extends Command {
+export default class ExitCommand extends Command {
 
 	onPerform(): void {
 		// if(this.console.currentLogger !== this.console.server.logger) {
@@ -24,5 +24,3 @@ class ExitCommand extends Command {
 		return "exit"
 	}
 }
-
-export default ExitCommand;

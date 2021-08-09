@@ -2,8 +2,9 @@
 import WebserverModule from './webserver-module';
 import * as path from 'path';
 import * as express from 'express';
+import WebServer from "./webserver";
 
-class BaseModule extends WebserverModule {
+export default class BaseModule extends WebserverModule {
     constructor() {
         super();
 
@@ -29,5 +30,3 @@ class BaseModule extends WebserverModule {
         }
     }
 }
-
-export default BaseModule;

@@ -1,7 +1,7 @@
 import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import DB from "../../../db/db";
+import MongoDatabase from "../../../db/mongo/mongo-database";
 import {WebserverSession} from "../../webserver-session";
 
 interface LoginAjaxFields extends AjaxFields {
@@ -23,7 +23,7 @@ export default class LoginAjaxHandler extends AjaxHandler<HubModule> {
             return;
         }
 
-        DB.instance.dbHandle.collection('users').findOne(fields).then((result) => {
+        this.module.webServer.server.db.authoriseUser(fields.login, fields.password).then((result) => {
             if(!result) {
                 res.status(200).send({ result: "invalid-credentials" })
                 return
