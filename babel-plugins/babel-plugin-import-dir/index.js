@@ -2,74 +2,53 @@
 /*
     Thw following file is a modified version of bluepropane/babel-plugin-import-dir
     babel plugin with some fixes (namely - https://github.com/bluepropane/babel-plugin-import-dir/issues/8).
-    Seems like this repository is abandomed, so I had to copy and modify it directly.
+    Seems like this repository is abandoned, so I had to copy and modify it directly.
  */
 
-const fs = require('fs');
-const pathJoin = require('path').join;
 const glob = require('glob');
+const path = require('path')
 
 const MATCH_MODULE_FILES = /\.(js|jsx|ts)$/g;
-const utils = {};
-
-utils.modulePathToName = function(modulePath) {
-    return [modulePath.split('/').slice(-1)[0], modulePath];
-};
-
-utils.modulePathToInfo = function(modulePath) {
-    return {
-        path: modulePath,
-        name: modulePath.split('/').slice(-1)[0],
-    };
-};
-
-utils.getModulesFromPattern = function(pattern, cwd) {
-    const dirs = glob.sync(pattern, { mark: true, cwd });
-    return dirs
-        .filter(mod => {
-            let result = MATCH_MODULE_FILES.exec(mod) || mod.endsWith('/')
-            MATCH_MODULE_FILES.lastIndex = 0
-            return result
-        })
-        .map(mod => {
-            if (mod.endsWith('/')) {
-                mod = mod.slice(0, -1);
-            } else {
-                mod = mod.replace(MATCH_MODULE_FILES, '');
-            }
-            return mod;
-        });
-};
-
-utils.getFinalPath = function(path) {
-    return path
-        .split('/')
-        .filter(subPath => subPath !== '')
-        .slice(-1);
-};
-
-utils.prependDotSlash = function(moduleInfo) {
-    moduleInfo.forEach(mod => {
-        if (!mod.path.startsWith('./')) {
-            mod.path = './' + mod.path;
-        }
-    });
-};
 
 class ImportDeclarationHandler {
-    constructor({ path, state, t } = { path: {}, state: {} }) {
+    constructor(path, state, t) {
         this.setContext(path, state, t);
         this.output = [];
     }
+    getModulesFromPattern(pattern, cwd) {
+        const dirs = glob.sync(pattern, { mark: true, cwd });
+        return dirs
+            .filter(mod => {
+                let result = MATCH_MODULE_FILES.exec(mod) || mod.endsWith('/')
+                MATCH_MODULE_FILES.lastIndex = 0
+                return result
+            })
+            .map(mod => {
+                if (mod.endsWith('/')) {
+                    mod = mod.slice(0, -1);
+                } else {
+                    mod = mod.replace(MATCH_MODULE_FILES, '');
+                }
+                return mod;
+            });
+    };
 
-    setContext = (path, state, t) => {
-        const { node } = path;
-        const context = { path, state, t, node };
-        context.cwd = state.file.opts.filename.replace(/(.*)\/[\w-.]+$/, '$1');
+
+    modulePathToInfo(modulePath) {
+        return {
+            path: modulePath,
+            name: modulePath.split('/').slice(-1)[0],
+        };
+    };
+
+    setContext(contextPath, state, t) {
+        const node = contextPath.node;
+        const context = { path: contextPath, state, t, node };
+        context.cwd = path.dirname(state.file.opts.filename);
         context.targetPattern = node.source.value;
-        const moduleInfo = utils
+        const moduleInfo = this
             .getModulesFromPattern(context.targetPattern, context.cwd)
-            .map(utils.modulePathToInfo);
+            .map(path => this.modulePathToInfo(path));
 
         context.modulePaths = moduleInfo.reduce((accum, { path, name }) => {
             accum[name] = path;
@@ -77,13 +56,13 @@ class ImportDeclarationHandler {
         }, {});
 
         context.importedModuleIdentifiers = moduleInfo.reduce((accum, { name }) => {
-            accum[name] = path.scope.generateUidIdentifier(name);
+            accum[name] = contextPath.scope.generateUidIdentifier(name);
             return accum;
         }, {});
         this.context = context;
     };
 
-    transformSpecifier = node => {
+    transformSpecifier(node) {
         let output;
         const { importedModuleIdentifiers, modulePaths, t } = this.context;
         if (this.hasDefaultImportSpecifier) {
@@ -103,10 +82,8 @@ class ImportDeclarationHandler {
         this.output.push(output);
     };
 
-    transformDefaultSpecifier = node => {
-        const { importedModuleIdentifiers, modulePaths, t, path } = this.context;
-        const targetImports = [];
-        const exportedName = node.local.name;
+    transformDefaultSpecifier() {
+        const { importedModuleIdentifiers, modulePaths, t } = this.context;
 
         for (let moduleName in modulePaths) {
             this.output.push(
@@ -118,14 +95,14 @@ class ImportDeclarationHandler {
         }
     };
 
-    generateDefaultExportObject = () => {
+    generateDefaultExportObject() {
         const { path, importedModuleIdentifiers, t } = this.context;
         const defaultExportObject = t.variableDeclaration('const', [
             t.variableDeclarator(
                 t.identifier(path.node.specifiers[0].local.name),
                 t.arrayExpression(
                     Object.entries(importedModuleIdentifiers).map(
-                        ([moduleName, importedModuleId]) => {
+                        ([, importedModuleId]) => {
                             return importedModuleId
                         })
                 )
@@ -139,7 +116,7 @@ class ImportDeclarationHandler {
         node.specifiers.map(specifierNode => {
             if (t.isImportDefaultSpecifier(specifierNode)) {
                 this.hasDefaultImportSpecifier = true;
-                this.transformDefaultSpecifier(specifierNode);
+                this.transformDefaultSpecifier();
             } else if (t.isImportSpecifier(specifierNode)) {
                 this.transformSpecifier(specifierNode);
             }
@@ -150,15 +127,22 @@ class ImportDeclarationHandler {
     }
 }
 
+function getFinalPath(path) {
+    return path
+        .split('/')
+        .filter(subPath => subPath !== '')
+        .slice(-1);
+}
+
 module.exports = ({ types: t }) => {
     return {
         visitor: {
             ImportDeclaration(path, state) {
-                const { node } = path;
-                if ((utils.getFinalPath(node.source.value)[0] || []).includes('*')) {
-                    const h = new ImportDeclarationHandler({ path, state, t });
-                    h.run();
-                    path.replaceWithMultiple(h.output);
+                const node = path.node;
+                if ((getFinalPath(node.source.value)[0] || []).includes('*')) {
+                    const handler = new ImportDeclarationHandler(path, state, t);
+                    handler.run();
+                    path.replaceWithMultiple(handler.output);
                 }
             },
         },
