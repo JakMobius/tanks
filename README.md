@@ -10,9 +10,9 @@ However, you can contribute and help make this game more and more awesome `:)`
 
 - The game uses high-performance WebGL for graphics
 - Client-server architecture allows you to play with your friends
-- Convinient server console
+- Convenient server console
 - Realistic spread and reflection of blast waves
-- Convinient map editor
+- Convenient map editor
 - Low traffic consumption
 - Uses TypeScript for both server and client.
 - Custom build system which allows to use the same files both in client and in server build for convinience
@@ -37,7 +37,7 @@ npm install
 # Building & running the server
 - To build server from sources, type the following command:
   ```
-  npm run build-server
+  node ./node_modules/beelder/bin/beelder/cli.js release-server
   ```
   This command will rebuild the entire project. This may take time the first time you run it, but subsequent builds will be much faster due to the build cache
 - To start server with default settings, simply type

@@ -1,7 +1,6 @@
 /* @load-resource: '../web/base-style.scss' */
 
 import BrowserCheckView from '../utils/browsercheck/browsercheckview';
-import BrowserSocketClient from "../networking/browser-client";
 
 window.addEventListener("load", function() {
     BrowserCheckView(downloadGameScript)

@@ -1974,7 +1974,7 @@ class Program extends EventEmitter {
 //     Ps = 6  -> Normal Cursor Mode (DECOM).
 //     Ps = 7  -> No Wraparound Mode (DECAWM).
 //     Ps = 8  -> No Auto-repeat Keys (DECARM).
-//     Ps = 9  -> Don't send Mouse X & Y on button press.
+//     Ps = 9  -> Don't sendOutgoingPacket Mouse X & Y on button press.
 //     Ps = 1 0  -> Hide toolbar (rxvt).
 //     Ps = 1 2  -> Stop Blinking Cursor (att610).
 //     Ps = 1 8  -> Don't print form feed (DECPFF).
@@ -1993,12 +1993,12 @@ class Program extends EventEmitter {
 //     Ps = 4 7  -> Use Normal Screen Buffer.
 //     Ps = 6 6  -> Numeric keypad (DECNKM).
 //     Ps = 6 7  -> Backarrow key sends delete (DECBKM).
-//     Ps = 1 0 0 0  -> Don't send Mouse X & Y on button press and
+//     Ps = 1 0 0 0  -> Don't sendOutgoingPacket Mouse X & Y on button press and
 //     release.  See the section Mouse Tracking.
 //     Ps = 1 0 0 1  -> Don't use Hilite Mouse Tracking.
 //     Ps = 1 0 0 2  -> Don't use Cell Motion Mouse Tracking.
 //     Ps = 1 0 0 3  -> Don't use All Motion Mouse Tracking.
-//     Ps = 1 0 0 4  -> Don't send FocusIn/FocusOut events.
+//     Ps = 1 0 0 4  -> Don't sendOutgoingPacket FocusIn/FocusOut events.
 //     Ps = 1 0 0 5  -> Disable Extended Mouse Mode.
 //     Ps = 1 0 1 0  -> Don't scroll to bottom on tty output
 //     (rxvt).
@@ -2007,11 +2007,11 @@ class Program extends EventEmitter {
 //     the eightBitInput resource).
 //     Ps = 1 0 3 5  -> Disable special modifiers for Alt and Num-
 //     Lock keys.  (This disables the numLock resource).
-//     Ps = 1 0 3 6  -> Don't send ESC  when Meta modifies a key.
+//     Ps = 1 0 3 6  -> Don't sendOutgoingPacket ESC  when Meta modifies a key.
 //     (This disables the metaSendsEscape resource).
 //     Ps = 1 0 3 7  -> Send VT220 Remove from the editing-keypad
 //     Delete key.
-//     Ps = 1 0 3 9  -> Don't send ESC  when Alt modifies a key.
+//     Ps = 1 0 3 9  -> Don't sendOutgoingPacket ESC  when Alt modifies a key.
 //     (This disables the altSendsEscape resource).
 //     Ps = 1 0 4 0  -> Do not keep selection when not highlighted.
 //     (This disables the keepSelection resource).

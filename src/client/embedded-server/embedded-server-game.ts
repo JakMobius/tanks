@@ -1,20 +1,27 @@
 import ClientGameWorld from "../client-game-world";
 import Game from "../../server/room/game";
 import GameMap from "../../map/gamemap";
-import EmbeddedServerClient from "./embedded-server-client";
 import ClientWorldBridge from "../game/client-world-bridge";
 import AdapterLoop from "../../utils/loop/adapter-loop";
+import ConnectionClient from "../../networking/connection-client";
+import SocketPortalClient from "../../server/socket/socket-portal-client";
+import Connection from "../../networking/connection";
+import LocalConnection from "../../networking/local-connection";
 
 export class EmbeddedServerGameConfig {
     map: GameMap
 }
 
 export default class EmbeddedServerGame {
-    embeddedServerClient: EmbeddedServerClient
-    clientWorld: ClientGameWorld
+    client: ConnectionClient<Connection>
+    server: ConnectionClient<Connection>
 
+    clientWorld: ClientGameWorld
     serverGame: Game
+
     serverLoop = new AdapterLoop()
+
+    // TODO: there is way too much stuff happening in the constructor
 
     constructor(config: EmbeddedServerGameConfig) {
         const map = config.map
@@ -32,12 +39,23 @@ export default class EmbeddedServerGame {
             map: map
         })
 
-        this.embeddedServerClient = new EmbeddedServerClient(this.serverGame)
-        ClientWorldBridge.buildBridge(this.embeddedServerClient, this.clientWorld)
+        const clientConnection = new LocalConnection()
+        this.client = new ConnectionClient(clientConnection)
+        ClientWorldBridge.buildBridge(this.client, this.clientWorld)
     }
 
-    connectClient() {
-        this.embeddedServerClient.connectToServer()
+    connectClientToServer() {
+
+        const serverConnection = new LocalConnection()
+        Connection.pipeReversed(this.client.connection, serverConnection)
+
+        this.serverGame.portal.clientConnected(new SocketPortalClient({
+            connection: serverConnection,
+            data: {
+                listeningForRooms: false,
+                player: null
+            }
+        }))
     }
 
     tick(dt: number) {

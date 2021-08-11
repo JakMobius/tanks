@@ -19,14 +19,14 @@ import PlayerControls from 'src/client/controls/playercontrols';
 import GamepadManager from 'src/client/controls/interact/gamepadmanager';
 import WorldDrawer from 'src/client/graphics/drawers/world-drawer';
 import TankModel from "src/entity/tanks/tank-model";
-import AbstractClient from "src/networking/abstract-client";
+import ConnectionClient from "src/networking/connection-client";
 import KeyboardController from "src/client/controls/interact/keyboardcontroller";
 import ClientGameWorld from "../../client-game-world";
 import ClientWorldBridge from "../client-world-bridge";
 import {ClientTankType} from "../../entity/tank/client-tank";
 
 export interface GameSceneConfig extends SceneConfig {
-    client: AbstractClient
+    client: ConnectionClient
 }
 
 export default class GameScene extends Scene {
@@ -38,7 +38,7 @@ export default class GameScene extends Scene {
 	public gamepad = new GamepadManager();
 	public touchController: TouchController;
 	public playerControls: PlayerControls;
-	public client: AbstractClient;
+	public client: ConnectionClient;
 	public overlay: PrimaryOverlay;
 	public eventContainer: EventContainer;
 	public chatContainer: ChatContainer;

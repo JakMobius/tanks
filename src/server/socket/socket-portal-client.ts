@@ -1,9 +1,9 @@
-import AbstractConnection from "../../networking/abstract-connection";
+import Connection from "../../networking/connection";
 import Room from "../room/room";
 
 export interface SocketPortalClientConfig<DataClass> {
 	data: DataClass
-	connection: AbstractConnection
+	connection: Connection
 }
 
 export default class SocketPortalClient<DataClass = any> {
@@ -11,7 +11,7 @@ export default class SocketPortalClient<DataClass = any> {
 
 	id: number
 	data: DataClass
-	connection: AbstractConnection
+	connection: Connection
 
 	game: Room = null
 

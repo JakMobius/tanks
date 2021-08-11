@@ -1,17 +1,18 @@
 import ClientDataHandler from "./client-packet-handler";
-import AbstractClient from "../abstract-client";
+import ConnectionClient from "../connection-client";
 import Queue from "../../utils/queue";
+import Connection from "../connection";
 
 export default class NetworkLatencyImitator extends ClientDataHandler {
 
     ping: number = 0
     jitter: number = 0
     queue = new Queue<ArrayBuffer>()
-    private client: AbstractClient;
+    private connection: Connection;
 
-    constructor(client: AbstractClient) {
+    constructor(connection: Connection) {
         super();
-        this.client = client;
+        this.connection = connection;
     }
 
     handleData(packet: ArrayBuffer): void {
@@ -28,8 +29,6 @@ export default class NetworkLatencyImitator extends ClientDataHandler {
     }
 
     private dequeuePacket() {
-        this.client.handleData(this.queue.dequeue())
+        this.connection.handleIncomingData(this.queue.dequeue())
     }
-
-
 }

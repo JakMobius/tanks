@@ -1,4 +1,4 @@
-import AbstractClient from "../../networking/abstract-client";
+import ConnectionClient from "../../networking/connection-client";
 import MapPacket from "../../networking/packets/game-packets/map-packet";
 import PlayerJoinPacket from "../../networking/packets/game-packets/player-join-packet";
 import PlayerSpawnPacket from "../../networking/packets/game-packets/player-spawn-packet";
@@ -21,7 +21,7 @@ import WorldPlayerControlsPacket from "../../networking/packets/game-packets/wor
 import EntityHealthPacket from "../../networking/packets/game-packets/entity-health-packet";
 
 export default class ClientWorldBridge {
-    static buildBridge(client: AbstractClient, world: ClientGameWorld) {
+    static buildBridge(client: ConnectionClient, world: ClientGameWorld) {
         client.on(MapPacket, (packet) => {
             world.setMap(packet.map)
         })

@@ -3,7 +3,6 @@ import UniversalPortListener from './universal-port-listener';
 import WebServer from './webserver/webserver';
 import GameSocket from './socket/game-server/game-socket-portal';
 import ClusterSocket from './socket/hub-server/cluster-socket-portal';
-import ServerParticipantClient from './socket/participant-client/server-participant-client';
 import CpuUsageWatcher from 'src/utils/cpu-usage-watcher';
 import GameSocketPortal from "./socket/game-server/game-socket-portal";
 import ClusterSocketPortal from "./socket/hub-server/cluster-socket-portal";
@@ -11,6 +10,10 @@ import Console from "./console/console";
 import ServerDatabase from "./db/server-database";
 import {parseServerConfig} from "./server-config-parser";
 import EventEmitter from "../utils/eventemitter";
+import ClusterHandshakeConnection from "./socket/participant-client/cluster-handshake-connection";
+import WebsocketConnection from "./websocket-connection";
+import Connection from "../networking/connection";
+import ConnectionClient from "../networking/connection-client";
 
 export interface ServerClusterConfig {
     url: string
@@ -35,7 +38,7 @@ export default class Server extends EventEmitter {
     portListeners = new Map<Number, UniversalPortListener>()
     gameSocket: GameSocketPortal | null = null
     clusterSocket: ClusterSocketPortal | null = null
-    clusterClient: ServerParticipantClient | null = null
+    clusterClient: ConnectionClient | null = null
     gamePageActive: boolean = false
     hubPageActive: boolean = false
     webServer: WebServer = null
@@ -120,16 +123,16 @@ export default class Server extends EventEmitter {
         if(active) {
             if(this.clusterClient) return
 
-            this.clusterClient = new ServerParticipantClient({
-                ip: this.config.cluster.url,
-                password: this.config.cluster.password
-            })
+            const websocketConnection = WebsocketConnection.clientConnection(this.config.cluster.url)
+            const handshakeConnection = new ClusterHandshakeConnection(this.config.cluster.password)
 
-            this.clusterClient.connectToServer()
+            Connection.pipeStraight(websocketConnection, handshakeConnection)
+
+            this.clusterClient = new ConnectionClient(handshakeConnection)
         } else {
             if(!this.clusterClient) return
 
-            this.clusterClient.disconnect()
+            this.clusterClient.connection.close()
             this.clusterClient = null
         }
     }

@@ -76,7 +76,7 @@ class ServiceCommand extends Command {
         " - service on          - all services are enabled\n" +
         " - service hub-only    - disallow game rooms and discard \"/game\" page requests\n" +
         " - service game-only   - discard \"/hub\" page requests\n" +
-        " - service socket-only - disable http server, run as websocket only"
+        " - service socket-only - disable http server, run as websocketConnection only"
     }
 }
 

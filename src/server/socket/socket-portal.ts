@@ -71,7 +71,7 @@ export default abstract class SocketPortal<ClientDataClass = any> {
         this.clientConnected(client)
         this.clients.set(client.id, client)
 
-        client.connection.on('packet', (packet: BinaryPacket) => {
+        client.connection.on('incoming-packet', (packet: BinaryPacket) => {
             this.handlePacket(packet, client)
         })
 

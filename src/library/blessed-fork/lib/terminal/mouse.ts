@@ -119,7 +119,7 @@ export class MouseController {
 
         //     Ps = 9  -> Send Mouse X & Y on button press.  See the sec-
         //     tion Mouse Tracking.
-        //     Ps = 9  -> Don't send Mouse X & Y on button press.
+        //     Ps = 9  -> Don't sendOutgoingPacket Mouse X & Y on button press.
         // x10 mouse
         if (opt.x10Mouse != null) {
             if (enable) this.program.setMode('?9');
@@ -128,7 +128,7 @@ export class MouseController {
 
         //     Ps = 1 0 0 0  -> Send Mouse X & Y on button press and
         //     release.  See the section Mouse Tracking.
-        //     Ps = 1 0 0 0  -> Don't send Mouse X & Y on button press and
+        //     Ps = 1 0 0 0  -> Don't sendOutgoingPacket Mouse X & Y on button press and
         //     release.  See the section Mouse Tracking.
         // vt200 mouse
         if (opt.vt200Mouse != null) {
@@ -167,7 +167,7 @@ export class MouseController {
         }
 
         //     Ps = 1 0 0 4  -> Send FocusIn/FocusOut events.
-        //     Ps = 1 0 0 4  -> Don't send FocusIn/FocusOut events.
+        //     Ps = 1 0 0 4  -> Don't sendOutgoingPacket FocusIn/FocusOut events.
         if (opt.sendFocus != null) {
             if (enable) this.program.setMode('?1004');
             else this.program.resetMode('?1004');
@@ -280,7 +280,7 @@ export class MouseController {
 //   button.c, charproc.c, misc.c
 // Relevant functions in xterm/button.c:
 //   BtnCode, EmitButtonCode, EditorButton, SendMousePosition
-// send a mouse event:
+// sendOutgoingPacket a mouse event:
 // regular/utf8: ^[[M Cb Cx Cy
 // urxvt: ^[[ Cb ; Cx ; Cy M
 // sgr: ^[[ Cb ; Cx ; Cy M/m
@@ -320,7 +320,7 @@ export class MouseController {
         };
 
         // XTerm / X10 for buggy VTE
-        // VTE can only send unsigned chars and no unicode for coords. This limits
+        // VTE can only sendOutgoingPacket unsigned chars and no unicode for coords. This limits
         // them to 0xff. However, normally the x10 protocol does not allow a byte
         // under 0x20, but since VTE can have the bytes overflow, we can consider
         // bytes below 0x20 to be up to 0xff + 0x20. This gives a limit of 287. Since

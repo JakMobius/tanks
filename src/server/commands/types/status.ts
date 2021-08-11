@@ -205,7 +205,7 @@ class StatusCommand extends Command {
         }
 
         if(isClusterClientActive) {
-            this.printStatus("connection status", this.connectingText(server.clusterClient.isOpen()))
+            this.printStatus("connection status", this.connectingText(server.clusterClient.connection.isReady()))
         }
         this.endStatusGroup()
     }

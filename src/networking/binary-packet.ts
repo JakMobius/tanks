@@ -2,7 +2,7 @@
 import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
 import BinaryEncoder from '../serialization/binary/binaryencoder';
 import BinaryDecoder from '../serialization/binary/binarydecoder';
-import AbstractConnection from "./abstract-connection";
+import Connection from "./connection";
 import Buffer, {ByteArray} from "../serialization/binary/buffer";
 
 /**
@@ -84,17 +84,17 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
     }
 
     /**
-     * Sends the packet to {@link AbstractConnection}. When called once, packet
+     * Sends the packet to {@link Connection}. When called once, packet
      * get compiled and can no longer change its data
      * @param connection The packet receiver.
      */
 
-    sendTo(connection: AbstractConnection): void {
-        if(!this.shouldSend() || !connection.isReady()) {
+    sendTo(connection: Connection): void {
+        if(!this.shouldSend()) {
             return
         }
 
-        connection.send(this)
+        connection.sendOutgoingPacket(this)
     }
 
     shouldSend(): boolean {

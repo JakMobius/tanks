@@ -1,62 +1,89 @@
 
-import AbstractConnection from '../networking/abstract-connection';
-import WebSocket from 'websocket';
+import Connection from '../networking/connection';
+import WebSocket, {IClientConfig} from 'websocket';
 import BinaryPacket from "../networking/binary-packet";
 import * as Websocket from "websocket";
 import {BinarySerializer} from "../serialization/binary/serializable";
+import * as http from "http";
 
 const WebSocketConnection = WebSocket.connection
 
-export default class WebsocketConnection extends AbstractConnection {
+export interface WebsocketClientConnectionConfig {
+    requestedProtocols?: string | string[]
+    origin?: string
+    headers?: http.OutgoingHttpHeaders
+    extraRequestOptions?: http.RequestOptions
+    clientConfig?: IClientConfig
+}
 
-    websocket: WebSocket.connection = null
+export default class WebsocketConnection extends Connection {
 
-    constructor(websocket: WebSocket.connection) {
+    websocketConnection: WebSocket.connection = null
+
+    constructor(websocketConnection?: WebSocket.connection) {
         super();
-        this.websocket = websocket
+        if(websocketConnection) this.bindToWebsocketConnection(websocketConnection)
+    }
 
-        websocket.on('message', (message: Websocket.IMessage) => {
+    bindToWebsocketConnection(connection?: WebSocket.connection) {
+        if(this.websocketConnection) {
+            throw new Error("This WebsocketConnection has already been bound to a socket")
+        }
+
+        this.websocketConnection = connection
+        connection.on('message', (message: Websocket.IMessage) => {
             this.handleMessage(message)
         })
 
-        websocket.on("close", (code: number, desc: string) =>  {
+        connection.on("close", (code: number, desc: string) =>  {
             this.emit("close", code, desc)
         });
     }
 
+    static clientConnection(ip: string, config?: WebsocketClientConnectionConfig) {
+        config = config || {}
+
+        const connection = new WebsocketConnection()
+        const websocketClient = new WebSocket.client(config.clientConfig)
+
+        websocketClient.on("connect", (websocketConnection) => {
+            connection.bindToWebsocketConnection(websocketConnection)
+        })
+
+        websocketClient.on("connectFailed", (error) => {
+            connection.emit("error", error)
+        })
+
+        websocketClient.connect(ip, config.requestedProtocols, config.origin, config.headers, config.extraRequestOptions)
+
+        return connection
+    }
+
     isReady() {
-        return this.websocket.state === "open"
+        return this.websocketConnection && this.websocketConnection.state === "open"
     }
 
-    send(packet: BinaryPacket) {
-        this.websocket.sendBytes(Buffer.from(packet.getData()))
+    sendOutgoingPacket(packet: BinaryPacket) {
+        this.websocketConnection.sendBytes(Buffer.from(packet.getData()))
     }
 
-    close(reason: string) {
-        this.websocket.close(WebSocketConnection.CLOSE_REASON_NORMAL, reason)
+    close(reason?: string) {
+        if(this.websocketConnection) {
+            this.websocketConnection.close(WebSocketConnection.CLOSE_REASON_NORMAL, reason)
+        }
     }
 
     private handleMessage(message: Websocket.IMessage) {
         try {
             if(message.type !== "binary") return
-
-            let data = message.binaryData
-            let decoder = BinaryPacket.binaryDecoder
-            decoder.reset()
-            decoder.readData(new Uint8Array(data).buffer)
-
-            // BinaryPacket.deserialize may only return
-            // a BinaryPacket instance
-
-            let packet = BinarySerializer.deserialize(decoder, BinaryPacket)
-
-            this.receivePacket(packet)
+            this.handleIncomingData(new Uint8Array(message.binaryData).buffer)
         } catch(e) {
             this.emit("error", e)
         }
     }
 
     getIpAddress(): string {
-        return this.websocket.remoteAddress;
+        if(!this.websocketConnection) return "unknown"
+        return this.websocketConnection.remoteAddress;
     }
 }

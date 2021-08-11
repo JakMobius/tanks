@@ -93,7 +93,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         super.handlePacket(packet, client)
 
         if(packet instanceof RoomListRequestPacket) {
-            client.data["listeningForRooms"] = packet.request;
+            client.data.listeningForRooms = packet.request;
         } else if(packet instanceof PlayerRoomRequestPacket) {
             const room = this.games.get(packet.room);
 

@@ -21,15 +21,8 @@ export default class RoomPortal extends TypedEventHandler<[GameSocketPortalClien
     broadcast(packet: BinaryPacket) {
         if(packet.shouldSend())
             for(let client of this.clients.values()) {
-                client.connection.send(packet)
+                client.connection.sendOutgoingPacket(packet)
             }
-    }
-
-    receiveClientData(client: GameSocketPortalClient, data: ArrayBuffer) {
-        let decoder = BinaryPacket.binaryDecoder
-        decoder.reset()
-        decoder.readData(data)
-        this.receiveClientPacket(client, BinarySerializer.deserialize(decoder, BinaryPacket))
     }
 
     receiveClientPacket(client: GameSocketPortalClient, packet: BinaryPacket) {

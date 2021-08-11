@@ -12,7 +12,6 @@ import {getTutorialMap} from "../tutorial-map";
 import ClientPlayer from "../../client-player";
 import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
-import NetworkLatencyImitator from "../../../networking/packet-handlers/network-latency-imitator";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -42,13 +41,12 @@ export default class TutorialScene extends Scene {
 
         this.game = new EmbeddedServerGame({ map: getTutorialMap() })
 
-        const latencyImitator = new NetworkLatencyImitator(this.game.embeddedServerClient)
-        latencyImitator.ping = 100
-        latencyImitator.jitter = 50
-        //this.game.embeddedServerClient.dataHandler = latencyImitator
+        // const latencyImitator = new NetworkLatencyImitator(this.game.client.connection)
+        // latencyImitator.ping = 100
+        // latencyImitator.jitter = 50
+        //this.game.client.dataHandler = latencyImitator
 
         this.worldController = new TutorialWorldController(this.game.serverGame)
-
         this.game.clientWorld.on("primary-player-set", (player) => this.onWorldPrimaryPlayerSet(player))
 
         this.touchController = new TouchController(this.controls, this.screen.canvas)
@@ -58,6 +56,8 @@ export default class TutorialScene extends Scene {
 
         this.playerControls.on("respawn", () => {})
 
+        this.game.connectClientToServer()
+
         this.keyboard.startListening()
         this.touchController.startListening()
         this.gamepad.startListening()
@@ -66,7 +66,6 @@ export default class TutorialScene extends Scene {
 
         this.layout()
 
-        this.game.connectClient()
     }
 
     layout() {
