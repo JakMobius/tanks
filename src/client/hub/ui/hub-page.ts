@@ -4,7 +4,6 @@ import View from "../../ui/view";
 import {UserDataRaw} from "../../user-data-raw";
 import NavigationView from "../../ui/navigation/navigation-view";
 import WelcomeController from "./welcome/welcome-controller";
-import EventView from "../../ui/overlay/events/eventview";
 import EventContainer from "../../ui/overlay/events/eventcontainer";
 import AuthorizedWelcomeController from "./authorised-welcome/authorized-welcome-controller";
 

@@ -13,7 +13,7 @@ export class TankWheel {
     friction: number
     isSliding: boolean = false;
     angle: number = 0
-    throttle: number = 0
+    torque: number = 0
     tensionVector: Vec2 = new Vec2()
     speed: number = 0
     distance: number = 0
@@ -52,7 +52,7 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
     axleFrictionList?: number[]
 
     /**
-     * Minimum turning radius of the vehicle
+     * Minimal turning radius of the vehicle
      */
     minSteerRadius?: number
 
@@ -97,9 +97,8 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
 }
 
 export default class WheeledTankBehaviour extends TankBehaviour {
-    public axleDistance: any;
-    public axleWidth: any;
-    public wheelSpeed: any;
+    public axleDistance: number;
+    public axleWidth: number;
     public wheels: TankWheel[] = []
     public minSteerRadius: number;
     public axles: number;
@@ -108,7 +107,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public axleOffsetList: number[];
     public axleFrictionList: number[];
     public driveAxleList: boolean[];
-    public perWheelPower: number;
+    public driveWheelCount: number
     public lateralTensionLossPerMeter: number;
 
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
@@ -116,7 +115,6 @@ export default class WheeledTankBehaviour extends TankBehaviour {
 
         this.axleDistance = config.axleDistance || 6
         this.axleWidth = config.axleWidth || 8
-        this.wheelSpeed = 9.8
         this.minSteerRadius = config.minSteerRadius || 20
         this.axles = config.axles || 3
         this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList(config.wheelSlideFriction)
@@ -126,17 +124,31 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.wheelTensionLimit = config.wheelTensionLimit || 0.3
         this.lateralTensionLossPerMeter = config.lateralTensionLossPerMeter || 0.02
 
-        this.perWheelPower = config.power / this.getDriveWheelCount()
+        this.driveWheelCount = this.calculateDriveWheelCount()
 
         this.createWheels()
     }
 
-    private getDriveWheelCount() {
-        let amount = 0;
+    /**
+     * @returns number average speed of all driving wheels
+     */
+    getDrivetrainSpeed(): number {
+        let totalSpeed = 0
         for(let i = 0; i < this.axles; i++) {
-            if(this.driveAxleList[i]) amount += 2;
+            if(this.driveAxleList[i]) {
+                totalSpeed += this.wheels[i * 2].speed
+                totalSpeed += this.wheels[i * 2 + 1].speed
+            }
         }
-        return amount;
+        return Math.abs(totalSpeed / this.driveWheelCount)
+    }
+
+    private calculateDriveWheelCount() {
+        let result = 0;
+        for(let i = 0; i < this.axles; i++) {
+            if(this.driveAxleList[i]) result += 2;
+        }
+        return result;
     }
 
     private defaultAxleFrictionList(friction?: number) {
@@ -197,7 +209,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.localVector2.SelfMul(dt)
         this.localVector2.y = 0
         wheel.tensionVector.SelfAdd(this.localVector2)
-        wheel.tensionVector.y = -wheel.throttle / wheel.friction * this.wheelTensionLimit
+        wheel.tensionVector.y = -wheel.torque / wheel.friction * this.wheelTensionLimit
 
         let tickMovement = wheel.speed * dt
         wheel.distance += tickMovement
@@ -247,15 +259,21 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.applyWheelForces(dt)
     }
 
-    protected updateWheelThrottle() {
-        let steerY = this.tank.controls.getThrottle()
+    calculateEngineTorque(velocity: number) {
+        if(velocity <= 0) return this.maxTorque
+        const torque = this.power / velocity
+        return Math.min(this.maxTorque, torque)
+    }
 
-        const throttle = this.perWheelPower * steerY
+    protected updateWheelThrottle() {
+        const throttle = this.tank.controls.getThrottle()
+        const engineTorque = this.calculateEngineTorque(this.getDrivetrainSpeed()) * throttle
+        const wheelTorque = engineTorque / this.driveWheelCount
 
         for(let i = 0; i < this.axles; i++) {
             if(this.driveAxleList[i]) {
-                this.wheels[i * 2].throttle = throttle
-                this.wheels[i * 2 + 1].throttle = throttle
+                this.wheels[i * 2].torque = wheelTorque
+                this.wheels[i * 2 + 1].torque = wheelTorque
             }
         }
     }

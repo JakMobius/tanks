@@ -97,8 +97,8 @@ export default class AbstractWorld<
 
     private performPhysicsTick() {
         this.world.ClearForces()
-        for (let player of this.players.values()) {
-            player.tank.model.physicsTick(this.physicsTick)
+        for (let entity of this.entities.values()) {
+            entity.model.physicsTick(this.physicsTick)
         }
         this.world.Step(this.physicsTick, this.velocitySteps, this.positionSteps);
     }

@@ -114,7 +114,6 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
                 ).sendTo(client.connection)
             }
         }
-        if(packet) client.game.portal.receiveClientPacket(client, packet)
     }
 
     getFreeGame() {

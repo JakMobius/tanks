@@ -12,6 +12,7 @@ import {getTutorialMap} from "../tutorial-map";
 import ClientPlayer from "../../client-player";
 import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
+import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -56,16 +57,23 @@ export default class TutorialScene extends Scene {
 
         this.playerControls.on("respawn", () => {})
 
-        this.game.connectClientToServer()
-
         this.keyboard.startListening()
         this.touchController.startListening()
         this.gamepad.startListening()
 
+        this.keyboard.keybinding("Tab", () => {
+            this.performClientCommand("#switch-tank")
+        })
+
         this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.game.clientWorld)
 
-        this.layout()
+        this.game.connectClientToServer()
 
+        this.layout()
+    }
+
+    performClientCommand(command: string) {
+        new PlayerChatPacket(command).sendTo(this.game.client.connection)
     }
 
     layout() {

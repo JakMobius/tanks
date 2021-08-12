@@ -92,4 +92,8 @@ export default class EntityModel implements BinarySerializable<typeof EntityMode
         if(!world) return
         world.emit("entity-health-change", entity)
     }
+
+    physicsTick(physicsTick: number) {
+        
+    }
 }

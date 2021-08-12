@@ -85,8 +85,8 @@ export default class WorldDrawer extends EventEmitter {
         this.world = world
 
 	    this.entityDrawers.clear()
-        for(let player of this.world.players.values()) {
-            this.setupDrawerForEntity(player.tank)
+        for(let entity of this.world.entities.values()) {
+            this.setupDrawerForEntity(entity)
         }
 
         this.worldEventHandler.setTarget(this.world)

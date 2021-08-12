@@ -24,16 +24,36 @@ export default class TruckTankBehaviour extends WheeledTankBehaviour {
 
     }
 
-    protected updateWheelThrottle() {
-        let steerY = this.tank.controls.getThrottle()
-        let steerX = this.tank.controls.getSteer()
+    getLeftTrackSpeed() {
+        let totalSpeed = 0
+        for(let i = 0; i < this.axles; i++) totalSpeed += this.wheels[i * 2].speed
+        return Math.abs(totalSpeed / this.axles)
+    }
 
-        let leftTruckThrottle = clamp(steerY - steerX, -1, 1) * this.perWheelPower
-        let rightTruckThrottle = clamp(steerY + steerX, -1, 1) * this.perWheelPower
+    getRightTrackSpeed() {
+        let totalSpeed = 0
+        for(let i = 0; i < this.axles; i++) totalSpeed += this.wheels[i * 2 + 1].speed
+        return Math.abs(totalSpeed / this.axles)
+    }
+
+    protected updateWheelThrottle() {
+        const steerY = this.tank.controls.getThrottle()
+        const steerX = this.tank.controls.getSteer()
+
+        const leftTruckThrottle = clamp(steerY - steerX, -1, 1)
+        const rightTruckThrottle = clamp(steerY + steerX, -1, 1)
+
+        const leftTruckSpeed = this.getLeftTrackSpeed()
+        const rightTruckSpeed = this.getRightTrackSpeed()
+
+        const engineTorque = this.calculateEngineTorque(leftTruckSpeed + rightTruckSpeed)
+
+        const leftTrackTorque = engineTorque * leftTruckThrottle / this.axles
+        const rightTruckTorque = engineTorque * rightTruckThrottle / this.axles
 
         for(let i = 0; i < this.axles; i++) {
-            this.wheels[i * 2 + 1].throttle = leftTruckThrottle
-            this.wheels[i * 2].throttle = rightTruckThrottle
+            this.wheels[i * 2 + 1].torque = leftTrackTorque
+            this.wheels[i * 2].torque = rightTruckTorque
         }
     }
 

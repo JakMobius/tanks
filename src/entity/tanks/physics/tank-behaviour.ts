@@ -3,7 +3,18 @@ import TankModel from '../tank-model';
 import {Vec2} from "../../../library/box2d";
 
 export interface TankBehaviourConfig {
+
+    // The following parameters adjust the power curve of the tank engine
+
+    /**
+     * Engine power of the tank (in watts)
+     */
     power?: number
+
+    /**
+     * Maximum force with which the engine will push the tank (in newtons)
+     */
+    maxTorque?: number
 }
 
 /**
@@ -11,8 +22,8 @@ export interface TankBehaviourConfig {
  */
 export default class TankBehaviour {
 	public power: number;
-	public lateralFriction: number;
 	public tank: TankModel;
+    public maxTorque: number;
 
     protected localVector1 = new Vec2()
     protected localVector2 = new Vec2()
@@ -22,6 +33,7 @@ export default class TankBehaviour {
     constructor(tank: TankModel, config: TankBehaviourConfig) {
 
         this.power = config.power || 10000
+        this.maxTorque = config.maxTorque || 1000000
 
         this.tank = tank
     }
