@@ -12,10 +12,11 @@ export default class SniperTankModel extends TankModel<TruckTankBehaviour> {
         super();
 
         this.behaviour = new TruckTankBehaviour(this, {
-            power: 50000,
+            power: 10000000,
             axleWidth: 7.5,
             truckLength: 15,
-            truckFriction: 30000
+            truckFriction: 200000,
+            maxTorque: 10000000
         });
     }
 
@@ -26,16 +27,17 @@ export default class SniperTankModel extends TankModel<TruckTankBehaviour> {
 
         // Sniper is a tank. Tank should be massive
 
-        let bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.45, new Box2D.Vec2(0, 0), {
-            density: 3,
+        let bodyFixture = PhysicsUtils.squareFixture(4.5, 4.05, new Box2D.Vec2(0, 0), {
+            density: 60,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.Vec2(-size / 2 - segment, size * 0.2), {
-            filter: physicsFilters.tank
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 9, new Box2D.Vec2(-size / 2 - segment, size * 0.2), {
+            filter: physicsFilters.tank,
+            density: 25
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            angularDamping: 1.0,
+            angularDamping: 0.1,
             linearDamping: 0.5
         });
 

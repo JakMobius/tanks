@@ -14,7 +14,7 @@ export default class MonsterTankModel extends TankModel {
         super()
 
         this.behaviour = new WheeledTankBehaviour(this, {
-            power: 3000000
+            power: 10000
         });
     }
 
