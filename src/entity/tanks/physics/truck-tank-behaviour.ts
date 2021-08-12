@@ -40,11 +40,28 @@ export default class TruckTankBehaviour extends WheeledTankBehaviour {
         const steerY = this.tank.controls.getThrottle()
         const steerX = this.tank.controls.getSteer()
 
-        const leftTruckThrottle = clamp(steerY - steerX, -1, 1)
-        const rightTruckThrottle = clamp(steerY + steerX, -1, 1)
+        let leftTruckThrottle = clamp(steerY - steerX, -1, 1)
+        let rightTruckThrottle = clamp(steerY + steerX, -1, 1)
 
         const leftTruckSpeed = this.getLeftTrackSpeed()
         const rightTruckSpeed = this.getRightTrackSpeed()
+
+        if(Math.abs(steerY) < 0.5) {
+            if(Math.abs(steerX) > 0.5) {
+                const steerFactor = Math.abs(steerX) - 0.5
+                const breakFactor = steerFactor - Math.abs(steerY)
+
+                if(breakFactor > 0) {
+                    if (steerX < 0) {
+                        if (leftTruckSpeed > 0) leftTruckThrottle -= breakFactor
+                        else leftTruckThrottle += breakFactor
+                    } else {
+                        if (rightTruckSpeed > 0) rightTruckThrottle -= breakFactor
+                        else rightTruckThrottle += breakFactor
+                    }
+                }
+            }
+        }
 
         const engineTorque = this.calculateEngineTorque(leftTruckSpeed + rightTruckSpeed)
 

@@ -54,8 +54,8 @@ class Drawer extends TankDrawer<ClientSniperTank> {
         transformQuadrangle(leftTrack, model.matrix)
         transformQuadrangle(rightTrack, model.matrix)
 
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4.0, 0.1)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4.0, 0.1)
+        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4.0, 0.2)
+        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4.0, 0.2)
         bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, quadrangle, body.GetAngle())
     }
 }
