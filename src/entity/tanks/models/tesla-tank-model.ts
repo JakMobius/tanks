@@ -1,7 +1,7 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
 import * as Box2D from '../../../library/box2d';
-import BasicTankBehaviour from '../physics/truck-tank-behaviour';
+import BasicTankBehaviour from '../physics/track-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
 
 export default class TeslaTankModel extends TankModel {

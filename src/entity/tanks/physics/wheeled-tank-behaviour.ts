@@ -94,6 +94,12 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
      * This value does not affect performance.
      */
     lateralTensionLossPerMeter?: number
+
+    /**
+     * This value determines how hard the vehicle is
+     * braking (in newtons). Defaults to maxTorque
+     */
+    brakeForce?: number
 }
 
 export default class WheeledTankBehaviour extends TankBehaviour {
@@ -109,6 +115,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public driveAxleList: boolean[];
     public driveWheelCount: number
     public lateralTensionLossPerMeter: number;
+    public brakeForce: number
 
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
         super(tank, config)
@@ -123,6 +130,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.steerAnchorOffset = config.steerAnchorOffset || 0
         this.wheelTensionLimit = config.wheelTensionLimit || 0.3
         this.lateralTensionLossPerMeter = config.lateralTensionLossPerMeter || 0.02
+        this.brakeForce = config.brakeForce || this.maxTorque
 
         this.driveWheelCount = this.calculateDriveWheelCount()
 

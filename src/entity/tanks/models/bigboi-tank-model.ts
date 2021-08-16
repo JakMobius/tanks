@@ -1,10 +1,10 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
-import TruckTankBehaviour from '../physics/truck-tank-behaviour';
+import TrackTankBehaviour from '../physics/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
 
-export default class BigBoiTankModel extends TankModel<TruckTankBehaviour> {
+export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
 
     public static typeName = 105
     private size: number;
@@ -14,7 +14,7 @@ export default class BigBoiTankModel extends TankModel<TruckTankBehaviour> {
 
         this.size = 9
 
-        this.behaviour = new TruckTankBehaviour(this, {
+        this.behaviour = new TrackTankBehaviour(this, {
             power: 60000,
             truckLength: this.size,
             axleWidth: this.size,

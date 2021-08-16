@@ -1,18 +1,18 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
 import * as Box2D from '../../../library/box2d';
-import TruckTankBehaviour from "../physics/truck-tank-behaviour";
+import TrackTankBehaviour from "../physics/track-tank-behaviour";
 import {physicsFilters} from "../../../physics/categories";
 
-export default class BomberTankModel extends TankModel<TruckTankBehaviour> {
+export default class BomberTankModel extends TankModel<TrackTankBehaviour> {
 
     public static typeName = 102
-    public behaviour: TruckTankBehaviour
+    public behaviour: TrackTankBehaviour
 
     constructor() {
         super()
 
-        this.behaviour = new TruckTankBehaviour(this, {
+        this.behaviour = new TrackTankBehaviour(this, {
             power: 30000,
             axleWidth: 7.5,
             truckLength: 15,
