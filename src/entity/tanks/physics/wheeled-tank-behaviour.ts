@@ -6,6 +6,7 @@ export interface TankWheelConfig {
     x: number
     y: number
     friction: number
+    mass?: number
 }
 
 export class TankWheel {
@@ -17,10 +18,12 @@ export class TankWheel {
     tensionVector: Vec2 = new Vec2()
     speed: number = 0
     distance: number = 0
+    mass: number
 
     constructor(config: TankWheelConfig) {
         this.position = new Vec2(config.x, config.y)
         this.friction = config.friction
+        this.mass = config.mass ?? 100
     }
 }
 
@@ -202,6 +205,14 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         }
     }
 
+    private getWheelTensionFromForce(wheel: TankWheel, force: number) {
+        return force / wheel.friction * this.wheelTensionLimit
+    }
+
+    private getWheelForceFromTension(wheel: TankWheel, tension: number) {
+        return tension * wheel.friction / this.wheelTensionLimit
+    }
+
     private getWheelReaction(wheel: TankWheel, out: Vec2, dt: number) {
         let x = wheel.position.x;
         let y = wheel.position.y;
@@ -210,16 +221,23 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         let body = this.tank.getBody()
         this.localVector2.x = x
         this.localVector2.y = y
+
+        // set localVector1 to world-space velocity of the wheel
         body.GetLinearVelocityFromLocalPoint(this.localVector2, this.localVector1)
+
+        // set localVector2 to vehicle-space velocity of the wheel
         body.GetLocalVector(this.localVector1, this.localVector2)
+
+        // set localVector2 to wheel-space velocity of the wheel
         this.localVector2.SelfRotate(-angle)
-        wheel.speed = this.localVector2.y
+
+        // set localVector2 to wheel-space translation of the wheel on this tick
         this.localVector2.SelfMul(dt)
-        this.localVector2.y = 0
-        wheel.tensionVector.SelfAdd(this.localVector2)
-        wheel.tensionVector.y = -wheel.torque / wheel.friction * this.wheelTensionLimit
 
         let tickMovement = wheel.speed * dt
+
+        wheel.tensionVector.SelfAdd(this.localVector2)
+        wheel.tensionVector.y -= tickMovement
         wheel.distance += tickMovement
 
         let tickDistance = Math.abs(tickMovement)
@@ -239,16 +257,18 @@ export default class WheeledTankBehaviour extends TankBehaviour {
 
         let wheelTension = wheel.tensionVector.Length()
 
-        if(wheelTension > this.wheelTensionLimit) {
-            wheel.isSliding = true
+        wheel.isSliding = wheelTension > this.wheelTensionLimit
+
+        if(wheel.isSliding) {
             wheel.tensionVector.SelfMul(this.wheelTensionLimit / wheelTension)
-        } else {
-            wheel.isSliding = false
         }
+
+        const totalWheelTorque = wheel.torque + this.getWheelForceFromTension(wheel, wheel.tensionVector.y)
+        wheel.speed += totalWheelTorque / wheel.mass * dt
 
         this.localVector3.Copy(wheel.tensionVector)
 
-        // Decreasing wheel reaction if car is moving backwards
+        // Decreasing wheel reaction if the vehicle is moving back to its neutral position
         let projection = this.localVector2.x / wheel.tensionVector.x
         if(projection < 0) {
             this.localVector3.x /= (1 - projection * 10);

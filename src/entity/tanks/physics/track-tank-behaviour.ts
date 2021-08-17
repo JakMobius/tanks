@@ -75,13 +75,13 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
         leftTrackTorque = clamp(leftTrackTorque, -1, 1)
         rightTrackTorque = clamp(rightTrackTorque, -1, 1)
 
-        if(Math.sign(leftTrackTorque) === Math.sign(leftTrackSteer)) {
+        if(Math.sign(leftTrackTorque) === Math.sign(leftTrackSpeed)) {
             leftTrackTorque *= engineTorque / this.axles
         } else {
             leftTrackTorque *= this.brakeForce / this.axles
         }
 
-        if(Math.sign(rightTrackTorque) === Math.sign(rightTrackSteer)) {
+        if(Math.sign(rightTrackTorque) === Math.sign(rightTrackSpeed)) {
             rightTrackTorque *= engineTorque / this.axles
         } else {
             rightTrackTorque *= this.brakeForce / this.axles
