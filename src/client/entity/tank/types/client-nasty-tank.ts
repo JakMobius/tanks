@@ -15,6 +15,7 @@ import {
     turnQuadrangle,
     copyQuadrangle
 } from "../../../../utils/quadrangle";
+import WorldDrawer from "../../../graphics/drawers/world-drawer";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
     static bodyQuadrangle           = squareQuadrangle(-8.64, -11.88, 17.28, 23.76)
@@ -80,12 +81,19 @@ class Drawer extends TankDrawer<ClientNastyTank> {
         transformQuadrangle(leftPropellerQuadrangle, model.matrix)
         transformQuadrangle(rightPropellerQuadrangle, model.matrix)
 
-        bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, bodyQuadrangle, body.GetAngle())
+        bodyProgram.drawMaskedSprite(
+            this.bodyBrightSprite,
+            this.bodyDarkSprite,
+            this.bodyLightMask,
+            bodyQuadrangle,
+            body.GetAngle(),
+            WorldDrawer.depths.tankBody
+        )
 
-        propellerProgram.drawSprite(this.ruderSprite, leftRuderQuadrangle)
-        propellerProgram.drawSprite(this.ruderSprite, rightRuderQuadrangle)
-        propellerProgram.drawSprite(propeller, leftPropellerQuadrangle)
-        propellerProgram.drawSprite(propeller, rightPropellerQuadrangle)
+        propellerProgram.drawSprite(this.ruderSprite, leftRuderQuadrangle, WorldDrawer.depths.tankTop)
+        propellerProgram.drawSprite(this.ruderSprite, rightRuderQuadrangle, WorldDrawer.depths.tankTop)
+        propellerProgram.drawSprite(propeller, leftPropellerQuadrangle, WorldDrawer.depths.tankTop)
+        propellerProgram.drawSprite(propeller, rightPropellerQuadrangle, WorldDrawer.depths.tankTop)
     }
 }
 

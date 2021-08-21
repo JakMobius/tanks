@@ -15,8 +15,10 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
             power: 11000000,
             axleWidth: 7.5,
             truckLength: 15,
-            truckFriction: 375000,
-            maxTorque: 10000000
+            truckFriction: 500000,
+            maxTorque: 10000000,
+            brakeTorque: 10000000,
+            wheelTensionLimit: 0.1
         });
     }
 
@@ -38,7 +40,7 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
 
         const body = PhysicsUtils.dynamicBody(world, {
             angularDamping: 0.1,
-            linearDamping: 0.5
+            linearDamping: 0.2
         });
 
         body.CreateFixture(bodyFixture)

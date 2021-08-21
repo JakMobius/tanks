@@ -4,6 +4,8 @@ import GameMap from 'src/map/gamemap';
 import BlockState from "../../../../map/blockstate/blockstate";
 import TextureProgram from "../../programs/texture-program";
 import {squareQuadrangle} from "../../../../utils/quadrangle";
+import MapDrawer from "../map-drawer";
+import WorldDrawer from "../world-drawer";
 
 export default class BlockDrawer {
 	public id: number;
@@ -24,7 +26,9 @@ export default class BlockDrawer {
         if (!(block.constructor as typeof BlockState).typeId) return
         let crack = Math.floor(block.damage * 6)
         if(crack) {
-            program.drawSprite(this.crackSprites[crack - 1], squareQuadrangle(x, y, GameMap.BLOCK_SIZE, GameMap.BLOCK_SIZE))
+            program.drawSprite(this.crackSprites[crack - 1], squareQuadrangle(x, y, GameMap.BLOCK_SIZE, GameMap.BLOCK_SIZE),
+                WorldDrawer.depths.blockCrack
+            )
         }
     }
 }

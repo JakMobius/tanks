@@ -19,7 +19,6 @@ export default class PostProcessingProgram extends Program {
     public widthUniform: Uniform;
     public heightUniform: Uniform;
     public vertexLength: number;
-    public texturePositionAttribute: number;
     public textures: number;
 
     constructor(name: string, ctx: WebGLRenderingContext) {
@@ -58,10 +57,10 @@ export default class PostProcessingProgram extends Program {
             0, 1, 3, 0, 2, 3
         ])
 
-        this.indexBuffer.updateData()
-        this.vertexBuffer.updateData()
+        this.indexBuffer.sendDataToGPU()
+        this.vertexBuffer.sendDataToGPU()
 
-        this.vertexPositionAttribute = this.getAttribute("a_vertex_position");
+        this.vertexPositionAttribute = this.registerAttribute("a_vertex_position");
         this.textureUniform = this.getUniform("u_texture")
         this.widthUniform = this.getUniform("u_screen_width")
         this.heightUniform = this.getUniform("u_screen_height")
@@ -83,8 +82,7 @@ export default class PostProcessingProgram extends Program {
         this.widthUniform.set1f(this.ctx.canvas.width)
         this.heightUniform.set1f(this.ctx.canvas.height)
 
-        this.ctx.enableVertexAttribArray(this.vertexPositionAttribute);
-        this.ctx.enableVertexAttribArray(this.texturePositionAttribute);
+        this.enableAttributes()
 
         this.ctx.vertexAttribPointer(this.vertexPositionAttribute, 2, this.ctx.FLOAT, false, stride, 0);
     }
@@ -92,10 +90,13 @@ export default class PostProcessingProgram extends Program {
     draw() {
 
         if(this.indexBuffer.pointer !== 0) {
+            this.ctx.disable(this.ctx.DEPTH_TEST)
+            this.ctx.disable(this.ctx.BLEND)
+
             this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.ctx.UNSIGNED_BYTE, 0);
         }
 
-        this.ctx.disableVertexAttribArray(this.vertexPositionAttribute);
+        this.disableAttributes()
 
         this.textures = 0
     }

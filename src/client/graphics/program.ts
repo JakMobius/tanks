@@ -2,11 +2,33 @@
 import Uniform from './uniform';
 import GLBuffer from './glbuffer';
 import Shader from "./shader";
+import {ByteArray} from "../../serialization/binary/buffer";
+
+export interface VertexAttribute {
+    index: number,
+    buffer: GLBuffer<any>,
+    normalized: boolean,
+    size: number
+}
+
+export type AttributeDef = {
+    name: string,
+    size?: 1 | 2 | 3 | 4,
+    normalized?: boolean
+}
+
+export interface ProgramBuffer<T extends ByteArray> {
+    glBuffer: GLBuffer<T>
+    attributes: VertexAttribute[]
+    vertexStride: number
+}
 
 export default abstract class Program {
     public shaders: Shader[];
     public raw: WebGLProgram;
     public ctx: WebGLRenderingContext;
+    private registeredVertexAttributes: VertexAttribute[] = [];
+    private registeredBuffers: ProgramBuffer<any>[] = []
 
     protected constructor(...shaders: Shader[]) {
         this.shaders = Array.prototype.slice.call(arguments)
@@ -42,6 +64,58 @@ export default abstract class Program {
 
     getAttribute(name: string) {
         return this.ctx.getAttribLocation(this.raw, name);
+    }
+
+    registerAttribute(def: AttributeDef, buffer: GLBuffer<any>) {
+        const attribute = {
+            index: this.getAttribute(def.name),
+            buffer: buffer,
+            normalized: def.normalized ?? false,
+            size: def.size
+        }
+        this.registeredVertexAttributes.push(attribute)
+        return attribute
+    }
+
+    enableAttributes() {
+        for(let attribute of this.registeredVertexAttributes) {
+            this.ctx.enableVertexAttribArray(attribute.index)
+        }
+    }
+
+    disableAttributes() {
+        for(let attribute of this.registeredVertexAttributes) {
+            this.ctx.disableVertexAttribArray(attribute.index)
+        }
+    }
+
+    registerBuffer<T extends ByteArray>(glBuffer: GLBuffer<T>, attributes: AttributeDef[]) {
+
+        let vertexStride = 0
+        for(let attribute of attributes) {
+            vertexStride += glBuffer.glElementSize * attribute.size
+        }
+
+        const buffer: ProgramBuffer<T> = {
+            glBuffer: glBuffer,
+            attributes: attributes.map(def => this.registerAttribute(def, glBuffer)),
+            vertexStride: vertexStride
+        }
+
+        this.registeredBuffers.push(buffer)
+        return buffer
+    }
+
+    setVertexAttributePointers() {
+        for(let buffer of this.registeredBuffers) {
+            buffer.glBuffer.bind()
+            let offset = 0
+            for(let attribute of buffer.attributes) {
+                this.ctx.vertexAttribPointer(attribute.index, attribute.size, buffer.glBuffer.glType, attribute.normalized, buffer.vertexStride, offset)
+                offset += attribute.size * buffer.glBuffer.glElementSize
+            }
+
+        }
     }
 
     bind() {

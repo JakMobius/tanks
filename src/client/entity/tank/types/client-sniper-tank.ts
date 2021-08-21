@@ -7,13 +7,13 @@ import TruckProgram from "../../../graphics/programs/truck-program";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {
     squareQuadrangle,
-    translateQuadrangle,
     transformQuadrangle,
-    multipliedQuadrangle, copyQuadrangle
+    copyQuadrangle
 } from "../../../../utils/quadrangle";
 import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
+import WorldDrawer from "../../../graphics/drawers/world-drawer";
 
 class Drawer extends TankDrawer<ClientSniperTank> {
 	public bodyBrightSprite: Sprite;
@@ -56,7 +56,14 @@ class Drawer extends TankDrawer<ClientSniperTank> {
 
         truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4.0, 0.2)
         truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4.0, 0.2)
-        bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, quadrangle, body.GetAngle())
+        bodyProgram.drawMaskedSprite(
+            this.bodyBrightSprite,
+            this.bodyDarkSprite,
+            this.bodyLightMask,
+            quadrangle,
+            body.GetAngle(),
+            WorldDrawer.depths.tankBody
+        )
     }
 }
 

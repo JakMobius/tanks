@@ -21,12 +21,9 @@ export default class TextureProgram extends CameraProgram {
 	public indexBufferType: number
 	public vertexBuffer: GLBuffer<Float32Array>;
 	public indexBuffer: GLBuffer<ByteArray>;
-	public vertexPositionAttribute: number;
-	public texturePositionAttribute: number;
 	public textureUniform: Uniform;
-	public vertexLength: number;
-	public textures: number;
 	public transform: Matrix3;
+	private vertices: number
     private updated: boolean;
 
     constructor(ctx: WebGLRenderingContext, options?: TextureProgramConfig) {
@@ -41,8 +38,7 @@ export default class TextureProgram extends CameraProgram {
         this.link(ctx)
 
         if(options.largeIndices) {
-            let uintsForIndices = ctx.getExtension("OES_element_index_uint");
-            if(!uintsForIndices) {
+            if(!ctx.getExtension("OES_element_index_uint")) {
                 throw new Error("No WebGL Extension: OES_element_index_uint. Please, update the browser.")
             }
         }
@@ -51,12 +47,18 @@ export default class TextureProgram extends CameraProgram {
         this.indexBufferType = options.largeIndices ? ctx.UNSIGNED_INT : ctx.UNSIGNED_SHORT
 
         this.ctx = ctx
-        this.vertexBuffer = new GLBuffer({
-            clazz: Float32Array,
-            gl: ctx,
-            drawMode: this.ctx.STATIC_DRAW,
-            capacity: options.largeIndices ? 16384 : 128
-        }).createBuffer()
+        this.vertexBuffer = this.registerBuffer(
+            new GLBuffer({
+                clazz: Float32Array,
+                gl: ctx,
+                drawMode: this.ctx.STATIC_DRAW,
+                capacity: options.largeIndices ? 16384 : 128
+            }).createBuffer(),
+            [
+                { name: "a_vertex_position", size: 3 },
+                { name: "a_texture_position", size: 2 }
+            ]
+        ).glBuffer
 
         this.indexBuffer = new GLBuffer<ByteArray>({
             gl: ctx,
@@ -66,34 +68,29 @@ export default class TextureProgram extends CameraProgram {
             capacity: options.largeIndices ? 16384 : 128
         }).createBuffer()
 
-        this.vertexPositionAttribute = this.getAttribute("a_vertex_position");
-        this.texturePositionAttribute = this.getAttribute("a_texture_position");
         this.textureUniform = this.getUniform("u_texture")
-
         this.matrixUniform = this.getUniform("u_matrix")
-        this.vertexLength = 4
-
-        this.textures = 0
+        this.vertices = 0
     }
 
-    drawTexture(quadrangle: Quadrangle, sx: number, sy: number, sw: number, sh: number) {
+    drawTexture(quadrangle: Quadrangle, sx: number, sy: number, sw: number, sh: number, z: number) {
         this.vertexBuffer.appendArray([
-            quadrangle.x1, quadrangle.y1, sx + sw, sy + sh,
-            quadrangle.x2, quadrangle.y2, sx + sw, sy,
-            quadrangle.x3, quadrangle.y3, sx, sy + sh,
-            quadrangle.x4, quadrangle.y4, sx, sy,
+            quadrangle.x1, quadrangle.y1, z, sx + sw, sy + sh,
+            quadrangle.x2, quadrangle.y2, z, sx + sw, sy,
+            quadrangle.x3, quadrangle.y3, z, sx, sy + sh,
+            quadrangle.x4, quadrangle.y4, z, sx, sy
         ])
 
-        const baseIndex = this.textures * 4
+        const baseIndex = this.vertices
 
         this.indexBuffer.appendArray([
             baseIndex, baseIndex + 1, baseIndex + 3, baseIndex, baseIndex + 2, baseIndex + 3
         ])
 
-        this.textures ++
+        this.vertices += 4
     }
 
-    drawSprite(sprite: Sprite, quadrangle: Quadrangle) {
+    drawSprite(sprite: Sprite, quadrangle: Quadrangle, z: number = 1) {
         const r = sprite.rect;
 
         const sx = r.x
@@ -101,44 +98,39 @@ export default class TextureProgram extends CameraProgram {
         const sw = r.w
         const sh = r.h
 
-        this.drawTexture(quadrangle, sx, sy, sw, sh)
+        this.drawTexture(quadrangle, sx, sy, sw, sh, z)
     }
 
     reset() {
         this.updated = true
         this.indexBuffer.reset()
         this.vertexBuffer.reset()
+
+        this.vertices = 0
     }
 
     bind() {
         super.bind()
-        this.vertexBuffer.bind()
 
-        const bytes = this.vertexBuffer.clazz.BYTES_PER_ELEMENT
-        const stride = this.vertexLength * bytes
-
-        this.ctx.enableVertexAttribArray(this.vertexPositionAttribute);
-        this.ctx.enableVertexAttribArray(this.texturePositionAttribute);
-
-        this.ctx.vertexAttribPointer(this.vertexPositionAttribute, 2, this.ctx.FLOAT, false, stride, 0);
-        this.ctx.vertexAttribPointer(this.texturePositionAttribute, 2, this.ctx.FLOAT, false, stride, 8);
+        this.enableAttributes()
+        this.setVertexAttributePointers()
     }
 
     draw() {
         if(this.updated === true) {
-            this.indexBuffer.updateData()
-            this.vertexBuffer.updateData()
+            this.vertexBuffer.sendDataToGPU()
+            this.indexBuffer.sendDataToGPU()
         } else {
             this.indexBuffer.bind()
         }
 
         if(this.indexBuffer.pointer !== 0) {
+            this.ctx.enable(this.ctx.DEPTH_TEST)
+            this.ctx.disable(this.ctx.BLEND)
+
             this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBufferType, 0);
         }
 
-        this.ctx.disableVertexAttribArray(this.vertexPositionAttribute);
-        this.ctx.disableVertexAttribArray(this.texturePositionAttribute);
-
-        this.textures = 0
+        this.disableAttributes()
     }
 }

@@ -13,15 +13,10 @@ export const fragmentShaderPath = "src/client/graphics/shaders/fragment/light-ma
 
 export default class LightMaskTextureProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
-	public brightTexturePositionAttribute: number;
-	public darkTexturePositionAttribute: number;
-	public maskPositionAttribute: number;
-	public vertexPositionAttribute: number;
 	public samplerUniform: Uniform;
 	public textureSizeUniform: Uniform;
 	public angleUniform: Uniform;
-	public vertexLength: number;
-    private vertexAngleAttribute: number;
+	public vertices: number
 
     constructor(ctx: WebGLRenderingContext) {
 
@@ -32,27 +27,31 @@ export default class LightMaskTextureProgram extends CameraProgram {
         this.link(ctx)
 
         this.ctx = ctx
-        this.vertexBuffer = new GLBuffer({
-            clazz: Float32Array,
-            gl: ctx,
-            drawMode: this.ctx.STATIC_DRAW
-        }).createBuffer()
-
-        this.brightTexturePositionAttribute = this.getAttribute("a_bright_texture_position");
-        this.darkTexturePositionAttribute = this.getAttribute("a_dark_texture_position");
-        this.maskPositionAttribute = this.getAttribute("a_mask_position");
-        this.vertexPositionAttribute = this.getAttribute("a_vertex_position");
-        this.vertexAngleAttribute = this.getAttribute("a_vertex_angle")
+        this.vertexBuffer = this.registerBuffer(
+            new GLBuffer({
+                clazz: Float32Array,
+                gl: ctx,
+                drawMode: this.ctx.STATIC_DRAW
+            }).createBuffer(),
+            [
+                { name: "a_vertex_position",            size: 3 },
+                { name: "a_vertex_angle",               size: 1 },
+                { name: "a_bright_texture_position",    size: 2 },
+                { name: "a_dark_texture_position",      size: 2 },
+                { name: "a_mask_position",              size: 2 }
+            ]
+        ).glBuffer
 
         this.samplerUniform = this.getUniform("u_texture")
         this.textureSizeUniform = this.getUniform("u_texture_size")
         this.angleUniform = this.getUniform("u_angle")
         this.matrixUniform = this.getUniform("u_matrix")
-        this.vertexLength = 9
 
         this.ctx.useProgram(this.raw)
         this.samplerUniform.set1i(0)
         this.textureSizeUniform.set2f(Sprite.mipmapimages[0].width, Sprite.mipmapimages[0].height)
+
+        this.vertices = 0
     }
 
     private normalizeAngle(angle: number) {
@@ -65,7 +64,7 @@ export default class LightMaskTextureProgram extends CameraProgram {
         this.angleUniform.set1f(this.normalizeAngle(angle))
     }
 
-    drawMaskedSprite(bright: Sprite, dark: Sprite, mask: Sprite, pos: Quadrangle, angle: number) {
+    drawMaskedSprite(bright: Sprite, dark: Sprite, mask: Sprite, pos: Quadrangle, angle: number, z: number = 1) {
         const b = bright.rect;
         const d = dark.rect;
         const m = mask.rect;
@@ -73,55 +72,43 @@ export default class LightMaskTextureProgram extends CameraProgram {
         angle = this.normalizeAngle(angle)
 
         // vertex:
-        // position, angle, bright texture position, dark texture position, mask texture position
+        // position, depth, angle, bright texture position, dark texture position, mask texture position
 
         this.vertexBuffer.appendArray([
-            pos.x1, pos.y1, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x2, pos.y2, angle, b.x + b.w, b.y,       d.x + d.w, d.y,       m.x + m.w, m.y,
-            pos.x4, pos.y4, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y,
-            pos.x1, pos.y1, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x3, pos.y3, angle, b.x,       b.y + b.h, d.x,       d.y + d.h, m.x,       m.y + m.h,
-            pos.x4, pos.y4, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y
+            pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
+            pos.x2, pos.y2, z, angle, b.x + b.w, b.y,       d.x + d.w, d.y,       m.x + m.w, m.y,
+            pos.x4, pos.y4, z, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y,
+            pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
+            pos.x3, pos.y3, z, angle, b.x,       b.y + b.h, d.x,       d.y + d.h, m.x,       m.y + m.h,
+            pos.x4, pos.y4, z, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y
         ])
+
+        this.vertices += 6
     }
 
     reset() {
         this.vertexBuffer.reset()
+        this.vertices = 0
     }
 
     bind() {
         super.bind()
         Sprite.setSmoothing(this.ctx, false)
-        this.vertexBuffer.bind()
 
-        const bytes = this.vertexBuffer.clazz.BYTES_PER_ELEMENT
-        const stride = this.vertexLength * bytes
-
-        this.ctx.enableVertexAttribArray(this.brightTexturePositionAttribute)
-        this.ctx.enableVertexAttribArray(this.darkTexturePositionAttribute)
-        this.ctx.enableVertexAttribArray(this.maskPositionAttribute)
-        this.ctx.enableVertexAttribArray(this.vertexPositionAttribute)
-        this.ctx.enableVertexAttribArray(this.vertexAngleAttribute)
-
-        this.ctx.vertexAttribPointer(this.vertexPositionAttribute, 2, this.ctx.FLOAT, false, stride, 0);
-        this.ctx.vertexAttribPointer(this.vertexAngleAttribute, 1, this.ctx.FLOAT, false, stride, 8)
-        this.ctx.vertexAttribPointer(this.brightTexturePositionAttribute, 2, this.ctx.FLOAT, false, stride, 12);
-        this.ctx.vertexAttribPointer(this.darkTexturePositionAttribute, 2, this.ctx.FLOAT, false, stride, 20);
-        this.ctx.vertexAttribPointer(this.maskPositionAttribute, 2, this.ctx.FLOAT, false, stride, 28);
+        this.enableAttributes()
+        this.setVertexAttributePointers()
     }
 
     draw() {
-
         if(this.vertexBuffer.pointer !== 0) {
-            this.vertexBuffer.updateData()
-            this.ctx.drawArrays(this.ctx.TRIANGLES, 0, this.vertexBuffer.pointer / this.vertexLength);
+            this.ctx.enable(this.ctx.DEPTH_TEST)
+            this.ctx.disable(this.ctx.BLEND)
+
+            this.vertexBuffer.sendDataToGPU()
+            this.ctx.drawArrays(this.ctx.TRIANGLES, 0, this.vertices);
         }
 
-        this.ctx.disableVertexAttribArray(this.brightTexturePositionAttribute)
-        this.ctx.disableVertexAttribArray(this.darkTexturePositionAttribute)
-        this.ctx.disableVertexAttribArray(this.maskPositionAttribute)
-        this.ctx.disableVertexAttribArray(this.vertexPositionAttribute)
-        this.ctx.disableVertexAttribArray(this.vertexAngleAttribute)
+        this.disableAttributes()
 
         Sprite.setSmoothing(this.ctx, true)
     }

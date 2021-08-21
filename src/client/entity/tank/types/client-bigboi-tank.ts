@@ -16,6 +16,7 @@ import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import {TankStat} from "../tank-stat";
 import {worker} from "cluster";
+import WorldDrawer from "../../../graphics/drawers/world-drawer";
 
 class Drawer extends TankDrawer<ClientBigboiTank> {
 	public bodyBrightSprite: Sprite;
@@ -56,7 +57,14 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
 
         truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.1)
         truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.1)
-        bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, bodyQuadrangle, body.GetAngle())
+        bodyProgram.drawMaskedSprite(
+            this.bodyBrightSprite,
+            this.bodyDarkSprite,
+            this.bodyLightMask,
+            bodyQuadrangle,
+            body.GetAngle(),
+            WorldDrawer.depths.tankBody
+        )
     }
 }
 

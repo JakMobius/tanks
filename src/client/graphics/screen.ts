@@ -99,7 +99,7 @@ export default class Screen {
     }
 
     clear(): void {
-        this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
+        this.ctx.clear(this.ctx.COLOR_BUFFER_BIT | this.ctx.DEPTH_BUFFER_BIT);
     }
 
     setScreenFramebuffer(): void {

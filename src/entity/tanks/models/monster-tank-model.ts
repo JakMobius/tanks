@@ -5,16 +5,16 @@ import {b2World} from "../../../library/box2d/dynamics/b2_world";
 import {Vec2} from "../../../library/box2d";
 import {physicsFilters} from "../../../physics/categories";
 
-export default class MonsterTankModel extends TankModel {
+export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
 
     public static typeName = 103
-    public behaviour: WheeledTankBehaviour
 
     constructor() {
         super()
 
         this.behaviour = new WheeledTankBehaviour(this, {
-            power: 10000
+            power: 11000000,
+            maxTorque: 10000000
         });
     }
 
@@ -31,7 +31,7 @@ export default class MonsterTankModel extends TankModel {
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            linearDamping: 0.3,
+            linearDamping: 0.1,
         });
 
         body.CreateFixture(bodyFixture)

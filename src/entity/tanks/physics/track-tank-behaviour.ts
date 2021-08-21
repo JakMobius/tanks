@@ -1,6 +1,6 @@
 
 import TankModel from "../tank-model";
-import WheeledTankBehaviour, {WheeledTankBehaviourConfig} from "./wheeled-tank-behaviour";
+import WheeledTankBehaviour, {TankWheel, WheeledTankBehaviourConfig} from "./wheeled-tank-behaviour";
 import {clamp} from "../../../utils/utils";
 
 export interface TruckTankBehaviourConfig extends WheeledTankBehaviourConfig {
@@ -49,12 +49,12 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
         let leftTrackSteer = clamp(throttle - steer, -1, 1)
         let rightTrackSteer = clamp(throttle + steer, -1, 1)
 
-        let leftTrackTorque = leftTrackSteer
-        let rightTrackTorque = rightTrackSteer
+        let leftTrackControl = leftTrackSteer
+        let rightTrackControl = rightTrackSteer
 
         const maximumSteer = Math.max(Math.abs(leftTrackSteer), Math.abs(rightTrackSteer))
 
-        leftTrackTorque = clamp(leftTrackTorque, -1, 1)
+        leftTrackControl = clamp(leftTrackControl, -1, 1)
 
         if(maximumSteer > 0) {
             leftTrackSteer /= maximumSteer
@@ -68,28 +68,16 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
             const differenceLeft = (leftTrackSteer - leftTrackSpeed) * maximumSteer
             const differenceRight = (rightTrackSteer - rightTrackSpeed) * maximumSteer
 
-            leftTrackTorque += differenceLeft
-            rightTrackTorque += differenceRight
+            leftTrackControl += differenceLeft
+            rightTrackControl += differenceRight
         }
 
-        leftTrackTorque = clamp(leftTrackTorque, -1, 1)
-        rightTrackTorque = clamp(rightTrackTorque, -1, 1)
-
-        if(Math.sign(leftTrackTorque) === Math.sign(leftTrackSpeed)) {
-            leftTrackTorque *= engineTorque / this.axles
-        } else {
-            leftTrackTorque *= this.brakeForce / this.axles
-        }
-
-        if(Math.sign(rightTrackTorque) === Math.sign(rightTrackSpeed)) {
-            rightTrackTorque *= engineTorque / this.axles
-        } else {
-            rightTrackTorque *= this.brakeForce / this.axles
-        }
+        leftTrackControl = clamp(leftTrackControl, -1, 1)
+        rightTrackControl = clamp(rightTrackControl, -1, 1)
 
         for(let i = 0; i < this.axles; i++) {
-            this.wheels[i * 2 + 1].torque = leftTrackTorque
-            this.wheels[i * 2].torque = rightTrackTorque
+            this.updateWheelTorque(this.wheels[i * 2 + 1], leftTrackControl, engineTorque)
+            this.updateWheelTorque(this.wheels[i * 2], rightTrackControl, engineTorque)
         }
     }
 
@@ -99,5 +87,17 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
 
     getRightTrackDistance() {
         return this.wheels[1].distance
+    }
+
+    tick(dt: number) {
+        super.tick(dt);
+
+        const leftTrackSpeed = this.getLeftTrackSpeed()
+        const rightTrackSpeed = this.getRightTrackSpeed()
+
+        for(let i = 0; i < this.axles; i++) {
+            this.wheels[i * 2 + 1].speed = leftTrackSpeed
+            this.wheels[i * 2].speed = rightTrackSpeed
+        }
     }
 }

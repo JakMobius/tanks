@@ -14,7 +14,7 @@ export default function CanvasFactory() {
 
     ctx.clearColor(1.0, 1.0, 1.0, 1.0);
     ctx.blendFuncSeparate(ctx.SRC_ALPHA, ctx.ONE_MINUS_SRC_ALPHA, ctx.ONE, ctx.ONE_MINUS_SRC_ALPHA);
-    ctx.enable(ctx.BLEND);
+    ctx.depthFunc(ctx.LEQUAL)
 
     return {
         canvas: canvas,

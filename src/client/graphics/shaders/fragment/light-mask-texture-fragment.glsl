@@ -74,5 +74,8 @@ void main() {
     position.x -= floor(position.x);
     position.y -= floor(position.y);
 
-    gl_FragColor = smoothPixel(position);
+    vec4 color = smoothPixel(position);
+    if(color.a == 0.0) discard;
+
+    gl_FragColor = color;
 }

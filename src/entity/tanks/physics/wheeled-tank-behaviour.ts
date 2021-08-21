@@ -15,10 +15,12 @@ export class TankWheel {
     isSliding: boolean = false;
     angle: number = 0
     torque: number = 0
+    brakeTorque: number = 0
     tensionVector: Vec2 = new Vec2()
     speed: number = 0
     distance: number = 0
     mass: number
+    groundSpeed: number = 0;
 
     constructor(config: TankWheelConfig) {
         this.position = new Vec2(config.x, config.y)
@@ -102,7 +104,12 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
      * This value determines how hard the vehicle is
      * braking (in newtons). Defaults to maxTorque
      */
-    brakeForce?: number
+    brakeTorque?: number
+
+    /**
+     * The mass of each wheel (in kilograms)
+     */
+    wheelMass?: number;
 }
 
 export default class WheeledTankBehaviour extends TankBehaviour {
@@ -119,6 +126,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public driveWheelCount: number
     public lateralTensionLossPerMeter: number;
     public brakeForce: number
+    public wheelMass: number;
 
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
         super(tank, config)
@@ -133,7 +141,8 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.steerAnchorOffset = config.steerAnchorOffset || 0
         this.wheelTensionLimit = config.wheelTensionLimit || 0.3
         this.lateralTensionLossPerMeter = config.lateralTensionLossPerMeter || 0.02
-        this.brakeForce = config.brakeForce || this.maxTorque
+        this.brakeForce = config.brakeTorque || this.maxTorque
+        this.wheelMass = config.wheelMass || 50
 
         this.driveWheelCount = this.calculateDriveWheelCount()
 
@@ -195,18 +204,16 @@ export default class WheeledTankBehaviour extends TankBehaviour {
             this.wheels.push(new TankWheel({
                 x: this.axleWidth,
                 y: axleOffset,
-                friction: axleFriction
+                friction: axleFriction,
+                mass: this.wheelMass
             }))
             this.wheels.push(new TankWheel({
                 x: -this.axleWidth,
                 y: axleOffset,
-                friction: axleFriction
+                friction: axleFriction,
+                mass: this.wheelMass
             }))
         }
-    }
-
-    private getWheelTensionFromForce(wheel: TankWheel, force: number) {
-        return force / wheel.friction * this.wheelTensionLimit
     }
 
     private getWheelForceFromTension(wheel: TankWheel, tension: number) {
@@ -230,6 +237,8 @@ export default class WheeledTankBehaviour extends TankBehaviour {
 
         // set localVector2 to wheel-space velocity of the wheel
         this.localVector2.SelfRotate(-angle)
+
+        wheel.groundSpeed = this.localVector2.y
 
         // set localVector2 to wheel-space translation of the wheel on this tick
         this.localVector2.SelfMul(dt)
@@ -266,6 +275,14 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         const totalWheelTorque = wheel.torque + this.getWheelForceFromTension(wheel, wheel.tensionVector.y)
         wheel.speed += totalWheelTorque / wheel.mass * dt
 
+        if(wheel.speed > 0) {
+            wheel.speed -= wheel.brakeTorque / wheel.mass * dt
+            if(wheel.speed < 0) wheel.speed = 0
+        } else {
+            wheel.speed += wheel.brakeTorque / wheel.mass * dt
+            if(wheel.speed > 0) wheel.speed = 0
+        }
+
         this.localVector3.Copy(wheel.tensionVector)
 
         // Decreasing wheel reaction if the vehicle is moving back to its neutral position
@@ -293,15 +310,34 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         return Math.min(this.maxTorque, torque)
     }
 
+    protected nonStrictSignComparator(a: number, b: number) {
+        const aSign = Math.sign(a)
+        const bSign = Math.sign(b)
+
+        return aSign == 0 || bSign == 0 || aSign == bSign
+    }
+
+    protected updateWheelTorque(wheel: TankWheel, control: number, engineForce: number) {
+        if(Math.abs(wheel.groundSpeed) < 5 || this.nonStrictSignComparator(control, wheel.groundSpeed)) {
+            // Accelerating
+            wheel.torque = control * engineForce / this.axles
+            wheel.brakeTorque = 0
+            return
+        }
+
+        // Braking
+        wheel.torque = 0
+        wheel.brakeTorque = Math.abs(control) * this.brakeForce / this.axles
+    }
+
     protected updateWheelThrottle() {
         const throttle = this.tank.controls.getThrottle()
-        const engineTorque = this.calculateEngineTorque(this.getDrivetrainSpeed()) * throttle
-        const wheelTorque = engineTorque / this.driveWheelCount
+        const engineTorque = this.calculateEngineTorque(this.getDrivetrainSpeed())
 
         for(let i = 0; i < this.axles; i++) {
             if(this.driveAxleList[i]) {
-                this.wheels[i * 2].torque = wheelTorque
-                this.wheels[i * 2 + 1].torque = wheelTorque
+                this.updateWheelTorque(this.wheels[i * 2], throttle, engineTorque)
+                this.updateWheelTorque(this.wheels[i * 2 + 1], throttle, engineTorque)
             }
         }
     }

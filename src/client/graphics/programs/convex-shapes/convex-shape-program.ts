@@ -1,7 +1,6 @@
 /* @load-resource: '../../shaders/fragment/convex-shape-fragment.glsl' */
 /* @load-resource: '../../shaders/vertex/convex-shape-vertex.glsl' */
 
-
 import CameraProgram from "../camera-program";
 import GLBuffer from "../../glbuffer";
 import Shader from "../../shader";
@@ -14,10 +13,7 @@ export default class ConvexShapeProgram extends CameraProgram {
     public vertexBuffer: GLBuffer<Float32Array>;
     public colorBuffer: GLBuffer<Uint32Array>;
     public indexBuffer: GLBuffer<Uint16Array>
-    public vertexPositionAttribute: number;
-    public colorAttribute: number;
-    public vertexLength: number;
-    private verticesCount: number;
+    private vertices: number;
 
     constructor(ctx: WebGLRenderingContext) {
 
@@ -28,59 +24,54 @@ export default class ConvexShapeProgram extends CameraProgram {
         this.link(ctx)
 
         this.ctx = ctx
-        this.vertexBuffer = new GLBuffer({
-            gl: ctx,
-            clazz: Float32Array,
-            drawMode: this.ctx.STATIC_DRAW
-        }).createBuffer()
+        this.vertexBuffer = this.registerBuffer(
+            new GLBuffer({
+                gl: ctx,
+                clazz: Float32Array,
+                drawMode: this.ctx.STATIC_DRAW
+            }).createBuffer(),
+            [
+                { name: "a_vertex_position", size: 2 }
+            ]
+        ).glBuffer
 
-        this.colorBuffer = new GLBuffer({
-            gl: ctx,
-            clazz: Uint32Array,
-            drawMode: this.ctx.STATIC_DRAW
-        }).createBuffer()
+        this.colorBuffer = this.registerBuffer(
+            new GLBuffer({
+                gl: ctx,
+                clazz: Uint32Array,
+                glType: this.ctx.UNSIGNED_BYTE,
+                drawMode: this.ctx.STATIC_DRAW
+            }).createBuffer(),
+        [
+                { name: "a_color", size: 4, normalized: true }
+            ]
+        ).glBuffer
 
         this.indexBuffer = this.createIndexBuffer()
 
-        this.vertexPositionAttribute = this.getAttribute("a_vertex_position");
-        this.colorAttribute = this.getAttribute("a_color");
         this.matrixUniform = this.getUniform("u_matrix")
-        this.vertexLength = 2
     }
 
     reset() {
         this.vertexBuffer.reset()
         this.indexBuffer.reset()
         this.colorBuffer.reset()
+
+        this.vertices = 0
     }
 
     bind() {
         super.bind()
 
-        this.ctx.enableVertexAttribArray(this.vertexPositionAttribute);
-        this.ctx.enableVertexAttribArray(this.colorAttribute);
-
-        this.vertexBuffer.bind()
-
-        const bytes = this.vertexBuffer.clazz.BYTES_PER_ELEMENT
-        const stride = this.vertexLength * bytes
-
-        this.ctx.vertexAttribPointer(this.vertexPositionAttribute, 2, this.ctx.FLOAT, false, stride, 0);
-
-        this.colorBuffer.bind()
-
-        const colorBytes = this.colorBuffer.clazz.BYTES_PER_ELEMENT
-
-        this.ctx.vertexAttribPointer(this.colorAttribute, 4, this.ctx.UNSIGNED_BYTE, true, colorBytes, 0);
-
-        this.verticesCount = 0
+        this.enableAttributes()
+        this.setVertexAttributePointers()
     }
 
     drawConvexShape(vertices: number[], color: number) {
         let points = vertices.length / 2
         for(let i = 0; i < points; i ++) this.colorBuffer.push(color)
 
-        const baseIndex = this.verticesCount
+        const baseIndex = this.vertices
         this.vertexBuffer.appendArray(vertices)
 
         for(let i = 2; i < points; i++) {
@@ -89,7 +80,7 @@ export default class ConvexShapeProgram extends CameraProgram {
             this.indexBuffer.push(baseIndex + i)
         }
 
-        this.verticesCount += points
+        this.vertices += points
     }
 
     drawRectangle(aX: number, aY: number, bX: number, bY: number, color: number) {
@@ -102,20 +93,18 @@ export default class ConvexShapeProgram extends CameraProgram {
     }
 
     draw() {
-        //this.ctx.blendFunc(this.ctx.ONE, this.ctx.ONE_MINUS_SRC_COLOR)
-
         if(this.indexBuffer.pointer !== 0) {
-            this.indexBuffer.updateData()
-            this.vertexBuffer.updateData()
-            this.colorBuffer.updateData()
+            this.indexBuffer.sendDataToGPU()
+            this.vertexBuffer.sendDataToGPU()
+            this.colorBuffer.sendDataToGPU()
 
-            this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.ctx.UNSIGNED_SHORT, 0);
+            this.ctx.disable(this.ctx.DEPTH_TEST)
+            this.ctx.enable(this.ctx.BLEND)
+
+            this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
         }
 
-        this.ctx.disableVertexAttribArray(this.vertexPositionAttribute);
-        this.ctx.disableVertexAttribArray(this.colorAttribute);
-
-        //this.ctx.blendFuncSeparate(this.ctx.SRC_ALPHA, this.ctx.ONE_MINUS_SRC_ALPHA, this.ctx.ONE, this.ctx.ONE_MINUS_SRC_ALPHA);
+        this.disableAttributes()
     }
 
     static getColor(r: number, g: number, b: number, a: number) {

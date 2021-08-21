@@ -1,7 +1,7 @@
 
 import { Shaders } from './shader-loader'
 
-class Shader {
+export default class Shader {
 	public name: string;
 	public type: GLenum;
 	public raw: WebGLShader;
@@ -31,5 +31,3 @@ class Shader {
         return this
     }
 }
-
-export default Shader;

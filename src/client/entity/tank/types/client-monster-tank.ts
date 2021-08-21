@@ -19,6 +19,7 @@ import {
 } from "../../../../utils/quadrangle";
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import {Constructor} from "../../../../serialization/binary/serializable";
+import WorldDrawer from "../../../graphics/drawers/world-drawer";
 
 class Drawer extends TankDrawer<ClientMonsterTank> {
 	public bodyBrightSprite: Sprite;
@@ -69,7 +70,14 @@ class Drawer extends TankDrawer<ClientMonsterTank> {
 
         const quadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
         transformQuadrangle(quadrangle, model.matrix)
-        bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, quadrangle, body.GetAngle())
+        bodyProgram.drawMaskedSprite(
+            this.bodyBrightSprite,
+            this.bodyDarkSprite,
+            this.bodyLightMask,
+            quadrangle,
+            body.GetAngle(),
+            WorldDrawer.depths.tankBody
+        )
     }
 }
 

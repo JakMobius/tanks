@@ -1,7 +1,7 @@
 #version 100
 precision mediump float;
 
-attribute vec2 a_vertex_position;
+attribute vec3 a_vertex_position;
 attribute float a_vertex_angle;
 attribute vec2 a_bright_texture_position;
 attribute vec2 a_dark_texture_position;
@@ -17,7 +17,7 @@ varying vec2 v_mask_position;
 varying float v_angle;
 
 void main() {
-    gl_Position = vec4((u_matrix * vec3(a_vertex_position, 1)).xy, 0.0, 1.0);
+    gl_Position = vec4((u_matrix * vec3(a_vertex_position.xy, 1)).xy, a_vertex_position.z, 1.0);
     v_bright_texture_position = a_bright_texture_position;
     v_dark_texture_position = a_dark_texture_position;
     v_mask_position = a_mask_position;

@@ -4,8 +4,10 @@ import Sprite, {SpriteRect} from '../../../sprite';
 import GameMap from '../../../../map/gamemap';
 import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/blockstate/blockstate';
+import {squareQuadrangle} from "../../../../utils/quadrangle";
+import WorldDrawer from "../world-drawer";
 
-class EdgedBlockDrawer extends BlockDrawer {
+export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];
     public spritePath: any;
     public spriteSize: any;
@@ -55,23 +57,12 @@ class EdgedBlockDrawer extends BlockDrawer {
         ]
     }
 
-    drawSlice(program: TextureProgram, x: number, y: number, slice: SpriteRect, s: any, h: number, dx: any, dy: any) {
+    drawSlice(program: TextureProgram, x: number, y: number, slice: SpriteRect, s: number, h: number, dx: any, dy: any) {
+
         dx += slice.x
         dy += slice.y
-        program.vertexBuffer.appendArray([
-            x, y, dx, dy,
-            x + h, y, dx + s, dy,
-            x, y + h, dx, dy + s,
-            x + h, y + h, dx + s, dy + s
-        ])
 
-        let base = program.textures * 4
-
-        program.indexBuffer.appendArray([
-            base, base + 1, base + 3, base, base + 2, base + 3
-        ])
-
-        program.textures++
+        program.drawTexture(squareQuadrangle(x, y, h, h), dx, dy, s, s, WorldDrawer.depths.block)
     }
 
     draw(program: TextureProgram, x: number, y: number, block: BlockState) {
@@ -103,5 +94,3 @@ class EdgedBlockDrawer extends BlockDrawer {
         super.draw(program, x, y, block)
     }
 }
-
-export default EdgedBlockDrawer;

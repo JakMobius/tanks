@@ -31,7 +31,7 @@ export default class BasicEntityDrawer extends EntityDrawer {
         this.matrix = new Matrix3()
     }
 
-    drawSprite(sprite: Sprite, width: number, height: number, phase: DrawPhase) {
+    drawSprite(sprite: Sprite, width: number, height: number, phase: DrawPhase, z: number = 1) {
         let program = phase.getProgram(TextureProgram)
         const entityBody = this.entity.model.getBody()
         const entityPosition = entityBody.GetPosition()
@@ -45,6 +45,6 @@ export default class BasicEntityDrawer extends EntityDrawer {
         turnQuadrangle(quadrangle, sine, cos)
         translateQuadrangle(quadrangle, entityPosition.x, entityPosition.y)
 
-        program.drawSprite(sprite, quadrangle)
+        program.drawSprite(sprite, quadrangle, z)
     }
 }
