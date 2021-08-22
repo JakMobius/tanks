@@ -55,8 +55,8 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
         transformQuadrangle(rightTrack, model.matrix)
         transformQuadrangle(bodyQuadrangle, model.matrix)
 
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.1)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.1)
+        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.2)
+        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.2)
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,

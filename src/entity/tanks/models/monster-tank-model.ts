@@ -13,12 +13,13 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
         super()
 
         this.behaviour = new WheeledTankBehaviour(this, {
-            power: 35000000,
-            maxTorque: 5000000,
-            wheelSlideFriction: 350000,
+            enginePower: 12000000,
+            engineMaxTorque: 5000000,
+            wheelGrip: 350000,
             wheelTensionLimit: 0.1,
             wheelMass: 100,
-            brakeTorque: 1000000
+            maxWheelBrakingTorque: 166600,
+            idleWheelBrakingTorque: 15000
         });
     }
 
@@ -27,7 +28,6 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
     }
 
     initPhysics(world: b2World) {
-        let size = 10
 
         let bodyFixture = PhysicsUtils.squareFixture(6, 10, new Vec2(), {
             density: 40,
@@ -35,8 +35,8 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            angularDamping: 0.8,
-            linearDamping: 0.8
+            angularDamping: 0.1,
+            linearDamping: 0.1
         });
 
         body.CreateFixture(bodyFixture)

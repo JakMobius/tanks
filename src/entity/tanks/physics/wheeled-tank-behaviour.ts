@@ -31,7 +31,11 @@ export class TankWheel {
 
 export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
     driveAxleList?: boolean[];
-    wheelSlideFriction?: number;
+
+    /**
+     * Friction of wheel to the surface
+     */
+    wheelGrip?: number;
 
     /**
      * Amount of wheel axles (single axle holds two wheels)
@@ -108,14 +112,19 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
 
     /**
      * This value determines how hard the vehicle is
-     * braking (in newtons). Defaults to maxTorque
+     * braking (in newtons). Defaults to engineMaxTorque / wheelCount
      */
-    brakeTorque?: number
+    wheelMaxBrakingTorque?: number
 
     /**
      * The mass of each wheel (in kilograms)
      */
     wheelMass?: number;
+
+    /**
+     * The rolling friction of each wheel
+     */
+    wheelIdleBrakingTorque?: number
 }
 
 export default class WheeledTankBehaviour extends TankBehaviour {
@@ -131,25 +140,27 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public driveAxleList: boolean[];
     public driveWheelCount: number
     public lateralTensionLossPerMeter: number;
-    public brakeForce: number
+    public wheelBrakeTorque: number
     public axlesOffset: number;
+    public idleWheelBrakeForce: number
     public wheelMass: number;
 
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
         super(tank, config)
 
+        this.idleWheelBrakeForce = config.wheelIdleBrakingTorque || 0
         this.axleDistance = config.axleDistance || 6
         this.axleWidth = config.axleWidth || 8
         this.minSteerRadius = config.minSteerRadius || 20
         this.axles = config.axles || 3
         this.axlesOffset = config.axlesOffset || 0
-        this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList(config.wheelSlideFriction)
+        this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList(config.wheelGrip)
         this.axleOffsetList = config.axleOffsets || this.defaultAxleOffsets()
         this.driveAxleList = config.driveAxleList || this.defaultDriveAxleList()
         this.steerAnchorOffset = config.steerAnchorOffset || 0
         this.wheelTensionLimit = config.wheelTensionLimit || 0.3
         this.lateralTensionLossPerMeter = config.lateralTensionLossPerMeter || 0.02
-        this.brakeForce = config.brakeTorque || this.maxTorque
+        this.wheelBrakeTorque = config.wheelBrakeTorque || this.maxTorque / (this.axles * 2)
         this.wheelMass = config.wheelMass || 50
 
         this.driveWheelCount = this.calculateDriveWheelCount()
@@ -329,13 +340,13 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         if(Math.abs(wheel.groundSpeed) < 5 || this.nonStrictSignComparator(control, wheel.groundSpeed)) {
             // Accelerating
             wheel.torque = control * engineForce / this.axles
-            wheel.brakeTorque = 0
+            wheel.brakeTorque = this.idleWheelBrakeForce
             return
         }
 
         // Braking
         wheel.torque = 0
-        wheel.brakeTorque = Math.abs(control) * this.brakeForce / this.axles
+        wheel.brakeTorque = Math.abs(control) * this.wheelBrakeTorque / this.axles + this.idleWheelBrakeForce
     }
 
     protected updateWheelThrottle() {

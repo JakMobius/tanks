@@ -39,7 +39,7 @@ export default class ExplodePoolDrawer {
                 //     y: walker.y,
                 //     dx: 0,
                 //     dy: 0,
-                //     color: new Color(255, 0, 0, pool.normalize(walker.power)),
+                //     color: new Color(255, 0, 0, pool.normalize(walker.enginePower)),
                 //     scaling: 0,
                 //     lifetime: dt
                 // })

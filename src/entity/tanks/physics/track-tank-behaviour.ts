@@ -4,8 +4,10 @@ import WheeledTankBehaviour, {TankWheel, WheeledTankBehaviourConfig} from "./whe
 import {clamp} from "../../../utils/utils";
 
 export interface TruckTankBehaviourConfig extends WheeledTankBehaviourConfig {
-    truckFriction?: number,
-    truckLength?: number
+    trackGrip?: number
+    trackLength?: number
+    trackMaxBrakingTorque?: number
+    trackIdleBrakingTorque?: number
 }
 
 export default class TrackTankBehaviour extends WheeledTankBehaviour {
@@ -13,9 +15,11 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
     constructor(tank: TankModel, config: TruckTankBehaviourConfig) {
 
         if(config.axles === undefined) config.axles = 5
-        if(config.truckLength) config.axleDistance = config.truckLength / config.axles
+        if(config.trackLength) config.axleDistance = config.trackLength / config.axles
         if(config.wheelTensionLimit === undefined) config.wheelTensionLimit = 0.05
-        if(config.truckFriction) config.wheelSlideFriction = config.truckFriction / config.axles
+        if(config.trackGrip) config.wheelGrip = config.trackGrip / config.axles
+        if(config.trackIdleBrakingTorque) config.wheelIdleBrakingTorque = config.trackIdleBrakingTorque / config.axles
+        if(config.trackMaxBrakingTorque) config.wheelMaxBrakingTorque = config.trackMaxBrakingTorque / config.axles
 
         super(tank, config)
     }

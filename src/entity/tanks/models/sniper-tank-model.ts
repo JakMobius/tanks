@@ -12,21 +12,19 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
         super();
 
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 11000000,
-            axleWidth: 7,
-            truckLength: 15,
-            truckFriction: 500000,
-            maxTorque: 10000000,
-            brakeTorque: 1000000,
+            enginePower: 11000000,
+            engineMaxTorque: 10000000,
+            trackLength: 15,
+            trackGrip: 500000,
+            trackMaxBrakingTorque: 50000000,
+            trackIdleBrakingTorque: 100000,
             wheelTensionLimit: 0.09,
-            axlesOffset: 2
+            axlesOffset: 2,
+            axleWidth: 7
         });
     }
 
     initPhysics(world: Box2D.World) {
-
-        let size = 9
-        const segment = size / 4;
 
         // Sniper is a tank. Tank should be massive
 
@@ -34,14 +32,14 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
             density: 30,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 9, new Box2D.Vec2(-size / 2 - segment, size * 0.2), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 9, new Box2D.Vec2(-6.75, 1.8), {
             filter: physicsFilters.tank,
             density: 30
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            angularDamping: 0.8,
-            linearDamping: 0.8
+            angularDamping: 0.2,
+            linearDamping: 0.2
         });
 
         body.CreateFixture(bodyFixture)

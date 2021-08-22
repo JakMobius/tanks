@@ -362,7 +362,7 @@ export class b2MotorJoint extends b2Joint {
     log("  jd.linearOffset.Set(%.15f, %.15f);\n", this.m_linearOffset.x, this.m_linearOffset.y);
     log("  jd.angularOffset = %.15f;\n", this.m_angularOffset);
     log("  jd.maxForce = %.15f;\n", this.m_maxForce);
-    log("  jd.maxTorque = %.15f;\n", this.m_maxTorque);
+    log("  jd.engineMaxTorque = %.15f;\n", this.m_maxTorque);
     log("  jd.correctionFactor = %.15f;\n", this.m_correctionFactor);
     log("  joints[%d] = this.m_world.CreateJoint(jd);\n", this.m_index);
   }

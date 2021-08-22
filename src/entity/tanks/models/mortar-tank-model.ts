@@ -12,7 +12,7 @@ class MortarTankModel extends TankModel<TrackTankBehaviour> {
         super()
 
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 30000
+            enginePower: 30000
         });
     }
 

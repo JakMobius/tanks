@@ -304,7 +304,7 @@ export class b2FrictionJoint extends b2Joint {
     log("  jd.localAnchorA.Set(%.15f, %.15f);\n", this.m_localAnchorA.x, this.m_localAnchorA.y);
     log("  jd.localAnchorB.Set(%.15f, %.15f);\n", this.m_localAnchorB.x, this.m_localAnchorB.y);
     log("  jd.maxForce = %.15f;\n", this.m_maxForce);
-    log("  jd.maxTorque = %.15f;\n", this.m_maxTorque);
+    log("  jd.engineMaxTorque = %.15f;\n", this.m_maxTorque);
     log("  joints[%d] = this.m_world.CreateJoint(jd);\n", this.m_index);
   }
 }

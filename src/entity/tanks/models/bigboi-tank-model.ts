@@ -7,21 +7,19 @@ import {physicsFilters} from "../../../physics/categories";
 export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
 
     public static typeName = 105
-    private size: number;
 
     constructor() {
         super();
 
-        this.size = 9
-
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 18000000,
-            truckLength: 15,
-            axleWidth: 9,
-            truckFriction: 1000000,
-            maxTorque: 10000000,
-            brakeTorque: 1000000,
-            wheelTensionLimit: 0.05
+            enginePower: 18000000,
+            engineMaxTorque: 10000000,
+            trackLength: 15,
+            trackGrip: 1200000,
+            trackMaxBrakingTorque: 5000000,
+            trackIdleBrakingTorque: 300000,
+            wheelTensionLimit: 0.05,
+            axleWidth: 9
         });
     }
     static getMaximumHealth() {
@@ -34,15 +32,14 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
             density: 60,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(4.5, 9,
-            new Box2D.Vec2(9, 0), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(4.5, 9, new Box2D.Vec2(9, 0), {
             density: 60,
             filter: physicsFilters.tank
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            angularDamping: 2,
-            linearDamping: 2
+            angularDamping: 0.1,
+            linearDamping: 0.2
         });
 
         body.CreateFixture(bodyFixtureDef)

@@ -13,10 +13,10 @@ export default class BomberTankModel extends TankModel<TrackTankBehaviour> {
         super()
 
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 30000,
+            enginePower: 30000,
             axleWidth: 7.5,
-            truckLength: 15,
-            truckFriction: 30000
+            trackLength: 15,
+            trackGrip: 30000
         });
     }
 

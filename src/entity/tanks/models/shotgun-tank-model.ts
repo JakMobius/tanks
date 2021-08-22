@@ -13,7 +13,7 @@ export default class ShotgunTankModel extends TankModel<TrackTankBehaviour> {
         super();
 
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 20000,
+            enginePower: 20000,
         });
     }
 

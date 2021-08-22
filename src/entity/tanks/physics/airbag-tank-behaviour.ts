@@ -18,7 +18,7 @@ export default class AirbagTankModel extends TankBehaviour {
     constructor(tank: TankModel, config: AirbagBehaviourConfig) {
         super(tank, config)
 
-        this.power = config.power || 50000
+        this.power = config.enginePower || 50000
         this.torque = config.torque || 120000
         this.friction = config.friction || 0.1
         this.maxPropellerSpeed = config.maxPropellerSpeed || 40

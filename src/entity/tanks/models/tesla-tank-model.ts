@@ -13,7 +13,7 @@ export default class TeslaTankModel extends TankModel {
         super()
 
         new BasicTankBehaviour(this, {
-            power: 20000
+            enginePower: 20000
         })
     }
 
