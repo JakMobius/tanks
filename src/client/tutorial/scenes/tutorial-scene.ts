@@ -65,6 +65,10 @@ export default class TutorialScene extends Scene {
             this.performClientCommand("#switch-tank")
         })
 
+        this.keyboard.keybinding("Cmd-B", () => {
+            this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
+        })
+
         this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.game.clientWorld)
 
         this.game.connectClientToServer()

@@ -6,15 +6,22 @@ import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import B2DebugDraw from "./b2-debug-draw";
 import {b2DrawFlags} from "../../../library/box2d/common/b2_draw";
+import ClientTank from "../../entity/tank/client-tank";
+import TankModel from "../../../entity/tanks/tank-model";
+import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank-behaviour";
+import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
     private world: ClientGameWorld;
 
+    // ARGB
     static chunkBorderColor = 0xFFDD22DD
     static meshFillColor = 0x800000FF
     static meshStrokeColor = 0xFF0000FF
     static meshVertexColor = 0xFF00DD00
+    static wheelColor = 0xAAFF00FF
+    static slidingWheelColor = 0xAAFF0000
     static vertexSize = 1.5
     static meshStrokeThickness = 1;
     private b2DebugDraw: B2DebugDraw;
@@ -33,6 +40,7 @@ export default class MapDebugDrawer {
         this.drawPhase.prepare()
         //this.drawChunksDebug()
         this.drawB2Debug()
+        this.drawTanksWheelDebug()
         this.drawPhase.draw()
     }
 
@@ -93,8 +101,37 @@ export default class MapDebugDrawer {
         }
     }
 
+    private drawTanksWheelDebug() {
+        for(let entity of this.world.entities.values()) {
+            if(entity instanceof ClientTank) {
+                this.drawTankWheelDebug(entity)
+            }
+        }
+    }
+
     private drawB2Debug() {
         this.world.world.SetDebugDraw(this.b2DebugDraw)
         this.world.world.DebugDraw()
+    }
+
+    private drawTankWheelDebug(entity: ClientTank<TankModel>) {
+        if(entity.model.behaviour instanceof WheeledTankBehaviour) {
+            let behaviour: WheeledTankBehaviour = entity.model.behaviour
+            let wheels = behaviour.wheels
+
+            let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
+
+            for(let wheel of wheels) {
+                let wheelQuadrangle = squareQuadrangle(-0.8, -2.5, 1.6, 5)
+
+                turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
+                translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
+                transformQuadrangle(wheelQuadrangle, entity.model.matrix)
+
+                let color = wheel.isSliding ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
+
+                convexShapeProgram.drawQuadrangle(wheelQuadrangle, color)
+            }
+        }
     }
 }

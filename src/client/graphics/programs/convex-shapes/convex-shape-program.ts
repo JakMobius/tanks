@@ -3,6 +3,7 @@
 
 import CameraProgram from "../camera-program";
 import GLBuffer from "../../glbuffer";
+import {Quadrangle} from "../../../../utils/quadrangle";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/convex-shape-fragment.glsl"
@@ -59,6 +60,15 @@ export default class ConvexShapeProgram extends CameraProgram {
         }
 
         this.vertices += points
+    }
+
+    drawQuadrangle(quadrangle: Quadrangle, color: number) {
+        this.drawConvexShape([
+            quadrangle.x1, quadrangle.y1,
+            quadrangle.x2, quadrangle.y2,
+            quadrangle.x4, quadrangle.y4,
+            quadrangle.x3, quadrangle.y3,
+        ], color)
     }
 
     drawRectangle(aX: number, aY: number, bX: number, bY: number, color: number) {
