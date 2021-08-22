@@ -2,12 +2,20 @@
 const bundlerBabelPlugins = [
     ["module-resolver", { "extensions": [".js", ".ts", ".json"], "alias": { "src": "./src" }}],
     ["./babel-plugins/babel-plugin-import-dir"],
-    ["@babel/plugin-proposal-private-methods", { "loose": true }]
+    ["@babel/plugin-proposal-private-methods", { "loose": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
+    ["@babel/plugin-syntax-class-properties"],
+    ["@babel/plugin-transform-typescript"],
+    ["@babel/plugin-transform-runtime"],
 ]
 
 const serverCompilerConfig = {
     "includeExternalModules": false,
     "babelPlugins": bundlerBabelPlugins,
+    "babelPresets": [
+        ['@babel/preset-env', { "targets": "node 7", "loose": false }]
+    ]
 }
 
 const serverBundlerConfig = {
@@ -17,7 +25,10 @@ const serverBundlerConfig = {
 const clientCompilerConfig = {
     "includeExternalModules": true,
     "babelPlugins": bundlerBabelPlugins,
-    "cacheSection": "with-external-modules"
+    "cacheSection": "with-external-modules",
+    "babelPresets": [
+        ['@babel/preset-env', { "loose": false }]
+    ]
 }
 
 const clientBundlerConfig = {

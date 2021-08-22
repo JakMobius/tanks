@@ -3,15 +3,14 @@
 
 import CameraProgram from "../camera-program";
 import GLBuffer from "../../glbuffer";
-import Shader from "../../shader";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/convex-shape-fragment.glsl"
 
 export default class ConvexShapeProgram extends CameraProgram {
 
-    public vertexBuffer: GLBuffer<Float32Array>;
-    public colorBuffer: GLBuffer<Uint32Array>;
+    public vertexBuffer: GLBuffer<Float32Array>
+    public colorBuffer: GLBuffer<Uint32Array>
     public indexBuffer: GLBuffer<Uint16Array>
     private vertices: number;
 
@@ -19,7 +18,6 @@ export default class ConvexShapeProgram extends CameraProgram {
         super(vertexShaderPath, fragmentShaderPath, ctx)
 
         this.vertexBuffer = this.createVertexArrayBuffer({
-            gl: ctx,
             clazz: Float32Array,
             drawMode: this.ctx.STATIC_DRAW,
             attributes: this.createVertexArrayAttributes([
