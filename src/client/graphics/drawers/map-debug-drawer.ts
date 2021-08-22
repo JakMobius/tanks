@@ -122,7 +122,7 @@ export default class MapDebugDrawer {
             let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
 
             for(let wheel of wheels) {
-                let wheelQuadrangle = squareQuadrangle(-0.8, -2.5, 1.6, 5)
+                let wheelQuadrangle = squareQuadrangle(-0.5, -0.5, 1, 1)
 
                 turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
                 translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
