@@ -15,10 +15,13 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
         this.size = 9
 
         this.behaviour = new TrackTankBehaviour(this, {
-            power: 60000,
-            truckLength: this.size,
-            axleWidth: this.size,
-            truckFriction: 60000,
+            power: 18000000,
+            truckLength: 15,
+            axleWidth: 9,
+            truckFriction: 800000,
+            maxTorque: 10000000,
+            brakeTorque: 5000000,
+            wheelTensionLimit: 0.05
         });
     }
     static getMaximumHealth() {
@@ -27,23 +30,19 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
 
     initPhysics(world: Box2D.World) {
 
-        let bodyFixtureDef = PhysicsUtils.squareFixture(
-            this.size,
-            this.size * 0.87,
-            null,{
-                density: 3.5,
-                filter: physicsFilters.tank
+        let bodyFixtureDef = PhysicsUtils.squareFixture(9, 7.83, null, {
+            density: 60,
+            filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(
-            this.size * 0.5,
-            this.size,
-            new Box2D.Vec2(this.size, 0), {
-                density: 2,
-                filter: physicsFilters.tank
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(4.5, 9,
+            new Box2D.Vec2(9, 0), {
+            density: 60,
+            filter: physicsFilters.tank
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            linearDamping: 0.5
+            angularDamping: 2,
+            linearDamping: 2
         });
 
         body.CreateFixture(bodyFixtureDef)
