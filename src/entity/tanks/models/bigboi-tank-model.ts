@@ -18,9 +18,9 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
             power: 18000000,
             truckLength: 15,
             axleWidth: 9,
-            truckFriction: 800000,
+            truckFriction: 1000000,
             maxTorque: 10000000,
-            brakeTorque: 5000000,
+            brakeTorque: 1000000,
             wheelTensionLimit: 0.05
         });
     }
