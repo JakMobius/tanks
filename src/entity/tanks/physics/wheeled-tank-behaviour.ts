@@ -52,6 +52,12 @@ export interface WheeledTankBehaviourConfig extends TankBehaviourConfig {
     axleWidth?: number,
 
     /**
+     * The vertical offset of each axle. This value will be used
+     * if axleOffsets field is omitted
+     */
+    axlesOffset?: number
+
+    /**
      * Array of friction factors for the wheels of each axle
      */
     axleFrictionList?: number[]
@@ -126,6 +132,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public driveWheelCount: number
     public lateralTensionLossPerMeter: number;
     public brakeForce: number
+    public axlesOffset: number;
     public wheelMass: number;
 
     constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
@@ -135,6 +142,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.axleWidth = config.axleWidth || 8
         this.minSteerRadius = config.minSteerRadius || 20
         this.axles = config.axles || 3
+        this.axlesOffset = config.axlesOffset || 0
         this.axleFrictionList = config.axleFrictionList || this.defaultAxleFrictionList(config.wheelSlideFriction)
         this.axleOffsetList = config.axleOffsets || this.defaultAxleOffsets()
         this.driveAxleList = config.driveAxleList || this.defaultDriveAxleList()
@@ -182,7 +190,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
 
     private defaultAxleOffsets() {
         let result = [];
-        let axleY = -this.axleDistance * (this.axles - 1) / 2
+        let axleY = -this.axleDistance * (this.axles - 1) / 2 + this.axlesOffset
         for(let axle = 0; axle < this.axles; axle++) {
             result.push(axleY)
             axleY += this.axleDistance
