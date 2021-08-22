@@ -2,6 +2,9 @@
 import Loop, {LoopConfig} from './loop';
 
 export interface HighPrecisionLoopConfig extends LoopConfig {
+    /**
+     * Target loop timestep in milliseconds
+     */
     interval: number
 }
 
@@ -12,8 +15,7 @@ export default class HighPrecisionLoop extends Loop {
     constructor(config?: HighPrecisionLoopConfig) {
         super(config);
         config = Object.assign({
-            interval: 1000 / 60,
-            maximumTimestep: 100
+            interval: 1000 / 60
         }, config)
 
         this.interval = config.interval
@@ -27,6 +29,7 @@ export default class HighPrecisionLoop extends Loop {
     }
 
     cycle(dt: number) {
+        dt /= this.timeMultiplier
         this.totalTime -= dt
         this.totalTime += this.interval
         if(this.totalTime < -this.maximumTimestep) {

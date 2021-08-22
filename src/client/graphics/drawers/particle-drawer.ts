@@ -2,7 +2,6 @@
 import Particle from "../../particles/particle";
 import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
-import ConvexShapeProgramFactory from "../programs/convex-shapes/convex-shape-program-factory";
 
 export default class ParticleDrawer {
     static drawParticle(phase: DrawPhase, particle: Particle) {

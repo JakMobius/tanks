@@ -42,7 +42,6 @@ export default class GameScene extends Scene {
 	public overlay: PrimaryOverlay;
 	public eventContainer: EventContainer;
 	public chatContainer: ChatContainer;
-	public timer: number;
 	public world: ClientGameWorld
     public worldDrawer: WorldDrawer
 
@@ -201,10 +200,6 @@ export default class GameScene extends Scene {
             this.keyboard.startListening()
             this.screen.canvas.focus()
         })
-    }
-
-    pause() {
-        cancelAnimationFrame(this.timer)
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {

@@ -20,8 +20,11 @@ export default class BasicCameraProgramController<ProgramClass extends CameraPro
     }
 
     draw() {
-        this.program.bind()
-        this.didBind()
-        this.program.draw()
+        if(this.program.shouldDraw()) {
+            this.program.bind()
+            this.didBind()
+            this.program.draw()
+            this.program.clean()
+        }
     }
 }

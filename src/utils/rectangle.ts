@@ -1,5 +1,5 @@
 
-class Rectangle {
+export default class Rectangle {
 
     x1: number = null
     y1: number = null
@@ -102,5 +102,3 @@ class Rectangle {
         return new Rectangle(x1, y1, x2, y2)
     }
 }
-
-export default Rectangle;

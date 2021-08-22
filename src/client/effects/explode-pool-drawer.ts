@@ -14,7 +14,7 @@ export default class ExplodePoolDrawer {
         this.screen = screen
         this.camera = camera
 
-        this.program = new PostProcessingProgram("explosion-drawer", this.screen.ctx)
+        this.program = new PostProcessingProgram(this.screen.ctx)
     }
 
     draw(pool: ExplodeEffectPool<ClientGameWorld>, dt: number) {

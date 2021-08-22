@@ -1,4 +1,4 @@
-import Program from "../../program";
+import Program from "../program";
 
 
 export default abstract class ProgramController<ProgramClass extends Program = Program> {

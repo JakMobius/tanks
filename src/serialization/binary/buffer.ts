@@ -22,7 +22,7 @@ export interface BufferConfig<T> {
 }
 
 class Buffer<T extends ByteArray = Uint8Array> {
-	public initialCapacity: any;
+	public initialCapacity: number;
 	public array: T;
 	public stack: number[];
     /**
@@ -82,7 +82,7 @@ class Buffer<T extends ByteArray = Uint8Array> {
      * @returns {boolean} `true`, if buffer has been reallocated, `false` otherwise
      */
 
-    extend(minimumCapacity?: number) {
+    extend(minimumCapacity?: number): boolean {
         if (minimumCapacity === undefined) {
             this.capacity *= this.reallocationFactor
         } else {

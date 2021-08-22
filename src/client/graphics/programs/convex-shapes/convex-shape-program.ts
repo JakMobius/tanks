@@ -16,40 +16,27 @@ export default class ConvexShapeProgram extends CameraProgram {
     private vertices: number;
 
     constructor(ctx: WebGLRenderingContext) {
+        super(vertexShaderPath, fragmentShaderPath, ctx)
 
-        let vertexShader = new Shader(vertexShaderPath, Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader(fragmentShaderPath, Shader.FRAGMENT).compile(ctx)
-        super(vertexShader, fragmentShader)
-
-        this.link(ctx)
-
-        this.ctx = ctx
-        this.vertexBuffer = this.registerBuffer(
-            new GLBuffer({
-                gl: ctx,
-                clazz: Float32Array,
-                drawMode: this.ctx.STATIC_DRAW
-            }).createBuffer(),
-            [
+        this.vertexBuffer = this.createVertexArrayBuffer({
+            gl: ctx,
+            clazz: Float32Array,
+            drawMode: this.ctx.STATIC_DRAW,
+            attributes: this.createVertexArrayAttributes([
                 { name: "a_vertex_position", size: 2 }
-            ]
-        ).glBuffer
+            ])
+        })
 
-        this.colorBuffer = this.registerBuffer(
-            new GLBuffer({
-                gl: ctx,
-                clazz: Uint32Array,
-                glType: this.ctx.UNSIGNED_BYTE,
-                drawMode: this.ctx.STATIC_DRAW
-            }).createBuffer(),
-        [
+        this.colorBuffer = this.createVertexArrayBuffer({
+            clazz: Uint32Array,
+            glType: this.ctx.UNSIGNED_BYTE,
+            drawMode: this.ctx.STATIC_DRAW,
+            attributes: this.createVertexArrayAttributes([
                 { name: "a_color", size: 4, normalized: true }
-            ]
-        ).glBuffer
+            ])
+        })
 
-        this.indexBuffer = this.createIndexBuffer()
-
-        this.matrixUniform = this.getUniform("u_matrix")
+        this.indexBuffer = this.createIndexBuffer(Uint16Array)
     }
 
     reset() {
@@ -60,16 +47,9 @@ export default class ConvexShapeProgram extends CameraProgram {
         this.vertices = 0
     }
 
-    bind() {
-        super.bind()
-
-        this.enableAttributes()
-        this.setVertexAttributePointers()
-    }
-
     drawConvexShape(vertices: number[], color: number) {
         let points = vertices.length / 2
-        for(let i = 0; i < points; i ++) this.colorBuffer.push(color)
+        for(let i = 0; i < points; i++) this.colorBuffer.push(color)
 
         const baseIndex = this.vertices
         this.vertexBuffer.appendArray(vertices)
@@ -92,19 +72,19 @@ export default class ConvexShapeProgram extends CameraProgram {
         ], color)
     }
 
+    shouldDraw(): boolean {
+        return this.indexBuffer.pointer !== 0
+    }
+
     draw() {
-        if(this.indexBuffer.pointer !== 0) {
-            this.indexBuffer.sendDataToGPU()
-            this.vertexBuffer.sendDataToGPU()
-            this.colorBuffer.sendDataToGPU()
+        this.indexBuffer.bindAndSendDataToGPU()
+        this.vertexBuffer.bindAndSendDataToGPU()
+        this.colorBuffer.bindAndSendDataToGPU()
 
-            this.ctx.disable(this.ctx.DEPTH_TEST)
-            this.ctx.enable(this.ctx.BLEND)
+        this.ctx.disable(this.ctx.DEPTH_TEST)
+        this.ctx.enable(this.ctx.BLEND)
 
-            this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
-        }
-
-        this.disableAttributes()
+        this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
     }
 
     static getColor(r: number, g: number, b: number, a: number) {

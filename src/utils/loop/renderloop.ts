@@ -5,10 +5,10 @@ export default class RenderLoop extends Loop {
 
     constructor(config: LoopConfig) {
         super(config);
-        this.timeMultiplier = 0.001
     }
 
     start() {
+        if(this.running) return
         super.start();
         this.perform(0)
     }

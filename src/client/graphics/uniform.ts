@@ -1,4 +1,4 @@
-import Program from "./program";
+import Program from "./programs/program";
 
 export default class Uniform {
 	public program: Program;

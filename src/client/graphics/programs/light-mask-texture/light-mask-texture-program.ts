@@ -1,7 +1,6 @@
 /* @load-resource: '../../shaders/fragment/light-mask-texture-fragment.glsl' */
 /* @load-resource: '../../shaders/vertex/light-mask-texture-vertex.glsl' */
 
-import Shader from '../../shader';
 import GLBuffer from '../../glbuffer';
 import Sprite from '../../../sprite';
 import Uniform from "../../uniform";
@@ -19,33 +18,23 @@ export default class LightMaskTextureProgram extends CameraProgram {
 	public vertices: number
 
     constructor(ctx: WebGLRenderingContext) {
+        super(vertexShaderPath, fragmentShaderPath, ctx)
 
-        let vertexShader = new Shader(vertexShaderPath, Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader(fragmentShaderPath, Shader.FRAGMENT).compile(ctx)
-        super(vertexShader, fragmentShader)
-
-        this.link(ctx)
-
-        this.ctx = ctx
-        this.vertexBuffer = this.registerBuffer(
-            new GLBuffer({
-                clazz: Float32Array,
-                gl: ctx,
-                drawMode: this.ctx.STATIC_DRAW
-            }).createBuffer(),
-            [
-                { name: "a_vertex_position",            size: 3 },
-                { name: "a_vertex_angle",               size: 1 },
-                { name: "a_bright_texture_position",    size: 2 },
-                { name: "a_dark_texture_position",      size: 2 },
-                { name: "a_mask_position",              size: 2 }
-            ]
-        ).glBuffer
+        this.vertexBuffer = this.createVertexArrayBuffer({
+            clazz: Float32Array,
+            drawMode: this.ctx.STATIC_DRAW,
+            attributes: this.createVertexArrayAttributes([
+                { name: "a_vertex_position",         size: 3 },
+                { name: "a_vertex_angle",            size: 1 },
+                { name: "a_bright_texture_position", size: 2 },
+                { name: "a_dark_texture_position",   size: 2 },
+                { name: "a_mask_position",           size: 2 }
+            ])
+        })
 
         this.samplerUniform = this.getUniform("u_texture")
         this.textureSizeUniform = this.getUniform("u_texture_size")
         this.angleUniform = this.getUniform("u_angle")
-        this.matrixUniform = this.getUniform("u_matrix")
 
         this.ctx.useProgram(this.raw)
         this.samplerUniform.set1i(0)
@@ -91,25 +80,17 @@ export default class LightMaskTextureProgram extends CameraProgram {
         this.vertices = 0
     }
 
-    bind() {
-        super.bind()
-        Sprite.setSmoothing(this.ctx, false)
-
-        this.enableAttributes()
-        this.setVertexAttributePointers()
+    shouldDraw(): boolean {
+        return this.vertexBuffer.pointer !== 0
     }
 
     draw() {
-        if(this.vertexBuffer.pointer !== 0) {
-            this.ctx.enable(this.ctx.DEPTH_TEST)
-            this.ctx.disable(this.ctx.BLEND)
+        Sprite.setSmoothing(this.ctx, false)
+        this.ctx.enable(this.ctx.DEPTH_TEST)
+        this.ctx.disable(this.ctx.BLEND)
 
-            this.vertexBuffer.sendDataToGPU()
-            this.ctx.drawArrays(this.ctx.TRIANGLES, 0, this.vertices);
-        }
-
-        this.disableAttributes()
-
+        this.vertexBuffer.bindAndSendDataToGPU()
+        this.ctx.drawArrays(this.ctx.TRIANGLES, 0, this.vertices);
         Sprite.setSmoothing(this.ctx, true)
     }
 }

@@ -1,7 +1,7 @@
 
 import ProgramController from "../programs/controllers/program-controller";
 import {Constructor} from "../../../serialization/binary/serializable";
-import Program from "../program";
+import Program from "../programs/program";
 
 export default class DrawPhase {
     private controllers = new Map<Constructor<Program>, ProgramController>()

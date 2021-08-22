@@ -1,25 +1,27 @@
-
 import Tool from '../tool';
 import GameMap from '../../../../map/gamemap';
 import RangeView from '../../../ui/elements/range/range';
-import BrushProgram from '../../../graphics/programs/brush-program';
+import BrushProgram from '../../../graphics/programs/brush-program/brush-program';
 import ToolManager from "../toolmanager";
 import BlockState from "../../../../map/blockstate/blockstate";
+import BrushProgramController from "../../../graphics/programs/brush-program/brush-program-controller";
+import Color from "../../../../utils/color";
+import {squareQuadrangleFromPoints} from "../../../../utils/quadrangle";
 
-class Pencil extends Tool {
+export default class Pencil extends Tool {
 	public actionName = "Карандаш";
     public image = "assets/img/pencil.png"
 
-	public decorationProgram: BrushProgram;
+    public brushProgramController: BrushProgramController
 	public brushX = 0;
 	public brushY = 0;
 	public brushPositionKnown = false;
 	public isSquare = false;
-	public thicknessRangeInput: any;
-	public thicknessLabel: any;
-	public thicknessContainer: any;
-	public roundModeButton: any;
-	public squareModeButton: any;
+	public thicknessRangeInput = new RangeView();
+	public thicknessLabel: JQuery;
+	public thicknessContainer: JQuery;
+	public roundModeButton: JQuery;
+	public squareModeButton: JQuery;
 	public thickness: number;
 	public oldX: number;
 	public oldY: number;
@@ -27,10 +29,9 @@ class Pencil extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.decorationProgram = new BrushProgram(this.manager.screen.ctx)
-        this.decorationProgram.bind()
-        this.decorationProgram.blockSizeUniform.set1f(GameMap.BLOCK_SIZE)
-        this.decorationProgram.colorUniform.set4f(0, 1, 0, 0.5)
+        const brushProgram = new BrushProgram(this.manager.screen.ctx)
+        this.brushProgramController = new BrushProgramController(brushProgram, this.manager.camera)
+        this.brushProgramController.brushColor = new Color(0, 1, 0, 0.5)
 
         this.setupMenu()
         this.setThickness(1)
@@ -210,18 +211,12 @@ class Pencil extends Tool {
 
         if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
 
-        this.decorationProgram.bind()
-        this.decorationProgram.setBrushBounds(lowX * s, lowY * s, highX * s, highY * s)
-        this.decorationProgram.brushCenterUniform.set2f(this.brushX, this.brushY)
-        this.decorationProgram.matrixUniform.setMatrix(this.manager.camera.matrix.m)
+        this.brushProgramController.brushBounds = squareQuadrangleFromPoints(lowX * s, lowY * s, highX * s, highY * s)
+        this.brushProgramController.brushX = this.brushX
+        this.brushProgramController.brushY = this.brushY
+        this.brushProgramController.brushIsSquare = this.isSquare
+        this.brushProgramController.brushDiameter = this.thickness
 
-        if(this.isSquare) {
-            this.decorationProgram.setBrushDiameter(0)
-        } else {
-            this.decorationProgram.setBrushDiameter(this.thickness)
-        }
-        this.decorationProgram.draw()
+        this.brushProgramController.draw()
     }
 }
-
-export default Pencil;

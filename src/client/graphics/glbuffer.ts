@@ -12,13 +12,13 @@ export interface GLBufferConfig<T> extends BufferConfig<T> {
 }
 
 export default class GLBuffer<T extends ByteArray> extends Buffer<T> {
-	public gl: WebGLRenderingContext;
+	public readonly gl: WebGLRenderingContext;
 	public readonly glType: GLenum
     public readonly glElementSize: number
-	public drawMode: GLenum;
-	public bufferType: GLenum;
-	public glBuffer: WebGLBuffer;
-	public shouldUpdate: boolean;
+	public readonly drawMode: GLenum;
+	public readonly bufferType: GLenum;
+	public glBuffer: WebGLBuffer | null = null;
+	private shouldRecreateGPUBuffer = true;
 
     constructor(config: GLBufferConfig<T>) {
         super(config);
@@ -27,8 +27,6 @@ export default class GLBuffer<T extends ByteArray> extends Buffer<T> {
         this.clazz = config.clazz
         this.drawMode = config.drawMode || this.gl.STATIC_DRAW
         this.bufferType = config.bufferType || this.gl.ARRAY_BUFFER
-        this.glBuffer = null
-        this.shouldUpdate = true
 
         this.glType = config.glType || this.defaultGLType()
         this.glElementSize = this.getGLElementSize(this.glType)
@@ -68,7 +66,7 @@ export default class GLBuffer<T extends ByteArray> extends Buffer<T> {
 
     extend(minimumCapacity?: number) {
         if(super.extend(minimumCapacity)) {
-            this.shouldUpdate = true
+            this.shouldRecreateGPUBuffer = true
             return true
         }
         return false
@@ -78,10 +76,10 @@ export default class GLBuffer<T extends ByteArray> extends Buffer<T> {
         this.gl.bindBuffer(this.bufferType, this.glBuffer);
     }
 
-    sendDataToGPU() {
+    bindAndSendDataToGPU() {
         this.bind()
-        if(this.shouldUpdate) {
-            this.shouldUpdate = false
+        if(this.shouldRecreateGPUBuffer) {
+            this.shouldRecreateGPUBuffer = false
             this.gl.bufferData(this.bufferType, this.array, this.drawMode);
         } else {
             this.gl.bufferSubData(this.bufferType, 0, this.array)

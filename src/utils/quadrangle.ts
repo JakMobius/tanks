@@ -23,6 +23,15 @@ export function squareQuadrangle(x: number, y: number, width: number, height: nu
     }
 }
 
+export function squareQuadrangleFromPoints(x1: number, y1: number, x2: number, y2: number): Quadrangle {
+    return {
+        x1: x2, y1: y2,
+        x2: x2, y2: y1,
+        x3: x1,  y3: y2,
+        x4: x1,  y4: y1,
+    }
+}
+
 export function setQuadrangle(quadrangle: Quadrangle, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) {
     quadrangle.x1 = x1
     quadrangle.y1 = y1

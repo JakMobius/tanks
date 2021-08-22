@@ -1,7 +1,6 @@
 /* @load-resource: '../shaders/fragment/texture-fragment.glsl' */
 /* @load-resource: '../shaders/vertex/texture-vertex.glsl' */
 
-import Shader from '../shader';
 import GLBuffer from '../glbuffer';
 import Sprite from "../../sprite";
 import {ByteArray} from "../../../serialization/binary/buffer";
@@ -18,7 +17,6 @@ export const vertexShaderPath = "src/client/graphics/shaders/vertex/texture-vert
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/texture-fragment.glsl"
 
 export default class TextureProgram extends CameraProgram {
-	public indexBufferType: number
 	public vertexBuffer: GLBuffer<Float32Array>;
 	public indexBuffer: GLBuffer<ByteArray>;
 	public textureUniform: Uniform;
@@ -31,45 +29,22 @@ export default class TextureProgram extends CameraProgram {
             largeIndices: false
         }, options)
 
-        let vertexShader = new Shader(vertexShaderPath, Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader(fragmentShaderPath, Shader.FRAGMENT).compile(ctx)
-        super(vertexShader, fragmentShader)
+        super(vertexShaderPath, fragmentShaderPath, ctx)
 
-        this.link(ctx)
+        if(options.largeIndices) this.getExtensionOrThrow("OES_element_index_uint")
 
-        if(options.largeIndices) {
-            if(!ctx.getExtension("OES_element_index_uint")) {
-                throw new Error("No WebGL Extension: OES_element_index_uint. Please, update the browser.")
-            }
-        }
-
-        const arrayType = options.largeIndices ? Uint32Array : Uint16Array
-        this.indexBufferType = options.largeIndices ? ctx.UNSIGNED_INT : ctx.UNSIGNED_SHORT
-
-        this.ctx = ctx
-        this.vertexBuffer = this.registerBuffer(
-            new GLBuffer({
-                clazz: Float32Array,
-                gl: ctx,
-                drawMode: this.ctx.STATIC_DRAW,
-                capacity: options.largeIndices ? 16384 : 128
-            }).createBuffer(),
-            [
+        this.vertexBuffer = this.createVertexArrayBuffer({
+            clazz: Float32Array,
+            drawMode: this.ctx.STATIC_DRAW,
+            attributes: this.createVertexArrayAttributes([
                 { name: "a_vertex_position", size: 3 },
                 { name: "a_texture_position", size: 2 }
-            ]
-        ).glBuffer
+            ])
+        })
 
-        this.indexBuffer = new GLBuffer<ByteArray>({
-            gl: ctx,
-            clazz: arrayType,
-            bufferType: this.ctx.ELEMENT_ARRAY_BUFFER,
-            drawMode: this.ctx.STATIC_DRAW,
-            capacity: options.largeIndices ? 16384 : 128
-        }).createBuffer()
+        this.indexBuffer = this.createIndexBuffer<ByteArray>(options.largeIndices ? Uint32Array : Uint16Array)
 
         this.textureUniform = this.getUniform("u_texture")
-        this.matrixUniform = this.getUniform("u_matrix")
         this.vertices = 0
     }
 
@@ -105,32 +80,25 @@ export default class TextureProgram extends CameraProgram {
         this.updated = true
         this.indexBuffer.reset()
         this.vertexBuffer.reset()
-
         this.vertices = 0
     }
 
-    bind() {
-        super.bind()
-
-        this.enableAttributes()
-        this.setVertexAttributePointers()
+    shouldDraw(): boolean {
+        return this.indexBuffer.pointer !== 0
     }
 
     draw() {
         if(this.updated === true) {
-            this.vertexBuffer.sendDataToGPU()
-            this.indexBuffer.sendDataToGPU()
+            this.vertexBuffer.bindAndSendDataToGPU()
+            this.indexBuffer.bindAndSendDataToGPU()
+            this.updated = false
         } else {
             this.indexBuffer.bind()
         }
 
-        if(this.indexBuffer.pointer !== 0) {
-            this.ctx.enable(this.ctx.DEPTH_TEST)
-            this.ctx.disable(this.ctx.BLEND)
+        this.ctx.enable(this.ctx.DEPTH_TEST)
+        this.ctx.disable(this.ctx.BLEND)
 
-            this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBufferType, 0);
-        }
-
-        this.disableAttributes()
+        this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
     }
 }

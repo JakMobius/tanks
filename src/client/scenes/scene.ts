@@ -4,7 +4,7 @@ export interface SceneConfig {
     screen: SceneScreen
 }
 
-class Scene {
+export default class Scene {
 
     screen: SceneScreen = null
     overlayContainer: JQuery = null
@@ -20,5 +20,3 @@ class Scene {
     appear() {}
     disappear() {}
 }
-
-export default Scene;

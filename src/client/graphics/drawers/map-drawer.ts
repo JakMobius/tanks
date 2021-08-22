@@ -24,6 +24,7 @@ export default class MapDrawer {
         this.blockProgram = new TextureProgram(this.screen.ctx, {
             largeIndices: true
         })
+
         this.reset()
     }
 
@@ -80,7 +81,7 @@ export default class MapDrawer {
             this.blockProgram.draw()
         } else {
             this.blockProgram.bind()
-            this.blockProgram.matrixUniform.setMatrix(camera.matrix.m)
+            this.blockProgram.setCamera(camera)
             Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
             this.blockProgram.draw()
         }

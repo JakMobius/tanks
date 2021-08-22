@@ -48,7 +48,8 @@ export default class TankSelectContainer extends Menu {
         this.previewWorld = new Box2D.World(new Box2D.Vec2())
 
         this.loop = new RenderLoop({
-            timeMultiplier: 0.001
+            timeMultiplier: 0.001,
+            maximumTimestep: 0.1
         })
         this.loop.run = (dt: number) => this.renderCards(dt)
 

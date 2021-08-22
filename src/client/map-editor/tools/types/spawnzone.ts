@@ -98,7 +98,7 @@ class SpawnZoneTool extends Tool {
         }
 
         this.program.bind()
-        this.program.matrixUniform.setMatrix(this.manager.camera.matrix.m)
+        this.program.setCamera(this.manager.camera)
         this.program.draw()
     }
 

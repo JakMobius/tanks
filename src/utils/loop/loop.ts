@@ -2,7 +2,14 @@
 import ScheduledTask from './scheduledtask';
 
 export interface LoopConfig {
+    /**
+     * Maximum passed dt. Defaults to 100
+     */
     maximumTimestep?: number
+
+    /**
+     * Time multiplier. When equal to one, dt corresponds to milliseconds. Defaults to 1
+     */
     timeMultiplier?: number
 }
 
@@ -18,7 +25,7 @@ export default class Loop {
 
 	constructor(config: LoopConfig) {
 	    config = Object.assign({
-            maximumTimestep: 0.1,
+            maximumTimestep: 100,
             timeMultiplier: 1
         }, config)
 
