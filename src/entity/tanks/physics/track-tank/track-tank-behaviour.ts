@@ -68,20 +68,30 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
         return totalSpeed / this.rightTrackWheels.length
     }
 
-    getLeftTrackGroundSpeed() {
-        let result = 0
-        for(let wheel of this.leftTrackWheels) {
-            if(Math.abs(wheel.groundSpeed) > Math.abs(result)) result = wheel.groundSpeed
-        }
-        return result
-    }
+    /**
+     * Counts approximate velocity of the most static point of the track
+     * @param wheels
+     */
+    getTrackGroundSpeed(wheels: TankWheel[]) {
+        let positiveSpeed = Infinity
+        let negativeSpeed = -Infinity
 
-    getRightTrackGroundSpeed() {
-        let result = 0
-        for(let wheel of this.rightTrackWheels) {
-            if(Math.abs(wheel.groundSpeed) > Math.abs(result)) result = wheel.groundSpeed
+        for(let wheel of wheels) {
+            if(wheel.groundSpeed < 0) negativeSpeed = Math.max(negativeSpeed, wheel.groundSpeed)
+            else positiveSpeed = Math.min(positiveSpeed, wheel.groundSpeed)
         }
-        return result
+
+        if(isFinite(positiveSpeed)) {
+            if(isFinite(negativeSpeed)) {
+                return 0
+            }
+            return positiveSpeed
+        }
+
+        if(isFinite(negativeSpeed)) {
+            return negativeSpeed
+        }
+        return 0
     }
 
     protected updateWheelThrottle() {
@@ -123,17 +133,16 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
         leftTrackControl = clamp(leftTrackControl, -1, 1)
         rightTrackControl = clamp(rightTrackControl, -1, 1)
 
-        const leftTrackGroundSpeed = this.getLeftTrackGroundSpeed()
-        const rightTrackGroundSpeed = this.getRightTrackGroundSpeed()
+        const leftTrackGroundSpeed = this.getTrackGroundSpeed(this.leftTrackWheels)
+        const rightTrackGroundSpeed = this.getTrackGroundSpeed(this.rightTrackWheels)
 
-
-        if(Math.abs(leftTrackGroundSpeed) < 0.5 || this.nonStrictSignComparator(leftTrackGroundSpeed, leftTrackControl)) {
+        if(Math.abs(leftTrackGroundSpeed) < 1.5 || this.nonStrictSignComparator(leftTrackGroundSpeed, leftTrackControl)) {
             this.accelerateTrack(this.leftTrackWheels, leftTrackControl, engineTorque)
         } else {
             this.brakeTrack(this.leftTrackWheels, leftTrackControl)
         }
 
-        if(Math.abs(rightTrackGroundSpeed) < 0.5 || this.nonStrictSignComparator(rightTrackGroundSpeed, rightTrackControl)) {
+        if(Math.abs(rightTrackGroundSpeed) < 1.5 || this.nonStrictSignComparator(rightTrackGroundSpeed, rightTrackControl)) {
             this.accelerateTrack(this.rightTrackWheels, rightTrackControl, engineTorque)
         } else {
             this.brakeTrack(this.rightTrackWheels, rightTrackControl)
