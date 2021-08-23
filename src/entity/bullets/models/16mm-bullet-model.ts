@@ -10,13 +10,13 @@ export default class BulletModel16mm extends BulletModel {
 
     initPhysics(world: Box2D.World) {
 
-        let bodyFixture = PhysicsUtils.squareFixture(0.33, 1, null, {
-            density: 3,
+        let bodyFixture = PhysicsUtils.squareFixture(0.0825, 0.25, null, {
+            density: 48,
             filter: physicsFilters.bullet
         })
 
         const body = PhysicsUtils.dynamicBody(world, {
-            angularDamping: 0.0,
+            angularDamping: 0.1,
             linearDamping: 0.2,
             bullet: true
         })

@@ -38,10 +38,8 @@ export default class BasicEntityDrawer extends EntityDrawer {
         const entityAngle = entityBody.GetAngle()
         const sine = Math.sin(entityAngle)
         const cos = Math.cos(entityAngle)
-        const w = width / 6
-        const h = height / 6
 
-        const quadrangle = squareQuadrangle(-w / 2, -h / 2, w, h)
+        const quadrangle = squareQuadrangle(-width / 2, -height / 2, width, height)
         turnQuadrangle(quadrangle, sine, cos)
         translateQuadrangle(quadrangle, entityPosition.x, entityPosition.y)
 

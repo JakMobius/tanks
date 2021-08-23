@@ -8,7 +8,7 @@ export default class BulletModel42mm extends BulletModel {
 	static typeName = 0
 
 	initPhysics(world: Box2D.World) {
-		const bodyFixtureDef = PhysicsUtils.squareFixture(0.5, 2, null, {
+		const bodyFixtureDef = PhysicsUtils.squareFixture(0.125, 0.5, null, {
 			density: 3,
 			filter: physicsFilters.bullet
 		})

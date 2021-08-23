@@ -11,7 +11,7 @@ export default class Weapon42mm extends SingleBarreledWeapon {
 			shootRate: 1000,
 			reloadTime: 5000,
 			bulletType: BulletModel42mm,
-			muzzlePoint: new Box2D.Vec2(0, 10),
+			muzzlePoint: new Box2D.Vec2(0, 2.5),
 			tank: config.tank,
 			triggerAxle: config.triggerAxle
 		});

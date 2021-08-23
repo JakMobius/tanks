@@ -9,9 +9,8 @@ export default class ServerBulletCannonball extends ServerBullet<BulletModelCann
     constructor(options: ServerBulletConfig<BulletModelCannonball>) {
         super(options);
 
-        this.startVelocity = 600
+        this.startVelocity = 150
         this.explodePower = 0
         this.wallDamage = 7600
-        this.mass = 30
     }
 }

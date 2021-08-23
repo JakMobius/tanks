@@ -16,9 +16,9 @@ class Drawer extends TankDrawer<ClientSniperTank> {
     //public bodyLightMask: Sprite;
     public truckSprite: Sprite;
 
-    static bodyQuadrangle = squareQuadrangle(-4.5, -9, 9, 18)
-    static leftTrack      = squareQuadrangle(4.5,  -6.4, 5.44, 13.5)
-    static rightTrack     = squareQuadrangle(-10, -6.4, 5.44, 13.5)
+    static bodyQuadrangle = squareQuadrangle(-1.125, -2.25, 2.25, 4.5)
+    static leftTrack      = squareQuadrangle(1.125,  -1.6, 1.36, 3.375)
+    static rightTrack     = squareQuadrangle(-2.5, -1.6, 1.36, 3.375)
 
     constructor(tank: ClientSniperTank, ctx: WebGLRenderingContext) {
         super(tank, ctx);
@@ -49,8 +49,8 @@ class Drawer extends TankDrawer<ClientSniperTank> {
         transformQuadrangle(leftTrack, model.matrix)
         transformQuadrangle(rightTrack, model.matrix)
 
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 3.0, 0.2)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 3.0, 0.2)
+        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
+        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
         bodyProgram.drawSprite(this.bodyBrightSprite, quadrangle)
         //bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, quadrangle, body.GetAngle())
     }

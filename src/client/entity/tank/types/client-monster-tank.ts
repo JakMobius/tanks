@@ -27,10 +27,10 @@ class Drawer extends TankDrawer<ClientMonsterTank> {
 	public bodyLightMask: Sprite;
     public wheelSprites: Sprite[];
 
-	static bodyQuadrangle  = squareQuadrangle(-8.0, -10, 16,  20)
-	static wheelQuadrangle = squareQuadrangle(-1.8, -3,  3.6, 6)
+	static bodyQuadrangle  = squareQuadrangle(-2, -2.5, 4,  5)
+	static wheelQuadrangle = squareQuadrangle(-0.45, -0.75,  0.9, 1.5)
 
-    static spriteDistance = 8
+    static spritesPerMeter = 20
     static wheelSpriteCount = 10
 
     constructor(tank: ClientMonsterTank, ctx: WebGLRenderingContext) {
@@ -55,7 +55,7 @@ class Drawer extends TankDrawer<ClientMonsterTank> {
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
 
         for(let wheel of model.behaviour.wheels) {
-            let spriteIndex = Math.floor(-wheel.distance * Drawer.spriteDistance % Drawer.wheelSpriteCount);
+            let spriteIndex = Math.floor(-wheel.distance * Drawer.spritesPerMeter % Drawer.wheelSpriteCount);
             if(spriteIndex < 0) spriteIndex = Drawer.wheelSpriteCount + spriteIndex;
             const position = wheel.position
             const angle = wheel.angle

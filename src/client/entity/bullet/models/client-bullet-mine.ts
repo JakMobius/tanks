@@ -21,7 +21,7 @@ class Drawer extends BasicEntityDrawer {
     draw(phase: DrawPhase) {
         let index = Math.floor((Date.now() + this.shift) / 1000) % 3
         if(index === 2) index = 1
-        this.drawSprite(Drawer.getSprite(index), 60, 60, phase)
+        this.drawSprite(Drawer.getSprite(index), 2.5, 2.5, phase)
     }
 }
 

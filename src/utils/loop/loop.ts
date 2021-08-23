@@ -72,11 +72,11 @@ export default class Loop {
 
             this.runScheduledTasks(dt)
 
+            this.cycle(dt)
+
             if(this.run) {
                 this.run(dt)
             }
-
-            this.cycle(dt)
         } else {
             this.loopTimestamp = undefined
         }

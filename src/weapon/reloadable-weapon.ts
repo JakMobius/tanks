@@ -115,7 +115,7 @@ export default class ReloadableWeapon extends Weapon {
 
         // TODO: костыль. Этим должен заниматься физ.движок
         tankBody.ApplyLinearImpulse(
-            new Box2D.Vec2(-vx * entity.mass, -vy * entity.mass),
+            new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
             new Box2D.Vec2(absoluteX, absoluteY)
         )
 

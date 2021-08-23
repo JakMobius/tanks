@@ -23,7 +23,10 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
     constructor() {
         super()
 
-        this.behaviour = new AirbagTankBehaviour(this, {})
+        this.behaviour = new AirbagTankBehaviour(this, {
+            power: 120000,
+            torque: 90000
+        })
     }
 
     static getMaximumHealth() {
@@ -31,12 +34,12 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
     }
 
     initPhysics(world: Box2D.World) {
-        let size = 9
 
-        let vertexArray = NastyTankModel.vertices.map(v => new Box2D.Vec2(v[0] * size, v[1] * size));
+        let vertexArray = NastyTankModel.vertices.map(v => new Box2D.Vec2(v[0] * 2.25, v[1] * 2.25));
 
         let bodyFixture = PhysicsUtils.vertexFixture(vertexArray, {
-            filter: physicsFilters.tank
+            filter: physicsFilters.tank,
+            density: 200
         })
 
         const body = PhysicsUtils.dynamicBody(world, {

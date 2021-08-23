@@ -19,7 +19,7 @@ export default class Shotgun extends ReloadableWeapon {
 
         config = Object.assign(config, {
             damage: 6,
-            radius: 60,
+            radius: 15,
             shootRate: 800,
             reloadTime: 4000,
             maxAmmo: 3,

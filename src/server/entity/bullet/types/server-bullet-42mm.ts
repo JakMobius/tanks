@@ -10,7 +10,7 @@ export default class ServerBullet42mm extends ServerBullet<BulletModel42mm> {
         super(options);
 
         this.wallDamage = 3000
-        this.startVelocity = 450
+        this.startVelocity = 112.5
         this.explodePower = 5
     }
 }

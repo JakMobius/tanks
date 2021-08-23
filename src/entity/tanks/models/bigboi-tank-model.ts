@@ -1,6 +1,6 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
-import TrackTankBehaviour from '../physics/track-tank-behaviour';
+import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
 
@@ -12,14 +12,17 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
         super();
 
         this.behaviour = new TrackTankBehaviour(this, {
-            enginePower: 18000000,
-            engineMaxTorque: 10000000,
-            trackLength: 15,
-            trackGrip: 1200000,
-            trackMaxBrakingTorque: 5000000,
-            trackIdleBrakingTorque: 300000,
-            wheelTensionLimit: 0.05,
-            axleWidth: 9
+            enginePower: 2000000,    // 2 mW = 2682 horsepower
+            engineMaxTorque: 600000, // 600 kN = 61.22 T
+            trackConfig: {
+                length: 3.75,
+                width: 2.25,
+                grip: 300000,
+                maxBrakingTorque: 240000,
+                idleBrakingTorque: 50000,
+                mass: 100
+            },
+            trackGauge: 4.5
         });
     }
     static getMaximumHealth() {
@@ -28,12 +31,12 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
 
     initPhysics(world: Box2D.World) {
 
-        let bodyFixtureDef = PhysicsUtils.squareFixture(9, 7.83, null, {
-            density: 60,
+        let bodyFixtureDef = PhysicsUtils.squareFixture(2.25, 1.9575, null, {
+            density: 1920,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(4.5, 9, new Box2D.Vec2(9, 0), {
-            density: 60,
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(1.125, 2.25, new Box2D.Vec2(2.25, 0), {
+            density: 1920,
             filter: physicsFilters.tank
         })
 

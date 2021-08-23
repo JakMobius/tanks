@@ -17,9 +17,9 @@ export default class WeaponStungun extends Weapon {
     constructor(config: WeaponStungunConfig) {
         super(config)
         this.damage = config.damage || 1.4 // Для каждой точки (то есть если точки две, то суммарный урон в два раза больше)
-        this.radius = config.radius || 50
+        this.radius = config.radius || 12.5
         this.squareRadius = this.radius ** 2
-        this.points = [[-7.5, 2], [7.5, 2]]
+        this.points = [[-1.875, 0.5], [1.875, 0.5]]
     }
 
     ready() {

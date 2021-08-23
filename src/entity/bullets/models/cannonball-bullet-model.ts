@@ -8,7 +8,7 @@ export default class BulletModelCannonball extends BulletModel {
     static typeName = 2
 
     initPhysics(world: Box2D.World) {
-        const bodyFixtureDef = PhysicsUtils.squareFixture(1.5, 1.5, null, {
+        const bodyFixtureDef = PhysicsUtils.squareFixture(0.375, 0.375, null, {
             density: 3,
             filter: physicsFilters.bullet
         })

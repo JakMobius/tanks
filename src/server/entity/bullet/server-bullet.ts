@@ -19,7 +19,6 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
 	public playerDamage: number;
 	public explodePower: number;
 	public lifeTime: number
-	public mass: number;
 	public startVelocity: number;
     public shooter: ServerPlayer = null
 
@@ -29,7 +28,6 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
         this.wallDamage = 0
         this.playerDamage = 0
         this.explodePower = 0
-        this.mass = 3
         this.startVelocity = 20
         this.lifeTime = 15
     }

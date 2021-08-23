@@ -18,7 +18,7 @@ export default class GameMap extends EventEmitter {
 	public needsUpdate: boolean;
 
 	static BinaryOptions: MapBinaryOptions = MapBinaryOptions.shared
-	static BLOCK_SIZE = 20;
+	static BLOCK_SIZE = 5;
 
 	data: BlockState[] = []
 	width: number = 0

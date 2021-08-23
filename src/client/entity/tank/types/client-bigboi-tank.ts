@@ -24,9 +24,9 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
 	public bodyLightMask: Sprite;
 	public truckSprite: Sprite;
 
-    static bodyQuadrangle   = squareQuadrangle(-9.00, -8.28, 18, 17.82)
-    static leftTrack        = squareQuadrangle(4.50,  -9.00, 9, 18.00)
-    static rightTrack       = squareQuadrangle(-13.50, -9.00, 9, 18.00)
+    static bodyQuadrangle   = squareQuadrangle(-2.25, -2.07, 4.5, 4.455)
+    static leftTrack        = squareQuadrangle(1.125,  -2.25, 2.25, 4.5)
+    static rightTrack       = squareQuadrangle(-3.375, -2.25, 2.25, 4.5)
 
     constructor(tank: ClientBigboiTank, ctx: WebGLRenderingContext) {
         super(tank, ctx);
@@ -55,8 +55,8 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
         transformQuadrangle(rightTrack, model.matrix)
         transformQuadrangle(bodyQuadrangle, model.matrix)
 
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.2)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.2)
+        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.85)
+        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.85)
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,

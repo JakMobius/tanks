@@ -1,6 +1,6 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
-import TrackTankBehaviour from '../physics/track-tank-behaviour';
+import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
 
@@ -12,15 +12,18 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
         super();
 
         this.behaviour = new TrackTankBehaviour(this, {
-            enginePower: 11000000,
-            engineMaxTorque: 10000000,
-            trackLength: 15,
-            trackGrip: 500000,
-            trackMaxBrakingTorque: 50000000,
-            trackIdleBrakingTorque: 100000,
-            wheelTensionLimit: 0.09,
-            axlesOffset: 2,
-            axleWidth: 7
+            enginePower: 900000,     // 0.9 mW = 1206 horsepower
+            engineMaxTorque: 200000, // 200 kN ~ 20 T
+            trackConfig: {
+                length: 3.75,
+                width: 1.15,
+                grip: 80000,
+                maxBrakingTorque: 90000,
+                idleBrakingTorque: 10000,
+                mass: 100,
+            },
+            trackOffset: 0.5,
+            trackGauge: 3.4
         });
     }
 
@@ -28,13 +31,13 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
 
         // Sniper is a tank. Tank should be massive
 
-        let bodyFixture = PhysicsUtils.squareFixture(4.5, 4.05, new Box2D.Vec2(0, 0), {
-            density: 30,
+        let bodyFixture = PhysicsUtils.squareFixture(1.125, 1.0125, new Box2D.Vec2(0, 0), {
+            density: 480,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 9, new Box2D.Vec2(-6.75, 1.8), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.5625, 2.25, new Box2D.Vec2(-1.6875, 0.45), {
             filter: physicsFilters.tank,
-            density: 30
+            density: 480
         })
 
         const body = PhysicsUtils.dynamicBody(world, {

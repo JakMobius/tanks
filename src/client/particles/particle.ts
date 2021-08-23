@@ -37,7 +37,7 @@ export default class Particle {
         this.dead = false
         this.lifetime = config.lifetime || 0.4
         this.lifespan = config.lifespan || 0
-        this.damping = config.damping || 0.99
+        this.damping = config.damping || 1
         this.color = config.color || new Color(0, 0, 0)
         this.width = config.width || 0
         this.height = config.height || 0
@@ -45,8 +45,9 @@ export default class Particle {
     }
 
     tick(dt: number) {
-        this.dx *= this.damping
-        this.dy *= this.damping
+        let coefficient = 1.0 / (1.0 + dt * this.damping)
+        this.dx *= coefficient
+        this.dy *= coefficient
         this.x += this.dx * dt
         this.y += this.dy * dt
         this.lifespan += dt

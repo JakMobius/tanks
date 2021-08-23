@@ -10,7 +10,7 @@ export default class WeaponMortar extends SingleBarreledWeapon {
 			shootRate: 1000,
 			reloadTime: 5000,
 			bulletType: MortarBall,
-			muzzlePoint: new Box2D.Vec2(0, 5),
+			muzzlePoint: new Box2D.Vec2(0, 1.25),
 			tank: config.tank,
 			triggerAxle: config.triggerAxle
 		});

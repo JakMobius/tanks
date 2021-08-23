@@ -55,13 +55,13 @@ export default class ExplodePoolDrawer {
                 for (let i = 0; i < 3; i++) {
 
                     let decoration = new ExplodeParticle({
-                        width: 2 + normalized * 8,
-                        height: 2 + normalized * 8,
+                        width: 0.5 + normalized * 2,
+                        height: 0.5 + normalized * 2,
                         x: walker.x + (Math.random() - 0.5) * pool.gridSize * 2,
                         y: walker.y + (Math.random() - 0.5) * pool.gridSize * 2,
                         dx: dx,
                         dy: dy,
-                        scaling: 1 + normalized / 2,
+                        scaling: 0.25 + normalized / 8,
                         lifetime: 0.6 - normalized / 2 + Math.random() * 0.3,
                         startOpacity: normalized / 2,
                         shifting: 1 - normalized * 2

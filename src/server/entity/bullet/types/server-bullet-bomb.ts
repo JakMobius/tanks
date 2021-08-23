@@ -7,7 +7,7 @@ export default class ServerBulletBomb extends ServerBullet<BulletModelBomb> {
     constructor(options: ServerBulletConfig<BulletModelBomb>) {
         super(options);
 
-        this.startVelocity = 200
+        this.startVelocity = 50
         this.explodePower = 5
         this.lifeTime = 5
     }

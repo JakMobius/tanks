@@ -69,10 +69,10 @@ export default class PlayerControls extends EventEmitter {
             .addSource(keyboard.createKeyAxle("ArrowDown").smooth().reverse())
 
         this.axles.get("tank-steer")
-            .addSource(keyboard.createKeyAxle("KeyD")      .smooth())
-            .addSource(keyboard.createKeyAxle("ArrowRight").smooth())
-            .addSource(keyboard.createKeyAxle("KeyA")      .smooth().reverse())
-            .addSource(keyboard.createKeyAxle("ArrowLeft") .smooth().reverse())
+            .addSource(keyboard.createKeyAxle("KeyD")      .smooth(0.4))
+            .addSource(keyboard.createKeyAxle("ArrowRight").smooth(0.4))
+            .addSource(keyboard.createKeyAxle("KeyA")      .smooth(0.4).reverse())
+            .addSource(keyboard.createKeyAxle("ArrowLeft") .smooth(0.4).reverse())
 
         this.axles.get("tank-miner")         .addSource(keyboard.createKeyAxle("KeyQ"))
         this.axles.get("tank-primary-weapon").addSource(keyboard.createKeyAxle("Space"))

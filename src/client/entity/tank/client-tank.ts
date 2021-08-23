@@ -59,15 +59,15 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
                 const color = new Color(gray, gray, gray)
 
                 const position = this.model.getBody().GetPosition()
-                const velocityX = this.model.matrix.transformX(0, -5, 0)
-                const velocityY = this.model.matrix.transformY(0, -5, 0)
+                const velocityX = this.model.matrix.transformX(0, -2, 0)
+                const velocityY = this.model.matrix.transformY(0, -2, 0)
 
                 const smoke = new Smoke({
                     x: position.x,
                     y: position.y,
-                    dx: (velocityX + Math.random() - 0.5) * 10,
-                    dy: (velocityY + Math.random() - 0.5) * 10,
-                    scaling: 10,
+                    dx: (velocityX + Math.random() - 0.5) * 5,
+                    dy: (velocityY + Math.random() - 0.5) * 5,
+                    scaling: 2.5,
                     color: color
                 })
 

@@ -6,7 +6,6 @@ import FX from 'src/client/sound/fx';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
-import {TankStat} from "../tank-stat";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {
     squareQuadrangle,
@@ -18,13 +17,13 @@ import {
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
-    static bodyQuadrangle           = squareQuadrangle(-8.64, -11.88, 17.28, 23.76)
-    static leftPropellerQuadrangle  = squareQuadrangle(-6.93, -9.54,  5.34,  0.72)
-    static rightPropellerQuadrangle = squareQuadrangle(1.53,  -9.54,  5.34,  0.72)
-    static ruderQuadrangle          = squareQuadrangle(-0.54, -3.96,  1.08,  4.5)
+    static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
+    static leftPropellerQuadrangle  = squareQuadrangle(-1.7325,-2.385,1.335,0.18)
+    static rightPropellerQuadrangle = squareQuadrangle(0.3825, -2.385, 1.335, 0.18)
+    static ruderQuadrangle          = squareQuadrangle(-0.135, -0.99, 0.27, 1.125)
 
-    static ruderXOffset = 4.14
-    static ruderYOffset = -10.89
+    static ruderXOffset = 1.035
+    static ruderYOffset = -2.7225
 
     static propellerSpriteCount = 4
 

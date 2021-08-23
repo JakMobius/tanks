@@ -8,7 +8,7 @@ class Drawer extends BasicEntityDrawer {
     static spriteNames = ["bullets/bomb/bomb"]
 
     draw(phase: DrawPhase) {
-        this.drawSprite(Drawer.getSprite(0), 18, 18, phase)
+        this.drawSprite(Drawer.getSprite(0), 0.75, 0.75, phase)
     }
 }
 

@@ -11,7 +11,7 @@ export default class WeaponCannon extends SingleBarreledWeapon {
 			shootRate: 2000,
 			reloadTime: 7000,
 			bulletType: CannonBall,
-			muzzlePoint: new Box2D.Vec2(0, 10),
+			muzzlePoint: new Box2D.Vec2(0, 2.5),
 			tank: config.tank,
 			triggerAxle: config.triggerAxle
 		})

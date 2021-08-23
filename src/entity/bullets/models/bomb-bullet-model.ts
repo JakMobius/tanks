@@ -16,7 +16,7 @@ export default class BulletModelBomb extends BulletModel {
     initPhysics(world: Box2D.World) {
 
         const shape = new Box2D.CircleShape()
-        shape.Set(new Box2D.Vec2(0, 0), 1.5)
+        shape.Set(new Box2D.Vec2(0, 0), 0.375)
         let bodyFixture = PhysicsUtils.createFixture(shape, {
             density: 3,
             filter: physicsFilters.bullet,
@@ -47,7 +47,7 @@ BinarySerializer.register(BulletModelBomb)
 // 	explodes: false,
 // 	size: 2,
 // 	lifetime: 3,
-// 	friction: 20,
+// 	grip: 20,
 // 	id: 1
 
 

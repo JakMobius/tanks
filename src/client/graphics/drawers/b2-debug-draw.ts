@@ -11,7 +11,7 @@ export default class B2DebugDraw extends Box2D.Draw {
     private drawPhase: DrawPhase;
     private transform = new Matrix3()
 
-    public thickness = 1
+    public thickness = 0.25
     public fillAlpha = 0.5
     public strokeAlpha = 0.8
 

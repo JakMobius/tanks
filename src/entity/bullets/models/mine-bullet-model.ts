@@ -9,7 +9,7 @@ export default class BulletModelMine extends BulletModel {
     static typeName = 7
 
     initPhysics(world: Box2D.World) {
-        let bodyFixture = PhysicsUtils.squareFixture(5, 5, null, {
+        let bodyFixture = PhysicsUtils.squareFixture(1.25, 1.25, null, {
             filter: physicsFilters.mine,
             isSensor: true
         })

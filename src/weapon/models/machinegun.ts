@@ -19,9 +19,9 @@ export default class WeaponMachineGun extends ReloadableWeapon {
 	}
 
 	shoot() {
-		const shift = (this.state === 0) ? -1.4 : 1.4;
+		const shift = (this.state === 0) ? -0.35 : 0.35;
 
-		this.launchBullet(new Bullet16mm(), shift, 10)
+		this.launchBullet(new Bullet16mm(), shift, 2.5)
 
 		this.state = 1 - this.state
 

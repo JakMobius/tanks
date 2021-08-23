@@ -8,7 +8,7 @@ import B2DebugDraw from "./b2-debug-draw";
 import {b2DrawFlags} from "../../../library/box2d/common/b2_draw";
 import ClientTank from "../../entity/tank/client-tank";
 import TankModel from "../../../entity/tanks/tank-model";
-import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank-behaviour";
+import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
 
 export default class MapDebugDrawer {
@@ -22,8 +22,9 @@ export default class MapDebugDrawer {
     static meshVertexColor = 0xFF00DD00
     static wheelColor = 0xAAFF00FF
     static slidingWheelColor = 0xAAFF0000
-    static vertexSize = 1.5
-    static meshStrokeThickness = 1;
+    static vertexSize = 0.375
+    static meshStrokeThickness = 0.25;
+    static wheelSize = 0.25
     private b2DebugDraw: B2DebugDraw;
 
     constructor(drawPhase: DrawPhase) {
@@ -120,9 +121,10 @@ export default class MapDebugDrawer {
             let wheels = behaviour.wheels
 
             let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
+            let wheelSize = MapDebugDrawer.wheelSize
 
             for(let wheel of wheels) {
-                let wheelQuadrangle = squareQuadrangle(-0.5, -0.5, 1, 1)
+                let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
 
                 turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
                 translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)

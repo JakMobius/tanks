@@ -39,14 +39,14 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 
         let world = this.tank.getWorld()
 
-        const particlePositionX = tank.model.matrix.transformX(0, 10)
-        const particlePositionY = tank.model.matrix.transformY(0, 10)
+        const particlePositionX = tank.model.matrix.transformX(0, 2.5)
+        const particlePositionY = tank.model.matrix.transformY(0, 2.5)
 
         while(this.queue > 0) {
             const heading = -angle + (Math.random() - 0.5) * Math.PI / 4;
             const sin = Math.sin(heading);
             const cos = Math.cos(heading);
-            const vel = 240 + Math.random() * 20;
+            const vel = 60 + Math.random() * 5;
             const dist = Math.random() * 6;
 
             const smoke = new FireParticle({
@@ -54,9 +54,9 @@ export default class ClientTankFireEffect extends ClientTankEffect {
                 y: particlePositionY + cos * dist,
                 dx: velocity.x + sin * vel,
                 dy: velocity.y + cos * vel,
-                width: 4,
-                height: 4,
-                scaling: 1.5,
+                width: 1,
+                height: 1,
+                scaling: 0.375,
                 lifetime: 0.4 + Math.random() * 0.1,
             });
             world.particles.push(smoke)

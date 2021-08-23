@@ -1,7 +1,7 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physicsutils';
 import * as Box2D from '../../../library/box2d';
-import BasicTankBehaviour from '../physics/track-tank-behaviour';
+import BasicTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
 
 export default class TeslaTankModel extends TankModel {
@@ -13,7 +13,14 @@ export default class TeslaTankModel extends TankModel {
         super()
 
         new BasicTankBehaviour(this, {
-            enginePower: 20000
+            engineMaxTorque: 30000,
+            enginePower: 30000,
+            trackConfig: {
+                length: 3.75,
+                grip: 30000,
+                mass: 100
+            },
+            trackGauge: 3.75
         })
     }
 
@@ -22,14 +29,11 @@ export default class TeslaTankModel extends TankModel {
     }
 
     initPhysics(world: Box2D.World) {
-        let size = 9
-        
-        const segment = size / 4
 
-        const bodyFixture = PhysicsUtils.squareFixture(size / 2, size * 0.8, null, {
+        const bodyFixture = PhysicsUtils.squareFixture(1.125, 1.8, null, {
             filter: physicsFilters.tank
         })
-        const trackFixtures = PhysicsUtils.horizontalSquareFixtures(segment, size, new Box2D.Vec2(size / 2 + segment, 0), {
+        const trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.5625, 2.25, new Box2D.Vec2(1.6875, 0), {
             filter: physicsFilters.tank
         })
 

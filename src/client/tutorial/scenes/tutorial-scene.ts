@@ -25,7 +25,6 @@ export default class TutorialScene extends Scene {
     public gamepad = new GamepadManager();
     public touchController: TouchController;
     public playerControls: PlayerControls;
-    public timer: number;
     public game: EmbeddedServerGame
     public worldDrawer: WorldDrawer
     public worldController: TutorialWorldController
@@ -34,7 +33,7 @@ export default class TutorialScene extends Scene {
         super(config)
 
         this.camera = new Camera({
-            baseScale: 3,
+            baseScale: 12,
             viewport: new Box2D.Vec2(this.screen.width, this.screen.height),
             defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
@@ -83,10 +82,6 @@ export default class TutorialScene extends Scene {
     layout() {
         this.camera.viewport.x = this.screen.width
         this.camera.viewport.y = this.screen.height
-    }
-
-    pause() {
-        cancelAnimationFrame(this.timer)
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {

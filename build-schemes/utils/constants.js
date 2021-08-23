@@ -27,7 +27,10 @@ const clientCompilerConfig = {
     "babelPlugins": bundlerBabelPlugins,
     "cacheSection": "with-external-modules",
     "babelPresets": [
-        ['@babel/preset-env', { "loose": false }]
+        ['@babel/preset-env', {
+            "targets": "chrome 80, firefox 80, safari 12, ios 12, android 81",
+            "loose": false
+        }]
     ]
 }
 

@@ -44,11 +44,11 @@ export default class TutorialWorldController {
     }
 
     private createDummies() {
-        this.createTank(BigBoiTankModel, 200, 820, 0)
-        this.createTank(NastyTankModel, 260, 820, 0)
-        this.createTank(SniperTankModel, 320, 800, 0)
-        this.createTank(BomberTankModel, 380, 820, 0)
-        this.createTank(MonsterTankModel, 120, 820, 0)
+        this.createTank(BigBoiTankModel, 50, 205, 0)
+        this.createTank(NastyTankModel, 65, 205, 0)
+        this.createTank(SniperTankModel, 80, 200, 0)
+        this.createTank(BomberTankModel, 95, 205, 0)
+        this.createTank(MonsterTankModel, 30, 205, 0)
     }
 
     private onPlayerCreate(player: ServerPlayer) {
@@ -79,7 +79,7 @@ export default class TutorialWorldController {
 
         model.setHealth((model.constructor as typeof TankModel).getMaximumHealth())
 
-        tank.teleport(70, 850)
+        tank.teleport(17.5, 212.5)
         tank.setVelocity(0, 0)
         body.SetAngle(4)
         body.SetAngularVelocity(0)

@@ -38,6 +38,7 @@ export default class FireParticle extends Particle {
 
     tick(dt: number) {
         super.tick(dt)
+        if(this.dead) return
         let fraction = this.lifespan / this.lifetime
         let r, g, b, a, c1, c2
         let colors = this.colors

@@ -53,7 +53,7 @@ export default class GameScene extends Scene {
         this.controlsUpdateInterval = 0.1 // seconds
 
         this.camera = new Camera({
-            baseScale: 3,
+            baseScale: 12,
             viewport: new Box2D.Vec2(this.screen.width, this.screen.height),
             defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
