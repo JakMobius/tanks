@@ -2,7 +2,7 @@
 import Axle from '../../controls/axle';
 import GamepadManager from "./interact/gamepadmanager";
 
-class GamepadAxle extends Axle {
+export default class GamepadAxle extends Axle {
 	public axle: number;
 	public controller: GamepadManager;
 	public power: number;
@@ -32,5 +32,3 @@ class GamepadAxle extends Axle {
         return this.inverted ? -this.value : this.value
     }
 }
-
-export default GamepadAxle;

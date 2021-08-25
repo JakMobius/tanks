@@ -32,8 +32,8 @@ class TankControls implements BinaryEncodable {
             return true
         }
 
-        if (this.axles.get("primary-weapon").needsUpdate()) return true
-        return !!this.axles.get("miner").needsUpdate();
+        if (this.axles.get("primary-weapon").needsUpdate) return true
+        return !!this.axles.get("miner").needsUpdate;
     }
 
     getThrottle() {
@@ -41,7 +41,7 @@ class TankControls implements BinaryEncodable {
             return 0
         }
 
-        if (this.axles.get("y").needsUpdate()) {
+        if (this.axles.get("y").needsUpdate) {
             this.updateAxes()
         }
         return this.throttle
@@ -52,7 +52,7 @@ class TankControls implements BinaryEncodable {
             return 0
         }
 
-        if (this.axles.get("x").needsUpdate()) {
+        if (this.axles.get("x").needsUpdate) {
             this.updateAxes()
         }
         return this.steer
@@ -73,7 +73,7 @@ class TankControls implements BinaryEncodable {
 
         let axle = this.getPrimaryWeaponAxle()
 
-        if (axle.needsUpdate()) {
+        if (axle.needsUpdate) {
             this.primaryWeaponActive = axle.getValue() > 0.5
         }
 
@@ -87,7 +87,7 @@ class TankControls implements BinaryEncodable {
 
         let axle = this.getMinerWeaponAxle()
 
-        if (axle.needsUpdate()) {
+        if (axle.needsUpdate) {
             this.minerActive = axle.getValue() > 0.5
         }
 

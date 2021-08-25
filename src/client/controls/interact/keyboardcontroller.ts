@@ -2,7 +2,7 @@
 import DocumentEventHandler from './documenteventhandler';
 import KeyAxle from '../keyaxle';
 
-class KeyboardController extends DocumentEventHandler {
+export default class KeyboardController extends DocumentEventHandler {
 	public keybindings: any;
 	public isMacOS: any;
 
@@ -77,5 +77,3 @@ class KeyboardController extends DocumentEventHandler {
         return new KeyAxle(this, key, min, max)
     }
 }
-
-export default KeyboardController;

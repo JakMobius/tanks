@@ -1,18 +1,10 @@
 
-class Axle {
-	public sources: any;
-	public ownValue: any;
-	public value: any;
-	public destinations: any;
-	public update: any;
-
-    constructor() {
-        this.sources = new Set<Axle>()
-        this.ownValue = 0
-        this.value = 0
-        this.destinations = new Set<Axle>()
-        this.update = false
-    }
+export default class Axle {
+	public sources = new Set<Axle>();
+	public ownValue: number = 0;
+	public value: number = 0;
+	public destinations = new Set<Axle>();
+	public needsUpdate: boolean = false;
 
     addSource(source: Axle) {
         this.sources.add(source)
@@ -39,16 +31,15 @@ class Axle {
     }
 
     getValue() {
-        if (this.update) {
-            this.update = false
+        if (this.needsUpdate) {
+            this.needsUpdate = false
             let result = this.ownValue
             for (let source of this.sources.values()) result += source.getValue()
             this.value = result
-            return result
-        } else {
-            return this.value
         }
+        return this.value
     }
+
 
     setValue(value: number) {
         this.ownValue = value
@@ -56,14 +47,9 @@ class Axle {
     }
 
     setNeedsUpdate() {
-        this.update = true
-        for(let destination of this.destinations.values())
+        this.needsUpdate = true
+        for(let destination of this.destinations.values()) {
             destination.setNeedsUpdate()
-    }
-
-    needsUpdate() {
-        return this.update
+        }
     }
 }
-
-export default Axle;

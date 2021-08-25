@@ -56,7 +56,7 @@ export default class ButtonAxle extends Axle {
         if(this.animationTime <= 0) {
             this.ownValue = this.keyPressed ? this.max : this.min
         }
-        this.update = false
+        this.needsUpdate = false
         let now = Date.now()
         let dt = (now - this.keypressTimestamp) / 1000
         this.keypressTimestamp = now

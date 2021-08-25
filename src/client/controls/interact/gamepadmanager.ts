@@ -5,16 +5,16 @@ import GamepadButton from '../gamepadbutton';
 
 navigator.getGamepads = navigator.getGamepads || (navigator as any)["webkitGetGamepads"]
 
-class GamepadManager extends DocumentEventHandler {
-	public gamepad: any;
-	public axises: any;
-	public buttons: any;
+export default class GamepadManager extends DocumentEventHandler {
+	public gamepad: number;
+	public axes: number[];
+	public buttons: number[];
 
     constructor() {
         super();
 
         this.gamepad = null
-        this.axises = []
+        this.axes = []
         this.buttons = []
         this.target = window
     }
@@ -38,9 +38,9 @@ class GamepadManager extends DocumentEventHandler {
         }
 
         for(let [i, axis] of navigator.getGamepads()[this.gamepad].axes.entries()) {
-            if(this.axises[i] !== axis) {
+            if(this.axes[i] !== axis) {
                 this.emit("axle", i, axis)
-                this.axises[i] = axis
+                this.axes[i] = axis
             }
         }
     }
@@ -50,7 +50,7 @@ class GamepadManager extends DocumentEventHandler {
             return
         }
         this.gamepad = event.gamepad.index
-        this.axises = new Array(navigator.getGamepads()[this.gamepad].axes.length)
+        this.axes = new Array(navigator.getGamepads()[this.gamepad].axes.length)
     }
 
     gamepadDisconnected(event: GamepadEvent) {
@@ -67,5 +67,3 @@ class GamepadManager extends DocumentEventHandler {
         return new GamepadButton(this, index)
     }
 }
-
-export default GamepadManager;

@@ -4,24 +4,33 @@ import EventEmitter from '../../utils/eventemitter';
 import TankControls from "../../controls/tankcontrols";
 import GamepadManager from "./interact/gamepadmanager";
 import KeyboardController from "./interact/keyboardcontroller";
+import CallbackActivatorAxle, {AxleCallback} from "./callback-activator-axle";
 
 export default class PlayerControls extends EventEmitter {
-	public axles: Map<string, Axle>;
-	public respawning: boolean;
+	public axles = new Map<string, Axle>();
+	public axlesToUpdate: CallbackActivatorAxle[] = []
     private controlledTanks = new Set<TankControls>()
+    private readonly axleUpdateCallback: AxleCallback = (axle) => this.axlesToUpdate.push(axle)
 
     constructor() {
         super()
 
-        this.axles = new Map()
         this.createAxle("tank-throttle")
         this.createAxle("tank-steer")
         this.createAxle("tank-primary-weapon")
         this.createAxle("tank-miner")
 
-        this.createAxle("tank-respawn")
+        this.createActivatorAxle("tank-respawn", () => this.emit("respawn"))
+        this.createActivatorAxle("game-pause", () => this.emit("pause"))
+        this.createActivatorAxle("game-player-list",
+            () => this.emit("player-list-open"),
+            () => this.emit("player-list-close")
+        )
+    }
 
-        this.respawning = true
+    createActivatorAxle(name: string, onActivate?: () => void, onDeactivate?: () => void) {
+	    let axle = new CallbackActivatorAxle(this.axleUpdateCallback, onActivate, onDeactivate)
+        this.axles.set(name, axle)
     }
 
     createAxle(name: string) {
@@ -77,16 +86,19 @@ export default class PlayerControls extends EventEmitter {
         this.axles.get("tank-miner")         .addSource(keyboard.createKeyAxle("KeyQ"))
         this.axles.get("tank-primary-weapon").addSource(keyboard.createKeyAxle("Space"))
         this.axles.get("tank-respawn")       .addSource(keyboard.createKeyAxle("KeyR"))
+        this.axles.get("game-pause")         .addSource(keyboard.createKeyAxle("Escape"))
     }
 
     refresh() {
-        if(this.axles.get("tank-respawn").getValue() > 0.5) {
-            if(!this.respawning) {
-                this.respawning = true
-                this.emit("respawn")
-            }
-        } else {
-            this.respawning = false
+	    if(this.axlesToUpdate.length) {
+	        // When calling getValue(), key axles may call their
+            // setNeedsUpdate method immediately, which will
+            // cause axlesToUpdate array to grow indefinitely.
+            // So we copy this array and creating a new one to
+            // store subsequent axles
+	        let axlesToUpdate = this.axlesToUpdate
+            this.axlesToUpdate = []
+            for (let axle of axlesToUpdate) axle.getValue()
         }
     }
 }

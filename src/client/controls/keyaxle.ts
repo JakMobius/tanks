@@ -2,7 +2,7 @@
 import ButtonAxle from './buttonaxle';
 import KeyboardController from "./interact/keyboardcontroller";
 
-class KeyAxle extends ButtonAxle {
+export default class KeyAxle extends ButtonAxle {
 	public key: any;
 
     constructor(keyboard: KeyboardController, key: string, min: number, max: number) {
@@ -17,5 +17,3 @@ class KeyAxle extends ButtonAxle {
         })
     }
 }
-
-export default KeyAxle;
