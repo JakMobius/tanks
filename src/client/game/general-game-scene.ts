@@ -23,7 +23,7 @@ export default class GeneralGameScene extends Scene {
 
     public eventContainer: EventContainer;
     public chatContainer: ChatContainer;
-    public world: ClientGameWorld
+    public displayedWorld: ClientGameWorld
     public worldDrawer: WorldDrawer
 
     public paused: boolean = false
@@ -72,7 +72,7 @@ export default class GeneralGameScene extends Scene {
         this.overlayContainer.append(this.chatContainer.element)
 
         this.keyboard.keybinding("Enter", () => {
-            if(this.world && this.world.player) {
+            if(this.displayedWorld && this.displayedWorld.player) {
                 this.chatContainer.showInput()
             }
         })
@@ -91,17 +91,17 @@ export default class GeneralGameScene extends Scene {
         })
     }
 
-    setWorld(world: ClientGameWorld) {
-        if(this.world) throw new Error("Game world cannot be changed after it's been set once")
-        this.world = world
+    displayWorld(world: ClientGameWorld) {
+        if(this.displayedWorld) throw new Error("Scene world cannot be changed after it's been set once")
+        this.displayedWorld = world
         this.worldDrawer.setWorld(world)
 
-        this.world.on("map-change", () => {
-            this.camera.defaultPosition.x = this.world.map.width / 2 * GameMap.BLOCK_SIZE
-            this.camera.defaultPosition.y = this.world.map.height / 2 * GameMap.BLOCK_SIZE
+        this.displayedWorld.on("map-change", () => {
+            this.camera.defaultPosition.x = this.displayedWorld.map.width / 2 * GameMap.BLOCK_SIZE
+            this.camera.defaultPosition.y = this.displayedWorld.map.height / 2 * GameMap.BLOCK_SIZE
         })
 
-        this.world.on("primary-player-set", (player: ClientPlayer) => {
+        this.displayedWorld.on("primary-player-set", (player: ClientPlayer) => {
             this.onWorldPrimaryPlayerSet(player)
         })
     }
@@ -119,11 +119,14 @@ export default class GeneralGameScene extends Scene {
 
         this.screen.clear()
 
-        if(!this.world) return
+        if(!this.displayedWorld) return
 
-        this.camera.tick(dt)
+        this.tick(dt)
         this.worldDrawer.draw(dt)
-        this.world.tick(dt)
+    }
+
+    tick(dt: number) {
+        this.camera.tick(dt)
     }
 
     protected onWorldPrimaryPlayerSet(player: ClientPlayer) {

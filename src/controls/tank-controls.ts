@@ -4,7 +4,7 @@ import BinaryDecoder from "../serialization/binary/binary-decoder";
 import BinaryEncoder from 'src/serialization/binary/binary-encoder';
 import TankModel from "../entity/tanks/tank-model";
 
-class TankControls implements BinaryEncodable {
+export default class TankControls implements BinaryEncodable {
 	public tank: TankModel | undefined;
 	public throttle = 0
 	public steer = 0;
@@ -12,7 +12,7 @@ class TankControls implements BinaryEncodable {
 	public primaryWeaponActive: boolean = false;
 	public minerActive: boolean = false;
 	public updated: boolean = false;
-	public directional: boolean = true;
+	public directional: boolean = false;
     public localControllers: number = 0
 
     constructor(tank?: TankModel) {
@@ -31,7 +31,7 @@ class TankControls implements BinaryEncodable {
         }
 
         if (this.axles.get("primary-weapon").needsUpdate) return true
-        return !!this.axles.get("miner").needsUpdate;
+        return this.axles.get("miner").needsUpdate;
     }
 
     getThrottle() {
@@ -99,8 +99,8 @@ class TankControls implements BinaryEncodable {
         this.updated = true
 
         if (this.directional) {
-            this.steer = this.tank.matrix.transformX(x, y)
-            this.throttle = this.tank.matrix.transformY(x, y)
+            this.steer = this.tank.matrix.transformX(x, y, 0)
+            this.throttle = this.tank.matrix.transformY(x, y, 0)
         } else {
             this.throttle = y
             this.steer = x
@@ -133,5 +133,3 @@ class TankControls implements BinaryEncodable {
         encoder.writeUint8(weapons)
     }
 }
-
-export default TankControls;

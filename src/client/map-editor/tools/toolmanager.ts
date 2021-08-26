@@ -7,7 +7,7 @@ import BlockState from "../../../map/block-state/block-state";
 import SceneScreen from "../../graphics/scene-screen";
 import EditorWorld from "../editor-world";
 
-class ToolManager extends DocumentEventHandler {
+export default class ToolManager extends DocumentEventHandler {
 
     camera: Camera = null
     canvas: HTMLCanvasElement = null
@@ -120,5 +120,3 @@ class ToolManager extends DocumentEventHandler {
     }
 
 }
-
-export default ToolManager;

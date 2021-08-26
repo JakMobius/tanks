@@ -20,7 +20,7 @@ export default class TankModel<BehaviourClass extends TankBehaviour = any> exten
     controls: TankControls = null
 
     /**
-     * Transition matrix from tank space to world space
+     * Transition matrix from tank space to the world space
      */
     matrix: Matrix3 = new Matrix3()
 

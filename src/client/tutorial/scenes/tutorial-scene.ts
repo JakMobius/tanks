@@ -19,7 +19,7 @@ export default class TutorialScene extends GeneralGameScene {
         super(config)
 
         this.game = new EmbeddedServerGame({ map: getTutorialMap() })
-        this.setWorld(this.game.clientWorld)
+        this.displayWorld(this.game.clientWorld)
 
         this.worldController = new TutorialWorldController(this.game.serverGame)
 
@@ -42,8 +42,13 @@ export default class TutorialScene extends GeneralGameScene {
         //this.game.client.dataHandler = latencyImitator
     //}
 
+    tick(dt: number) {
+        super.tick(dt)
+        this.game.tick(dt)
+    }
+
     performClientCommand(command: string) {
-        new PlayerChatPacket(command).sendTo(this.game.client.connection)
+        new PlayerChatPacket(command).sendTo(this.game.clientConnection.connection)
     }
 
     onWorldPrimaryPlayerSet(player: ClientPlayer) {

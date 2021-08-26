@@ -13,15 +13,11 @@ export class EmbeddedServerGameConfig {
 }
 
 export default class EmbeddedServerGame {
-    client: ConnectionClient<Connection>
-    server: ConnectionClient<Connection>
-
+    clientConnection: ConnectionClient<Connection>
     clientWorld: ClientGameWorld
     serverGame: Game
 
     serverLoop = new AdapterLoop()
-
-    // TODO: there is way too much stuff happening in the constructor
 
     constructor(config: EmbeddedServerGameConfig) {
         const map = config.map
@@ -40,14 +36,14 @@ export default class EmbeddedServerGame {
         })
 
         const clientConnection = new LocalConnection()
-        this.client = new ConnectionClient(clientConnection)
-        ClientWorldBridge.buildBridge(this.client, this.clientWorld)
+        this.clientConnection = new ConnectionClient(clientConnection)
+        ClientWorldBridge.buildBridge(this.clientConnection, this.clientWorld)
     }
 
     connectClientToServer() {
 
         const serverConnection = new LocalConnection()
-        Connection.pipeReversed(this.client.connection, serverConnection)
+        Connection.pipeReversed(this.clientConnection.connection, serverConnection)
 
         this.serverGame.portal.clientConnected(new SocketPortalClient({
             connection: serverConnection,

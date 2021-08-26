@@ -34,9 +34,9 @@ export default class GameScene extends GeneralGameScene {
         this.setupUpdateLoop()
         this.initOverlay()
         this.setupPacketHandling()
-        this.setWorld(new ClientGameWorld())
+        this.displayWorld(new ClientGameWorld())
 
-        ClientWorldBridge.buildBridge(this.client, this.world)
+        ClientWorldBridge.buildBridge(this.client, this.displayedWorld)
 
         this.overlay.show()
     }
@@ -48,9 +48,9 @@ export default class GameScene extends GeneralGameScene {
         })
 
         this.overlay.on("play", (nick: string, tank: ClientTankType) => {
-            if(this.world && this.world.player) {
+            if(this.displayedWorld && this.displayedWorld.player) {
                 let newTankId = tank.Model.getId()
-                let oldTankId = (this.world.player.tank.model.constructor as typeof TankModel).getId()
+                let oldTankId = (this.displayedWorld.player.tank.model.constructor as typeof TankModel).getId()
                 if(newTankId === oldTankId) return
             }
 
@@ -62,7 +62,7 @@ export default class GameScene extends GeneralGameScene {
         })
 
         this.keyboard.keybinding("Escape", () => {
-            if(this.world && this.world.player) {
+            if(this.displayedWorld && this.displayedWorld.player) {
                 if (this.overlay.shown) {
                     this.overlay.hide()
                 } else {
@@ -75,8 +75,8 @@ export default class GameScene extends GeneralGameScene {
     private setupUpdateLoop() {
         const update = () => {
             this.screen.loop.scheduleTask(update, this.controlsUpdateInterval)
-            if(this.world && this.world.player && this.world.player.tank.model.controls.shouldUpdate()) {
-                new PlayerControlsPacket(this.world.player.tank.model.controls).sendTo(this.client.connection)
+            if(this.displayedWorld && this.displayedWorld.player && this.displayedWorld.player.tank.model.controls.shouldUpdate()) {
+                new PlayerControlsPacket(this.displayedWorld.player.tank.model.controls).sendTo(this.client.connection)
             }
         }
 
@@ -112,6 +112,11 @@ export default class GameScene extends GeneralGameScene {
         } else {
             new PlayerChatPacket(text).sendTo(this.client.connection)
         }
+    }
+
+    tick(dt: number) {
+        super.tick(dt)
+        this.displayedWorld.tick(dt)
     }
 
     private handleCommand(text: string) {
