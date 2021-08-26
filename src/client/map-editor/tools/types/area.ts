@@ -1,12 +1,12 @@
 
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import KeyboardController from '../../../controls/interact/keyboardcontroller';
+import KeyboardController from '../../../controls/interact/keyboard-controller';
 import MapDrawer from '../../../graphics/drawers/map-drawer';
-import EditorMap from '../../editormap';
-import MapAreaModification from '../../history/modification/mapareamodification';
+import EditorMap from '../../editor-map';
+import MapAreaModification from '../../history/modification/map-area-modification';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../map/blockstate/blockstate";
+import BlockState from "../../../../map/block-state/block-state";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 
 export default class AreaTool extends Tool {

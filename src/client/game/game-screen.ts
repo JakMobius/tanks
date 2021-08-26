@@ -1,6 +1,6 @@
 /* @load-resource: '../web/base-style.scss' */
 
-import GameScene from './scenes/gamescene';
+import GameScene from './scenes/game-scene';
 import './game-loader'
 
 import {ScreenConfig} from "../graphics/screen";
@@ -14,7 +14,7 @@ import 'src/client/entity/tank/model-loader';
 import 'src/client/graphics/drawers/block/type-loader';
 import 'src/client/effects/tank/type-loader';
 import 'src/client/effects/world/type-loader';
-import 'src/map/blockstate/type-loader';
+import 'src/map/block-state/type-loader';
 import WebsocketConnection from "../networking/websocket-connection";
 import ConnectionClient from "../../networking/connection-client";
 

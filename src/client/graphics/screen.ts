@@ -1,7 +1,7 @@
 
 import "../animation-frame-polyfill"
-import SoundEngine from "../sound/soundengine";
-import CanvasFactory from '../utils/canvasfactory'
+import SoundEngine from "../sound/sound-engine";
+import CanvasFactory from '../utils/canvas-factory'
 import Sprite from "../sprite";
 
 export interface ScreenConfig {

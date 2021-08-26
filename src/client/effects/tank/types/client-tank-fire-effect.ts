@@ -1,6 +1,6 @@
 
 // const FX = require("../../sound/fx")
-import FireParticle from '../../../particles/fireparticle';
+import FireParticle from '../../../particles/fire-particle';
 
 import ClientTankEffect from 'src/client/effects/tank/client-tank-effect';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';

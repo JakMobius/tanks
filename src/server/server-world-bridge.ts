@@ -11,8 +11,8 @@ import BlockUpdatePacket from "../networking/packets/game-packets/block-update-p
 import PlayerJoinPacket from "../networking/packets/game-packets/player-join-packet";
 import PlayerLeavePacket from "../networking/packets/game-packets/player-leave-packet";
 import MapPacket from "../networking/packets/game-packets/map-packet";
-import ServerEntity from "./entity/serverentity";
-import ServerEffect from "./effects/servereffect";
+import ServerEntity from "./entity/server-entity";
+import ServerEffect from "./effects/server-effect";
 import ServerGameWorld from "./server-game-world";
 import RoomPortal from "./room-portal";
 import ServerPlayer from "./server-player";

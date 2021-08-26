@@ -1,7 +1,7 @@
 
 /* @load-resource: '../web/base-style.scss' */
 
-import LoadingScene from '../scenes/loading/loadingscene';
+import LoadingScene from '../scenes/loading/loading-scene';
 import Sprite from '../sprite';
 
 import './game-loader'

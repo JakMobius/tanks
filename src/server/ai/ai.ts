@@ -1,6 +1,6 @@
 import Server from "../server";
 import ServerGameWorld from "../server-game-world";
-import ServerTank from "../entity/tank/servertank";
+import ServerTank from "../entity/tank/server-tank";
 
 
 export interface AIConfig {

@@ -1,6 +1,6 @@
 /* @load-resource: './drag-overlay.scss' */
 
-import DocumentEventHandler from '../../../controls/interact/documenteventhandler';
+import DocumentEventHandler from '../../../controls/interact/document-event-handler';
 
 class DragOverlay extends DocumentEventHandler {
 	public root: JQuery;

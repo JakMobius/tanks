@@ -2,10 +2,10 @@
 
 import Menu from '../../../../../ui/menu/menu';
 
-import MapStorage from '../../../../mapstorage';
+import MapStorage from '../../../../map-storage';
 import DragListener from '../../../element/dragoverlay';
 import {trimFileExtension} from '../../../../../../utils/utils';
-import EditorMap from "../../../../editormap";
+import EditorMap from "../../../../editor-map";
 
 class MapSelectContainer extends Menu {
 	public noMapsLabel: JQuery;

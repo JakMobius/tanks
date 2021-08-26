@@ -1,8 +1,8 @@
 
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 
 /**
  * This packet is sent when player wants to join the room

@@ -1,12 +1,12 @@
 
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
 import ServerWorldEffect from 'src/server/effects/world/server-world-effect';
-import ServerEntity from '../serverentity';
+import ServerEntity from '../server-entity';
 import BulletModel from "../../../entity/bullets/bullet-model";
 import ServerPlayer from "../../server-player";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import * as Box2D from 'src/library/box2d'
-import ServerTank from "../tank/servertank";
+import ServerTank from "../tank/server-tank";
 
 export interface ServerBulletConfig<ModelClass extends BulletModel> {
     model: ModelClass

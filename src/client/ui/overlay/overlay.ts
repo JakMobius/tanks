@@ -1,6 +1,6 @@
 /* @load-resource: './overlay.scss' */
 
-import EventEmitter from '../../../utils/eventemitter';
+import EventEmitter from '../../../utils/event-emitter';
 
 export interface OverlayConfig {
     root: JQuery

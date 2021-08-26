@@ -1,7 +1,7 @@
 
 import {BinaryCodable, Constructor} from 'src/serialization/binary/serializable';
-import BinaryEncoder from "../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../serialization/binary/binary-decoder";
 
 class RoomConfig implements BinaryCodable<typeof RoomConfig> {
 

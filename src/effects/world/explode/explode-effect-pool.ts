@@ -1,8 +1,8 @@
 
-import GameMap from 'src/map/gamemap';
+import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
 import AbstractWorld from "../../../abstract-world";
-import BlockState from "../../../map/blockstate/blockstate";
+import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
 
 interface ExplodePoolWalker {

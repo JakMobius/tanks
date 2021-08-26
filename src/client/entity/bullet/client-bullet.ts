@@ -1,7 +1,7 @@
 
 import ClientEntity from '../client-entity';
 import BulletModel from 'src/entity/bullets/bullet-model';
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import * as Box2D from "src/library/box2d"
 
 export interface ClientBulletOptions<ModelType extends BulletModel> {

@@ -1,11 +1,6 @@
 
 import TankBehaviour from './physics/tank-behaviour';
-import TankControls from '../../controls/tankcontrols';
-import RotationalMatrix from '../../utils/rotationalmatrix';
-import {Constructor} from '../../serialization/binary/serializable';
-import * as Box2D from '../../library/box2d';
-import BinaryEncoder from "../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import TankControls from '../../controls/tank-controls';
 import EntityModel from "../entity-model";
 import Matrix3 from "../../utils/matrix3";
 

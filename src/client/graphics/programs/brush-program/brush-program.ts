@@ -2,7 +2,7 @@
 /* @load-resource: '../shaders/vertex/brush-vertex.glsl' */
 
 import GLBuffer from '../../glbuffer';
-import GameMap from '../../../../map/gamemap';
+import GameMap from '../../../../map/game-map';
 import Uniform from "../../uniform";
 import CameraProgram from "../camera-program";
 import {Quadrangle} from "../../../../utils/quadrangle";

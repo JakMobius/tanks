@@ -8,7 +8,7 @@
  * Modules
  */
 
-import EventEmitter from 'src/utils/eventemitter';
+import EventEmitter from 'src/utils/event-emitter';
 import {StringDecoder} from 'string_decoder';
 import cp from 'child_process';
 import util from 'util';

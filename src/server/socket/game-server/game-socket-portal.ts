@@ -10,8 +10,8 @@ import * as Websocket from "websocket";
 import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
-import GameMap from "../../../map/gamemap";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import GameMap from "../../../map/game-map";
 import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
 import ServerPlayer from "../../server-player";

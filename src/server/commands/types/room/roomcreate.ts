@@ -1,10 +1,10 @@
 
 import Command, {CommandConfig} from '../../command';
-import CommandFlag from '../../commandflag';
+import CommandFlag from '../../command-flag';
 import Game from 'src/server/room/game';
 import fs from 'fs';
-import GameMap from 'src/map/gamemap';
-import BinaryDecoder from 'src/serialization/binary/binarydecoder';
+import GameMap from 'src/map/game-map';
+import BinaryDecoder from 'src/serialization/binary/binary-decoder';
 import pako from 'pako';
 import path from 'path';
 import RoomConfig from "../../../room/room-config";

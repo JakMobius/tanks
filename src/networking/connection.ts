@@ -1,5 +1,5 @@
 import BinaryPacket from "./binary-packet";
-import EventEmitter from "../utils/eventemitter";
+import EventEmitter from "../utils/event-emitter";
 import {BinarySerializer} from "../serialization/binary/serializable";
 
 export default abstract class Connection extends EventEmitter {

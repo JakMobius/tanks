@@ -1,7 +1,7 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 export default class PlayerRoomChangePacket extends BinaryPacket {

@@ -1,7 +1,7 @@
 
 import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
-import BinaryEncoder from '../serialization/binary/binaryencoder';
-import BinaryDecoder from '../serialization/binary/binarydecoder';
+import BinaryEncoder from '../serialization/binary/binary-encoder';
+import BinaryDecoder from '../serialization/binary/binary-decoder';
 import Connection from "./connection";
 import Buffer, {ByteArray} from "../serialization/binary/buffer";
 

@@ -8,7 +8,7 @@ import Engine from "../../engine";
 import ClientPlayer from "../../client-player";
 import ClientTankEffect from "../../effects/tank/client-tank-effect";
 import ClientEntity from "../client-entity";
-import Smoke from "../../particles/smoke";
+import SmokeParticle from "../../particles/smoke-particle";
 import Color from "../../../utils/color";
 
 export interface TankConfig<ModelClass extends TankModel> {
@@ -62,7 +62,7 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
                 const velocityX = this.model.matrix.transformX(0, -2, 0)
                 const velocityY = this.model.matrix.transformY(0, -2, 0)
 
-                const smoke = new Smoke({
+                const smoke = new SmokeParticle({
                     x: position.x,
                     y: position.y,
                     dx: (velocityX + Math.random() - 0.5) * 5,

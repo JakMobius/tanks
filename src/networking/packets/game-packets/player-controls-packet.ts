@@ -1,7 +1,7 @@
 
-import TankControls from '../../../controls/tankcontrols';
+import TankControls from '../../../controls/tank-controls';
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 
 export default class PlayerControlsPacket extends BinaryPacket {

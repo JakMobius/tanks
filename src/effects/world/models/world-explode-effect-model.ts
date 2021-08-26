@@ -1,8 +1,8 @@
 
 import WorldEffectModel, {WorldEffectModelConfig} from '../world-effect-model';
 import {Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 
 export interface WorldExplodeEffectModelConfig extends WorldEffectModelConfig {
     x: number

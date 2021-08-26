@@ -1,9 +1,9 @@
 
 import BinaryPacket from '../../binary-packet';
 import EffectModel from 'src/effects/effect-model';
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 
 export default class EffectCreatePacket extends BinaryPacket {
 	public effect: EffectModel;

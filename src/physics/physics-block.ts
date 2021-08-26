@@ -1,4 +1,4 @@
-import BlockState from "../map/blockstate/blockstate";
+import BlockState from "../map/block-state/block-state";
 import PhysicsEdge, {solidBlockShape} from "./physics-edge";
 
 export class PhysicsBlock {

@@ -1,6 +1,6 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractEntity from "../../../entity/abstract-entity";
 import AbstractWorld from "../../../abstract-world";

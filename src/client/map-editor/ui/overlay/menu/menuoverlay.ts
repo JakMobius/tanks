@@ -3,7 +3,7 @@ import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import MapSelectContainer from './map-list/mapselectcontainer';
 import MapPreviewContainer from './map-preview/mappreviewcontainer';
 import DialogOverlay from '../../overlay/dialog/dialogoverlay';
-import EditorMap from '../../../editormap';
+import EditorMap from '../../../editor-map';
 
 class MenuOverlay extends Overlay {
 	public mapSelect = new MapSelectContainer();

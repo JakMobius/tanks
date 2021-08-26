@@ -1,9 +1,9 @@
 
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import AbstractPlayer from "../../../abstract-player";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 
 export default class PlayerLeavePacket extends BinaryPacket {
 	public playerId: number;

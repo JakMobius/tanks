@@ -1,6 +1,6 @@
 import ClientGameWorld from "../../client-game-world";
 import PhysicsChunk from "../../../physics/physics-chunk";
-import GameMap from "../../../map/gamemap";
+import GameMap from "../../../map/game-map";
 import LineDrawer from "./line-drawer";
 import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";

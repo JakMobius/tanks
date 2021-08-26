@@ -5,7 +5,7 @@ import Screen from '../screen'
 import ClientGameWorld from "../../client-game-world";
 import ExplodePoolDrawer from "../../effects/explode-pool-drawer";
 import MapDrawer from "./map-drawer";
-import EventEmitter from "../../../utils/eventemitter";
+import EventEmitter from "../../../utils/event-emitter";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 import MapDebugDrawer from "./map-debug-drawer";
 import ParticleDrawer from "./particle-drawer";

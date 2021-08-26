@@ -1,8 +1,8 @@
 
 import Command, {CommandConfig} from '../command';
-import CommandFlag from '../commandflag';
+import CommandFlag from '../command-flag';
 import Chalk from 'chalk';
-import filesize from 'src/utils/fs/filesize';
+import filesize from 'src/utils/fs/file-size';
 import Server from "../../server";
 
 class StatusCommand extends Command {

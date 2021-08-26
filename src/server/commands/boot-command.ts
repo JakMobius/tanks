@@ -1,6 +1,6 @@
 
 import Command, {CommandConfig} from './command';
-import CommandFlag from './commandflag';
+import CommandFlag from './command-flag';
 
 export interface ConfigOverride {
     key: string[]

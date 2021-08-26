@@ -1,6 +1,6 @@
 
 import ClientTankEffect from '../client-tank-effect';
-import Pellet from 'src/client/particles/pellet'
+import Pellet from 'src/client/particles/pellet-particle'
 import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/tank/models/tank-pellets-effect-model';

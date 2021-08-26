@@ -1,7 +1,7 @@
 
 import BasicCameraProgramController from "../controllers/basic-camera-program-controller";
 import BrushProgram from "./brush-program";
-import GameMap from "../../../../map/gamemap";
+import GameMap from "../../../../map/game-map";
 import {Quadrangle} from "../../../../utils/quadrangle";
 import Color from "../../../../utils/color";
 

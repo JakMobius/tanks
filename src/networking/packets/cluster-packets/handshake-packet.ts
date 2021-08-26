@@ -2,8 +2,8 @@
 import BinaryPacket from '../../binary-packet';
 import ClusterHandshake from '../../../server/socket/cluster-handshake';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 
 export default class HandshakePacket extends BinaryPacket {
 

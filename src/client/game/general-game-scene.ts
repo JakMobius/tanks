@@ -1,15 +1,15 @@
 import Camera from "../camera";
-import KeyboardController from "../controls/interact/keyboardcontroller";
-import ControlPanel from "./ui/controlpanel";
-import GamepadManager from "../controls/interact/gamepadmanager";
-import TouchController from "../controls/interact/touchcontroller";
-import PlayerControls from "../controls/playercontrols";
-import EventContainer from "../ui/overlay/events/eventcontainer";
-import ChatContainer from "./ui/overlay/chat/chatcontainer";
+import KeyboardController from "../controls/interact/keyboard-controller";
+import ControlPanel from "./ui/control-panel";
+import GamepadManager from "../controls/interact/gamepad-manager";
+import TouchController from "../controls/interact/touch-controller";
+import PlayerControls from "../controls/player-controls";
+import EventContainer from "../ui/overlay/events/event-container";
+import ChatContainer from "./ui/overlay/chat/chat-container";
 import ClientGameWorld from "../client-game-world";
 import WorldDrawer from "../graphics/drawers/world-drawer";
 import * as Box2D from "../../library/box2d";
-import GameMap from "../../map/gamemap";
+import GameMap from "../../map/game-map";
 import Scene, {SceneConfig} from "../scenes/scene";
 import ClientPlayer from "../client-player";
 

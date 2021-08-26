@@ -1,6 +1,6 @@
 import ClientGameWorld from "../client-game-world";
 import Game from "../../server/room/game";
-import GameMap from "../../map/gamemap";
+import GameMap from "../../map/game-map";
 import ClientWorldBridge from "../game/client-world-bridge";
 import AdapterLoop from "../../utils/loop/adapter-loop";
 import ConnectionClient from "../../networking/connection-client";

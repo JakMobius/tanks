@@ -1,8 +1,8 @@
 
 import EffectModel, { EffectModelConfig } from '../effect-model';
-import BinaryDecoder from "../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../serialization/binary/binary-decoder";
 import { Constructor } from 'src/serialization/binary/serializable';
-import BinaryEncoder from 'src/serialization/binary/binaryencoder';
+import BinaryEncoder from 'src/serialization/binary/binary-encoder';
 
 export interface WorldEffectModelConfig extends EffectModelConfig {
     x: number

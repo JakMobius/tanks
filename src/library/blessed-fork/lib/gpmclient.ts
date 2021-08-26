@@ -6,7 +6,7 @@
 
 import net from 'net';
 import fs from 'fs';
-import EventEmitter from 'src/utils/eventemitter';
+import EventEmitter from 'src/utils/event-emitter';
 
 const GPM_USE_MAGIC = false;
 

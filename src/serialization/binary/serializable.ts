@@ -1,7 +1,7 @@
 
-import BinarySerializationGroup from '../serializationgroup';
-import BinaryDecoder from "./binarydecoder";
-import BinaryEncoder from "./binaryencoder";
+import BinarySerializationGroup from '../serialization-group';
+import BinaryDecoder from "./binary-decoder";
+import BinaryEncoder from "./binary-encoder";
 
 export type Constructor<T> = { new (...args: any[]): T }
 

@@ -1,5 +1,5 @@
 
-import { Touch } from "./touchcontroller";
+import { Touch } from "./touch-controller";
 
 export default class Vidget {
     id: number

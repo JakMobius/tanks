@@ -1,7 +1,7 @@
 
 import BinarySerializable, {Constructor} from '../serialization/binary/serializable';
-import BinaryEncoder from "../serialization/binary/binaryencoder";
-import BinaryDecoder from "../serialization/binary/binarydecoder";
+import BinaryEncoder from "../serialization/binary/binary-encoder";
+import BinaryDecoder from "../serialization/binary/binary-decoder";
 import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
 import * as Box2D from "../library/box2d"

@@ -1,5 +1,5 @@
 
-import EventEmitter from '../../utils/eventemitter';
+import EventEmitter from '../../utils/event-emitter';
 import * as blessed from '../../library/blessed-fork/lib/blessed';
 import ConsoleBox from "./console-box";
 import HistoryEntry from "./console-history-entry";

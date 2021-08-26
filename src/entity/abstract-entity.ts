@@ -1,16 +1,16 @@
 
 import EntityModel, {EntityModelType} from './entity-model';
 import AbstractWorld from 'src/abstract-world';
-import BinaryEncoder from "../serialization/binary/binaryencoder";
-import BinaryDecoder from "../serialization/binary/binarydecoder";
+import BinaryEncoder from "../serialization/binary/binary-encoder";
+import BinaryDecoder from "../serialization/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
 import {b2Body} from "../library/box2d/dynamics/b2_body";
-import ServerEntity from "../server/entity/serverentity";
+import ServerEntity from "../server/entity/server-entity";
 import PhysicsChunk from "../physics/physics-chunk";
 import * as Box2D from "../library/box2d";
 import {XY} from "../library/box2d";
 import {b2ManifoldPoint} from "../library/box2d/collision/b2_collision";
-import GameMap from "../map/gamemap";
+import GameMap from "../map/game-map";
 
 export default abstract class AbstractEntity<
         WorldClass extends AbstractWorld = any,

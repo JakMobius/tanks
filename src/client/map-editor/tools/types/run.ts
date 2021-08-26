@@ -1,8 +1,8 @@
 
 import Tool from '../tool';
 import * as Box2D from '../../../../library/box2d';
-import PlayerControls from '../../../controls/playercontrols';
-import KeyboardController from '../../../controls/interact/keyboardcontroller';
+import PlayerControls from '../../../controls/player-controls';
+import KeyboardController from '../../../controls/interact/keyboard-controller';
 import ToolManager from "../toolmanager";
 import ClientPlayer from "../../../client-player";
 import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";

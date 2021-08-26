@@ -1,5 +1,5 @@
 
-import CommandFlag from "./commandflag";
+import CommandFlag from "./command-flag";
 import Console, {ConsoleAutocompleteOptions} from '../console/console'
 import Logger from "../log/logger";
 import path from "path";

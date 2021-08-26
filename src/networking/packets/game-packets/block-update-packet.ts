@@ -1,8 +1,8 @@
 
 import BinaryPacket from '../../binary-packet';
-import BlockState from '../../../map/blockstate/blockstate';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BlockState from '../../../map/block-state/block-state';
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 export default class BlockUpdatePacket extends BinaryPacket {

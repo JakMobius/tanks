@@ -25,7 +25,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-import EventEmitter from 'src/utils/eventemitter';
+import EventEmitter from 'src/utils/event-emitter';
 import {KeyEvent} from "./widgets/screen";
 import {StringDecoder} from "string_decoder";
 

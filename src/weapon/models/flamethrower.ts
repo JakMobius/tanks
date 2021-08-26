@@ -1,6 +1,6 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
-import ServerTankEffect from 'src/server/effects/tank/servertankeffect';
+import ServerTankEffect from 'src/server/effects/tank/server-tank-effect';
 
 export interface FlamethrowerConfig extends WeaponConfig {
 	damage?: number

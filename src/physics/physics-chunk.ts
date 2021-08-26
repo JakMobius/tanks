@@ -7,7 +7,7 @@ import EdgeFindingContext from "./edge-finding-context";
 import {MeshGenerationContext} from "./mesh-generation-context";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {b2BodyType} from "../library/box2d/dynamics/b2_body";
-import GameMap from "../map/gamemap";
+import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
 
 export default class PhysicsChunk {

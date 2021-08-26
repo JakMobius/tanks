@@ -1,8 +1,8 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 
 export default class PlayerRespawnPacket extends BinaryPacket {
     static typeName = 9

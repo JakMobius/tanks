@@ -1,4 +1,4 @@
-import ServerTank, {ServerTankConfig} from "../servertank";
+import ServerTank, {ServerTankConfig} from "../server-tank";
 import BigBoiTankModel from "../../../../entity/tanks/models/bigboi-tank-model";
 import WeaponMiner from "../../../../weapon/models/miner";
 import WeaponCannon from "../../../../weapon/models/cannon";

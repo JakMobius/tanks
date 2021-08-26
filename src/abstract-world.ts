@@ -1,7 +1,7 @@
 
 import * as Box2D from 'src/library/box2d';
-import GameMap from 'src/map/gamemap';
-import EventEmitter from 'src/utils/eventemitter';
+import GameMap from 'src/map/game-map';
+import EventEmitter from 'src/utils/event-emitter';
 import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
 import AbstractEffect from 'src/effects/abstract-effect';
 import AbstractEntity from 'src/entity/abstract-entity';

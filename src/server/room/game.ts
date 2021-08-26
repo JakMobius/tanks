@@ -1,28 +1,28 @@
 import Team from '../team';
 import Color from '../../utils/color';
-import ServerTank from '../entity/tank/servertank';
+import ServerTank from '../entity/tank/server-tank';
 import ServerGameWorld from '../server-game-world';
 import HighPrecisionLoop from '../../utils/loop/high-precision-loop';
 import Room from './room';
 import Logger from '../log/logger';
 import SocketPortalClient from "../socket/socket-portal-client";
-import GameMap from "../../map/gamemap";
+import GameMap from "../../map/game-map";
 
 import 'src/entity/tanks/model-loader'
 import 'src/server/entity/bullet/type-loader';
 import 'src/server/entity/tank/type-loader'
 import 'src/server/effects/world/type-loader';
 import 'src/server/effects/tank/type-loader';
-import 'src/map/blockstate/type-loader';
+import 'src/map/block-state/type-loader';
 
-import HTMLEscape from "../../utils/htmlescape";
+import HTMLEscape from "../../utils/html-escape";
 import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-packet";
 import AbstractPlayer from "../../abstract-player";
 import TankModel from "../../entity/tanks/tank-model";
 import ServerPlayer from "../server-player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
-import ServerEntity from "../entity/serverentity";
+import ServerEntity from "../entity/server-entity";
 
 interface GameConfig {
     name: string

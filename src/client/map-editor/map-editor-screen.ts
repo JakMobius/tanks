@@ -1,9 +1,9 @@
 /* @load-resource: './style.css' */
 
-import MapEditorScene from './scenes/mapeditorscene';
-import RequestFrameLoop from '../../utils/loop/requestframeloop';
+import MapEditorScene from './scenes/map-editor-scene';
+import RequestFrameLoop from '../../utils/loop/request-frame-loop';
 import 'src/client/graphics/drawers/block/type-loader';
-import 'src/map/blockstate/type-loader';
+import 'src/map/block-state/type-loader';
 import GeneralGameScreen from "../game/general-game-screen";
 
 export default class MapEditorScreen extends GeneralGameScreen {

@@ -1,8 +1,8 @@
 
 import Tool from '../tool';
-import GameMap from '../../../../map/gamemap';
+import GameMap from '../../../../map/game-map';
 import ToolManager from '../toolmanager';
-import BlockState from "../../../../map/blockstate/blockstate";
+import BlockState from "../../../../map/block-state/block-state";
 
 class Fill extends Tool {
     public actionName: any;

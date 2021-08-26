@@ -2,10 +2,10 @@
 import Tool from '../tool';
 import Particle from '../../../particles/particle';
 import Color from '../../../../utils/color';
-import SpawnZone from '../../../../map/spawnzone';
-import GameMap from '../../../../map/gamemap';
+import SpawnZone from '../../../../map/spawn-zone';
+import GameMap from '../../../../map/game-map';
 import ToolManager from "../toolmanager";
-import EditorMap from "../../editormap";
+import EditorMap from "../../editor-map";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 
 class SpawnZoneTool extends Tool {

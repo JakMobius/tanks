@@ -1,4 +1,4 @@
-import EventEmitter from '../../utils/eventemitter';
+import EventEmitter from '../../utils/event-emitter';
 
 class View extends EventEmitter {
 

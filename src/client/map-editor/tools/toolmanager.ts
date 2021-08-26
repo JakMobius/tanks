@@ -1,9 +1,9 @@
 
-import DocumentEventHandler from '../../controls/interact/documenteventhandler';
+import DocumentEventHandler from '../../controls/interact/document-event-handler';
 import Camera from '../../camera';
 import Tool from '../tools/tool';
-import KeyboardController from "../../controls/interact/keyboardcontroller";
-import BlockState from "../../../map/blockstate/blockstate";
+import KeyboardController from "../../controls/interact/keyboard-controller";
+import BlockState from "../../../map/block-state/block-state";
 import SceneScreen from "../../graphics/scene-screen";
 import EditorWorld from "../editor-world";
 

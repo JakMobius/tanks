@@ -1,4 +1,4 @@
-import MapModification from "./modification/mapmodification";
+import MapModification from "./modification/map-modification";
 
 class History {
 	public history: any;

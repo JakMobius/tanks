@@ -1,5 +1,5 @@
 
-import EdgedBlockDrawer from '../edgedblockdrawer';
+import EdgedBlockDrawer from '../edged-block-drawer';
 
 class StoneBlockDrawer extends EdgedBlockDrawer {
 

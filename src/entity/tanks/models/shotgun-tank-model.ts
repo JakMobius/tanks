@@ -1,6 +1,6 @@
 
 import TankModel from '../tank-model';
-import PhysicsUtils from '../../../utils/physicsutils';
+import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";

@@ -2,7 +2,7 @@
 import BinaryPacket from '../../binary-packet';
 import EntityModel from '../../../entity/entity-model';
 import BinarySerializable, {BinarySerializer} from '../../../serialization/binary/serializable';
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import AbstractEntity from "../../../entity/abstract-entity";
 import BulletModel from "../../../entity/bullets/bullet-model";
 

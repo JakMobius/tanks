@@ -1,9 +1,9 @@
 
 import BinaryPacket from '../../binary-packet';
-import GameMap from '../../../map/gamemap';
+import GameMap from '../../../map/game-map';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binaryencoder";
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 
 export default class MapPacket extends BinaryPacket {
 	public map: GameMap;

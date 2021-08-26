@@ -8,7 +8,7 @@
  * Modules
  */
 
-import EventEmitter from 'src/utils/eventemitter';
+import EventEmitter from 'src/utils/event-emitter';
 import {Screen} from "./screen";
 
 export interface ElementPosition {

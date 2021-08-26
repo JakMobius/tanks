@@ -16,7 +16,7 @@ let nextTick = global.setImmediate || process.nextTick.bind(process);
 import {Input} from './input';
 import * as unicode from "../unicode";
 import {ScrollableBoxConfig} from "./scrollablebox";
-import EventEmitter from "../../../../utils/eventemitter";
+import EventEmitter from "../../../../utils/event-emitter";
 
 export interface PromptConfig extends ScrollableBoxConfig {
     value?: string

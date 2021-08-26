@@ -1,6 +1,6 @@
 
 import SniperTankModel from "src/entity/tanks/models/sniper-tank-model";
-import ServerTank, {ServerTankConfig} from "../servertank";
+import ServerTank, {ServerTankConfig} from "../server-tank";
 import Weapon42mm from "src/weapon/models/42mm";
 import WeaponMiner from "src/weapon/models/miner";
 

@@ -1,5 +1,5 @@
 
-import ServerTank, {ServerTankConfig} from "../servertank";
+import ServerTank, {ServerTankConfig} from "../server-tank";
 import WeaponMiner from "src/weapon/models/miner";
 import FlamethrowerWeapon from "../../../../weapon/models/flamethrower";
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";

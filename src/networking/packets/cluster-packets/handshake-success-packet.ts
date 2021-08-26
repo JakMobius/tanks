@@ -1,6 +1,6 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryDecoder from "../../../serialization/binary/binarydecoder";
+import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 
 /**

@@ -2,12 +2,12 @@
 
 import Menu from 'src/client/ui/menu/menu';
 
-import MapStorage from 'src/client/map-editor/mapstorage';
+import MapStorage from 'src/client/map-editor/map-storage';
 import Camera from 'src/client/camera';
-import GameMap from 'src/map/gamemap';
+import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
-import EditorMap from "../../../../editormap";
+import EditorMap from "../../../../editor-map";
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
 import Screen from "src/client/graphics/screen";
 

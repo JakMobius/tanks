@@ -1,11 +1,11 @@
 
 import AbstractWorld, {GameWorldConfig} from '../abstract-world';
 import Game from "./room/game";
-import ServerEntity from "./entity/serverentity";
-import ServerEffect from "./effects/servereffect";
+import ServerEntity from "./entity/server-entity";
+import ServerEffect from "./effects/server-effect";
 import ServerPlayer from "./server-player";
-import GameMap from "../map/gamemap";
-import ServerTank from "./entity/tank/servertank";
+import GameMap from "../map/game-map";
+import ServerTank from "./entity/tank/server-tank";
 import ServerWorldExplodeEffectPool from "./server-world-explode-effect-model-pool";
 
 export interface ServerGameWorldConfig<MapClass extends GameMap = GameMap> extends GameWorldConfig<MapClass> {

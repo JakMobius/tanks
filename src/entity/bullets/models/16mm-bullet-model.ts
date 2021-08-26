@@ -2,7 +2,7 @@
 import BulletModel from '../bullet-model';
 import {BinarySerializer} from "src/serialization/binary/serializable";
 import * as Box2D from "src/library/box2d";
-import PhysicsUtils from "src/utils/physicsutils";
+import PhysicsUtils from "src/utils/physics-utils";
 import {physicsFilters} from "src/physics/categories";
 
 export default class BulletModel16mm extends BulletModel {

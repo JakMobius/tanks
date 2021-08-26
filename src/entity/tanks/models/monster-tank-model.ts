@@ -1,5 +1,5 @@
 import TankModel from '../tank-model';
-import PhysicsUtils from '../../../utils/physicsutils';
+import PhysicsUtils from '../../../utils/physics-utils';
 import WheeledTankBehaviour from '../physics/wheeled-tank/wheeled-tank-behaviour';
 import {b2World} from "../../../library/box2d/dynamics/b2_world";
 import {Vec2} from "../../../library/box2d";

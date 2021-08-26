@@ -2,8 +2,8 @@ import AbstractWorld from "../abstract-world";
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import PhysicsChunk from "./physics-chunk";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
-import GameMap from "../map/gamemap";
-import EventEmitter from "../utils/eventemitter";
+import GameMap from "../map/game-map";
+import EventEmitter from "../utils/event-emitter";
 
 export interface PhysicsChunkManagerConfig {
     world: AbstractWorld

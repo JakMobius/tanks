@@ -1,5 +1,5 @@
 import AbstractEventHandlerSet from "./abstract-event-handler-set";
-import EventEmitter from "./eventemitter";
+import EventEmitter from "./event-emitter";
 
 export default class BasicEventHandlerSet extends AbstractEventHandlerSet<EventEmitter> {
 

@@ -9,7 +9,7 @@ import ClusterSocketPortal from "./socket/hub-server/cluster-socket-portal";
 import Console from "./console/console";
 import ServerDatabase from "./db/server-database";
 import {parseServerConfig} from "./server-config-parser";
-import EventEmitter from "../utils/eventemitter";
+import EventEmitter from "../utils/event-emitter";
 import ClusterHandshakeConnection from "./socket/participant-client/cluster-handshake-connection";
 import WebsocketConnection from "./websocket-connection";
 import Connection from "../networking/connection";

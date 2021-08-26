@@ -1,7 +1,7 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import AbstractPlayer from "../../abstract-player";
 import ServerGameWorld from "../../server/server-game-world";
-import ServerEntity from "../../server/entity/serverentity";
+import ServerEntity from "../../server/entity/server-entity";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number

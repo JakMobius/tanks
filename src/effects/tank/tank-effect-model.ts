@@ -1,8 +1,8 @@
 
 import EffectModel from '../effect-model';
 import {Constructor} from "../../serialization/binary/serializable";
-import BinaryDecoder from "../../serialization/binary/binarydecoder";
-import BinaryEncoder from "../../serialization/binary/binaryencoder";
+import BinaryDecoder from "../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../serialization/binary/binary-encoder";
 
 export default class TankEffectModel extends EffectModel {
 
