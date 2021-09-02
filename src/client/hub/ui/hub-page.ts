@@ -2,19 +2,22 @@
 
 import View from "../../ui/view";
 import {UserDataRaw} from "../../user-data-raw";
-import NavigationView from "../../ui/navigation/navigation-view";
 import WelcomeController from "./welcome/welcome-controller";
 import EventContainer from "../../ui/overlay/events/event-container";
 import AuthorizedWelcomeController from "./authorised-welcome/authorized-welcome-controller";
+import BasicNavigationView from "../../ui/navigation/basic-navigation-view";
+import HubNavigationBlock from "./hub-navigation-block";
 
 export class HubPage extends View {
     userData: UserDataRaw;
     dimmer: JQuery
-    navigationController = new NavigationView()
+    navigationController = new BasicNavigationView()
     eventContainer = new EventContainer()
 
     constructor(userData: UserDataRaw) {
         super();
+        this.navigationController.blockClass = HubNavigationBlock
+
         this.userData = userData
         this.element.addClass("hub-body")
         this.dimmer = $("<div>").addClass("dimmer")

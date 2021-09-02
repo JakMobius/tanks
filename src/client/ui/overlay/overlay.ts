@@ -6,15 +6,13 @@ export interface OverlayConfig {
     root: JQuery
 }
 
-class Overlay extends EventEmitter {
-	public overlay: JQuery;
-	public shown: boolean;
+export default class Overlay extends EventEmitter {
+	public overlay = $("<div>").addClass("overlay");
+	public shown = false;
 	public root: JQuery;
 
     constructor(options: OverlayConfig) {
         super()
-        this.overlay = $("<div>").addClass("overlay")
-        this.shown = false
         this.root = options.root
         this.root.append(this.overlay)
         this.overlay.hide()
@@ -25,21 +23,19 @@ class Overlay extends EventEmitter {
 
         this.shown = true
         this.overlay.show()
-        this.overlay.fadeIn()
-        this.overlay[0].focus()
+        this.overlay.trigger("focus")
     }
 
     hide(callback?: () => void): void {
         if(!this.shown) { return }
 
         this.shown = false
-        this.overlay.fadeOut(700, callback)
-        this.overlay[0].blur()
+        this.overlay.trigger("blur")
+        this.overlay.hide()
+        if(callback) setTimeout(callback)
     }
 
     static menu() {
         return $("<div>").addClass("menu")
     }
 }
-
-export default Overlay;

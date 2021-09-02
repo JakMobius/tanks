@@ -42,20 +42,20 @@ function multiply(a: Float32Array, b: Float32Array) {
     const a01 = a[1];
     const a02 = a[2];
     const a10 = a[3];
-    const a11 = a[3 + 1];
-    const a12 = a[3 + 2];
-    const a20 = a[2 * 3];
-    const a21 = a[2 * 3 + 1];
-    const a22 = a[2 * 3 + 2];
+    const a11 = a[4];
+    const a12 = a[5];
+    const a20 = a[6];
+    const a21 = a[7];
+    const a22 = a[8];
     const b00 = b[0];
     const b01 = b[1];
     const b02 = b[2];
     const b10 = b[3];
-    const b11 = b[3 + 1];
-    const b12 = b[3 + 2];
-    const b20 = b[2 * 3];
-    const b21 = b[2 * 3 + 1];
-    const b22 = b[2 * 3 + 2];
+    const b11 = b[4];
+    const b12 = b[5];
+    const b20 = b[6];
+    const b21 = b[7];
+    const b22 = b[8];
 
     return new Float32Array([
         b00 * a00 + b01 * a10 + b02 * a20,
@@ -124,6 +124,7 @@ function inverse(m: Float32Array) {
     const t10 = m[1] * m[2 * 3 + 2] - m[2] * m[2 * 3 + 1];
     const t20 = m[1] * m[3 + 2] - m[2] * m[3 + 1];
     const d = 1.0 / (m[0] * t00 - m[3] * t10 + m[2 * 3] * t20);
+
     return new Float32Array([
         d * t00, -d * t10, d * t20,
         -d * (m[3] * m[2 * 3 + 2] - m[3 + 2] * m[2 * 3]),

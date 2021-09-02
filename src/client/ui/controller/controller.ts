@@ -1,13 +1,25 @@
 import View from "../view";
 import EventEmitter from "../../../utils/event-emitter";
-import NavigationView from "../navigation/navigation-view";
+import BasicNavigationView from "../navigation/basic-navigation-view";
 
-export default class Controller extends EventEmitter {
-    view: View
+export default class Controller<ViewClass extends View = View> extends EventEmitter {
+    view: ViewClass
 
     leftBarItems: View[] = []
     rightBarItems: View[] = []
     bottomBarItems: View[] = []
     title: string | null
-    navigationView: NavigationView;
+    navigationView: BasicNavigationView;
+
+    setNavigationView(navigationView: BasicNavigationView) {
+        this.navigationView = navigationView
+    }
+
+    onFocus() {
+
+    }
+
+    onBlur() {
+
+    }
 }

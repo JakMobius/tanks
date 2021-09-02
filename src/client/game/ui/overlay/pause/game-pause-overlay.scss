@@ -1,0 +1,16 @@
+
+$pause-overlay-blur: 20px;
+
+@mixin blur($px) {
+  backdrop-filter: blur($px);
+  -webkit-backdrop-filter: blur($px);
+  backface-visibility: hidden;
+}
+
+.overlay.pause-overlay {
+  @include blur($pause-overlay-blur);
+  background: rgba(0, 0, 0, .08);
+
+  justify-content: center;
+  align-items: center;
+}

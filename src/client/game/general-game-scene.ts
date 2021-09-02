@@ -12,6 +12,7 @@ import * as Box2D from "../../library/box2d";
 import GameMap from "../../map/game-map";
 import Scene, {SceneConfig} from "../scenes/scene";
 import ClientPlayer from "../client-player";
+import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera;
@@ -27,6 +28,8 @@ export default class GeneralGameScene extends Scene {
     public worldDrawer: WorldDrawer
 
     public paused: boolean = false
+    public didChangeSize: boolean = false
+    private pauseOverlay?: GamePauseOverlay
 
     constructor(config: SceneConfig) {
         super(config)
@@ -35,6 +38,7 @@ export default class GeneralGameScene extends Scene {
         this.setupDrawer()
         this.setupChat()
         this.setupEventContainer()
+        this.setupPauseOverlay()
         this.layout()
     }
 
@@ -109,13 +113,15 @@ export default class GeneralGameScene extends Scene {
     layout() {
         this.camera.viewport.x = this.screen.width
         this.camera.viewport.y = this.screen.height
+        this.didChangeSize = true
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {
         this.gamepad.refresh()
         this.playerControls.refresh()
 
-        if(this.paused) return
+        if(this.paused && !this.didChangeSize) return
+        this.didChangeSize = false
 
         this.screen.clear()
 
@@ -146,5 +152,22 @@ export default class GeneralGameScene extends Scene {
 
     protected togglePauseOverlay() {
         this.paused = !this.paused
+
+        if(this.paused) {
+            this.pauseOverlay.show()
+            this.keyboard.stopListening()
+        } else {
+            this.pauseOverlay.hide()
+            this.keyboard.startListening()
+        }
+    }
+
+    private setupPauseOverlay() {
+        this.pauseOverlay = new GamePauseOverlay({
+            root: this.overlayContainer
+        })
+        this.pauseOverlay.on("close", () => {
+            if(this.pauseOverlay) this.togglePauseOverlay()
+        })
     }
 }

@@ -1,0 +1,12 @@
+
+.pause-menu-view {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 10px 20px 5px;
+  width: 400px;
+
+  >div:not(:last-child) {
+    margin: 0 0 10px 0;
+  }
+}

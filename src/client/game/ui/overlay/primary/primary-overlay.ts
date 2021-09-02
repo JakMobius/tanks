@@ -14,7 +14,6 @@ export interface PrimaryOverlayConfig extends OverlayConfig {
 }
 
 class PrimaryOverlay extends Overlay {
-	public shown: boolean;
 	public game: GameScene;
 	public menuContainer: JQuery;
 	public steeringContainer: JQuery;
@@ -28,7 +27,6 @@ class PrimaryOverlay extends Overlay {
 
     constructor(options: PrimaryOverlayConfig) {
         super(options)
-        this.shown = false
         this.game = options.game
 
         this.menuContainer = $("<div>")

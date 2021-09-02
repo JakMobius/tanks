@@ -6,7 +6,7 @@ export interface DialogOverlayConfig extends OverlayConfig {
     requiresDecision?: boolean
 }
 
-class DialogOverlay extends Overlay {
+export default class DialogOverlay extends Overlay {
 	public dialog: DialogView;
 	public requiresDecision: boolean;
 
@@ -40,12 +40,10 @@ class DialogOverlay extends Overlay {
     }
 
     hide(callback?: () => void) {
-        this.overlay.blur()
+        this.overlay.trigger("blur")
         super.hide(() => {
             this.overlay.remove()
             callback && callback()
         })
     }
 }
-
-export default DialogOverlay;

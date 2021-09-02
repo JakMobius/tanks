@@ -1,6 +1,6 @@
 import EventEmitter from '../../utils/event-emitter';
 
-class View extends EventEmitter {
+export default class View extends EventEmitter {
 
     /**
      * View raw element
@@ -14,5 +14,3 @@ class View extends EventEmitter {
 
     static tagName = "<div>"
 }
-
-export default View;
