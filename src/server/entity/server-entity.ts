@@ -5,6 +5,7 @@ import BinaryDecoder from "../../serialization/binary/binary-decoder";
 import BinaryEncoder from "../../serialization/binary/binary-encoder";
 import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
 	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;
@@ -50,7 +51,7 @@ export default class ServerEntity<ModelClass extends EntityModel = EntityModel> 
     }
 
     private encodePositionVelocity(encoder: BinaryEncoder) {
-        let body = this.model.getBody()
+        let body = this.model.getComponent(PhysicalComponent).getBody()
         let position = body.GetPosition()
         encoder.writeFloat32(position.x)
         encoder.writeFloat32(position.y)

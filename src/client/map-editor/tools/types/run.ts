@@ -8,6 +8,7 @@ import ClientPlayer from "../../../client-player";
 import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
 import ClientTank from "../../../entity/tank/client-tank";
 import ClientMonsterTank from "../../../entity/tank/types/client-monster-tank";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
@@ -84,7 +85,7 @@ export default class RunTool extends Tool {
 
         world.createPlayer(this.player)
 
-        const body = this.player.tank.model.getBody()
+        const body = this.player.tank.model.getComponent(PhysicalComponent).getBody()
 
         body.SetPosition(this.spawnPoint)
 

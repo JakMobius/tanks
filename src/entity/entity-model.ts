@@ -5,6 +5,8 @@ import BinaryDecoder from "../serialization/binary/binary-decoder";
 import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
 import * as Box2D from "../library/box2d"
+import Entity from "../utils/ecs/entity";
+import PhysicalComponent from "./entity-physics-component";
 
 /**
  * Entity model. Describes entity position,
@@ -20,7 +22,7 @@ export type EntityModelType = {
     getMaximumHealth(): number
 }
 
-export default class EntityModel implements BinarySerializable<typeof EntityModel> {
+export default class EntityModel extends Entity {
 
     static groupName = 5
     static typeName = 0
@@ -36,9 +38,9 @@ export default class EntityModel implements BinarySerializable<typeof EntityMode
     public game: AbstractWorld
     public entity?: AbstractEntity
 
-    private body: Box2D.Body
-
     constructor() {
+        super()
+
         this.setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
     }
 
@@ -66,19 +68,6 @@ export default class EntityModel implements BinarySerializable<typeof EntityMode
     initPhysics(world: Box2D.World) {
         throw new Error("Method not implemented")
     }
-
-    destroyPhysics() {
-        this.body.GetWorld().DestroyBody(this.body)
-        this.body = null
-    }
-
-    setBody(body: Box2D.Body) {
-        if(body) body.SetUserData(null)
-        this.body = body
-        body.SetUserData(this)
-    }
-
-    getBody() { return this.body }
 
     static getId(): number {
         return this.typeName

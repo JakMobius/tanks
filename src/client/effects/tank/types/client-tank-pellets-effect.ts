@@ -5,6 +5,7 @@ import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/tank/models/tank-pellets-effect-model';
 import ClientPlayer from "../../../client-player";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 export default class ClientTankPelletsEffect extends ClientTankEffect {
 	public player: ClientPlayer;
@@ -21,7 +22,7 @@ export default class ClientTankPelletsEffect extends ClientTankEffect {
         const player = this.player;
 
         const tank = player.tank;
-        const body = tank.model.getBody()
+        const body = tank.model.getComponent(PhysicalComponent).getBody()
         const tankRotation = body.GetAngle()
         const tankPosition = body.GetPosition()
         const tankVelocity = body.GetLinearVelocity()

@@ -2,6 +2,7 @@ import {Vec2} from '../../../../library/box2d'
 import TankBehaviour from '../tank-behaviour';
 import TankModel from "../../tank-model";
 import {TankWheel} from "./wheel";
+import PhysicalComponent from "../../../entity-physics-component";
 
 export interface WheeledTankBehaviourConfig {
 
@@ -78,7 +79,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         let y = wheel.position.y;
         let angle = wheel.angle;
 
-        let body = this.tank.getBody()
+        let body = this.tank.getComponent(PhysicalComponent).getBody()
         this.localVector2.x = x
         this.localVector2.y = y
 
@@ -210,7 +211,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     }
 
     protected applyWheelForces(dt: number) {
-        const body = this.tank.getBody()
+        const body = this.tank.getComponent(PhysicalComponent).getBody()
 
         for(let wheel of this.wheels) {
             this.getWheelReaction(wheel, this.localVector1, dt)

@@ -6,6 +6,7 @@ import TextureProgram from "../programs/texture-program";
 import DrawPhase from "./draw-phase";
 import Matrix3 from "../../../utils/matrix3";
 import {squareQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
+import PhysicalComponent from "../../../entity/entity-physics-component";
 
 export default class BasicEntityDrawer extends EntityDrawer {
 	public matrix: Matrix3;
@@ -33,7 +34,7 @@ export default class BasicEntityDrawer extends EntityDrawer {
 
     drawSprite(sprite: Sprite, width: number, height: number, phase: DrawPhase, z: number = 1) {
         let program = phase.getProgram(TextureProgram)
-        const entityBody = this.entity.model.getBody()
+        const entityBody = this.entity.model.getComponent(PhysicalComponent).getBody()
         const entityPosition = entityBody.GetPosition()
         const entityAngle = entityBody.GetAngle()
         const sine = Math.sin(entityAngle)

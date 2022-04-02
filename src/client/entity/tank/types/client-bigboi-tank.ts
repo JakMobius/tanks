@@ -17,6 +17,7 @@ import FX from "../../../sound/fx";
 import {TankStat} from "../tank-stat";
 import {worker} from "cluster";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 class Drawer extends TankDrawer<ClientBigboiTank> {
 	public bodyBrightSprite: Sprite;
@@ -39,7 +40,7 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
 
     draw(phase: DrawPhase) {
         const model = this.entity.model
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)

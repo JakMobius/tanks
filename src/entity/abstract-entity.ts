@@ -5,12 +5,10 @@ import BinaryEncoder from "../serialization/binary/binary-encoder";
 import BinaryDecoder from "../serialization/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
 import {b2Body} from "../library/box2d/dynamics/b2_body";
-import ServerEntity from "../server/entity/server-entity";
 import PhysicsChunk from "../physics/physics-chunk";
 import * as Box2D from "../library/box2d";
-import {XY} from "../library/box2d";
-import {b2ManifoldPoint} from "../library/box2d/collision/b2_collision";
 import GameMap from "../map/game-map";
+import PhysicalComponent from "./entity-physics-component";
 
 export default abstract class AbstractEntity<
         WorldClass extends AbstractWorld = any,
@@ -76,7 +74,7 @@ export default abstract class AbstractEntity<
 
     private emitMultipleBlockHits(points: Box2D.Vec2[]) {
         for(let point of points) {
-            if(!this.model.getBody().GetWorld()) continue
+            if(!this.model.getComponent(PhysicalComponent).getBody().GetWorld()) continue
             this.emitBlockHit(point)
         }
     }
@@ -95,7 +93,7 @@ export default abstract class AbstractEntity<
         }
 
         const velocity = new Box2D.Vec2()
-        this.model.getBody().GetLinearVelocityFromWorldPoint(point, velocity)
+        this.model.getComponent(PhysicalComponent).getBody().GetLinearVelocityFromWorldPoint(point, velocity)
 
         if(velocity.x === 0 && velocity.y === 0) return
 

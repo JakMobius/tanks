@@ -2,6 +2,7 @@ import Weapon, {WeaponConfig} from '../weapon';
 import AbstractPlayer from "../../abstract-player";
 import ServerGameWorld from "../../server/server-game-world";
 import ServerEntity from "../../server/entity/server-entity";
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
@@ -55,7 +56,7 @@ const near = function (x: number, y: number, tplayer: AbstractPlayer, world: Ser
 
         if (entity.model.id === tplayer.id) continue
 
-        const pos = entity.model.getBody().GetPosition();
+        const pos = entity.model.getComponent(PhysicalComponent).getBody().GetPosition();
         const dx = pos.x - x;
         const dy = pos.y - y;
 

@@ -33,7 +33,7 @@ class Drawer extends TankDrawer<ClientSniperTank> {
 
     draw(phase: DrawPhase) {
         const model = this.entity.model
-        //const body = model.getBody()
+        //const body = model.getComponent(PhysicalComponent).getBody()
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(TextureProgram)

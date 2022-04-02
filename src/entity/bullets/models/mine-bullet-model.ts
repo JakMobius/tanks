@@ -4,6 +4,7 @@ import * as Box2D from "../../../library/box2d";
 import PhysicsUtils from "../../../utils/physics-utils";
 import {b2BodyType} from "../../../library/box2d/dynamics/b2_body";
 import {physicsFilters} from "../../../physics/categories";
+import PhysicalComponent from "../../entity-physics-component";
 
 export default class BulletModelMine extends BulletModel {
     static typeName = 7
@@ -20,7 +21,7 @@ export default class BulletModelMine extends BulletModel {
 
         body.CreateFixture(bodyFixture)
 
-        this.setBody(body)
+        this.addComponent(new PhysicalComponent(body))
     }
 }
 

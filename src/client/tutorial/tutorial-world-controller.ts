@@ -11,6 +11,7 @@ import MonsterTankModel from "../../entity/tanks/models/monster-tank-model";
 import {Constructor} from "../../serialization/binary/serializable";
 import BigBoiTankModel from "../../entity/tanks/models/bigboi-tank-model";
 import NastyTankModel from "../../entity/tanks/models/nasty-tank-model";
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 export default class TutorialWorldController {
     game: Game;
@@ -37,7 +38,7 @@ export default class TutorialWorldController {
 
         tank.teleport(x, y)
 
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
         body.SetAngle(angle)
 
         this.tanks.push(tank)
@@ -75,7 +76,7 @@ export default class TutorialWorldController {
     private respawnPlayer(player: ServerPlayer) {
         const tank = player.tank
         const model = tank.model
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
 
         model.setHealth((model.constructor as typeof TankModel).getMaximumHealth())
 

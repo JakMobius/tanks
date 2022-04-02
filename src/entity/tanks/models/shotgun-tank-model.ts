@@ -4,6 +4,7 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
+import PhysicalComponent from "../../entity-physics-component";
 
 export default class ShotgunTankModel extends TankModel<TrackTankBehaviour> {
 
@@ -39,7 +40,7 @@ export default class ShotgunTankModel extends TankModel<TrackTankBehaviour> {
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        this.setBody(body)
+        this.addComponent(new PhysicalComponent(body))
     }
 
     static getMaximumHealth() {

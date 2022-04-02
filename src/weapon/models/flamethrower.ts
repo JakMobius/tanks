@@ -1,6 +1,7 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
 import ServerTankEffect from 'src/server/effects/tank/server-tank-effect';
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 export interface FlamethrowerConfig extends WeaponConfig {
 	damage?: number
@@ -39,7 +40,7 @@ export default class FlamethrowerWeapon extends Weapon {
 		if(!this.engaged) return
 
 		const tank = this.tank
-		const tankBody = tank.model.getBody()
+		const tankBody = tank.model.getComponent(PhysicalComponent).getBody()
 		const tankLocation = tankBody.GetPosition()
 		const tankAngle = tankBody.GetAngle()
 
@@ -52,7 +53,7 @@ export default class FlamethrowerWeapon extends Weapon {
 			if(!player || player.tank === tank) continue
 
 			const anotherTank = player.tank;
-			const anotherTankLocation = anotherTank.model.getBody().GetPosition()
+			const anotherTankLocation = anotherTank.model.getComponent(PhysicalComponent).getBody().GetPosition()
 
 			const x = anotherTankLocation.x - tankLocation.x;
 			const y = anotherTankLocation.y - tankLocation.y;

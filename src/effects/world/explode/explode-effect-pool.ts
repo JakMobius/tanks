@@ -4,6 +4,7 @@ import * as Box2D from 'src/library/box2d';
 import AbstractWorld from "../../../abstract-world";
 import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
+import PhysicalComponent from "../../../entity/entity-physics-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -339,7 +340,7 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
         for(let player of this.world.players.values()) {
             let tank = player.tank
             if(!tank) continue
-            let position = tank.model.getBody().GetPosition()
+            let position = tank.model.getComponent(PhysicalComponent).getBody().GetPosition()
 
             const x = position.x
             const y = position.y
@@ -391,7 +392,7 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
             resultVx *= force
             resultVy *= force
 
-            tank.model.getBody().ApplyLinearImpulse(new Box2D.Vec2(
+            tank.model.getComponent(PhysicalComponent).getBody().ApplyLinearImpulse(new Box2D.Vec2(
                 resultVx,
                 resultVy
             ), position)

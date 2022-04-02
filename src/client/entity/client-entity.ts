@@ -8,6 +8,7 @@ import BinaryEncoder from "../../serialization/binary/binary-encoder";
 import ClientGameWorld from "../client-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import BulletModel from "../../entity/bullets/bullet-model";
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 export default class ClientEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ClientGameWorld, ModelClass> {
 
@@ -31,7 +32,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         let vy = decoder.readFloat32()
         let angularVelocity = decoder.readFloat32()
 
-        const body = this.model.getBody()
+        const body = this.model.getComponent(PhysicalComponent).getBody()
 
         let velocity = body.GetLinearVelocity()
 
@@ -66,7 +67,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         const vy = decoder.readFloat32()
         const angularVelocity = decoder.readFloat32()
 
-        const body = this.model.getBody()
+        const body = this.model.getComponent(PhysicalComponent).getBody()
 
         body.SetPositionXY(x, y)
 
@@ -92,7 +93,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
     tick(dt: number) {
         //super.tick(dt)
         if(this.serverPositionUpdateDate) {
-            const body = this.model.getBody()
+            const body = this.model.getComponent(PhysicalComponent).getBody()
             let pos = body.GetPosition()
 
             let targetX = this.serverPosition.x

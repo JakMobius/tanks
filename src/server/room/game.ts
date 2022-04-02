@@ -23,6 +23,7 @@ import ServerPlayer from "../server-player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
 import ServerEntity from "../entity/server-entity";
+import PhysicalComponent from "../../entity/entity-physics-component";
 
 interface GameConfig {
     name: string
@@ -197,7 +198,7 @@ export default class Game extends Room {
         tank.model.setHealth((player.tank.model.constructor as typeof TankModel).getMaximumHealth())
 
         const spawnPoint = this.world.map.spawnPointForTeam(team.id)
-        const body = tank.model.getBody()
+        const body = tank.model.getComponent(PhysicalComponent).getBody()
         body.SetPosition(spawnPoint)
         body.SetAngle(0)
 

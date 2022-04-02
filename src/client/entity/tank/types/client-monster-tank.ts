@@ -20,6 +20,7 @@ import {
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import {Constructor} from "../../../../serialization/binary/serializable";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 class Drawer extends TankDrawer<ClientMonsterTank> {
 	public bodyBrightSprite: Sprite;
@@ -49,7 +50,7 @@ class Drawer extends TankDrawer<ClientMonsterTank> {
 
     draw(phase: DrawPhase) {
 	    const model = this.entity.model
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
 
         const wheelProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)

@@ -12,6 +12,7 @@ import PhysicsChunkManager from "./physics/physics-chunk-manager";
 import BasicEventHandlerSet from "./utils/basic-event-handler-set";
 import GameWorldContactListener from "./contact-listener";
 import GameWorldContactFilter from "./contact-filter";
+import PhysicalComponent from "./entity/entity-physics-component";
 
 export interface GameWorldConfig<MapClass extends GameMap = GameMap> {
     physicsTick?: number
@@ -145,13 +146,13 @@ export default class AbstractWorld<
 
     createEntity(entity: EntityClass): void {
         entity.setWorld(this)
-        if(!entity.model.getBody()) entity.model.initPhysics(this.world)
+        if(!entity.model.getComponent(PhysicalComponent)) entity.model.initPhysics(this.world)
         this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
 
     removeEntity(entity: EntityClass): void {
-        entity.model.destroyPhysics()
+        entity.model.destroy()
         entity.setWorld(null)
         this.entities.delete(entity.model.id)
         this.emit("entity-remove", entity)

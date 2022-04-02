@@ -4,6 +4,7 @@ import PhysicsChunk from "./physics-chunk";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import GameMap from "../map/game-map";
 import EventEmitter from "../utils/event-emitter";
+import PhysicalComponent from "../entity/entity-physics-component";
 
 export interface PhysicsChunkManagerConfig {
     world: AbstractWorld
@@ -83,7 +84,7 @@ export default class PhysicsChunkManager extends EventEmitter {
         this.time += dt
 
         for(let entity of this.world.entities.values()) {
-            let position = entity.model.getBody().GetPosition()
+            let position = entity.model.getComponent(PhysicalComponent).getBody().GetPosition()
             this.makeNearbyChunksRelevant(position.x / GameMap.BLOCK_SIZE, position.y / GameMap.BLOCK_SIZE)
         }
 

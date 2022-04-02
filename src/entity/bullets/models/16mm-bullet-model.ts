@@ -4,6 +4,7 @@ import {BinarySerializer} from "src/serialization/binary/serializable";
 import * as Box2D from "src/library/box2d";
 import PhysicsUtils from "src/utils/physics-utils";
 import {physicsFilters} from "src/physics/categories";
+import PhysicalComponent from "../../entity-physics-component";
 
 export default class BulletModel16mm extends BulletModel {
     static typeName = 4
@@ -23,7 +24,7 @@ export default class BulletModel16mm extends BulletModel {
 
         body.CreateFixture(bodyFixture)
 
-        this.setBody(body)
+        this.addComponent(new PhysicalComponent(body))
     }
 }
 

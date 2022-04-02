@@ -5,6 +5,7 @@ import Sprite from 'src/client/sprite';
 import * as Box2D from 'src/library/box2d'
 import Camera from "src/client/camera";
 import ClientTank, {ClientTankType} from "../../../../../entity/tank/client-tank";
+import PhysicalComponent from "../../../../../../entity/entity-physics-component";
 
 export interface TankSelectElementViewConfig {
     Tank: ClientTankType
@@ -76,7 +77,7 @@ export default class TankSelectElement extends View {
         let model = new this.Tank.Model()
         this.tank = new (this.Tank)({ model: model })
         this.tank.model.initPhysics(this.previewWorld)
-        const fixtureList = this.tank.model.getBody().GetFixtureList()
+        const fixtureList = this.tank.model.getComponent(PhysicalComponent).getBody().GetFixtureList()
 
         fixtureList.m_filter.maskBits = 0x000
         fixtureList.m_filter.categoryBits = 0x000
@@ -90,7 +91,7 @@ export default class TankSelectElement extends View {
     draw(dt: number) {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
         const tank = this.getTank()
-        const body = tank.model.getBody()
+        const body = tank.model.getComponent(PhysicalComponent).getBody()
         body.SetAngle(body.GetAngle() + dt)
     }
 }

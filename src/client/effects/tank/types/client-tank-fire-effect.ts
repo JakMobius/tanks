@@ -6,6 +6,7 @@ import ClientTankEffect from 'src/client/effects/tank/client-tank-effect';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../../entity/tank/client-tank";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 export default class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;
@@ -29,7 +30,7 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 
     tick(dt: number) {
 
-	    const body = this.tank.model.getBody()
+	    const body = this.tank.model.getComponent(PhysicalComponent).getBody()
         const velocity = body.GetLinearVelocity()
         const angle = body.GetAngle()
 

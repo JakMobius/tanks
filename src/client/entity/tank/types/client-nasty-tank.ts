@@ -15,6 +15,7 @@ import {
     copyQuadrangle
 } from "../../../../utils/quadrangle";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
@@ -51,7 +52,7 @@ class Drawer extends TankDrawer<ClientNastyTank> {
 
     draw(phase: DrawPhase) {
         const model = this.entity.model
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
 
         const propellerProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)

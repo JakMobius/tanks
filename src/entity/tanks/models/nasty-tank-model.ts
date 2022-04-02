@@ -4,6 +4,7 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import AirbagTankBehaviour from '../physics/airbag-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
+import PhysicalComponent from "../../entity-physics-component";
 
 export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
 
@@ -49,6 +50,6 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
 
         body.CreateFixture(bodyFixture)
 
-        this.setBody(body)
+        this.addComponent(new PhysicalComponent(body))
     }
 }

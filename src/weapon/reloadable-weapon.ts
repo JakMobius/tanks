@@ -2,6 +2,7 @@ import Weapon, {WeaponConfig} from "./weapon";
 import BulletModel from "../entity/bullets/bullet-model";
 import ServerBullet from "../server/entity/bullet/server-bullet";
 import * as Box2D from "../library/box2d";
+import PhysicalComponent from "../entity/entity-physics-component";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -87,7 +88,7 @@ export default class ReloadableWeapon extends Weapon {
     launchBullet(bullet: BulletModel, x: number, y: number, rotation: number = 0): void {
 
         const tank = this.tank
-        const tankBody = tank.model.getBody()
+        const tankBody = tank.model.getComponent(PhysicalComponent).getBody()
 
         rotation = tankBody.GetAngle()
 
@@ -104,7 +105,7 @@ export default class ReloadableWeapon extends Weapon {
         entity.shooter = tank.player
         entity.model.initPhysics(world.world)
 
-        const bulletBody = bullet.getBody()
+        const bulletBody = bullet.getComponent(PhysicalComponent).getBody()
 
         let vx = -sin * entity.startVelocity
         let vy = cos * entity.startVelocity

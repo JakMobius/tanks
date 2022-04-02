@@ -14,6 +14,7 @@ import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import PhysicalComponent from "../../../../entity/entity-physics-component";
 
 class Drawer extends TankDrawer<ClientSniperTank> {
 	public bodyBrightSprite: Sprite;
@@ -38,7 +39,7 @@ class Drawer extends TankDrawer<ClientSniperTank> {
 
     draw(phase: DrawPhase) {
 	    const model = this.entity.model
-        const body = model.getBody()
+        const body = model.getComponent(PhysicalComponent).getBody()
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)

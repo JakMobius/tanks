@@ -8,7 +8,7 @@ module.exports = {
             beelder.delete("dist/server/index.js"),
             beelder.delete("dist/server/index.js.map"),
             beelder.delete("dist/server/resources"),
-            beelder.copy("#server-build", "#server-build")
+            beelder.copy("#server-build", "#server = dist/server")
         ]
     },
 

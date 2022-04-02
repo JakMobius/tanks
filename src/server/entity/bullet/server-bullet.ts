@@ -7,6 +7,7 @@ import ServerPlayer from "../../server-player";
 import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
+import PhysicalComponent from "../../../entity/entity-physics-component";
 
 export interface ServerBulletConfig<ModelClass extends BulletModel> {
     model: ModelClass
@@ -43,7 +44,7 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
         if(this.model.dead) return
         this.model.dead = true
         if(this.explodePower) {
-            let position = this.model.getBody().GetPosition()
+            let position = this.model.getComponent(PhysicalComponent).getBody().GetPosition()
             let effect = new WorldExplodeEffectModel({
                 x: position.x,
                 y: position.y,

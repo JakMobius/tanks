@@ -1,6 +1,7 @@
 import * as Box2D from '../../../library/box2d';
 import TankBehaviour from './tank-behaviour';
 import TankModel from "../tank-model";
+import PhysicalComponent from "../../entity-physics-component";
 
 interface AirbagBehaviourConfig {
     power: number
@@ -24,7 +25,7 @@ export default class AirbagTankModel extends TankBehaviour {
     }
 
     tick(dt: number) {
-        const body = this.tank.getBody();
+        const body = this.tank.getComponent(PhysicalComponent).getBody();
 
         const throttleInput = this.tank.controls.getThrottle()
 
