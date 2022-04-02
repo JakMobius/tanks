@@ -3,11 +3,12 @@ const getClientResources = require("./utils/get-client-resources")
 const exportShaders = require("./utils/export-shaders")
 const exportStylesheets = require("./utils/export-stylesheets")
 const insertShadersPlugin = require("./utils/insert-shaders-plugin")
+const beelder = require("./utils/beelder-steps")
 const constants = require("./utils/constants")
 
 module.exports = {
     "prepare-tutorial-resources": {
-        "steps": [
+        steps: [
             getClientResources({
                 source: "src/client/tutorial/index.ts",
                 targetName: "tutorial"
@@ -19,7 +20,7 @@ module.exports = {
         ]
     },
     "compile-tutorial-resources": {
-        "steps": [
+        steps: [
             // Writing shader library to temp folder, because
             // we don't want this json to appear in the bundle.
             exportShaders({
@@ -38,30 +39,28 @@ module.exports = {
         ]
     },
     "build-tutorial": {
-        "steps": [{
-            "action": "bundle-javascript",
-            "source": "src/client/tutorial-launcher/index.ts",
-            "target": `#tutorial-launcher = ${constants.cacheFolder}/tutorial/scripts/index.js`,
-            "compilerOptions": constants.clientCompilerConfig,
-            ...constants.clientBundlerConfig
-        }, {
-            "action": "bundle-javascript",
-            "source": "src/client/tutorial/index.ts",
-            "target": `#tutorial-executable = ${constants.cacheFolder}/tutorial/scripts/tutorial.js`,
-            "compilerOptions": {
-                ...constants.clientCompilerConfig,
-                "plugins": [
-                    insertShadersPlugin({
-                        file: "#tutorial-shaders"
-                    })
-                ]
-            },
-            ...constants.clientBundlerConfig
-        }, {
-            "action": "copy",
-            "source": "src/client/web/tutorial",
-            "target": `${constants.cacheFolder}/tutorial`
-        }],
-        "targets": [ `#tutorial = ${constants.cacheFolder}/tutorial` ]
+        steps: [
+            beelder.bundleJavascript(
+                "src/client/tutorial-launcher/index.ts",
+                `#tutorial-launcher = ${constants.cacheFolder}/tutorial/scripts/index.js`,
+                {
+                    compilerOptions: constants.clientCompilerConfig,
+                    ...constants.clientBundlerConfig
+                }
+            ),
+            beelder.bundleJavascript(
+                "src/client/tutorial/index.ts",
+                `#tutorial-executable = ${constants.cacheFolder}/tutorial/scripts/tutorial.js`,
+                {
+                    compilerOptions: {
+                        ...constants.clientCompilerConfig,
+                        plugins: [ insertShadersPlugin({ file: "#tutorial-shaders" })]
+                    },
+                    ...constants.clientBundlerConfig
+                }
+            ),
+            beelder.copy("src/client/web/tutorial", `${constants.cacheFolder}/tutorial`)
+        ],
+        targets: [ `#tutorial = ${constants.cacheFolder}/tutorial` ]
     },
 }

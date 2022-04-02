@@ -58,15 +58,15 @@ export default class Game extends Room {
 
         ServerWorldBridge.buildBridge(this.world, this.portal)
 
-        this.portal.on("client-connect", () => this.onClientConnect())
+        this.portal.on("client-connect",    () =>       this.onClientConnect())
         this.portal.on("client-disconnect", (client) => this.onClientDisconnect(client))
 
-        this.world.on("player-create", (player) => this.onPlayerJoin(player))
-        this.world.on("player-changed-tank", (player) => this.onPlayerChangedTank(player))
-        this.world.on("player-remove", (player) => this.onPlayerLeave(player))
-        this.world.on("player-respawn", (player) => this.onPlayerRespawn(player))
-        this.world.on("player-chat", (player, text) => this.onPlayerChat(player, text))
-        this.world.on("player-config", (player, tank, nick) => this.onClientConfig(player, tank, nick))
+        this.world.on("player-create",      (player) => this.onPlayerJoin(player))
+        this.world.on("player-changed-tank",(player) => this.onPlayerChangedTank(player))
+        this.world.on("player-remove",      (player) => this.onPlayerLeave(player))
+        this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
+        this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
+        this.world.on("player-config",      (player, tank, nick) => this.onClientConfig(player, tank, nick))
 
         if(options.loop) {
             this.loop = options.loop

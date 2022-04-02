@@ -4,6 +4,7 @@ const exportShaders = require("./utils/export-shaders")
 const exportStylesheets = require("./utils/export-stylesheets")
 const insertShadersPlugin = require("./utils/insert-shaders-plugin")
 const constants = require("./utils/constants")
+const beelder = require("./utils/beelder-steps");
 
 module.exports = {
     "prepare-game-resources": {
@@ -38,34 +39,27 @@ module.exports = {
         ]
     },
     "build-game": {
-        "steps": [{
-            "action": "bundle-javascript",
-            "source": "src/client/game-launcher/index.ts",
-            "target": `#game-launcher = ${constants.cacheFolder}/game/scripts/index.js`,
-            "compilerOptions": constants.clientCompilerConfig,
-            ...constants.clientBundlerConfig
-        }, {
-            "action": "bundle-javascript",
-            "source": "src/client/game/index.ts",
-            "target": `#game-executable = ${constants.cacheFolder}/game/scripts/game.js`,
-            "compilerOptions": {
-                ...constants.clientCompilerConfig,
-                "plugins": [
-                    insertShadersPlugin({
-                        file: "#game-shaders"
-                    })
-                ]
-            },
-            ...constants.clientBundlerConfig
-        }, {
-            "action": "copy",
-            "source": "src/client/web/game",
-            "target": `${constants.cacheFolder}/game`
-        }, {
-            "action": "copy",
-            "source": "#texture-atlas",
-            "target": `${constants.cacheFolder}/game/assets/img/textures`,
-        }],
+        "steps": [
+            beelder.bundleJavascript("src/client/game-launcher/index.ts", `#game-launcher = ${constants.cacheFolder}/game/scripts/index.js`, {
+                "compilerOptions": constants.clientCompilerConfig,
+                ...constants.clientBundlerConfig
+            }),
+            beelder.bundleJavascript(
+                "src/client/game/index.ts",
+                `#game-executable = ${constants.cacheFolder}/game/scripts/game.js`, {
+                    compilerOptions: {
+                        ...constants.clientCompilerConfig,
+                        plugins: [
+                            insertShadersPlugin({
+                                file: "#game-shaders"
+                            })
+                        ]
+                    },
+                    ...constants.clientBundlerConfig
+            }),
+            beelder.copy("src/client/web/game", `${constants.cacheFolder}/game`),
+            beelder.copy("#texture-atlas", `${constants.cacheFolder}/game/assets/img/textures`)
+        ],
         "targets": [ `#game = ${constants.cacheFolder}/game` ]
     },
 }

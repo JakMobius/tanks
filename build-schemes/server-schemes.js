@@ -1,75 +1,38 @@
 
+const beelder = require("./utils/beelder-steps")
 const constants = require("./utils/constants")
 
 module.exports = {
     "release-server": {
-        "steps": [{
-            "action": "delete",
-            "target": "dist/server/index.js"
-        }, {
-            "action": "delete",
-            "target": "dist/server/index.js.map"
-        }, {
-            "action": "delete",
-            "target": "dist/server/resources"
-        }, {
-            "action": "copy",
-            "source": "#server-build",
-            "target": "#server = dist/server"
-        }]
+        steps: [
+            beelder.delete("dist/server/index.js"),
+            beelder.delete("dist/server/index.js.map"),
+            beelder.delete("dist/server/resources"),
+            beelder.copy("#server-build", "#server-build")
+        ]
     },
 
     "release-server-resources": {
-        "steps": [{
-            "action": "delete",
-            "target": "dist/server/resources"
-        }, {
-            "action": "copy",
-            "source": "#server-build",
-            "target": "dist/"
-        }]
+        "steps": [
+            beelder.delete("dist/server/resources"),
+            beelder.copy("#server-build", "dist/")
+        ]
     },
 
     "build-server": {
-        "steps": [{
-            "action": "bundle-javascript",
-            "source": "src/server/main.ts",
-            "target": `${constants.cacheFolder}/server/index.js`,
-            "compilerOptions": constants.serverCompilerConfig,
-            ...constants.serverBundlerConfig
-        }, {
-            "action": "copy",
-            "source": "#game",
-            "target": `${constants.cacheFolder}/server/resources/web/`
-        }, {
-            "action": "copy",
-            "source": "#hub",
-            "target": `${constants.cacheFolder}/server/resources/web/`
-        }, {
-           "action": "copy",
-           "source": "#tutorial",
-           "target": `${constants.cacheFolder}/server/resources/web/`
-        }, {
-            "action": "copy",
-            "source": "src/client/web/default",
-            "target": `${constants.cacheFolder}/server/resources/web/`
-        }, {
-            "action": "copy",
-            "source": "src/library/blessed-fork/usr",
-            "target": `${constants.cacheFolder}/server/resources/terminal/`
-        }, {
-            "action": "copy",
-            "source": "src/server/maps",
-            "target": `${constants.cacheFolder}/server/resources/`
-        }, {
-            "action": "copy",
-            "source": "src/server/preferences/default.json",
-            "target": `${constants.cacheFolder}/server/resources/default-preferences.json`
-        }, {
-            "action": "copy",
-            "source": "src/server/scripts",
-            "target": `${constants.cacheFolder}/server/resources/`
-        }],
+        steps: [
+            beelder.bundleJavascript("src/server/main.ts", `${constants.cacheFolder}/server/index.js`, {
+                "compilerOptions": constants.serverCompilerConfig,
+                ...constants.serverBundlerConfig
+            }),
+            beelder.copy("src/server/preferences/default.json", `${constants.cacheFolder}/server/resources/default-preferences.json`),
+            beelder.copy("#game",                  `${constants.cacheFolder}/server/resources/web/`),
+            beelder.copy("#hub",                   `${constants.cacheFolder}/server/resources/web/`),
+            beelder.copy("#tutorial",              `${constants.cacheFolder}/server/resources/web/`),
+            beelder.copy("src/client/web/default", `${constants.cacheFolder}/server/resources/web/`),
+            beelder.copy("src/server/maps",        `${constants.cacheFolder}/server/resources/`),
+            beelder.copy("src/server/scripts",     `${constants.cacheFolder}/server/resources/`)
+        ],
         "targets": [
             `#server-build = ${constants.cacheFolder}/server`
         ]

@@ -1,5 +1,5 @@
 /*
-  Server preferences file. JSON5 parser is used for parsing this file,
+  Server preferences file. JSON5 parser is used to parse this file,
   so C-style comments are allowed here.
 */
 

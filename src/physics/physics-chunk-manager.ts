@@ -11,7 +11,7 @@ export interface PhysicsChunkManagerConfig {
     chunkHeight?: number
 }
 
-// According to benchmarks, arrays is best choice for storing points,
+// According to benchmarks, arrays are the best choice for storing points,
 // as they're fast to create.
 export type PhysicsPoint = [number, number]
 

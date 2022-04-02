@@ -2,6 +2,7 @@
 const getClientResources = require("./utils/get-client-resources")
 const exportStylesheets = require("./utils/export-stylesheets")
 const constants = require("./utils/constants")
+const beelder = require("./utils/beelder-steps")
 
 module.exports = {
     "prepare-hub-resources": {
@@ -22,20 +23,14 @@ module.exports = {
         ]
     },
     "build-hub": {
-        "steps": [{
-            "action": "require-target",
-            "target": "#hub-styles"
-        }, {
-            "action": "bundle-javascript",
-            "source": "src/client/hub/index.ts",
-            "target": `${constants.cacheFolder}/hub/scripts/index.js`,
-            "compilerOptions": constants.clientCompilerConfig,
-            ...constants.clientBundlerConfig
-        }, {
-            "action": "copy",
-            "source": "src/client/web/hub",
-            "target": `${constants.cacheFolder}/hub`
-        }],
+        "steps": [
+            beelder.requireTarget("#hub-styles"),
+            beelder.bundleJavascript("src/client/hub/index.ts", `${constants.cacheFolder}/hub/scripts/index.js`, {
+                "compilerOptions": constants.clientCompilerConfig,
+                ...constants.clientBundlerConfig
+            }),
+            beelder.copy("src/client/web/hub", `${constants.cacheFolder}/hub`)
+        ],
         "targets": [ `#hub = ${constants.cacheFolder}/hub` ]
     },
 }

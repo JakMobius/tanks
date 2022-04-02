@@ -1,12 +1,13 @@
 /* @load-resource: '../web/base-style.scss' */
 
-import GameScene from './scenes/game-scene';
 import './game-loader'
 
+import GameScene from './scenes/game-scene';
 import {ScreenConfig} from "../graphics/screen";
 import GeneralGameScreen from "./general-game-screen";
+import WebsocketConnection from "../networking/websocket-connection";
+import ConnectionClient from "../../networking/connection-client";
 
-/* Loading all necessary stuff for the game */
 import 'src/entity/tanks/model-loader'
 import 'src/effects/model-loader'
 import 'src/client/entity/bullet/model-loader';
@@ -15,8 +16,6 @@ import 'src/client/graphics/drawers/block/type-loader';
 import 'src/client/effects/tank/type-loader';
 import 'src/client/effects/world/type-loader';
 import 'src/map/block-state/type-loader';
-import WebsocketConnection from "../networking/websocket-connection";
-import ConnectionClient from "../../networking/connection-client";
 
 export interface GameConfig extends ScreenConfig {
     ip: string
