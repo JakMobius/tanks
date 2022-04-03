@@ -2,7 +2,8 @@ import Weapon, {WeaponConfig} from "./weapon";
 import BulletModel from "../entity/bullets/bullet-model";
 import ServerBullet from "../server/entity/bullet/server-bullet";
 import * as Box2D from "../library/box2d";
-import PhysicalComponent from "../entity/entity-physics-component";
+import PhysicalComponent from "../entity/physics-component";
+import PhysicalHostComponent from "../physics-world";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -103,7 +104,7 @@ export default class ReloadableWeapon extends Weapon {
         const entity = ServerBullet.fromModel(bullet) as ServerBullet
 
         entity.shooter = tank.player
-        entity.model.initPhysics(world.world)
+        entity.model.initPhysics(world.getComponent(PhysicalHostComponent))
 
         const bulletBody = bullet.getComponent(PhysicalComponent).getBody()
 

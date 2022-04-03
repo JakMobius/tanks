@@ -14,7 +14,7 @@ import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 class Drawer extends TankDrawer<ClientSniperTank> {
 	public bodyBrightSprite: Sprite;

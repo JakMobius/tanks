@@ -1,7 +1,6 @@
 
 import * as Box2D from 'src/library/box2d';
 import GameMap from 'src/map/game-map';
-import EventEmitter from 'src/utils/event-emitter';
 import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
 import AbstractEffect from 'src/effects/abstract-effect';
 import AbstractEntity from 'src/entity/abstract-entity';
@@ -12,7 +11,9 @@ import PhysicsChunkManager from "./physics/physics-chunk-manager";
 import BasicEventHandlerSet from "./utils/basic-event-handler-set";
 import GameWorldContactListener from "./contact-listener";
 import GameWorldContactFilter from "./contact-filter";
-import PhysicalComponent from "./entity/entity-physics-component";
+import PhysicalComponent from "./entity/physics-component";
+import Entity from "./utils/ecs/entity";
+import PhysicalHostComponent from "./physics-world";
 
 export interface GameWorldConfig<MapClass extends GameMap = GameMap> {
     physicsTick?: number
@@ -28,14 +29,9 @@ export default class AbstractWorld<
     EffectClass extends AbstractEffect = AbstractEffect,
     PlayerClass extends AbstractPlayer = AbstractPlayer,
     TankClass extends AbstractEntity = AbstractEntity
-> extends EventEmitter {
-	public physicsTick: number;
-	public maxTicks: number;
-	public positionSteps: number;
-	public velocitySteps: number;
+> extends Entity {
     public readonly physicsLoop: AdapterLoop;
 
-    world: Box2D.World
     map: MapClass
     players = new Map<number, PlayerClass>()
     entities = new Map<number, EntityClass>()
@@ -57,15 +53,15 @@ export default class AbstractWorld<
             velocitySteps: 1
         }, options)
 
-        this.world = new Box2D.World(new Box2D.Vec2())
+        this.addComponent(new PhysicalHostComponent({
+            physicsTick: options.physicsTick,
+            positionSteps: options.positionSteps,
+            velocitySteps: options.velocitySteps
+        }))
+
         this.setupContactListener()
         this.setupContactFilter()
         this.setMap(options.map)
-
-        this.physicsTick = options.physicsTick
-        this.maxTicks = options.maxTicks
-        this.positionSteps = options.positionSteps
-        this.velocitySteps = options.velocitySteps
 
         this.createExplosionPool()
 
@@ -75,7 +71,7 @@ export default class AbstractWorld<
 
         this.physicsLoop = new AdapterLoop({
             maximumSteps: options.maxTicks,
-            interval: this.physicsTick
+            interval: options.physicsTick
         })
 
         this.physicsChunkManager = new PhysicsChunkManager({
@@ -84,9 +80,7 @@ export default class AbstractWorld<
 
         this.physicsChunkManager.attach()
 
-        this.physicsLoop.run = () => {
-            this.performPhysicsTick()
-        }
+        this.physicsLoop.run = () => this.getComponent(PhysicalHostComponent).tickPhysics()
         this.physicsLoop.start()
     }
 
@@ -96,19 +90,9 @@ export default class AbstractWorld<
         })
     }
 
-    private performPhysicsTick() {
-        this.world.ClearForces()
-        for (let entity of this.entities.values()) {
-            entity.model.physicsTick(this.physicsTick)
-        }
-        this.world.Step(this.physicsTick, this.velocitySteps, this.positionSteps);
-    }
-
     processPhysics(dt: number): void {
-
         this.explosionEffectPool.tick(dt)
         this.physicsLoop.timePassed(dt)
-        this.world.ClearForces()
     }
 
     processEntities(dt: number): void {
@@ -123,6 +107,7 @@ export default class AbstractWorld<
                 this.removeEntity(entity)
         }
     }
+
     processEffects(dt: number): void {
         for(let effect of this.effects.values()) {
             effect.tick(dt)
@@ -146,7 +131,7 @@ export default class AbstractWorld<
 
     createEntity(entity: EntityClass): void {
         entity.setWorld(this)
-        if(!entity.model.getComponent(PhysicalComponent)) entity.model.initPhysics(this.world)
+        if(!entity.model.getComponent(PhysicalComponent)) entity.model.initPhysics(this.getComponent(PhysicalHostComponent))
         this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
@@ -204,13 +189,15 @@ export default class AbstractWorld<
         this.emit("map-change", map)
     }
 
+    // TODO: move to component
+
     protected setupContactListener() {
         this.contactListener = new GameWorldContactListener(this)
-        this.world.SetContactListener(this.contactListener)
+        this.getComponent(PhysicalHostComponent).world.SetContactListener(this.contactListener)
     }
 
     protected setupContactFilter() {
         this.contactFilter = new GameWorldContactFilter()
-        this.world.SetContactFilter(this.contactFilter)
+        this.getComponent(PhysicalHostComponent).world.SetContactFilter(this.contactFilter)
     }
 }

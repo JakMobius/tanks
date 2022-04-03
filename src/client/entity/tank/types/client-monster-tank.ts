@@ -20,7 +20,7 @@ import {
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import {Constructor} from "../../../../serialization/binary/serializable";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 class Drawer extends TankDrawer<ClientMonsterTank> {
 	public bodyBrightSprite: Sprite;

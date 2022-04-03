@@ -5,7 +5,7 @@ import Sprite from 'src/client/sprite';
 import * as Box2D from 'src/library/box2d'
 import Camera from "src/client/camera";
 import ClientTank, {ClientTankType} from "../../../../../entity/tank/client-tank";
-import PhysicalComponent from "../../../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../../../entity/physics-component";
 
 export interface TankSelectElementViewConfig {
     Tank: ClientTankType
@@ -25,7 +25,7 @@ export default class TankSelectElement extends View {
     canvasSize = 70;
 
     Tank: ClientTankType = null;
-    tank: ClientTank = null
+    // tank: ClientTank = null
 
     constructor(options: TankSelectElementViewConfig) {
         super();
@@ -49,7 +49,7 @@ export default class TankSelectElement extends View {
         Sprite.applyTexture(this.ctx)
 
         this.title = $("<div>").addClass("tank-preview-title")
-        this.title.text(this.Tank.getName())
+        // this.title.text(this.Tank.getName())
 
         this.element.append(this.canvas)
         this.element.append(this.title)
@@ -74,24 +74,24 @@ export default class TankSelectElement extends View {
     }
 
     createTank() {
-        let model = new this.Tank.Model()
-        this.tank = new (this.Tank)({ model: model })
-        this.tank.model.initPhysics(this.previewWorld)
-        const fixtureList = this.tank.model.getComponent(PhysicalComponent).getBody().GetFixtureList()
+        // let model = new this.Tank.Model()
+        // this.tank = new (this.Tank)({ model: model })
+        // this.tank.model.initPhysics(this.previewWorld)
+        // const fixtureList = this.tank.model.getComponent(PhysicalComponent).getBody().GetFixtureList()
 
-        fixtureList.m_filter.maskBits = 0x000
-        fixtureList.m_filter.categoryBits = 0x000
+        // fixtureList.m_filter.maskBits = 0x000
+        // fixtureList.m_filter.categoryBits = 0x000
     }
 
     getTank() {
-        if(!this.tank) this.createTank()
-        return this.tank
+        // if(!this.tank) this.createTank()
+        // return this.tank
     }
 
     draw(dt: number) {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
-        const tank = this.getTank()
-        const body = tank.model.getComponent(PhysicalComponent).getBody()
-        body.SetAngle(body.GetAngle() + dt)
+        // const tank = this.getTank()
+        // const body = tank.model.getComponent(PhysicalComponent).getBody()
+        // body.SetAngle(body.GetAngle() + dt)
     }
 }

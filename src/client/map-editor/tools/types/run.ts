@@ -8,7 +8,7 @@ import ClientPlayer from "../../../client-player";
 import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
 import ClientTank from "../../../entity/tank/client-tank";
 import ClientMonsterTank from "../../../entity/tank/types/client-monster-tank";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;

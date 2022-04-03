@@ -3,7 +3,7 @@ import TankBehaviour from './physics/tank-behaviour';
 import TankControls from '../../controls/tank-controls';
 import EntityModel from "../entity-model";
 import Matrix3 from "../../utils/matrix3";
-import PhysicalComponent from "../entity-physics-component";
+import PhysicalComponent from "../physics-component";
 
 /**
  * Tank model. Сombines the physical model
@@ -28,14 +28,14 @@ export default class TankModel<BehaviourClass extends TankBehaviour = any> exten
     constructor() {
         super()
         this.controls = new TankControls(this)
-    }
 
-    physicsTick(dt: number) {
-        this.behaviour.tick(dt)
-        const body = this.getComponent(PhysicalComponent).getBody()
-        const position = body.GetPosition()
-        this.matrix.reset()
-        this.matrix.translate(position.x, position.y)
-        this.matrix.rotate(-body.GetAngle())
+        this.on("physics-tick", (dt) => {
+            this.behaviour.tick(dt)
+            const body = this.getComponent(PhysicalComponent).getBody()
+            const position = body.GetPosition()
+            this.matrix.reset()
+            this.matrix.translate(position.x, position.y)
+            this.matrix.rotate(-body.GetAngle())
+        })
     }
 }

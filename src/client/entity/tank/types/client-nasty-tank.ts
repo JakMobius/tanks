@@ -15,7 +15,7 @@ import {
     copyQuadrangle
 } from "../../../../utils/quadrangle";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)

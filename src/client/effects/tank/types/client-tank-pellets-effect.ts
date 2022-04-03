@@ -5,7 +5,7 @@ import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/tank/models/tank-pellets-effect-model';
 import ClientPlayer from "../../../client-player";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 export default class ClientTankPelletsEffect extends ClientTankEffect {
 	public player: ClientPlayer;

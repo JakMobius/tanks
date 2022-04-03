@@ -4,24 +4,25 @@ import * as Box2D from "../../../library/box2d";
 import PhysicsUtils from "../../../utils/physics-utils";
 import {b2BodyType} from "../../../library/box2d/dynamics/b2_body";
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class BulletModelMine extends BulletModel {
     static typeName = 7
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
         let bodyFixture = PhysicsUtils.squareFixture(1.25, 1.25, null, {
             filter: physicsFilters.mine,
             isSensor: true
         })
 
-        const body = world.CreateBody({
+        const body = world.world.CreateBody({
             type: b2BodyType.b2_staticBody
         })
 
         body.CreateFixture(bodyFixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }
 

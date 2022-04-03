@@ -4,7 +4,8 @@ import * as Box2D from "../../../library/box2d";
 import PhysicsUtils from "../../../utils/physics-utils";
 import {physicsFilters} from "../../../physics/categories";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class BulletModelBomb extends BulletModel {
     static typeName = 5
@@ -14,7 +15,7 @@ export default class BulletModelBomb extends BulletModel {
         this.diesAfterWallHit = false
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         const shape = new Box2D.CircleShape()
         shape.Set(new Box2D.Vec2(0, 0), 0.375)
@@ -25,7 +26,7 @@ export default class BulletModelBomb extends BulletModel {
             restitution: 1
         })
 
-        const body = PhysicsUtils.dynamicBody(world, {
+        const body = PhysicsUtils.dynamicBody(world.world, {
             angularDamping: 0.0,
             linearDamping: 0.15,
             bullet: true
@@ -33,7 +34,7 @@ export default class BulletModelBomb extends BulletModel {
 
         body.CreateFixture(bodyFixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }
 

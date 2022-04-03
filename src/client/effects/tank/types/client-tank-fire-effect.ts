@@ -6,7 +6,7 @@ import ClientTankEffect from 'src/client/effects/tank/client-tank-effect';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../../entity/tank/client-tank";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 export default class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;

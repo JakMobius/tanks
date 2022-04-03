@@ -19,6 +19,8 @@ import ClientPlayer from "../client-player";
 import ClientTank from "../entity/tank/client-tank";
 import WorldPlayerControlsPacket from "../../networking/packets/game-packets/world-player-controls-packet";
 import EntityHealthPacket from "../../networking/packets/game-packets/entity-health-packet";
+import PhysicalComponent from "../../entity/physics-component";
+import PhysicalHostComponent from "../../physics-world";
 
 export default class ClientWorldBridge {
     static buildBridge(client: ConnectionClient, world: ClientGameWorld) {
@@ -42,7 +44,7 @@ export default class ClientWorldBridge {
         client.on(EntityCreatePacket, (packet) => {
             const entities = packet.createEntities((model) => {
                 let entity = ClientEntity.fromModel(model)
-                entity.model.initPhysics(world.world)
+                entity.model.initPhysics(world.getComponent(PhysicalHostComponent))
                 return entity
             })
 

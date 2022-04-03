@@ -6,7 +6,7 @@ import TextureProgram from "../programs/texture-program";
 import DrawPhase from "./draw-phase";
 import Matrix3 from "../../../utils/matrix3";
 import {squareQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
-import PhysicalComponent from "../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../entity/physics-component";
 
 export default class BasicEntityDrawer extends EntityDrawer {
 	public matrix: Matrix3;

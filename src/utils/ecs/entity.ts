@@ -1,7 +1,8 @@
 import {Component} from "./component";
 import {Constructor} from "../../serialization/binary/serializable";
+import EventEmitter from "../event-emitter";
 
-export default class Entity {
+export default class Entity extends EventEmitter {
     public components: Component[] = []
 
     public addComponent(component: Component): void {

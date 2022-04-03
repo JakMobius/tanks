@@ -4,7 +4,8 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import AirbagTankBehaviour from '../physics/airbag-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
 
@@ -34,7 +35,7 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
         return 15
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         let vertexArray = NastyTankModel.vertices.map(v => new Box2D.Vec2(v[0] * 2.25, v[1] * 2.25));
 
@@ -43,13 +44,13 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
             density: 200
         })
 
-        const body = PhysicsUtils.dynamicBody(world, {
+        const body = PhysicsUtils.dynamicBody(world.world, {
             linearDamping: 0.8,
             angularDamping: 0.7
         });
 
         body.CreateFixture(bodyFixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }

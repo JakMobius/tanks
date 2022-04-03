@@ -17,7 +17,7 @@ import FX from "../../../sound/fx";
 import {TankStat} from "../tank-stat";
 import {worker} from "cluster";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../../entity/physics-component";
 
 class Drawer extends TankDrawer<ClientBigboiTank> {
 	public bodyBrightSprite: Sprite;

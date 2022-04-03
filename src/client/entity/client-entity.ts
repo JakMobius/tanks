@@ -8,7 +8,7 @@ import BinaryEncoder from "../../serialization/binary/binary-encoder";
 import ClientGameWorld from "../client-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import BulletModel from "../../entity/bullets/bullet-model";
-import PhysicalComponent from "../../entity/entity-physics-component";
+import PhysicalComponent from "../../entity/physics-component";
 
 export default class ClientEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ClientGameWorld, ModelClass> {
 

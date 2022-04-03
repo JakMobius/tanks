@@ -1,7 +1,7 @@
 import ClientGameWorld from "./client-game-world";
 import TankModel from "../entity/tanks/tank-model";
 import Sound from "./sound/sound";
-import PhysicalComponent from "../entity/entity-physics-component";
+import PhysicalComponent from "../entity/physics-component";
 
 
 export interface EngineConfig {

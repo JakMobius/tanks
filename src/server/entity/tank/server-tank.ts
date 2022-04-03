@@ -7,7 +7,7 @@ import AbstractEffect from "../../../effects/abstract-effect";
 import ServerPlayer from "../../server-player";
 import {Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
-import PhysicalComponent from "../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../entity/physics-component";
 
 export interface ServerTankConfig<ModelClass> {
     model: ModelClass

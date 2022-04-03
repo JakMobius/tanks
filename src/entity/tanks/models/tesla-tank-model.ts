@@ -3,7 +3,8 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import BasicTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class TeslaTankModel extends TankModel {
 
@@ -29,7 +30,7 @@ export default class TeslaTankModel extends TankModel {
         return 20
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         const bodyFixture = PhysicsUtils.squareFixture(1.125, 1.8, null, {
             filter: physicsFilters.tank
@@ -38,11 +39,11 @@ export default class TeslaTankModel extends TankModel {
             filter: physicsFilters.tank
         })
 
-        const body = PhysicsUtils.dynamicBody(world)
+        const body = PhysicsUtils.dynamicBody(world.world)
         body.CreateFixture(bodyFixture)
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }

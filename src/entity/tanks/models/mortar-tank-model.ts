@@ -3,7 +3,8 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 class MortarTankModel extends TankModel<TrackTankBehaviour> {
 
@@ -24,7 +25,7 @@ class MortarTankModel extends TankModel<TrackTankBehaviour> {
         });
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         let size = 9
         const segment = size / 4;
@@ -39,13 +40,13 @@ class MortarTankModel extends TankModel<TrackTankBehaviour> {
             density: 600
         })
 
-        const body = PhysicsUtils.dynamicBody(world);
+        const body = PhysicsUtils.dynamicBody(world.world);
 
         body.CreateFixture(bodyFixture)
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 
     static getMaximumHealth() {

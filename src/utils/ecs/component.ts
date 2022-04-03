@@ -1,13 +1,8 @@
 import Entity from "./entity";
 
-export class Component {
+export interface Component {
     entity?: Entity | null
 
-    onAttach(entity: Entity) {
-        this.entity = entity;
-    };
-
-    onDetach() {
-        this.entity = null
-    };
+    onAttach(entity: Entity): void;
+    onDetach(): void;
 }

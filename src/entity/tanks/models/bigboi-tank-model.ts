@@ -3,7 +3,8 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
 
@@ -30,7 +31,7 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
         return 20
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         let bodyFixtureDef = PhysicsUtils.squareFixture(2.25, 1.9575, null, {
             density: 1920,
@@ -41,7 +42,7 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
             filter: physicsFilters.tank
         })
 
-        const body = PhysicsUtils.dynamicBody(world, {
+        const body = PhysicsUtils.dynamicBody(world.world, {
             angularDamping: 0.1,
             linearDamping: 0.2
         });
@@ -52,6 +53,6 @@ export default class BigBoiTankModel extends TankModel<TrackTankBehaviour> {
             body.CreateFixture(fixture)
         }
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }

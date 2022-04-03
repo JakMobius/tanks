@@ -4,7 +4,7 @@ import PhysicsChunk from "./physics-chunk";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import GameMap from "../map/game-map";
 import EventEmitter from "../utils/event-emitter";
-import PhysicalComponent from "../entity/entity-physics-component";
+import PhysicalComponent from "../entity/physics-component";
 
 export interface PhysicsChunkManagerConfig {
     world: AbstractWorld

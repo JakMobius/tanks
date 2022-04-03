@@ -5,7 +5,7 @@ import BinaryDecoder from "../../serialization/binary/binary-decoder";
 import BinaryEncoder from "../../serialization/binary/binary-encoder";
 import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
-import PhysicalComponent from "../../entity/entity-physics-component";
+import PhysicalComponent from "../../entity/physics-component";
 
 export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
 	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;

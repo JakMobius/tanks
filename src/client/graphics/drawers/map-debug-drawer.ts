@@ -10,6 +10,7 @@ import ClientTank from "../../entity/tank/client-tank";
 import TankModel from "../../../entity/tanks/tank-model";
 import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -111,8 +112,9 @@ export default class MapDebugDrawer {
     }
 
     private drawB2Debug() {
-        this.world.world.SetDebugDraw(this.b2DebugDraw)
-        this.world.world.DebugDraw()
+        // TODO: This hurts my eyes. Should be easy to fix later
+        this.world.getComponent(PhysicalHostComponent).world.SetDebugDraw(this.b2DebugDraw)
+        this.world.getComponent(PhysicalHostComponent).world.DebugDraw()
     }
 
     private drawTankWheelDebug(entity: ClientTank<TankModel>) {

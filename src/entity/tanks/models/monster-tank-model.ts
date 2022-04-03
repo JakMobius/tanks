@@ -5,7 +5,8 @@ import {b2World} from "../../../library/box2d/dynamics/b2_world";
 import {Vec2} from "../../../library/box2d";
 import {physicsFilters} from "../../../physics/categories";
 import WheelAxlesGenerator from "../physics/wheeled-tank/wheel-axles-generator";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
 
@@ -35,14 +36,14 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
         return 10
     }
 
-    initPhysics(world: b2World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         let bodyFixture = PhysicsUtils.squareFixture(1.5, 2.5, new Vec2(), {
             density: 512,
             filter: physicsFilters.tank
         })
 
-        const body = PhysicsUtils.dynamicBody(world, {
+        const body = PhysicsUtils.dynamicBody(world.world, {
             angularDamping: 0.1,
             linearDamping: 0.1
         });
@@ -57,6 +58,6 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
             body.CreateFixture(fixture)
         }
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }

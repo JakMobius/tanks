@@ -7,7 +7,7 @@ import ServerPlayer from "../../server-player";
 import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
-import PhysicalComponent from "../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../entity/physics-component";
 
 export interface ServerBulletConfig<ModelClass extends BulletModel> {
     model: ModelClass

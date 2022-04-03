@@ -9,6 +9,7 @@ import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {b2BodyType} from "../library/box2d/dynamics/b2_body";
 import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
+import PhysicalHostComponent from "../physics-world";
 
 export default class PhysicsChunk {
     public readonly manager: PhysicsChunkManager;
@@ -80,7 +81,7 @@ export default class PhysicsChunk {
             this.body.GetWorld().DestroyBody(this.body)
         }
 
-        const body = this.manager.world.world.CreateBody({
+        const body = this.manager.world.getComponent(PhysicalHostComponent).world.CreateBody({
             type: b2BodyType.b2_staticBody,
             position: { x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE },
         })

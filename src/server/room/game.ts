@@ -23,7 +23,7 @@ import ServerPlayer from "../server-player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
 import ServerEntity from "../entity/server-entity";
-import PhysicalComponent from "../../entity/entity-physics-component";
+import PhysicalComponent from "../../entity/physics-component";
 
 interface GameConfig {
     name: string

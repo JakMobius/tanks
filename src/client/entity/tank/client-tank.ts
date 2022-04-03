@@ -10,7 +10,7 @@ import ClientTankEffect from "../../effects/tank/client-tank-effect";
 import ClientEntity from "../client-entity";
 import SmokeParticle from "../../particles/smoke-particle";
 import Color from "../../../utils/color";
-import PhysicalComponent from "../../../entity/entity-physics-component";
+import PhysicalComponent from "../../../entity/physics-component";
 
 export interface TankConfig<ModelClass extends TankModel> {
     model: ModelClass

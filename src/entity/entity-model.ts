@@ -1,12 +1,12 @@
 
-import BinarySerializable, {Constructor} from '../serialization/binary/serializable';
+import {Constructor} from '../serialization/binary/serializable';
 import BinaryEncoder from "../serialization/binary/binary-encoder";
 import BinaryDecoder from "../serialization/binary/binary-decoder";
 import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
-import * as Box2D from "../library/box2d"
 import Entity from "../utils/ecs/entity";
-import PhysicalComponent from "./entity-physics-component";
+import PhysicalHostComponent from "../physics-world";
+import PositionComponent from "./position-component";
 
 /**
  * Entity model. Describes entity position,
@@ -41,6 +41,7 @@ export default class EntityModel extends Entity {
     constructor() {
         super()
 
+        this.addComponent(new PositionComponent())
         this.setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
     }
 
@@ -65,7 +66,7 @@ export default class EntityModel extends Entity {
         return 10
     }
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
         throw new Error("Method not implemented")
     }
 
@@ -80,9 +81,5 @@ export default class EntityModel extends Entity {
         const world = entity.getWorld()
         if(!world) return
         world.emit("entity-health-change", entity)
-    }
-
-    physicsTick(physicsTick: number) {
-        
     }
 }

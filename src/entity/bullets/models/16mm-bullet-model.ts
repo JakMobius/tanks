@@ -4,19 +4,20 @@ import {BinarySerializer} from "src/serialization/binary/serializable";
 import * as Box2D from "src/library/box2d";
 import PhysicsUtils from "src/utils/physics-utils";
 import {physicsFilters} from "src/physics/categories";
-import PhysicalComponent from "../../entity-physics-component";
+import PhysicalComponent from "../../physics-component";
+import PhysicalHostComponent from "../../../physics-world";
 
 export default class BulletModel16mm extends BulletModel {
     static typeName = 4
 
-    initPhysics(world: Box2D.World) {
+    initPhysics(world: PhysicalHostComponent) {
 
         let bodyFixture = PhysicsUtils.squareFixture(0.0825, 0.25, null, {
             density: 48,
             filter: physicsFilters.bullet
         })
 
-        const body = PhysicsUtils.dynamicBody(world, {
+        const body = PhysicsUtils.dynamicBody(world.world, {
             angularDamping: 0.1,
             linearDamping: 0.2,
             bullet: true
@@ -24,7 +25,7 @@ export default class BulletModel16mm extends BulletModel {
 
         body.CreateFixture(bodyFixture)
 
-        this.addComponent(new PhysicalComponent(body))
+        this.addComponent(new PhysicalComponent(body, world))
     }
 }
 
