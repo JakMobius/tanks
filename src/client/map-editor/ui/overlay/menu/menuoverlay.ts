@@ -80,12 +80,12 @@ class MenuOverlay extends Overlay {
         creationOverlay.dialog.addButton({
             title: "Создать карту",
             onclick: () => {
-                let width = creationOverlay.dialog.element.find("input.width").val() || "50"
-                let height = creationOverlay.dialog.element.find("input.height").val() || "50"
-                let name = creationOverlay.dialog.element.find("input.name").val() || "Карта"
+                let widthStr = creationOverlay.dialog.element.find("input.width").val().toString() || "50"
+                let heightStr = creationOverlay.dialog.element.find("input.height").val().toString() || "50"
+                let name = creationOverlay.dialog.element.find("input.name").val().toString() || "Карта"
 
-                width = parseInt(width)
-                height = parseInt(height)
+                let width = parseInt(widthStr)
+                let height = parseInt(heightStr)
 
                 if(Number.isNaN(width) || Number.isNaN(height) || width < 0 || height < 0 || width * height > 65535) {
                     return

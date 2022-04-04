@@ -1,6 +1,5 @@
 
 import EventEmitter from '../../utils/event-emitter';
-import * as blessed from '../../library/blessed-fork/lib/blessed';
 import HistoryEntry from "./console-history-entry";
 import CallbackLogger from "./callback-logger";
 import ServerLine from "../../library/serverline"
@@ -158,7 +157,7 @@ export default class ConsoleWindow extends EventEmitter {
         this.emit("tab", shift)
     }
 
-    onKeypress(key: blessed.KeyEvent) {
+    onKeypress(key: any) {
         this.emit("keypress", key)
     }
 

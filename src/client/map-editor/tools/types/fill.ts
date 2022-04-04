@@ -39,7 +39,7 @@ export default class Fill extends Tool {
     }
 
     fill(x: number, y: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
         let baseBlock = map.getBlock(x, y)
 
         if(!baseBlock) return
