@@ -1,14 +1,14 @@
 import Logger from '../log/logger';
 import * as fs from 'fs';
-import ConsoleWindow from './console-window';
 import * as path from 'path';
 import ArgumentParser from './argument-parser';
 
-// @ts-ignore
+//@ts-ignore
 import CommandList from "../commands/types/*"
 import Command from "../commands/command";
 import Server from "../server";
 import StdCatchLogger from "../log/std-catch-logger";
+import ConsoleWindow from "./console-window";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required
@@ -159,7 +159,7 @@ export default class Console {
 			return
 		}
 
-		let cursorPosition = this.window.consoleBox.consoleTextbox.cursorPosition
+		let cursorPosition = this.window.getCurrentCursorPosition()
 		let line = this.window.getValue()
 
 		if(line.length == 0 || cursorPosition != line.length) {
@@ -183,8 +183,6 @@ export default class Console {
 	evaluate(line: string): void {
 
 		line = line.trim()
-
-		this.logger.log("> §!FFF;" + line)
 
 		if(line.length === 0) return
 
@@ -240,5 +238,9 @@ export default class Console {
 			})
 			this.commands.set(command.getName(), command);
 		}
+	}
+
+	destroy() {
+		if(this.window) this.window.destroy()
 	}
 }

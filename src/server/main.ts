@@ -39,7 +39,7 @@ async function initialize() {
         server = new Server(config)
         server.setConsole(serverConsole)
         server.on("terminate", () => {
-            serverConsole.window.screen.destroy()
+            serverConsole.window.destroy()
             server.db.disconnect(false)
         })
 
@@ -49,7 +49,7 @@ async function initialize() {
         // Cleaning up everything that would cause program to stay active
 
         if(server) server.terminate().then()
-        else if(serverConsole) serverConsole.window.destroy()
+        else if(serverConsole) serverConsole.destroy()
 
         throw e
     }
