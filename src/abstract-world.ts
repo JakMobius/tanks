@@ -1,5 +1,4 @@
 
-import * as Box2D from 'src/library/box2d';
 import GameMap from 'src/map/game-map';
 import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
 import AbstractEffect from 'src/effects/abstract-effect';
@@ -7,13 +6,13 @@ import AbstractEntity from 'src/entity/abstract-entity';
 import AbstractPlayer from 'src/abstract-player';
 import ExplodeEffectPool from "src/effects/world/explode/explode-effect-pool";
 import AdapterLoop from "./utils/loop/adapter-loop";
-import PhysicsChunkManager from "./physics/physics-chunk-manager";
-import BasicEventHandlerSet from "./utils/basic-event-handler-set";
+import ChunkedMapCollider from "./physics/chunked-map-collider";
 import GameWorldContactListener from "./contact-listener";
 import GameWorldContactFilter from "./contact-filter";
 import PhysicalComponent from "./entity/physics-component";
 import Entity from "./utils/ecs/entity";
-import PhysicalHostComponent from "./physics-world";
+import PhysicalHostComponent from "./physiсal-world-component";
+import TilemapComponent from "./physics/tilemap-component";
 
 export interface GameWorldConfig<MapClass extends GameMap = GameMap> {
     physicsTick?: number
@@ -32,16 +31,12 @@ export default class AbstractWorld<
 > extends Entity {
     public readonly physicsLoop: AdapterLoop;
 
-    map: MapClass
     players = new Map<number, PlayerClass>()
     entities = new Map<number, EntityClass>()
     effects = new Map<number, EffectClass>()
     explosionEffectPool: ExplodeEffectPool<this>
-    physicsChunkManager: PhysicsChunkManager
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
-
-    private mapEventHandler = new BasicEventHandlerSet()
 
     constructor(options?: GameWorldConfig<MapClass>) {
         super()
@@ -53,35 +48,34 @@ export default class AbstractWorld<
             velocitySteps: 1
         }, options)
 
+        this.addComponent(new TilemapComponent());
+
         this.addComponent(new PhysicalHostComponent({
             physicsTick: options.physicsTick,
             positionSteps: options.positionSteps,
             velocitySteps: options.velocitySteps
         }))
 
+        this.addComponent(new ChunkedMapCollider());
+
         this.setupContactListener()
         this.setupContactFilter()
-        this.setMap(options.map)
+        this.getComponent(TilemapComponent).setMap(options.map)
 
         this.createExplosionPool()
-
-        this.mapEventHandler.on("block-update", (x, y) => this.emit("map-block-update", x, y))
-        this.mapEventHandler.on("block-damage", (x, y) => this.emit("map-block-damage", x, y))
-        this.mapEventHandler.on("block-change", (x, y) => this.emit("map-block-change", x, y))
 
         this.physicsLoop = new AdapterLoop({
             maximumSteps: options.maxTicks,
             interval: options.physicsTick
         })
 
-        this.physicsChunkManager = new PhysicsChunkManager({
-            world: this
-        })
-
-        this.physicsChunkManager.attach()
-
         this.physicsLoop.run = () => this.getComponent(PhysicalHostComponent).tickPhysics()
         this.physicsLoop.start()
+
+        this.on("map-change", () => {
+            this.effects.clear()
+            this.players.clear()
+        })
     }
 
     createExplosionPool(): void {
@@ -155,7 +149,6 @@ export default class AbstractWorld<
 
     removePlayer(player: PlayerClass) {
         player.destroy()
-        //player.team.remove(player);
         this.players.delete(player.id)
         this.emit("player-remove", player)
     }
@@ -179,14 +172,6 @@ export default class AbstractWorld<
         if(this.effects.delete(effect.model.id)) {
             this.emit("effect-remove", effect)
         }
-    }
-
-    setMap(map: MapClass) {
-        this.effects.clear()
-        this.players.clear()
-        this.map = map
-        this.mapEventHandler.setTarget(map)
-        this.emit("map-change", map)
     }
 
     // TODO: move to component

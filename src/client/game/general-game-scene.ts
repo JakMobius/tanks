@@ -14,6 +14,7 @@ import Scene, {SceneConfig} from "../scenes/scene";
 import ClientPlayer from "../client-player";
 import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
 import PhysicalComponent from "../../entity/physics-component";
+import TilemapComponent from "../../physics/tilemap-component";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera;
@@ -102,8 +103,9 @@ export default class GeneralGameScene extends Scene {
         this.worldDrawer.setWorld(world)
 
         this.displayedWorld.on("map-change", () => {
-            this.camera.defaultPosition.x = this.displayedWorld.map.width / 2 * GameMap.BLOCK_SIZE
-            this.camera.defaultPosition.y = this.displayedWorld.map.height / 2 * GameMap.BLOCK_SIZE
+            const map = this.displayedWorld.getComponent(TilemapComponent).map
+            this.camera.defaultPosition.x = map.width / 2 * GameMap.BLOCK_SIZE
+            this.camera.defaultPosition.y = map.height / 2 * GameMap.BLOCK_SIZE
         })
 
         this.displayedWorld.on("primary-player-set", (player: ClientPlayer) => {

@@ -8,6 +8,7 @@ import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
 import PhysicalComponent from "../../../entity/physics-component";
+import TilemapComponent from "../../../physics/tilemap-component";
 
 export interface ServerBulletConfig<ModelClass extends BulletModel> {
     model: ModelClass
@@ -81,7 +82,10 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
         if(this.wallDamage) {
             const world = this.getWorld()
             world.physicsLoop.scheduleTask(() => {
-                world.map.damageBlock(x, y, this.wallDamage)
+                const mapComponent = this.world.getComponent(TilemapComponent)
+                if(mapComponent) {
+                    mapComponent.map.damageBlock(x, y, this.wallDamage)
+                }
             })
         }
     }

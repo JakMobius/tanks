@@ -20,12 +20,13 @@ import ClientTank from "../entity/tank/client-tank";
 import WorldPlayerControlsPacket from "../../networking/packets/game-packets/world-player-controls-packet";
 import EntityHealthPacket from "../../networking/packets/game-packets/entity-health-packet";
 import PhysicalComponent from "../../entity/physics-component";
-import PhysicalHostComponent from "../../physics-world";
+import PhysicalHostComponent from "../../physiсal-world-component";
+import TilemapComponent from "../../physics/tilemap-component";
 
 export default class ClientWorldBridge {
     static buildBridge(client: ConnectionClient, world: ClientGameWorld) {
         client.on(MapPacket, (packet) => {
-            world.setMap(packet.map)
+            world.getComponent(TilemapComponent).setMap(packet.map)
         })
 
         client.on(PlayerJoinPacket, (packet) => {
@@ -62,7 +63,7 @@ export default class ClientWorldBridge {
         })
 
         client.on(BlockUpdatePacket, (packet) => {
-            world.map.setBlock(packet.x, packet.y, packet.block)
+            world.getComponent(TilemapComponent).map.setBlock(packet.x, packet.y, packet.block)
         })
 
         client.on(WorldPlayerControlsPacket, (packet) => {

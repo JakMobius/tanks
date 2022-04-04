@@ -5,7 +5,7 @@ import PhysicsUtils from "../../../utils/physics-utils";
 import {physicsFilters} from "../../../physics/categories";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class BulletModelBomb extends BulletModel {
     static typeName = 5

@@ -17,6 +17,7 @@ import BasicCameraProgramController from "../programs/controllers/basic-camera-p
 import TruckProgram from "../programs/truck-program";
 import LightMaskTextureProgram from "../programs/light-mask-texture/light-mask-texture-program";
 import MaskTextureProgramController from "../programs/light-mask-texture/light-mask-texture-program-controller";
+import TilemapComponent from "../../../physics/tilemap-component";
 
 export default class WorldDrawer extends EventEmitter {
 	public readonly camera: Camera
@@ -121,7 +122,12 @@ export default class WorldDrawer extends EventEmitter {
     }
 
     draw(dt: number) {
-        if(this.world.map) this.mapDrawer.drawMap(this.world.map, this.camera)
+        const mapComponent = this.world.getComponent(TilemapComponent)
+        if(mapComponent) {
+            const map = mapComponent.map
+            if(map) this.mapDrawer.drawMap(map, this.camera)
+        }
+
         this.drawEntities()
         this.drawParticles()
         this.explodePoolDrawer.draw(this.world.explosionEffectPool, dt)

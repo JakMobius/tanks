@@ -1,12 +1,11 @@
 import TankModel from '../tank-model';
 import PhysicsUtils from '../../../utils/physics-utils';
 import WheeledTankBehaviour from '../physics/wheeled-tank/wheeled-tank-behaviour';
-import {b2World} from "../../../library/box2d/dynamics/b2_world";
 import {Vec2} from "../../../library/box2d";
 import {physicsFilters} from "../../../physics/categories";
 import WheelAxlesGenerator from "../physics/wheeled-tank/wheel-axles-generator";
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
 

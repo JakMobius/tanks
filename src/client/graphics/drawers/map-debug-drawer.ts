@@ -10,7 +10,8 @@ import ClientTank from "../../entity/tank/client-tank";
 import TankModel from "../../../entity/tanks/tank-model";
 import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
+import ChunkedMapCollider from "../../../physics/chunked-map-collider";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -47,7 +48,7 @@ export default class MapDebugDrawer {
     }
 
     private drawChunksDebug() {
-        let chunkManager = this.world.physicsChunkManager
+        let chunkManager = this.world.getComponent(ChunkedMapCollider)
 
         for(let row of chunkManager.chunkMap.rows.values()) {
             for(let chunk of row.values()) {

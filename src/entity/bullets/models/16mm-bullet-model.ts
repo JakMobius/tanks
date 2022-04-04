@@ -5,7 +5,7 @@ import * as Box2D from "src/library/box2d";
 import PhysicsUtils from "src/utils/physics-utils";
 import {physicsFilters} from "src/physics/categories";
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class BulletModel16mm extends BulletModel {
     static typeName = 4

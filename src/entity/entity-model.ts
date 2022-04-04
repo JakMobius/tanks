@@ -5,7 +5,7 @@ import BinaryDecoder from "../serialization/binary/binary-decoder";
 import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";
-import PhysicalHostComponent from "../physics-world";
+import PhysicalHostComponent from "../physiсal-world-component";
 import PositionComponent from "./position-component";
 
 /**

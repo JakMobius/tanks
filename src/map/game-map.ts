@@ -1,4 +1,4 @@
-import EventEmitter from 'src/utils/event-emitter';
+
 import MapBinaryOptions from './map-binary-options';
 import BlockState from './block-state/block-state';
 import AirBlockState from './block-state/types/air-block-state';
@@ -6,6 +6,7 @@ import SpawnZone from "./spawn-zone";
 import BinaryDecoder from "../serialization/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
 import BinaryEncoder from "../serialization/binary/binary-encoder";
+import Entity from "../utils/ecs/entity";
 
 export interface GameMapConfig {
 	spawnZones?: SpawnZone[]
@@ -14,7 +15,7 @@ export interface GameMapConfig {
 	data: BlockState[]
 }
 
-export default class GameMap extends EventEmitter {
+export default class GameMap extends Entity {
 	public needsUpdate: boolean;
 
 	static BinaryOptions: MapBinaryOptions = MapBinaryOptions.shared

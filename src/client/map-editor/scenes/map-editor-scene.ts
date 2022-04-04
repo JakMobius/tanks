@@ -17,6 +17,7 @@ import Tools from "../tools/type-loader"
 import EditorMap from "../editor-map";
 import ClientGameWorld from "../../client-game-world";
 import EditorWorld from "../editor-world";
+import TilemapComponent from "../../../physics/tilemap-component";
 
 export default class MapEditorScene extends Scene {
 
@@ -63,8 +64,8 @@ export default class MapEditorScene extends Scene {
 
         this.menuOverlay.on("open", (map) => {
             this.map = map
-            this.world.setMap(map)
-            this.toolManager.world.setMap(map)
+            this.world.getComponent(TilemapComponent).setMap(this.map)
+            this.toolManager.world.getComponent(TilemapComponent).setMap(this.map)
 
             if(map) {
                 if(!this.camera.target) {

@@ -7,6 +7,7 @@ import GameMap from '../../../../map/game-map';
 import ToolManager from "../toolmanager";
 import EditorMap from "../../editor-map";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
+import TilemapComponent from "../../../../physics/tilemap-component";
 
 class SpawnZoneTool extends Tool {
     public image = "assets/img/spawnzones.png"
@@ -83,7 +84,7 @@ class SpawnZoneTool extends Tool {
 
     drawDecorations() {
         super.drawDecorations();
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         this.program.reset()
 
@@ -115,7 +116,7 @@ class SpawnZoneTool extends Tool {
     }
 
     deleteZone(id: number) {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         let i = 0;
         for(let zone of map.spawnZones) {
@@ -129,7 +130,7 @@ class SpawnZoneTool extends Tool {
     }
 
     getZone(id: number) {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         for(let zone of map.spawnZones) {
             if(zone.id === id) {
@@ -142,7 +143,7 @@ class SpawnZoneTool extends Tool {
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         if(this.selectedTeam === null) return
         let zone = this.getZone(this.selectedTeam)

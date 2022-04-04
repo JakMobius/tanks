@@ -4,7 +4,7 @@ import PhysicsUtils from "../../../utils/physics-utils";
 import {physicsFilters} from "../../../physics/categories";
 import * as Box2D from 'src/library/box2d'
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class BulletModelCannonball extends BulletModel {
     static typeName = 2

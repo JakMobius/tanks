@@ -3,7 +3,7 @@ import BulletModel from "../entity/bullets/bullet-model";
 import ServerBullet from "../server/entity/bullet/server-bullet";
 import * as Box2D from "../library/box2d";
 import PhysicalComponent from "../entity/physics-component";
-import PhysicalHostComponent from "../physics-world";
+import PhysicalHostComponent from "../physiсal-world-component";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number

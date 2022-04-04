@@ -4,7 +4,7 @@ import * as Box2D from '../../../library/box2d';
 import TrackTankBehaviour from "../physics/track-tank/track-tank-behaviour";
 import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class BomberTankModel extends TankModel<TrackTankBehaviour> {
 

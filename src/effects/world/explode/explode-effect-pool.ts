@@ -5,6 +5,7 @@ import AbstractWorld from "../../../abstract-world";
 import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
 import PhysicalComponent from "../../../entity/physics-component";
+import TilemapComponent from "../../../physics/tilemap-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -88,13 +89,14 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
     }
 
     isBlock (x: number, y: number): boolean {
-        let block = this.world.map.getBlock(Math.floor(x / GameMap.BLOCK_SIZE), Math.floor(y / GameMap.BLOCK_SIZE))
+        const map = this.world.getComponent(TilemapComponent).map
+        let block = map.getBlock(Math.floor(x / GameMap.BLOCK_SIZE), Math.floor(y / GameMap.BLOCK_SIZE))
         if(!block) return true
         return (block.constructor as typeof BlockState).isSolid
     }
 
     /**
-     * Adds a high pressure zone to this pool (aka an explosion source). If
+     * Adds a high pressure zone to this pool (same as an explosion source). If
      * given coordinates does not match the pool grid, the pressure will
      * be distributed among the nearest grid cells according to the
      * linear interpolation algorithm

@@ -9,6 +9,7 @@ import PhysicsChunk from "../physics/physics-chunk";
 import * as Box2D from "../library/box2d";
 import GameMap from "../map/game-map";
 import PhysicalComponent from "./physics-component";
+import TilemapComponent from "../physics/tilemap-component";
 
 export default abstract class AbstractEntity<
         WorldClass extends AbstractWorld = any,
@@ -86,7 +87,9 @@ export default abstract class AbstractEntity<
         const gridX = Math.floor(blockX)
         const gridY = Math.floor(blockY)
 
-        const block = this.getWorld().map.getBlock(gridX, gridY)
+        const map = this.getWorld().getComponent(TilemapComponent).map
+
+        const block = map.getBlock(gridX, gridY)
         if(block && block.solid) {
             this.onBlockHit(gridX, gridY, point)
             return

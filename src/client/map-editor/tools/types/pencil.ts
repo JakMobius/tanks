@@ -7,6 +7,8 @@ import BlockState from "../../../../map/block-state/block-state";
 import BrushProgramController from "../../../graphics/programs/brush-program/brush-program-controller";
 import Color from "../../../../utils/color";
 import {squareQuadrangleFromPoints} from "../../../../utils/quadrangle";
+import TilemapComponent from "../../../../physics/tilemap-component";
+import EditorMap from "../../editor-map";
 
 export default class Pencil extends Tool {
 	public actionName = "Карандаш";
@@ -131,13 +133,14 @@ export default class Pencil extends Tool {
 
     mouseUp() {
         super.mouseUp();
-        const map = this.manager.world.map
+        // History should be map component, I guess...
+        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
 
         map.history.commitActions(this.actionName)
     }
 
     draw(x: number, y: number) {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
         const radius = this.thickness / 2
         const area = Math.ceil(radius)
 
@@ -179,7 +182,7 @@ export default class Pencil extends Tool {
     }
 
     fragment(x: number, y: number) {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         if((map.getBlock(x, y).constructor as typeof BlockState).typeId ===
             (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
@@ -196,7 +199,7 @@ export default class Pencil extends Tool {
     }
 
     drawDecorations() {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
 
         const s = GameMap.BLOCK_SIZE
         const x = this.brushX / s

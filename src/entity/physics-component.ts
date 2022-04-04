@@ -2,7 +2,7 @@ import {Component} from "../utils/ecs/component";
 import * as Box2D from "../library/box2d";
 import Entity from "../utils/ecs/entity";
 import PositionComponent from "./position-component";
-import PhysicalHostComponent from "../physics-world";
+import PhysicalHostComponent from "../physiсal-world-component";
 
 export default class PhysicalComponent implements Component {
     entity: Entity | null

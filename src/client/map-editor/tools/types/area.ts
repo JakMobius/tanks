@@ -8,6 +8,7 @@ import MapAreaModification from '../../history/modification/map-area-modificatio
 import ToolManager from "../toolmanager";
 import BlockState from "../../../../map/block-state/block-state";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
+import TilemapComponent from "../../../../physics/tilemap-component";
 
 export default class AreaTool extends Tool {
 	public area: Rectangle;
@@ -52,10 +53,11 @@ export default class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        let areaModification = new MapAreaModification(this.manager.world.map, this.area.clone(), void 0)
+        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
+        let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
         areaModification.perform()
-        this.manager.world.map.history.registerModification(areaModification)
-        this.manager.world.map.history.commitActions("Удаление")
+        map.history.registerModification(areaModification)
+        map.history.commitActions("Удаление")
         this.resetSelection()
         this.manager.setNeedsRedraw()
     }
@@ -63,7 +65,7 @@ export default class AreaTool extends Tool {
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
 
         let bound = this.area.bounding(0, 0, map.width, map.height)
 
@@ -140,11 +142,13 @@ export default class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        let modification = new MapAreaModification(this.manager.world.map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
+        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
+
+        let modification = new MapAreaModification(map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
 
         modification.perform()
-        this.manager.world.map.history.registerModification(modification)
-        this.manager.world.map.history.commitActions("Вставка")
+        map.history.registerModification(modification)
+        map.history.commitActions("Вставка")
 
         this.manager.setNeedsRedraw()
     }

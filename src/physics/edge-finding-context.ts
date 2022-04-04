@@ -1,6 +1,6 @@
 import PhysicsChunk from "./physics-chunk";
 import PhysicsEdge from "./physics-edge";
-import {PhysicsPoint} from "./physics-chunk-manager";
+import {PhysicsPoint} from "./chunked-map-collider";
 import {getFastAngle} from "./angle-utils";
 
 export default class EdgeFindingContext {

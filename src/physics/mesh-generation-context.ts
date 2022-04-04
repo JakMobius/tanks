@@ -1,5 +1,5 @@
 import PhysicsChunk from "./physics-chunk";
-import {PhysicsPoint} from "./physics-chunk-manager";
+import {PhysicsPoint} from "./chunked-map-collider";
 import {areCollinear, areEqualToTheFlip, getLineIntersection} from "../utils/utils";
 import PhysicsEdge from "./physics-edge";
 import {continuousPathTurnDirection, pathTurnDirection} from "./angle-utils";

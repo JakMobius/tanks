@@ -4,7 +4,7 @@ import TrackTankBehaviour from '../physics/track-tank/track-tank-behaviour';
 import * as Box2D from '../../../library/box2d';
 import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
-import PhysicalHostComponent from "../../../physics-world";
+import PhysicalHostComponent from "../../../physiсal-world-component";
 
 class MortarTankModel extends TankModel<TrackTankBehaviour> {
 

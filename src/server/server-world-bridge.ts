@@ -22,6 +22,7 @@ import WorldPlayerControlsPacket from "../networking/packets/game-packets/world-
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import EntityHealthPacket from "../networking/packets/game-packets/entity-health-packet";
 import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
+import TilemapComponent from "../physics/tilemap-component";
 
 export default class ServerWorldBridge {
     static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
@@ -47,7 +48,7 @@ export default class ServerWorldBridge {
         })
 
         portal.on("client-connect", (client: GameSocketPortalClient) => {
-            new MapPacket(world.map).sendTo(client.connection)
+            new MapPacket(world.getComponent(TilemapComponent).map).sendTo(client.connection)
             new EntityCreatePacket(Array.from(world.entities.values())).sendTo(client.connection)
             this.broadcastPlayers(client, portal)
         })
@@ -125,17 +126,19 @@ export default class ServerWorldBridge {
     private static setupBlockUpdates(world: ServerGameWorld, portal: RoomPortal) {
         const blockUpdateMap = new TwoDimensionalMap<number, number, boolean>()
 
-        world.map.on("block-change", (x: number, y: number) => {
+        world.on("map-block-change", (x: number, y: number) => {
             blockUpdateMap.set(x, y, true)
         })
-        world.map.on("block-damage", (x: number, y: number) => {
+
+        world.on("map-block-damage", (x: number, y: number) => {
             blockUpdateMap.set(x, y, true)
         })
 
         world.on("tick", () => {
+            const map = world.getComponent(TilemapComponent).map
             for(let [x, row] of blockUpdateMap.rows.entries()) {
                 for(let y of row.keys()) {
-                    portal.broadcast(new BlockUpdatePacket(x, y, world.map.getBlock(x, y)))
+                    portal.broadcast(new BlockUpdatePacket(x, y, map.getBlock(x, y)))
                 }
             }
 

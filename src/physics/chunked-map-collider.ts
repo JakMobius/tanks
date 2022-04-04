@@ -1,13 +1,14 @@
-import AbstractWorld from "../abstract-world";
+
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import PhysicsChunk from "./physics-chunk";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import GameMap from "../map/game-map";
-import EventEmitter from "../utils/event-emitter";
-import PhysicalComponent from "../entity/physics-component";
+import Entity from "../utils/ecs/entity";
+import PhysicalHostComponent from "../physiсal-world-component";
+import {Component} from "../utils/ecs/component";
+import TilemapComponent from "./tilemap-component";
 
 export interface PhysicsChunkManagerConfig {
-    world: AbstractWorld
     chunkWidth?: number
     chunkHeight?: number
 }
@@ -16,8 +17,7 @@ export interface PhysicsChunkManagerConfig {
 // as they're fast to create.
 export type PhysicsPoint = [number, number]
 
-export default class PhysicsChunkManager extends EventEmitter {
-    public readonly world: AbstractWorld
+export default class ChunkedMapCollider implements Component {
     public readonly chunkWidth: number;
     public readonly chunkHeight: number
     public time: number = 0
@@ -27,14 +27,16 @@ export default class PhysicsChunkManager extends EventEmitter {
     private readonly relevanceRadius: number;
     private readonly relevanceDuration: number;
 
-    constructor(config: PhysicsChunkManagerConfig) {
-        super()
+    private mapComponent?: TilemapComponent
+
+    entity?: Entity
+
+    constructor(config: PhysicsChunkManagerConfig = {}) {
         config = Object.assign({
             chunkWidth: 16,
             chunkHeight: 16
         }, config)
 
-        this.world = config.world
         this.chunkWidth = config.chunkWidth
         this.chunkHeight = config.chunkHeight
 
@@ -43,6 +45,13 @@ export default class PhysicsChunkManager extends EventEmitter {
 
         this.relevanceRadius = 6
         this.relevanceDuration = 1.0 // in seconds
+    }
+
+    getMap() {
+        if(!this.mapComponent || this.mapComponent.entity != this.entity) {
+            this.mapComponent = this.entity.getComponent(TilemapComponent)
+        }
+        return this.mapComponent.map
     }
 
     getChunk(x: number, y: number): PhysicsChunk {
@@ -56,19 +65,16 @@ export default class PhysicsChunkManager extends EventEmitter {
         this.chunkMap.set(x, y, chunk)
         chunk.listen()
 
-        this.emit("chunk-load", chunk)
         return chunk
     }
 
     private unloadChunk(chunk: PhysicsChunk) {
         chunk.destroy()
         this.chunkMap.delete(chunk.x, chunk.y)
-        this.emit("chunk-unload", chunk)
     }
 
     private updateChunk(chunk: PhysicsChunk) {
         chunk.updateBody()
-        this.emit("chunk-update", chunk)
     }
 
     private resetChunks() {
@@ -83,8 +89,10 @@ export default class PhysicsChunkManager extends EventEmitter {
     private updateChunks(dt: number) {
         this.time += dt
 
-        for(let entity of this.world.entities.values()) {
-            let position = entity.model.getComponent(PhysicalComponent).getBody().GetPosition()
+        const physicalComponents = this.entity.getComponent(PhysicalHostComponent).physicalComponents
+
+        for(let component of physicalComponents) {
+            let position = component.getBody().GetPosition()
             this.makeNearbyChunksRelevant(position.x / GameMap.BLOCK_SIZE, position.y / GameMap.BLOCK_SIZE)
         }
 
@@ -97,15 +105,6 @@ export default class PhysicsChunkManager extends EventEmitter {
                 }
             }
         }
-    }
-
-    attach() {
-        this.eventHandler.setTarget(this.world)
-    }
-
-    detach() {
-        this.resetChunks()
-        this.eventHandler.setTarget(null)
     }
 
     private makeNearbyChunksRelevant(x: number, y: number) {
@@ -123,5 +122,16 @@ export default class PhysicsChunkManager extends EventEmitter {
 
     private isChunkRelevant(chunk: PhysicsChunk) {
         return chunk.lastRelevanceTime > this.time - this.relevanceDuration
+    }
+
+    onAttach(entity: Entity) {
+        this.entity = entity
+        this.eventHandler.setTarget(this.entity)
+    }
+
+    onDetach() {
+        this.resetChunks()
+        this.eventHandler.setTarget(null)
+        this.entity = null
     }
 }

@@ -6,7 +6,7 @@ import Matrix3 from "../../utils/matrix3";
 import PhysicalComponent from "../physics-component";
 
 /**
- * Tank model. Сombines the physical model
+ * Tank model. Combines the physical model
  * of the tank, its behavior and controls.
  * This class used both on client and server
  * side. Can be updated dynamically through

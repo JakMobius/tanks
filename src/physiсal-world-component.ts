@@ -13,7 +13,7 @@ export interface PhysicalHostComponentConfig {
 
 export default class PhysicalHostComponent implements Component {
 
-    private physicalComponents: PhysicalComponent[] = []
+    physicalComponents: PhysicalComponent[] = []
     entity?: Entity | null
 
     public world: Box2D.World

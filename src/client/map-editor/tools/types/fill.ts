@@ -3,8 +3,10 @@ import Tool from '../tool';
 import GameMap from '../../../../map/game-map';
 import ToolManager from '../toolmanager';
 import BlockState from "../../../../map/block-state/block-state";
+import TilemapComponent from "../../../../physics/tilemap-component";
+import EditorMap from "../../editor-map";
 
-class Fill extends Tool {
+export default class Fill extends Tool {
     public actionName: any;
 
     constructor(manager: ToolManager) {
@@ -37,7 +39,7 @@ class Fill extends Tool {
     }
 
     fill(x: number, y: number) {
-        const map = this.manager.world.map
+        const map = this.manager.world.getComponent(TilemapComponent).map
         let baseBlock = map.getBlock(x, y)
 
         if(!baseBlock) return
@@ -81,5 +83,3 @@ class Fill extends Tool {
         map.history.commitActions(this.actionName)
     }
 }
-
-export default Fill;

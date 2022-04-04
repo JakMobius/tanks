@@ -1,5 +1,5 @@
 import {angleTangent, makeLimited, signedDoubleTriangleSurface} from "../utils/utils";
-import {PhysicsPoint} from "./physics-chunk-manager";
+import {PhysicsPoint} from "./chunked-map-collider";
 
 /**
  * This function counts a value that grows monotonically with the angle between vectors ab and bc.

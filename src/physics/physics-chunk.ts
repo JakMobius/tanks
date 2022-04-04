@@ -1,5 +1,5 @@
 
-import PhysicsChunkManager, {PhysicsPoint} from "./physics-chunk-manager";
+import ChunkedMapCollider, {PhysicsPoint} from "./chunked-map-collider";
 import * as Box2D from "../library/box2d"
 import {PhysicsBlock} from "./physics-block";
 import {epsilon, signedDoubleTriangleSurface} from "../utils/utils";
@@ -9,10 +9,11 @@ import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {b2BodyType} from "../library/box2d/dynamics/b2_body";
 import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
-import PhysicalHostComponent from "../physics-world";
+import PhysicalHostComponent from "../physiсal-world-component";
+import TilemapComponent from "./tilemap-component";
 
 export default class PhysicsChunk {
-    public readonly manager: PhysicsChunkManager;
+    public readonly manager: ChunkedMapCollider;
     public readonly x: number;
     public readonly y: number;
     public readonly width: number;
@@ -27,7 +28,7 @@ export default class PhysicsChunk {
     edgePaths: PhysicsPoint[][];
     edgeMesh: PhysicsPoint[][];
 
-    constructor(manager: PhysicsChunkManager, x: number, y: number) {
+    constructor(manager: ChunkedMapCollider, x: number, y: number) {
         this.manager = manager
         this.x = x
         this.y = y
@@ -45,13 +46,13 @@ export default class PhysicsChunk {
         let localY = y - this.y
 
         if(localX >= 0 && localY >= 0 && localX < this.width && localY < this.height) {
-            this.blocks[localX + localY * this.width].updateBlock(this.manager.world.map.getBlock(x, y))
+            this.blocks[localX + localY * this.width].updateBlock(this.manager.getMap().getBlock(x, y))
             this.needsUpdate = true
         }
     }
 
     listen() {
-        this.eventHandlers.setTarget(this.manager.world)
+        this.eventHandlers.setTarget(this.manager.entity)
         this.needsUpdate = true
     }
 
@@ -61,10 +62,12 @@ export default class PhysicsChunk {
     }
 
     private loadBlocks() {
+        const map = this.manager.getMap();
+
         this.blocks = new Array(this.width * this.height)
         for(let y = this.y, dy = 0, i = 0; dy < this.height; y++, dy++) {
             for(let x = this.x, dx = 0; dx < this.width; x++, dx++, i++) {
-                this.blocks[i] = new PhysicsBlock(this.manager.world.map.getBlock(x, y))
+                this.blocks[i] = new PhysicsBlock(map.getBlock(x, y))
             }
         }
     }
@@ -81,7 +84,7 @@ export default class PhysicsChunk {
             this.body.GetWorld().DestroyBody(this.body)
         }
 
-        const body = this.manager.world.getComponent(PhysicalHostComponent).world.CreateBody({
+        const body = this.manager.entity.getComponent(PhysicalHostComponent).world.CreateBody({
             type: b2BodyType.b2_staticBody,
             position: { x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE },
         })
