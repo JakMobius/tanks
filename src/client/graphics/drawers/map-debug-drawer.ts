@@ -12,6 +12,7 @@ import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/whe
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 import ChunkedMapCollider from "../../../physics/chunked-map-collider";
+import TransformComponent from "../../../entity/transform-component";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -120,6 +121,7 @@ export default class MapDebugDrawer {
 
     private drawTankWheelDebug(entity: ClientTank<TankModel>) {
         const behaviour = entity.model.getComponent(WheeledTankBehaviour)
+        const transform = entity.model.getComponent(TransformComponent).transform
 
         if(!behaviour) return
 
@@ -133,7 +135,7 @@ export default class MapDebugDrawer {
 
             turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
             translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
-            transformQuadrangle(wheelQuadrangle, entity.model.matrix)
+            transformQuadrangle(wheelQuadrangle, transform)
 
             let color = wheel.isSliding ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
 

@@ -5,6 +5,7 @@ import BinaryEncoder from 'src/serialization/binary/binary-encoder';
 import TankModel from "../entity/tanks/tank-model";
 import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
+import TransformComponent from "../entity/transform-component";
 
 export default class TankControls implements BinaryEncodable, Component {
 	public throttle = 0
@@ -83,10 +84,10 @@ export default class TankControls implements BinaryEncodable, Component {
         this.updated = true
 
         if (this.directional) {
+            const transform = this.entity.getComponent(TransformComponent).transform
 
-            // TODO: create transform component and use it here
-            // this.steer = this.tank.matrix.transformX(x, y, 0)
-            // this.throttle = this.tank.matrix.transformY(x, y, 0)
+            this.steer = transform.transformX(x, y, 0)
+            this.throttle = transform.transformY(x, y, 0)
         } else {
             this.throttle = y
             this.steer = x

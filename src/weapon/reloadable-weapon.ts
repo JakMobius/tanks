@@ -4,6 +4,7 @@ import ServerBullet from "../server/entity/bullet/server-bullet";
 import * as Box2D from "../library/box2d";
 import PhysicalComponent from "../entity/physics-component";
 import PhysicalHostComponent from "../physiсal-world-component";
+import TransformComponent from "../entity/transform-component";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -90,11 +91,12 @@ export default class ReloadableWeapon extends Weapon {
 
         const tank = this.tank
         const tankBody = tank.model.getComponent(PhysicalComponent).getBody()
+        const transform = tank.model.getComponent(TransformComponent).transform
 
         rotation = tankBody.GetAngle()
 
-        const absoluteX = tank.model.matrix.transformX(x, y)
-        const absoluteY = tank.model.matrix.transformY(x, y)
+        const absoluteX = transform.transformX(x, y)
+        const absoluteY = transform.transformY(x, y)
 
         const sin = Math.sin(rotation)
         const cos = Math.cos(rotation)

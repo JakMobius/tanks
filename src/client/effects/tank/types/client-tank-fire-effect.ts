@@ -7,6 +7,7 @@ import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model'
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../../entity/tank/client-tank";
 import PhysicalComponent from "../../../../entity/physics-component";
+import TransformComponent from "../../../../entity/transform-component";
 
 export default class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;
@@ -31,17 +32,17 @@ export default class ClientTankFireEffect extends ClientTankEffect {
     tick(dt: number) {
 
 	    const body = this.tank.model.getComponent(PhysicalComponent).getBody()
+        const transform = this.tank.model.getComponent(TransformComponent).transform
+
         const velocity = body.GetLinearVelocity()
         const angle = body.GetAngle()
-
-        const tank = this.tank;
 
         this.queue += dt * this.frequency
 
         let world = this.tank.getWorld()
 
-        const particlePositionX = tank.model.matrix.transformX(0, 2.5)
-        const particlePositionY = tank.model.matrix.transformY(0, 2.5)
+        const particlePositionX = transform.transformX(0, 2.5)
+        const particlePositionY = transform.transformY(0, 2.5)
 
         while(this.queue > 0) {
             const heading = -angle + (Math.random() - 0.5) * Math.PI / 4;

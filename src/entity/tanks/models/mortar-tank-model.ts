@@ -6,7 +6,7 @@ import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-class MortarTankModel extends TankModel {
+export default class MortarTankModel extends TankModel {
 
     public static typeName = 110
 
@@ -53,5 +53,3 @@ class MortarTankModel extends TankModel {
         return 10
     }
 }
-
-export default MortarTankModel;

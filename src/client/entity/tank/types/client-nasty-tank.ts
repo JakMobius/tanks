@@ -18,6 +18,7 @@ import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
+import TransformComponent from "../../../../entity/transform-component";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
@@ -57,6 +58,7 @@ class Drawer extends TankDrawer<ClientNastyTank> {
         const body = model.getComponent(PhysicalComponent).getBody()
         const controlsComponent = model.getComponent(TankControls)
         const behaviour = model.getComponent(AirbagTankModel)
+        const transform = model.getComponent(TransformComponent).transform
 
         const propellerProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
@@ -79,11 +81,11 @@ class Drawer extends TankDrawer<ClientNastyTank> {
         translateQuadrangle(leftRuderQuadrangle, Drawer.ruderXOffset, Drawer.ruderYOffset)
         translateQuadrangle(rightRuderQuadrangle, -Drawer.ruderXOffset, Drawer.ruderYOffset)
 
-        transformQuadrangle(bodyQuadrangle, model.matrix)
-        transformQuadrangle(leftRuderQuadrangle, model.matrix)
-        transformQuadrangle(rightRuderQuadrangle, model.matrix)
-        transformQuadrangle(leftPropellerQuadrangle, model.matrix)
-        transformQuadrangle(rightPropellerQuadrangle, model.matrix)
+        transformQuadrangle(bodyQuadrangle, transform)
+        transformQuadrangle(leftRuderQuadrangle, transform)
+        transformQuadrangle(rightRuderQuadrangle, transform)
+        transformQuadrangle(leftPropellerQuadrangle, transform)
+        transformQuadrangle(rightPropellerQuadrangle, transform)
 
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,

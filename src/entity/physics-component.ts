@@ -1,7 +1,7 @@
 import {Component} from "../utils/ecs/component";
 import * as Box2D from "../library/box2d";
 import Entity from "../utils/ecs/entity";
-import PositionComponent from "./position-component";
+import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "../physiсal-world-component";
 
 export default class PhysicalComponent implements Component {
@@ -9,7 +9,7 @@ export default class PhysicalComponent implements Component {
     body: Box2D.Body
     host: PhysicalHostComponent
 
-    private positionComponent?: PositionComponent
+    private positionComponent?: TransformComponent
 
     constructor(body: Box2D.Body, host: PhysicalHostComponent) {
         this.body = body
@@ -18,14 +18,19 @@ export default class PhysicalComponent implements Component {
 
     getPositionComponent() {
         if(!this.positionComponent || this.positionComponent.entity != this.entity) {
-            this.positionComponent = this.entity.getComponent(PositionComponent)
+            this.positionComponent = this.entity.getComponent(TransformComponent)
         }
         return this.positionComponent;
     }
 
     onPhysicsTick(dt: number) {
-        let positionComponent = this.getPositionComponent();
-        positionComponent.position = this.body.GetPosition();
+        const transformComponent = this.getPositionComponent().transform
+        const position = this.body.GetPosition()
+
+        transformComponent.reset()
+        transformComponent.translate(position.x, position.y)
+        transformComponent.rotate(-this.body.GetAngle())
+
         this.entity.emit("physics-tick", dt)
     }
 

@@ -6,7 +6,7 @@ import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";
 import PhysicalHostComponent from "../physiсal-world-component";
-import PositionComponent from "./position-component";
+import TransformComponent from "./transform-component";
 
 /**
  * Entity model. Describes entity position,
@@ -41,7 +41,7 @@ export default class EntityModel extends Entity {
     constructor() {
         super()
 
-        this.addComponent(new PositionComponent())
+        this.addComponent(new TransformComponent())
         this.setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
     }
 

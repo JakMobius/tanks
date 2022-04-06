@@ -19,6 +19,7 @@ import {worker} from "cluster";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
+import TransformComponent from "../../../../entity/transform-component";
 
 class Drawer extends TankDrawer<ClientBigboiTank> {
 	public bodyBrightSprite: Sprite;
@@ -43,6 +44,7 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
         const model = this.entity.model
         const body = model.getComponent(PhysicalComponent).getBody()
         const behaviour = model.getComponent(TrackTankBehaviour)
+        const transform = model.getComponent(TransformComponent).transform
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
@@ -54,9 +56,9 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
         const leftTrack      = copyQuadrangle(Drawer.leftTrack)
         const rightTrack     = copyQuadrangle(Drawer.rightTrack)
 
-        transformQuadrangle(leftTrack, model.matrix)
-        transformQuadrangle(rightTrack, model.matrix)
-        transformQuadrangle(bodyQuadrangle, model.matrix)
+        transformQuadrangle(leftTrack, transform)
+        transformQuadrangle(rightTrack, transform)
+        transformQuadrangle(bodyQuadrangle, transform)
 
         truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.85)
         truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.85)

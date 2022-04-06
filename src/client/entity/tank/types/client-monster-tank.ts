@@ -7,21 +7,19 @@ import FX from 'src/client/sound/fx';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
-import {TankStat} from "../tank-stat";
-import Matrix3 from "../../../../utils/matrix3";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {
     squareQuadrangle,
     translateQuadrangle,
     transformQuadrangle,
     turnQuadrangle,
-    multipliedQuadrangle, copyQuadrangle
+    copyQuadrangle
 } from "../../../../utils/quadrangle";
-import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
-import {Constructor} from "../../../../serialization/binary/serializable";
+
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
 import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
+import TransformComponent from "../../../../entity/transform-component";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -53,6 +51,7 @@ class Drawer extends TankDrawer {
 	    const model = this.entity.model
         const body = model.getComponent(PhysicalComponent).getBody()
         const behaviour = model.getComponent(WheeledTankBehaviour)
+        const transform = model.getComponent(TransformComponent).transform
 
         const wheelProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
@@ -66,13 +65,13 @@ class Drawer extends TankDrawer {
             const wheelQuadrangle = copyQuadrangle(Drawer.wheelQuadrangle)
             if(angle) turnQuadrangle(wheelQuadrangle, Math.sin(angle), Math.cos(angle))
             translateQuadrangle(wheelQuadrangle, position.x, position.y)
-            transformQuadrangle(wheelQuadrangle, model.matrix)
+            transformQuadrangle(wheelQuadrangle, transform)
 
             wheelProgram.drawSprite(this.wheelSprites[spriteIndex], wheelQuadrangle)
         }
 
         const quadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
-        transformQuadrangle(quadrangle, model.matrix)
+        transformQuadrangle(quadrangle, transform)
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,

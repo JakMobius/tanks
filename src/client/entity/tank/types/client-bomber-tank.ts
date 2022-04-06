@@ -10,6 +10,7 @@ import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import TextureProgram from "../../../graphics/programs/texture-program";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
+import TransformComponent from "../../../../entity/transform-component";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -35,6 +36,7 @@ class Drawer extends TankDrawer {
     draw(phase: DrawPhase) {
         const model = this.entity.model
         const behaviour = this.entity.model.getComponent(TrackTankBehaviour)
+        const transform = model.getComponent(TransformComponent).transform
         //const body = model.getComponent(PhysicalComponent).getBody()
 
         const truckProgram = phase.getProgram(TruckProgram)
@@ -47,9 +49,9 @@ class Drawer extends TankDrawer {
         const leftTrackDist = behaviour.getLeftTrackDistance()
         const rightTrackDist = behaviour.getRightTrackDistance()
 
-        transformQuadrangle(quadrangle, model.matrix)
-        transformQuadrangle(leftTrack, model.matrix)
-        transformQuadrangle(rightTrack, model.matrix)
+        transformQuadrangle(quadrangle, transform)
+        transformQuadrangle(leftTrack, transform)
+        transformQuadrangle(rightTrack, transform)
 
         truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
         truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 3.0, 0.85)

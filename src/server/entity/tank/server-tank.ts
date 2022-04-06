@@ -22,7 +22,6 @@ export default class ServerTank<ModelClass extends TankModel = TankModel> extend
     public static Tanks: ServerTankType[] = []
 
 	public teleported: boolean;
-	public health: number;
     public effects = new Map<number, AbstractEffect>()
     public player: ServerPlayer
 

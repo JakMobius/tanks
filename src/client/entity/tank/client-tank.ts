@@ -11,6 +11,7 @@ import ClientEntity from "../client-entity";
 import SmokeParticle from "../../particles/smoke-particle";
 import Color from "../../../utils/color";
 import PhysicalComponent from "../../../entity/physics-component";
+import TransformComponent from "../../../entity/transform-component";
 
 export interface TankConfig<ModelClass extends TankModel> {
     model: ModelClass
@@ -41,6 +42,8 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
 
     tick(dt: number) {
         super.tick(dt)
+        const transform = this.model.getComponent(TransformComponent).transform
+
         for(let effect of this.effects.values()) {
             effect.tick(dt)
         }
@@ -56,8 +59,8 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
                 const color = new Color(gray, gray, gray)
 
                 const position = this.model.getComponent(PhysicalComponent).getBody().GetPosition()
-                const velocityX = this.model.matrix.transformX(0, -2, 0)
-                const velocityY = this.model.matrix.transformY(0, -2, 0)
+                const velocityX = transform.transformX(0, -2, 0)
+                const velocityY = transform.transformY(0, -2, 0)
 
                 const smoke = new SmokeParticle({
                     x: position.x,

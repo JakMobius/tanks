@@ -6,6 +6,7 @@ import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/tank/models/tank-pellets-effect-model';
 import ClientPlayer from "../../../client-player";
 import PhysicalComponent from "../../../../entity/physics-component";
+import TransformComponent from "../../../../entity/transform-component";
 
 export default class ClientTankPelletsEffect extends ClientTankEffect {
 	public player: ClientPlayer;
@@ -23,12 +24,14 @@ export default class ClientTankPelletsEffect extends ClientTankEffect {
 
         const tank = player.tank;
         const body = tank.model.getComponent(PhysicalComponent).getBody()
+        const transform = this.tank.model.getComponent(TransformComponent).transform
+
         const tankRotation = body.GetAngle()
         const tankPosition = body.GetPosition()
         const tankVelocity = body.GetLinearVelocity()
 
-        const particleOffsetX = tank.model.matrix.transformX(0, 2, 0)
-        const particleOffsetY = tank.model.matrix.transformY(0, 2, 0)
+        const particleOffsetX = transform.transformX(0, 2, 0)
+        const particleOffsetY = transform.transformY(0, 2, 0)
 
         for(let k = 0; k < 8; k++) {
             const angle = tankRotation + (Math.random() - 0.5) * Math.PI / 4;

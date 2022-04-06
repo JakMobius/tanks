@@ -3,6 +3,7 @@ import AbstractPlayer from "../../abstract-player";
 import ServerGameWorld from "../../server/server-game-world";
 import ServerEntity from "../../server/entity/server-entity";
 import PhysicalComponent from "../../entity/physics-component";
+import TransformComponent from "../../entity/transform-component";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
@@ -31,17 +32,17 @@ export default class WeaponStungun extends Weapon {
         super.tick(dt)
         if(!this.engaged) return
 
+        const transform = this.tank.model.getComponent(TransformComponent).transform
+
         let tank = this.tank
         let player = tank.player
         let game = player.getWorld()
-        const matrix = tank.model.matrix
 
-        for (let i = this.points.length - 1; i >= 0; i--)
-        {
+        for (let i = this.points.length - 1; i >= 0; i--) {
             const point = this.points[i];
 
-            const px = matrix.transformX(point[0], point[1]);
-            const py = matrix.transformY(point[0], point[1]);
+            const px = transform.transformX(point[0], point[1]);
+            const py = transform.transformY(point[0], point[1]);
 
             for(let each of near(px, py, player, game, this.squareRadius)) {
                 each.damage(this.damage * dt)
