@@ -31,7 +31,9 @@ export default class PhysicalComponent implements Component {
 
     onDetach() {
         this.entity = null
-        this.body.GetWorld().DestroyBody(this.body)
+        if(this.body.GetWorld()) {
+            this.body.GetWorld().DestroyBody(this.body)
+        }
         this.host.destroyComponent(this)
     }
 

@@ -21,8 +21,9 @@ import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import {Constructor} from "../../../../serialization/binary/serializable";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
+import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 
-class Drawer extends TankDrawer<ClientMonsterTank> {
+class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
 	public bodyDarkSprite: Sprite;
 	public bodyLightMask: Sprite;
@@ -51,11 +52,12 @@ class Drawer extends TankDrawer<ClientMonsterTank> {
     draw(phase: DrawPhase) {
 	    const model = this.entity.model
         const body = model.getComponent(PhysicalComponent).getBody()
+        const behaviour = model.getComponent(WheeledTankBehaviour)
 
         const wheelProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
 
-        for(let wheel of model.behaviour.wheels) {
+        for(let wheel of behaviour.wheels) {
             let spriteIndex = Math.floor(-wheel.distance * Drawer.spritesPerMeter % Drawer.wheelSpriteCount);
             if(spriteIndex < 0) spriteIndex = Drawer.wheelSpriteCount + spriteIndex;
             const position = wheel.position

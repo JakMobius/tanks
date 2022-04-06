@@ -3,6 +3,7 @@ import BinaryPacket from '../../binary-packet';
 import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractWorld from "../../../abstract-world";
+import TankControls from "../../../controls/tank-controls";
 
 export default class WorldPlayerControlsPacket extends BinaryPacket {
     private world: AbstractWorld;
@@ -17,7 +18,11 @@ export default class WorldPlayerControlsPacket extends BinaryPacket {
         encoder.writeUint16(this.world.players.size)
         for(let [id, player] of this.world.players.entries()) {
             encoder.writeUint32(id)
-            player.tank.model.controls.toBinary(encoder)
+            // TODO: This is also kind of wrong.
+            // TankControls should rather add itself in
+            // "dynamically-updated data" registry, and
+            // write its data in the packet by his own.
+            player.tank.model.getComponent(TankControls).toBinary(encoder)
         }
     }
 
@@ -26,7 +31,7 @@ export default class WorldPlayerControlsPacket extends BinaryPacket {
         for(let i = 0; i < count; i++) {
             const id = this.decoder.readUint32()
             let player = world.players.get(id)
-            player.tank.model.controls.updateState(this.decoder)
+            player.tank.model.getComponent(TankControls).updateState(this.decoder)
         }
     }
 }

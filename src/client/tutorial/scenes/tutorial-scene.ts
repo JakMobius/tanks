@@ -6,6 +6,7 @@ import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
 import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
 import GeneralGameScene from "../../game/general-game-scene";
+import TankControls from "../../../controls/tank-controls";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -57,7 +58,7 @@ export default class TutorialScene extends GeneralGameScene {
             // Well, at least this approach is better than updating the tank
             // controls in a timer...
             let serverPlayer = this.game.serverGame.world.players.get(player.id)
-            this.playerControls.connectTankControls(serverPlayer.tank.model.controls)
+            this.playerControls.connectTankControls(serverPlayer.tank.model.getComponent(TankControls))
         }
     }
 }

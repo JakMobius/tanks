@@ -6,14 +6,14 @@ import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
+export default class SniperTankModel extends TankModel {
 
     public static typeName = 101
 
     constructor() {
         super();
 
-        this.behaviour = new TrackTankBehaviour(this, {
+        this.addComponent(new TrackTankBehaviour(this, {
             enginePower: 900000,     // 0.9 mW = 1206 horsepower
             engineMaxTorque: 200000, // 200 kN ~ 20 T
             trackConfig: {
@@ -26,17 +26,15 @@ export default class SniperTankModel extends TankModel<TrackTankBehaviour> {
             },
             trackOffset: 0.5,
             trackGauge: 3.4
-        });
+        }));
     }
 
     initPhysics(world: PhysicalHostComponent) {
-
-        // Sniper is a tank. Tank should be massive
-
         let bodyFixture = PhysicsUtils.squareFixture(1.125, 1.0125, new Box2D.Vec2(0, 0), {
             density: 480,
             filter: physicsFilters.tank
         })
+
         let trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.5625, 2.25, new Box2D.Vec2(-1.6875, 0.45), {
             filter: physicsFilters.tank,
             density: 480

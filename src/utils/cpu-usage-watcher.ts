@@ -1,5 +1,5 @@
 
-class CpuUsageWatcher {
+export default class CpuUsageWatcher {
 	public updateSeconds: any;
 	public usageBufferLength: any;
 	public previousUsage: any;
@@ -53,5 +53,3 @@ class CpuUsageWatcher {
         clearInterval(this.interval)
     }
 }
-
-export default CpuUsageWatcher;

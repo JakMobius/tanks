@@ -25,12 +25,14 @@ export default class AirbagTankModel extends TankBehaviour {
     }
 
     tick(dt: number) {
-        const body = this.tank.getComponent(PhysicalComponent).getBody();
+        super.tick(dt)
 
-        const throttleInput = this.tank.controls.getThrottle()
+        const body = this.entity.getComponent(PhysicalComponent).getBody();
+
+        const throttleInput = this.controlsComponent.getThrottle()
 
         const throttle = this.power * throttleInput;
-        const rotation = this.torque * this.tank.controls.getSteer() * this.tank.controls.getThrottle();
+        const rotation = this.torque * this.controlsComponent.getSteer() * this.controlsComponent.getThrottle();
 
         body.GetWorldVector(new Box2D.Vec2(0, throttle), this.localVector1)
         body.GetWorldPoint(new Box2D.Vec2(0, 0), this.localVector2)

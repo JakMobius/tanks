@@ -24,7 +24,7 @@ export interface GameSocketPortalClientData {
 export type GameSocketPortalClient = SocketPortalClient<GameSocketPortalClientData>
 
 export default class GameSocketPortal extends SocketPortal<GameSocketPortalClientData> {
-	public roomsInterval: any;
+	public roomsInterval: NodeJS.Timeout;
     public games = new Map<string, Room>()
 
     constructor() {
@@ -64,7 +64,6 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
     }
 
     terminate() {
-        this.logger.log("Closing server...")
         this.stopRoomUpdate()
         super.terminate()
     }

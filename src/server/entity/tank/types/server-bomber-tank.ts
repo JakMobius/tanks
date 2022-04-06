@@ -5,6 +5,7 @@ import ServerTank, {ServerTankConfig} from "../server-tank";
 import WeaponMiner from "src/weapon/models/miner";
 import BomberTankModel from "../../../../entity/tanks/models/bomber-tank-model";
 import WeaponBomber from "../../../../weapon/models/bomber";
+import TankControls from "../../../../controls/tank-controls";
 
 export default class ServerBomberTank extends ServerTank<BomberTankModel> {
     static Model = BomberTankModel
@@ -14,14 +15,16 @@ export default class ServerBomberTank extends ServerTank<BomberTankModel> {
     constructor(options: ServerTankConfig<SniperTankModel>) {
         super(options);
 
+        const controlsComponent = this.model.getComponent(TankControls)
+
         this.primaryWeapon = new WeaponBomber({
             tank: this,
-            triggerAxle: this.model.controls.getPrimaryWeaponAxle()
+            triggerAxle: controlsComponent.getPrimaryWeaponAxle()
         })
 
         this.minerWeapon = new WeaponMiner({
             tank: this,
-            triggerAxle: this.model.controls.getMinerWeaponAxle()
+            triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
     }
 

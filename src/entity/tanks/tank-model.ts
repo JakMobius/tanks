@@ -13,12 +13,8 @@ import PhysicalComponent from "../physics-component";
  * binary serialization.
  */
 
-export default class TankModel<BehaviourClass extends TankBehaviour = any> extends EntityModel {
+export default class TankModel extends EntityModel {
     static Types = new Map();
-
-    // Physical behaviour of this tank
-    behaviour: BehaviourClass = null
-    controls: TankControls = null
 
     /**
      * Transition matrix from tank space to the world space
@@ -27,10 +23,10 @@ export default class TankModel<BehaviourClass extends TankBehaviour = any> exten
 
     constructor() {
         super()
-        this.controls = new TankControls(this)
+
+        this.addComponent(new TankControls())
 
         this.on("physics-tick", (dt) => {
-            this.behaviour.tick(dt)
             const body = this.getComponent(PhysicalComponent).getBody()
             const position = body.GetPosition()
             this.matrix.reset()

@@ -10,13 +10,16 @@ export interface ServerLineOptions {
 }
 
 export default class ServerLine extends EventEmitter {
-    emitter = new EventEmitter()
-    readline: Readline = null
+    readline?: Readline = null
     promptString = '> '
-    collection = {
-        stdout: new stream.Writable(),
-        stderr: new stream.Writable()
+    collection: {
+        stdout?: stream.Writable,
+        stderr?: stream.Writable
+    } = {
+        stdout: null,
+        stderr: null
     }
+    private originalConsole?: Console;
 
     getPrompt() {
         return this.promptString
@@ -44,7 +47,13 @@ export default class ServerLine extends EventEmitter {
     }
 
     close() {
+        this.collection.stdout = null
+        this.collection.stderr = null
         this.readline.close()
+        this.readline = null
+        this.collection = null
+        console = this.originalConsole
+        this.originalConsole = null
     }
 
     pause() {
@@ -137,6 +146,9 @@ export default class ServerLine extends EventEmitter {
     }
 
     private consoleOverwrite(options: NodeJS.ConsoleConstructorOptions) {
+        this.collection.stderr = new stream.Writable()
+        this.collection.stdout = new stream.Writable()
+
         this.overwriteStream(this.collection.stdout, process.stdout)
         this.overwriteStream(this.collection.stderr, process.stderr)
 
@@ -145,6 +157,7 @@ export default class ServerLine extends EventEmitter {
             stdout: this.collection.stdout,
             stderr: this.collection.stderr
         }, options)
+        this.originalConsole = console
         console = new Console(consoleOptions)
         console.Console = Console
     }

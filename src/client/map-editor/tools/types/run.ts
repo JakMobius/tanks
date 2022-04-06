@@ -9,6 +9,7 @@ import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model
 import ClientTank from "../../../entity/tank/client-tank";
 import ClientMonsterTank from "../../../entity/tank/types/client-monster-tank";
 import PhysicalComponent from "../../../../entity/physics-component";
+import TankControls from "../../../../controls/tank-controls";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
@@ -38,7 +39,7 @@ export default class RunTool extends Tool {
             model: new MonsterTankModel()
         })
         
-        this.playerControls.connectTankControls(this.tank.model.controls)
+        this.playerControls.connectTankControls(this.tank.model.getComponent(TankControls))
         
         this.player = new ClientPlayer({
             id: 0,
@@ -89,7 +90,7 @@ export default class RunTool extends Tool {
 
         body.SetPosition(this.spawnPoint)
 
-        this.playerControls.connectTankControls(this.player.tank.model.controls)
+        this.playerControls.connectTankControls(this.player.tank.model.getComponent(TankControls))
 
         this.manager.camera.inertial = true
         this.manager.camera.target = body.GetPosition()

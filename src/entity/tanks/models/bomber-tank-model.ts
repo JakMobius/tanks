@@ -6,15 +6,14 @@ import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-export default class BomberTankModel extends TankModel<TrackTankBehaviour> {
+export default class BomberTankModel extends TankModel {
 
     public static typeName = 102
-    public behaviour: TrackTankBehaviour
 
     constructor() {
         super()
 
-        this.behaviour = new TrackTankBehaviour(this, {
+        this.addComponent(new TrackTankBehaviour(this, {
             enginePower: 600000, // 0.6 mW = 804.6 horsepower
             engineMaxTorque: 100000,
             trackConfig: {
@@ -26,7 +25,7 @@ export default class BomberTankModel extends TankModel<TrackTankBehaviour> {
                 mass: 100
             },
             trackGauge: 3.75
-        });
+        }));
     }
 
     static getMaximumHealth() {

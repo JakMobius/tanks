@@ -7,14 +7,14 @@ import WheelAxlesGenerator from "../physics/wheeled-tank/wheel-axles-generator";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
+export default class MonsterTankModel extends TankModel {
 
     public static typeName = 103
 
     constructor() {
         super()
 
-        this.behaviour = new WheeledTankBehaviour(this, {
+        this.addComponent(new WheeledTankBehaviour(this, {
             enginePower: 900000,
             engineMaxTorque: 200000,
             wheels: WheelAxlesGenerator.generateWheels({
@@ -28,7 +28,7 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
                 axleDistance: 1.5,
                 axleWidth: 2
             })
-        });
+        }));
     }
 
     static getMaximumHealth() {
@@ -49,7 +49,9 @@ export default class MonsterTankModel extends TankModel<WheeledTankBehaviour> {
 
         body.CreateFixture(bodyFixture)
 
-        for (let wheel of this.behaviour.wheels) {
+        const behaviour = this.getComponent(WheeledTankBehaviour)
+
+        for (let wheel of behaviour.wheels) {
             const fixture = PhysicsUtils.squareFixture(0.175, 0.5, wheel.position, {
                 density: 512,
                 filter: physicsFilters.tank

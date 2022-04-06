@@ -28,7 +28,8 @@ export default class WebserverModule {
     }
 
     staticAccess(path: string) {
-        this.router.use(path, this.router.static(this.resourcePath(path)))
+        // Not sure if express.static can be used here instead of router.static
+        this.router.use(path, express.static(this.resourcePath(path)))
     }
 
     resourcePath(resourcePath: string) {

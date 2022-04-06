@@ -8,8 +8,7 @@ export default class ExitCommand extends Command {
 		// 	this.console.render()
 		// 	return
 		// }
-		this.console.server.terminate()
-		process.exit(0)
+		this.console.server.terminate().then()
 	}
 
 	getName(): string {

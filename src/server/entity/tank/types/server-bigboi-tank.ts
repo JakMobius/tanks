@@ -2,6 +2,7 @@ import ServerTank, {ServerTankConfig} from "../server-tank";
 import BigBoiTankModel from "../../../../entity/tanks/models/bigboi-tank-model";
 import WeaponMiner from "../../../../weapon/models/miner";
 import WeaponCannon from "../../../../weapon/models/cannon";
+import TankControls from "../../../../controls/tank-controls";
 
 export default class ServerBigboiTank extends ServerTank<BigBoiTankModel> {
     static Model = BigBoiTankModel
@@ -11,14 +12,16 @@ export default class ServerBigboiTank extends ServerTank<BigBoiTankModel> {
     constructor(options: ServerTankConfig<BigBoiTankModel>) {
         super(options);
 
+        const controlsComponent = this.model.getComponent(TankControls)
+
         this.primaryWeapon = new WeaponCannon({
             tank: this,
-            triggerAxle: this.model.controls.getPrimaryWeaponAxle()
+            triggerAxle: controlsComponent.getPrimaryWeaponAxle()
         })
 
         this.minerWeapon = new WeaponMiner({
             tank: this,
-            triggerAxle: this.model.controls.getMinerWeaponAxle()
+            triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
     }
 

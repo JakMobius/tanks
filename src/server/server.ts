@@ -95,7 +95,7 @@ export default class Server extends EventEmitter {
 
             this.webServer.disable()
             this.webServer = null
-            this.getPortListener(this.config.port).retainHTTP()
+            this.getPortListener(this.config.port).releaseHTTP()
         }
     }
 
@@ -110,10 +110,9 @@ export default class Server extends EventEmitter {
             this.gameSocket.bindToWebsocket(portListener.webSocketServer)
         } else {
             if(!this.gameSocket) return
-
             this.gameSocket.terminate()
             this.gameSocket = null
-            this.getPortListener(this.config.port).retainWebsocket()
+            this.getPortListener(this.config.port).releaseWebsocket()
         }
     }
 
@@ -185,11 +184,14 @@ export default class Server extends EventEmitter {
     }
 
     async terminate(): Promise<void> {
+        this.cpuUsageWatcher.destroy()
         this.setHubPageActive(false)
         this.setGamePageActive(false)
         this.setClusterClientActive(false)
+        this.setGameSocketActive(false)
         this.setWebServerActive(false)
         this.setClusterSocketServerActive(false)
+        await this.db.disconnect(false)
 
         this.emit("terminate")
     }

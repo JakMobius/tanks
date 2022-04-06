@@ -16,6 +16,8 @@ import {
 } from "../../../../utils/quadrangle";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
+import TankControls from "../../../../controls/tank-controls";
+import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
 
 class Drawer extends TankDrawer<ClientNastyTank> {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
@@ -53,12 +55,14 @@ class Drawer extends TankDrawer<ClientNastyTank> {
     draw(phase: DrawPhase) {
         const model = this.entity.model
         const body = model.getComponent(PhysicalComponent).getBody()
+        const controlsComponent = model.getComponent(TankControls)
+        const behaviour = model.getComponent(AirbagTankModel)
 
         const propellerProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
 
-        const propellerDist = model.behaviour.propellerDist
-        const ruderAngle = model.controls.getSteer() * Drawer.ruderAngle
+        const propellerDist = behaviour.propellerDist
+        const ruderAngle = controlsComponent.getSteer() * Drawer.ruderAngle
         const propeller = this.propellerSprites[Math.round(propellerDist) % Drawer.propellerSpriteCount]
 
         const bodyQuadrangle = copyQuadrangle(Drawer.bodyQuadrangle)

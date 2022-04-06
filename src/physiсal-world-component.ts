@@ -52,6 +52,6 @@ export default class PhysicalHostComponent implements Component {
     destroyComponent(component: PhysicalComponent) {
         let index = this.physicalComponents.indexOf(component)
         if(index < 0) return;
-        this.physicalComponents.slice(index, 1)
+        this.physicalComponents.splice(index, 1)
     }
 }

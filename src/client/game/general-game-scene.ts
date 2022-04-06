@@ -15,6 +15,7 @@ import ClientPlayer from "../client-player";
 import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
 import PhysicalComponent from "../../entity/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
+import TankControls from "../../controls/tank-controls";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera;
@@ -143,7 +144,7 @@ export default class GeneralGameScene extends Scene {
         if(player) {
             const model = player.tank.model
             const body = model.getComponent(PhysicalComponent).getBody()
-            this.playerControls.connectTankControls(model.controls)
+            this.playerControls.connectTankControls(model.getComponent(TankControls))
             this.camera.target = body.GetPosition()
             this.camera.targetVelocity = body.GetLinearVelocity()
         }

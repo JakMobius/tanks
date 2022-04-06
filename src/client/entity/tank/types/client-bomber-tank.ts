@@ -9,8 +9,9 @@ import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../..
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import TextureProgram from "../../../graphics/programs/texture-program";
+import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 
-class Drawer extends TankDrawer<ClientSniperTank> {
+class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
     //public bodyDarkSprite: Sprite;
     //public bodyLightMask: Sprite;
@@ -33,6 +34,7 @@ class Drawer extends TankDrawer<ClientSniperTank> {
 
     draw(phase: DrawPhase) {
         const model = this.entity.model
+        const behaviour = this.entity.model.getComponent(TrackTankBehaviour)
         //const body = model.getComponent(PhysicalComponent).getBody()
 
         const truckProgram = phase.getProgram(TruckProgram)
@@ -42,8 +44,8 @@ class Drawer extends TankDrawer<ClientSniperTank> {
         const leftTrack  = copyQuadrangle(Drawer.leftTrack)
         const rightTrack = copyQuadrangle(Drawer.rightTrack)
 
-        const leftTrackDist = model.behaviour.getLeftTrackDistance()
-        const rightTrackDist = model.behaviour.getRightTrackDistance()
+        const leftTrackDist = behaviour.getLeftTrackDistance()
+        const rightTrackDist = behaviour.getRightTrackDistance()
 
         transformQuadrangle(quadrangle, model.matrix)
         transformQuadrangle(leftTrack, model.matrix)

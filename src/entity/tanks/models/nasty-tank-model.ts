@@ -7,7 +7,7 @@ import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
+export default class NastyTankModel extends TankModel {
 
     public static typeName = 107
 
@@ -25,10 +25,10 @@ export default class NastyTankModel extends TankModel<AirbagTankBehaviour> {
     constructor() {
         super()
 
-        this.behaviour = new AirbagTankBehaviour(this, {
+        this.addComponent(new AirbagTankBehaviour(this, {
             power: 120000,
             torque: 90000
-        })
+        }))
     }
 
     static getMaximumHealth() {

@@ -38,7 +38,7 @@
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
     "nyc": "^15.1.0",
-    "source-map-support": "^0.5.19",
+    "source-map-support": "^0.5.21",
     "typescript": "3.9"
   },
   "scripts": {

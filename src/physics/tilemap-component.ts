@@ -21,11 +21,11 @@ export default class TilemapComponent implements Component {
         this.mapEventHandler.setTarget(map)
     }
 
-    onAttach(entity: Entity): void {
+    onAttach(entity: Entity) {
         this.entity = entity;
     }
 
-    onDetach(): void {
+    onDetach() {
         this.entity = null;
         this.mapEventHandler.setTarget(null)
     }

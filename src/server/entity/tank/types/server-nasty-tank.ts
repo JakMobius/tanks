@@ -3,6 +3,7 @@ import ServerTank, {ServerTankConfig} from "../server-tank";
 import WeaponMiner from "src/weapon/models/miner";
 import FlamethrowerWeapon from "../../../../weapon/models/flamethrower";
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
+import TankControls from "../../../../controls/tank-controls";
 
 export default class ServerNastyTank extends ServerTank<NastyTankModel> {
     static Model = NastyTankModel
@@ -12,14 +13,16 @@ export default class ServerNastyTank extends ServerTank<NastyTankModel> {
     constructor(options: ServerTankConfig<NastyTankModel>) {
         super(options);
 
+        const controlsComponent = this.model.getComponent(TankControls)
+
         this.primaryWeapon = new FlamethrowerWeapon({
             tank: this,
-            triggerAxle: this.model.controls.getPrimaryWeaponAxle()
+            triggerAxle: controlsComponent.getPrimaryWeaponAxle()
         })
 
         this.minerWeapon = new WeaponMiner({
             tank: this,
-            triggerAxle: this.model.controls.getMinerWeaponAxle()
+            triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
     }
 

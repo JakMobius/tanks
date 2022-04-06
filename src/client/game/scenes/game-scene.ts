@@ -13,6 +13,7 @@ import ClientGameWorld from "../../client-game-world";
 import ClientWorldBridge from "../client-world-bridge";
 import {ClientTankType} from "../../entity/tank/client-tank";
 import GeneralGameScene from "../general-game-scene";
+import TankControls from "../../../controls/tank-controls";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient
@@ -75,8 +76,9 @@ export default class GameScene extends GeneralGameScene {
     private setupUpdateLoop() {
         const update = () => {
             this.screen.loop.scheduleTask(update, this.controlsUpdateInterval)
-            if(this.displayedWorld && this.displayedWorld.player && this.displayedWorld.player.tank.model.controls.shouldUpdate()) {
-                new PlayerControlsPacket(this.displayedWorld.player.tank.model.controls).sendTo(this.client.connection)
+            // TODO: this is a wrong place to send these packets.
+            if(this.displayedWorld && this.displayedWorld.player && this.displayedWorld.player.tank.model.getComponent(TankControls).shouldUpdate()) {
+                new PlayerControlsPacket(this.displayedWorld.player.tank.model.getComponent(TankControls)).sendTo(this.client.connection)
             }
         }
 

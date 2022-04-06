@@ -38,9 +38,9 @@ async function initialize() {
 
         server = new Server(config)
         server.setConsole(serverConsole)
+
         server.on("terminate", () => {
-            serverConsole.window.destroy()
-            server.db.disconnect(false)
+            serverConsole.destroy()
         })
 
         bootCommand.runPostInit()

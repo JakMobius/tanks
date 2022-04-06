@@ -5,7 +5,7 @@ import {clamp} from "../../../../utils/utils";
 import WheelTruckGenerator, {TrackConfig} from "./wheel-track-generator";
 import {TankWheel} from "../wheeled-tank/wheel";
 
-export type TruckTankBehaviourConfig = Omit<WheeledTankBehaviourConfig, 'wheels'> & {
+export type TrackTankBehaviourConfig = Omit<WheeledTankBehaviourConfig, 'wheels'> & {
     /**
      * The longitudinal offset of each track
      */
@@ -27,7 +27,7 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
     leftTrackWheels: TankWheel[]
     rightTrackWheels: TankWheel[]
 
-    constructor(tank: TankModel, config: TruckTankBehaviourConfig) {
+    constructor(tank: TankModel, config: TrackTankBehaviourConfig) {
         const leftTrackConfig = Object.assign({}, config.trackConfig)
         const rightTrackConfig = Object.assign({}, config.trackConfig)
 
@@ -95,8 +95,8 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
     }
 
     protected updateWheelThrottle() {
-        const throttle = this.tank.controls.getThrottle()
-        const steer = this.tank.controls.getSteer()
+        const throttle = this.controlsComponent.getThrottle()
+        const steer = this.controlsComponent.getSteer()
 
         let leftTrackSpeed = this.getLeftTrackSpeed()
         let rightTrackSpeed = this.getRightTrackSpeed()

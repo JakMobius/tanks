@@ -82,7 +82,7 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
         if(this.wallDamage) {
             const world = this.getWorld()
             world.physicsLoop.scheduleTask(() => {
-                const mapComponent = this.world.getComponent(TilemapComponent)
+                const mapComponent = world.getComponent(TilemapComponent)
                 if(mapComponent) {
                     mapComponent.map.damageBlock(x, y, this.wallDamage)
                 }

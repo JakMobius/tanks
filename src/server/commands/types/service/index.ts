@@ -7,7 +7,7 @@ export interface ServerServiceConfig {
     rooms: boolean
 }
 
-class ServiceCommand extends Command {
+export default class ServiceCommand extends Command {
 	public actions: Map<string, ServerServiceConfig>;
 
     constructor(options: CommandConfig) {
@@ -79,5 +79,3 @@ class ServiceCommand extends Command {
         " - service socket-only - disable http server, run as websocketConnection only"
     }
 }
-
-export default ServiceCommand;

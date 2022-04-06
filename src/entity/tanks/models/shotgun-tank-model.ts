@@ -7,14 +7,14 @@ import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
-export default class ShotgunTankModel extends TankModel<TrackTankBehaviour> {
+export default class ShotgunTankModel extends TankModel {
 
     public static typeName = 100
 
     constructor() {
         super();
 
-        this.behaviour = new TrackTankBehaviour(this, {
+        this.addComponent(new TrackTankBehaviour(this, {
             engineMaxTorque: 30000,
             enginePower: 30000,
             trackConfig: {
@@ -23,7 +23,7 @@ export default class ShotgunTankModel extends TankModel<TrackTankBehaviour> {
                 mass: 100
             },
             trackGauge: 3.75
-        });
+        }));
     }
 
     initPhysics(world: PhysicalHostComponent) {

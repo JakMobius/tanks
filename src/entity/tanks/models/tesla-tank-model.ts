@@ -9,12 +9,11 @@ import PhysicalHostComponent from "../../../physiсal-world-component";
 export default class TeslaTankModel extends TankModel {
 
     public static typeName = 106
-    public behaviour: BasicTankBehaviour
 
     constructor() {
         super()
 
-        new BasicTankBehaviour(this, {
+        this.addComponent(new BasicTankBehaviour(this, {
             engineMaxTorque: 30000,
             enginePower: 30000,
             trackConfig: {
@@ -23,7 +22,7 @@ export default class TeslaTankModel extends TankModel {
                 mass: 100
             },
             trackGauge: 3.75
-        })
+        }))
     }
 
     static getMaximumHealth() {

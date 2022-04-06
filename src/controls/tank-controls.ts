@@ -3,9 +3,10 @@ import Axle from './axle';
 import BinaryDecoder from "../serialization/binary/binary-decoder";
 import BinaryEncoder from 'src/serialization/binary/binary-encoder';
 import TankModel from "../entity/tanks/tank-model";
+import {Component} from "../utils/ecs/component";
+import Entity from "../utils/ecs/entity";
 
-export default class TankControls implements BinaryEncodable {
-	public tank: TankModel | undefined;
+export default class TankControls implements BinaryEncodable, Component {
 	public throttle = 0
 	public steer = 0;
 	public axles = new Map<string, Axle>();
@@ -14,10 +15,9 @@ export default class TankControls implements BinaryEncodable {
 	public updated: boolean = false;
 	public directional: boolean = false;
     public localControllers: number = 0
+    public entity: Entity | null;
 
-    constructor(tank?: TankModel) {
-        this.tank = tank
-
+    constructor() {
         this.axles.set("x", new Axle())
         this.axles.set("y", new Axle())
         this.axles.set("primary-weapon", new Axle())
@@ -35,10 +35,6 @@ export default class TankControls implements BinaryEncodable {
     }
 
     getThrottle() {
-        if (this.tank.health <= 0) {
-            return 0
-        }
-
         if (this.axles.get("y").needsUpdate) {
             this.updateAxes()
         }
@@ -46,10 +42,6 @@ export default class TankControls implements BinaryEncodable {
     }
 
     getSteer() {
-        if (this.tank.health <= 0) {
-            return 0
-        }
-
         if (this.axles.get("x").needsUpdate) {
             this.updateAxes()
         }
@@ -65,10 +57,6 @@ export default class TankControls implements BinaryEncodable {
     }
 
     isPrimaryWeaponActive() {
-        if (this.tank.health <= 0) {
-            return false
-        }
-
         let axle = this.getPrimaryWeaponAxle()
 
         if (axle.needsUpdate) {
@@ -79,10 +67,6 @@ export default class TankControls implements BinaryEncodable {
     }
 
     isMinerActive() {
-        if (this.tank.health <= 0) {
-            return false
-        }
-
         let axle = this.getMinerWeaponAxle()
 
         if (axle.needsUpdate) {
@@ -99,8 +83,10 @@ export default class TankControls implements BinaryEncodable {
         this.updated = true
 
         if (this.directional) {
-            this.steer = this.tank.matrix.transformX(x, y, 0)
-            this.throttle = this.tank.matrix.transformY(x, y, 0)
+
+            // TODO: create transform component and use it here
+            // this.steer = this.tank.matrix.transformX(x, y, 0)
+            // this.throttle = this.tank.matrix.transformY(x, y, 0)
         } else {
             this.throttle = y
             this.steer = x
@@ -131,5 +117,13 @@ export default class TankControls implements BinaryEncodable {
             (this.isMinerActive() as unknown as number & 1) << 1
 
         encoder.writeUint8(weapons)
+    }
+
+    onAttach(entity: Entity) {
+        this.entity = entity
+    }
+
+    onDetach() {
+        this.entity = null
     }
 }

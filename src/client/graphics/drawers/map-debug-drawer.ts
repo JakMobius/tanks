@@ -119,24 +119,25 @@ export default class MapDebugDrawer {
     }
 
     private drawTankWheelDebug(entity: ClientTank<TankModel>) {
-        if(entity.model.behaviour instanceof WheeledTankBehaviour) {
-            let behaviour: WheeledTankBehaviour = entity.model.behaviour
-            let wheels = behaviour.wheels
+        const behaviour = entity.model.getComponent(WheeledTankBehaviour)
 
-            let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
-            let wheelSize = MapDebugDrawer.wheelSize
+        if(!behaviour) return
 
-            for(let wheel of wheels) {
-                let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
+        let wheels = behaviour.wheels
 
-                turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
-                translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
-                transformQuadrangle(wheelQuadrangle, entity.model.matrix)
+        let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
+        let wheelSize = MapDebugDrawer.wheelSize
 
-                let color = wheel.isSliding ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
+        for(let wheel of wheels) {
+            let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
 
-                convexShapeProgram.drawQuadrangle(wheelQuadrangle, color)
-            }
+            turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
+            translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
+            transformQuadrangle(wheelQuadrangle, entity.model.matrix)
+
+            let color = wheel.isSliding ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
+
+            convexShapeProgram.drawQuadrangle(wheelQuadrangle, color)
         }
     }
 }

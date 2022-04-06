@@ -3,6 +3,7 @@ import SniperTankModel from "src/entity/tanks/models/sniper-tank-model";
 import ServerTank, {ServerTankConfig} from "../server-tank";
 import Weapon42mm from "src/weapon/models/42mm";
 import WeaponMiner from "src/weapon/models/miner";
+import TankControls from "../../../../controls/tank-controls";
 
 export default class ServerSniperTank extends ServerTank<SniperTankModel> {
     static Model = SniperTankModel
@@ -12,14 +13,16 @@ export default class ServerSniperTank extends ServerTank<SniperTankModel> {
     constructor(options: ServerTankConfig<SniperTankModel>) {
         super(options);
 
+        const controlsComponent = this.model.getComponent(TankControls)
+
         this.primaryWeapon = new Weapon42mm({
             tank: this,
-            triggerAxle: this.model.controls.getPrimaryWeaponAxle()
+            triggerAxle: controlsComponent.getPrimaryWeaponAxle()
         })
 
         this.minerWeapon = new WeaponMiner({
             tank: this,
-            triggerAxle: this.model.controls.getMinerWeaponAxle()
+            triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
     }
 

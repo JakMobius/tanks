@@ -15,6 +15,7 @@ import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
+import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 
 class Drawer extends TankDrawer<ClientSniperTank> {
 	public bodyBrightSprite: Sprite;
@@ -40,6 +41,7 @@ class Drawer extends TankDrawer<ClientSniperTank> {
     draw(phase: DrawPhase) {
 	    const model = this.entity.model
         const body = model.getComponent(PhysicalComponent).getBody()
+        const behaviour = model.getComponent(TrackTankBehaviour)
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
@@ -48,8 +50,8 @@ class Drawer extends TankDrawer<ClientSniperTank> {
         const leftTrack  = copyQuadrangle(Drawer.leftTrack)
         const rightTrack = copyQuadrangle(Drawer.rightTrack)
 
-        const leftTrackDist = model.behaviour.getLeftTrackDistance()
-        const rightTrackDist = model.behaviour.getRightTrackDistance()
+        const leftTrackDist = behaviour.getLeftTrackDistance()
+        const rightTrackDist = behaviour.getRightTrackDistance()
 
         transformQuadrangle(quadrangle, model.matrix)
         transformQuadrangle(leftTrack, model.matrix)

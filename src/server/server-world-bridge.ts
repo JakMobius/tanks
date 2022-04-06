@@ -23,13 +23,14 @@ import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import EntityHealthPacket from "../networking/packets/game-packets/entity-health-packet";
 import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
 import TilemapComponent from "../physics/tilemap-component";
+import TankControls from "../controls/tank-controls";
 
 export default class ServerWorldBridge {
     static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
         portal.on(PlayerControlsPacket, (packet, client) => {
             const player = client.data.player
             if(!player) return
-            packet.updateControls(player.tank.model.controls)
+            packet.updateControls(player.tank.model.getComponent(TankControls))
         })
 
         portal.on(PlayerConfigPacket, (packet, client) => {

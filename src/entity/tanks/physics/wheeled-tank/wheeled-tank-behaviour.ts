@@ -3,6 +3,7 @@ import TankBehaviour from '../tank-behaviour';
 import TankModel from "../../tank-model";
 import {TankWheel} from "./wheel";
 import PhysicalComponent from "../../../physics-component";
+import TankControls from "../../../../controls/tank-controls";
 
 export interface WheeledTankBehaviourConfig {
 
@@ -79,7 +80,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         let y = wheel.position.y;
         let angle = wheel.angle;
 
-        let body = this.tank.getComponent(PhysicalComponent).getBody()
+        let body = this.entity.getComponent(PhysicalComponent).getBody()
         this.localVector2.x = x
         this.localVector2.y = y
 
@@ -185,7 +186,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     }
 
     protected updateWheelThrottle() {
-        const throttle = this.tank.controls.getThrottle()
+        const throttle = this.controlsComponent.getThrottle()
         const engineTorque = this.calculateEngineTorque(this.getDrivetrainSpeed())
 
         for(let wheel of this.wheels) {
@@ -194,7 +195,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     }
 
     protected updateWheelAngles() {
-        const steerX = this.tank.controls.getSteer()
+        const steerX = this.controlsComponent.getSteer()
         let radius = 0
         if(steerX != 0) {
             radius = 1 / steerX * this.minSteerRadius
@@ -211,7 +212,7 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     }
 
     protected applyWheelForces(dt: number) {
-        const body = this.tank.getComponent(PhysicalComponent).getBody()
+        const body = this.entity.getComponent(PhysicalComponent).getBody()
 
         for(let wheel of this.wheels) {
             this.getWheelReaction(wheel, this.localVector1, dt)
