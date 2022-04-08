@@ -1,7 +1,6 @@
 import Logger from '../log/logger';
 import * as fs from 'fs';
 import * as path from 'path';
-import ArgumentParser from './argument-parser';
 
 //@ts-ignore
 import CommandList from "../commands/types/*"
@@ -9,11 +8,20 @@ import Command from "../commands/command";
 import Server from "../server";
 import StdCatchLogger from "../log/std-catch-logger";
 import ConsoleWindow from "./console-window";
+import Parser, {
+	CommandASTNode,
+	CommandParameterASTNode,
+	CommentASTNode,
+	GlobalASTNode
+} from "./language/parser";
+
+import Serializer from "./language/serializer";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required
 	single?: boolean
 }
+
 
 export default class Console {
 	public observingRoom: any;
@@ -48,14 +56,15 @@ export default class Console {
 		// Shift-tab feature doesn't work
 		// in WebStorm internal console.
 
-		this.window.on("keypress", () => this.updateAutosuggestion())
-		this.window.on("keypress", () => this.tabCompleteClear())
+		this.window.on("input", () => this.updateAutosuggestion())
+		this.window.on("input", () => this.tabCompleteClear())
 		this.window.on("history-walk", () => {
 			this.tabCompleteClear()
 			this.window.suggest(null)
 		})
 		this.window.on("exit", 	() => this.commands.get("exit").onPerform([]))
 		this.window.on("command", 	(command: string) => this.evaluate(command))
+
 		this.window.on("tab", (shift) => {
 			if (this.tabCompletions) {
 				if(shift) this.tabCompletePrevious()
@@ -68,33 +77,88 @@ export default class Console {
 		this.logger.addDestination(this.window.destination)
 	}
 
-	private getAutocompletes(args: string[], options: ConsoleAutocompleteOptions): string[] {
+	private getCommandByOffset(ast: GlobalASTNode, offset: number): CommandASTNode | null {
+		let position = 0
 
-		if(args.length <= 1) {
-
-			let completions = []
-			for(let command of this.commands.values()) {
-				let name = command.getName()
-
-				if(args.length === 0 || name.startsWith(args[0])) {
-					completions.push(name)
+		for(let eachCommand of ast.children) {
+			if(eachCommand instanceof CommandASTNode) {
+				if(position < offset && position + eachCommand.totalRawLength() >= offset) {
+					return eachCommand
 				}
 			}
-			return completions
-		} else {
-			let command = this.commands.get(args[0])
-			if (command) {
-
-				let completions = command.onTabComplete(args.slice(1), options)
-
-				if(completions) return completions
-			}
+			position += eachCommand.totalRawLength()
 		}
 
 		return null
 	}
+
+	private processCommandParameters(command: CommandASTNode, offset: number): string[] | null {
+		let result = []
+		let position = 0
+		let insideOfParameter = false
+
+		for(let i = 0; i < command.children.length; i++) {
+			let child = command.children[i]
+
+			if (position < offset) {
+				if(child instanceof CommandParameterASTNode) {
+					result.push(child.lexeme.contents)
+
+					if(position + child.totalRawLength() >= offset) {
+						insideOfParameter = true
+					}
+				} else if(child instanceof CommentASTNode) {
+					return null
+				}
+			} else {
+				child.removeFromParent()
+				i--
+			}
+			position += child.totalRawLength()
+		}
+
+		if(!insideOfParameter) {
+			result.push("")
+		}
+
+		return result
+	}
+
+	private getAutocompletes(args: string[], options: ConsoleAutocompleteOptions): string[] {
+
+		if (args.length > 1) {
+			let command = this.commands.get(args[0])
+			if (!command) return null
+
+			let completions = command.onTabComplete(args.slice(1), options)
+			if (!completions) return null
+
+			return completions
+		}
+
+		let completions = []
+		for (let command of this.commands.values()) {
+			let name = command.getName()
+
+			if (args.length !== 0 && !name.startsWith(args[0])) continue;
+
+			completions.push(name)
+		}
+		return completions
+	}
+
 	tabCompleteBegin(line: string, shift: boolean): void {
-		let args = ArgumentParser.parseArguments(line)
+		let cursorPosition = this.window.getCurrentCursorPosition()
+		let ast = Parser.shared.parseSource(line)
+
+		let commandNode = this.getCommandByOffset(ast, cursorPosition)
+		if(!commandNode) return
+
+		let args = this.processCommandParameters(commandNode, cursorPosition)
+		if (!args) return
+
+		console.log("args = ", args)
+
 		this.tabCompletions = this.getAutocompletes(args, {
 			single: false
 		})
@@ -106,7 +170,9 @@ export default class Console {
 				this.logger.log(this.tabCompletions.join(", "))
 			}
 
-			let prefix = ArgumentParser.trimLastArgument(line, false)
+			let prefix = Serializer.shared.serialize(commandNode)
+
+			console.log("Prefix = " + prefix)
 
 			this.tabCompletions = this.tabCompletions.map((completion: string) => {
 				if(completion.indexOf(' ') != -1) {
@@ -116,18 +182,18 @@ export default class Console {
 				return prefix + completion
 			})
 
-			if(this.tabCompletions.length > 1) {
-				if(shift) {
-					this.tabCompleteIndex = this.tabCompletions.length
-					this.tabCompletePrevious()
-				} else {
-					this.tabCompleteIndex = -1
-					this.tabCompleteNext()
-				}
-				return
-			}
-
-			this.window.setLine(this.tabCompletions[0])
+			// if(this.tabCompletions.length > 1) {
+			// 	if(shift) {
+			// 		this.tabCompleteIndex = this.tabCompletions.length
+			// 		this.tabCompletePrevious()
+			// 	} else {
+			// 		this.tabCompleteIndex = -1
+			// 		this.tabCompleteNext()
+			// 	}
+			// 	return
+			// }
+			//
+			// this.setConsoleLine(this.tabCompletions[0])
 		}
 
 		this.tabCompletions = null
@@ -136,7 +202,7 @@ export default class Console {
 	tabCompletePrevious(): void {
 		this.tabCompleteIndex--
 		if(this.tabCompleteIndex < 0) this.tabCompleteIndex = this.tabCompletions.length - 1;
-		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
+		this.setConsoleLine(this.tabCompletions[this.tabCompleteIndex])
 	}
 
 	tabCompleteNext(): void {
@@ -144,7 +210,12 @@ export default class Console {
 		if(this.tabCompleteIndex >= this.tabCompletions.length) {
 			this.tabCompleteIndex = 0
 		}
-		this.window.setLine(this.tabCompletions[this.tabCompleteIndex])
+		this.setConsoleLine(this.tabCompletions[this.tabCompleteIndex])
+	}
+
+	setConsoleLine(text: string) {
+		this.window.setLine(text)
+		this.window.setCursorPosition(text.length)
 	}
 
 	tabCompleteClear(): void {
@@ -167,7 +238,14 @@ export default class Console {
 			return
 		}
 
-		let args = ArgumentParser.parseArguments(line)
+		let ast = Parser.shared.parseSource(line)
+
+		let commandNode = this.getCommandByOffset(ast, cursorPosition)
+		if(!commandNode) return
+
+		let args = this.processCommandParameters(commandNode, cursorPosition)
+		if (!args) return
+
 		let completions = this.getAutocompletes(args, {
 			single: true
 		})
@@ -181,22 +259,28 @@ export default class Console {
 	}
 
 	evaluate(line: string): void {
-
+		console.log("> " + line)
 		line = line.trim()
 
 		if(line.length === 0) return
 
-		let command = ArgumentParser.parseArguments(line)
+		let ast = Parser.shared.parseSource(line)
 
-		if(!command.length || command[0].length === 0) return
+		for(let children of ast.children) {
+			if(!(children instanceof CommandASTNode)) continue;
 
-		let handle = this.commands.get(command[0])
+			let parameters = children.getParameters()
 
-		if (handle) {
-			this.callHandle(handle, command.slice(1))
-        } else {
-            this.logger.log("§F00;Unknown command: '" + command[0] + "'")
-        }
+			if (!parameters.length || parameters[0].length === 0) return
+
+			let handle = this.commands.get(parameters[0])
+
+			if (handle) {
+				this.callHandle(handle, parameters.slice(1))
+			} else {
+				this.logger.log("§F00;Unknown command: '" + parameters[0] + "'")
+			}
+		}
 	}
 
 	callHandle(handle: Command, args: string[]) {

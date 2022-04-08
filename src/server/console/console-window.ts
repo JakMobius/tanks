@@ -2,7 +2,7 @@
 import EventEmitter from '../../utils/event-emitter';
 import HistoryEntry from "./console-history-entry";
 import CallbackLogger from "./callback-logger";
-import ServerLine from "../../library/serverline"
+import ServerLine, {Keypress} from "../../library/serverline"
 
 export default class ConsoleWindow extends EventEmitter {
     public destination: CallbackLogger;
@@ -23,62 +23,51 @@ export default class ConsoleWindow extends EventEmitter {
         this.currentHistoryEntry = new HistoryEntry(null, 0)
 
         this.serverline = new ServerLine()
-        this.serverline.init()
         this.serverline.setPrompt('> ')
 
-        this.serverline.on('line', (line: string) => {
-            this.onCommand(line)
-        });
+        this.serverline.on("keypress", (key: Keypress) => {
+            if(key.name == "return") {
+                this.onCommand(this.serverline.getLine())
+            } else if(key.name == "tab") {
+                this.onTab(key.shift)
+            } else if(key.name == "up") {
+                this.historyGoUp()
+            } else if(key.name == "down") {
+                this.historyGoDown()
+            } else {
+                this.onKeypress(key)
+                return true
+            }
+            return false
+        })
 
-        // this.consoleBox.consoleTextbox.key("C-c", () => this.onExit())
-        // this.consoleBox.consoleTextbox.key("enter", () => {
-        //     const command = this.getValue()
-        //     this.onCommand(command)
-        // })
-        //
-        // this.consoleBox.consoleTextbox.key("up", () => this.historyGoUp())
-        // this.consoleBox.consoleTextbox.key("down", () => this.historyGoDown())
-        // this.consoleBox.consoleTextbox.on("keypress", (_, event: blessed.KeyEvent) => {
-        //     if(event.name == 'tab') {
-        //         event.cancelled = true
-        //         this.onTab(event.shift)
-        //     }
-        // })
-        //
-        // this.consoleBox.consoleTextbox.on("keypress", (_, event: blessed.KeyEvent) => {
-        //     if(!event.cancelled) {
-        //         this.onKeypress(event)
-        //     }
-        // }, EventEmitter.PRIORITY_LOW)
+        this.serverline.on("after-keypress", () => {
+            this.onInput()
+        })
+
+        this.serverline.on("exit", () => this.onExit())
     }
 
     getCurrentCursorPosition() {
-        return 0
+        return this.serverline.getCursorPosition()
     }
 
     setCursorPosition(position: number) {
-
+        this.serverline.setCursorPosition(position)
     }
 
     addHistoryEntry(command: string) {
-
-        let pushHistoryEntry = true
+        this.historyIndex = null
 
         if (this.history.length > 0) {
-            if (this.historyIndex === null) {
-                const index = this.history.length - 1
-                if (this.history[index].text === command) {
-                    this.history[index].cursorPos = this.getCurrentCursorPosition()
-                    pushHistoryEntry = false
-                }
+            const lastIndex = this.history.length - 1
+            if (this.history[lastIndex].text === command) {
+                this.history[lastIndex].cursorPos = this.getCurrentCursorPosition()
+                return
             }
         }
 
-        if(pushHistoryEntry) {
-            this.history.push(new HistoryEntry(command, this.getCurrentCursorPosition()))
-        }
-
-        this.historyIndex = null
+        this.history.push(new HistoryEntry(command, this.getCurrentCursorPosition()))
     }
 
     historyGoUp() {
@@ -90,7 +79,6 @@ export default class ConsoleWindow extends EventEmitter {
                 return
             }
         } else {
-            this.storeState(this.history[this.historyIndex])
             this.historyIndex--;
         }
 
@@ -114,8 +102,6 @@ export default class ConsoleWindow extends EventEmitter {
     historyGoDown() {
         if (this.historyIndex === null) return
 
-        this.storeState(this.history[this.historyIndex])
-
         this.historyIndex++
 
         if (this.historyIndex >= this.history.length) {
@@ -137,27 +123,27 @@ export default class ConsoleWindow extends EventEmitter {
     }
 
     setPrompt(prompt: string) {
-        this.prompt = prompt
-
-        prompt += "> "
+        this.prompt = prompt + " >"
+        this.serverline.setPrompt(this.prompt)
     }
 
     setLine(text: string) {
-
+        this.serverline.setLine(text)
     }
 
     onCommand(text: string) {
         this.addHistoryEntry(text)
         this.emit("command", text)
         this.setLine("")
+        this.setCursorPosition(0)
         this.onHistoryWalk()
     }
 
-    onTab(shift: boolean) {
-        this.emit("tab", shift)
+    onInput() {
+        this.emit("input")
     }
 
-    onKeypress(key: any) {
+    onKeypress(key: Keypress) {
         this.emit("keypress", key)
     }
 
@@ -165,12 +151,16 @@ export default class ConsoleWindow extends EventEmitter {
         this.emit("exit")
     }
 
+    onTab(shift: boolean) {
+        this.emit("tab", shift)
+    }
+
     getValue(): string {
-        return ""
+        return this.serverline.getLine()
     }
 
     suggest(param?: string, trim: boolean = true) {
-
+        this.serverline.suggest(param)
     }
 
     destroy() {

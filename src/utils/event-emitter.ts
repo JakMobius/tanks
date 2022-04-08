@@ -12,8 +12,7 @@ export default class EventEmitter {
         this.handlers = []
     }
 
-    addListener(type: string, listener: () => void, priority: number)
-    {
+    addListener(type: string, listener: () => void, priority: number) {
         let priorityBlock = this.handlers[priority]
 
         if(!priorityBlock) {

@@ -2,24 +2,69 @@
 import stream from 'stream'
 import {createReadline, Readline} from "./readline";
 import EventEmitter from "../../utils/event-emitter";
+import * as KeypressListener from "./keypress-listener";
+import * as readline from "readline";
+import chalk from "chalk";
 
 export interface ServerLineOptions {
     prompt?: string
-    forceTerminalContext?: boolean
     consoleOptions: NodeJS.ConsoleConstructorOptions
+}
+
+export interface Keypress {
+    sequence: string,
+    name: string,
+    ctrl: boolean,
+    meta: boolean,
+    shift: boolean
+}
+
+export interface ServerLineCollection {
+    stdout?: stream.Writable,
+    stderr?: stream.Writable,
+    stdin?: stream.Readable
 }
 
 export default class ServerLine extends EventEmitter {
     readline?: Readline = null
     promptString = '> '
-    collection: {
-        stdout?: stream.Writable,
-        stderr?: stream.Writable
-    } = {
+    collection: ServerLineCollection = {
         stdout: null,
-        stderr: null
+        stderr: null,
+        stdin: null
     }
+
     private originalConsole?: Console;
+    private keypressListener?: (key: string, keypress: Keypress) => void
+    private sigintListener?: () => void
+    private suggestion?: string
+
+    constructor(options?: ServerLineOptions) {
+        super()
+        options = Object.assign({}, options)
+
+        this.createInput();
+
+        this.readline = createReadline({
+            input: this.collection.stdin,
+            output: process.stdout,
+            prompt: options.prompt ?? '> '
+        })
+
+        if (!this.readline.terminal) {
+            console.warn("Warning: output is not a terminal. ")
+        }
+
+        this.consoleOverwrite(options.consoleOptions)
+
+        this.keypressListener = (key: string, keypress: Keypress) => this.onKeypress(key, keypress)
+        this.sigintListener = () => this.onExit()
+
+        KeypressListener.addListener(this.keypressListener)
+        this.readline.on('SIGINT', this.sigintListener)
+
+        this.readline.prompt()
+    }
 
     getPrompt() {
         return this.promptString
@@ -30,38 +75,15 @@ export default class ServerLine extends EventEmitter {
         this.readline.setPrompt(this.promptString)
     }
 
-    getHistory() {
-        return (this.readline.terminal) ? this.readline.history : []
-    }
-
-    setHistory(history: string[]) {
-        if (this.readline.terminal && Array.isArray(history)) {
-            this.readline.history = history
-            return true
-        }
-        return !!this.readline.terminal
-    }
-
-    getReadline() {
-        return this.readline
-    }
-
     close() {
-        this.collection.stdout = null
-        this.collection.stderr = null
+        if(!this.readline) return
+
         this.readline.close()
         this.readline = null
         this.collection = null
         console = this.originalConsole
         this.originalConsole = null
-    }
-
-    pause() {
-        this.readline.pause()
-    }
-
-    resume() {
-        this.readline.resume()
+        KeypressListener.removeListener(this.keypressListener)
     }
 
     private beforeTheLastLine(chunk: any) {
@@ -75,50 +97,8 @@ export default class ServerLine extends EventEmitter {
         return Buffer.from(text, 'utf8')
     }
 
-    init(options?: ServerLineOptions) {
-        options = Object.assign({
-            prompt: '> ',
-            forceTerminalContext: false
-        }, options)
-
-        if (options.forceTerminalContext) {
-            process.stdin.isTTY = true
-            process.stdout.isTTY = true
-        }
-
-        this.readline = createReadline({
-            input: process.stdin,
-            output: process.stdout,
-            completer: (line: string) => this.completer(line),
-            prompt: options.prompt
-        })
-
-        if (!this.readline.terminal) {
-            console.warn('WARN: Compatibility mode! The current context is not a terminal. This may ' +
-                'occur when you redirect terminal output into a file.')
-            console.warn('You can try to define `options.forceTerminalContext = true`.')
-        }
-
-        this.consoleOverwrite(options.consoleOptions)
-
-        this.readline.on('line', (line) => {
-            if (this.readline.history && this.readline.terminal) {
-                this.readline.history.push(line)
-            }
-            this.emit('line', line)
-            if (this.readline.terminal) {
-                this.readline.prompt()
-            }
-        })
-        this.readline.on('SIGINT', () => {
-            this.setLine("")
-            this.emit('SIGINT', this.readline)
-        })
-        this.readline.prompt()
-    }
-
     setLine(line: string) {
-        if (this.readline.terminal) {
+        if(this.readline && this.readline.terminal) {
             (this.readline as any).line = line
             this.readline._refreshLine()
         }
@@ -134,13 +114,24 @@ export default class ServerLine extends EventEmitter {
     private overwriteStream(stream: stream.Writable, original: stream.Writable) {
         stream._write = (chunk, encoding, callback) => {
             // https://github.com/nodejs/node/blob/v10.0.0/lib/readline.js#L178
-            if (this.readline.terminal) {
+            if (this.readline && this.readline.terminal) {
                 original.write(this.beforeTheLastLine(chunk), encoding, () => {
-                    this.readline._refreshLine()
+                    if(this.readline) {
+                        this.readline._refreshLine()
+                    }
                     callback()
                 })
             } else {
                 original.write(chunk, encoding, callback)
+            }
+        }
+    }
+
+    private createInput() {
+        this.collection.stdin = new stream.Readable()
+        this.collection.stdin._read = (size) => {
+            if(this.readline) {
+                process.stdin.read(size)
             }
         }
     }
@@ -152,6 +143,12 @@ export default class ServerLine extends EventEmitter {
         this.overwriteStream(this.collection.stdout, process.stdout)
         this.overwriteStream(this.collection.stderr, process.stderr)
 
+        const originalRefreshLine = this.readline._refreshLine
+        this.readline._refreshLine = () => {
+            originalRefreshLine.call(this.readline)
+            this.updateSuggestion()
+        }
+
         const Console = console.Console
         const consoleOptions = Object.assign({}, {
             stdout: this.collection.stdout,
@@ -162,7 +159,35 @@ export default class ServerLine extends EventEmitter {
         console.Console = Console
     }
 
-    private completer(line: string) {
-        this.emit('completer', line)
+    private onKeypress(key: string, keypress: Keypress) {
+        if(this.emit("keypress", keypress)) {
+            this.readline.write(key, keypress)
+            this.emit("after-keypress", keypress)
+        }
+    }
+
+    private onExit() {
+        this.emit("exit")
+        this.setLine("")
+    }
+
+    getCursorPosition() {
+        return this.readline.getCursorPos().cols - this.promptString.length
+    }
+
+    setCursorPosition(position: number) {
+        this.readline._moveCursor(position - this.getCursorPosition())
+    }
+
+    suggest(line?: string) {
+        this.suggestion = line
+        this.readline._refreshLine()
+    }
+
+    private updateSuggestion() {
+        if(this.suggestion) {
+            process.stdout.write(chalk.gray(this.suggestion))
+            readline.moveCursor(process.stdout, -this.suggestion.length, 0)
+        }
     }
 }
