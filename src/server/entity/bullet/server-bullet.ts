@@ -9,6 +9,8 @@ import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
 import PhysicalComponent from "../../../entity/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
+import EntityModel from "../../../entity/entity-model";
+import EffectHost from "../../../effects/effect-host";
 
 export interface ServerBulletConfig<ModelClass extends BulletModel> {
     model: ModelClass
@@ -53,7 +55,7 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
             })
             const world = this.shooter.getWorld()
 
-            world.addEffect(ServerWorldEffect.fromModelAndWorld(effect, world))
+            world.getComponent(EffectHost).addEffect(ServerWorldEffect.fromModelAndWorld(effect, world))
         }
     }
 

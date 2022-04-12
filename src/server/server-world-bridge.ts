@@ -65,6 +65,16 @@ export default class ServerWorldBridge {
 
         world.on("entity-create", (entity: ServerEntity) => {
             portal.broadcast(new EntityCreatePacket(entity))
+
+            // TODO: this is wrong.
+            entity.model.on("effect-create", (effect: ServerEffect) => {
+                portal.broadcast(new EffectCreatePacket(effect.model))
+            })
+
+            entity.model.on("effect-remove", (effect: ServerEffect) => {
+                if((effect.constructor as typeof ServerEffect).shouldSynchroniseRemoval)
+                    portal.broadcast(new EffectRemovePacket(effect.model.id))
+            })
         })
 
         world.on("entity-remove", (entity: ServerEntity) => {

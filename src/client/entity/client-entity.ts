@@ -91,7 +91,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
     }
 
     tick(dt: number) {
-        //super.tick(dt)
+        super.tick(dt)
         if(this.serverPositionUpdateDate) {
             const body = this.model.getComponent(PhysicalComponent).getBody()
             let pos = body.GetPosition()

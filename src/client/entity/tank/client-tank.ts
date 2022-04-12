@@ -33,8 +33,6 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
 	public player: ClientPlayer
     public timeSinceLastSmoke = 0
 
-    effects = new Map<number, ClientTankEffect>()
-
     constructor(config: TankConfig<ModelClass>) {
         super(config.model)
         this.engine = null
@@ -43,10 +41,6 @@ export default class ClientTank<ModelClass extends TankModel = TankModel> extend
     tick(dt: number) {
         super.tick(dt)
         const transform = this.model.getComponent(TransformComponent).transform
-
-        for(let effect of this.effects.values()) {
-            effect.tick(dt)
-        }
 
         if(this.model.health < 7) {
             this.timeSinceLastSmoke += dt

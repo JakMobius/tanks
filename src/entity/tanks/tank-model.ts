@@ -1,6 +1,7 @@
 
 import TankControls from '../../controls/tank-controls';
 import EntityModel from "../entity-model";
+import EffectHost from "../../effects/effect-host";
 
 /**
  * Tank model. Combines the physical model
@@ -16,6 +17,8 @@ export default class TankModel extends EntityModel {
     constructor() {
         super()
 
+        // TODO: should we add effectHost to each entity?...
+        this.addComponent(new EffectHost())
         this.addComponent(new TankControls())
     }
 }

@@ -13,7 +13,6 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 	public queue: any;
 	public frequency: any;
 	public sound: any;
-	public dead: any;
 
 	static Model: typeof EffectModel = TankFireEffectModel
 
@@ -26,7 +25,7 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 
     stop() {
         this.sound.stop()
-        this.dead = true
+        this.die()
     }
 
     tick(dt: number) {

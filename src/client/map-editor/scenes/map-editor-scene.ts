@@ -40,7 +40,7 @@ export default class MapEditorScene extends Scene {
         super(config)
 
         this.keyboard.startListening()
-        this.world = new ClientGameWorld<EditorMap>({})
+        this.world = new ClientGameWorld({})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
         this.dragHandler.draggingEnabled = false

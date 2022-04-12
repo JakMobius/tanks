@@ -13,19 +13,18 @@ import PhysicalComponent from "./entity/physics-component";
 import Entity from "./utils/ecs/entity";
 import PhysicalHostComponent from "./physiсal-world-component";
 import TilemapComponent from "./physics/tilemap-component";
+import EffectHost from "./effects/effect-host";
 
-export interface GameWorldConfig<MapClass extends GameMap = GameMap> {
+export interface GameWorldConfig {
     physicsTick?: number
     maxTicks?: number
     positionSteps?: number
     velocitySteps?: number
-    map?: MapClass
+    map?: GameMap
 }
 
 export default class AbstractWorld<
-    MapClass extends GameMap = GameMap,
     EntityClass extends AbstractEntity = AbstractEntity,
-    EffectClass extends AbstractEffect = AbstractEffect,
     PlayerClass extends AbstractPlayer = AbstractPlayer,
     TankClass extends AbstractEntity = AbstractEntity
 > extends Entity {
@@ -33,12 +32,11 @@ export default class AbstractWorld<
 
     players = new Map<number, PlayerClass>()
     entities = new Map<number, EntityClass>()
-    effects = new Map<number, EffectClass>()
     explosionEffectPool: ExplodeEffectPool<this>
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
 
-    constructor(options?: GameWorldConfig<MapClass>) {
+    constructor(options?: GameWorldConfig) {
         super()
 
         options = Object.assign({
@@ -48,6 +46,7 @@ export default class AbstractWorld<
             velocitySteps: 1
         }, options)
 
+        this.addComponent(new EffectHost());
         this.addComponent(new TilemapComponent());
 
         this.addComponent(new PhysicalHostComponent({
@@ -73,7 +72,6 @@ export default class AbstractWorld<
         this.physicsLoop.start()
 
         this.on("map-change", () => {
-            this.effects.clear()
             this.players.clear()
         })
     }
@@ -102,21 +100,11 @@ export default class AbstractWorld<
         }
     }
 
-    processEffects(dt: number): void {
-        for(let effect of this.effects.values()) {
-            effect.tick(dt)
-            if(effect.dead) {
-                this.removeEffect(effect)
-            }
-        }
-    }
-
     tick(dt: number): void {
         this.emit("before-tick", dt)
 
         this.processPhysics(dt)
         this.processEntities(dt)
-        this.processEffects(dt)
 
         this.emit("tick", dt)
 
@@ -125,7 +113,9 @@ export default class AbstractWorld<
 
     createEntity(entity: EntityClass): void {
         entity.setWorld(this)
-        if(!entity.model.getComponent(PhysicalComponent)) entity.model.initPhysics(this.getComponent(PhysicalHostComponent))
+        if(!entity.model.getComponent(PhysicalComponent)) {
+            entity.model.initPhysics(this.getComponent(PhysicalHostComponent))
+        }
         this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
@@ -151,27 +141,6 @@ export default class AbstractWorld<
         player.destroy()
         this.players.delete(player.id)
         this.emit("player-remove", player)
-    }
-
-    addTankEffect(effect: EffectClass, tank: TankClass) {
-        this.emit("effect-create", effect, tank)
-    }
-
-    removeTankEffect(effect: EffectClass, tank: TankClass) {
-        this.emit("effect-remove", effect, tank)
-    }
-
-    addEffect(effect: EffectClass) {
-        if(this.effects.has(effect.model.id)) return
-
-        this.effects.set(effect.model.id, effect)
-        this.emit("effect-create", effect)
-    }
-
-    removeEffect(effect: EffectClass) {
-        if(this.effects.delete(effect.model.id)) {
-            this.emit("effect-remove", effect)
-        }
     }
 
     // TODO: move to component

@@ -8,6 +8,7 @@ import ServerPlayer from "../../server-player";
 import {Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
 import PhysicalComponent from "../../../entity/physics-component";
+import EffectHost from "../../../effects/effect-host";
 
 export interface ServerTankConfig<ModelClass> {
     model: ModelClass
@@ -22,29 +23,12 @@ export default class ServerTank<ModelClass extends TankModel = TankModel> extend
     public static Tanks: ServerTankType[] = []
 
 	public teleported: boolean;
-    public effects = new Map<number, AbstractEffect>()
     public player: ServerPlayer
 
     constructor(options: ServerTankConfig<ModelClass>) {
         super(options.model);
 
         this.teleported = false
-    }
-
-    addEffect(effect: ServerTankEffect): void {
-        if(this.effects.has(effect.model.id)) {
-            return
-        }
-        // TODO: Это криво
-        effect.model.tankId = this.player.id
-        this.effects.set(effect.model.id, effect)
-        this.player.getWorld().addTankEffect(effect, this)
-    }
-
-    removeEffect(effect: ServerTankEffect): void {
-        if(this.effects.delete(effect.model.id)) {
-            this.player.getWorld().removeTankEffect(effect, this)
-        }
     }
 
     teleport(x: number, y: number) {

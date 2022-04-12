@@ -46,7 +46,7 @@ export default class EntityModel extends Entity {
     }
 
     tick(dt: number): void {
-
+        this.emit("tick", dt)
     }
 
     toBinary(encoder: BinaryEncoder): void {

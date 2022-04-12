@@ -8,15 +8,15 @@ import GameMap from "../map/game-map";
 import ServerTank from "./entity/tank/server-tank";
 import ServerWorldExplodeEffectPool from "./server-world-explode-effect-model-pool";
 
-export interface ServerGameWorldConfig<MapClass extends GameMap = GameMap> extends GameWorldConfig<MapClass> {
+export interface ServerGameWorldConfig extends GameWorldConfig {
     room: Game
 }
 
-export default class ServerGameWorld<MapClass extends GameMap = GameMap> extends AbstractWorld<MapClass, ServerEntity, ServerEffect, ServerPlayer, ServerTank> {
+export default class ServerGameWorld extends AbstractWorld<ServerEntity, ServerPlayer, ServerTank> {
 
     public room: Game
 
-    constructor(options: ServerGameWorldConfig<MapClass>) {
+    constructor(options: ServerGameWorldConfig) {
         super(options);
 
         this.room = options.room

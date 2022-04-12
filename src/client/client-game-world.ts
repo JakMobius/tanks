@@ -7,12 +7,12 @@ import GameMap from "../map/game-map";
 import ClientPlayer from "./client-player";
 import ClientTank from "./entity/tank/client-tank";
 
-export default class ClientGameWorld<T extends GameMap = GameMap> extends AbstractWorld<T, ClientEntity, ClientEffect, ClientPlayer, ClientTank> {
+export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer, ClientTank> {
 
     public player: ClientPlayer = null
     public particles: Particle[] = []
 
-    constructor(options?: GameWorldConfig<T>) {
+    constructor(options?: GameWorldConfig) {
         super(options);
     }
 

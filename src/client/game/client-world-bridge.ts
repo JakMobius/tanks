@@ -22,6 +22,8 @@ import EntityHealthPacket from "../../networking/packets/game-packets/entity-hea
 import PhysicalComponent from "../../entity/physics-component";
 import PhysicalHostComponent from "../../physiсal-world-component";
 import TilemapComponent from "../../physics/tilemap-component";
+import EffectHost from "../../effects/effect-host";
+import AbstractEffect from "../../effects/abstract-effect";
 
 export default class ClientWorldBridge {
     static buildBridge(client: ConnectionClient, world: ClientGameWorld) {
@@ -75,10 +77,11 @@ export default class ClientWorldBridge {
             world.removePlayer(player)
         })
 
+        // TODO: bad.
+        let effects = new Map<number, AbstractEffect>()
+
         client.on(EffectCreatePacket, (packet) => {
             let effect = packet.effect
-            if(world.effects.has(effect.id))
-                world.effects.get(effect.id).die()
 
             if(effect instanceof TankEffectModel) {
                 let player = world.players.get(effect.tankId)
@@ -86,28 +89,18 @@ export default class ClientWorldBridge {
                 if (!player || !tank) return
 
                 let wrapper = ClientTankEffect.fromModelAndTank(effect, tank)
-                tank.effects.set(effect.id, wrapper)
-
-                world.effects.set(effect.id, wrapper)
+                tank.model.getComponent(EffectHost).addEffect(wrapper)
+                effects.set(effect.id, wrapper)
             } else if(effect instanceof WorldEffectModel) {
                 let wrapper = ClientWorldEffect.fromModelAndWorld(effect, world)
-                world.effects.set(effect.id, wrapper)
+                world.getComponent(EffectHost).addEffect(wrapper)
+                effects.set(effect.id, wrapper)
             }
         })
 
         client.on(EffectRemovePacket, (packet) => {
-            let effect = world.effects.get(packet.id)
+            let effect = effects.get(packet.effectId)
             effect.die()
-            world.effects.delete(packet.id)
-
-            if(effect.model instanceof TankEffectModel) {
-                let player = world.players.get(effect.model.tankId)
-                if (!player || !player.tank) return
-
-                player.tank.effects.delete(packet.id)
-            } else if(effect.model instanceof WorldEffectModel) {
-                world.effects.delete(packet.id)
-            }
         })
     }
 
