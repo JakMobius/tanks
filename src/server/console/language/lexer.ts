@@ -41,6 +41,33 @@ export class StringLexeme extends Lexeme {
 
     contents: string = "";
     quoteType: QuoteType
+
+    setQuoteType(type: QuoteType) {
+        if(type == this.quoteType) return;
+
+        if(this.quoteType) {
+            if(!this.rawContents.endsWith(this.quoteType)) {
+                this.rawContents = this.rawContents.substr(1, this.rawContents.length - 1)
+            } else {
+                this.rawContents = this.rawContents.substr(1, this.rawContents.length - 2)
+            }
+        } else if(type) {
+            this.rawContents = this.contents.split("").map((c) => {
+                if(Lexer.stringCharacterShouldBeEscaped(c, type)) return "\\" + c
+                return c
+            }).join("")
+        }
+
+        if(type) {
+            this.rawContents = type + this.rawContents + type
+        } else if(this.quoteType) {
+            this.rawContents = this.rawContents.split("").map((c) => {
+                if(Lexer.escapeStringContents(c, null)) return "\\" + c
+                return c
+            }).join("")
+        }
+        this.quoteType = type
+    }
 }
 
 export default class Lexer {
@@ -53,38 +80,43 @@ export default class Lexer {
     constructor() {
     }
 
-    private next() {
-        return this.string[this.position]
-    }
+    private next() { return this.string[this.position] }
+    private eat() { this.position++ }
 
-    private eat() {
-        this.position++
-    }
-
-    getLexemes(line: string): Lexeme[] {
-        this.string = line
+    reset() {
         this.position = 0
         this.result = []
-        let c = ""
+        this.string = null
+    }
 
+    setString(string: string) {
+        this.string = string
+    }
+
+    private addLexeme(lexeme: Lexeme) {
+        this.result.push(lexeme)
+    }
+
+    parseGlobal(): Lexeme[] {
+        let c = ""
         while ((c = this.next())) {
-            if (this.isQuote(c)) {
-                this.parseString(c as QuoteType)
-            } else if (this.isWhitespace(c)) {
-                this.parseWhitespace()
-            } else if (this.isNewline(c)) {
-                this.parseNewline()
-            } else if (this.isComment(c)) {
-                this.parseComment()
+            if (Lexer.isQuote(c)) {
+                this.addLexeme(this.parseString(c as QuoteType))
+            } else if (Lexer.isWhitespace(c)) {
+                this.addLexeme(this.parseWhitespace())
+            } else if (Lexer.isNewline(c)) {
+                this.addLexeme(this.parseNewline())
+            } else if (Lexer.isComment(c)) {
+                this.addLexeme(this.parseComment())
             } else {
-                this.parseString(null)
+                this.addLexeme(this.parseString(null))
             }
         }
 
         return this.result
     }
 
-    private parseComment() {
+    parseComment() {
         let startPosition = this.position
         let lexeme = new WhitespaceLexeme()
 
@@ -92,7 +124,7 @@ export default class Lexer {
 
         while (true) {
             let c = this.next();
-            if (this.isNewline(c) || !c) {
+            if (Lexer.isNewline(c) || !c) {
                 break;
             }
             this.eat()
@@ -100,22 +132,22 @@ export default class Lexer {
         }
 
         lexeme.rawContents = this.string.substring(startPosition, this.position)
-        this.result.push(lexeme)
+        return lexeme
     }
 
-    private parseNewline() {
+    parseNewline() {
         let lexeme = new NewlineLexeme()
         this.eat()
-        this.result.push(lexeme)
+        return lexeme
     }
 
-    private parseWhitespace() {
+    parseWhitespace() {
         let startPosition = this.position
         let lexeme = new WhitespaceLexeme()
 
         while (true) {
             let c = this.next();
-            if (this.isWhitespace(c)) {
+            if (Lexer.isWhitespace(c)) {
                 this.eat()
                 lexeme.contents += c
             } else {
@@ -124,15 +156,15 @@ export default class Lexer {
         }
 
         lexeme.rawContents = this.string.substring(startPosition, this.position)
-        this.result.push(lexeme)
+        return lexeme
     }
 
-    private parseString(type: QuoteType) {
+    parseString(type: QuoteType) {
         let startPosition = this.position
         let lexeme = new StringLexeme(type)
         let escaped = false
 
-        if (this.isQuote(type)) {
+        if (Lexer.isQuote(type)) {
             this.eat();
         }
 
@@ -153,7 +185,7 @@ export default class Lexer {
                 continue;
             }
 
-            if (this.isNewline(c)) break;
+            if (Lexer.isNewline(c)) break;
 
             if (type) {
                 if (c == type) {
@@ -164,7 +196,7 @@ export default class Lexer {
                     this.eat()
                 }
             } else {
-                if (this.isWhitespace(c) || this.isQuote(c)) {
+                if (Lexer.isWhitespace(c) || Lexer.isQuote(c) || Lexer.isComment(c)) {
                     break;
                 } else {
                     lexeme.contents += c
@@ -174,24 +206,64 @@ export default class Lexer {
         }
 
         lexeme.rawContents = this.string.substring(startPosition, this.position)
-        this.result.push(lexeme)
+        return lexeme
     }
 
 
-    private isNewline(c?: string) {
+    private static isNewline(c?: string) {
         return c == "\n"
     }
 
-    private isQuote(c?: string) {
+    private static isQuote(c?: string) {
         return c == "\"" || c == "\'"
     }
 
-    private isWhitespace(c?: string) {
+    private static isWhitespace(c?: string) {
         return c == " " || c == "\t"
     }
 
-    private isComment(c?: string) {
+    private static isComment(c?: string) {
         return c == "#";
+    }
+
+    static stringCharacterShouldBeEscaped(char: string, quote: QuoteType) {
+        if(!quote) {
+            if(this.isWhitespace(char) ||
+                this.isNewline(char) ||
+                this.isQuote(char) ||
+                this.isComment(char) ||
+                char == "\\") return true
+        } else {
+            if (this.isQuote(char)) {
+                if (char == quote) return true
+            }
+            if(this.isNewline(char) || char == "\\") {
+                return true
+            }
+        }
+        return false
+    }
+
+    static adviceQuotesForString(contents: string) {
+        for(let char of contents) {
+            if(this.stringCharacterShouldBeEscaped(contents, null)) return true;
+        }
+        return false;
+    }
+
+    static escapeStringContents(contents: string, quote: QuoteType) {
+        let result = ""
+        if(quote) result += quote
+
+        for(let char of contents) {
+            if(this.stringCharacterShouldBeEscaped(char, quote)) {
+                result += "\\"
+            }
+            result += char
+        }
+
+        if(quote) result += quote
+        return result
     }
 }
 

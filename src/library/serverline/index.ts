@@ -19,6 +19,12 @@ export interface Keypress {
     shift: boolean
 }
 
+export interface Suggestion {
+    position?: number
+    replace?: boolean
+    suggestion: string
+}
+
 export interface ServerLineCollection {
     stdout?: stream.Writable,
     stderr?: stream.Writable,
@@ -37,7 +43,7 @@ export default class ServerLine extends EventEmitter {
     private originalConsole?: Console;
     private keypressListener?: (key: string, keypress: Keypress) => void
     private sigintListener?: () => void
-    private suggestion?: string
+    private suggestions: Suggestion[] = []
 
     constructor(options?: ServerLineOptions) {
         super()
@@ -179,15 +185,42 @@ export default class ServerLine extends EventEmitter {
         this.readline._moveCursor(position - this.getCursorPosition())
     }
 
-    suggest(line?: string) {
-        this.suggestion = line
+    suggest(suggestions?: Suggestion[]) {
+        if(!suggestions) this.suggestions = []
+        else this.suggestions = suggestions.sort((a, b) => a.position - b.position)
         this.readline._refreshLine()
     }
 
     private updateSuggestion() {
-        if(this.suggestion) {
-            process.stdout.write(chalk.gray(this.suggestion))
-            readline.moveCursor(process.stdout, -this.suggestion.length, 0)
+        let line = this.getLine()
+        let start = 0
+
+        let oldPosition = this.getCursorPosition()
+        let unmodifiedPosition = oldPosition
+        readline.moveCursor(process.stdout, -oldPosition, 0)
+
+        let currentPosition = 0
+
+        for(let i = 0; i < this.suggestions.length; i++) {
+            let suggestion = this.suggestions[i]
+            let end = suggestion.position ?? line.length
+
+            process.stdout.write(line.substring(start, end))
+            process.stdout.write(chalk.gray(suggestion.suggestion))
+
+            currentPosition += end - start + suggestion.suggestion.length
+
+            if(suggestion.replace) {
+                start = end + suggestion.suggestion.length
+            } else {
+                start = end
+                if(suggestion.position < oldPosition) {
+                    oldPosition += suggestion.suggestion.length
+                }
+            }
         }
+
+        readline.moveCursor(process.stdout, oldPosition - currentPosition, 0);
+        (this.readline as any).cursor = unmodifiedPosition
     }
 }

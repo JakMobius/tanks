@@ -16,19 +16,19 @@ import Parser, {
 } from "./language/parser";
 
 import Serializer from "./language/serializer";
+import Lexer, {Lexeme, StringLexeme} from "./language/lexer";
+import {raw} from "express";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required
 	single?: boolean
 }
 
-
 export default class Console {
 	public observingRoom: any;
-	public visible: any;
 	public prompt: any;
-	public tabCompleteIndex: any;
-	public tabCompletions: any;
+	public tabCompleteIndex: number;
+	public tabCompletions?: string[];
 	public window: ConsoleWindow;
 	public currentLogger: Logger;
 	public commands = new Map<string, Command>();
@@ -39,7 +39,6 @@ export default class Console {
 	constructor() {
 		this.server = null
 		this.observingRoom = null
-		this.visible = true
 		this.prompt = null
 
 		this.tabCompleteIndex = null
@@ -92,6 +91,7 @@ export default class Console {
 		return null
 	}
 
+	// TODO: this is way too large and ugly
 	private processCommandParameters(command: CommandASTNode, offset: number): string[] | null {
 		let result = []
 		let position = 0
@@ -102,11 +102,22 @@ export default class Console {
 
 			if (position < offset) {
 				if(child instanceof CommandParameterASTNode) {
-					result.push(child.lexeme.contents)
+					let rightPosition = position + child.lexeme.rawContents.length
+					let raw = child.lexeme.rawContents
 
-					if(position + child.totalRawLength() >= offset) {
+					if(rightPosition >= offset) {
 						insideOfParameter = true
+						raw = raw.substring(0, raw.length - rightPosition + offset)
+						Lexer.shared.reset()
+						Lexer.shared.setString(raw)
+						let lexeme = Lexer.shared.parseString(child.lexeme.quoteType)
+						Lexer.shared.reset()
+
+						result.push(lexeme.contents)
+					} else {
+						result.push(raw)
 					}
+
 				} else if(child instanceof CommentASTNode) {
 					return null
 				}
@@ -122,6 +133,21 @@ export default class Console {
 		}
 
 		return result
+	}
+
+	private lastCommandParameter(command: CommandASTNode) {
+		let childrenCount = command.children.length
+
+		if(childrenCount && command.children[childrenCount - 1] instanceof CommandParameterASTNode) {
+			return command.children[childrenCount - 1] as CommandParameterASTNode
+		} else {
+			let lastParameter = new CommandParameterASTNode()
+			lastParameter.lexeme = new StringLexeme(null)
+			lastParameter.lexeme.contents = ""
+			lastParameter.lexeme.rawContents = ""
+			command.children.push(lastParameter)
+			return lastParameter
+		}
 	}
 
 	private getAutocompletes(args: string[], options: ConsoleAutocompleteOptions): string[] {
@@ -147,17 +173,39 @@ export default class Console {
 		return completions
 	}
 
+	private autocompleteStringLexeme(lexeme: StringLexeme, line: string) {
+		let lexemeQuoteType = lexeme.quoteType
+		let rawContents = lexeme.rawContents
+
+		for(let i = lexeme.contents.length; i < line.length; i++) {
+			let char = line[i]
+			lexeme.contents += char;
+
+			let escape = false
+			while((escape = Lexer.stringCharacterShouldBeEscaped(char, lexemeQuoteType))) {
+				if(lexemeQuoteType) break;
+				lexemeQuoteType = "\""
+				rawContents = lexemeQuoteType + rawContents
+			}
+
+			rawContents += escape ? "\\" + char : char
+		}
+
+
+		if(lexemeQuoteType) rawContents += lexemeQuoteType
+		lexeme.rawContents = rawContents
+		lexeme.setQuoteType(lexemeQuoteType)
+	}
+
 	tabCompleteBegin(line: string, shift: boolean): void {
 		let cursorPosition = this.window.getCurrentCursorPosition()
-		let ast = Parser.shared.parseSource(line)
+		let ast = Parser.shared.parseGlobalSource(line)
 
 		let commandNode = this.getCommandByOffset(ast, cursorPosition)
 		if(!commandNode) return
 
 		let args = this.processCommandParameters(commandNode, cursorPosition)
 		if (!args) return
-
-		console.log("args = ", args)
 
 		this.tabCompletions = this.getAutocompletes(args, {
 			single: false
@@ -170,30 +218,33 @@ export default class Console {
 				this.logger.log(this.tabCompletions.join(", "))
 			}
 
-			let prefix = Serializer.shared.serialize(commandNode)
+			let lastParameter = this.lastCommandParameter(commandNode)
+			let originalQuoteType = lastParameter.lexeme.quoteType
+			let originalRawContent = lastParameter.lexeme.rawContents
+			let originalContent = lastParameter.lexeme.contents
 
-			console.log("Prefix = " + prefix)
+			if(lastParameter) {
+				this.tabCompletions = this.tabCompletions.map((completion: string) => {
+					lastParameter.lexeme.quoteType = originalQuoteType
+					lastParameter.lexeme.rawContents = originalRawContent
+					lastParameter.lexeme.contents = originalContent
+					this.autocompleteStringLexeme(lastParameter.lexeme, completion)
+					return Serializer.shared.serialize(commandNode)
+				})
 
-			this.tabCompletions = this.tabCompletions.map((completion: string) => {
-				if(completion.indexOf(' ') != -1) {
-					completion = "'" + completion + "'"
+				if (this.tabCompletions.length > 1) {
+					if (shift) {
+						this.tabCompleteIndex = this.tabCompletions.length
+						this.tabCompletePrevious()
+					} else {
+						this.tabCompleteIndex = -1
+						this.tabCompleteNext()
+					}
+					return
 				}
 
-				return prefix + completion
-			})
-
-			// if(this.tabCompletions.length > 1) {
-			// 	if(shift) {
-			// 		this.tabCompleteIndex = this.tabCompletions.length
-			// 		this.tabCompletePrevious()
-			// 	} else {
-			// 		this.tabCompleteIndex = -1
-			// 		this.tabCompleteNext()
-			// 	}
-			// 	return
-			// }
-			//
-			// this.setConsoleLine(this.tabCompletions[0])
+				this.setConsoleLine(this.tabCompletions[0])
+			}
 		}
 
 		this.tabCompletions = null
@@ -238,7 +289,7 @@ export default class Console {
 			return
 		}
 
-		let ast = Parser.shared.parseSource(line)
+		let ast = Parser.shared.parseGlobalSource(line)
 
 		let commandNode = this.getCommandByOffset(ast, cursorPosition)
 		if(!commandNode) return
@@ -251,11 +302,40 @@ export default class Console {
 		})
 
 		if(completions && completions.length == 1) {
-			let lastArgument = args[args.length - 1]
-			this.window.suggest(completions[0].substr(lastArgument.length), false)
-		} else {
-			this.window.suggest(null)
+
+			let lastParameter = this.lastCommandParameter(commandNode)
+
+			if(lastParameter) {
+				let originalParameter = lastParameter.lexeme.rawContents
+				let originalQuote = lastParameter.lexeme.quoteType ?? ""
+				this.autocompleteStringLexeme(lastParameter.lexeme, completions[0])
+
+				let newQuote = lastParameter.lexeme.quoteType ?? ""
+				let suggestion = lastParameter.lexeme.rawContents
+
+				if(originalQuote != newQuote) {
+					suggestion = suggestion.substr(originalParameter.length + newQuote.length - originalQuote.length)
+
+					this.window.suggest([{
+						suggestion: newQuote,
+						replace: originalQuote.length > 0,
+						position: line.length - originalParameter.length
+					}, {
+						suggestion: suggestion
+					}])
+				} else {
+					suggestion = suggestion.substr(originalParameter.length)
+
+					this.window.suggest([{
+						suggestion: suggestion
+					}])
+				}
+
+				return;
+			}
 		}
+
+		this.window.suggest(null)
 	}
 
 	evaluate(line: string): void {
@@ -264,7 +344,7 @@ export default class Console {
 
 		if(line.length === 0) return
 
-		let ast = Parser.shared.parseSource(line)
+		let ast = Parser.shared.parseGlobalSource(line)
 
 		for(let children of ast.children) {
 			if(!(children instanceof CommandASTNode)) continue;
@@ -328,3 +408,4 @@ export default class Console {
 		if(this.window) this.window.destroy()
 	}
 }
+

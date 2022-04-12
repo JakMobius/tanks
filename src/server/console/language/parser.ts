@@ -93,11 +93,10 @@ export default class Parser {
 
     constructor() {}
 
-    next() {
-        return this.lexemes[this.position]
-    }
+    private next() { return this.lexemes[this.position] }
+    private eat() { this.position++ }
 
-    nextReasonable() {
+    private nextReasonable() {
         while(true) {
             let next = this.lexemes[this.position]
             if(!next) return next
@@ -111,28 +110,24 @@ export default class Parser {
         }
     }
 
-    eat() {
-        this.position++
-    }
-
-    pushNode<T extends ASTNode>(node: T) {
+    private pushNode<T extends ASTNode>(node: T) {
         this.astStack.push(node)
         this.astPositionStack.push(this.position)
         return node
     }
 
-    topNode() {
+    private topNode() {
         return this.astStack[this.astStack.length - 1]
     }
 
-    revertNode() {
+    private revertNode() {
         this.position = this.astPositionStack[this.astPositionStack.length - 1]
 
         this.astPositionStack.pop()
         this.astStack.pop()
     }
 
-    completeNode<T extends ASTNode>(node: T): T {
+    private completeNode<T extends ASTNode>(node: T): T {
         if(this.topNode() != node) {
             this.error("Parser stack misalignment")
         }
@@ -207,12 +202,7 @@ export default class Parser {
         return this.completeNode(result);
     }
 
-    parseGlobal(lexemes: Lexeme[]): GlobalASTNode {
-        this.lexemes = lexemes
-        this.position = 0
-        this.astStack = []
-        this.astPositionStack = []
-
+    parseGlobal(): GlobalASTNode {
         let result = this.pushNode(new GlobalASTNode())
 
         let c: Lexeme | null = null
@@ -236,11 +226,33 @@ export default class Parser {
         return this.completeNode(result)
     }
 
-    parseSource(text: string) {
-        return this.parseGlobal(Lexer.shared.getLexemes(text))
-    }
-
     error(string: string) {
         throw new Error("Parser error at position " + this.position + ": " + string)
+    }
+
+    reset() {
+        this.lexemes = []
+        this.position = 0
+        this.astStack = []
+        this.astPositionStack = []
+    }
+
+    setLexemes(lexemes: Lexeme[]) {
+        this.lexemes = lexemes
+    }
+
+    parseGlobalSource(text: string) {
+        this.reset()
+
+        Lexer.shared.reset()
+        Lexer.shared.setString(text)
+        this.setLexemes(Lexer.shared.parseGlobal())
+
+        let result = this.parseGlobal()
+
+        Lexer.shared.reset()
+        this.reset()
+
+        return result
     }
 }

@@ -2,7 +2,7 @@
 import EventEmitter from '../../utils/event-emitter';
 import HistoryEntry from "./console-history-entry";
 import CallbackLogger from "./callback-logger";
-import ServerLine, {Keypress} from "../../library/serverline"
+import ServerLine, {Keypress, Suggestion} from "../../library/serverline"
 
 export default class ConsoleWindow extends EventEmitter {
     public destination: CallbackLogger;
@@ -159,7 +159,7 @@ export default class ConsoleWindow extends EventEmitter {
         return this.serverline.getLine()
     }
 
-    suggest(param?: string, trim: boolean = true) {
+    suggest(param?: Suggestion[]) {
         this.serverline.suggest(param)
     }
 
