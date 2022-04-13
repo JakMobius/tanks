@@ -4,6 +4,7 @@ import ServerBullet, {ServerBulletConfig} from '../server/entity/bullet/server-b
 import Axle from "../controls/axle";
 import ServerTank from "../server/entity/tank/server-tank";
 import BulletModel from "../entity/bullets/bullet-model";
+import HealthComponent from "../entity/health-component";
 
 export interface WeaponConfig {
     tank: ServerTank
@@ -35,7 +36,7 @@ export default class Weapon {
 
     tick(dt: number) {
         if(!this.triggerAxle) return
-        if (this.tank.model.health <= 0) {
+        if (this.tank.model.getComponent(HealthComponent).getHealth() <= 0) {
             if(this.engaged) {
                 this.engaged = false
                 this.onDisengage()

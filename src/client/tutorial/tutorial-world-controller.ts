@@ -12,6 +12,7 @@ import {Constructor} from "../../serialization/binary/serializable";
 import BigBoiTankModel from "../../entity/tanks/models/bigboi-tank-model";
 import NastyTankModel from "../../entity/tanks/models/nasty-tank-model";
 import PhysicalComponent from "../../entity/physics-component";
+import HealthComponent from "../../entity/health-component";
 
 export default class TutorialWorldController {
     game: Game;
@@ -78,7 +79,7 @@ export default class TutorialWorldController {
         const model = tank.model
         const body = model.getComponent(PhysicalComponent).getBody()
 
-        model.setHealth((model.constructor as typeof TankModel).getMaximumHealth())
+        model.getComponent(HealthComponent).setHealth((model.constructor as typeof TankModel).getMaximumHealth())
 
         tank.teleport(17.5, 212.5)
         tank.setVelocity(0, 0)

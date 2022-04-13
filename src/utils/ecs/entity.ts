@@ -4,6 +4,8 @@ import EventEmitter from "../event-emitter";
 
 export default class Entity extends EventEmitter {
     public components: Component[] = []
+    public children: Entity[] = []
+    public parent: Entity | null
 
     public addComponent(component: Component): void {
         this.components.push(component)
@@ -35,5 +37,25 @@ export default class Entity extends EventEmitter {
             this.components[this.components.length - 1].onDetach();
             this.components.pop();
         }
+    }
+
+    public appendChild(child: Entity) {
+        this.children.push(child)
+        child.parent = this
+
+        child.emit("appended-to-parent", this)
+        this.emit("child-added", child)
+    }
+
+    public removeFromParent() {
+        if(!this.parent) return
+        let index = this.parent.children.indexOf(this)
+        if(index == -1) return
+        this.parent.children.splice(index, 1)
+        let parent = this.parent
+        this.parent = null
+
+        this.emit("removed-from-parent", parent)
+        parent.emit("child-removed", this)
     }
 }

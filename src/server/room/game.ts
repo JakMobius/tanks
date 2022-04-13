@@ -25,6 +25,7 @@ import ServerWorldBridge from "../server-world-bridge";
 import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
+import HealthComponent from "../../entity/health-component";
 
 interface GameConfig {
     name: string
@@ -196,7 +197,7 @@ export default class Game extends Room {
         const team = player.team
         const tank = player.tank
 
-        tank.model.setHealth((player.tank.model.constructor as typeof TankModel).getMaximumHealth())
+        tank.model.getComponent(HealthComponent).setHealth((player.tank.model.constructor as typeof TankModel).getMaximumHealth())
 
         const spawnPoint = this.world.getComponent(TilemapComponent).map.spawnPointForTeam(team.id)
         const body = tank.model.getComponent(PhysicalComponent).getBody()

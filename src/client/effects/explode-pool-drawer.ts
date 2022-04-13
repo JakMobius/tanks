@@ -17,7 +17,7 @@ export default class ExplodePoolDrawer {
         this.program = new PostProcessingProgram(this.screen.ctx)
     }
 
-    draw(pool: ExplodeEffectPool<ClientGameWorld>, dt: number) {
+    draw(pool: ExplodeEffectPool, dt: number) {
         if(dt === 0) return
 
         //this.program.use()
@@ -67,7 +67,7 @@ export default class ExplodePoolDrawer {
                         shifting: 1 - normalized * 2
                     });
 
-                    pool.world.particles.push(decoration)
+                    pool.entity.particles.push(decoration)
                 }
             }
         }

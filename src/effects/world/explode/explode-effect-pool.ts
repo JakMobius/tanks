@@ -6,6 +6,10 @@ import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
 import PhysicalComponent from "../../../entity/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
+import {Component} from "../../../utils/ecs/component";
+import Entity from "../../../utils/ecs/entity";
+import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import HealthComponent from "../../../entity/health-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -29,11 +33,7 @@ interface ExplodePoolWalker {
 
 type ExplodePoolWalkerMap = TwoDimensionalMap<number, number,ExplodePoolWalker>
 
-export interface ExplodeEffectPoolConfig<WorldClass> {
-    world: WorldClass
-}
-
-export default class ExplodeEffectPool<WorldClass extends AbstractWorld = AbstractWorld> {
+export default class ExplodeEffectPool implements Component {
 	public powerDamping = 0.01
 	public stepsPerSecond = 30
 	public stepsWaiting = 0
@@ -82,14 +82,15 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
     // сила отталкивания будет рассчитана более правильно.
 	public pressureDifferentialDistance = this.gridSize * 2
 
-    public world: WorldClass
+    public entity: Entity
+    private eventHandler = new BasicEventHandlerSet()
 
-    constructor(config: ExplodeEffectPoolConfig<WorldClass>) {
-        this.world = config.world
+    constructor() {
+        this.eventHandler.on("tick", (dt: number) => this.tick(dt))
     }
 
     isBlock (x: number, y: number): boolean {
-        const map = this.world.getComponent(TilemapComponent).map
+        const map = this.entity.getComponent(TilemapComponent).map
         let block = map.getBlock(Math.floor(x / GameMap.BLOCK_SIZE), Math.floor(y / GameMap.BLOCK_SIZE))
         if(!block) return true
         return (block.constructor as typeof BlockState).isSolid
@@ -244,7 +245,7 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
                         sibling[j] = -this.damageEnergyFraction
 
                         // Reflection algorithm
-                        // Sibling element is negative meaning block is being damaged
+                        // When sibling element is negative, it means that block is being damaged
 
                         if(dx && !dy && (dx > 0) === (walker.vx > 0)) walker.vx = -walker.vx
                         if(!dx && dy && (dy > 0) === (walker.vy > 0)) walker.vy = -walker.vy
@@ -339,10 +340,10 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
 
     private tickEntities(dt: number): void {
 
-        for(let player of this.world.players.values()) {
-            let tank = player.tank
-            if(!tank) continue
-            let position = tank.model.getComponent(PhysicalComponent).getBody().GetPosition()
+        for(let child of this.entity.children) {
+            let physicalComponent = child.getComponent(PhysicalComponent)
+            if(!physicalComponent) continue
+            let position = physicalComponent.getBody().GetPosition()
 
             const x = position.x
             const y = position.y
@@ -394,14 +395,17 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
             resultVx *= force
             resultVy *= force
 
-            tank.model.getComponent(PhysicalComponent).getBody().ApplyLinearImpulse(new Box2D.Vec2(
+            child.getComponent(PhysicalComponent).getBody().ApplyLinearImpulse(new Box2D.Vec2(
                 resultVx,
                 resultVy
             ), position)
 
             const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
 
-            if(damage > 0) tank.damage(damage)
+            if(damage > 0) {
+                let healthComponent = child.getComponent(HealthComponent)
+                if(healthComponent) healthComponent.damage(damage)
+            }
         }
     }
 
@@ -415,5 +419,16 @@ export default class ExplodeEffectPool<WorldClass extends AbstractWorld = Abstra
         this.stepsWaiting += this.stepsPerSecond * dt
 
         while(this.stepsWaiting > 1) this.step(1 / this.stepsPerSecond)
+    }
+
+    onAttach(entity: Entity): void {
+        this.entity = entity
+        this.eventHandler.setTarget(this.entity)
+    }
+
+    onDetach(): void {
+        this.entity = null
+        this.eventHandler.setTarget(null)
+        this.walkers.clear()
     }
 }

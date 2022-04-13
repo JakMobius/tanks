@@ -7,6 +7,8 @@ import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";
 import PhysicalHostComponent from "../physiсal-world-component";
 import TransformComponent from "./transform-component";
+import PhysicalComponent from "./physics-component";
+import HealthComponent from "./health-component";
 
 /**
  * Entity model. Describes entity position,
@@ -33,16 +35,19 @@ export default class EntityModel extends Entity {
     /// Indicating if entity has died
     public dead = false
 
-    public health: number
-
-    public game: AbstractWorld
     public entity?: AbstractEntity
 
     constructor() {
         super()
 
         this.addComponent(new TransformComponent())
-        this.setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
+        this.addComponent(new HealthComponent())
+
+        this.getComponent(HealthComponent).setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
+
+        this.on("appended-to-parent", (parent) => {
+            this.initPhysics(parent.getComponent(PhysicalHostComponent))
+        });
     }
 
     tick(dt: number): void {
@@ -54,7 +59,6 @@ export default class EntityModel extends Entity {
     }
 
     static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
-
         const model = new this() as any as EntityModel
 
         model.id = decoder.readUint32()
@@ -72,14 +76,5 @@ export default class EntityModel extends Entity {
 
     static getId(): number {
         return this.typeName
-    }
-
-    setHealth(health: number) {
-        this.health = health
-        const entity = this.entity
-        if(!entity) return
-        const world = entity.getWorld()
-        if(!world) return
-        world.emit("entity-health-change", entity)
     }
 }

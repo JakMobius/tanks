@@ -66,7 +66,8 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
     onEntityHit(entity: ServerEntity) {
         if(entity == this.shooter.tank) return
         if(entity instanceof ServerTank) {
-            const world = this.getWorld()
+            const world = this.model.parent
+
             world.physicsLoop.scheduleTask(() => {
                 entity.damage(this.playerDamage)
             })
@@ -82,7 +83,8 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
             this.die()
         }
         if(this.wallDamage) {
-            const world = this.getWorld()
+            const world = this.model.parent
+
             world.physicsLoop.scheduleTask(() => {
                 const mapComponent = world.getComponent(TilemapComponent)
                 if(mapComponent) {

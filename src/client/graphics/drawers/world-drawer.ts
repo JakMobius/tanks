@@ -18,6 +18,7 @@ import TruckProgram from "../programs/truck-program";
 import LightMaskTextureProgram from "../programs/light-mask-texture/light-mask-texture-program";
 import MaskTextureProgramController from "../programs/light-mask-texture/light-mask-texture-program-controller";
 import TilemapComponent from "../../../physics/tilemap-component";
+import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
 
 export default class WorldDrawer extends EventEmitter {
 	public readonly camera: Camera
@@ -79,8 +80,8 @@ export default class WorldDrawer extends EventEmitter {
         this.mapDrawer = new MapDrawer(this.screen)
 
         this.worldEventHandler.on("map-change", () => this.onWorldMapChanged())
-        this.worldEventHandler.on("entity-create", (player) => this.onEntityCreate(player))
-        this.worldEventHandler.on("entity-remove", (player) => this.onEntityRemove(player))
+        this.worldEventHandler.on("entity-create", (entity) => this.onEntityCreate(entity))
+        this.worldEventHandler.on("entity-remove", (entity) => this.onEntityRemove(entity))
         this.worldEventHandler.on("map-block-update", () => this.onMapBlockUpdate())
 
         this.setWorld(world)
@@ -130,7 +131,11 @@ export default class WorldDrawer extends EventEmitter {
 
         this.drawEntities()
         this.drawParticles()
-        this.explodePoolDrawer.draw(this.world.explosionEffectPool, dt)
+
+        let explodePool = this.world.getComponent(ExplodeEffectPool)
+        if(explodePool) {
+            this.explodePoolDrawer.draw(explodePool, dt)
+        }
         if(this.debugDrawOn) this.debugDrawer.draw()
     }
 

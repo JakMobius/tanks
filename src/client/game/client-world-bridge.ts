@@ -45,15 +45,11 @@ export default class ClientWorldBridge {
         })
 
         client.on(EntityCreatePacket, (packet) => {
-            const entities = packet.createEntities((model) => {
+            packet.createEntities((model) => {
                 let entity = ClientEntity.fromModel(model)
-                entity.model.initPhysics(world.getComponent(PhysicalHostComponent))
+                world.createEntity(entity)
                 return entity
             })
-
-            for(let entity of entities) {
-                world.createEntity(entity)
-            }
         })
 
         client.on(EntityRemovePacket, (packet) => {

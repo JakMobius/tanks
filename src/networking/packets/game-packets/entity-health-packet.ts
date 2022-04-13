@@ -3,6 +3,7 @@ import AbstractEntity from "../../../entity/abstract-entity";
 import BinaryEncoder from "../../../serialization/binary/binary-encoder";
 import AbstractWorld from "../../../abstract-world";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
+import HealthComponent from "../../../entity/health-component";
 
 export default class EntityHealthPacket extends BinaryPacket {
 
@@ -18,7 +19,7 @@ export default class EntityHealthPacket extends BinaryPacket {
         encoder.writeUint32(this.entities.size)
         for(let entity of this.entities) {
             encoder.writeUint32(entity.model.id)
-            encoder.writeFloat32(entity.model.health)
+            encoder.writeFloat32(entity.model.getComponent(HealthComponent).getHealth())
         }
     }
 
@@ -28,7 +29,7 @@ export default class EntityHealthPacket extends BinaryPacket {
             const id = this.decoder.readUint32()
             const health = this.decoder.readFloat32()
 
-            world.entities.get(id).model.setHealth(health)
+            world.entities.get(id).model.getComponent(HealthComponent).setHealth(health)
         }
     }
 

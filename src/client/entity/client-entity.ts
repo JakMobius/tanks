@@ -9,6 +9,7 @@ import ClientGameWorld from "../client-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import BulletModel from "../../entity/bullets/bullet-model";
 import PhysicalComponent from "../../entity/physics-component";
+import HealthComponent from "../../entity/health-component";
 
 export default class ClientEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ClientGameWorld, ModelClass> {
 
@@ -79,7 +80,8 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         body.SetAngularVelocity(angularVelocity)
         body.SetAngle(rotation)
 
-        this.model.setHealth(decoder.readFloat32())
+        const healthComponent = this.model.getComponent(HealthComponent)
+        healthComponent.setHealth(decoder.readFloat32())
     }
 
     encodeInitialData(encoder: BinaryEncoder) {

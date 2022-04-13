@@ -30,19 +30,15 @@ export default class EntityCreatePacket extends BinaryPacket {
         }
     }
 
-    createEntities<T extends AbstractEntity>(factory: (model: EntityModel) => T): T[] {
+    createEntities<T extends AbstractEntity>(factory: (model: EntityModel) => T) {
         let decoder = this.decoder
         let count = decoder.readUint16()
-        let result = []
 
         for(let i = 0; i < count; i++) {
             let model = BinarySerializer.deserialize(decoder, EntityModel)
             let entity = factory(model)
             entity.decodeInitialData(decoder)
-            result.push(entity)
         }
-
-        return result
     }
 }
 

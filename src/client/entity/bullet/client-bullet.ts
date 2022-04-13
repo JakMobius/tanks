@@ -16,7 +16,7 @@ export default class ClientBullet<ModelType extends BulletModel> extends ClientE
     }
 
     getShooter() {
-        return this.getWorld().players.get(this.shooterId)
+        return this.model.parent.players.get(this.shooterId)
     }
 
     shouldHitEntity(entity: ClientEntity): boolean {

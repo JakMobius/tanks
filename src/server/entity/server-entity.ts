@@ -6,6 +6,7 @@ import BinaryEncoder from "../../serialization/binary/binary-encoder";
 import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import PhysicalComponent from "../../entity/physics-component";
+import HealthComponent from "../../entity/health-component";
 
 export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
 	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;
@@ -67,7 +68,7 @@ export default class ServerEntity<ModelClass extends EntityModel = EntityModel> 
 
     encodeInitialData(encoder: BinaryEncoder) {
         this.encodePositionVelocity(encoder)
-        encoder.writeFloat32(this.model.health)
+        encoder.writeFloat32(this.model.getComponent(HealthComponent).getHealth())
     }
 
     encodeDynamicData(encoder: BinaryEncoder): void {
@@ -77,7 +78,6 @@ export default class ServerEntity<ModelClass extends EntityModel = EntityModel> 
     }
 
     damage(damage: number): void {
-        this.model.setHealth(Math.max(0, this.model.health - damage))
-        this.world.emit("entity-damage", this, damage)
+        this.model.getComponent(HealthComponent).damage(damage)
     }
 }

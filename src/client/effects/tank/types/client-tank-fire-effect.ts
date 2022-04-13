@@ -38,7 +38,7 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 
         this.queue += dt * this.frequency
 
-        let world = this.tank.getWorld()
+        let world = this.tank.model.parent
 
         const particlePositionX = transform.transformX(0, 2.5)
         const particlePositionY = transform.transformY(0, 2.5)

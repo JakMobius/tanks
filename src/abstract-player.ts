@@ -1,5 +1,4 @@
 
-import * as Box2D from './library/box2d';
 import AbstractWorld from "./abstract-world";
 import Team from "./server/team";
 import AbstractEntity from "./entity/abstract-entity";

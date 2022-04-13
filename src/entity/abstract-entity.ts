@@ -18,11 +18,6 @@ export default abstract class AbstractEntity<
 
     public static Model: Constructor<EntityModel> & EntityModelType = null
 
-    protected world: WorldClass
-
-    public getWorld(): WorldClass & AbstractWorld { return this.world }
-    public setWorld(game: WorldClass & AbstractWorld) { this.world = game }
-
     protected constructor(model: ModelClass) {
         this.model = model
         model.entity = this
@@ -87,7 +82,7 @@ export default abstract class AbstractEntity<
         const gridX = Math.floor(blockX)
         const gridY = Math.floor(blockY)
 
-        const map = this.getWorld().getComponent(TilemapComponent).map
+        const map = this.model.parent.getComponent(TilemapComponent).map
 
         const block = map.getBlock(gridX, gridY)
         if(block && block.solid) {

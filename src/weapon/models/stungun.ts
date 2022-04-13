@@ -4,6 +4,8 @@ import ServerGameWorld from "../../server/server-game-world";
 import ServerEntity from "../../server/entity/server-entity";
 import PhysicalComponent from "../../entity/physics-component";
 import TransformComponent from "../../entity/transform-component";
+import Entity from "../../utils/ecs/entity";
+import HealthComponent from "../../entity/health-component";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
@@ -45,19 +47,20 @@ export default class WeaponStungun extends Weapon {
             const py = transform.transformY(point[0], point[1]);
 
             for(let each of near(px, py, player, game, this.squareRadius)) {
-                each.damage(this.damage * dt)
+                if(each != this.tank.model) {
+                    each.getComponent(HealthComponent).damage(this.damage * dt)
+                }
             }
         }
     }
 }
 
-const near = function (x: number, y: number, tplayer: AbstractPlayer, world: ServerGameWorld, distance: number): ServerEntity[] {
+const near = function (x: number, y: number, tplayer: AbstractPlayer, world: ServerGameWorld, distance: number): Entity[] {
     const result = [];
-    for (let entity of world.entities.values()) {
 
-        if (entity.model.id === tplayer.id) continue
+    for (let entity of world.children.values()) {
 
-        const pos = entity.model.getComponent(PhysicalComponent).getBody().GetPosition();
+        const pos = entity.getComponent(PhysicalComponent).getBody().GetPosition();
         const dx = pos.x - x;
         const dy = pos.y - y;
 

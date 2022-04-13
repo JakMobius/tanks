@@ -6,6 +6,7 @@ import ClientEffect from "./effects/client-effect";
 import GameMap from "../map/game-map";
 import ClientPlayer from "./client-player";
 import ClientTank from "./entity/tank/client-tank";
+import WorldExplodeEffectModelPool from "../effects/world/explode/explode-effect-pool";
 
 export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer, ClientTank> {
 
@@ -14,6 +15,8 @@ export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientP
 
     constructor(options?: GameWorldConfig) {
         super(options);
+
+        this.addComponent(new WorldExplodeEffectModelPool())
     }
 
     private processParticles(dt: number): void {
