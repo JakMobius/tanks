@@ -2,8 +2,10 @@
 import BinaryPacket from '../../binary-packet';
 import ClusterHandshake from '../../../server/socket/cluster-handshake';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class HandshakePacket extends BinaryPacket {
 
@@ -14,12 +16,12 @@ export default class HandshakePacket extends BinaryPacket {
         this.handshakeData = data
     }
 
-    toBinary(encoder: BinaryEncoder) {
-        encoder.writeUint8Array(this.handshakeData)
+    toBinary(encoder: WriteBuffer): void {
+        encoder.writeBytes(this.handshakeData)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
-        return new this(decoder.readUint8(ClusterHandshake.handshakeBytes))
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
+        return new this(decoder.readBytes(ClusterHandshake.handshakeBytes))
     }
 
     static typeName = 1001

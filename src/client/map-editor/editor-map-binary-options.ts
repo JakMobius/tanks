@@ -1,8 +1,8 @@
 
 import MapBinaryOptions from '../../map/map-binary-options';
-import {FlagHandler} from "../../utils/binary-options";
+import FlagHandler from "../../serialization/binary/parsers/flag-handler";
 
-class EditorMapBinaryOptions extends MapBinaryOptions {
+export default class EditorMapBinaryOptions extends MapBinaryOptions {
 
     NAME_FLAG = 0x0010
 
@@ -11,7 +11,7 @@ class EditorMapBinaryOptions extends MapBinaryOptions {
     constructor() {
         super();
 
-        this.addFlagHandler(new FlagHandler(this.NAME_FLAG)
+        this.addFlagHandler(this.NAME_FLAG, new FlagHandler()
             .setPacker((encoder, options) => {
                 encoder.writeString(options.name || "")
             })
@@ -21,5 +21,3 @@ class EditorMapBinaryOptions extends MapBinaryOptions {
         )
     }
 }
-
-export default EditorMapBinaryOptions;

@@ -19,6 +19,7 @@ import LightMaskTextureProgram from "../programs/light-mask-texture/light-mask-t
 import MaskTextureProgramController from "../programs/light-mask-texture/light-mask-texture-program-controller";
 import TilemapComponent from "../../../physics/tilemap-component";
 import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
+import ParticleHost from "../../particle-host";
 
 export default class WorldDrawer extends EventEmitter {
 	public readonly camera: Camera
@@ -140,10 +141,11 @@ export default class WorldDrawer extends EventEmitter {
     }
 
     private drawParticles() {
-        if(this.world.particles.length) {
+        const particleComponent = this.world.getComponent(ParticleHost)
+        if(particleComponent.particles.length) {
             this.particleDrawPhase.prepare()
 
-            for(let particle of this.world.particles) {
+            for(let particle of particleComponent.particles) {
                 ParticleDrawer.drawParticle(this.particleDrawPhase, particle)
             }
 

@@ -1,8 +1,10 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class PlayerChatPacket extends BinaryPacket {
 	public text: string;
@@ -14,11 +16,11 @@ export default class PlayerChatPacket extends BinaryPacket {
         this.text = text
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeString(this.text)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         return new PlayerChatPacket(decoder.readString()) as any as T
     }
 }

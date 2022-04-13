@@ -2,9 +2,11 @@
 import BinaryPacket from '../../binary-packet';
 import EntityModel from '../../../entity/entity-model';
 import BinarySerializable, {BinarySerializer} from '../../../serialization/binary/serializable';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import AbstractEntity from "../../../entity/abstract-entity";
 import BulletModel from "../../../entity/bullets/bullet-model";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class EntityCreatePacket extends BinaryPacket {
 	public entities: AbstractEntity[];
@@ -21,7 +23,7 @@ export default class EntityCreatePacket extends BinaryPacket {
         } else this.entities = entities
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint16(this.entities.length)
 
         for(let entity of this.entities) {

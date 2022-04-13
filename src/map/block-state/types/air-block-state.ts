@@ -1,13 +1,10 @@
 
 import BlockState from '../block-state';
-import BinaryOptions from '../../../utils/binary-options';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
 import GameMap from "../../game-map";
+import BlockStateBinaryOptions from "../block-state-binary-options";
 
-class AirBinaryOptions extends BinaryOptions {
-    convertOptions(encoder: BinaryEncoder, options: any, flags: number[]) {}
-    convertBinary(decoder: BinaryDecoder, options?: any) {}
+class AirBinaryOptions extends BlockStateBinaryOptions {
+
 }
 
 export default class AirBlockState extends BlockState {

@@ -10,11 +10,12 @@ import * as Websocket from "websocket";
 import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import GameMap from "../../../map/game-map";
 import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
 import ServerPlayer from "../../server-player";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
 
 export interface GameSocketPortalClientData {
     listeningForRooms: boolean;
@@ -156,20 +157,30 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
     }
 
     async createRoom(config: RoomConfig) {
-        const gzip = await fs.promises.readFile(config.map)
-        const data = pako.inflate(gzip)
-        const decoder = new BinaryDecoder({ largeIndices: true })
-        decoder.reset()
-        decoder.readData(data.buffer)
+        try {
+            const gzip = await fs.promises.readFile(config.map)
+            const data = pako.inflate(gzip)
+            const decoder = ReadBuffer.getShared(data.buffer)
 
-        const map = GameMap.fromBinary(decoder)
+            const signature = String.fromCharCode(...decoder.readBytes(4))
+            if(signature != "TNKS") throw "Invalid signature"
 
-        const game = new Game({
-            name: config.name,
-            map: map
-        })
+            const version = decoder.readUint32()
+            if(version != 1) throw "Unsupported file version: " + version
 
-        this.games.set(config.name, game)
+            const map = GameMap.fromBinary(decoder)
+
+            const game = new Game({
+                name: config.name,
+                map: map
+            })
+
+            this.games.set(config.name, game)
+
+        } catch(e) {
+            console.error("Failed to load map: ", e)
+            return;
+        }
     }
 
     createClient(connection: WebsocketConnection): SocketPortalClient<GameSocketPortalClientData> {

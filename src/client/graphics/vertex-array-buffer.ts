@@ -1,5 +1,5 @@
 import GLBuffer, {GLBufferConfig} from "./glbuffer";
-import {ByteArray} from "../../serialization/binary/buffer";
+import {ByteArray} from "../../legacy/serialization-v0001/binary/buffer";
 
 export interface VertexAttribute {
     index: number,

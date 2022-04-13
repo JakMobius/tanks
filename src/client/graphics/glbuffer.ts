@@ -1,5 +1,5 @@
 
-import Buffer, {BufferConfig, ByteArray} from '../../serialization/binary/buffer';
+import Buffer, {BufferConfig, ByteArray} from '../../legacy/serialization-v0001/binary/buffer';
 import {Constructor} from "../../serialization/binary/serializable";
 
 export interface GLBufferConfig<T> extends BufferConfig<T> {

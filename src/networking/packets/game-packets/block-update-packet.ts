@@ -1,9 +1,11 @@
 
 import BinaryPacket from '../../binary-packet';
 import BlockState from '../../../map/block-state/block-state';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class BlockUpdatePacket extends BinaryPacket {
 	public x: number;
@@ -20,21 +22,21 @@ export default class BlockUpdatePacket extends BinaryPacket {
         this.block = block
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         const blockType = this.block.constructor as typeof BlockState
         encoder.writeUint16(this.x)
         encoder.writeUint16(this.y)
         encoder.writeUint8(blockType.typeId)
-        blockType.BinaryOptions.convertOptions(encoder, this.block)
+        blockType.BinaryOptions.objectToBuffer(encoder, this.block)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let x = decoder.readUint16()
         let y = decoder.readUint16()
         let id = decoder.readUint8()
 
         let Block = BlockState.getBlockStateClass(id)
-        let block = new Block(Block.BinaryOptions.convertBinary(decoder))
+        let block = new Block(Block.BinaryOptions.bufferToObject(decoder))
 
         return new BlockUpdatePacket(
             x, y, block

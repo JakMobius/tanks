@@ -1,8 +1,10 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class PlayerRoomChangePacket extends BinaryPacket {
 	public room: string;
@@ -17,7 +19,7 @@ export default class PlayerRoomChangePacket extends BinaryPacket {
         this.error = error
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint8(this.error ? 0 : 1)
         encoder.writeString(this.room)
         if(this.error) {
@@ -25,7 +27,7 @@ export default class PlayerRoomChangePacket extends BinaryPacket {
         }
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let isSuccess = decoder.readUint8()
         let room = decoder.readString()
         let error = isSuccess ? null : decoder.readString()

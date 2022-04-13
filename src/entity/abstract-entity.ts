@@ -1,8 +1,8 @@
 
 import EntityModel, {EntityModelType} from './entity-model';
 import AbstractWorld from 'src/abstract-world';
-import BinaryEncoder from "../serialization/binary/binary-encoder";
-import BinaryDecoder from "../serialization/binary/binary-decoder";
+import BinaryEncoder from "../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
 import {b2Body} from "../library/box2d/dynamics/b2_body";
 import PhysicsChunk from "../physics/physics-chunk";
@@ -10,6 +10,8 @@ import * as Box2D from "../library/box2d";
 import GameMap from "../map/game-map";
 import PhysicalComponent from "./physics-component";
 import TilemapComponent from "../physics/tilemap-component";
+import ReadBuffer from "../serialization/binary/read-buffer";
+import WriteBuffer from "../serialization/binary/write-buffer";
 
 export default abstract class AbstractEntity<
         WorldClass extends AbstractWorld = any,
@@ -29,11 +31,11 @@ export default abstract class AbstractEntity<
         this.model.tick(dt)
     }
 
-    abstract encodeInitialData(encoder: BinaryEncoder): void
-    abstract decodeInitialData(decoder: BinaryDecoder): void
+    abstract encodeInitialData(encoder: WriteBuffer): void
+    abstract decodeInitialData(decoder: ReadBuffer): void
 
-    abstract encodeDynamicData(encoder: BinaryEncoder): void
-    abstract decodeDynamicData(decoder: BinaryDecoder): void
+    abstract encodeDynamicData(encoder: WriteBuffer): void
+    abstract decodeDynamicData(decoder: ReadBuffer): void
     abstract damage(damage: number): void
 
     shouldHitEntity(entity: AbstractEntity) { return true }

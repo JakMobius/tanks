@@ -1,11 +1,13 @@
 import {BinaryEncodable} from '../serialization/binary/serializable';
 import Axle from './axle';
-import BinaryDecoder from "../serialization/binary/binary-decoder";
-import BinaryEncoder from 'src/serialization/binary/binary-encoder';
+import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
+import BinaryEncoder from 'src/legacy/serialization-v0001/binary/binary-encoder';
 import TankModel from "../entity/tanks/tank-model";
 import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
 import TransformComponent from "../entity/transform-component";
+import WriteBuffer from "../serialization/binary/write-buffer";
+import ReadBuffer from "../serialization/binary/read-buffer";
 
 export default class TankControls implements BinaryEncodable, Component {
 	public throttle = 0
@@ -94,7 +96,7 @@ export default class TankControls implements BinaryEncodable, Component {
         }
     }
 
-    updateState(decoder: BinaryDecoder): void {
+    updateState(decoder: ReadBuffer): void {
         const xValue = Math.max(Math.min(decoder.readFloat32(), 1), -1)
         const yValue = Math.max(Math.min(decoder.readFloat32(), 1), -1)
         let weapons = decoder.readUint8()
@@ -109,7 +111,7 @@ export default class TankControls implements BinaryEncodable, Component {
         this.updateAxes()
     }
 
-    toBinary(encoder: BinaryEncoder): void {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeFloat32(this.axles.get("x").getValue())
         encoder.writeFloat32(this.axles.get("y").getValue())
 

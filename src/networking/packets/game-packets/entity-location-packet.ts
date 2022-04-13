@@ -1,9 +1,11 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractEntity from "../../../entity/abstract-entity";
 import AbstractWorld from "../../../abstract-world";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class EntityLocationPacket extends BinaryPacket {
     public world: AbstractWorld
@@ -22,7 +24,7 @@ export default class EntityLocationPacket extends BinaryPacket {
         this.world = world
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint16(this.world.entities.size)
 
         for (let [key, entity] of this.world.entities) {
@@ -40,7 +42,7 @@ export default class EntityLocationPacket extends BinaryPacket {
             throw new Error("This packet is not valid anymore: The decoder buffer has been reused.")
         }
 
-        this.decoder.save()
+        let position = this.decoder.offset
 
         let count = this.decoder.readUint16()
         while (count--) {
@@ -50,7 +52,7 @@ export default class EntityLocationPacket extends BinaryPacket {
             entity.decodeDynamicData(this.decoder)
         }
 
-        this.decoder.restore()
+        this.decoder.offset = position
     }
 }
 

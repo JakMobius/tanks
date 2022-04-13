@@ -121,11 +121,7 @@ export default class MapPreviewContainer extends Menu {
         document.body.appendChild(a);
         a.style.display = "none";
 
-        let data = MapStorage.writeMap(this.map, [
-            GameMap.BinaryOptions.SIZE_FLAG,
-            GameMap.BinaryOptions.DATA_FLAG,
-            GameMap.BinaryOptions.SPAWN_ZONES_FLAG
-        ])
+        let data = MapStorage.writeMap(this.map)
 
         const blob = new Blob([data], { type: "octet/stream" })
         const url = window.URL.createObjectURL(blob);

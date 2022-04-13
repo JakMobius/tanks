@@ -1,6 +1,7 @@
 import BinaryPacket from "./binary-packet";
 import EventEmitter from "../utils/event-emitter";
 import {BinarySerializer} from "../serialization/binary/serializable";
+import ReadBuffer from "../serialization/binary/read-buffer";
 
 export default abstract class Connection extends EventEmitter {
 
@@ -60,9 +61,7 @@ export default abstract class Connection extends EventEmitter {
      */
 
     handleIncomingData(data: ArrayBuffer) {
-        let decoder = BinaryPacket.binaryDecoder
-        decoder.reset()
-        decoder.readData(data)
+        let decoder = ReadBuffer.getShared(data)
         const packet = BinarySerializer.deserialize(decoder, BinaryPacket)
         this.handleIncomingPacket(packet)
     }

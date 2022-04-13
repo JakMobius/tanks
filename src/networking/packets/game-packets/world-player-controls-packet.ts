@@ -1,9 +1,11 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractWorld from "../../../abstract-world";
 import TankControls from "../../../controls/tank-controls";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class WorldPlayerControlsPacket extends BinaryPacket {
     private world: AbstractWorld;
@@ -14,7 +16,7 @@ export default class WorldPlayerControlsPacket extends BinaryPacket {
         this.world = world
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint16(this.world.players.size)
         for(let [id, player] of this.world.players.entries()) {
             encoder.writeUint32(id)
