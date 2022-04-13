@@ -1,9 +1,11 @@
 
 import BinaryPacket from '../../binary-packet';
 import EffectModel from 'src/effects/effect-model';
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class EffectCreatePacket extends BinaryPacket {
 	public effect: EffectModel;
@@ -16,11 +18,11 @@ export default class EffectCreatePacket extends BinaryPacket {
         this.effect = effect
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         BinarySerializer.serialize(this.effect, encoder)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         const effect = BinarySerializer.deserialize(decoder, EffectModel)
 
         return new this(effect)

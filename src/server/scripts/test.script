@@ -1,0 +1,2 @@
+service on
+room create -map converted-maps/arena

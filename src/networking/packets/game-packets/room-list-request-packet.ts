@@ -1,8 +1,10 @@
 
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class RoomListRequestPacket extends BinaryPacket {
 	public request: boolean;
@@ -17,11 +19,11 @@ export default class RoomListRequestPacket extends BinaryPacket {
         this.request = request
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint8(this.request as any as number)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         return new RoomListRequestPacket(decoder.readUint8() as any as boolean) as any as T
     }
 }

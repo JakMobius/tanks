@@ -1,6 +1,6 @@
 
 import Buffer, {ByteArray, ByteArrayConstructor} from './buffer';
-import {Constructor} from "./serializable";
+import {Constructor} from "../../../serialization/binary/serializable";
 
 class BinaryPool {
     static bufferTypes: Map<ByteArrayConstructor<ByteArray>, Buffer<ByteArray>> = new Map()

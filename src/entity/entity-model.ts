@@ -1,7 +1,7 @@
 
 import {Constructor} from '../serialization/binary/serializable';
-import BinaryEncoder from "../serialization/binary/binary-encoder";
-import BinaryDecoder from "../serialization/binary/binary-decoder";
+import BinaryEncoder from "../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
 import AbstractWorld from "../abstract-world";
 import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";
@@ -9,6 +9,8 @@ import PhysicalHostComponent from "../physiсal-world-component";
 import TransformComponent from "./transform-component";
 import PhysicalComponent from "./physics-component";
 import HealthComponent from "./health-component";
+import ReadBuffer from "../serialization/binary/read-buffer";
+import WriteBuffer from "../serialization/binary/write-buffer";
 
 /**
  * Entity model. Describes entity position,
@@ -54,11 +56,11 @@ export default class EntityModel extends Entity {
         this.emit("tick", dt)
     }
 
-    toBinary(encoder: BinaryEncoder): void {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint32(this.id)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         const model = new this() as any as EntityModel
 
         model.id = decoder.readUint32()

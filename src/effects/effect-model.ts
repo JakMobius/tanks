@@ -1,7 +1,9 @@
 
 import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
-import BinaryEncoder from "../serialization/binary/binary-encoder";
-import BinaryDecoder from "../serialization/binary/binary-decoder";
+import BinaryEncoder from "../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
+import ReadBuffer from "../serialization/binary/read-buffer";
+import WriteBuffer from "../serialization/binary/write-buffer";
 
 export interface EffectModelConfig {
     id?: number
@@ -33,11 +35,11 @@ export default class EffectModel implements BinarySerializable<typeof EffectMode
     static groupName = 2
     static typeName = 0
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer) {
         encoder.writeFloat64(this.id)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         return new this({
             id: decoder.readFloat64()
         }) as T

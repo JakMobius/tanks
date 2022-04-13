@@ -1,9 +1,11 @@
 
 import BinaryPacket from '../../binary-packet';
 import AbstractEntity from "../../../entity/abstract-entity";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractWorld from "../../../abstract-world";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class EntityRemovePacket extends BinaryPacket {
 	public entityId: number;
@@ -16,7 +18,7 @@ export default class EntityRemovePacket extends BinaryPacket {
         this.entityId = entity ? entity.model.id : 0
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint32(this.entityId)
     }
 

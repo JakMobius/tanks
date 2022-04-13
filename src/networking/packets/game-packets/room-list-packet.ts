@@ -1,8 +1,10 @@
 
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export interface ClientRoomInformant {
     getName(): string,
@@ -36,7 +38,7 @@ export default class RoomListPacket extends BinaryPacket {
         this.rooms = rooms
     }
 
-    toBinary(encoder: BinaryEncoder): void {
+    toBinary(encoder: WriteBuffer): void {
         encoder.writeUint8(this.rooms.length)
 
         for(let room of this.rooms) {
@@ -46,7 +48,7 @@ export default class RoomListPacket extends BinaryPacket {
         }
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let rooms: ClientRoomInformant[] = []
 
         let count = decoder.readUint8()

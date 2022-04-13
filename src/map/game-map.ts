@@ -3,10 +3,10 @@ import MapBinaryOptions from './map-binary-options';
 import BlockState from './block-state/block-state';
 import AirBlockState from './block-state/types/air-block-state';
 import SpawnZone from "./spawn-zone";
-import BinaryDecoder from "../serialization/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
-import BinaryEncoder from "../serialization/binary/binary-encoder";
 import Entity from "../utils/ecs/entity";
+import ReadBuffer from "../serialization/binary/read-buffer";
+import WriteBuffer from "../serialization/binary/write-buffer";
 
 export interface GameMapConfig {
 	spawnZones?: SpawnZone[]
@@ -112,13 +112,13 @@ export default class GameMap extends Entity {
 		}
 	}
 
-	static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
-		let options = GameMap.BinaryOptions.convertBinary(decoder)
+	static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
+		let options = GameMap.BinaryOptions.bufferToObject(decoder)
 
 		return new this(options)
 	}
 
-	toBinary(encoder: BinaryEncoder, flags: number[]) {
-		(this.constructor as typeof GameMap).BinaryOptions.convertOptions(encoder, this, flags)
+	toBinary(encoder: WriteBuffer) {
+		(this.constructor as typeof GameMap).BinaryOptions.objectToBuffer(encoder, this)
 	}
 }

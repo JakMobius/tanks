@@ -1,8 +1,9 @@
 
 import ClientEntity from '../client-entity';
 import BulletModel from 'src/entity/bullets/bullet-model';
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import * as Box2D from "src/library/box2d"
+import ReadBuffer from "../../../serialization/binary/read-buffer";
 
 export interface ClientBulletOptions<ModelType extends BulletModel> {
     model: ModelType
@@ -31,12 +32,12 @@ export default class ClientBullet<ModelType extends BulletModel> extends ClientE
         this.hidden = true
     }
 
-    decodeInitialData(decoder: BinaryDecoder) {
+    decodeInitialData(decoder: ReadBuffer) {
         super.decodeInitialData(decoder);
         this.shooterId = decoder.readUint32()
     }
 
-    decodeDynamicData(decoder: BinaryDecoder) {
+    decodeDynamicData(decoder: ReadBuffer) {
         super.decodeDynamicData(decoder);
         this.hidden = false
     }

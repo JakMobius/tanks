@@ -1,9 +1,11 @@
 
 import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
-import BinaryEncoder from '../serialization/binary/binary-encoder';
-import BinaryDecoder from '../serialization/binary/binary-decoder';
+import BinaryEncoder from '../legacy/serialization-v0001/binary/binary-encoder';
+import BinaryDecoder from '../legacy/serialization-v0001/binary/binary-decoder';
 import Connection from "./connection";
-import Buffer, {ByteArray} from "../serialization/binary/buffer";
+import Buffer, {ByteArray} from "../legacy/serialization-v0001/binary/buffer";
+import ReadBuffer from "../serialization/binary/read-buffer";
+import WriteBuffer from "../serialization/binary/write-buffer";
 
 /**
  * This class is a binary data packet that can be transmitted over a
@@ -42,7 +44,7 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
      * Valid until it is reused.
      */
 
-	public decoder: BinaryDecoder | null = null;
+	public decoder: ReadBuffer | null = null;
 
     /*
      Considering that the buffer will only be reused after the
@@ -51,10 +53,6 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
      BinaryDecoder.shared... Uhh... Nevermind...)
      */
 
-    static requireLargeIndices = false
-    static binaryEncoder = new BinaryEncoder({ writeIndexMode: true })
-    static binaryDecoder = new BinaryDecoder({ readIndexMode: true })
-
     static groupName = 3
     static typeName = 0
 
@@ -62,12 +60,9 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
     }
 
     encode() {
-        let encoder = BinaryPacket.binaryEncoder
-        encoder.largeIndices = (this.constructor as typeof BinaryPacket).requireLargeIndices
-        encoder.reset()
-        BinarySerializer.serialize(this, encoder)
-
-        return encoder.compile()
+        WriteBuffer.shared.reset();
+        BinarySerializer.serialize(this, WriteBuffer.shared)
+        return WriteBuffer.shared.spitBuffer()
     }
 
     /**
@@ -101,11 +96,11 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
         return true
     }
 
-    toBinary(encoder: BinaryEncoder): void {
+    toBinary(encoder: WriteBuffer): void {
 
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let packet = new this() as any as BinaryPacket
         packet.decoder = decoder
         return packet as any as T

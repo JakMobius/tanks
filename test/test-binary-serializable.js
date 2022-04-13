@@ -1,7 +1,7 @@
 
 const BinarySerializable = require("../src/serialization/binary/serializable")
-const BinaryEncoder = require("../src/serialization/binary/binary-encoder")
-const BinaryDecoder = require("../src/serialization/binary/binary-decoder")
+const BinaryEncoder = require("../src/legacy/serialization-v0001/binary/binary-encoder")
+const BinaryDecoder = require("../src/legacy/serialization-v0001/binary/binary-decoder")
 const mocha = require("mocha")
 const chai = require("chai")
 

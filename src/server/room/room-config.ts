@@ -1,7 +1,9 @@
 
 import {BinaryCodable, Constructor} from 'src/serialization/binary/serializable';
-import BinaryEncoder from "../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
+import WriteBuffer from "../../serialization/binary/write-buffer";
+import ReadBuffer from "../../serialization/binary/read-buffer";
 
 class RoomConfig implements BinaryCodable<typeof RoomConfig> {
 
@@ -12,12 +14,12 @@ class RoomConfig implements BinaryCodable<typeof RoomConfig> {
     name: string
     map: string
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer) {
         encoder.writeString(this.name)
         encoder.writeString(this.map)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let name = decoder.readString()
         let map = decoder.readString()
 

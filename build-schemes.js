@@ -5,6 +5,7 @@ const gameSchemes = require("./build-schemes/game-schemes")
 const tutorialSchemes = require("./build-schemes/tutorial-schemes")
 const mapEditorSchemes = require("./build-schemes/map-editor-schemes")
 const textureAtlasScheme = require("./build-schemes/texture-atlas-scheme")
+const mapConverterSchemes = require("./build-schemes/map-converter-schemes")
 
 module.exports = {
 	"schemes": {
@@ -13,6 +14,7 @@ module.exports = {
 		...gameSchemes,
 		...tutorialSchemes,
 		...mapEditorSchemes,
-		...textureAtlasScheme
+		...textureAtlasScheme,
+		...mapConverterSchemes
 	}
 }

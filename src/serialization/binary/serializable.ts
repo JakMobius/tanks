@@ -1,7 +1,9 @@
 
 import BinarySerializationGroup from '../serialization-group';
-import BinaryDecoder from "./binary-decoder";
-import BinaryEncoder from "./binary-encoder";
+import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
+import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
+import WriteBuffer from "./write-buffer";
+import ReadBuffer from "./read-buffer";
 
 export type Constructor<T> = { new (...args: any[]): T }
 
@@ -29,11 +31,11 @@ export class BinarySerializer {
      * Uses {@link fromBinary} method to deserialize instance from
      * binary data, returned by {@link serialize} function.
      * @param decoder The object to be deserialized
-     * @param group The serialization group name. Can be either undefined, number or {@link BinarySerializable} subclass.
+     * @param group? The serialization group name. Can be either undefined, number or {@link BinarySerializable} subclass.
      * @returns The deserialized object or `null` if base class was not found.
      */
 
-    static deserialize<C extends BinarySerializableStatic<C>>(decoder: BinaryDecoder, group?: Number | C): InstanceType<C> {
+    static deserialize<C extends BinarySerializableStatic<C>>(decoder: ReadBuffer, group?: Number | C): InstanceType<C> {
 
         let groupId: number;
 
@@ -55,11 +57,11 @@ export class BinarySerializer {
      * Uses {@link toBinary} method to serialize subclass instances to
      * object. Suitable for network transporting. Call {@link deserialize} to get exact
      * same object copy.
-     * @param encoder where object serialization will be stored.
      * @param object to be serialized
+     * @param encoder where object serialization will be stored.
      */
 
-    static serialize<T extends BinarySerializableStatic<T>>(object: BinarySerializable<T>, encoder: BinaryEncoder): void {
+    static serialize<T extends BinarySerializableStatic<T>>(object: BinarySerializable<T>, encoder: WriteBuffer): void {
         encoder.writeInt16((object.constructor as BinarySerializableStatic<T>).typeName)
         object.toBinary(encoder)
     }
@@ -141,7 +143,7 @@ export interface BinaryCodableStatic<C extends BinaryCodableStatic<C>> extends C
      * @returns The deserialized object
      */
 
-    fromBinary<T extends BinaryCodable<C>>(this: Constructor<T>, decoder: BinaryDecoder): T;
+    fromBinary<T extends BinaryCodable<C>>(this: Constructor<T>, decoder: ReadBuffer): T;
 }
 
 /**
@@ -164,7 +166,7 @@ export interface BinaryEncodable {
      * @param encoder The encoder which will store object data
      */
 
-    toBinary(encoder: BinaryEncoder): void
+    toBinary(encoder: WriteBuffer): void
 }
 
 export interface BinaryDecodable<T extends BinaryCodableStatic<T>> {}

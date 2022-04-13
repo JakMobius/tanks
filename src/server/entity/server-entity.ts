@@ -1,12 +1,14 @@
 
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityModel from "../../entity/entity-model";
-import BinaryDecoder from "../../serialization/binary/binary-decoder";
-import BinaryEncoder from "../../serialization/binary/binary-encoder";
+import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
+import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
 import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import PhysicalComponent from "../../entity/physics-component";
 import HealthComponent from "../../entity/health-component";
+import ReadBuffer from "../../serialization/binary/read-buffer";
+import WriteBuffer from "../../serialization/binary/write-buffer";
 
 export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
 	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;
@@ -43,15 +45,15 @@ export default class ServerEntity<ModelClass extends EntityModel = EntityModel> 
         this.types.set(modelClass, serverClass)
     }
 
-    decodeInitialData(decoder: BinaryDecoder) {
+    decodeInitialData(decoder: ReadBuffer) {
 	    throw new Error("Method not implemented")
     }
 
-    decodeDynamicData(decoder: BinaryDecoder): void {
+    decodeDynamicData(decoder: ReadBuffer): void {
         throw new Error("Method not implemented")
     }
 
-    private encodePositionVelocity(encoder: BinaryEncoder) {
+    private encodePositionVelocity(encoder: WriteBuffer) {
         let body = this.model.getComponent(PhysicalComponent).getBody()
         let position = body.GetPosition()
         encoder.writeFloat32(position.x)
@@ -66,12 +68,12 @@ export default class ServerEntity<ModelClass extends EntityModel = EntityModel> 
         encoder.writeFloat32(angular)
     }
 
-    encodeInitialData(encoder: BinaryEncoder) {
+    encodeInitialData(encoder: WriteBuffer) {
         this.encodePositionVelocity(encoder)
         encoder.writeFloat32(this.model.getComponent(HealthComponent).getHealth())
     }
 
-    encodeDynamicData(encoder: BinaryEncoder): void {
+    encodeDynamicData(encoder: WriteBuffer): void {
         encoder.writeUint8(this.teleported as any as number)
         this.teleported = false
         this.encodePositionVelocity(encoder)

@@ -1,6 +1,6 @@
 import BinarySerializable, {BinarySerializableStatic, Constructor} from "./binary/serializable";
 
-class BinarySerializationGroup {
+export default class BinarySerializationGroup {
     map = new Map<number, BinarySerializableStatic<any>>();
 
     constructor() {
@@ -19,5 +19,3 @@ class BinarySerializationGroup {
         return this.map.get(type);
     }
 }
-
-export default BinarySerializationGroup;

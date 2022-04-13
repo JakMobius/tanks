@@ -1,8 +1,10 @@
 
 import EffectModel, { EffectModelConfig } from '../effect-model';
-import BinaryDecoder from "../../serialization/binary/binary-decoder";
+import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
 import { Constructor } from 'src/serialization/binary/serializable';
-import BinaryEncoder from 'src/serialization/binary/binary-encoder';
+import BinaryEncoder from 'src/legacy/serialization-v0001/binary/binary-encoder';
+import WriteBuffer from "../../serialization/binary/write-buffer";
+import ReadBuffer from "../../serialization/binary/read-buffer";
 
 export interface WorldEffectModelConfig extends EffectModelConfig {
     x: number
@@ -25,13 +27,13 @@ class WorldEffectModel extends EffectModel {
         this.y = options.y
     }
 
-    toBinary(encoder: BinaryEncoder) {
+    toBinary(encoder: WriteBuffer) {
         super.toBinary(encoder)
         encoder.writeFloat32(this.x)
         encoder.writeFloat32(this.y)
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let model: WorldEffectModel = super.fromBinary(decoder) as WorldEffectModel
 
         model.x = decoder.readFloat32()

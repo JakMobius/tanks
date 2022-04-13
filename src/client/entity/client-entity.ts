@@ -2,14 +2,16 @@
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityDrawer from '../graphics/drawers/entity-drawer';
 import EntityModel from '../../entity/entity-model';
-import BinaryDecoder from "../../serialization/binary/binary-decoder";
+import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
 import {Vec2} from "../../library/box2d";
-import BinaryEncoder from "../../serialization/binary/binary-encoder";
+import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
 import ClientGameWorld from "../client-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import BulletModel from "../../entity/bullets/bullet-model";
 import PhysicalComponent from "../../entity/physics-component";
 import HealthComponent from "../../entity/health-component";
+import WriteBuffer from "../../serialization/binary/write-buffer";
+import ReadBuffer from "../../serialization/binary/read-buffer";
 
 export default class ClientEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ClientGameWorld, ModelClass> {
 
@@ -24,7 +26,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         super(model);
     }
 
-    decodeDynamicData(decoder: BinaryDecoder) {
+    decodeDynamicData(decoder: ReadBuffer) {
         let teleport = decoder.readUint8()
         let x = decoder.readFloat32()
         let y = decoder.readFloat32()
@@ -60,7 +62,7 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         body.SetAngle(rotation)
     }
 
-    decodeInitialData(decoder: BinaryDecoder) {
+    decodeInitialData(decoder: ReadBuffer) {
         const x = decoder.readFloat32()
         const y = decoder.readFloat32()
         const rotation = decoder.readFloat32()
@@ -84,11 +86,11 @@ export default class ClientEntity<ModelClass extends EntityModel = EntityModel> 
         healthComponent.setHealth(decoder.readFloat32())
     }
 
-    encodeInitialData(encoder: BinaryEncoder) {
+    encodeInitialData(encoder: WriteBuffer) {
         throw new Error("Method not implemented")
     }
 
-    encodeDynamicData(encoder: BinaryEncoder): void {
+    encodeDynamicData(encoder: WriteBuffer): void {
         throw new Error("Method not implemented")
     }
 

@@ -2,8 +2,10 @@
 import BinaryPacket from '../../binary-packet';
 import GameMap from '../../../map/game-map';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryEncoder from "../../../serialization/binary/binary-encoder";
-import BinaryDecoder from "../../../serialization/binary/binary-decoder";
+import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
+import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
+import WriteBuffer from "../../../serialization/binary/write-buffer";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
 
 export default class MapPacket extends BinaryPacket {
 	public map: GameMap;
@@ -18,17 +20,14 @@ export default class MapPacket extends BinaryPacket {
         this.map = map
     }
 
-    static fromBinary<T>(this: Constructor<T>, decoder: BinaryDecoder): T {
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
         let map = GameMap.fromBinary(decoder)
         map.update()
         return new MapPacket(map) as any as T
     }
 
-    toBinary(encoder: BinaryEncoder) {
-        this.map.toBinary(encoder, [
-            GameMap.BinaryOptions.SIZE_FLAG,
-            GameMap.BinaryOptions.DATA_FLAG
-        ])
+    toBinary(encoder: WriteBuffer): void {
+        this.map.toBinary(encoder)
     }
 }
 

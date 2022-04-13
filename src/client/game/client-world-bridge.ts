@@ -19,8 +19,6 @@ import ClientPlayer from "../client-player";
 import ClientTank from "../entity/tank/client-tank";
 import WorldPlayerControlsPacket from "../../networking/packets/game-packets/world-player-controls-packet";
 import EntityHealthPacket from "../../networking/packets/game-packets/entity-health-packet";
-import PhysicalComponent from "../../entity/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import EffectHost from "../../effects/effect-host";
 import AbstractEffect from "../../effects/abstract-effect";

@@ -1,7 +1,7 @@
 
 import BinaryPool from './binary-pool';
 import {ByteArray, ByteArrayConstructor} from './buffer';
-import {Constructor} from "./serializable";
+import {Constructor} from "../../../serialization/binary/serializable";
 import Buffer from "./buffer";
 
 export interface BinaryDecoderConfig {
