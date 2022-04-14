@@ -1,7 +1,5 @@
 
 import BinarySerializationGroup from '../serialization-group';
-import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
-import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
 import WriteBuffer from "./write-buffer";
 import ReadBuffer from "./read-buffer";
 
@@ -139,7 +137,7 @@ export interface BinaryCodableStatic<C extends BinaryCodableStatic<C>> extends C
     /**
      * To serialize and deserialize the base class instances, use
      * {@link serialize} and {@link deserialize} static functions.
-     * @param decoder The {@link BinaryDecoder} which contains source object data.
+     * @param decoder The {@link ReadBuffer} which contains source object data.
      * @returns The deserialized object
      */
 

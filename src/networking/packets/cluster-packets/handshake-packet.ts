@@ -2,8 +2,6 @@
 import BinaryPacket from '../../binary-packet';
 import ClusterHandshake from '../../../server/socket/cluster-handshake';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
-import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
 

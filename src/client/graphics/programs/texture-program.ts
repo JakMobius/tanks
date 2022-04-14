@@ -3,11 +3,11 @@
 
 import GLBuffer from '../glbuffer';
 import Sprite from "../../sprite";
-import {ByteArray} from "../../../legacy/serialization-v0001/binary/buffer";
 import Uniform from "../uniform";
 import CameraProgram from "./camera-program";
 import Matrix3 from "../../../utils/matrix3";
 import {Quadrangle} from "../../../utils/quadrangle";
+import {ByteArray} from "../../../serialization/binary/typed-buffer";
 
 export interface TextureProgramConfig {
     largeIndices: boolean

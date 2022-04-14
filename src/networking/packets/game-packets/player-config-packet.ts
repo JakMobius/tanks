@@ -1,8 +1,6 @@
 
 import BinaryPacket from '../../binary-packet';
 import TankModel from '../../../entity/tanks/tank-model';
-import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
-import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
 import ReadBuffer from "../../../serialization/binary/read-buffer";

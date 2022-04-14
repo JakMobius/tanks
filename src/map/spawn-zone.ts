@@ -1,8 +1,6 @@
 
 import Rectangle from '../utils/rectangle';
-import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
-import BinaryEncoder from "../legacy/serialization-v0001/binary/binary-encoder";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
 

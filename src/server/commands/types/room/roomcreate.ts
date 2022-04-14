@@ -1,11 +1,7 @@
 
 import Command, {CommandConfig} from '../../command';
 import CommandFlag from '../../command-flag';
-import Game from 'src/server/room/game';
 import fs from 'fs';
-import GameMap from 'src/map/game-map';
-import BinaryDecoder from 'src/legacy/serialization-v0001/binary/binary-decoder';
-import pako from 'pako';
 import path from 'path';
 import RoomConfig from "../../../room/room-config";
 import {ConsoleAutocompleteOptions} from "../../../console/console";

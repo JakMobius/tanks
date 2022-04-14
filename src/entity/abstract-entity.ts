@@ -1,8 +1,6 @@
 
 import EntityModel, {EntityModelType} from './entity-model';
 import AbstractWorld from 'src/abstract-world';
-import BinaryEncoder from "../legacy/serialization-v0001/binary/binary-encoder";
-import BinaryDecoder from "../legacy/serialization-v0001/binary/binary-decoder";
 import {Constructor} from "../serialization/binary/serializable";
 import {b2Body} from "../library/box2d/dynamics/b2_body";
 import PhysicsChunk from "../physics/physics-chunk";

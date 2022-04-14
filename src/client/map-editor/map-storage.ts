@@ -1,7 +1,5 @@
 
 import {base64ToBytes, bytesToBase64} from '../../utils/base64';
-import BinaryDecoder from '../../legacy/serialization-v0001/binary/binary-decoder';
-import BinaryEncoder from '../../legacy/serialization-v0001/binary/binary-encoder';
 import pako from 'pako';
 import EditorMap from './editor-map';
 import ReadBuffer from "../../serialization/binary/read-buffer";

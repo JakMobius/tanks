@@ -4,12 +4,10 @@ import ServerWorldEffect from 'src/server/effects/world/server-world-effect';
 import ServerEntity from '../server-entity';
 import BulletModel from "../../../entity/bullets/bullet-model";
 import ServerPlayer from "../../server-player";
-import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
 import PhysicalComponent from "../../../entity/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
-import EntityModel from "../../../entity/entity-model";
 import EffectHost from "../../../effects/effect-host";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
 

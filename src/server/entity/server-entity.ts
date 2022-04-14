@@ -1,8 +1,6 @@
 
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityModel from "../../entity/entity-model";
-import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
-import BinaryEncoder from "../../legacy/serialization-v0001/binary/binary-encoder";
 import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
 import PhysicalComponent from "../../entity/physics-component";

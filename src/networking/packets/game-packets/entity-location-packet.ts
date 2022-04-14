@@ -1,10 +1,7 @@
 
 import BinaryPacket from '../../binary-packet';
-import BinaryEncoder from "../../../legacy/serialization-v0001/binary/binary-encoder";
 import {BinarySerializer} from "../../../serialization/binary/serializable";
-import AbstractEntity from "../../../entity/abstract-entity";
 import AbstractWorld from "../../../abstract-world";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
 
 export default class EntityLocationPacket extends BinaryPacket {

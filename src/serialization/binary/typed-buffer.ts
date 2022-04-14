@@ -1,4 +1,4 @@
-import {Constructor} from "../../../serialization/binary/serializable";
+import {Constructor} from "./serializable";
 
 export type ByteArray =
     | Uint8Array
@@ -21,10 +21,10 @@ export interface BufferConfig<T> {
     reallocationFactor?: number
 }
 
-class Buffer<T extends ByteArray = Uint8Array> {
-	public initialCapacity: number;
-	public array: T;
-	public stack: number[];
+export default class Buffer<T extends ByteArray = Uint8Array> {
+    public initialCapacity: number;
+    public array: T;
+    public stack: number[];
     /**
      * Buffer base capacity.
      * If the `initialCapacity` equals to
@@ -232,5 +232,3 @@ class Buffer<T extends ByteArray = Uint8Array> {
         this.pointer = this.stack.pop()
     }
 }
-
-export default Buffer;

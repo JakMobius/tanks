@@ -1,8 +1,6 @@
 
 import EffectModel, { EffectModelConfig } from '../effect-model';
-import BinaryDecoder from "../../legacy/serialization-v0001/binary/binary-decoder";
 import { Constructor } from 'src/serialization/binary/serializable';
-import BinaryEncoder from 'src/legacy/serialization-v0001/binary/binary-encoder';
 import WriteBuffer from "../../serialization/binary/write-buffer";
 import ReadBuffer from "../../serialization/binary/read-buffer";
 
