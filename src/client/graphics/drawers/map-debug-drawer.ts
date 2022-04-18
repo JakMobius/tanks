@@ -119,7 +119,7 @@ export default class MapDebugDrawer {
         this.world.getComponent(PhysicalHostComponent).world.DebugDraw()
     }
 
-    private drawTankWheelDebug(entity: ClientTank<TankModel>) {
+    private drawTankWheelDebug(entity: ClientTank) {
         const behaviour = entity.model.getComponent(WheeledTankBehaviour)
         const transform = entity.model.getComponent(TransformComponent).transform
 

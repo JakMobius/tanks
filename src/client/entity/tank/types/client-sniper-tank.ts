@@ -13,7 +13,7 @@ import PhysicalComponent from "../../../../entity/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/transform-component";
 
-class Drawer extends TankDrawer<ClientSniperTank> {
+class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
 	public bodyDarkSprite: Sprite;
 	public bodyLightMask: Sprite;
@@ -23,8 +23,8 @@ class Drawer extends TankDrawer<ClientSniperTank> {
     static leftTrack      = squareQuadrangle(1.125,  -1.8, 1.125, 4.5)
     static rightTrack     = squareQuadrangle(-2.25, -1.8, 1.125, 4.5)
 
-    constructor(tank: ClientSniperTank, ctx: WebGLRenderingContext) {
-        super(tank, ctx);
+    constructor() {
+        super();
 
         this.bodyBrightSprite = Sprite.named("tanks/sniper/body-bright")
         this.bodyDarkSprite = Sprite.named("tanks/sniper/body-dark")
@@ -35,7 +35,7 @@ class Drawer extends TankDrawer<ClientSniperTank> {
     }
 
     draw(phase: DrawPhase) {
-	    const model = this.entity.model
+	    const model = this.entity
         const body = model.getComponent(PhysicalComponent).getBody()
         const behaviour = model.getComponent(TrackTankBehaviour)
         const transform = model.getComponent(TransformComponent).transform
@@ -67,14 +67,10 @@ class Drawer extends TankDrawer<ClientSniperTank> {
     }
 }
 
-export interface SniperTankConfig extends TankConfig<SniperTankModel> {
-    model: SniperTankModel
-}
-
-export default class ClientSniperTank extends ClientTank<SniperTankModel> {
+export default class ClientSniperTank extends ClientTank {
     public static Model = SniperTankModel
 
-    constructor(options: SniperTankConfig) {
+    constructor(options: TankConfig) {
         super(options);
 
         this.engine = new Engine({
@@ -88,9 +84,10 @@ export default class ClientSniperTank extends ClientTank<SniperTankModel> {
             multiplier: 20,
             pitch: 1
         })
+
+        this.model.addComponent(new Drawer())
     }
 
-    static getDrawer() { return Drawer }
     static getName() { return "Снайпер" }
     static getDescription() {
         return "Классический танк. Довольно быстрый и маневренный. " +

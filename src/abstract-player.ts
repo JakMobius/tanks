@@ -13,7 +13,7 @@ export interface PlayerConfig<
     tank?: TankClass
 }
 
-export type AbstractTank = AbstractEntity<any, TankModel> & {
+export type AbstractTank = AbstractEntity & {
     player: AbstractPlayer
 }
 

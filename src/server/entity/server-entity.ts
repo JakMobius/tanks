@@ -7,13 +7,13 @@ import HealthComponent from "../../entity/health-component";
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import WriteBuffer from "../../serialization/binary/write-buffer";
 
-export default class ServerEntity<ModelClass extends EntityModel = EntityModel> extends AbstractEntity<ServerGameWorld, ModelClass> {
+export default class ServerEntity extends AbstractEntity {
 	public types: Map<Constructor<EntityModel>, Constructor<ServerEntity>>;
 	public teleported: boolean = true
     static types = new Map()
     static globalId = 0
 
-    constructor(model: ModelClass) {
+    constructor(model: EntityModel) {
         super(model);
 
         model.id = ServerEntity.globalId++

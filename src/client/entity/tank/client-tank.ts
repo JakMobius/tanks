@@ -9,26 +9,25 @@ import ClientEntity from "../client-entity";
 import EffectHost from "../../../effects/effect-host";
 import DamageSmokeEffect from "./damage-smoke-effect";
 
-export interface TankConfig<ModelClass extends TankModel> {
-    model: ModelClass
+export interface TankConfig {
+    model: TankModel
 }
 
 export type ClientTankType = Constructor<ClientTank> & {
-    getDrawer(): Constructor<TankDrawer>
     getName(): string
     getDescription(): string
     getStats(): TankStat
     Model: Constructor<TankModel> & EntityModelType
 }
 
-export default class ClientTank<ModelClass extends TankModel = TankModel> extends ClientEntity<ModelClass> {
+export default class ClientTank extends ClientEntity {
     public static Model: EntityModelType & Constructor<TankModel> = null
     public static Tanks: ClientTankType[] = []
 
 	public engine: Engine;
 	public player: ClientPlayer
 
-    constructor(config: TankConfig<ModelClass>) {
+    constructor(config: TankConfig) {
         super(config.model)
         this.engine = null
 

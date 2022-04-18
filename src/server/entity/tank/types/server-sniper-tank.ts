@@ -4,12 +4,12 @@ import Weapon42mm from "src/weapon/models/42mm";
 import WeaponMiner from "src/weapon/models/miner";
 import TankControls from "../../../../controls/tank-controls";
 
-export default class ServerSniperTank extends ServerTank<SniperTankModel> {
+export default class ServerSniperTank extends ServerTank {
     static Model = SniperTankModel
     private primaryWeapon: Weapon42mm;
     private minerWeapon: WeaponMiner;
 
-    constructor(options: ServerTankConfig<SniperTankModel>) {
+    constructor(options: ServerTankConfig) {
         super(options);
 
         const controlsComponent = this.model.getComponent(TankControls)

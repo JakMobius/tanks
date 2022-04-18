@@ -5,22 +5,22 @@ import {Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
 import PhysicalComponent from "../../../entity/physics-component";
 
-export interface ServerTankConfig<ModelClass> {
-    model: ModelClass
+export interface ServerTankConfig {
+    model: TankModel
 }
 
 export type ServerTankType = Constructor<ServerTank> & {
     Model: Constructor<TankModel> & EntityModelType
 }
 
-export default class ServerTank<ModelClass extends TankModel = TankModel> extends ServerEntity<TankModel> {
+export default class ServerTank extends ServerEntity {
     public static Model: EntityModelType & Constructor<TankModel> = null
     public static Tanks: ServerTankType[] = []
 
 	public teleported: boolean;
     public player: ServerPlayer
 
-    constructor(options: ServerTankConfig<ModelClass>) {
+    constructor(options: ServerTankConfig) {
         super(options.model);
 
         this.teleported = false

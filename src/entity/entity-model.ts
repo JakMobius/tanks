@@ -42,8 +42,10 @@ export default class EntityModel extends Entity {
 
         this.getComponent(HealthComponent).setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
 
-        this.on("appended-to-parent", (parent) => {
-            this.initPhysics(parent.getComponent(PhysicalHostComponent))
+        this.on("attached-to-parent", (child, parent) => {
+            if(child == this) {
+                this.initPhysics(parent.getComponent(PhysicalHostComponent))
+            }
         });
     }
 

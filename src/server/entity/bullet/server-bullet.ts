@@ -9,12 +9,13 @@ import PhysicalComponent from "../../../entity/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
 import EffectHost from "../../../effects/effect-host";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
+import HealthComponent from "../../../entity/health-component";
 
-export interface ServerBulletConfig<ModelClass extends BulletModel> {
-    model: ModelClass
+export interface ServerBulletConfig {
+    model: BulletModel
 }
 
-export default class ServerBullet<ModelClass extends BulletModel = BulletModel> extends ServerEntity<ModelClass> {
+export default class ServerBullet extends ServerEntity {
     static Model: typeof BulletModel
 
 	public wallDamage: number;
@@ -24,7 +25,7 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
 	public startVelocity: number;
     public shooter: ServerPlayer = null
 
-    constructor(options: ServerBulletConfig<ModelClass>) {
+    constructor(options: ServerBulletConfig) {
         super(options.model);
 
         this.wallDamage = 0
@@ -67,7 +68,8 @@ export default class ServerBullet<ModelClass extends BulletModel = BulletModel> 
             const world = this.model.parent
 
             world.physicsLoop.scheduleTask(() => {
-                entity.damage(this.playerDamage)
+                let healthComponent = entity.model.getComponent(HealthComponent)
+                if(healthComponent) healthComponent.damage(this.playerDamage)
             })
 
         }

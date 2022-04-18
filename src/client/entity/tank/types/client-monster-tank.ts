@@ -32,8 +32,8 @@ class Drawer extends TankDrawer {
     static spritesPerMeter = 20
     static wheelSpriteCount = 10
 
-    constructor(tank: ClientMonsterTank, ctx: WebGLRenderingContext) {
-        super(tank, ctx);
+    constructor() {
+        super();
 
         this.bodyBrightSprite = Sprite.named("tanks/monster/body-bright")
         this.bodyDarkSprite = Sprite.named("tanks/monster/body-dark")
@@ -47,7 +47,7 @@ class Drawer extends TankDrawer {
     }
 
     draw(phase: DrawPhase) {
-	    const model = this.entity.model
+	    const model = this.entity
         const body = model.getComponent(PhysicalComponent).getBody()
         const behaviour = model.getComponent(WheeledTankBehaviour)
         const transform = model.getComponent(TransformComponent).transform
@@ -82,10 +82,10 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientMonsterTank extends ClientTank<MonsterTankModel> {
+export default class ClientMonsterTank extends ClientTank {
     public static Model = MonsterTankModel
 
-    constructor(options: TankConfig<MonsterTankModel>) {
+    constructor(options: TankConfig) {
         super(options);
 
         this.engine = new Engine({
@@ -97,9 +97,10 @@ export default class ClientMonsterTank extends ClientTank<MonsterTankModel> {
             multiplier: 20,
             pitch: 0.8
         })
+
+        this.model.addComponent(new Drawer())
     }
 
-    static getDrawer() { return Drawer }
     static getName() { return "Монстр" }
     static getDescription() {
         return "Рассекайте шоссе 66 на монстре! Скоростной пулемёт " +

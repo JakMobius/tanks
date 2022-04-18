@@ -4,12 +4,12 @@ import MonsterTankModel from "src/entity/tanks/models/monster-tank-model";
 import WeaponMachineGun from "src/weapon/models/machinegun";
 import TankControls from "../../../../controls/tank-controls";
 
-export default class ServerSniperTank extends ServerTank<MonsterTankModel> {
+export default class ServerSniperTank extends ServerTank {
     static Model = MonsterTankModel
     private primaryWeapon: WeaponMachineGun;
     private minerWeapon: WeaponMiner;
 
-    constructor(options: ServerTankConfig<MonsterTankModel>) {
+    constructor(options: ServerTankConfig) {
         super(options);
 
         const controlsComponent = this.model.getComponent(TankControls)

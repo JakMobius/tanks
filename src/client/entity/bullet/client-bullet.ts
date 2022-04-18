@@ -3,14 +3,14 @@ import BulletModel from 'src/entity/bullets/bullet-model';
 import * as Box2D from "src/library/box2d"
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 
-export interface ClientBulletOptions<ModelType extends BulletModel> {
-    model: ModelType
+export interface ClientBulletOptions {
+    model: BulletModel
 }
 
-export default class ClientBullet<ModelType extends BulletModel> extends ClientEntity<ModelType> {
+export default class ClientBullet extends ClientEntity {
     private shooterId: number;
 
-    constructor(options: ClientBulletOptions<ModelType>) {
+    constructor(options: ClientBulletOptions) {
         super(options.model);
     }
 

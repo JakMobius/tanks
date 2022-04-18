@@ -13,7 +13,7 @@ import PhysicalComponent from "../../../../entity/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/transform-component";
 
-class Drawer extends TankDrawer<ClientBigboiTank> {
+class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
 	public bodyDarkSprite: Sprite;
 	public bodyLightMask: Sprite;
@@ -23,8 +23,8 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
     static leftTrack        = squareQuadrangle(1.125,  -2.25, 2.25, 4.5)
     static rightTrack       = squareQuadrangle(-3.375, -2.25, 2.25, 4.5)
 
-    constructor(tank: ClientBigboiTank, ctx: WebGLRenderingContext) {
-        super(tank, ctx);
+    constructor() {
+        super();
 
         this.bodyBrightSprite = Sprite.named("tanks/golden-bigboi/body-bright")
         this.bodyDarkSprite = Sprite.named("tanks/golden-bigboi/body-dark")
@@ -33,7 +33,7 @@ class Drawer extends TankDrawer<ClientBigboiTank> {
     }
 
     draw(phase: DrawPhase) {
-        const model = this.entity.model
+        const model = this.entity
         const body = model.getComponent(PhysicalComponent).getBody()
         const behaviour = model.getComponent(TrackTankBehaviour)
         const transform = model.getComponent(TransformComponent).transform
@@ -80,9 +80,10 @@ export default class ClientBigboiTank extends ClientTank<BigBoiTankModel> {
             multiplier: 20,
             pitch: 0.8
         })
+
+        this.model.addComponent(new Drawer())
     }
 
-    static getDrawer() { return Drawer }
     static getName() { return "Big Boi" }
     static getDescription() {
         return "Это невероятное чудо техники создано, чтобы " +

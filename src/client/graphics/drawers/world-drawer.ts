@@ -1,14 +1,12 @@
 import TextureProgram from '../../graphics/programs/texture-program';
 import Camera from "../../camera";
 import Screen from '../screen'
-import ClientGameWorld from "../../client-game-world";
 import ExplodePoolDrawer from "../../effects/explode-pool-drawer";
 import MapDrawer from "./map-drawer";
 import EventEmitter from "../../../utils/event-emitter";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 import MapDebugDrawer from "./map-debug-drawer";
 import ParticleDrawer from "./particle-drawer";
-import ClientEntity from "../../entity/client-entity";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import EntityDrawer from "./entity-drawer";
 import DrawPhase from "./draw-phase";
@@ -19,8 +17,11 @@ import MaskTextureProgramController from "../programs/light-mask-texture/light-m
 import TilemapComponent from "../../../physics/tilemap-component";
 import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
 import ParticleHost from "../../particle-host";
+import Entity from "../../../utils/ecs/entity";
+import {Component} from "../../../utils/ecs/component";
 
-export default class WorldDrawer extends EventEmitter {
+export default class WorldDrawer extends EventEmitter implements Component {
+    public entity: Entity
 	public readonly camera: Camera
 	public readonly screen: Screen
     public readonly convexShapeProgramController: BasicCameraProgramController
@@ -30,9 +31,8 @@ export default class WorldDrawer extends EventEmitter {
     public readonly debugDrawer: MapDebugDrawer
     public readonly explodePoolDrawer: ExplodePoolDrawer
     public debugDrawOn: boolean = false
-    private world: ClientGameWorld;
 	private mapDrawer: MapDrawer
-    private entityDrawers = new Map<number, EntityDrawer>()
+    private entityDrawers = new Set<EntityDrawer>()
     private worldEventHandler = new BasicEventHandlerSet()
 
     private mapDrawPhase = new DrawPhase()
@@ -49,7 +49,7 @@ export default class WorldDrawer extends EventEmitter {
         blockCrack: 0.04
     }
 
-    constructor(camera: Camera, screen: Screen, world: ClientGameWorld) {
+    constructor(camera: Camera, screen: Screen) {
 	    super()
 
         this.camera = camera
@@ -80,41 +80,12 @@ export default class WorldDrawer extends EventEmitter {
         this.mapDrawer = new MapDrawer(this.screen)
 
         this.worldEventHandler.on("map-change", () => this.onWorldMapChanged())
-        this.worldEventHandler.on("entity-create", (entity) => this.onEntityCreate(entity))
-        this.worldEventHandler.on("entity-remove", (entity) => this.onEntityRemove(entity))
         this.worldEventHandler.on("map-block-update", () => this.onMapBlockUpdate())
-
-        this.setWorld(world)
     }
 
     onMapBlockUpdate() {
         this.mapDrawer.reset()
         this.setNeedsRedraw()
-    }
-
-    setWorld(world: ClientGameWorld) {
-        this.world = world
-
-	    this.entityDrawers.clear()
-
-        if(this.world) {
-            for (let entity of this.world.entities.values()) {
-                this.setupDrawerForEntity(entity)
-            }
-        }
-
-        this.worldEventHandler.setTarget(this.world)
-        this.debugDrawer.setWorld(world)
-
-	    this.onWorldMapChanged()
-    }
-
-    onEntityCreate(entity: ClientEntity) {
-	    this.setupDrawerForEntity(entity)
-    }
-
-    onEntityRemove(entity: ClientEntity) {
-	    this.entityDrawers.delete(entity.model.id)
     }
 
     onWorldMapChanged() {
@@ -123,7 +94,7 @@ export default class WorldDrawer extends EventEmitter {
     }
 
     draw(dt: number) {
-        const mapComponent = this.world.getComponent(TilemapComponent)
+        const mapComponent = this.entity.getComponent(TilemapComponent)
         if(mapComponent) {
             const map = mapComponent.map
             if(map) this.mapDrawer.drawMap(map, this.camera)
@@ -132,7 +103,7 @@ export default class WorldDrawer extends EventEmitter {
         this.drawEntities()
         this.drawParticles()
 
-        let explodePool = this.world.getComponent(ExplodeEffectPool)
+        let explodePool = this.entity.getComponent(ExplodeEffectPool)
         if(explodePool) {
             this.explodePoolDrawer.draw(explodePool, dt)
         }
@@ -140,7 +111,7 @@ export default class WorldDrawer extends EventEmitter {
     }
 
     private drawParticles() {
-        const particleComponent = this.world.getComponent(ParticleHost)
+        const particleComponent = this.entity.getComponent(ParticleHost)
         if(particleComponent.particles.length) {
             this.particleDrawPhase.prepare()
 
@@ -152,15 +123,13 @@ export default class WorldDrawer extends EventEmitter {
         }
     }
     private drawEntities() {
-        let entities = this.world.entities
+        let entities = this.entity.entities
 
         if(entities.size > 0) {
             this.entityDrawPhase.prepare()
 
             for(let entityDrawer of this.entityDrawers.values()) {
-                if(!entityDrawer.entity.hidden) {
-                    entityDrawer.draw(this.entityDrawPhase)
-                }
+                entityDrawer.draw(this.entityDrawPhase)
             }
 
             this.entityDrawPhase.draw()
@@ -171,9 +140,32 @@ export default class WorldDrawer extends EventEmitter {
         this.emit("redraw")
     }
 
-    private setupDrawerForEntity(entity: ClientEntity) {
-        let entityClass = (entity.constructor as typeof ClientEntity)
-        let DrawerClass = entityClass.getDrawer()
-        this.entityDrawers.set(entity.model.id, new DrawerClass(entity))
+    setWorld(world: Entity) {
+        this.entity = world
+        this.entityDrawers.clear()
+        this.worldEventHandler.setTarget(this.entity)
+        this.debugDrawer.setWorld(this.entity)
+        this.onWorldMapChanged()
+    }
+
+    onAttach(entity: Entity): void {
+        this.setWorld(entity)
+        entity.propagateEvent("world-drawer-attached", this)
+    }
+
+    onDetach(): void {
+        this.setWorld(null)
+        for(let drawer of this.entityDrawers) {
+            drawer.setWorldDrawer(null)
+        }
+        this.entityDrawers.clear()
+    }
+
+    addDrawer(drawer: EntityDrawer) {
+        this.entityDrawers.add(drawer)
+    }
+
+    removeDrawer(drawer: EntityDrawer) {
+        this.entityDrawers.delete(drawer)
     }
 }

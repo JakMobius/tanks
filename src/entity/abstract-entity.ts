@@ -10,19 +10,16 @@ import TilemapComponent from "../physics/tilemap-component";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
 
-export default abstract class AbstractEntity<
-        WorldClass extends AbstractWorld = any,
-        ModelClass extends EntityModel = EntityModel
-    > {
+export default abstract class AbstractEntity {
 
     public static Model: Constructor<EntityModel> & EntityModelType = null
 
-    protected constructor(model: ModelClass) {
+    protected constructor(model: EntityModel) {
         this.model = model
         model.entity = this
     }
 
-    public model: ModelClass = null
+    public model: EntityModel = null
 
     tick(dt: number) {
         this.model.tick(dt)

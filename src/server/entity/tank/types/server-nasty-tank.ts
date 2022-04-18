@@ -4,12 +4,12 @@ import FlamethrowerWeapon from "../../../../weapon/models/flamethrower";
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import TankControls from "../../../../controls/tank-controls";
 
-export default class ServerNastyTank extends ServerTank<NastyTankModel> {
+export default class ServerNastyTank extends ServerTank {
     static Model = NastyTankModel
     private primaryWeapon: FlamethrowerWeapon;
     private minerWeapon: WeaponMiner;
 
-    constructor(options: ServerTankConfig<NastyTankModel>) {
+    constructor(options: ServerTankConfig) {
         super(options);
 
         const controlsComponent = this.model.getComponent(TankControls)

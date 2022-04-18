@@ -1,4 +1,4 @@
-import ClientBullet from '../client-bullet';
+import ClientBullet, {ClientBulletOptions} from '../client-bullet';
 import BulletModelCannonball from '../../../../entity/bullets/models/cannonball-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
@@ -11,8 +11,12 @@ class Drawer extends BasicEntityDrawer {
     }
 }
 
-export default class ClientBulletCannonball extends ClientBullet<BulletModelCannonball> {
+export default class ClientBulletCannonball extends ClientBullet {
     static Model = BulletModelCannonball
 
-    static getDrawer() { return Drawer }
+    constructor(options: ClientBulletOptions) {
+        super(options);
+
+        this.model.addComponent(new Drawer())
+    }
 }

@@ -1,11 +1,11 @@
 import ServerBullet, {ServerBulletConfig} from '../server-bullet';
 import BulletModel16mm from '../../../../entity/bullets/models/16mm-bullet-model';
 
-export default class ServerBullet16mm extends ServerBullet<BulletModel16mm> {
+export default class ServerBullet16mm extends ServerBullet {
 
     static Model = BulletModel16mm
 
-    constructor(options: ServerBulletConfig<BulletModel16mm>) {
+    constructor(options: ServerBulletConfig) {
         super(options);
 
         this.startVelocity = 150

@@ -20,7 +20,7 @@ import TankControls from "../../../../controls/tank-controls";
 import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
 import TransformComponent from "../../../../entity/transform-component";
 
-class Drawer extends TankDrawer<ClientNastyTank> {
+class Drawer extends TankDrawer {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
     static leftPropellerQuadrangle  = squareQuadrangle(-1.7325,-2.385,1.335,0.18)
     static rightPropellerQuadrangle = squareQuadrangle(0.3825, -2.385, 1.335, 0.18)
@@ -39,8 +39,8 @@ class Drawer extends TankDrawer<ClientNastyTank> {
     public ruderSprite: Sprite;
     public propellerSprites: Sprite[];
 
-    constructor(tank: ClientNastyTank, ctx: WebGLRenderingContext) {
-        super(tank, ctx);
+    constructor() {
+        super();
 
         this.bodyBrightSprite = Sprite.named("tanks/nasty/body-bright")
         this.bodyDarkSprite = Sprite.named("tanks/nasty/body-dark")
@@ -54,7 +54,7 @@ class Drawer extends TankDrawer<ClientNastyTank> {
     }
 
     draw(phase: DrawPhase) {
-        const model = this.entity.model
+        const model = this.entity
         const body = model.getComponent(PhysicalComponent).getBody()
         const controlsComponent = model.getComponent(TankControls)
         const behaviour = model.getComponent(AirbagTankModel)
@@ -103,10 +103,10 @@ class Drawer extends TankDrawer<ClientNastyTank> {
     }
 }
 
-export default class ClientNastyTank extends ClientTank<NastyTankModel> {
+export default class ClientNastyTank extends ClientTank {
     public static Model = NastyTankModel
 
-    constructor(options: TankConfig<NastyTankModel>) {
+    constructor(options: TankConfig) {
         super(options);
 
         this.engine = new Engine({
@@ -115,10 +115,8 @@ export default class ClientNastyTank extends ClientTank<NastyTankModel> {
             pitch: 0.9,
             volume: 0.6
         })
-    }
 
-    static getDrawer() {
-        return Drawer
+        this.model.addComponent(new Drawer())
     }
 
     static getName() {

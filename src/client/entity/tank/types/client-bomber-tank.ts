@@ -1,8 +1,7 @@
 import BomberTankModel from "../../../../entity/tanks/models/bomber-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
-import ClientSniperTank, {SniperTankConfig} from "./client-sniper-tank";
-import ClientTank from "../client-tank";
+import ClientTank, {TankConfig} from "../client-tank";
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
@@ -22,8 +21,8 @@ class Drawer extends TankDrawer {
     static leftTrack      = squareQuadrangle(1.125,  -1.6, 1.36, 3.375)
     static rightTrack     = squareQuadrangle(-2.5, -1.6, 1.36, 3.375)
 
-    constructor(tank: ClientSniperTank, ctx: WebGLRenderingContext) {
-        super(tank, ctx);
+    constructor() {
+        super();
 
         this.bodyBrightSprite = Sprite.named("tanks/bomber/body")
         //this.bodyDarkSprite = Sprite.named("tanks/bomber/body-dark")
@@ -34,8 +33,8 @@ class Drawer extends TankDrawer {
     }
 
     draw(phase: DrawPhase) {
-        const model = this.entity.model
-        const behaviour = this.entity.model.getComponent(TrackTankBehaviour)
+        const model = this.entity
+        const behaviour = this.entity.getComponent(TrackTankBehaviour)
         const transform = model.getComponent(TransformComponent).transform
         //const body = model.getComponent(PhysicalComponent).getBody()
 
@@ -60,10 +59,10 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientBomberTank extends ClientTank<BomberTankModel> {
+export default class ClientBomberTank extends ClientTank {
     public static Model = BomberTankModel
 
-    constructor(options: SniperTankConfig) {
+    constructor(options: TankConfig) {
         super(options);
 
         this.engine = new Engine({
@@ -77,9 +76,10 @@ export default class ClientBomberTank extends ClientTank<BomberTankModel> {
             multiplier: 20,
             pitch: 1
         })
+
+        this.model.addComponent(new Drawer())
     }
 
-    static getDrawer() { return Drawer }
     static getName() { return "Бомбер" }
     static getDescription() {
         return "Идеальная машина для партизанской войны! Стены и углы" +

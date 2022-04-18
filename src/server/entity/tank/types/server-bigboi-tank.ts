@@ -4,12 +4,12 @@ import WeaponMiner from "../../../../weapon/models/miner";
 import WeaponCannon from "../../../../weapon/models/cannon";
 import TankControls from "../../../../controls/tank-controls";
 
-export default class ServerBigboiTank extends ServerTank<BigBoiTankModel> {
+export default class ServerBigboiTank extends ServerTank {
     static Model = BigBoiTankModel
     private primaryWeapon: WeaponCannon;
     private minerWeapon: WeaponMiner;
 
-    constructor(options: ServerTankConfig<BigBoiTankModel>) {
+    constructor(options: ServerTankConfig) {
         super(options);
 
         const controlsComponent = this.model.getComponent(TankControls)

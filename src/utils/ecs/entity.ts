@@ -43,7 +43,7 @@ export default class Entity extends EventEmitter {
         this.children.push(child)
         child.parent = this
 
-        child.emit("appended-to-parent", this)
+        child.propagateEvent("attached-to-parent", child, this)
         this.emit("child-added", child)
     }
 
@@ -55,7 +55,14 @@ export default class Entity extends EventEmitter {
         let parent = this.parent
         this.parent = null
 
-        this.emit("removed-from-parent", parent)
+        this.propagateEvent("removed-from-parent", this, parent)
         parent.emit("child-removed", this)
+    }
+
+    public propagateEvent(event: string, ...args: any[]) {
+        this.emit(event, ...args);
+        for(let child of this.children) {
+            child.propagateEvent(event, ...args)
+        }
     }
 }

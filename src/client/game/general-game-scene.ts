@@ -101,6 +101,7 @@ export default class GeneralGameScene extends Scene {
     displayWorld(world: ClientGameWorld) {
         if(this.displayedWorld) throw new Error("Scene world cannot be changed after it's been set once")
         this.displayedWorld = world
+        this.displayedWorld.addComponent(this.worldDrawer)
         this.worldDrawer.setWorld(world)
 
         this.displayedWorld.on("map-change", () => {

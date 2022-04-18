@@ -5,12 +5,12 @@ import BomberTankModel from "../../../../entity/tanks/models/bomber-tank-model";
 import WeaponBomber from "../../../../weapon/models/bomber";
 import TankControls from "../../../../controls/tank-controls";
 
-export default class ServerBomberTank extends ServerTank<BomberTankModel> {
+export default class ServerBomberTank extends ServerTank {
     static Model = BomberTankModel
     private primaryWeapon: WeaponBomber;
     private minerWeapon: WeaponMiner;
 
-    constructor(options: ServerTankConfig<SniperTankModel>) {
+    constructor(options: ServerTankConfig) {
         super(options);
 
         const controlsComponent = this.model.getComponent(TankControls)

@@ -1,8 +1,9 @@
-import ClientBullet from '../client-bullet';
+import ClientBullet, {ClientBulletOptions} from '../client-bullet';
 import BulletModelMine from '../../../../entity/bullets/models/mine-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import ClientEntity from "../../client-entity";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
+import BulletModelBomb from "../../../../entity/bullets/models/bomb-bullet-model";
 
 class Drawer extends BasicEntityDrawer {
 	public shift: any;
@@ -11,10 +12,11 @@ class Drawer extends BasicEntityDrawer {
         "bullets/mine/off"
     ]
 
-    constructor(entity: ClientEntity) {
-        super(entity);
+    constructor() {
+        super();
 
-        this.shift = this.entity.model.id * 350
+        // this.shift = this.entity.id * 350
+        this.shift = Math.random() * 350
     }
 
     draw(phase: DrawPhase) {
@@ -24,8 +26,12 @@ class Drawer extends BasicEntityDrawer {
     }
 }
 
-export default class ClientBulletMine extends ClientBullet<BulletModelMine> {
+export default class ClientBulletMine extends ClientBullet {
     static Model = BulletModelMine
 
-    static getDrawer() { return Drawer }
+    constructor(options: ClientBulletOptions) {
+        super(options);
+
+        this.model.addComponent(new Drawer())
+    }
 }

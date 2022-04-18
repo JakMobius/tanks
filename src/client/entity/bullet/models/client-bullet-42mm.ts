@@ -1,7 +1,8 @@
-import ClientBullet from '../client-bullet';
+import ClientBullet, {ClientBulletOptions} from '../client-bullet';
 import BulletModel42mm from '../../../../entity/bullets/models/42mm-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
+import BulletModel16mm from "../../../../entity/bullets/models/16mm-bullet-model";
 
 class Drawer extends BasicEntityDrawer {
     static spriteNames = ["bullets/42mm/42mm"]
@@ -11,8 +12,12 @@ class Drawer extends BasicEntityDrawer {
     }
 }
 
-export default class ClientBullet42mm extends ClientBullet<BulletModel42mm> {
+export default class ClientBullet42mm extends ClientBullet {
     static Model = BulletModel42mm
 
-    static getDrawer() { return Drawer }
+    constructor(options: ClientBulletOptions) {
+        super(options);
+
+        this.model.addComponent(new Drawer())
+    }
 }
