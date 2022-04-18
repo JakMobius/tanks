@@ -1,4 +1,3 @@
-
 import ClientEffect from '../client-effect';
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../entity/tank/client-tank";

@@ -1,4 +1,3 @@
-
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
 import KeyboardController from '../../../controls/interact/keyboard-controller';

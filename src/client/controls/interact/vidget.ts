@@ -1,6 +1,3 @@
-
-import { Touch } from "./touch-controller";
-
 export default class Vidget {
     id: number
     hidden: boolean

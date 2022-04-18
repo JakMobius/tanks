@@ -1,4 +1,3 @@
-
 import MapBinaryOptions from './map-binary-options';
 import BlockState from './block-state/block-state';
 import AirBlockState from './block-state/types/air-block-state';

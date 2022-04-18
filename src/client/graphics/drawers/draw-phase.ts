@@ -1,4 +1,3 @@
-
 import ProgramController from "../programs/controllers/program-controller";
 import {Constructor} from "../../../serialization/binary/serializable";
 import Program from "../programs/program";

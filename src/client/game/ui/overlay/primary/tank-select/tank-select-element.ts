@@ -1,11 +1,9 @@
-
 import View from 'src/client/ui/view';
 import CanvasFactory from 'src/client/utils/canvas-factory';
 import Sprite from 'src/client/sprite';
 import * as Box2D from 'src/library/box2d'
 import Camera from "src/client/camera";
-import ClientTank, {ClientTankType} from "../../../../../entity/tank/client-tank";
-import PhysicalComponent from "../../../../../../entity/physics-component";
+import {ClientTankType} from "../../../../../entity/tank/client-tank";
 
 export interface TankSelectElementViewConfig {
     Tank: ClientTankType

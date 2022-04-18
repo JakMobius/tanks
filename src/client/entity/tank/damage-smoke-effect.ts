@@ -1,4 +1,3 @@
-
 import TransformComponent from "../../../entity/transform-component";
 import Color from "../../../utils/color";
 import PhysicalComponent from "../../../entity/physics-component";

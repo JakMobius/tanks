@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import BlockState from '../../../map/block-state/block-state';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

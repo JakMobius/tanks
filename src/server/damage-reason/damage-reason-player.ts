@@ -1,4 +1,3 @@
-
 import DamageReason from './damage-reason';
 
 export default class DamageReasonPlayer extends DamageReason {

@@ -1,4 +1,3 @@
-
 import BlockStateBinaryOptions from './block-state-binary-options';
 import GameMap from "../game-map";
 

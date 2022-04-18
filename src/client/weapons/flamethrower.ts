@@ -1,4 +1,3 @@
-
 import Weapon, {WeaponConfig} from './weapon';
 
 class Flamethrower extends Weapon {

@@ -1,4 +1,3 @@
-
 import CannonBall from '../../entity/bullets/models/cannonball-bullet-model';
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"

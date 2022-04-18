@@ -1,4 +1,3 @@
-
 import BinarySerializationGroup from '../serialization-group';
 import WriteBuffer from "./write-buffer";
 import ReadBuffer from "./read-buffer";

@@ -1,4 +1,3 @@
-
 import Color from '../../utils/color';
 
 export interface ParticleConfig {

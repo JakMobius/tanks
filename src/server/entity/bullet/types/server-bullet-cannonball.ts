@@ -1,4 +1,3 @@
-
 import ServerBullet, {ServerBulletConfig} from '../server-bullet';
 import BulletModelCannonball from '../../../../entity/bullets/models/cannonball-bullet-model';
 

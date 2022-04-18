@@ -1,4 +1,3 @@
-
 import GameMap, {GameMapConfig} from '../../map/game-map';
 import EditorMapBinaryOptions from './editor-map-binary-options';
 import History from './history/history';

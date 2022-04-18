@@ -1,4 +1,3 @@
-
 import Downloader from '../utils/downloader';
 import Sound, {SoundConfig} from './sound';
 import FX from './fx';

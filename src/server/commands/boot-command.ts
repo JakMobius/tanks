@@ -1,4 +1,3 @@
-
 import Command, {CommandConfig} from './command';
 import CommandFlag from './command-flag';
 

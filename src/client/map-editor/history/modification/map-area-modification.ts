@@ -1,7 +1,5 @@
-
 import MapModification from './map-modification';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
-import GameMap from "../../../../map/game-map";
 import EditorMap from "../../editor-map";
 import Rectangle from "../../../../utils/rectangle";
 import BlockState from "../../../../map/block-state/block-state";

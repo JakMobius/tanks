@@ -1,4 +1,3 @@
-
 // const FX = require("../../sound/fx")
 import FireParticle from '../../../particles/fire-particle';
 

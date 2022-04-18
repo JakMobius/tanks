@@ -1,4 +1,3 @@
-
 import Command from '../command';
 
 export default class ExitCommand extends Command {

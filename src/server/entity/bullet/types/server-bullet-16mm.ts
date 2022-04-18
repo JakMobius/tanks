@@ -1,4 +1,3 @@
-
 import ServerBullet, {ServerBulletConfig} from '../server-bullet';
 import BulletModel16mm from '../../../../entity/bullets/models/16mm-bullet-model';
 

@@ -1,4 +1,3 @@
-
 import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
 import Connection from "./connection";
 import ReadBuffer from "../serialization/binary/read-buffer";

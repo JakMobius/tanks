@@ -1,4 +1,3 @@
-
 import ServerWorldEffect from '../server-world-effect';
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
 import ServerGameWorld from "../../../server-game-world";

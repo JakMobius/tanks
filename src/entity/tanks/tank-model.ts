@@ -1,4 +1,3 @@
-
 import TankControls from '../../controls/tank-controls';
 import EntityModel from "../entity-model";
 import EffectHost from "../../effects/effect-host";

@@ -1,4 +1,3 @@
-
 import * as Box2D from '../library/box2d';
 import Matrix3 from "../utils/matrix3";
 

@@ -1,4 +1,3 @@
-
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import PhysicsChunk from "./physics-chunk";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";

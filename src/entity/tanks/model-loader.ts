@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import Models from './models/*'
 import {BinarySerializer} from "../../serialization/binary/serializable";

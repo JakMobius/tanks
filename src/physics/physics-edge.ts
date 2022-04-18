@@ -1,4 +1,3 @@
-
 import PhysicsChunk from "./physics-chunk";
 
 export default class PhysicsEdge {

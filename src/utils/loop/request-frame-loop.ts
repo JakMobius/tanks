@@ -1,4 +1,3 @@
-
 import Loop, {LoopConfig} from './loop';
 
 export default class RequestFrameLoop extends Loop {

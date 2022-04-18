@@ -1,4 +1,3 @@
-
 import DocumentEventHandler from './document-event-handler';
 
 export default class DragHandler extends DocumentEventHandler {

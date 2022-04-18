@@ -1,4 +1,3 @@
-
 import Tool from '../tool';
 import ToolManager from "../toolmanager";
 

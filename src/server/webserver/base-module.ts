@@ -1,8 +1,6 @@
-
 import WebserverModule from './webserver-module';
 import * as path from 'path';
 import * as express from 'express';
-import WebServer from "./webserver";
 
 export default class BaseModule extends WebserverModule {
     constructor() {

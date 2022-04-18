@@ -1,7 +1,6 @@
 import SpawnZone from './spawn-zone';
 import BinaryFlaggedCoder from "../serialization/binary/parsers/binary-flagged-coder";
 import FlagHandler from "../serialization/binary/parsers/flag-handler";
-import BlockStateBinaryOptions from "./block-state/block-state-binary-options";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import BlockState from "./block-state/block-state";
 import BinaryBlockCoder from "../serialization/binary/parsers/binary-block-coder";

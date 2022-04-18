@@ -1,4 +1,3 @@
-
 import ActivatorAxle from "../../controls/activator-axle";
 
 export type AxleCallback = (axle: CallbackActivatorAxle) => void

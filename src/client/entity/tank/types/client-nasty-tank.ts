@@ -8,11 +8,11 @@ import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-tex
 import TextureProgram from 'src/client/graphics/programs/texture-program';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {
+    copyQuadrangle,
     squareQuadrangle,
-    translateQuadrangle,
     transformQuadrangle,
-    turnQuadrangle,
-    copyQuadrangle
+    translateQuadrangle,
+    turnQuadrangle
 } from "../../../../utils/quadrangle";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";

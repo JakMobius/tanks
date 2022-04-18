@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractWorld from "../../../abstract-world";

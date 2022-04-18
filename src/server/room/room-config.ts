@@ -1,4 +1,3 @@
-
 import {BinaryCodable, Constructor} from 'src/serialization/binary/serializable';
 import WriteBuffer from "../../serialization/binary/write-buffer";
 import ReadBuffer from "../../serialization/binary/read-buffer";

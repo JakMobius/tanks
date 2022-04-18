@@ -1,4 +1,3 @@
-
 import AbstractEffect from 'src/effects/abstract-effect';
 import EffectModel from "../../effects/effect-model";
 

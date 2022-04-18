@@ -1,4 +1,3 @@
-
 /* @load-resource: './dropdown.scss' */
 
 import View from '../../view';

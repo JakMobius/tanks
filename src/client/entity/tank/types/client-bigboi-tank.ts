@@ -1,21 +1,13 @@
-
 import ClientTank, {TankConfig} from '../client-tank';
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import LightMaskTextureProgram from "../../../graphics/programs/light-mask-texture/light-mask-texture-program";
-import {
-    squareQuadrangle,
-    translateQuadrangle,
-    transformQuadrangle,
-    multipliedQuadrangle, copyQuadrangle
-} from "../../../../utils/quadrangle";
+import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
 import BigBoiTankModel from "../../../../entity/tanks/models/bigboi-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
-import {TankStat} from "../tank-stat";
-import {worker} from "cluster";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";

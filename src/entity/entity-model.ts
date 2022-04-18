@@ -1,4 +1,3 @@
-
 import {Constructor} from '../serialization/binary/serializable';
 import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";

@@ -1,4 +1,3 @@
-
 /* @load-resource: '../web/base-style.scss' */
 
 import LoadingScene from '../scenes/loading/loading-scene';

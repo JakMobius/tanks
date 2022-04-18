@@ -1,6 +1,5 @@
 import BulletModel from '../bullet-model';
 import {BinarySerializer} from "../../../serialization/binary/serializable";
-import * as Box2D from 'src/library/box2d'
 import PhysicsUtils from "../../../utils/physics-utils";
 import {physicsFilters} from "../../../physics/categories";
 import PhysicalComponent from "../../physics-component";

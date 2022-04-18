@@ -2,8 +2,6 @@ import * as Box2D from "./library/box2d";
 import {b2Contact} from "./library/box2d/dynamics/b2_contact";
 import AbstractWorld from "./abstract-world";
 import EntityModel from "./entity/entity-model";
-import PhysicalComponent from "./entity/physics-component";
-import Entity from "./utils/ecs/entity";
 
 /**
  * This class handles collision events and tells the appropriate

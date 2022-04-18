@@ -1,5 +1,4 @@
 import Command from '../command';
-import BotClient from '../../ai/bot';
 
 class AICommand extends Command {
 	public observingRoom: any;

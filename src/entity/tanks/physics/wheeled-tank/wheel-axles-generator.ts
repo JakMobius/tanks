@@ -1,4 +1,3 @@
-
 import {TankWheel, TankWheelConfig} from "./wheel";
 
 export interface WheelAxlesConfig {

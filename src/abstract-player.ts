@@ -1,4 +1,3 @@
-
 import AbstractWorld from "./abstract-world";
 import Team from "./server/team";
 import AbstractEntity from "./entity/abstract-entity";

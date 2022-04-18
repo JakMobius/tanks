@@ -7,7 +7,6 @@ import BlockSelectOverlay from '../blockselect/blockselectoverlay';
 import BlockSelectButton from '../blockselect/blockselectbutton';
 import BlockState from "../../../../../../map/block-state/block-state";
 import Tool from "../../../../tools/tool";
-import BlockSelectMenu from "../blockselect/blockselectmenu";
 
 export interface ToolbarViewOptions {
     root: JQuery

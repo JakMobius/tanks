@@ -1,4 +1,3 @@
-
 import Overlay, {OverlayConfig} from 'src/client/ui/overlay/overlay';
 import ControlsContainer from './controls/controls-container';
 import PlayMenuContainer from './play-menu/play-menu-container';

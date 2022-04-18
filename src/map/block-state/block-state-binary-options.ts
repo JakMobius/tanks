@@ -1,4 +1,3 @@
-
 import FlagHandler from "../../serialization/binary/parsers/flag-handler";
 import BinaryFlaggedCoder from "../../serialization/binary/parsers/binary-flagged-coder";
 import WriteBuffer from "../../serialization/binary/write-buffer";

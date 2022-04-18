@@ -1,4 +1,3 @@
-
 import PlayerJoinPacket from './player-join-packet';
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 

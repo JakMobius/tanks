@@ -1,4 +1,3 @@
-
 import BulletModelBomb from '../../entity/bullets/models/bomb-bullet-model';
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"

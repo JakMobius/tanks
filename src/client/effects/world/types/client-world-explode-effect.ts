@@ -1,4 +1,3 @@
-
 import ClientWorldEffect from '../client-world-effect';
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
 import ClientGameWorld from "../../../client-game-world";

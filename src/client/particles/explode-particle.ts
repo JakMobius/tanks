@@ -1,4 +1,3 @@
-
 import FireParticle from './fire-particle';
 import {ParticleConfig} from "./particle";
 

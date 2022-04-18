@@ -1,4 +1,3 @@
-
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityModel from "../../entity/entity-model";
 import ServerGameWorld from "../server-game-world";

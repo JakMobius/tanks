@@ -1,9 +1,7 @@
 /* @load-resource: ./game-pause-navigation-block.scss */
 
 import Cloud from "../../cloud/cloud";
-import Controller from "../../../../ui/controller/controller";
 import NavigationBlock from "../../../../ui/navigation/navigation-block";
-import {PauseMenuView} from "./pause-menu-view";
 import GamePauseViewController from "./controllers/pause-view-controller";
 
 export default class GamePauseNavigationBlock extends NavigationBlock<GamePauseViewController> {

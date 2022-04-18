@@ -1,4 +1,3 @@
-
 import WebSocket from 'websocket';
 import * as HTTP from 'http';
 

@@ -1,4 +1,3 @@
-
 import Tool from '../tool';
 import * as Box2D from '../../../../library/box2d';
 import PlayerControls from '../../../controls/player-controls';

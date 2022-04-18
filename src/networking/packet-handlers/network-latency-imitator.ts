@@ -1,5 +1,4 @@
 import ClientDataHandler from "./client-packet-handler";
-import ConnectionClient from "../connection-client";
 import Queue from "../../utils/queue";
 import Connection from "../connection";
 

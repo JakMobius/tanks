@@ -1,7 +1,4 @@
-import SocketPortalClient, {SocketPortalClientConfig} from '../socket/socket-portal-client';
-import AIConnection from './ai_connection';
-import Server from "../server";
-import Room from "../room/room";
+import SocketPortalClient from '../socket/socket-portal-client';
 
 export interface GameBotData {
 

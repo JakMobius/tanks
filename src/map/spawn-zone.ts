@@ -1,4 +1,3 @@
-
 import Rectangle from '../utils/rectangle';
 import {Constructor} from "../serialization/binary/serializable";
 import ReadBuffer from "../serialization/binary/read-buffer";

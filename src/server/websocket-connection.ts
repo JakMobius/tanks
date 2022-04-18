@@ -1,9 +1,7 @@
-
 import Connection from '../networking/connection';
-import WebSocket, {IClientConfig} from 'websocket';
+import WebSocket, * as Websocket from 'websocket';
+import {IClientConfig} from 'websocket';
 import BinaryPacket from "../networking/binary-packet";
-import * as Websocket from "websocket";
-import {BinarySerializer} from "../serialization/binary/serializable";
 import * as http from "http";
 
 const WebSocketConnection = WebSocket.connection

@@ -1,4 +1,3 @@
-
 import Weapon, {WeaponConfig} from './weapon';
 
 class Stungun extends Weapon {

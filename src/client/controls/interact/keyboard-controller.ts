@@ -1,4 +1,3 @@
-
 import DocumentEventHandler from './document-event-handler';
 import KeyAxle from '../key-axle';
 

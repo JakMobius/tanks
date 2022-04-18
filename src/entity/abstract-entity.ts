@@ -1,4 +1,3 @@
-
 import EntityModel, {EntityModelType} from './entity-model';
 import AbstractWorld from 'src/abstract-world';
 import {Constructor} from "../serialization/binary/serializable";

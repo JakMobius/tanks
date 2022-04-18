@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import EffectModel from 'src/effects/effect-model';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

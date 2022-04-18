@@ -1,7 +1,6 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import AbstractPlayer from "../../abstract-player";
 import ServerGameWorld from "../../server/server-game-world";
-import ServerEntity from "../../server/entity/server-entity";
 import PhysicalComponent from "../../entity/physics-component";
 import TransformComponent from "../../entity/transform-component";
 import Entity from "../../utils/ecs/entity";

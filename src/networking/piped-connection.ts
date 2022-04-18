@@ -1,4 +1,3 @@
-
 import Connection from "./connection";
 
 export default class PipedConnection extends Connection {

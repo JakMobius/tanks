@@ -1,4 +1,3 @@
-
 import stream from 'stream'
 import {createReadline, Readline} from "./readline";
 import EventEmitter from "../../utils/event-emitter";

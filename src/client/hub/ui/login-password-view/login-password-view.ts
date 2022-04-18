@@ -1,7 +1,6 @@
 /* @load-resource: './login-password-view.scss' */
 
 import View from "../../../ui/view";
-import InputTipList from "../input-tip-list/input-tip-list-view";
 import AuthInput from "../auth-input/auth-input";
 import AuthTitle from "../auth-title/auth-title";
 import {HubPage} from "../hub-page";

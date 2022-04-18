@@ -1,4 +1,3 @@
-
 import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import DialogView from './dialogview';
 

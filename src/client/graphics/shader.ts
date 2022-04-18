@@ -1,5 +1,4 @@
-
-import { Shaders } from './shader-loader'
+import {Shaders} from './shader-loader'
 
 export default class Shader {
 	public name: string;

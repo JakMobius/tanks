@@ -1,4 +1,3 @@
-
 import Command from '../command';
 import {ConsoleAutocompleteOptions} from "../../console/console";
 import path from "path";

@@ -1,4 +1,3 @@
-
 import ClientTank, {TankConfig} from '../client-tank';
 import TankDrawer from 'src/client/graphics/drawers/tank-drawer';
 import MonsterTankModel from 'src/entity/tanks/models/monster-tank-model';
@@ -9,11 +8,11 @@ import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-tex
 import TextureProgram from 'src/client/graphics/programs/texture-program';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {
+    copyQuadrangle,
     squareQuadrangle,
-    translateQuadrangle,
     transformQuadrangle,
-    turnQuadrangle,
-    copyQuadrangle
+    translateQuadrangle,
+    turnQuadrangle
 } from "../../../../utils/quadrangle";
 
 import WorldDrawer from "../../../graphics/drawers/world-drawer";

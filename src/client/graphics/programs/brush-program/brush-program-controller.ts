@@ -1,4 +1,3 @@
-
 import BasicCameraProgramController from "../controllers/basic-camera-program-controller";
 import BrushProgram from "./brush-program";
 import GameMap from "../../../../map/game-map";

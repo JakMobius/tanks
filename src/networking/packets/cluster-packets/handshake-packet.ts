@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import ClusterHandshake from '../../../server/socket/cluster-handshake';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

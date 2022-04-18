@@ -1,14 +1,9 @@
-
 import TankModel from 'src/entity/tanks/tank-model';
-import ServerTankEffect from "../../effects/tank/server-tank-effect";
-import DamageReason from "../../damage-reason/damage-reason";
 import ServerEntity from "../server-entity";
-import AbstractEffect from "../../../effects/abstract-effect";
 import ServerPlayer from "../../server-player";
 import {Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
 import PhysicalComponent from "../../../entity/physics-component";
-import EffectHost from "../../../effects/effect-host";
 
 export interface ServerTankConfig<ModelClass> {
     model: ModelClass

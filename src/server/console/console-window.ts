@@ -1,4 +1,3 @@
-
 import EventEmitter from '../../utils/event-emitter';
 import HistoryEntry from "./console-history-entry";
 import CallbackLogger from "./callback-logger";

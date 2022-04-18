@@ -1,4 +1,3 @@
-
 import Command from '../command';
 
 class BanIPCommand extends Command {

@@ -1,4 +1,3 @@
-
 import BulletModel from '../bullet-model';
 import * as Box2D from "../../../library/box2d";
 import PhysicsUtils from "../../../utils/physics-utils";

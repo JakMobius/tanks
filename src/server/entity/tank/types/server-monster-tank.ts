@@ -1,4 +1,3 @@
-
 import ServerTank, {ServerTankConfig} from "../server-tank";
 import WeaponMiner from "src/weapon/models/miner";
 import MonsterTankModel from "src/entity/tanks/models/monster-tank-model";

@@ -1,4 +1,3 @@
-
 import DocumentEventHandler from './document-event-handler';
 import Vidget from "./vidget";
 import ControlPanel from "../../game/ui/control-panel";

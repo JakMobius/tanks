@@ -3,7 +3,6 @@ import TankBehaviour from '../tank-behaviour';
 import TankModel from "../../tank-model";
 import {TankWheel} from "./wheel";
 import PhysicalComponent from "../../../physics-component";
-import TankControls from "../../../../controls/tank-controls";
 
 export interface WheeledTankBehaviourConfig {
 

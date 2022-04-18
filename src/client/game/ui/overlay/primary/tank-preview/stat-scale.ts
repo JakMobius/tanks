@@ -1,4 +1,3 @@
-
 import View from 'src/client/ui/view';
 import {Stat} from "./tank-preview-container";
 

@@ -1,9 +1,5 @@
-
 import AbstractWorld, {GameWorldConfig} from '../abstract-world';
-import Particle from "./particles/particle";
 import ClientEntity from "./entity/client-entity";
-import ClientEffect from "./effects/client-effect";
-import GameMap from "../map/game-map";
 import ClientPlayer from "./client-player";
 import ClientTank from "./entity/tank/client-tank";
 import WorldExplodeEffectModelPool from "../effects/world/explode/explode-effect-pool";

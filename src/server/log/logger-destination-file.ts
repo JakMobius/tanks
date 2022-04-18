@@ -1,4 +1,3 @@
-
 import LoggerDestination from './logger-destination';
 import fs from 'fs';
 

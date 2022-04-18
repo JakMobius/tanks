@@ -1,4 +1,3 @@
-
 import TankModel from '../tank-model';
 import {Vec2} from "../../../library/box2d";
 import TankControls from "../../../controls/tank-controls";

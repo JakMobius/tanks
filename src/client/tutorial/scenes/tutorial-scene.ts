@@ -1,4 +1,3 @@
-
 import {SceneConfig} from 'src/client/scenes/scene';
 import {getTutorialMap} from "../tutorial-map";
 import ClientPlayer from "../../client-player";

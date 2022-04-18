@@ -1,4 +1,3 @@
-
 import RoomPortal from "../room-portal";
 import {ClientRoomInformant} from "../../networking/packets/game-packets/room-list-packet";
 

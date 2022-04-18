@@ -1,4 +1,3 @@
-
 import Command, {CommandConfig} from '../command';
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
 import ServerWorldEffect from 'src/server/effects/world/server-world-effect';

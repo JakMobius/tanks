@@ -1,4 +1,3 @@
-
 import BlockState from '../block-state';
 
 export default class BrickBlockState extends BlockState {

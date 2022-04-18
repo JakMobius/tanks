@@ -1,4 +1,3 @@
-
 //@ts-ignore
 import Types from './types/*'
 import ClientTankEffect from "./client-tank-effect";

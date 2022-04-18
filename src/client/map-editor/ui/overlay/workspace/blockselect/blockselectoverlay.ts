@@ -1,4 +1,3 @@
-
 import Overlay, {OverlayConfig} from 'src/client/ui/overlay/overlay';
 import BlockSelectMenu from './blockselectmenu';
 

@@ -1,4 +1,3 @@
-
 import ClientBullet from '../client-bullet';
 import BulletModelMine from '../../../../entity/bullets/models/mine-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';

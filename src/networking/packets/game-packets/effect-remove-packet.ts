@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 import ReadBuffer from "../../../serialization/binary/read-buffer";

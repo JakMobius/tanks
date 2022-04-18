@@ -1,4 +1,3 @@
-
 import Cloud from './cloud'
 import {Constructor} from "../../../../serialization/binary/serializable";
 import Controller from "../../../ui/controller/controller";

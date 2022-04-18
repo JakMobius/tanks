@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import AbstractEntity from "../../../entity/abstract-entity";
 import {BinarySerializer} from "../../../serialization/binary/serializable";

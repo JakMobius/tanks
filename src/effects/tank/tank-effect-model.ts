@@ -1,4 +1,3 @@
-
 import EffectModel from '../effect-model';
 import {Constructor} from "../../serialization/binary/serializable";
 import ReadBuffer from "../../serialization/binary/read-buffer";

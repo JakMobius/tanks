@@ -1,4 +1,3 @@
-
 import DocumentEventHandler from '../../controls/interact/document-event-handler';
 import Camera from '../../camera';
 import Tool from '../tools/tool';

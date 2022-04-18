@@ -1,4 +1,3 @@
-
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityDrawer from '../graphics/drawers/entity-drawer';
 import EntityModel from '../../entity/entity-model';

@@ -1,4 +1,3 @@
-
 import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
 

@@ -1,4 +1,3 @@
-
 import BlockDrawer from './block-drawer';
 import Sprite, {SpriteRect} from '../../../sprite';
 import GameMap from '../../../../map/game-map';

@@ -1,4 +1,3 @@
-
 import TankControls from '../../../controls/tank-controls';
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer} from "../../../serialization/binary/serializable";

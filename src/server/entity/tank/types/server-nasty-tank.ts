@@ -1,4 +1,3 @@
-
 import ServerTank, {ServerTankConfig} from "../server-tank";
 import WeaponMiner from "src/weapon/models/miner";
 import FlamethrowerWeapon from "../../../../weapon/models/flamethrower";

@@ -1,4 +1,3 @@
-
 import DocumentEventHandler from './document-event-handler';
 import GamepadAxle from '../gamepad-axle';
 import GamepadButton from '../gamepad-button';

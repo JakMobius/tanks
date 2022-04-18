@@ -1,4 +1,3 @@
-
 import Progress from "../utils/progress";
 import Sprite from "../sprite";
 

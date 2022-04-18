@@ -1,4 +1,3 @@
-
 import Controller from "../../../ui/controller/controller";
 import {HubPage} from "../hub-page";
 import AuthorizedWelcomeView from "./authorized-welcome-view";

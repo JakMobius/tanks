@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
 import AbstractPlayer from "../../../abstract-player";

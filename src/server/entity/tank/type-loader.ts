@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import Types from "./types/*"
 import ServerTank from "./server-tank";

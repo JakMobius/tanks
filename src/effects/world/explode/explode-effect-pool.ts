@@ -1,7 +1,5 @@
-
 import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
-import AbstractWorld from "../../../abstract-world";
 import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
 import PhysicalComponent from "../../../entity/physics-component";

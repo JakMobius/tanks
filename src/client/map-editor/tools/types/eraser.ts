@@ -1,4 +1,3 @@
-
 import Pencil from './pencil';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
 import ToolManager from "../toolmanager";

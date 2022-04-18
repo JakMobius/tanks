@@ -1,4 +1,3 @@
-
 import Particle, {ParticleConfig} from './particle';
 
 export default class Smoke extends Particle {

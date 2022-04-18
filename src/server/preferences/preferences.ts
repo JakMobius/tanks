@@ -1,7 +1,6 @@
-
 import JSON5 from 'json5';
 import path from 'path';
-import { promises as fs } from 'fs';
+import {promises as fs} from 'fs';
 
 const preferencesPath = path.resolve(__dirname, "server-preferences.json")
 const defaultsPath = path.resolve(__dirname, "resources/default-preferences.json")

@@ -1,9 +1,8 @@
-
 import * as Box2D from "../../../library/box2d"
+import {RGBA, XY} from "../../../library/box2d"
 import DrawPhase from "./draw-phase";
 import Matrix3 from "../../../utils/matrix3";
 import {b2Transform} from "../../../library/box2d/common/b2_math";
-import {RGBA, XY} from "../../../library/box2d";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import LineDrawer from "./line-drawer";
 

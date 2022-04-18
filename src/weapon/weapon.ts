@@ -1,9 +1,5 @@
-import * as Box2D from '../library/box2d';
-import Bullet42mmModel from '../entity/bullets/models/42mm-bullet-model';
-import ServerBullet, {ServerBulletConfig} from '../server/entity/bullet/server-bullet';
 import Axle from "../controls/axle";
 import ServerTank from "../server/entity/tank/server-tank";
-import BulletModel from "../entity/bullets/bullet-model";
 import HealthComponent from "../entity/health-component";
 
 export interface WeaponConfig {

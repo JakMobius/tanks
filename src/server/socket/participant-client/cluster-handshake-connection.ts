@@ -1,4 +1,3 @@
-
 import PipedConnection from "../../../networking/piped-connection";
 import BinaryPacket from "../../../networking/binary-packet";
 import HandshakePacket from "../../../networking/packets/cluster-packets/handshake-packet";

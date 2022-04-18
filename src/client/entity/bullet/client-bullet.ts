@@ -1,7 +1,5 @@
-
 import ClientEntity from '../client-entity';
 import BulletModel from 'src/entity/bullets/bullet-model';
-import BinaryDecoder from "../../../legacy/serialization-v0001/binary/binary-decoder";
 import * as Box2D from "src/library/box2d"
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 

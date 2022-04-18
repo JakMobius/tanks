@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import TankModel from '../../../entity/tanks/tank-model';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

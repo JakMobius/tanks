@@ -1,4 +1,3 @@
-
 import {SceneConfig} from 'src/client/scenes/scene';
 import PlayerControlsPacket from 'src/networking/packets/game-packets/player-controls-packet';
 import PlayerConfigPacket from 'src/networking/packets/game-packets/player-config-packet';

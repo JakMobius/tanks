@@ -1,4 +1,3 @@
-
 import SocketPortal from '../socket-portal';
 import ClusterHandshake from '../cluster-handshake';
 import HandshakePacket from 'src/networking/packets/cluster-packets/handshake-packet';

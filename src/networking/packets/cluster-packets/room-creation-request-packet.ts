@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import RoomConfig from 'src/server/room/room-config';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

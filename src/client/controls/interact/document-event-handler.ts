@@ -1,4 +1,3 @@
-
 import EventEmitter from '../../../utils/event-emitter';
 
 export default class DocumentEventHandler extends EventEmitter {

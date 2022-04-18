@@ -1,4 +1,3 @@
-
 import PlayerControlsPacket from "../networking/packets/game-packets/player-controls-packet";
 import PlayerConfigPacket from "../networking/packets/game-packets/player-config-packet";
 import PlayerChatPacket from "../networking/packets/game-packets/player-chat-packet";

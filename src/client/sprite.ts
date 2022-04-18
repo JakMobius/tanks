@@ -1,4 +1,3 @@
-
 import Progress from './utils/progress';
 import Downloader from './utils/downloader';
 import Uniform from "./graphics/uniform";

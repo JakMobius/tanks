@@ -1,4 +1,3 @@
-
 import Command from '../../command';
 import Game from "../../../room/game";
 import {ConsoleAutocompleteOptions} from "../../../console/console";

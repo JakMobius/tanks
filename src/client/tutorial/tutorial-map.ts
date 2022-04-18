@@ -1,4 +1,3 @@
-
 import {base64ToBytes} from "../../utils/base64";
 import GameMap from "../../map/game-map";
 import ReadBuffer from "../../serialization/binary/read-buffer";

@@ -1,6 +1,4 @@
-
 import {Db, MongoClient} from 'mongodb';
-import {PreferencesSection} from '../../preferences/preferences';
 import ServerDatabase from "../server-database";
 import {UserDataRaw} from "../../../client/user-data-raw";
 import MongoStore from "connect-mongo";

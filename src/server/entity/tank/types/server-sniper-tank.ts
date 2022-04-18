@@ -1,4 +1,3 @@
-
 import SniperTankModel from "src/entity/tanks/models/sniper-tank-model";
 import ServerTank, {ServerTankConfig} from "../server-tank";
 import Weapon42mm from "src/weapon/models/42mm";

@@ -1,7 +1,6 @@
 import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import MongoDatabase from "../../../db/mongo/mongo-database";
 import {nickIsValid} from "../../../../utils/nick-checker";
 import {passwordIsValid} from "../../../../utils/password-checker";
 import {WebserverSession} from "../../webserver-session";

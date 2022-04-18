@@ -1,4 +1,3 @@
-
 import ClientTankEffect from '../client-tank-effect';
 import Pellet from 'src/client/particles/pellet-particle'
 import Color from 'src/utils/color';

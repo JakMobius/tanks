@@ -8,16 +8,10 @@ import Command from "../commands/command";
 import Server from "../server";
 import StdCatchLogger from "../log/std-catch-logger";
 import ConsoleWindow from "./console-window";
-import Parser, {
-	CommandASTNode,
-	CommandParameterASTNode,
-	CommentASTNode,
-	GlobalASTNode
-} from "./language/parser";
+import Parser, {CommandASTNode, CommandParameterASTNode, CommentASTNode, GlobalASTNode} from "./language/parser";
 
 import Serializer from "./language/serializer";
-import Lexer, {Lexeme, StringLexeme} from "./language/lexer";
-import {raw} from "express";
+import Lexer, {StringLexeme} from "./language/lexer";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required

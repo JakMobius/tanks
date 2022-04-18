@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import Models from "./models/*"
 import EffectModel from "../effect-model";

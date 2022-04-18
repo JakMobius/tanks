@@ -1,4 +1,3 @@
-
 import Command from '../command';
 
 class UnbanCommand extends Command {

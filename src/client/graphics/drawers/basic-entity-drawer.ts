@@ -1,4 +1,3 @@
-
 import EntityDrawer from './entity-drawer';
 import Sprite from '../../sprite';
 import ClientEntity from "../../entity/client-entity";

@@ -1,4 +1,3 @@
-
 import ReloadableWeapon, {ReloadableWeaponConfig} from "./reloadable-weapon";
 import BulletModel from "../entity/bullets/bullet-model";
 import * as Box2D from '../library/box2d'

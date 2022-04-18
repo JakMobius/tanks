@@ -1,7 +1,5 @@
-
 import WebserverModule from '../webserver-module';
 import * as path from 'path';
-import * as express from 'express';
 import {redirectToSlash} from "../redirest-to-slash";
 
 class GameModule extends WebserverModule {

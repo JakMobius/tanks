@@ -1,4 +1,3 @@
-
 import BulletModel42mm from '../../entity/bullets/models/42mm-bullet-model';
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"

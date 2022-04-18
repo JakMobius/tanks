@@ -1,4 +1,3 @@
-
 import * as Box2D from './library/box2d'
 import {b2Fixture} from "./library/box2d/dynamics/b2_fixture";
 import EntityModel from "./entity/entity-model";

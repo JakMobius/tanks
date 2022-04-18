@@ -1,7 +1,5 @@
-
 import {Constructor} from "../../serialization/binary/serializable";
-import {BufferConfig, ByteArray} from "../../serialization/binary/typed-buffer";
-import Buffer from "../../serialization/binary/typed-buffer"
+import Buffer, {BufferConfig, ByteArray} from "../../serialization/binary/typed-buffer";
 
 export interface GLBufferConfig<T> extends BufferConfig<T> {
     // Device-side element type

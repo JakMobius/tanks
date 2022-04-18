@@ -1,8 +1,6 @@
-
 import "../animation-frame-polyfill"
 import SoundEngine from "../sound/sound-engine";
 import CanvasFactory from '../utils/canvas-factory'
-import Sprite from "../sprite";
 
 export interface ScreenConfig {
     scale?: number

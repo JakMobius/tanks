@@ -1,4 +1,3 @@
-
 import ScheduledTask from './scheduled-task';
 
 export interface LoopConfig {

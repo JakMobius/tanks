@@ -1,4 +1,3 @@
-
 import Matrix3 from "./matrix3";
 
 export interface Quadrangle {

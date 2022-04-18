@@ -1,4 +1,3 @@
-
 import {PauseMenuView} from "../pause-menu-view";
 import GraphicsController from "./graphics-controller";
 import ControlsController from "./controls-controller";

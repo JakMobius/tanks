@@ -1,4 +1,3 @@
-
 import Tool from '../tool';
 import Particle from '../../../particles/particle';
 import Color from '../../../../utils/color';

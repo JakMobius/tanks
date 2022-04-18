@@ -1,4 +1,3 @@
-
 import {base64ToBytes, bytesToBase64} from '../../utils/base64';
 import pako from 'pako';
 import EditorMap from './editor-map';

@@ -1,10 +1,8 @@
-
 import Sprite from '../../../sprite';
 import GameMap from 'src/map/game-map';
 import BlockState from "../../../../map/block-state/block-state";
 import TextureProgram from "../../programs/texture-program";
 import {squareQuadrangle} from "../../../../utils/quadrangle";
-import MapDrawer from "../map-drawer";
 import WorldDrawer from "../world-drawer";
 
 export default class BlockDrawer {

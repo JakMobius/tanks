@@ -1,15 +1,10 @@
-
 import GameMap from 'src/map/game-map';
-import WorldExplodeEffectModelPool from 'src/effects/world/explode/explode-effect-pool';
-import AbstractEffect from 'src/effects/abstract-effect';
 import AbstractEntity from 'src/entity/abstract-entity';
 import AbstractPlayer from 'src/abstract-player';
-import ExplodeEffectPool from "src/effects/world/explode/explode-effect-pool";
 import AdapterLoop from "./utils/loop/adapter-loop";
 import ChunkedMapCollider from "./physics/chunked-map-collider";
 import GameWorldContactListener from "./contact-listener";
 import GameWorldContactFilter from "./contact-filter";
-import PhysicalComponent from "./entity/physics-component";
 import Entity from "./utils/ecs/entity";
 import PhysicalHostComponent from "./physiсal-world-component";
 import TilemapComponent from "./physics/tilemap-component";

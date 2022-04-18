@@ -1,4 +1,3 @@
-
 import AbstractWorld, {GameWorldConfig} from '../abstract-world';
 import Game from "./room/game";
 import ServerEntity from "./entity/server-entity";

@@ -1,4 +1,3 @@
-
 import ServerBullet, {ServerBulletConfig} from '../server-bullet';
 import BulletModelMine from '../../../../entity/bullets/models/mine-bullet-model';
 

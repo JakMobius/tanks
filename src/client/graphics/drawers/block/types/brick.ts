@@ -1,4 +1,3 @@
-
 import EdgedBlockDrawer from '../edged-block-drawer';
 
 class BrickBlockDrawer extends EdgedBlockDrawer {

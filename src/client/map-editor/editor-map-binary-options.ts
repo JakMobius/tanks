@@ -1,4 +1,3 @@
-
 import MapBinaryOptions from '../../map/map-binary-options';
 import FlagHandler from "../../serialization/binary/parsers/flag-handler";
 

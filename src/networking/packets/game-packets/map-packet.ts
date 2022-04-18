@@ -1,4 +1,3 @@
-
 import BinaryPacket from '../../binary-packet';
 import GameMap from '../../../map/game-map';
 import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";

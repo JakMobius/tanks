@@ -1,4 +1,3 @@
-
 import ChunkedMapCollider, {PhysicsPoint} from "./chunked-map-collider";
 import * as Box2D from "../library/box2d"
 import {PhysicsBlock} from "./physics-block";
@@ -10,7 +9,6 @@ import {b2BodyType} from "../library/box2d/dynamics/b2_body";
 import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "../physiсal-world-component";
-import TilemapComponent from "./tilemap-component";
 
 export default class PhysicsChunk {
     public readonly manager: ChunkedMapCollider;

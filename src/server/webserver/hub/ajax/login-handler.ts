@@ -1,7 +1,6 @@
 import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import MongoDatabase from "../../../db/mongo/mongo-database";
 import {WebserverSession} from "../../webserver-session";
 
 interface LoginAjaxFields extends AjaxFields {

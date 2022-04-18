@@ -1,4 +1,3 @@
-
 import CommandFlag from "./command-flag";
 import Console, {ConsoleAutocompleteOptions} from '../console/console'
 import Logger from "../log/logger";

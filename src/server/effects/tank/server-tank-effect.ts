@@ -1,8 +1,6 @@
-
 import ServerEffect from '../server-effect';
 import TankEffectModel from 'src/effects/tank/tank-effect-model';
 import ServerTank from "../../entity/tank/server-tank";
-import EffectModel from "../../../effects/effect-model";
 
 /**
  * This class unites all the tank effect implementations on the server

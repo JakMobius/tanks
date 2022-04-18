@@ -1,4 +1,3 @@
-
 import Tool from '../tool';
 import GameMap from '../../../../map/game-map';
 import ToolManager from '../toolmanager';

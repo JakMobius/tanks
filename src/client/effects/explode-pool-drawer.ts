@@ -2,7 +2,6 @@ import Camera from "../camera";
 import ExplodeEffectPool from "../../effects/world/explode/explode-effect-pool";
 import Screen from "../graphics/screen";
 import ExplodeParticle from "../particles/explode-particle";
-import ClientGameWorld from "../client-game-world";
 import PostProcessingProgram from "../graphics/programs/post-processing-program";
 import ParticleHost from "../particle-host";
 

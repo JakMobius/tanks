@@ -1,4 +1,3 @@
-
 import Axle from '../../controls/axle';
 
 export default class ButtonAxle extends Axle {

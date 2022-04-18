@@ -1,4 +1,3 @@
-
 import TextureProgram from '../../graphics/programs/texture-program';
 import Camera from "../../camera";
 import Screen from '../screen'

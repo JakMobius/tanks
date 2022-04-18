@@ -1,6 +1,4 @@
-
 import GameMap from 'src/map/game-map';
-import AbstractWorld from "../abstract-world";
 import ExplodeEffectPool from "../effects/world/explode/explode-effect-pool";
 import TilemapComponent from "../physics/tilemap-component";
 

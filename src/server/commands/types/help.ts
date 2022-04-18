@@ -1,4 +1,3 @@
-
 import Command from '../command';
 import ConsoleTableDrawer from "../../console/console-table-drawer";
 

@@ -1,5 +1,3 @@
-import {b2IFilter} from "../library/box2d/dynamics/b2_fixture";
-
 export const physicsCategories = {
     mine:   0b00001,
     wall:   0b00010,

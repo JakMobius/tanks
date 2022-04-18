@@ -1,6 +1,6 @@
 import {URL} from "url";
 import {PreferencesSection} from "./preferences/preferences";
-import {ServerConfig, ServerClusterConfig, WebServerConfig} from "./server";
+import {ServerClusterConfig, ServerConfig, WebServerConfig} from "./server";
 import ServerDatabase from "./db/server-database";
 import MongoDatabase from "./db/mongo/mongo-database";
 import FileDatabase from "./db/file/file-database";

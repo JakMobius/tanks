@@ -1,4 +1,3 @@
-
 import ButtonAxle from './button-axle';
 import GamepadManager from "./interact/gamepad-manager";
 

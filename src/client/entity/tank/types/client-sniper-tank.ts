@@ -1,15 +1,10 @@
-
 import ClientTank, {TankConfig} from '../client-tank';
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import LightMaskTextureProgram from "../../../graphics/programs/light-mask-texture/light-mask-texture-program";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
-import {
-    squareQuadrangle,
-    transformQuadrangle,
-    copyQuadrangle
-} from "../../../../utils/quadrangle";
+import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
 import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";

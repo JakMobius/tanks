@@ -1,4 +1,3 @@
-
 import MapModification from './map-modification';
 import EditorMap from "../../editor-map";
 import BlockState from "../../../../map/block-state/block-state";

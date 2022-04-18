@@ -1,4 +1,3 @@
-
 import TankModel from "../../tank-model";
 import WheeledTankBehaviour, {WheeledTankBehaviourConfig} from "../wheeled-tank/wheeled-tank-behaviour";
 import {clamp} from "../../../../utils/utils";

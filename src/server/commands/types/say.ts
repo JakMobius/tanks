@@ -1,4 +1,3 @@
-
 import Command from '../command';
 import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
 
