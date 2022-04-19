@@ -25,13 +25,6 @@ export default abstract class AbstractEntity {
         this.model.tick(dt)
     }
 
-    abstract encodeInitialData(encoder: WriteBuffer): void
-    abstract decodeInitialData(decoder: ReadBuffer): void
-
-    abstract encodeDynamicData(encoder: WriteBuffer): void
-    abstract decodeDynamicData(decoder: ReadBuffer): void
-    abstract damage(damage: number): void
-
     shouldHitEntity(entity: AbstractEntity) { return true }
 
     /**

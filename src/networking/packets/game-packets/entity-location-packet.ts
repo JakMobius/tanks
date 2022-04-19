@@ -2,6 +2,8 @@ import BinaryPacket from '../../binary-packet';
 import {BinarySerializer} from "../../../serialization/binary/serializable";
 import AbstractWorld from "../../../abstract-world";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
+import EntityDataDecoder from "../../../client/entity/entity-data-decoder";
+import EntityDataEncoder from "../../../server/entity/entity-data-encoder";
 
 export default class EntityLocationPacket extends BinaryPacket {
     public world: AbstractWorld
@@ -25,7 +27,7 @@ export default class EntityLocationPacket extends BinaryPacket {
 
         for (let [key, entity] of this.world.entities) {
             encoder.writeUint32(key)
-            entity.encodeDynamicData(encoder)
+            entity.model.getComponent(EntityDataEncoder).encodeDynamicData(encoder)
         }
     }
 
@@ -45,7 +47,7 @@ export default class EntityLocationPacket extends BinaryPacket {
             let key = this.decoder.readUint32()
 
             let entity = world.entities.get(key)
-            entity.decodeDynamicData(this.decoder)
+            entity.model.getComponent(EntityDataDecoder).decodeDynamicData(this.decoder)
         }
 
         this.decoder.offset = position

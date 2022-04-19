@@ -5,7 +5,7 @@ import ClientTank from "./entity/tank/client-tank";
 import WorldExplodeEffectModelPool from "../effects/world/explode/explode-effect-pool";
 import ParticleHost from "./particle-host";
 
-export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer, ClientTank> {
+export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer> {
 
     public player: ClientPlayer = null
 

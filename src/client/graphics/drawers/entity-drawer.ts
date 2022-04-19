@@ -50,7 +50,7 @@ export default class EntityDrawer implements Component {
         this.setDrawer(host)
     }
 
-    private setDrawer(drawer: WorldDrawer) {
+    setDrawer(drawer: WorldDrawer) {
         if(drawer == this.drawer) return
         if(this.drawer) {
             this.drawer.removeDrawer(this)

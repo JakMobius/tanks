@@ -9,7 +9,7 @@ export interface ServerGameWorldConfig extends GameWorldConfig {
     room: Game
 }
 
-export default class ServerGameWorld extends AbstractWorld<ServerEntity, ServerPlayer, ServerTank> {
+export default class ServerGameWorld extends AbstractWorld<ServerEntity, ServerPlayer> {
 
     public room: Game
 

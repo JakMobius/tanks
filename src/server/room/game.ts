@@ -206,7 +206,6 @@ export default class Game extends Room {
 
         const velocity = body.GetLinearVelocity()
         velocity.Set(0, 0)
-        tank.teleported = true
         body.SetLinearVelocity(velocity)
     }
 }

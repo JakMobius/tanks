@@ -3,6 +3,8 @@ import EntityModel from '../../../entity/entity-model';
 import {BinarySerializer} from '../../../serialization/binary/serializable';
 import AbstractEntity from "../../../entity/abstract-entity";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
+import EntityDataDecoder from "../../../client/entity/entity-data-decoder";
+import EntityDataEncoder from "../../../server/entity/entity-data-encoder";
 
 export default class EntityCreatePacket extends BinaryPacket {
 	public entities: AbstractEntity[];
@@ -24,7 +26,7 @@ export default class EntityCreatePacket extends BinaryPacket {
 
         for(let entity of this.entities) {
             BinarySerializer.serialize(entity.model, encoder)
-            entity.encodeInitialData(encoder)
+            entity.model.getComponent(EntityDataEncoder).encodeInitialData(encoder)
         }
     }
 
@@ -35,7 +37,7 @@ export default class EntityCreatePacket extends BinaryPacket {
         for(let i = 0; i < count; i++) {
             let model = BinarySerializer.deserialize(decoder, EntityModel)
             let entity = factory(model)
-            entity.decodeInitialData(decoder)
+            entity.model.getComponent(EntityDataDecoder).decodeInitialData(decoder)
         }
     }
 }

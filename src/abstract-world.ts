@@ -20,8 +20,7 @@ export interface GameWorldConfig {
 
 export default class AbstractWorld<
     EntityClass extends AbstractEntity = AbstractEntity,
-    PlayerClass extends AbstractPlayer = AbstractPlayer,
-    TankClass extends AbstractEntity = AbstractEntity
+    PlayerClass extends AbstractPlayer = AbstractPlayer
 > extends Entity {
     public readonly physicsLoop: AdapterLoop;
 

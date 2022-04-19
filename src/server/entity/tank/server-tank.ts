@@ -22,12 +22,9 @@ export default class ServerTank extends ServerEntity {
 
     constructor(options: ServerTankConfig) {
         super(options.model);
-
-        this.teleported = false
     }
 
     teleport(x: number, y: number) {
-        this.teleported = true
         this.model.getComponent(PhysicalComponent).getBody().SetPositionXY(x, y)
     }
 

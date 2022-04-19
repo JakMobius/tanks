@@ -123,17 +123,13 @@ export default class WorldDrawer extends EventEmitter implements Component {
         }
     }
     private drawEntities() {
-        let entities = this.entity.entities
+        if (this.entityDrawers.size === 0) return;
 
-        if(entities.size > 0) {
-            this.entityDrawPhase.prepare()
-
-            for(let entityDrawer of this.entityDrawers.values()) {
-                entityDrawer.draw(this.entityDrawPhase)
-            }
-
-            this.entityDrawPhase.draw()
+        this.entityDrawPhase.prepare()
+        for (let entityDrawer of this.entityDrawers.values()) {
+            entityDrawer.draw(this.entityDrawPhase)
         }
+        this.entityDrawPhase.draw()
     }
 
     private setNeedsRedraw() {
@@ -156,7 +152,7 @@ export default class WorldDrawer extends EventEmitter implements Component {
     onDetach(): void {
         this.setWorld(null)
         for(let drawer of this.entityDrawers) {
-            drawer.setWorldDrawer(null)
+            drawer.setDrawer(null)
         }
         this.entityDrawers.clear()
     }

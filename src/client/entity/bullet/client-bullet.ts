@@ -14,29 +14,31 @@ export default class ClientBullet extends ClientEntity {
         super(options.model);
     }
 
-    getShooter() {
-        return this.model.parent.players.get(this.shooterId)
-    }
+    // TODO: fix it
 
-    shouldHitEntity(entity: ClientEntity): boolean {
-        return entity != this.getShooter().tank;
-    }
+    // getShooter() {
+    //     return this.model.parent.players.get(this.shooterId)
+    // }
 
-    onEntityHit(entity: ClientEntity) {
-        this.hidden = true
-    }
+    // shouldHitEntity(entity: ClientEntity): boolean {
+    //     return entity != this.getShooter().tank;
+    // }
 
-    onBlockHit(x: number, y: number, contactPoint: Box2D.Vec2) {
-        this.hidden = true
-    }
+    // onEntityHit(entity: ClientEntity) {
+    //     this.hidden = true
+    // }
+    //
+    // onBlockHit(x: number, y: number, contactPoint: Box2D.Vec2) {
+    //     this.hidden = true
+    // }
 
-    decodeInitialData(decoder: ReadBuffer) {
-        super.decodeInitialData(decoder);
-        this.shooterId = decoder.readUint32()
-    }
-
-    decodeDynamicData(decoder: ReadBuffer) {
-        super.decodeDynamicData(decoder);
-        this.hidden = false
-    }
+    // decodeInitialData(decoder: ReadBuffer) {
+    //     super.decodeInitialData(decoder);
+    //     this.shooterId = decoder.readUint32()
+    // }
+    //
+    // decodeDynamicData(decoder: ReadBuffer) {
+    //     super.decodeDynamicData(decoder);
+    //     this.hidden = false
+    // }
 }

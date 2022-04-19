@@ -94,8 +94,8 @@ export default class ServerBullet extends ServerEntity {
         }
     }
 
-    encodeInitialData(encoder: WriteBuffer) {
-        super.encodeInitialData(encoder);
-        encoder.writeUint32(this.shooter.id)
-    }
+    // encodeInitialData(encoder: WriteBuffer) {
+    //     super.encodeInitialData(encoder);
+    //     encoder.writeUint32(this.shooter.id)
+    // }
 }

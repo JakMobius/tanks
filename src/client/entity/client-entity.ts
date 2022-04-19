@@ -5,6 +5,7 @@ import HealthComponent from "../../entity/health-component";
 import WriteBuffer from "../../serialization/binary/write-buffer";
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import ServerPosition from "./server-position";
+import EntityDataDecoder from "./entity-data-decoder";
 
 export default class ClientEntity extends AbstractEntity {
 
@@ -16,25 +17,7 @@ export default class ClientEntity extends AbstractEntity {
         super(model);
 
         model.addComponent(new ServerPosition())
-    }
-
-    decodeDynamicData(decoder: ReadBuffer) {
-        this.model.getComponent(ServerPosition).decodeMovement(decoder)
-    }
-
-    decodeInitialData(decoder: ReadBuffer) {
-        this.model.getComponent(ServerPosition).decodePosition(decoder)
-
-        const healthComponent = this.model.getComponent(HealthComponent)
-        healthComponent.setHealth(decoder.readFloat32())
-    }
-
-    encodeInitialData(encoder: WriteBuffer) {
-        throw new Error("Method not implemented")
-    }
-
-    encodeDynamicData(encoder: WriteBuffer): void {
-        throw new Error("Method not implemented")
+        model.addComponent(new EntityDataDecoder())
     }
 
     /**
@@ -56,9 +39,5 @@ export default class ClientEntity extends AbstractEntity {
             })
         }
         return null
-    }
-
-    damage(damage: number): void {
-        // Client entity should not handle this
     }
 }
