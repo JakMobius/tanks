@@ -1,5 +1,4 @@
 import ConnectionClient from "../../networking/connection-client";
-import MapPacket from "../../networking/packets/game-packets/map-packet";
 import PlayerJoinPacket from "../../networking/packets/game-packets/player-join-packet";
 import PlayerSpawnPacket from "../../networking/packets/game-packets/player-spawn-packet";
 import EntityCreatePacket from "../../networking/packets/game-packets/entity-create-packet";
@@ -10,13 +9,9 @@ import ClientGameWorld from "../client-game-world";
 import ClientPlayer from "../client-player";
 import ClientTank from "../entity/tank/client-tank";
 import WorldPlayerControlsPacket from "../../networking/packets/game-packets/world-player-controls-packet";
-import TilemapComponent from "../../physics/tilemap-component";
 
 export default class ClientWorldBridge {
     static buildBridge(client: ConnectionClient, world: ClientGameWorld) {
-        client.on(MapPacket, (packet) => {
-            world.getComponent(TilemapComponent).setMap(packet.map)
-        })
 
         client.on(PlayerJoinPacket, (packet) => {
             this.createPlayer(world, packet.nick, packet.id, packet.tankId)

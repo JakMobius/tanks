@@ -1,5 +1,4 @@
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
-import ServerWorldEffect from 'src/server/effects/world/server-world-effect';
 import ServerEntity from '../server-entity';
 import BulletModel from "../../../entity/bullets/bullet-model";
 import ServerPlayer from "../../server-player";
@@ -8,8 +7,8 @@ import ServerTank from "../tank/server-tank";
 import PhysicalComponent from "../../../entity/components/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
 import EffectHost from "../../../effects/effect-host";
-import WriteBuffer from "../../../serialization/binary/write-buffer";
 import HealthComponent from "../../../entity/components/health-component";
+import ServerEffect from "../../effects/server-effect";
 
 export interface ServerBulletConfig {
     model: BulletModel
@@ -52,9 +51,9 @@ export default class ServerBullet extends ServerEntity {
                 y: position.y,
                 power: this.explodePower
             })
-            const world = this.shooter.getWorld()
+            const world = this.shooter.tank.model.parent
 
-            world.getComponent(EffectHost).addEffect(ServerWorldEffect.fromModelAndWorld(effect, world))
+            world.getComponent(EffectHost).addEffect(ServerEffect.fromModel(effect))
         }
     }
 

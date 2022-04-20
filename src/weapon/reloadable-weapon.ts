@@ -100,8 +100,7 @@ export default class ReloadableWeapon extends Weapon {
 
         const sin = Math.sin(rotation)
         const cos = Math.cos(rotation)
-
-        const world = tank.player.getWorld()
+        const world = tank.model.parent
 
         const entity = ServerBullet.fromModel(bullet) as ServerBullet
 

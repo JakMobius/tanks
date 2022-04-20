@@ -4,8 +4,7 @@ import AbstractEntity from "./entity/abstract-entity";
 import TankModel from "./entity/tanks/tank-model";
 
 export interface PlayerConfig<
-        TankClass extends AbstractEntity = AbstractEntity,
-        WorldClass extends AbstractWorld = any
+        TankClass extends AbstractEntity = AbstractEntity
     > {
     nick?: string
     id?: number
@@ -18,23 +17,16 @@ export type AbstractTank = AbstractEntity & {
 }
 
 export default class AbstractPlayer<
-        TankClass extends AbstractTank = AbstractTank,
-        WorldClass extends AbstractWorld = any
+        TankClass extends AbstractTank = AbstractTank
     > {
 
-    protected world: WorldClass
     public tank: TankClass
-
-    /* Ugly stuff to get around "circular default generic" problem */
-
-    public getWorld(): WorldClass & AbstractWorld { return this.world }
-    public setWorld(world: WorldClass & AbstractWorld) { this.world = world }
 
     public nick: string;
     public id: number;
     public team: Team;
 
-    constructor(config?: PlayerConfig<TankClass, WorldClass>) {
+    constructor(config?: PlayerConfig<TankClass>) {
         config = config || {}
         this.nick = config.nick
         this.id = config.id

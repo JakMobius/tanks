@@ -1,8 +1,8 @@
 import PhysicalComponent from "../../physics-component";
 import {Commands} from "../commands";
-import {TransmitterComponent} from "../transmitter-component";
+import {Transmitter} from "../transmitter";
 
-export default class PositionTransmitterComponent extends TransmitterComponent {
+export default class PositionTransmitterComponent extends Transmitter {
     private waitsPositionSync = false
 
     constructor() {
@@ -12,10 +12,10 @@ export default class PositionTransmitterComponent extends TransmitterComponent {
             if(this.waitsPositionSync) return
             this.waitsPositionSync = true
 
-            this.onPack((context) => {
+            this.performOnPack((context) => {
                 this.waitsPositionSync = false
                 context.pack(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-                    let body = this.entity.getComponent(PhysicalComponent).getBody()
+                    let body = this.getEntity().getComponent(PhysicalComponent).getBody()
                     let position = body.GetPosition()
                     buffer.writeFloat32(position.x)
                     buffer.writeFloat32(position.y)

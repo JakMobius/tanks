@@ -1,15 +1,15 @@
 
 import AbstractEffect from "../../../../effects/abstract-effect";
-import {TransmitterComponent} from "../transmitter-component";
+import {Transmitter} from "../transmitter";
 import {BinarySerializer} from "../../../../serialization/binary/serializable";
 import {Commands} from "../commands";
 
-export default class EffectTransmitterComponent extends TransmitterComponent {
+export default class EffectTransmitter extends Transmitter {
     constructor() {
         super()
 
         this.eventHandler.on("effect-create", (effect: AbstractEffect) => {
-            this.onPack((context) => {
+            this.performOnPack((context) => {
                 context.pack(Commands.EFFECT_CREATE_COMMAND, (buffer) => {
                     BinarySerializer.serialize(effect.model, buffer)
                 })

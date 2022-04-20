@@ -21,8 +21,4 @@ export default class EntityDataDecoder implements Component {
         const healthComponent = this.entity.getComponent(HealthComponent)
         healthComponent.setHealth(decoder.readFloat32())
     }
-
-    decodeDynamicData(decoder: ReadBuffer) {
-        this.entity.getComponent(ServerPosition).decodeMovement(decoder)
-    }
 }

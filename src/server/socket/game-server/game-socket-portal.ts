@@ -18,10 +18,12 @@ import ReadBuffer from "../../../serialization/binary/read-buffer";
 import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
 import BinaryBlockCoder from "../../../serialization/binary/parsers/binary-block-coder";
+import PlayerVisibilityManager from "../../player-visibility-manager";
 
 export interface GameSocketPortalClientData {
-    listeningForRooms: boolean;
+    listeningForRooms: boolean
     player: ServerPlayer | null
+    visibilityManager: PlayerVisibilityManager
 }
 
 export type GameSocketPortalClient = SocketPortalClient<GameSocketPortalClientData>
@@ -185,13 +187,21 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         }
     }
 
-    createClient(connection: WebsocketConnection): SocketPortalClient<GameSocketPortalClientData> {
-        return new SocketPortalClient<GameSocketPortalClientData>({
+    createClient(connection: WebsocketConnection): GameSocketPortalClient {
+
+        let visibilityManager = new PlayerVisibilityManager()
+
+        let client = new SocketPortalClient<GameSocketPortalClientData>({
             connection: connection,
             data: {
                 player: null,
-                listeningForRooms: false
+                listeningForRooms: false,
+                visibilityManager: visibilityManager
             }
         })
+
+        visibilityManager.client = client
+
+        return client
     }
 }

@@ -11,8 +11,7 @@ import GameMap from "../../map/game-map";
 import 'src/entity/tanks/model-loader'
 import 'src/server/entity/bullet/type-loader';
 import 'src/server/entity/tank/type-loader'
-import 'src/server/effects/tank/type-loader';
-import 'src/server/effects/world/type-loader';
+import 'src/server/effects/type-loader';
 import 'src/map/block-state/type-loader';
 
 import HTMLEscape from "../../utils/html-escape";
@@ -26,6 +25,13 @@ import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import HealthComponent from "../../entity/components/health-component";
+import EntityDataTransmitComponent, {
+    TransmitContext
+} from "../../entity/components/network/entity-data-transmit-component";
+import WriteBuffer from "../../serialization/binary/write-buffer";
+import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
+import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
+import PlayerVisibilityManager from "../player-visibility-manager";
 
 interface GameConfig {
     name: string
@@ -60,7 +66,7 @@ export default class Game extends Room {
 
         ServerWorldBridge.buildBridge(this.world, this.portal)
 
-        this.portal.on("client-connect",    () =>       this.onClientConnect())
+        this.portal.on("client-connect",    (client) => this.onClientConnect(client))
         this.portal.on("client-disconnect", (client) => this.onClientDisconnect(client))
 
         this.world.on("player-create",      (player) => this.onPlayerJoin(player))
@@ -69,6 +75,25 @@ export default class Game extends Room {
         this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
         this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
         this.world.on("player-config",      (player, tank, nick) => this.onClientConfig(player, tank, nick))
+
+        this.world.on("tick", () => {
+            let transmitterComponent = this.world.getComponent(EntityDataTransmitComponent)
+
+            for(let [end, set] of transmitterComponent.transmitters) {
+                if (!set.hasData) continue;
+
+                let buffer = new WriteBuffer()
+                let context = new TransmitContext()
+                context.buffer = buffer
+                context.end = end
+                transmitterComponent.packBuffer(context)
+
+                let client = (end as any as PlayerVisibilityManager).client
+                if(client) {
+                    new WorldCommunicationPacket(buffer.spitBuffer()).sendTo(client.connection)
+                }
+            }
+        })
 
         if(options.loop) {
             this.loop = options.loop
@@ -92,15 +117,18 @@ export default class Game extends Room {
         }
     }
 
-    private onClientConnect() {
+    private onClientConnect(client: GameSocketPortalClient) {
         if (!this.timer) {
             this.log("Player connected, resuming the screen...")
             this.loop.start()
         }
+
+        client.data.visibilityManager.setWorld(this.world)
     }
 
-    private onClientDisconnect(client: SocketPortalClient) {
+    private onClientDisconnect(client: GameSocketPortalClient) {
         this.log("Disconnected " + client.id)
+        client.data.visibilityManager.setWorld(null)
 
         if (this.portal.clients.size === 0) {
             this.log("No players, pausing the screen...")
@@ -163,7 +191,7 @@ export default class Game extends Room {
         this.portal.broadcast(new PlayerChatPacket(text))
     }
 
-    private onClientConfig(client: SocketPortalClient, model: typeof TankModel, nick: string) {
+    private onClientConfig(client: GameSocketPortalClient, model: typeof TankModel, nick: string) {
         let player: ServerPlayer = client.data.player
 
         if(!player) {
@@ -184,6 +212,7 @@ export default class Game extends Room {
         const oldTank = player.tank
 
         this.world.createEntity(tank)
+        client.data.visibilityManager.setTank(tank)
         player.setTank(tank)
 
         this.world.createPlayer(player)

@@ -1,8 +1,8 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
-import ServerTankEffect from 'src/server/effects/tank/server-tank-effect';
 import PhysicalComponent from "../../entity/components/physics-component";
 import EffectHost from "../../effects/effect-host";
+import ServerEffect from "../../server/effects/server-effect";
 
 export interface FlamethrowerConfig extends WeaponConfig {
 	damage?: number
@@ -16,7 +16,7 @@ export default class FlamethrowerWeapon extends Weapon {
 	public angle: number;
 	public squareRadius: number;
 	public fireEffect: TankFireEffectModel;
-	public serverEffect: ServerTankEffect;
+	public serverEffect: ServerEffect;
 
 	constructor(config: FlamethrowerConfig) {
 		config = Object.assign({
@@ -32,7 +32,7 @@ export default class FlamethrowerWeapon extends Weapon {
 		this.squareRadius = this.radius ** 2
 
 		this.fireEffect = new TankFireEffectModel()
-		this.serverEffect = ServerTankEffect.fromModelAndTank(this.fireEffect, this.tank)
+		this.serverEffect = ServerEffect.fromModel(this.fireEffect)
 	}
 
 	tick(dt: number) {
@@ -47,14 +47,11 @@ export default class FlamethrowerWeapon extends Weapon {
 
 		const pAngle = (tankAngle + Math.PI) % (Math.PI * 2) - Math.PI;
 
-		const world = tank.player.getWorld()
+		const world = tank.model.parent
 
-		for (let player of world.players.values()) {
+		for (let entity of world.children.values()) {
 
-			if(!player || player.tank === tank) continue
-
-			const anotherTank = player.tank;
-			const anotherTankLocation = anotherTank.model.getComponent(PhysicalComponent).getBody().GetPosition()
+			const anotherTankLocation = entity.getComponent(PhysicalComponent).getBody().GetPosition()
 
 			const x = anotherTankLocation.x - tankLocation.x;
 			const y = anotherTankLocation.y - tankLocation.y;

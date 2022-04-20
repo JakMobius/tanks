@@ -106,7 +106,6 @@ export default class AbstractWorld<
     }
 
     createPlayer(player: PlayerClass) {
-        player.setWorld(this)
         if(!this.players.has(player.id)) {
             this.players.set(player.id, player)
             this.emit("player-create", player)

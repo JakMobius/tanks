@@ -7,6 +7,7 @@ import ServerPosition from "../../../../client/entity/server-position";
 import HealthComponent from "../../health-component";
 import BlockState from "../../../../map/block-state/block-state";
 import TilemapComponent from "../../../../physics/tilemap-component";
+import GameMap from "../../../../map/game-map";
 
 export default class MapReceiverComponent extends ReceiverComponent {
 
@@ -21,6 +22,12 @@ export default class MapReceiverComponent extends ReceiverComponent {
 
             const map = this.entity.getComponent(TilemapComponent).map
             map.setBlock(x, y, block)
+        })
+
+        receiveComponent.commandHandlers.set(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
+            let map = GameMap.fromBinary(buffer)
+            map.update()
+            this.entity.getComponent(TilemapComponent).setMap(map)
         })
     }
 }

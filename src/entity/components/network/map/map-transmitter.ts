@@ -1,10 +1,10 @@
-import {TransmitterComponent} from "../transmitter-component";
-import HealthComponent from "../../health-component";
+import {Transmitter} from "../transmitter";
 import {Commands} from "../commands";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import BlockState from "../../../../map/block-state/block-state";
+import {TransmitterSet} from "../entity-data-transmit-component";
 
-export default class MapTransmitterComponent extends TransmitterComponent {
+export default class MapTransmitter extends Transmitter {
     constructor() {
         super()
 
@@ -12,10 +12,22 @@ export default class MapTransmitterComponent extends TransmitterComponent {
         this.eventHandler.on("map-block-change", (x, y) => this.queueBlockUpdate(x, y))
     }
 
-    queueBlockUpdate(x: number, y: number) {
-        const map = this.entity.getComponent(TilemapComponent).map
+    attachToSet(set: TransmitterSet) {
+        super.attachToSet(set);
 
-        this.onPack((context) => {
+        this.performOnPack((context) => {
+            const map = this.getEntity().getComponent(TilemapComponent).map
+
+            context.pack(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
+                map.toBinary(buffer)
+            })
+        })
+    }
+
+    queueBlockUpdate(x: number, y: number) {
+        this.performOnPack((context) => {
+            const map = this.getEntity().getComponent(TilemapComponent).map
+
             context.pack(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {
                 buffer.writeUint16(x)
                 buffer.writeUint16(y)

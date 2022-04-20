@@ -16,7 +16,7 @@ export default abstract class SocketPortal<ClientDataClass = any> {
 	public webSocketServer: Websocket.server;
 
     /**
-     * Clients of exactly this portal
+     * Clients of this portal
      */
     public clients = new Map<number, SocketPortalClient<ClientDataClass>>()
 

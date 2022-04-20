@@ -1,8 +1,9 @@
 import Command, {CommandConfig} from '../command';
 import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
-import ServerWorldEffect from 'src/server/effects/world/server-world-effect';
+import ServerEffect from "../../effects/server-effect";
+import EffectHost from "../../../effects/effect-host";
 
-class ExplodeCommand extends Command {
+export default class ExplodeCommand extends Command {
 	public defaultPower: number;
 
     constructor(options?: CommandConfig) {
@@ -45,8 +46,8 @@ class ExplodeCommand extends Command {
             power: power
         })
 
-        let serverEffect = ServerWorldEffect.fromModelAndWorld(effect, world)
-        world.addEffect(serverEffect)
+        let serverEffect = ServerEffect.fromModel(effect)
+        world.getComponent(EffectHost).addEffect(serverEffect)
     }
 
     getName() {
@@ -65,5 +66,3 @@ class ExplodeCommand extends Command {
         return true
     }
 }
-
-export default ExplodeCommand;

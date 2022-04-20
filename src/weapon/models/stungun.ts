@@ -37,7 +37,7 @@ export default class WeaponStungun extends Weapon {
 
         let tank = this.tank
         let player = tank.player
-        let game = player.getWorld()
+        let world = tank.model.parent
 
         for (let i = this.points.length - 1; i >= 0; i--) {
             const point = this.points[i];
@@ -45,7 +45,7 @@ export default class WeaponStungun extends Weapon {
             const px = transform.transformX(point[0], point[1]);
             const py = transform.transformY(point[0], point[1]);
 
-            for(let each of near(px, py, player, game, this.squareRadius)) {
+            for(let each of near(px, py, player, world, this.squareRadius)) {
                 if(each != this.tank.model) {
                     each.getComponent(HealthComponent).damage(this.damage * dt)
                 }
@@ -54,7 +54,7 @@ export default class WeaponStungun extends Weapon {
     }
 }
 
-const near = function (x: number, y: number, tplayer: AbstractPlayer, world: ServerGameWorld, distance: number): Entity[] {
+const near = function (x: number, y: number, tplayer: AbstractPlayer, world: Entity, distance: number): Entity[] {
     const result = [];
 
     for (let entity of world.children.values()) {

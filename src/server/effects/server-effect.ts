@@ -4,7 +4,6 @@ import {Constructor} from "../../serialization/binary/serializable";
 
 export default class ServerEffect extends AbstractEffect {
     static Model: Constructor<EffectModel>
-    static shouldSynchroniseRemoval = true
 
     static Types = new Map<typeof EffectModel, typeof ServerEffect>()
 

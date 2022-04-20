@@ -6,7 +6,6 @@ import EntityCreatePacket from "../networking/packets/game-packets/entity-create
 import EntityRemovePacket from "../networking/packets/game-packets/entity-remove-packet";
 import PlayerJoinPacket from "../networking/packets/game-packets/player-join-packet";
 import PlayerLeavePacket from "../networking/packets/game-packets/player-leave-packet";
-import MapPacket from "../networking/packets/game-packets/map-packet";
 import ServerEntity from "./entity/server-entity";
 import ServerGameWorld from "./server-game-world";
 import RoomPortal from "./room-portal";
@@ -14,11 +13,7 @@ import ServerPlayer from "./server-player";
 import PlayerSpawnPacket from "../networking/packets/game-packets/player-spawn-packet";
 import WorldPlayerControlsPacket from "../networking/packets/game-packets/world-player-controls-packet";
 import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
-import TilemapComponent from "../physics/tilemap-component";
 import TankControls from "../controls/tank-controls";
-import WriteBuffer from "../serialization/binary/write-buffer";
-import WorldCommunicationPacket from "../networking/packets/game-packets/world-communication-packet";
-import EntityDataTransmitComponent, {TransmitContext} from "../entity/components/network/entity-data-transmit-component";
 
 export default class ServerWorldBridge {
     static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
@@ -44,7 +39,6 @@ export default class ServerWorldBridge {
         })
 
         portal.on("client-connect", (client: GameSocketPortalClient) => {
-            new MapPacket(world.getComponent(TilemapComponent).map).sendTo(client.connection)
             new EntityCreatePacket(Array.from(world.entities.values())).sendTo(client.connection)
             this.broadcastPlayers(client, portal)
         })
@@ -80,18 +74,6 @@ export default class ServerWorldBridge {
 
         world.on("tick", () => {
             portal.broadcast(new WorldPlayerControlsPacket(world))
-
-            let transmitterComponent = world.getComponent(EntityDataTransmitComponent)
-
-            if(transmitterComponent.hasAnythingToPack()) {
-                let buffer = new WriteBuffer()
-                let context = new TransmitContext()
-                context.buffer = buffer
-
-                transmitterComponent.packBuffer(context)
-
-                portal.broadcast(new WorldCommunicationPacket(buffer.spitBuffer()))
-            }
         })
     }
 

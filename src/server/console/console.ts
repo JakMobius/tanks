@@ -12,6 +12,7 @@ import Parser, {CommandASTNode, CommandParameterASTNode, CommentASTNode, GlobalA
 
 import Serializer from "./language/serializer";
 import Lexer, {StringLexeme} from "./language/lexer";
+import Game from "../room/game";
 
 export interface ConsoleAutocompleteOptions {
 	/// Indicates whether only one completion unit is required
@@ -19,14 +20,13 @@ export interface ConsoleAutocompleteOptions {
 }
 
 export default class Console {
-	public observingRoom: any;
+	public observingRoom: Game;
 	public prompt: any;
 	public tabCompleteIndex: number;
 	public tabCompletions?: string[];
 	public window: ConsoleWindow;
 	public currentLogger: Logger;
 	public commands = new Map<string, Command>();
-	public stdLogger: StdCatchLogger
 	public server: Server = null
 	public logger: Logger = null
 
