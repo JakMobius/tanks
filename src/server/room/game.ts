@@ -25,9 +25,7 @@ import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import HealthComponent from "../../entity/components/health-component";
-import EntityDataTransmitComponent, {
-    TransmitContext
-} from "../../entity/components/network/entity-data-transmit-component";
+import EntityDataTransmitComponent from "../../entity/components/network/transmitting/entity-data-transmit-component";
 import WriteBuffer from "../../serialization/binary/write-buffer";
 import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
 import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
@@ -77,21 +75,10 @@ export default class Game extends Room {
         this.world.on("player-config",      (player, tank, nick) => this.onClientConfig(player, tank, nick))
 
         this.world.on("tick", () => {
-            let transmitterComponent = this.world.getComponent(EntityDataTransmitComponent)
-
-            for(let [end, set] of transmitterComponent.transmitters) {
-                if (!set.hasData) continue;
-
-                let buffer = new WriteBuffer()
-                let context = new TransmitContext()
-                context.buffer = buffer
-                context.end = end
-                transmitterComponent.packBuffer(context)
-
-                let client = (end as any as PlayerVisibilityManager).client
-                if(client) {
-                    new WorldCommunicationPacket(buffer.spitBuffer()).sendTo(client.connection)
-                }
+            for(let client of this.portal.clients.values()) {
+                let manager = client.data.visibilityManager
+                if (!manager.end.hasData()) continue;
+                new WorldCommunicationPacket(manager.end.spitBuffer()).sendTo(client.connection)
             }
         })
 

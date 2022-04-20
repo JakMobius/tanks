@@ -1,11 +1,9 @@
-import {Transmitter} from "../transmitter";
+import {Transmitter} from "../transmitting/transmitter";
 import HealthComponent from "../../health-component";
 import {Commands} from "../commands";
-import {TransmitterSet} from "../entity-data-transmit-component";
+import {TransmitterSet} from "../transmitting/transmitter-set";
 
 export default class HealthTransmitterComponent extends Transmitter {
-    private waitsHealthSync = false
-
     constructor() {
         super()
 
@@ -18,14 +16,8 @@ export default class HealthTransmitterComponent extends Transmitter {
     }
 
     queueHealthUpdate() {
-        if(this.waitsHealthSync) return
-        this.waitsHealthSync = true
-
-        this.performOnPack((context) => {
-            this.waitsHealthSync = false
-            context.pack(Commands.HEALTH_UPDATE_COMMAND, (buffer) => {
-                buffer.writeFloat32(this.getEntity().getComponent(HealthComponent).getHealth())
-            })
+        this.pack(Commands.HEALTH_UPDATE_COMMAND, (buffer) => {
+            buffer.writeFloat32(this.getEntity().getComponent(HealthComponent).getHealth())
         })
     }
 }

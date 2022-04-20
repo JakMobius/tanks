@@ -1,7 +1,8 @@
-import BlockTreeDecoder from "../../../networking/block-tree-decoder";
+
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 import HierarchicalComponent from "../hierarchical-component";
-import {Commands} from "./commands";
+import BinaryBlockCoder from "../../../serialization/binary/parsers/binary-block-coder";
+import Entity from "../../../utils/ecs/entity";
 
 export default class EntityDataReceiveComponent extends HierarchicalComponent {
 
@@ -26,32 +27,49 @@ export default class EntityDataReceiveComponent extends HierarchicalComponent {
     }
 
     receiveBuffer(buffer: ReadBuffer) {
-        BlockTreeDecoder.forEachNodeChildren(buffer, (buffer, size) => {
-            this.receiveCommand(buffer)
+        BinaryBlockCoder.decodeBlock(buffer, (buffer, size) => {
+            let entity = this.entity
+            let end = buffer.offset + size
+            while(buffer.offset < end) {
+                entity = EntityDataReceiveComponent.performNavigation(buffer, entity)
+                let component = entity.getComponent(EntityDataReceiveComponent)
+                component.parseCommand(buffer)
+            }
         })
     }
 
-    receiveCommand(buffer: ReadBuffer) {
-        let command = buffer.readUint16()
-
-        if(command == Commands.PASS_BLOCK_TO_CHILD) {
+    private static performNavigation(buffer: ReadBuffer, entity: Entity): Entity {
+        let offset = buffer.offset
+        let ascendCount = buffer.readUint16()
+        while(ascendCount--) {
+            entity = entity.parent
+        }
+        let descentWayLength = buffer.readUint16()
+        while(descentWayLength--) {
             let childIndex = buffer.readUint32()
-            let children = this.mappedChildren.get(childIndex)
-            if(!children) {
-                console.error("ReceiverComponent has failed to pass network buffer to child entity with id=" + childIndex, this)
+            let component = entity.getComponent(EntityDataReceiveComponent)
+            let child = component.mappedChildren.get(childIndex)
+            if (!child) {
+                console.error("ReceiverComponent has failed to navigate to child entity with id=" + childIndex, entity)
+                return null
+            }
+            entity = child.entity
+        }
+
+        return entity
+    }
+
+    private parseCommand(buffer: ReadBuffer) {
+        BinaryBlockCoder.decodeBlock(buffer, () => {
+            let command = buffer.readUint16()
+
+            let handler = this.commandHandlers.get(command)
+            if (!handler) {
+                console.error("ReceiverComponent received unknown command: " + command, this)
                 return
             }
 
-            children.receiveBuffer(buffer)
-            return
-        }
-
-        let handler = this.commandHandlers.get(command)
-        if(!handler) {
-            console.error("ReceiverComponent received unknown command: " + command, this)
-            return
-        }
-
-        handler(buffer)
+            handler(buffer)
+        });
     }
 }

@@ -1,9 +1,8 @@
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import Entity from "../utils/ecs/entity";
 import ServerGameWorld from "./server-game-world";
-import {PlayerConfig} from "../abstract-player";
 import ServerTank from "./entity/tank/server-tank";
-import EntityDataTransmitComponent from "../entity/components/network/entity-data-transmit-component";
+import EntityDataTransmitComponent from "../entity/components/network/transmitting/entity-data-transmit-component";
 import EffectTransmitter from "../entity/components/network/effect/effect-transmitter";
 import MapTransmitter from "../entity/components/network/map/map-transmitter";
 import TransformComponent from "../entity/components/transform-component";
@@ -11,6 +10,7 @@ import PhysicalComponent from "../entity/components/physics-component";
 import PositionTransmitterComponent from "../entity/components/network/position/position-transmitter-component";
 import HealthTransmitterComponent from "../entity/components/network/health/health-transmitter-component";
 import SocketPortalClient from "./socket/socket-portal-client";
+import {ReceivingEnd} from "../entity/components/network/transmitting/receiving-end";
 
 export default class PlayerVisibilityManager {
     // There are times when you can't rewrite something well,
@@ -25,6 +25,7 @@ export default class PlayerVisibilityManager {
     tankEventHandler = new BasicEventHandlerSet()
     visibleEntities = new Set<Entity>()
     client: SocketPortalClient
+    end = new ReceivingEnd()
 
     private world: ServerGameWorld
     private tank: ServerTank
@@ -36,15 +37,17 @@ export default class PlayerVisibilityManager {
     setWorld(world: ServerGameWorld) {
         if(this.world) {
             let transmitComponent = this.world.getComponent(EntityDataTransmitComponent)
-            transmitComponent.detachTransmitters(this)
+            transmitComponent.getTransmitterSet(this.end).detachTransmitters()
         }
 
         this.world = world
 
+        this.end.setRoot(world)
+
         if(this.world) {
             let transmitComponent = this.world.getComponent(EntityDataTransmitComponent)
-            transmitComponent.attachTransmitter(this, new EffectTransmitter())
-            transmitComponent.attachTransmitter(this, new MapTransmitter())
+            transmitComponent.getTransmitterSet(this.end).attachTransmitter(new EffectTransmitter())
+            transmitComponent.getTransmitterSet(this.end).attachTransmitter(new MapTransmitter())
         }
     }
 
@@ -77,12 +80,12 @@ export default class PlayerVisibilityManager {
             if(!transmitComponent) continue
 
             if(visible) {
-                transmitComponent.attachTransmitter(this, new EffectTransmitter())
-                transmitComponent.attachTransmitter(this, new PositionTransmitterComponent())
-                transmitComponent.attachTransmitter(this, new HealthTransmitterComponent())
+                transmitComponent.getTransmitterSet(this.end).attachTransmitter(new EffectTransmitter())
+                transmitComponent.getTransmitterSet(this.end).attachTransmitter(new PositionTransmitterComponent())
+                transmitComponent.getTransmitterSet(this.end).attachTransmitter(new HealthTransmitterComponent())
                 this.visibleEntities.add(entity)
             } else {
-                transmitComponent.detachTransmitters(this)
+                transmitComponent.getTransmitterSet(this.end).detachTransmitters()
                 this.visibleEntities.delete(entity)
             }
         }

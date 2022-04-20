@@ -7,6 +7,7 @@ import ConnectionClient from "../../networking/connection-client";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
 import Connection from "../../networking/connection";
 import LocalConnection from "../../networking/local-connection";
+import PlayerVisibilityManager from "../../server/player-visibility-manager";
 
 export class EmbeddedServerGameConfig {
     map: GameMap
@@ -45,14 +46,20 @@ export default class EmbeddedServerGame {
 
         const serverConnection = new LocalConnection()
         Connection.pipeReversed(this.clientConnection.connection, serverConnection)
+        const visibilityManager = new PlayerVisibilityManager()
 
-        this.serverGame.portal.clientConnected(new SocketPortalClient({
+        let client = new SocketPortalClient({
             connection: serverConnection,
             data: {
                 listeningForRooms: false,
-                player: null
+                player: null,
+                visibilityManager: visibilityManager
             }
-        }))
+        })
+
+        visibilityManager.client = client
+
+        this.serverGame.portal.clientConnected(client)
     }
 
     tick(dt: number) {

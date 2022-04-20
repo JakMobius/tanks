@@ -36,7 +36,7 @@ export default class HierarchicalComponent implements Component {
         this.eventHandler.setTarget(null)
     }
 
-    private attachChildrenComponents() {
+    protected attachChildrenComponents() {
         for(let child of this.entity.children) {
             let childComponent = child.getComponent(this.constructor as typeof HierarchicalComponent)
             if(!childComponent) continue
@@ -44,7 +44,7 @@ export default class HierarchicalComponent implements Component {
         }
     }
 
-    private detachChildComponents() {
+    protected detachChildComponents() {
         for(let child of this.entity.children) {
             let childComponent = child.getComponent(this.constructor as typeof HierarchicalComponent)
             if(!childComponent) continue
@@ -52,7 +52,7 @@ export default class HierarchicalComponent implements Component {
         }
     }
 
-    private attachToParentComponent() {
+    protected attachToParentComponent() {
         let parent = this.entity.parent
         if(!parent) return
         let parentComponent = parent.getComponent(this.constructor as typeof HierarchicalComponent)
@@ -60,7 +60,7 @@ export default class HierarchicalComponent implements Component {
         parentComponent.childComponentAdded(this)
     }
 
-    private detachFromParentComponent(parent: Entity = this.entity.parent) {
+    protected detachFromParentComponent(parent: Entity = this.entity.parent) {
         if(!parent) return
         let parentComponent = parent.getComponent(this.constructor as typeof HierarchicalComponent)
         if(!parentComponent) return
