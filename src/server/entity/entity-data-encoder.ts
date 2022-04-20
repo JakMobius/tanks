@@ -1,8 +1,8 @@
 import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import WriteBuffer from "../../serialization/binary/write-buffer";
-import PhysicalComponent from "../../entity/physics-component";
-import HealthComponent from "../../entity/health-component";
+import PhysicalComponent from "../../entity/components/physics-component";
+import HealthComponent from "../../entity/components/health-component";
 
 export default class EntityDataEncoder implements Component {
     entity: Entity | null;

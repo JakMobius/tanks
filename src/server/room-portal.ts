@@ -3,7 +3,6 @@ import BinaryPacket from "../networking/binary-packet";
 import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
 
 export default class RoomPortal extends TypedEventHandler<[GameSocketPortalClient]> {
-    /// Map of clients, connected to this portal.
     clients = new Map<Number, GameSocketPortalClient>()
     packetHandlers = new Map<Number, (packet: BinaryPacket) => void>()
 

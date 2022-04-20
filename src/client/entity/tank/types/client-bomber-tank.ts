@@ -9,7 +9,7 @@ import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import TextureProgram from "../../../graphics/programs/texture-program";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
-import TransformComponent from "../../../../entity/transform-component";
+import TransformComponent from "../../../../entity/components/transform-component";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;

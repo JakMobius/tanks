@@ -1,5 +1,6 @@
 import AbstractEffect from 'src/effects/abstract-effect';
 import EffectModel from "../../effects/effect-model";
+import EffectHost from "../../effects/effect-host";
 
 export default class ClientEffect extends AbstractEffect {
 

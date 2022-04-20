@@ -11,8 +11,8 @@ import GameMap from "../../map/game-map";
 import 'src/entity/tanks/model-loader'
 import 'src/server/entity/bullet/type-loader';
 import 'src/server/entity/tank/type-loader'
-import 'src/server/effects/world/type-loader';
 import 'src/server/effects/tank/type-loader';
+import 'src/server/effects/world/type-loader';
 import 'src/map/block-state/type-loader';
 
 import HTMLEscape from "../../utils/html-escape";
@@ -23,9 +23,9 @@ import ServerPlayer from "../server-player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
 import ServerEntity from "../entity/server-entity";
-import PhysicalComponent from "../../entity/physics-component";
+import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
-import HealthComponent from "../../entity/health-component";
+import HealthComponent from "../../entity/components/health-component";
 
 interface GameConfig {
     name: string
@@ -55,8 +55,7 @@ export default class Game extends Room {
         this.name = options.name
 
         this.world = new ServerGameWorld({
-            map: options.map,
-            room: this
+            map: options.map
         })
 
         ServerWorldBridge.buildBridge(this.world, this.portal)

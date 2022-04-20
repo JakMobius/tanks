@@ -16,9 +16,9 @@ import {
 } from "../../../../utils/quadrangle";
 
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/physics-component";
+import PhysicalComponent from "../../../../entity/components/physics-component";
 import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
-import TransformComponent from "../../../../entity/transform-component";
+import TransformComponent from "../../../../entity/components/transform-component";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

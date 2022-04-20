@@ -9,9 +9,9 @@ import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/physics-component";
+import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
-import TransformComponent from "../../../../entity/transform-component";
+import TransformComponent from "../../../../entity/components/transform-component";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

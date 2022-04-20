@@ -15,10 +15,10 @@ import {
     turnQuadrangle
 } from "../../../../utils/quadrangle";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
-import PhysicalComponent from "../../../../entity/physics-component";
+import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
-import TransformComponent from "../../../../entity/transform-component";
+import TransformComponent from "../../../../entity/components/transform-component";
 
 class Drawer extends TankDrawer {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)

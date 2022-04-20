@@ -31,7 +31,7 @@ export default class ClientTank extends ClientEntity {
         super(config.model)
         this.engine = null
 
-        this.model.getComponent(EffectHost).addEffect(new DamageSmokeEffect(this))
+        this.model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
     }
 
     static register(tank: ClientTankType) {

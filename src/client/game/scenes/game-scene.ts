@@ -13,6 +13,9 @@ import ClientWorldBridge from "../client-world-bridge";
 import {ClientTankType} from "../../entity/tank/client-tank";
 import GeneralGameScene from "../general-game-scene";
 import TankControls from "../../../controls/tank-controls";
+import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
+import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient
@@ -36,6 +39,10 @@ export default class GameScene extends GeneralGameScene {
         this.setupPacketHandling()
         this.displayWorld(new ClientGameWorld())
 
+        this.client.on(WorldCommunicationPacket, (packet) => {
+            let buffer = new ReadBuffer(packet.buffer.buffer)
+            this.displayedWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+        })
         ClientWorldBridge.buildBridge(this.client, this.displayedWorld)
 
         this.overlay.show()

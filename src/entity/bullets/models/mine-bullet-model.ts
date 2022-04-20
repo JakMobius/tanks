@@ -3,7 +3,7 @@ import {BinarySerializer} from "../../../serialization/binary/serializable";
 import PhysicsUtils from "../../../utils/physics-utils";
 import {b2BodyType} from "../../../library/box2d/dynamics/b2_body";
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../physics-component";
+import PhysicalComponent from "../../components/physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class BulletModelMine extends BulletModel {

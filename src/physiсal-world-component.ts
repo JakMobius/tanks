@@ -1,5 +1,5 @@
 import * as Box2D from "./library/box2d";
-import PhysicalComponent from "./entity/physics-component";
+import PhysicalComponent from "./entity/components/physics-component";
 import {Component} from "./utils/ecs/component";
 import Entity from "./utils/ecs/entity";
 

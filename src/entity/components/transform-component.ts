@@ -1,7 +1,7 @@
-import {Component} from "../utils/ecs/component";
-import * as Box2D from "../library/box2d";
-import Entity from "../utils/ecs/entity";
-import Matrix3 from "../utils/matrix3";
+import {Component} from "../../utils/ecs/component";
+import * as Box2D from "../../library/box2d";
+import Entity from "../../utils/ecs/entity";
+import Matrix3 from "../../utils/matrix3";
 
 export default class TransformComponent implements Component {
     entity: Entity | null

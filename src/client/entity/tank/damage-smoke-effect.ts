@@ -1,23 +1,22 @@
-import TransformComponent from "../../../entity/transform-component";
+import TransformComponent from "../../../entity/components/transform-component";
 import Color from "../../../utils/color";
-import PhysicalComponent from "../../../entity/physics-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
 import SmokeParticle from "../../particles/smoke-particle";
-import ClientTankEffect from "../../effects/tank/client-tank-effect";
-import ClientTank from "./client-tank";
-import HealthComponent from "../../../entity/health-component";
+import HealthComponent from "../../../entity/components/health-component";
 import ParticleHost from "../../particle-host";
+import ClientEffect from "../../effects/client-effect";
 
-export default class DamageSmokeEffect extends ClientTankEffect {
+export default class DamageSmokeEffect extends ClientEffect {
     private smokeTimer: number = 0;
 
-    constructor(tank: ClientTank) {
-        super(null, tank)
+    constructor() {
+        super(null)
     }
 
     tick(dt: number) {
-        const model = this.tank.model
-        const transform = model.getComponent(TransformComponent).transform
-        const health = model.getComponent(HealthComponent).getHealth()
+        const entity = this.host.entity
+        const transform = entity.getComponent(TransformComponent).transform
+        const health = entity.getComponent(HealthComponent).getHealth()
 
         if (health >= 7) {
             this.smokeTimer = 0
@@ -32,8 +31,8 @@ export default class DamageSmokeEffect extends ClientTankEffect {
             return
         }
 
-        const physicalComponent = model.getComponent(PhysicalComponent)
-        const particleComponent = model.parent.getComponent(ParticleHost)
+        const physicalComponent = entity.getComponent(PhysicalComponent)
+        const particleComponent = entity.parent.getComponent(ParticleHost)
 
         const gray = health / 7 * 255
         const color = new Color(gray, gray, gray)

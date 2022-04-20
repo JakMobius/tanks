@@ -54,7 +54,7 @@ export default class MapEditorScene extends Scene {
             inertial: false
         })
 
-        this.worldDrawer = new WorldDrawer(this.camera, this.screen, this.world)
+        this.worldDrawer = new WorldDrawer(this.camera, this.screen)
 
         this.setupWorkspace()
 

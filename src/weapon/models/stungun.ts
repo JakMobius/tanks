@@ -1,10 +1,10 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import AbstractPlayer from "../../abstract-player";
 import ServerGameWorld from "../../server/server-game-world";
-import PhysicalComponent from "../../entity/physics-component";
-import TransformComponent from "../../entity/transform-component";
+import PhysicalComponent from "../../entity/components/physics-component";
+import TransformComponent from "../../entity/components/transform-component";
 import Entity from "../../utils/ecs/entity";
-import HealthComponent from "../../entity/health-component";
+import HealthComponent from "../../entity/components/health-component";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number

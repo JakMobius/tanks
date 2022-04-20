@@ -1,7 +1,7 @@
 import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import {Vec2} from "../../library/box2d";
-import PhysicalComponent from "../../entity/physics-component";
+import PhysicalComponent from "../../entity/components/physics-component";
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 
@@ -44,42 +44,6 @@ export default class ServerPosition implements Component {
 
         body.SetLinearVelocity(velocity)
         body.SetAngularVelocity(angularVelocity)
-        body.SetAngle(rotation)
-    }
-
-    decodeMovement(decoder: ReadBuffer) {
-        let teleport = decoder.readUint8()
-        let x = decoder.readFloat32()
-        let y = decoder.readFloat32()
-        let rotation = decoder.readFloat32()
-        let vx = decoder.readFloat32()
-        let vy = decoder.readFloat32()
-        let angularVelocity = decoder.readFloat32()
-
-        const body = this.entity.getComponent(PhysicalComponent).getBody()
-
-        let velocity = body.GetLinearVelocity()
-
-        velocity.Set(vx, vy)
-
-        body.SetLinearVelocity(velocity)
-        body.SetAngularVelocity(angularVelocity)
-
-        // When teleporting, entity should instantly move
-        // from one point to another. Otherwise, this
-        // meant to be continuous movement. Considering
-        // ping jitter and other imperfections of WWW,
-        // these positions should be interpolated to give
-        // a smooth move impression to player.
-
-        if (teleport) {
-            body.SetPositionXY(x, y)
-        }
-
-        this.serverPosition.Set(x, y)
-        this.serverVelocity.Set(vx, vy)
-        this.serverPositionUpdateDate = Date.now()
-
         body.SetAngle(rotation)
     }
 

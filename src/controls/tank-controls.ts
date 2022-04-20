@@ -2,7 +2,7 @@ import {BinaryEncodable} from '../serialization/binary/serializable';
 import Axle from './axle';
 import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
-import TransformComponent from "../entity/transform-component";
+import TransformComponent from "../entity/components/transform-component";
 import WriteBuffer from "../serialization/binary/write-buffer";
 import ReadBuffer from "../serialization/binary/read-buffer";
 

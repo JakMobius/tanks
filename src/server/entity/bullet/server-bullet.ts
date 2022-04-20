@@ -5,11 +5,11 @@ import BulletModel from "../../../entity/bullets/bullet-model";
 import ServerPlayer from "../../server-player";
 import * as Box2D from 'src/library/box2d'
 import ServerTank from "../tank/server-tank";
-import PhysicalComponent from "../../../entity/physics-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
 import EffectHost from "../../../effects/effect-host";
 import WriteBuffer from "../../../serialization/binary/write-buffer";
-import HealthComponent from "../../../entity/health-component";
+import HealthComponent from "../../../entity/components/health-component";
 
 export interface ServerBulletConfig {
     model: BulletModel

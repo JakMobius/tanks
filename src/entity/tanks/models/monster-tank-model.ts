@@ -4,7 +4,7 @@ import WheeledTankBehaviour from '../physics/wheeled-tank/wheeled-tank-behaviour
 import {Vec2} from "../../../library/box2d";
 import {physicsFilters} from "../../../physics/categories";
 import WheelAxlesGenerator from "../physics/wheeled-tank/wheel-axles-generator";
-import PhysicalComponent from "../../physics-component";
+import PhysicalComponent from "../../components/physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class MonsterTankModel extends TankModel {

@@ -13,21 +13,25 @@ import GameMap from "../../map/game-map";
 import Scene, {SceneConfig} from "../scenes/scene";
 import ClientPlayer from "../client-player";
 import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
-import PhysicalComponent from "../../entity/physics-component";
+import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
+import EntityModel from "../../entity/entity-model";
+import BlockTreeDecoder from "../../networking/block-tree-decoder";
 
 export default class GeneralGameScene extends Scene {
-    public camera: Camera;
-    public keyboard = new KeyboardController();
-    public controls = new ControlPanel();
-    public gamepad = new GamepadManager();
-    public touchController: TouchController;
-    public playerControls: PlayerControls;
+    public camera: Camera
+    public keyboard = new KeyboardController()
+    public controls = new ControlPanel()
+    public gamepad = new GamepadManager()
+    public touchController: TouchController
+    public playerControls: PlayerControls
 
-    public eventContainer: EventContainer;
-    public chatContainer: ChatContainer;
+    public eventContainer: EventContainer
+    public chatContainer: ChatContainer
+    public packetReceiver = new BlockTreeDecoder()
     public displayedWorld: ClientGameWorld
+    public controlledTank: EntityModel
     public worldDrawer: WorldDrawer
 
     public paused: boolean = false
@@ -66,7 +70,7 @@ export default class GeneralGameScene extends Scene {
             inertial: true
         })
 
-        this.worldDrawer = new WorldDrawer(this.camera, this.screen, null)
+        this.worldDrawer = new WorldDrawer(this.camera, this.screen)
     }
 
     private setupEventContainer() {
@@ -141,11 +145,11 @@ export default class GeneralGameScene extends Scene {
     }
 
     protected onWorldPrimaryPlayerSet(player: ClientPlayer) {
+        this.controlledTank = player.tank.model
         this.playerControls.disconnectAllTankControls()
         if(player) {
-            const model = player.tank.model
-            const body = model.getComponent(PhysicalComponent).getBody()
-            this.playerControls.connectTankControls(model.getComponent(TankControls))
+            const body = this.controlledTank.getComponent(PhysicalComponent).getBody()
+            this.playerControls.connectTankControls(this.controlledTank.getComponent(TankControls))
             this.camera.target = body.GetPosition()
             this.camera.targetVelocity = body.GetLinearVelocity()
         }

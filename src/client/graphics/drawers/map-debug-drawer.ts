@@ -12,7 +12,7 @@ import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/whe
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 import ChunkedMapCollider from "../../../physics/chunked-map-collider";
-import TransformComponent from "../../../entity/transform-component";
+import TransformComponent from "../../../entity/components/transform-component";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;

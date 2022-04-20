@@ -2,12 +2,12 @@ import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
 import BlockState from "../../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
-import PhysicalComponent from "../../../entity/physics-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
 import TilemapComponent from "../../../physics/tilemap-component";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import HealthComponent from "../../../entity/health-component";
+import HealthComponent from "../../../entity/components/health-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -30,6 +30,11 @@ interface ExplodePoolWalker {
 }
 
 type ExplodePoolWalkerMap = TwoDimensionalMap<number, number,ExplodePoolWalker>
+
+export interface ExplodeEffectPoolConfig {
+    damageBlocks?: boolean
+    damageEntities?: boolean
+}
 
 export default class ExplodeEffectPool implements Component {
 	public powerDamping = 0.01
@@ -80,11 +85,24 @@ export default class ExplodeEffectPool implements Component {
     // сила отталкивания будет рассчитана более правильно.
 	public pressureDifferentialDistance = this.gridSize * 2
 
+    // Ну это сколько-то.
+    // Домножь на damageEnergyFraction, чтобы прикинуть
+    // урон блокам от взрыва
+    public blockDamageCoefficient = 20000
+
     public entity: Entity
     private eventHandler = new BasicEventHandlerSet()
 
-    constructor() {
+    private damageBlocks = false
+    private damageEntities = false
+
+    constructor(config?: ExplodeEffectPoolConfig) {
         this.eventHandler.on("tick", (dt: number) => this.tick(dt))
+
+        if(config) {
+            if(config.damageBlocks) this.damageBlocks = true
+            if(config.damageEntities) this.damageEntities = true
+        }
     }
 
     isBlock (x: number, y: number): boolean {
@@ -304,7 +322,11 @@ export default class ExplodeEffectPool implements Component {
         this.walkers = newWalkers
     }
 
-    protected damageBlock(x: number, y: number, damage: number): void {}
+    protected damageBlock(x: number, y: number, damage: number): void {
+        if(!this.damageBlocks) return
+        const map = this.entity.getComponent(TilemapComponent).map
+        map.damageBlock(x / GameMap.BLOCK_SIZE, y / GameMap.BLOCK_SIZE, damage * this.blockDamageCoefficient)
+    }
 
     private mapPower(walkers: ExplodePoolWalkerMap, x: number, y: number): number {
         const relX = (x / this.gridSize - 0.5)
@@ -398,11 +420,13 @@ export default class ExplodeEffectPool implements Component {
                 resultVy
             ), position)
 
-            const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
+            if(this.damageEntities) {
+                const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
 
-            if(damage > 0) {
-                let healthComponent = child.getComponent(HealthComponent)
-                if(healthComponent) healthComponent.damage(damage)
+                if (damage > 0) {
+                    let healthComponent = child.getComponent(HealthComponent)
+                    if (healthComponent) healthComponent.damage(damage)
+                }
             }
         }
     }

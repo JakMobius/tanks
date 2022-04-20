@@ -3,7 +3,7 @@ import ServerEntity from "../server-entity";
 import ServerPlayer from "../../server-player";
 import {Constructor} from "../../../serialization/binary/serializable";
 import {EntityModelType} from "../../../entity/entity-model";
-import PhysicalComponent from "../../../entity/physics-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
 
 export interface ServerTankConfig {
     model: TankModel
@@ -17,7 +17,6 @@ export default class ServerTank extends ServerEntity {
     public static Model: EntityModelType & Constructor<TankModel> = null
     public static Tanks: ServerTankType[] = []
 
-	public teleported: boolean;
     public player: ServerPlayer
 
     constructor(options: ServerTankConfig) {

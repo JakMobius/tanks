@@ -5,7 +5,7 @@ import {b2Body} from "../library/box2d/dynamics/b2_body";
 import PhysicsChunk from "../physics/physics-chunk";
 import * as Box2D from "../library/box2d";
 import GameMap from "../map/game-map";
-import PhysicalComponent from "./physics-component";
+import PhysicalComponent from "./components/physics-component";
 import TilemapComponent from "../physics/tilemap-component";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";

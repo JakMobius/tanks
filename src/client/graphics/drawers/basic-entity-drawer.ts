@@ -3,7 +3,7 @@ import Sprite from '../../sprite';
 import TextureProgram from "../programs/texture-program";
 import DrawPhase from "./draw-phase";
 import {squareQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
-import PhysicalComponent from "../../../entity/physics-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
 
 export default class BasicEntityDrawer extends EntityDrawer {
     static sprites: Sprite[];

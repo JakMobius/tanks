@@ -37,6 +37,7 @@ export default class EmbeddedServerGame {
 
         const clientConnection = new LocalConnection()
         this.clientConnection = new ConnectionClient(clientConnection)
+
         ClientWorldBridge.buildBridge(this.clientConnection, this.clientWorld)
     }
 

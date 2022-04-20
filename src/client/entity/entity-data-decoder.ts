@@ -2,7 +2,7 @@ import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import ServerPosition from "./server-position";
-import HealthComponent from "../../entity/health-component";
+import HealthComponent from "../../entity/components/health-component";
 
 export default class EntityDataDecoder implements Component {
     entity: Entity | null;

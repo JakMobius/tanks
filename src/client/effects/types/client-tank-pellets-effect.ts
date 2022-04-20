@@ -1,29 +1,26 @@
-import ClientTankEffect from '../client-tank-effect';
+
 import Pellet from 'src/client/particles/pellet-particle'
 import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/tank/models/tank-pellets-effect-model';
-import ClientPlayer from "../../../client-player";
-import PhysicalComponent from "../../../../entity/physics-component";
-import TransformComponent from "../../../../entity/transform-component";
+import PhysicalComponent from "../../../entity/components/physics-component";
+import TransformComponent from "../../../entity/components/transform-component";
+import ParticleHost from "../../particle-host";
+import ClientEffect from "../client-effect";
 
-export default class ClientTankPelletsEffect extends ClientTankEffect {
-	public player: ClientPlayer;
-	public game: any;
-
+export default class ClientTankPelletsEffect extends ClientEffect {
     static Model: typeof EffectModel = TankPelletsEffectModel
 
-    start(player: ClientPlayer) {
-        this.player = player
+    start() {
+
     }
 
     draw(ctx: WebGLRenderingContext) {
-        const game = this.game;
-        const player = this.player;
 
-        const tank = player.tank;
-        const body = tank.model.getComponent(PhysicalComponent).getBody()
-        const transform = this.tank.model.getComponent(TransformComponent).transform
+        const entity = this.host.entity
+        const world = entity.parent
+        const body = entity.getComponent(PhysicalComponent).getBody()
+        const transform = entity.getComponent(TransformComponent).transform
 
         const tankRotation = body.GetAngle()
         const tankPosition = body.GetPosition()
@@ -42,12 +39,13 @@ export default class ClientTankPelletsEffect extends ClientTankEffect {
             const pellet = new Pellet({
                 x: tankPosition.x + particleOffsetX + sin * dist,
                 y: tankPosition.y + particleOffsetY + cos * dist,
-                dx: (tankVelocity.x + sin * vel) / game.tps,
-                dy: (tankVelocity.y + cos * vel) / game.tps,
+                dx: tankVelocity.x + sin * vel,
+                dy: tankVelocity.y + cos * vel,
                 lifetime: 150,
                 color: new Color(50, 50, 50)
             });
-            game.particles.push(pellet)
+
+            world.getComponent(ParticleHost).particles.push(pellet)
         }
     }
 }

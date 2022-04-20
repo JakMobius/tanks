@@ -14,11 +14,15 @@ export default class WriteBuffer {
     }
 
     private extend() {
-        let newBuffer = new Uint8Array(this.size * 2);
+        let newSize = this.size * 2
+        while(newSize < this.offset) {
+            newSize *= 2
+        }
+        let newBuffer = new Uint8Array(newSize);
         newBuffer.set(this.buffer)
         this.view = new DataView(newBuffer.buffer)
         this.buffer = newBuffer
-        this.size *= 2
+        this.size = newSize
     }
 
     private prepareSpace(size: number) {
@@ -30,8 +34,9 @@ export default class WriteBuffer {
 
     writeBytes(data: Uint8Array) {
         let pos = this.offset
-        this.prepareSpace(data.byteLength)
+        this.prepareSpace(data.length)
         this.buffer.set(data, pos)
+        this.offset += data.length
     }
 
     writeFloat64(num: number) {

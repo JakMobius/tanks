@@ -4,25 +4,21 @@ import PlayerChatPacket from "../networking/packets/game-packets/player-chat-pac
 import PlayerRespawnPacket from "../networking/packets/game-packets/player-respawn-packet";
 import EntityCreatePacket from "../networking/packets/game-packets/entity-create-packet";
 import EntityRemovePacket from "../networking/packets/game-packets/entity-remove-packet";
-import EffectCreatePacket from "../networking/packets/game-packets/effect-create-packet";
-import EffectRemovePacket from "../networking/packets/game-packets/effect-remove-packet";
-import BlockUpdatePacket from "../networking/packets/game-packets/block-update-packet";
 import PlayerJoinPacket from "../networking/packets/game-packets/player-join-packet";
 import PlayerLeavePacket from "../networking/packets/game-packets/player-leave-packet";
 import MapPacket from "../networking/packets/game-packets/map-packet";
 import ServerEntity from "./entity/server-entity";
-import ServerEffect from "./effects/server-effect";
 import ServerGameWorld from "./server-game-world";
 import RoomPortal from "./room-portal";
 import ServerPlayer from "./server-player";
-import EntityLocationPacket from "../networking/packets/game-packets/entity-location-packet";
 import PlayerSpawnPacket from "../networking/packets/game-packets/player-spawn-packet";
 import WorldPlayerControlsPacket from "../networking/packets/game-packets/world-player-controls-packet";
-import {TwoDimensionalMap} from "../utils/two-dimensional-map";
-import EntityHealthPacket from "../networking/packets/game-packets/entity-health-packet";
 import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
 import TilemapComponent from "../physics/tilemap-component";
 import TankControls from "../controls/tank-controls";
+import WriteBuffer from "../serialization/binary/write-buffer";
+import WorldCommunicationPacket from "../networking/packets/game-packets/world-communication-packet";
+import EntityDataTransmitComponent, {TransmitContext} from "../entity/components/network/entity-data-transmit-component";
 
 export default class ServerWorldBridge {
     static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
@@ -64,29 +60,10 @@ export default class ServerWorldBridge {
 
         world.on("entity-create", (entity: ServerEntity) => {
             portal.broadcast(new EntityCreatePacket(entity))
-
-            // TODO: this is wrong.
-            entity.model.on("effect-create", (effect: ServerEffect) => {
-                portal.broadcast(new EffectCreatePacket(effect.model))
-            })
-
-            entity.model.on("effect-remove", (effect: ServerEffect) => {
-                if((effect.constructor as typeof ServerEffect).shouldSynchroniseRemoval)
-                    portal.broadcast(new EffectRemovePacket(effect.model.id))
-            })
         })
 
         world.on("entity-remove", (entity: ServerEntity) => {
             portal.broadcast(new EntityRemovePacket(entity))
-        })
-
-        world.on("effect-create", (effect: ServerEffect) => {
-            portal.broadcast(new EffectCreatePacket(effect.model))
-        })
-
-        world.on("effect-remove", (effect: ServerEffect) => {
-            if((effect.constructor as typeof ServerEffect).shouldSynchroniseRemoval)
-                portal.broadcast(new EffectRemovePacket(effect.model.id))
         })
 
         world.on("player-create", (player: ServerPlayer) => {
@@ -102,12 +79,20 @@ export default class ServerWorldBridge {
         })
 
         world.on("tick", () => {
-            portal.broadcast(new EntityLocationPacket(world))
             portal.broadcast(new WorldPlayerControlsPacket(world))
-        })
 
-        this.setupBlockUpdates(world, portal)
-        this.setupEntityHealthUpdates(world, portal)
+            let transmitterComponent = world.getComponent(EntityDataTransmitComponent)
+
+            if(transmitterComponent.hasAnythingToPack()) {
+                let buffer = new WriteBuffer()
+                let context = new TransmitContext()
+                context.buffer = buffer
+
+                transmitterComponent.packBuffer(context)
+
+                portal.broadcast(new WorldCommunicationPacket(buffer.spitBuffer()))
+            }
+        })
     }
 
     private static sendPlayerJoinEvent(clients: Iterable<GameSocketPortalClient>, player: ServerPlayer) {
@@ -131,43 +116,5 @@ export default class ServerWorldBridge {
                 new PlayerJoinPacket(otherPlayer.nick, otherPlayer.id, otherPlayer.tank.model.id).sendTo(client.connection)
             }
         }
-    }
-
-    private static setupBlockUpdates(world: ServerGameWorld, portal: RoomPortal) {
-        const blockUpdateMap = new TwoDimensionalMap<number, number, boolean>()
-
-        world.on("map-block-change", (x: number, y: number) => {
-            blockUpdateMap.set(x, y, true)
-        })
-
-        world.on("map-block-damage", (x: number, y: number) => {
-            blockUpdateMap.set(x, y, true)
-        })
-
-        world.on("tick", () => {
-            const map = world.getComponent(TilemapComponent).map
-            for(let [x, row] of blockUpdateMap.rows.entries()) {
-                for(let y of row.keys()) {
-                    portal.broadcast(new BlockUpdatePacket(x, y, map.getBlock(x, y)))
-                }
-            }
-
-            blockUpdateMap.clear()
-        })
-    }
-
-    private static setupEntityHealthUpdates(world: ServerGameWorld, portal: RoomPortal) {
-        const healthUpdatedEntities = new Set<ServerEntity>()
-
-        world.on("entity-health-change", (entity: ServerEntity) => {
-            healthUpdatedEntities.add(entity)
-        })
-
-        world.on("tick", () => {
-            if(healthUpdatedEntities.size) {
-                portal.broadcast(new EntityHealthPacket(healthUpdatedEntities))
-                healthUpdatedEntities.clear()
-            }
-        })
     }
 }

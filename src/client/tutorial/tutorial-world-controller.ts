@@ -10,8 +10,8 @@ import MonsterTankModel from "../../entity/tanks/models/monster-tank-model";
 import {Constructor} from "../../serialization/binary/serializable";
 import BigBoiTankModel from "../../entity/tanks/models/bigboi-tank-model";
 import NastyTankModel from "../../entity/tanks/models/nasty-tank-model";
-import PhysicalComponent from "../../entity/physics-component";
-import HealthComponent from "../../entity/health-component";
+import PhysicalComponent from "../../entity/components/physics-component";
+import HealthComponent from "../../entity/components/health-component";
 
 export default class TutorialWorldController {
     game: Game;

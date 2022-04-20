@@ -2,10 +2,12 @@ import {Constructor} from '../serialization/binary/serializable';
 import AbstractEntity from "./abstract-entity";
 import Entity from "../utils/ecs/entity";
 import PhysicalHostComponent from "../physiсal-world-component";
-import TransformComponent from "./transform-component";
-import HealthComponent from "./health-component";
+import TransformComponent from "./components/transform-component";
+import HealthComponent from "./components/health-component";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
+import EffectHost from "../effects/effect-host";
+import EffectReceiverComponent from "./components/network/effect/effect-receiver-component";
 
 /**
  * Entity model. Describes entity position,
@@ -39,6 +41,7 @@ export default class EntityModel extends Entity {
 
         this.addComponent(new TransformComponent())
         this.addComponent(new HealthComponent())
+        this.addComponent(new EffectHost())
 
         this.getComponent(HealthComponent).setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
 

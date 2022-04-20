@@ -1,8 +1,8 @@
-import {Component} from "../utils/ecs/component";
-import * as Box2D from "../library/box2d";
-import Entity from "../utils/ecs/entity";
+import {Component} from "../../utils/ecs/component";
+import * as Box2D from "../../library/box2d";
+import Entity from "../../utils/ecs/entity";
 import TransformComponent from "./transform-component";
-import PhysicalHostComponent from "../physiсal-world-component";
+import PhysicalHostComponent from "../../physiсal-world-component";
 
 export default class PhysicalComponent implements Component {
     entity: Entity | null

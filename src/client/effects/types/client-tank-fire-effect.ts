@@ -1,23 +1,23 @@
 // const FX = require("../../sound/fx")
-import FireParticle from '../../../particles/fire-particle';
+import FireParticle from '../../particles/fire-particle';
 
-import ClientTankEffect from 'src/client/effects/tank/client-tank-effect';
 import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
-import ClientTank from "../../../entity/tank/client-tank";
-import PhysicalComponent from "../../../../entity/physics-component";
-import TransformComponent from "../../../../entity/transform-component";
-import ParticleHost from "../../../particle-host";
+import ClientTank from "../../entity/tank/client-tank";
+import PhysicalComponent from "../../../entity/components/physics-component";
+import TransformComponent from "../../../entity/components/transform-component";
+import ParticleHost from "../../particle-host";
+import ClientEffect from "../client-effect";
 
-export default class ClientTankFireEffect extends ClientTankEffect {
+export default class ClientTankFireEffect extends ClientEffect {
 	public queue: any;
 	public frequency: any;
 	public sound: any;
 
 	static Model: typeof EffectModel = TankFireEffectModel
 
-    constructor(model: EffectModel, tank: ClientTank) {
-        super(model, tank);
+    constructor(model: EffectModel) {
+        super(model);
 
         this.queue = 0
         this.frequency = 20
@@ -30,15 +30,16 @@ export default class ClientTankFireEffect extends ClientTankEffect {
 
     tick(dt: number) {
 
-	    const body = this.tank.model.getComponent(PhysicalComponent).getBody()
-        const transform = this.tank.model.getComponent(TransformComponent).transform
+        const entity = this.host.entity
+	    const body = entity.getComponent(PhysicalComponent).getBody()
+        const transform = entity.getComponent(TransformComponent).transform
 
         const velocity = body.GetLinearVelocity()
         const angle = body.GetAngle()
 
         this.queue += dt * this.frequency
 
-        const world = this.tank.model.parent
+        const world = entity.parent
         const particleComponent = world.getComponent(ParticleHost)
 
         const particlePositionX = transform.transformX(0, 2.5)

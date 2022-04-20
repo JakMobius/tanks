@@ -1,5 +1,5 @@
-import {Component} from "../utils/ecs/component";
-import Entity from "../utils/ecs/entity";
+import {Component} from "../../utils/ecs/component";
+import Entity from "../../utils/ecs/entity";
 
 export default class HealthComponent implements Component {
     private health: number

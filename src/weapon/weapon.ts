@@ -1,6 +1,6 @@
 import Axle from "../controls/axle";
 import ServerTank from "../server/entity/tank/server-tank";
-import HealthComponent from "../entity/health-component";
+import HealthComponent from "../entity/components/health-component";
 
 export interface WeaponConfig {
     tank: ServerTank

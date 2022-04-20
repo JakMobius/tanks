@@ -3,7 +3,7 @@ import PhysicsUtils from '../../../utils/physics-utils';
 import * as Box2D from '../../../library/box2d';
 import AirbagTankBehaviour from '../physics/airbag-tank-behaviour';
 import {physicsFilters} from "../../../physics/categories";
-import PhysicalComponent from "../../physics-component";
+import PhysicalComponent from "../../components/physics-component";
 import PhysicalHostComponent from "../../../physiсal-world-component";
 
 export default class NastyTankModel extends TankModel {

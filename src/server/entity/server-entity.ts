@@ -1,12 +1,11 @@
 import AbstractEntity from '../../entity/abstract-entity';
 import EntityModel from "../../entity/entity-model";
-import ServerGameWorld from "../server-game-world";
 import {Constructor} from "../../serialization/binary/serializable";
-import PhysicalComponent from "../../entity/physics-component";
-import HealthComponent from "../../entity/health-component";
-import ReadBuffer from "../../serialization/binary/read-buffer";
-import WriteBuffer from "../../serialization/binary/write-buffer";
 import EntityDataEncoder from "./entity-data-encoder";
+import EntityDataTransmitComponent, {TransmitContext} from "../../entity/components/network/entity-data-transmit-component";
+import EffectTransmitterComponent from "../../entity/components/network/effect/effect-transmitter-component";
+import PositionTransmitterComponent from "../../entity/components/network/position/position-transmitter-component";
+import HealthTransmitterComponent from "../../entity/components/network/health/health-transmitter-component";
 
 export default class ServerEntity extends AbstractEntity {
     static types = new Map<Constructor<EntityModel>, Constructor<ServerEntity>>()
@@ -17,6 +16,11 @@ export default class ServerEntity extends AbstractEntity {
 
         model.id = ServerEntity.globalId++
         model.addComponent(new EntityDataEncoder())
+        model.addComponent(new EntityDataTransmitComponent(model.id))
+
+        model.addComponent(new EffectTransmitterComponent())
+        model.addComponent(new PositionTransmitterComponent())
+        model.addComponent(new HealthTransmitterComponent())
     }
 
     die() {
