@@ -25,7 +25,6 @@ export default class AbstractWorld<
     public readonly physicsLoop: AdapterLoop;
 
     players = new Map<number, PlayerClass>()
-    entities = new Map<number, EntityClass>()
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
 
@@ -66,34 +65,17 @@ export default class AbstractWorld<
         })
     }
 
-    processEntities(dt: number): void {
-        for (let entity of this.entities.values()) {
-            entity.tick(dt)
-        }
-    }
-
-    removeDeadEntities() {
-        for(let entity of this.entities.values()) {
-            if (entity.model.dead)
-                this.removeEntity(entity)
-        }
-    }
-
     tick(dt: number): void {
         this.emit("before-tick", dt)
 
         this.physicsLoop.timePassed(dt)
-        this.processEntities(dt)
 
         this.emit("tick", dt)
-
-        this.removeDeadEntities()
     }
 
     createEntity(entity: EntityClass): void {
         this.appendChild(entity.model)
 
-        this.entities.set(entity.model.id, entity)
         this.emit("entity-create", entity)
     }
 
@@ -101,7 +83,6 @@ export default class AbstractWorld<
         entity.model.removeFromParent()
         entity.model.destroy()
 
-        this.entities.delete(entity.model.id)
         this.emit("entity-remove", entity)
     }
 

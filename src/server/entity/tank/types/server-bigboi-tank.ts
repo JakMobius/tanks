@@ -3,6 +3,9 @@ import BigBoiTankModel from "../../../../entity/tanks/models/bigboi-tank-model";
 import WeaponMiner from "../../../../weapon/models/miner";
 import WeaponCannon from "../../../../weapon/models/cannon";
 import TankControls from "../../../../controls/tank-controls";
+import EntityDataTransmitComponent
+    from "../../../../entity/components/network/transmitting/entity-data-transmit-component";
+import {EntityType} from "../../../../client/entity/client-entity";
 
 export default class ServerBigboiTank extends ServerTank {
     static Model = BigBoiTankModel
@@ -23,6 +26,8 @@ export default class ServerBigboiTank extends ServerTank {
             tank: this,
             triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
+
+        this.model.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_BIGBOI)
     }
 
     tick(dt: number): void {

@@ -25,11 +25,12 @@ import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import HealthComponent from "../../entity/components/health-component";
-import EntityDataTransmitComponent from "../../entity/components/network/transmitting/entity-data-transmit-component";
-import WriteBuffer from "../../serialization/binary/write-buffer";
 import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
 import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
-import PlayerVisibilityManager from "../player-visibility-manager";
+import {Constructor} from "../../serialization/binary/serializable";
+import EntityModel from "../../entity/entity-model";
+import {EntityType} from "../../client/entity/client-entity";
+import ServerSniperTank from "../entity/tank/types/server-sniper-tank";
 
 interface GameConfig {
     name: string
@@ -178,7 +179,8 @@ export default class Game extends Room {
         this.portal.broadcast(new PlayerChatPacket(text))
     }
 
-    private onClientConfig(client: GameSocketPortalClient, model: typeof TankModel, nick: string) {
+    private onClientConfig(client: GameSocketPortalClient, modelId: number, nick: string) {
+
         let player: ServerPlayer = client.data.player
 
         if(!player) {
@@ -194,8 +196,11 @@ export default class Game extends Room {
             client.data.player = player
         }
 
-        const tankModel = new model()
-        const tank = ServerEntity.fromModel(tankModel) as ServerTank
+        const model = new EntityModel()
+        EntityModel.Types.get(modelId)(model)
+        const tank = new ServerSniperTank({
+            model: model
+        })
         const oldTank = player.tank
 
         this.world.createEntity(tank)

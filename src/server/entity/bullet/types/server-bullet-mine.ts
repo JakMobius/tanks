@@ -11,8 +11,4 @@ export default class ServerBulletMine extends ServerBullet {
         this.startVelocity = 0
         this.explodePower = 15
     }
-
-    tick(dt: number) {
-
-    }
 }

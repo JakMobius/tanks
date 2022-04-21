@@ -7,7 +7,7 @@ import {Commands} from "../commands";
 import ReceiverComponent from "../receiver-component";
 import EntityDataReceiveComponent from "../entity-data-receive-component";
 
-export default class EffectReceiverComponent extends ReceiverComponent {
+export default class EffectReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
 

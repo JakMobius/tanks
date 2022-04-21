@@ -19,6 +19,10 @@ import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
+import EffectHost from "../../../../effects/effect-host";
+import DamageSmokeEffect from "../damage-smoke-effect";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -82,40 +86,22 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientMonsterTank extends ClientTank {
-    public static Model = MonsterTankModel
+ClientEntity.associate(EntityType.TANK_MONSTER, (model) => {
+    // TODO: bad
+    EntityModel.Types.get(EntityType.TANK_MONSTER)(model)
+    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
 
-    constructor(options: TankConfig) {
-        super(options);
+    let engine = new Engine({
+        sound: FX.ENGINE_2,
+        gears: [
+            {high: 1.9, gearing: 1},
+            {low: 1.4, high: 2, gearing: 0.8},
+            {low: 1.4, high: 2, gearing: 0.6},
+            {low: 1.4, high: 2, gearing: 0.4},
+        ],
+        multiplier: 20,
+        pitch: 1
+    })
 
-        this.engine = new Engine({
-            sound: FX.ENGINE_1,
-            gears: [
-                {high: 1.9, gearing: 1},
-                {low: 1.4, gearing: 0.8},
-            ],
-            multiplier: 20,
-            pitch: 0.8
-        })
-
-        this.model.addComponent(new Drawer())
-    }
-
-    static getName() { return "Монстр" }
-    static getDescription() {
-        return "Рассекайте шоссе 66 на монстре! Скоростной пулемёт " +
-            "поможет сбить прицел соперника, а мощный двигатель и " +
-            "хорошая маневренность позволят оторваться почти от " +
-            "любых видов военной техники."
-    }
-
-    static getStats() {
-        return {
-            damage: 4,
-            health: 20,
-            speed: 46,
-            shootrate: 2,
-            reload: 7
-        }
-    }
-}
+    model.addComponent(new Drawer())
+})

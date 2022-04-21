@@ -5,6 +5,8 @@ import EntityModel from "./entity/entity-model";
 export default class GameWorldContactFilter extends Box2D.ContactFilter {
 
     ShouldCollide(fixtureA: b2Fixture, fixtureB: b2Fixture): boolean {
+        // TODO:
+        return true
         if(!super.ShouldCollide(fixtureA, fixtureB)) return false
 
         const bodyA = fixtureA.GetBody()

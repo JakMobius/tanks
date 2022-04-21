@@ -6,7 +6,7 @@ import ReceiverComponent from "../receiver-component";
 import ServerPosition from "../../../../client/entity/server-position";
 import HealthComponent from "../../health-component";
 
-export default class HealthReceiverComponent extends ReceiverComponent {
+export default class HealthReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
         receiveComponent.commandHandlers.set(Commands.HEALTH_UPDATE_COMMAND, (buffer) => {

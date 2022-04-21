@@ -21,10 +21,6 @@ export default abstract class AbstractEntity {
 
     public model: EntityModel = null
 
-    tick(dt: number) {
-        this.model.tick(dt)
-    }
-
     shouldHitEntity(entity: AbstractEntity) { return true }
 
     /**

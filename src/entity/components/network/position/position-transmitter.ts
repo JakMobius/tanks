@@ -2,7 +2,7 @@ import PhysicalComponent from "../../physics-component";
 import {Commands} from "../commands";
 import {Transmitter} from "../transmitting/transmitter";
 
-export default class PositionTransmitterComponent extends Transmitter {
+export default class PositionTransmitter extends Transmitter {
     constructor() {
         super()
 

@@ -15,6 +15,8 @@ export default class GameWorldContactListener extends Box2D.ContactListener {
     }
 
     BeginContact(contact: b2Contact) {
+        // TODO:
+        return
         const worldManifold = new Box2D.WorldManifold()
         contact.GetWorldManifold(worldManifold)
 
@@ -27,11 +29,11 @@ export default class GameWorldContactListener extends Box2D.ContactListener {
         const dataB = bodyB.GetUserData()
 
         if(dataA instanceof EntityModel) {
-            dataA.entity.onBodyHit(bodyB, contact)
+            dataA.onBodyHit(bodyB, contact)
         }
 
         if(dataB instanceof EntityModel) {
-            dataB.entity.onBodyHit(bodyA, contact)
+            dataB.onBodyHit(bodyA, contact)
         }
     }
 }

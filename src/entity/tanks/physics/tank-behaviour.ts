@@ -3,12 +3,13 @@ import {Vec2} from "../../../library/box2d";
 import TankControls from "../../../controls/tank-controls";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
+import EntityModel from "../../entity-model";
 
 /**
  * Class which defines the physical behaviour of each specific type of tank (tracked, wheeled, etc.)
  */
 export default class TankBehaviour implements Component {
-	public entity: TankModel;
+	public entity: Entity;
 
     protected localVector1 = new Vec2()
     protected localVector2 = new Vec2()
@@ -35,9 +36,6 @@ export default class TankBehaviour implements Component {
     }
 
     onAttach(entity: Entity) {
-        if(!(entity instanceof TankModel)) {
-            throw new Error("TankBehaviour component may only be attached to entities of TankModel type")
-        }
         this.entity = entity
         this.entity.on("physics-tick", this.physicsTickHandler);
     }

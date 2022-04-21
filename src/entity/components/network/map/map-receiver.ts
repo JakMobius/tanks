@@ -9,7 +9,7 @@ import BlockState from "../../../../map/block-state/block-state";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import GameMap from "../../../../map/game-map";
 
-export default class MapReceiverComponent extends ReceiverComponent {
+export default class MapReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
         receiveComponent.commandHandlers.set(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {

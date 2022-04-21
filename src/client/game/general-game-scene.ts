@@ -18,6 +18,7 @@ import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
 import EntityModel from "../../entity/entity-model";
 import BlockTreeDecoder from "../../networking/block-tree-decoder";
+import Entity from "../../utils/ecs/entity";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
@@ -29,7 +30,6 @@ export default class GeneralGameScene extends Scene {
 
     public eventContainer: EventContainer
     public chatContainer: ChatContainer
-    public packetReceiver = new BlockTreeDecoder()
     public displayedWorld: ClientGameWorld
     public controlledTank: EntityModel
     public worldDrawer: WorldDrawer
@@ -114,8 +114,8 @@ export default class GeneralGameScene extends Scene {
             this.camera.defaultPosition.y = map.height / 2 * GameMap.BLOCK_SIZE
         })
 
-        this.displayedWorld.on("primary-player-set", (player: ClientPlayer) => {
-            this.onWorldPrimaryPlayerSet(player)
+        this.displayedWorld.on("primary-entity-set", (entity: EntityModel) => {
+            this.onWorldPrimaryEntitySet(entity)
         })
     }
 
@@ -144,11 +144,12 @@ export default class GeneralGameScene extends Scene {
         this.camera.tick(dt)
     }
 
-    protected onWorldPrimaryPlayerSet(player: ClientPlayer) {
-        this.controlledTank = player.tank.model
+    protected onWorldPrimaryEntitySet(entity: EntityModel) {
+        this.controlledTank = entity
         this.playerControls.disconnectAllTankControls()
-        if(player) {
-            const body = this.controlledTank.getComponent(PhysicalComponent).getBody()
+
+        if(entity) {
+            let body = entity.getComponent(PhysicalComponent).getBody()
             this.playerControls.connectTankControls(this.controlledTank.getComponent(TankControls))
             this.camera.target = body.GetPosition()
             this.camera.targetVelocity = body.GetLinearVelocity()

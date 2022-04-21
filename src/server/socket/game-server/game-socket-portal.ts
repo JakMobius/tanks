@@ -15,9 +15,6 @@ import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
 import ServerPlayer from "../../server-player";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
-import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
-import WriteBuffer from "../../../serialization/binary/write-buffer";
-import BinaryBlockCoder from "../../../serialization/binary/parsers/binary-block-coder";
 import PlayerVisibilityManager from "../../player-visibility-manager";
 
 export interface GameSocketPortalClientData {

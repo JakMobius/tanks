@@ -7,7 +7,6 @@ import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-bl
 export class ReceivingEnd {
     private buffer = new WriteBuffer()
     private currentNode: Entity
-    private currentDepth = 0
     private root: Entity
 
     hasData() {
@@ -16,7 +15,6 @@ export class ReceivingEnd {
 
     reset() {
         this.buffer.reset()
-        this.currentDepth = 0
         this.currentNode = this.root
         this.buffer.writeInt32(-1)
     }
@@ -43,9 +41,9 @@ export class ReceivingEnd {
         return this.root
     }
 
-    private navigateTo(transmitterSet: TransmitterSet) {
-        const savedEntity = this.currentNode
-        const savedDepth = this.currentDepth
+    private encodeNavigation(source: TransmitterSet, transmitterSet: TransmitterSet) {
+        let sourceEntity = source.transmitComponent.entity
+        let sourceDepth = source.getNodeDepth()
 
         const targetEntity = transmitterSet.transmitComponent.entity
         const targetDepth = transmitterSet.getNodeDepth()
@@ -54,10 +52,10 @@ export class ReceivingEnd {
 
         let ascendLength = 0
 
-        while(this.currentDepth > targetDepth) {
+        while(sourceDepth > targetDepth) {
             ascendLength++
-            this.currentDepth--
-            this.currentNode = this.currentNode.parent
+            sourceDepth--
+            sourceEntity = sourceEntity.parent
         }
 
         let middleEntity = targetEntity
@@ -65,26 +63,21 @@ export class ReceivingEnd {
 
         let descentPath = []
 
-        while(this.currentDepth < middleDepth) {
+        while(sourceDepth < middleDepth) {
             middleDepth--
             descentPath.push(middleEntity)
             middleEntity = middleEntity.parent
         }
 
-        while(middleEntity != this.currentNode) {
+        while(middleEntity != sourceEntity) {
             ascendLength++
             descentPath.push(middleEntity)
-            if(!this.currentNode || !middleEntity) {
-                this.currentNode = savedEntity
-                this.currentDepth = savedDepth
+            if(!sourceEntity || !middleEntity) {
                 throw new Error("Provided entities does not have any common parents")
             }
             middleEntity = middleEntity.parent
-            this.currentNode = this.currentNode.parent
+            sourceEntity = sourceEntity.parent
         }
-
-        this.currentNode = targetEntity
-        this.currentDepth = targetDepth
 
         this.buffer.writeUint16(ascendLength)
         this.buffer.writeUint16(descentPath.length)
@@ -95,8 +88,18 @@ export class ReceivingEnd {
         }
     }
 
+    packNavigationPath(target: TransmitterSet) {
+        let entityComponent = this.currentNode.getComponent(EntityDataTransmitComponent)
+        let currentTransmitterSet = entityComponent.getTransmitterSet(this)
+
+        this.encodeNavigation(currentTransmitterSet, target)
+    }
+
     packCommand(transmitterSet: TransmitterSet, command: number, callback: (buffer: WriteBuffer) => void) {
-        this.navigateTo(transmitterSet)
+        this.packNavigationPath(transmitterSet)
+
+        this.currentNode = transmitterSet.transmitComponent.entity
+
         BinaryBlockCoder.encodeBlock(this.buffer, () => {
             this.buffer.writeUint16(command)
             callback(this.buffer)

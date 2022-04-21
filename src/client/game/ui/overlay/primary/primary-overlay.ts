@@ -12,7 +12,7 @@ export interface PrimaryOverlayConfig extends OverlayConfig {
     game: GameScene
 }
 
-class PrimaryOverlay extends Overlay {
+export default class PrimaryOverlay extends Overlay {
 	public game: GameScene;
 	public menuContainer: JQuery;
 	public steeringContainer: JQuery;
@@ -70,7 +70,7 @@ class PrimaryOverlay extends Overlay {
     }
 
     emitPlay(): void {
-        this.emit("play", this.playMenu.nickInput.val(), this.tankSelectMenu.selectedTank)
+        this.emit("play", this.playMenu.nickInput.val())
     }
 
     createSteeringContainer(): void {
@@ -94,8 +94,8 @@ class PrimaryOverlay extends Overlay {
 
     createTankSelectContainer(): void {
         this.tankSelectMenu = new TankSelectContainer()
-        this.tankSelectMenu.on("select", (tank) => this.selectTank(tank))
-        this.selectTank(this.tankSelectMenu.selectedTank)
+        // this.tankSelectMenu.on("select", (tank) => this.selectTank(tank))
+        // this.selectTank(this.tankSelectMenu.selectedTank)
         this.menuContainer.append(this.tankSelectMenu.element)
     }
 
@@ -113,7 +113,7 @@ class PrimaryOverlay extends Overlay {
         if(this.shown) return
         super.show()
         new RoomListRequestPacket(true).sendTo(this.game.client.connection)
-        this.tankSelectMenu.loop.start()
+        // this.tankSelectMenu.loop.start()
     }
 
     hide(callback?: () => void): void {
@@ -121,8 +121,6 @@ class PrimaryOverlay extends Overlay {
         super.hide(callback)
 
         new RoomListRequestPacket(false).sendTo(this.game.client.connection)
-        this.tankSelectMenu.loop.stop()
+        // this.tankSelectMenu.loop.stop()
     }
 }
-
-export default PrimaryOverlay;

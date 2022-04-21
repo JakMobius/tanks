@@ -10,6 +10,10 @@ import TruckProgram from "../../../graphics/programs/truck-program";
 import TextureProgram from "../../../graphics/programs/texture-program";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
+import EffectHost from "../../../../effects/effect-host";
+import DamageSmokeEffect from "../damage-smoke-effect";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -59,31 +63,22 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientBomberTank extends ClientTank {
-    public static Model = BomberTankModel
+ClientEntity.associate(EntityType.TANK_BOMBER, (model) => {
+    // TODO: bad
+    EntityModel.Types.get(EntityType.TANK_BOMBER)(model)
+    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
 
-    constructor(options: TankConfig) {
-        super(options);
+    let engine = new Engine({
+        sound: FX.ENGINE_2,
+        gears: [
+            {high: 1.9, gearing: 1},
+            {low: 1.4, high: 2, gearing: 0.8},
+            {low: 1.4, high: 2, gearing: 0.6},
+            {low: 1.4, high: 2, gearing: 0.4},
+        ],
+        multiplier: 20,
+        pitch: 1
+    })
 
-        this.engine = new Engine({
-            sound: FX.ENGINE_2,
-            gears: [
-                {high: 1.9, gearing: 1},
-                {low: 1.4, high: 2, gearing: 0.8},
-                {low: 1.4, high: 2, gearing: 0.6},
-                {low: 1.4, high: 2, gearing: 0.4},
-            ],
-            multiplier: 20,
-            pitch: 1
-        })
-
-        this.model.addComponent(new Drawer())
-    }
-
-    static getName() { return "Бомбер" }
-    static getDescription() {
-        return "Идеальная машина для партизанской войны! Стены и углы" +
-            " - ваши лучшие друзья. Снаряды отскакивают от стен и взрываются" +
-            " при столкновении с танком."
-    }
-}
+    model.addComponent(new Drawer())
+})

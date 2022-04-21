@@ -4,8 +4,10 @@ import ClientPlayer from "./client-player";
 import WorldExplodeEffectModelPool from "../effects/world/explode/explode-effect-pool";
 import ParticleHost from "./particle-host";
 import EntityDataReceiveComponent from "../entity/components/network/entity-data-receive-component";
-import EffectReceiverComponent from "../entity/components/network/effect/effect-receiver-component";
-import MapReceiverComponent from "../entity/components/network/map/map-receiver-component";
+import EffectReceiver from "../entity/components/network/effect/effect-receiver";
+import MapReceiver from "../entity/components/network/map/map-receiver";
+import EntityStateReceiver from "../entity/components/network/entity/entity-state-receiver";
+import PrimaryPlayerReceiver from "../entity/components/network/primary-player/primary-player-receiver";
 
 export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer> {
 
@@ -17,16 +19,13 @@ export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientP
         this.addComponent(new WorldExplodeEffectModelPool())
         this.addComponent(new ParticleHost())
         this.addComponent(new EntityDataReceiveComponent(null))
-        this.addComponent(new EffectReceiverComponent())
-        this.addComponent(new MapReceiverComponent())
+        this.addComponent(new EffectReceiver())
+        this.addComponent(new MapReceiver())
+        this.addComponent(new EntityStateReceiver())
+        this.addComponent(new PrimaryPlayerReceiver())
     }
 
     public tick(dt: number): void {
         super.tick(dt)
-    }
-
-    setPrimaryPlayer(player: ClientPlayer) {
-        this.player = player
-        this.emit("primary-player-set", player)
     }
 }

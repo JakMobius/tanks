@@ -1,7 +1,5 @@
 import TankModel from 'src/entity/tanks/tank-model';
-import {TankStat} from "./tank-stat";
 import {Constructor} from "../../../serialization/binary/serializable";
-import TankDrawer from "../../graphics/drawers/tank-drawer";
 import {EntityModelType} from "../../../entity/entity-model";
 import Engine from "../../engine";
 import ClientPlayer from "../../client-player";
@@ -14,15 +12,11 @@ export interface TankConfig {
 }
 
 export type ClientTankType = Constructor<ClientTank> & {
-    getName(): string
-    getDescription(): string
-    getStats(): TankStat
     Model: Constructor<TankModel> & EntityModelType
 }
 
 export default class ClientTank extends ClientEntity {
     public static Model: EntityModelType & Constructor<TankModel> = null
-    public static Tanks: ClientTankType[] = []
 
 	public engine: Engine;
 	public player: ClientPlayer
@@ -32,10 +26,5 @@ export default class ClientTank extends ClientEntity {
         this.engine = null
 
         this.model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
-    }
-
-    static register(tank: ClientTankType) {
-	    ClientTank.Tanks.push(tank)
-        ClientEntity.associate(tank, tank.Model)
     }
 }

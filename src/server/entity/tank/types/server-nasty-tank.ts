@@ -3,6 +3,9 @@ import WeaponMiner from "src/weapon/models/miner";
 import FlamethrowerWeapon from "../../../../weapon/models/flamethrower";
 import NastyTankModel from "../../../../entity/tanks/models/nasty-tank-model";
 import TankControls from "../../../../controls/tank-controls";
+import EntityDataTransmitComponent
+    from "../../../../entity/components/network/transmitting/entity-data-transmit-component";
+import {EntityType} from "../../../../client/entity/client-entity";
 
 export default class ServerNastyTank extends ServerTank {
     static Model = NastyTankModel
@@ -23,6 +26,8 @@ export default class ServerNastyTank extends ServerTank {
             tank: this,
             triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
+
+        this.model.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_NASTY)
     }
 
     tick(dt: number): void {

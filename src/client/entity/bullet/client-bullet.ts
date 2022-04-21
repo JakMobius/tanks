@@ -8,7 +8,7 @@ export interface ClientBulletOptions {
 }
 
 export default class ClientBullet extends ClientEntity {
-    private shooterId: number;
+    // private shooterId: number;
 
     constructor(options: ClientBulletOptions) {
         super(options.model);

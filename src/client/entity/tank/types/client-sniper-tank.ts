@@ -5,13 +5,16 @@ import LightMaskTextureProgram from "../../../graphics/programs/light-mask-textu
 import TruckProgram from "../../../graphics/programs/truck-program";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
-import SniperTankModel from "../../../../entity/tanks/models/sniper-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
+import EffectHost from "../../../../effects/effect-host";
+import DamageSmokeEffect from "../damage-smoke-effect";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -67,31 +70,22 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientSniperTank extends ClientTank {
-    public static Model = SniperTankModel
+ClientEntity.associate(EntityType.TANK_SNIPER, (model) => {
+    // TODO: bad
+    EntityModel.Types.get(EntityType.TANK_SNIPER)(model)
+    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
 
-    constructor(options: TankConfig) {
-        super(options);
+    let engine = new Engine({
+        sound: FX.ENGINE_2,
+        gears: [
+            {high: 1.9, gearing: 1},
+            {low: 1.4, high: 2, gearing: 0.8},
+            {low: 1.4, high: 2, gearing: 0.6},
+            {low: 1.4, high: 2, gearing: 0.4},
+        ],
+        multiplier: 20,
+        pitch: 1
+    })
 
-        this.engine = new Engine({
-            sound: FX.ENGINE_2,
-            gears: [
-                {high: 1.9, gearing: 1},
-                {low: 1.4, high: 2, gearing: 0.8},
-                {low: 1.4, high: 2, gearing: 0.6},
-                {low: 1.4, high: 2, gearing: 0.4},
-            ],
-            multiplier: 20,
-            pitch: 1
-        })
-
-        this.model.addComponent(new Drawer())
-    }
-
-    static getName() { return "Снайпер" }
-    static getDescription() {
-        return "Классический танк. Довольно быстрый и маневренный. " +
-                "Его длинное дуло обеспечит точнейший выстрел. Отлично " +
-                "подходит для всех ситуаций на поле битвы"
-    }
-}
+    model.addComponent(new Drawer())
+})

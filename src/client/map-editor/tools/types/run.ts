@@ -4,9 +4,8 @@ import PlayerControls from '../../../controls/player-controls';
 import KeyboardController from '../../../controls/interact/keyboard-controller';
 import ToolManager from "../toolmanager";
 import ClientPlayer from "../../../client-player";
-import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
+// import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
 import ClientTank from "../../../entity/tank/client-tank";
-import ClientMonsterTank from "../../../entity/tank/types/client-monster-tank";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 
@@ -34,9 +33,9 @@ export default class RunTool extends Tool {
         this.playerControls = new PlayerControls()
         this.playerControls.setupKeyboard(this.keyboard)
 
-        this.tank = new ClientMonsterTank({
-            model: new MonsterTankModel()
-        })
+        // this.tank = new ClientMonsterTank({
+        //     model: new MonsterTankModel()
+        // })
         
         this.playerControls.connectTankControls(this.tank.model.getComponent(TankControls))
         

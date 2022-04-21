@@ -2,7 +2,6 @@ import {Transmitter} from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import BlockState from "../../../../map/block-state/block-state";
-import {TransmitterSet} from "../transmitting/transmitter-set";
 
 export default class MapTransmitter extends Transmitter {
     constructor() {
@@ -12,9 +11,7 @@ export default class MapTransmitter extends Transmitter {
         this.eventHandler.on("map-block-change", (x, y) => this.queueBlockUpdate(x, y))
     }
 
-    attachToSet(set: TransmitterSet) {
-        super.attachToSet(set);
-
+    attachedToRoot() {
         const map = this.getEntity().getComponent(TilemapComponent).map
 
         this.pack(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {

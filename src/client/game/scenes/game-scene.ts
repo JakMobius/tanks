@@ -6,16 +6,15 @@ import RoomListPacket from 'src/networking/packets/game-packets/room-list-packet
 import PlayerRoomRequestPacket from 'src/networking/packets/game-packets/player-room-request-packet';
 import PlayerRoomChangePacket from 'src/networking/packets/game-packets/player-room-change-packet';
 import PrimaryOverlay from '../ui/overlay/primary/primary-overlay';
-import TankModel from "src/entity/tanks/tank-model";
 import ConnectionClient from "src/networking/connection-client";
 import ClientGameWorld from "../../client-game-world";
 import ClientWorldBridge from "../client-world-bridge";
-import {ClientTankType} from "../../entity/tank/client-tank";
 import GeneralGameScene from "../general-game-scene";
 import TankControls from "../../../controls/tank-controls";
 import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
 import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
+import {EntityType} from "../../entity/client-entity";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient
@@ -54,14 +53,10 @@ export default class GameScene extends GeneralGameScene {
             game: this
         })
 
-        this.overlay.on("play", (nick: string, tank: ClientTankType) => {
-            if(this.displayedWorld && this.displayedWorld.player) {
-                let newTankId = tank.Model.getId()
-                let oldTankId = (this.displayedWorld.player.tank.model.constructor as typeof TankModel).getId()
-                if(newTankId === oldTankId) return
-            }
+        this.overlay.on("play", (nick: string) => {
+            let tankId = EntityType.TANK_SNIPER
 
-            new PlayerConfigPacket(nick, tank.Model).sendTo(this.client.connection)
+            new PlayerConfigPacket(nick, tankId).sendTo(this.client.connection)
         })
 
         this.overlay.roomSelectContainer.on("select", (room: string) => {

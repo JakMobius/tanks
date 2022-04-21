@@ -1,9 +1,7 @@
 import ClientBullet, {ClientBulletOptions} from '../client-bullet';
 import BulletModelMine from '../../../../entity/bullets/models/mine-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
-import ClientEntity from "../../client-entity";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
-import BulletModelBomb from "../../../../entity/bullets/models/bomb-bullet-model";
 
 class Drawer extends BasicEntityDrawer {
 	public shift: any;

@@ -3,10 +3,15 @@ import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import {ReceivingEnd} from "./receiving-end";
 
 export class TransmitterSet {
-    private treeDepth: number = null
+    private treeDepth: number | null = null
     transmitters = new Set<Transmitter>()
     transmitComponent: EntityDataTransmitComponent | null = null
     receivingEnd: ReceivingEnd
+    private attached = false
+
+    constructor(end: ReceivingEnd) {
+        this.receivingEnd = end
+    }
 
     attachTransmitter(transmitter: Transmitter) {
         transmitter.attachToSet(this)
@@ -34,6 +39,11 @@ export class TransmitterSet {
     }
 
     private calculateNodeDepth() {
+        if(!this.transmitComponent) {
+            this.treeDepth = null
+            return
+        }
+        // TODO: can be optimised by using parent node depths
         this.treeDepth = 0
         let entity = this.transmitComponent.entity
         while(entity != this.receivingEnd.getRoot()) {
@@ -42,10 +52,6 @@ export class TransmitterSet {
         }
 
         if(entity == this.receivingEnd.getRoot()) return
-        this.treeDepth = NaN
-    }
-
-    invalidateNodeDepth() {
         this.treeDepth = null
     }
 
@@ -60,5 +66,40 @@ export class TransmitterSet {
             this.calculateNodeDepth()
         }
         return this.treeDepth
+    }
+
+    handleTreeChange() {
+        this.calculateNodeDepth()
+        this.updateAttachState()
+    }
+
+    private updateAttachState() {
+        let newAttachState = Number.isInteger(this.treeDepth)
+        if(newAttachState == this.attached) return
+        this.attached = newAttachState
+
+        if(this.attached) this.attachedToRoot()
+        else this.detachedFromRoot()
+    }
+
+    private attachedToRoot() {
+        for(let transmitter of this.transmitters.values()) {
+            transmitter.attachedToRoot()
+        }
+    }
+
+    private detachedFromRoot() {
+        for(let transmitter of this.transmitters.values()) {
+            transmitter.detachedFromRoot()
+        }
+    }
+
+    setTransmitComponent(component: EntityDataTransmitComponent) {
+        this.transmitComponent = component
+        this.handleTreeChange()
+    }
+
+    isAttachedToRoot() {
+        return this.attached;
     }
 }

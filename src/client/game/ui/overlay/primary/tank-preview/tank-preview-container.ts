@@ -33,7 +33,7 @@ export class Stat implements StatConfig {
     }
 }
 
-class TankPreviewContainer extends Menu {
+export default class TankPreviewContainer extends Menu {
 	public tankPreview: JQuery;
 	public previewCanvas: JQuery<HTMLCanvasElement>;
 	public previewCtx: WebGLRenderingContext;
@@ -136,10 +136,8 @@ class TankPreviewContainer extends Menu {
     previewTank(tank: ClientTankType) {
         this.drawTank(tank)
 
-        this.previewTitle.text(tank.getName())
-        this.descriptionBlock.text(tank.getDescription())
+        // this.previewTitle.text(tank.getName())
+        // this.descriptionBlock.text(tank.getDescription())
         this.applyStats(tank)
     }
 }
-
-export default TankPreviewContainer;

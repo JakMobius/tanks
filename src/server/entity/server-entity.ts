@@ -3,9 +3,6 @@ import EntityModel from "../../entity/entity-model";
 import {Constructor} from "../../serialization/binary/serializable";
 import EntityDataEncoder from "./entity-data-encoder";
 import EntityDataTransmitComponent from "../../entity/components/network/transmitting/entity-data-transmit-component";
-import EffectTransmitter from "../../entity/components/network/effect/effect-transmitter";
-import PositionTransmitterComponent from "../../entity/components/network/position/position-transmitter-component";
-import HealthTransmitterComponent from "../../entity/components/network/health/health-transmitter-component";
 
 export default class ServerEntity extends AbstractEntity {
     static types = new Map<Constructor<EntityModel>, Constructor<ServerEntity>>()
@@ -21,10 +18,6 @@ export default class ServerEntity extends AbstractEntity {
 
     die() {
         this.model.dead = true
-    }
-
-    tick(dt: number) {
-        this.model.tick(dt)
     }
 
     static fromModel(model: EntityModel): ServerEntity | null {

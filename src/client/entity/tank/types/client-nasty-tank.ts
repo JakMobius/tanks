@@ -19,6 +19,10 @@ import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
+import EffectHost from "../../../../effects/effect-host";
+import DamageSmokeEffect from "../damage-smoke-effect";
 
 class Drawer extends TankDrawer {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)
@@ -103,29 +107,17 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientNastyTank extends ClientTank {
-    public static Model = NastyTankModel
+ClientEntity.associate(EntityType.TANK_NASTY, (model) => {
+    // TODO: bad
+    EntityModel.Types.get(EntityType.TANK_NASTY)(model)
+    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
 
-    constructor(options: TankConfig) {
-        super(options);
+    let engine = new Engine({
+        sound: FX.ENGINE_4,
+        multiplier: 20,
+        pitch: 0.9,
+        volume: 0.6
+    })
 
-        this.engine = new Engine({
-            sound: FX.ENGINE_4,
-            multiplier: 20,
-            pitch: 0.9,
-            volume: 0.6
-        })
-
-        this.model.addComponent(new Drawer())
-    }
-
-    static getName() {
-        return "Мерзила"
-    }
-
-    static getDescription() {
-        return "Любите запах напалма на утрам? Тогда эта машина - " +
-            "идеальный выбор для вас! Сложный в управлении, но чудовищно " +
-            "разрушительный танк с огнемётом на воздушной подушке."
-    }
-}
+    model.addComponent(new Drawer())
+})

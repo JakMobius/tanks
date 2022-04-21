@@ -38,21 +38,22 @@ export default class EntityDataReceiveComponent extends HierarchicalComponent {
         })
     }
 
-    private static performNavigation(buffer: ReadBuffer, entity: Entity): Entity {
-        let offset = buffer.offset
+    static performNavigation(buffer: ReadBuffer, entity: Entity): Entity {
         let ascendCount = buffer.readUint16()
         while(ascendCount--) {
             entity = entity.parent
         }
         let descentWayLength = buffer.readUint16()
-        while(descentWayLength--) {
+        while(true) {
+            if (!entity) {
+                return null
+            }
+
+            if(descentWayLength-- == 0) break;
+
             let childIndex = buffer.readUint32()
             let component = entity.getComponent(EntityDataReceiveComponent)
             let child = component.mappedChildren.get(childIndex)
-            if (!child) {
-                console.error("ReceiverComponent has failed to navigate to child entity with id=" + childIndex, entity)
-                return null
-            }
             entity = child.entity
         }
 

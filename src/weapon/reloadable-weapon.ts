@@ -103,9 +103,8 @@ export default class ReloadableWeapon extends Weapon {
         const world = tank.model.parent
 
         const entity = ServerBullet.fromModel(bullet) as ServerBullet
-
         entity.shooter = tank.player
-        entity.model.initPhysics(world.getComponent(PhysicalHostComponent))
+        world.createEntity(entity)
 
         const bulletBody = bullet.getComponent(PhysicalComponent).getBody()
 
@@ -121,7 +120,5 @@ export default class ReloadableWeapon extends Weapon {
             new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
             new Box2D.Vec2(absoluteX, absoluteY)
         )
-
-        world.createEntity(entity)
     }
 }

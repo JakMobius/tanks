@@ -3,6 +3,9 @@ import ServerTank, {ServerTankConfig} from "../server-tank";
 import Weapon42mm from "src/weapon/models/42mm";
 import WeaponMiner from "src/weapon/models/miner";
 import TankControls from "../../../../controls/tank-controls";
+import EntityDataTransmitComponent
+    from "../../../../entity/components/network/transmitting/entity-data-transmit-component";
+import {EntityType} from "../../../../client/entity/client-entity";
 
 export default class ServerSniperTank extends ServerTank {
     static Model = SniperTankModel
@@ -23,6 +26,8 @@ export default class ServerSniperTank extends ServerTank {
             tank: this,
             triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
+
+        this.model.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_SNIPER)
     }
 
     tick(dt: number): void {

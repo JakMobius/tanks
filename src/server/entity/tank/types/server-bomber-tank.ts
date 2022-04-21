@@ -4,6 +4,9 @@ import WeaponMiner from "src/weapon/models/miner";
 import BomberTankModel from "../../../../entity/tanks/models/bomber-tank-model";
 import WeaponBomber from "../../../../weapon/models/bomber";
 import TankControls from "../../../../controls/tank-controls";
+import EntityDataTransmitComponent
+    from "../../../../entity/components/network/transmitting/entity-data-transmit-component";
+import {EntityType} from "../../../../client/entity/client-entity";
 
 export default class ServerBomberTank extends ServerTank {
     static Model = BomberTankModel
@@ -24,6 +27,8 @@ export default class ServerBomberTank extends ServerTank {
             tank: this,
             triggerAxle: controlsComponent.getMinerWeaponAxle()
         })
+
+        this.model.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_BOMBER)
     }
 
     tick(dt: number): void {

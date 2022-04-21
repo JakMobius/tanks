@@ -7,7 +7,8 @@ import HealthComponent from "./components/health-component";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
 import EffectHost from "../effects/effect-host";
-import EffectReceiverComponent from "./components/network/effect/effect-receiver-component";
+import EffectReceiver from "./components/network/effect/effect-receiver";
+import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 
 /**
  * Entity model. Describes entity position,
@@ -24,6 +25,7 @@ export type EntityModelType = {
 }
 
 export default class EntityModel extends Entity {
+    static Types = new Map<number, (entity: EntityModel) => void>()
 
     static groupName = 5
     static typeName = 0
@@ -36,6 +38,8 @@ export default class EntityModel extends Entity {
 
     public entity?: AbstractEntity
 
+    private parentEventHandler = new BasicEventHandlerSet()
+
     constructor() {
         super()
 
@@ -45,10 +49,10 @@ export default class EntityModel extends Entity {
 
         this.getComponent(HealthComponent).setHealth((this.constructor as typeof EntityModel).getMaximumHealth())
 
+        this.parentEventHandler.on("tick", (dt) => this.tick(dt))
+
         this.on("attached-to-parent", (child, parent) => {
-            if(child == this) {
-                this.initPhysics(parent.getComponent(PhysicalHostComponent))
-            }
+            if(child == this) this.parentEventHandler.setTarget(parent)
         });
     }
 
@@ -73,7 +77,7 @@ export default class EntityModel extends Entity {
     }
 
     initPhysics(world: PhysicalHostComponent) {
-        throw new Error("Method not implemented")
+        // throw new Error("Method not implemented")
     }
 
     static getId(): number {

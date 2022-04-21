@@ -34,16 +34,17 @@ export default class ServerBullet extends ServerEntity {
         this.lifeTime = 15
     }
 
-    tick(dt: number) {
-        super.tick(dt)
-
-        this.lifeTime -= dt
-        if(this.lifeTime <= 0) this.die()
-    }
+    // tick(dt: number) {
+    //     super.tick(dt)
+    //
+    //     this.lifeTime -= dt
+    //     if(this.lifeTime <= 0) this.die()
+    // }
 
     die() {
         if(this.model.dead) return
         this.model.dead = true
+
         if(this.explodePower) {
             let position = this.model.getComponent(PhysicalComponent).getBody().GetPosition()
             let effect = new WorldExplodeEffectModel({
@@ -55,6 +56,8 @@ export default class ServerBullet extends ServerEntity {
 
             world.getComponent(EffectHost).addEffect(ServerEffect.fromModel(effect))
         }
+
+        this.model.removeFromParent()
     }
 
     shouldHitEntity(entity: ServerEntity): boolean {

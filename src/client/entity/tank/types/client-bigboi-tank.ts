@@ -1,17 +1,20 @@
-import ClientTank, {TankConfig} from '../client-tank';
+
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import LightMaskTextureProgram from "../../../graphics/programs/light-mask-texture/light-mask-texture-program";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
-import BigBoiTankModel from "../../../../entity/tanks/models/bigboi-tank-model";
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
+import EffectHost from "../../../../effects/effect-host";
+import DamageSmokeEffect from "../damage-smoke-effect";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -65,30 +68,20 @@ class Drawer extends TankDrawer {
     }
 }
 
-export default class ClientBigboiTank extends ClientTank {
-    public static Model = BigBoiTankModel
+ClientEntity.associate(EntityType.TANK_BIGBOI, (model) => {
+    // TODO: bad copypaste
+    EntityModel.Types.get(EntityType.TANK_BIGBOI)(model)
+    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
 
-    constructor(options: TankConfig) {
-        super(options);
+    let engine = new Engine({
+        sound: FX.ENGINE_1,
+        gears: [
+            {high: 1.9, gearing: 1},
+            {low: 1.4, gearing: 0.8},
+        ],
+        multiplier: 20,
+        pitch: 0.8
+    })
 
-        this.engine = new Engine({
-            sound: FX.ENGINE_1,
-            gears: [
-                {high: 1.9, gearing: 1},
-                {low: 1.4, gearing: 0.8},
-            ],
-            multiplier: 20,
-            pitch: 0.8
-        })
-
-        this.model.addComponent(new Drawer())
-    }
-
-    static getName() { return "Big Boi" }
-    static getDescription() {
-        return "Это невероятное чудо техники создано, чтобы " +
-            "уничтожать всё на своём пути. Снаряд этого танка, " +
-            "имея огромную массу, способен резко изменить " +
-            "траекторию движения соперника или вовсе закрутить и обездвижить его."
-    }
-}
+    model.addComponent(new Drawer())
+})

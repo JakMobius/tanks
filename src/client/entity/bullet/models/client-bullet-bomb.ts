@@ -3,7 +3,6 @@ import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import BulletModel from 'src/entity/bullets/bullet-model';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import BulletModelBomb from "../../../../entity/bullets/models/bomb-bullet-model";
-import BulletModel42mm from "../../../../entity/bullets/models/42mm-bullet-model";
 
 class Drawer extends BasicEntityDrawer {
     static spriteNames = ["bullets/bomb/bomb"]

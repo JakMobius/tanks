@@ -6,6 +6,7 @@ export const Commands = {
     ENTITY_REMOVE_COMMAND:    0xF002,
 
     // Component commands
+    PLAYER_TANK_SET:          0x0F09,
     GAME_MAP_CONTENT_COMMAND: 0x0F0A,
     BLOCK_UPDATE_COMMAND:     0x0F0B,
     HEALTH_UPDATE_COMMAND:    0x0F0C,

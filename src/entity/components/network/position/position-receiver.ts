@@ -5,7 +5,7 @@ import {Commands} from "../commands";
 import ReceiverComponent from "../receiver-component";
 import ServerPosition from "../../../../client/entity/server-position";
 
-export default class PositionReceiverComponent extends ReceiverComponent {
+export default class PositionReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
 
