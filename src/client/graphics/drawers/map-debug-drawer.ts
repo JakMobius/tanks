@@ -13,10 +13,13 @@ import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrang
 import PhysicalHostComponent from "../../../physiсal-world-component";
 import ChunkedMapCollider from "../../../physics/chunked-map-collider";
 import TransformComponent from "../../../entity/components/transform-component";
+import TankBehaviour from "../../../entity/tanks/physics/tank-behaviour";
+import EntityModel from "../../../entity/entity-model";
+import Entity from "../../../utils/ecs/entity";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
-    private world: ClientGameWorld;
+    private world: Entity;
 
     // ARGB
     static chunkBorderColor = 0xFFDD22DD
@@ -36,7 +39,7 @@ export default class MapDebugDrawer {
         this.b2DebugDraw.SetFlags(b2DrawFlags.e_shapeBit)
     }
 
-    setWorld(world: ClientGameWorld) {
+    setWorld(world: Entity) {
         this.world = world
     }
 
@@ -106,8 +109,9 @@ export default class MapDebugDrawer {
     }
 
     private drawTanksWheelDebug() {
-        for(let entity of this.world.entities.values()) {
-            if(entity instanceof ClientTank) {
+        for(let entity of this.world.children) {
+            let behaviourComponent = entity.getComponent(TankBehaviour)
+            if(behaviourComponent) {
                 this.drawTankWheelDebug(entity)
             }
         }
@@ -119,9 +123,9 @@ export default class MapDebugDrawer {
         this.world.getComponent(PhysicalHostComponent).world.DebugDraw()
     }
 
-    private drawTankWheelDebug(entity: ClientTank) {
-        const behaviour = entity.model.getComponent(WheeledTankBehaviour)
-        const transform = entity.model.getComponent(TransformComponent).transform
+    private drawTankWheelDebug(entity: Entity) {
+        const behaviour = entity.getComponent(WheeledTankBehaviour)
+        const transform = entity.getComponent(TransformComponent).transform
 
         if(!behaviour) return
 

@@ -1,32 +1,29 @@
-import AbstractWorld from "./abstract-world";
+
 import Team from "./server/team";
 import AbstractEntity from "./entity/abstract-entity";
-import TankModel from "./entity/tanks/tank-model";
+import EntityModel from "./entity/entity-model";
 
-export interface PlayerConfig<
-        TankClass extends AbstractEntity = AbstractEntity
-    > {
+
+export interface PlayerConfig {
     nick?: string
     id?: number
     team?: Team
-    tank?: TankClass
+    tank?: EntityModel
 }
 
 export type AbstractTank = AbstractEntity & {
     player: AbstractPlayer
 }
 
-export default class AbstractPlayer<
-        TankClass extends AbstractTank = AbstractTank
-    > {
+export default class AbstractPlayer {
 
-    public tank: TankClass
+    public tank: EntityModel
 
     public nick: string;
     public id: number;
     public team: Team;
 
-    constructor(config?: PlayerConfig<TankClass>) {
+    constructor(config?: PlayerConfig) {
         config = config || {}
         this.nick = config.nick
         this.id = config.id
@@ -35,9 +32,8 @@ export default class AbstractPlayer<
         if(config.tank) this.setTank(config.tank)
     }
 
-    setTank(tank: TankClass) {
+    setTank(tank: EntityModel) {
         this.tank = tank
-        tank.player = this
     }
 
     destroy() {

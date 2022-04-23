@@ -1,16 +1,14 @@
 import Weapon, {WeaponConfig} from "./weapon";
-import BulletModel from "../entity/bullets/bullet-model";
-import ServerBullet from "../server/entity/bullet/server-bullet";
-import * as Box2D from "../library/box2d";
 import PhysicalComponent from "../entity/components/physics-component";
-import PhysicalHostComponent from "../physiсal-world-component";
 import TransformComponent from "../entity/components/transform-component";
+import EntityModel from "../entity/entity-model";
+import ServerEntity from "../server/entity/server-entity";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
     shootRate?: number
     reloadTime?: number
-    bulletType?: typeof BulletModel
+    bulletType?: number
 }
 
 export default class ReloadableWeapon extends Weapon {
@@ -87,11 +85,11 @@ export default class ReloadableWeapon extends Weapon {
      * @param rotation Initial bullet rotation relative to the tank
      */
 
-    launchBullet(bullet: BulletModel, x: number, y: number, rotation: number = 0): void {
+    launchBullet(bullet: number, x: number, y: number, rotation: number = 0): void {
 
         const tank = this.tank
-        const tankBody = tank.model.getComponent(PhysicalComponent).getBody()
-        const transform = tank.model.getComponent(TransformComponent).transform
+        const tankBody = tank.getComponent(PhysicalComponent).getBody()
+        const transform = tank.getComponent(TransformComponent).transform
 
         rotation = tankBody.GetAngle()
 
@@ -100,25 +98,27 @@ export default class ReloadableWeapon extends Weapon {
 
         const sin = Math.sin(rotation)
         const cos = Math.cos(rotation)
-        const world = tank.model.parent
+        const world = tank.parent
 
-        const entity = ServerBullet.fromModel(bullet) as ServerBullet
-        entity.shooter = tank.player
-        world.createEntity(entity)
+        const entity = new EntityModel()
+        EntityModel.Types.get(bullet)(entity)
+        ServerEntity.types.get(bullet)(entity)
+        // entity.addComponent(new EntityDataTransmitComponent(model.id))
+        world.appendChild(entity)
 
-        const bulletBody = bullet.getComponent(PhysicalComponent).getBody()
+        const bulletBody = entity.getComponent(PhysicalComponent).getBody()
 
-        let vx = -sin * entity.startVelocity
-        let vy = cos * entity.startVelocity
+        // let vx = -sin * entity.startVelocity
+        // let vy = cos * entity.startVelocity
 
-        bulletBody.SetAngle(rotation)
-        bulletBody.SetPosition(bulletBody.GetPosition().Set(absoluteX, absoluteY))
-        bulletBody.SetLinearVelocity(bulletBody.GetLinearVelocity().Set(vx, vy))
-
-        // TODO: костыль. Этим должен заниматься физ.движок
-        tankBody.ApplyLinearImpulse(
-            new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
-            new Box2D.Vec2(absoluteX, absoluteY)
-        )
+        // bulletBody.SetAngle(rotation)
+        // bulletBody.SetPosition(bulletBody.GetPosition().Set(absoluteX, absoluteY))
+        // bulletBody.SetLinearVelocity(bulletBody.GetLinearVelocity().Set(vx, vy))
+        //
+        // // TODO: костыль. Этим должен заниматься физ.движок
+        // tankBody.ApplyLinearImpulse(
+        //     new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
+        //     new Box2D.Vec2(absoluteX, absoluteY)
+        // )
     }
 }

@@ -1,21 +1,15 @@
 import Game from "../../server/room/game";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
 import ServerPlayer from "../../server/server-player";
-import ServerTank from "../../server/entity/tank/server-tank";
-import SniperTankModel from "../../entity/tanks/models/sniper-tank-model";
 import TankModel from "../../entity/tanks/tank-model";
-import ServerEntity from "../../server/entity/server-entity";
-import BomberTankModel from "../../entity/tanks/models/bomber-tank-model";
-import MonsterTankModel from "../../entity/tanks/models/monster-tank-model";
-import {Constructor} from "../../serialization/binary/serializable";
-import BigBoiTankModel from "../../entity/tanks/models/bigboi-tank-model";
-import NastyTankModel from "../../entity/tanks/models/nasty-tank-model";
 import PhysicalComponent from "../../entity/components/physics-component";
 import HealthComponent from "../../entity/components/health-component";
+import {EntityType} from "../entity/client-entity";
+import EntityModel from "../../entity/entity-model";
 
 export default class TutorialWorldController {
     game: Game;
-    private tanks: ServerTank[] = []
+    private tanks: EntityModel[] = []
     private selectedTanks: Map<ServerPlayer, number> = new Map()
 
     constructor(serverGame: Game) {
@@ -31,25 +25,26 @@ export default class TutorialWorldController {
         this.createDummies()
     }
 
-    private createTank(modelClass: Constructor<TankModel>, x: number, y: number, angle: number) {
-        let model = new modelClass()
-        let tank = ServerEntity.fromModel(model) as ServerTank
-        this.game.world.createEntity(tank)
+    private createTank(entityType: number, x: number, y: number, angle: number) {
+        throw "Not implemented"
 
-        tank.teleport(x, y)
-
-        const body = model.getComponent(PhysicalComponent).getBody()
-        body.SetAngle(angle)
-
-        this.tanks.push(tank)
+        // let model = new modelClass()
+        // let tank = ServerEntity.fromModel(model) as ServerTank
+        // this.game.world.createEntity(tank)
+        //
+        // const body = model.getComponent(PhysicalComponent).getBody()
+        // body.SetPositionXY(x, y)
+        // body.SetAngle(angle)
+        //
+        // this.tanks.push(tank)
     }
 
     private createDummies() {
-        this.createTank(BigBoiTankModel, 50, 205, 0)
-        this.createTank(NastyTankModel, 65, 205, 0)
-        this.createTank(SniperTankModel, 80, 200, 0)
-        this.createTank(BomberTankModel, 95, 205, 0)
-        this.createTank(MonsterTankModel, 30, 205, 0)
+        this.createTank(EntityType.TANK_BIGBOI, 50, 205, 0)
+        this.createTank(EntityType.TANK_NASTY, 65, 205, 0)
+        this.createTank(EntityType.TANK_SNIPER, 80, 200, 0)
+        this.createTank(EntityType.TANK_BOMBER, 95, 205, 0)
+        this.createTank(EntityType.TANK_MONSTER, 30, 205, 0)
     }
 
     private onPlayerCreate(player: ServerPlayer) {
@@ -75,13 +70,12 @@ export default class TutorialWorldController {
 
     private respawnPlayer(player: ServerPlayer) {
         const tank = player.tank
-        const model = tank.model
-        const body = model.getComponent(PhysicalComponent).getBody()
 
-        model.getComponent(HealthComponent).setHealth((model.constructor as typeof TankModel).getMaximumHealth())
+        tank.getComponent(HealthComponent).setHealth((tank.constructor as typeof TankModel).getMaximumHealth())
 
-        tank.teleport(17.5, 212.5)
-        tank.setVelocity(0, 0)
+        let body = tank.getComponent(PhysicalComponent).getBody()
+        body.SetPositionXY(17.5, 212.5)
+        body.SetLinearVelocity({x: 0, y: 0})
         body.SetAngle(4)
         body.SetAngularVelocity(0)
     }

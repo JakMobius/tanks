@@ -1,4 +1,4 @@
-import BulletModel from "../../entity/bullets/bullet-model";
+import BulletModel from "../../entity/bullet-model";
 import ClientGameWorld from "../client-game-world";
 
 export interface WeaponConfig {

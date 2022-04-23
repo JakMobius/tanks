@@ -1,7 +1,8 @@
-import CannonBall from '../../entity/bullets/models/cannonball-bullet-model';
+
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"
 import {WeaponConfig} from "../weapon";
+import {EntityType} from "../../client/entity/client-entity";
 
 export default class WeaponCannon extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
@@ -9,7 +10,7 @@ export default class WeaponCannon extends SingleBarreledWeapon {
 			maxAmmo: 5,
 			shootRate: 2000,
 			reloadTime: 7000,
-			bulletType: CannonBall,
+			bulletType: EntityType.BULLET_CANNONBALL,
 			muzzlePoint: new Box2D.Vec2(0, 2.5),
 			tank: config.tank,
 			triggerAxle: config.triggerAxle

@@ -1,7 +1,7 @@
 import SingleBarreledWeapon from "../single-barreled-weapon";
-import BulletModelMine from "../../entity/bullets/models/mine-bullet-model";
 import * as Box2D from "../../library/box2d"
 import {WeaponConfig} from "../weapon";
+import {EntityType} from "../../client/entity/client-entity";
 
 export default class WeaponMiner extends SingleBarreledWeapon {
     constructor(config: WeaponConfig) {
@@ -9,7 +9,7 @@ export default class WeaponMiner extends SingleBarreledWeapon {
             maxAmmo: 1,
             shootRate: 1000,
             reloadTime: 1000,
-            bulletType: BulletModelMine,
+            bulletType: EntityType.BULLET_MINE,
             muzzlePoint: new Box2D.Vec2(0, 0),
             tank: config.tank,
             triggerAxle: config.triggerAxle

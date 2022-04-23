@@ -7,10 +7,10 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
     transmitterSets = new Map<ReceivingEnd, TransmitterSet>()
     networkIdentifier: number | null = null
     configScriptIndex: number = 0
+    private entitiesCreated: number = 0
 
-    constructor(identifier: number | null = null) {
+    constructor() {
         super();
-        this.networkIdentifier = identifier
 
         this.eventHandler.on("attached-to-parent", () => {
             for(let set of this.transmitterSets.values()) {
@@ -42,13 +42,15 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
     }
 
     protected childComponentAdded(component: EntityDataTransmitComponent) {
-        if (!Number.isInteger(component.networkIdentifier)) {
-            throw new Error("Only root transmitter component may have null identifier")
-        }
+        component.networkIdentifier = this.nextUnusedNetworkIdentifier()
         this.childTransmitComponents.set(component.networkIdentifier, component)
     }
 
     protected childComponentDetached(component: EntityDataTransmitComponent) {
         this.childTransmitComponents.delete(component.networkIdentifier)
+    }
+
+    private nextUnusedNetworkIdentifier() {
+        return this.entitiesCreated++
     }
 }

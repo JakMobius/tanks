@@ -8,7 +8,7 @@ import {UserDataRaw} from "../user-data-raw";
 import GeneralGameScreen from "../game/general-game-screen";
 
 /* Loading all necessary stuff for the game */
-import 'src/entity/tanks/model-loader'
+import 'src/entity/model-loader'
 import 'src/client/entity/bullet/model-loader';
 import 'src/client/entity/tank/model-loader';
 import 'src/client/graphics/drawers/block/type-loader';

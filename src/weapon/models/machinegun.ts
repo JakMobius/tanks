@@ -1,6 +1,7 @@
-import Bullet16mm from '../../entity/bullets/models/16mm-bullet-model';
+
 import ReloadableWeapon from "../reloadable-weapon";
 import {WeaponConfig} from "../weapon";
+import {EntityType} from "../../client/entity/client-entity";
 
 export default class WeaponMachineGun extends ReloadableWeapon {
 	public state: number;
@@ -20,7 +21,7 @@ export default class WeaponMachineGun extends ReloadableWeapon {
 	shoot() {
 		const shift = (this.state === 0) ? -0.35 : 0.35;
 
-		this.launchBullet(new Bullet16mm(), shift, 2.5)
+		this.launchBullet(EntityType.BULLET_16MM, shift, 2.5)
 
 		this.state = 1 - this.state
 

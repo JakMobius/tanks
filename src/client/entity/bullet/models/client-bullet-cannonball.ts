@@ -1,7 +1,8 @@
-import ClientBullet, {ClientBulletOptions} from '../client-bullet';
-import BulletModelCannonball from '../../../../entity/bullets/models/cannonball-bullet-model';
+
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
 
 class Drawer extends BasicEntityDrawer {
     static spriteNames = ["bullets/cannonball/cannonball"]
@@ -11,12 +12,7 @@ class Drawer extends BasicEntityDrawer {
     }
 }
 
-export default class ClientBulletCannonball extends ClientBullet {
-    static Model = BulletModelCannonball
-
-    constructor(options: ClientBulletOptions) {
-        super(options);
-
-        this.model.addComponent(new Drawer())
-    }
-}
+ClientEntity.associate(EntityType.BULLET_CANNONBALL, (model) => {
+    EntityModel.Types.get(EntityType.BULLET_CANNONBALL)(model)
+    model.addComponent(new Drawer())
+})

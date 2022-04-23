@@ -6,6 +6,7 @@ import ClientPlayer from "../../client-player";
 import ClientEntity from "../client-entity";
 import EffectHost from "../../../effects/effect-host";
 import DamageSmokeEffect from "./damage-smoke-effect";
+import Entity from "../../../utils/ecs/entity";
 
 export interface TankConfig {
     model: TankModel
@@ -26,5 +27,10 @@ export default class ClientTank extends ClientEntity {
         this.engine = null
 
         this.model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
+    }
+
+    static configureEntity(entity: Entity) {
+        ClientEntity.configureEntity(entity)
+        entity.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
     }
 }

@@ -41,13 +41,13 @@ export default class FlamethrowerWeapon extends Weapon {
 		if(!this.engaged) return
 
 		const tank = this.tank
-		const tankBody = tank.model.getComponent(PhysicalComponent).getBody()
+		const tankBody = tank.getComponent(PhysicalComponent).getBody()
 		const tankLocation = tankBody.GetPosition()
 		const tankAngle = tankBody.GetAngle()
 
 		const pAngle = (tankAngle + Math.PI) % (Math.PI * 2) - Math.PI;
 
-		const world = tank.model.parent
+		const world = tank.parent
 
 		for (let entity of world.children.values()) {
 
@@ -75,11 +75,11 @@ export default class FlamethrowerWeapon extends Weapon {
 
 	onEngage() {
 		super.onEngage();
-		this.tank.model.getComponent(EffectHost).addEffect(this.serverEffect)
+		this.tank.getComponent(EffectHost).addEffect(this.serverEffect)
 	}
 
 	onDisengage() {
 		super.onDisengage();
-		this.tank.model.getComponent(EffectHost).removeEffect(this.serverEffect)
+		this.tank.getComponent(EffectHost).removeEffect(this.serverEffect)
 	}
 }

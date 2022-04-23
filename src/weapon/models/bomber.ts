@@ -1,7 +1,8 @@
-import BulletModelBomb from '../../entity/bullets/models/bomb-bullet-model';
+
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"
 import {WeaponConfig} from "../weapon";
+import {EntityType} from "../../client/entity/client-entity";
 
 export default class WeaponBomber extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
@@ -9,7 +10,7 @@ export default class WeaponBomber extends SingleBarreledWeapon {
 			maxAmmo: 5,
 			shootRate: 1000,
 			reloadTime: 5000,
-			bulletType: BulletModelBomb,
+			bulletType: EntityType.BULLET_BOMB,
 			muzzlePoint: new Box2D.Vec2(0, 2.5),
 			tank: config.tank,
 			triggerAxle: config.triggerAxle

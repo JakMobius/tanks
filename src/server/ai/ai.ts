@@ -1,12 +1,11 @@
 import Server from "../server";
 import ServerGameWorld from "../server-game-world";
-import ServerTank from "../entity/tank/server-tank";
-
+import EntityModel from "../../entity/entity-model";
 
 export interface AIConfig {
 	server: Server
 	game: ServerGameWorld
-	tank: ServerTank
+	tank: EntityModel
 }
 
 export default class AI {

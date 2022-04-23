@@ -6,6 +6,7 @@ import TutorialWorldController from "../tutorial-world-controller";
 import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
 import GeneralGameScene from "../../game/general-game-scene";
 import TankControls from "../../../controls/tank-controls";
+import EntityModel from "../../../entity/entity-model";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -51,13 +52,13 @@ export default class TutorialScene extends GeneralGameScene {
         new PlayerChatPacket(command).sendTo(this.game.clientConnection.connection)
     }
 
-    onWorldPrimaryPlayerSet(player: ClientPlayer) {
-        super.onWorldPrimaryPlayerSet(player)
-        if(player) {
+    onWorldPrimaryEntitySet(entity: EntityModel) {
+        super.onWorldPrimaryEntitySet(entity)
+        // if(player) {
             // Well, at least this approach is better than updating the tank
             // controls in a timer...
-            let serverPlayer = this.game.serverGame.world.players.get(player.id)
-            this.playerControls.connectTankControls(serverPlayer.tank.model.getComponent(TankControls))
-        }
+            //let serverPlayer = this.game.serverGame.world.players.get(player.id)
+            //this.playerControls.connectTankControls(serverPlayer.tank.model.getComponent(TankControls))
+        // }
     }
 }

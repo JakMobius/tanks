@@ -9,7 +9,7 @@ import MapReceiver from "../entity/components/network/map/map-receiver";
 import EntityStateReceiver from "../entity/components/network/entity/entity-state-receiver";
 import PrimaryPlayerReceiver from "../entity/components/network/primary-player/primary-player-receiver";
 
-export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer> {
+export default class EntityClientGameWorld extends AbstractWorld<ClientEntity, ClientPlayer> {
 
     public player: ClientPlayer = null
 
@@ -18,7 +18,7 @@ export default class ClientGameWorld extends AbstractWorld<ClientEntity, ClientP
 
         this.addComponent(new WorldExplodeEffectModelPool())
         this.addComponent(new ParticleHost())
-        this.addComponent(new EntityDataReceiveComponent(null))
+        this.addComponent(new EntityDataReceiveComponent())
         this.addComponent(new EffectReceiver())
         this.addComponent(new MapReceiver())
         this.addComponent(new EntityStateReceiver())

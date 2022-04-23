@@ -78,8 +78,13 @@ export default class GameScene extends GeneralGameScene {
         const update = () => {
             this.screen.loop.scheduleTask(update, this.controlsUpdateInterval)
             // TODO: this is a wrong place to send these packets.
-            if(this.displayedWorld && this.displayedWorld.player && this.displayedWorld.player.tank.model.getComponent(TankControls).shouldUpdate()) {
-                new PlayerControlsPacket(this.displayedWorld.player.tank.model.getComponent(TankControls)).sendTo(this.client.connection)
+
+            let tank = this.controlledTank
+            if(!tank) return
+
+            let component = tank.getComponent(TankControls)
+            if(component.shouldUpdate()) {
+                new PlayerControlsPacket(component).sendTo(this.client.connection)
             }
         }
 

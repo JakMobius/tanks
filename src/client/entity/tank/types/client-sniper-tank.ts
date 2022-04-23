@@ -1,4 +1,4 @@
-import ClientTank, {TankConfig} from '../client-tank';
+
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import LightMaskTextureProgram from "../../../graphics/programs/light-mask-texture/light-mask-texture-program";
@@ -15,6 +15,7 @@ import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import EffectHost from "../../../../effects/effect-host";
 import DamageSmokeEffect from "../damage-smoke-effect";
+import ClientTank from "../client-tank";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -73,7 +74,7 @@ class Drawer extends TankDrawer {
 ClientEntity.associate(EntityType.TANK_SNIPER, (model) => {
     // TODO: bad
     EntityModel.Types.get(EntityType.TANK_SNIPER)(model)
-    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
+    ClientTank.configureEntity(model)
 
     let engine = new Engine({
         sound: FX.ENGINE_2,

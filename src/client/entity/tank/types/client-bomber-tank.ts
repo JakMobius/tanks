@@ -1,7 +1,6 @@
-import BomberTankModel from "../../../../entity/tanks/models/bomber-tank-model";
+
 import Engine from "../../../engine";
 import FX from "../../../sound/fx";
-import ClientTank, {TankConfig} from "../client-tank";
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
@@ -14,6 +13,7 @@ import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import EffectHost from "../../../../effects/effect-host";
 import DamageSmokeEffect from "../damage-smoke-effect";
+import ClientTank from "../client-tank";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -66,7 +66,7 @@ class Drawer extends TankDrawer {
 ClientEntity.associate(EntityType.TANK_BOMBER, (model) => {
     // TODO: bad
     EntityModel.Types.get(EntityType.TANK_BOMBER)(model)
-    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
+    ClientTank.configureEntity(model)
 
     let engine = new Engine({
         sound: FX.ENGINE_2,

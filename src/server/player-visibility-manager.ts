@@ -1,7 +1,6 @@
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import Entity from "../utils/ecs/entity";
 import ServerGameWorld from "./server-game-world";
-import ServerTank from "./entity/tank/server-tank";
 import EntityDataTransmitComponent from "../entity/components/network/transmitting/entity-data-transmit-component";
 import EffectTransmitter from "../entity/components/network/effect/effect-transmitter";
 import MapTransmitter from "../entity/components/network/map/map-transmitter";
@@ -12,8 +11,8 @@ import HealthTransmitter from "../entity/components/network/health/health-transm
 import SocketPortalClient from "./socket/socket-portal-client";
 import {ReceivingEnd} from "../entity/components/network/transmitting/receiving-end";
 import EntityStateTransmitter from "../entity/components/network/entity/entity-state-transmitter";
-import PrimaryPlayerReceiver from "../entity/components/network/primary-player/primary-player-receiver";
 import PrimaryPlayerTransmitter from "../entity/components/network/primary-player/primary-player-transmitter";
+import EntityModel from "../entity/entity-model";
 
 export default class PlayerVisibilityManager {
     // There are times when you can't rewrite something well,
@@ -33,7 +32,7 @@ export default class PlayerVisibilityManager {
     primaryPlayerTransmitter = new PrimaryPlayerTransmitter()
 
     private world: ServerGameWorld
-    private tank: ServerTank
+    private tank: EntityModel
 
     constructor() {
         this.tankEventHandler.on("tick", () => this.updateVisibleEntities())
@@ -58,21 +57,21 @@ export default class PlayerVisibilityManager {
         }
     }
 
-    setTank(tank: ServerTank) {
+    setTank(tank: EntityModel) {
         this.tank = tank
-        this.tankEventHandler.setTarget(tank.model)
+        this.tankEventHandler.setTarget(tank)
     }
 
     private updateVisibleEntities() {
         // This code is bad on purpose. I'm forcing myself to
         // rewrite this in the future.
 
-        for(let entity of this.tank.model.parent.children) {
+        for(let entity of this.tank.parent.children) {
             let transform = entity.getComponent(TransformComponent)
             if(!transform) continue
 
             let position = transform.getPosition()
-            let myPosition = this.tank.model.getComponent(PhysicalComponent).getBody().GetPosition()
+            let myPosition = this.tank.getComponent(PhysicalComponent).getBody().GetPosition()
 
             position.x -= myPosition.x
             position.y -= myPosition.y
@@ -93,10 +92,10 @@ export default class PlayerVisibilityManager {
                 transmitterSet.attachTransmitter(new EffectTransmitter())
                 transmitterSet.attachTransmitter(new PositionTransmitter())
                 transmitterSet.attachTransmitter(new HealthTransmitter())
-                if(entity == this.tank.model) this.primaryPlayerTransmitter.setEntity(this.tank.model)
+                if(entity == this.tank) this.primaryPlayerTransmitter.setEntity(this.tank)
                 this.visibleEntities.add(entity)
             } else {
-                if(entity == this.tank.model) this.primaryPlayerTransmitter.setEntity(null)
+                if(entity == this.tank) this.primaryPlayerTransmitter.setEntity(null)
                 transmitterSet.detachTransmitters()
                 this.visibleEntities.delete(entity)
             }

@@ -33,11 +33,11 @@ export default class WeaponStungun extends Weapon {
         super.tick(dt)
         if(!this.engaged) return
 
-        const transform = this.tank.model.getComponent(TransformComponent).transform
+        const transform = this.tank.getComponent(TransformComponent).transform
 
         let tank = this.tank
-        let player = tank.player
-        let world = tank.model.parent
+        // let player = tank.player
+        let world = tank.parent
 
         for (let i = this.points.length - 1; i >= 0; i--) {
             const point = this.points[i];
@@ -45,8 +45,8 @@ export default class WeaponStungun extends Weapon {
             const px = transform.transformX(point[0], point[1]);
             const py = transform.transformY(point[0], point[1]);
 
-            for(let each of near(px, py, player, world, this.squareRadius)) {
-                if(each != this.tank.model) {
+            for(let each of near(px, py, null, world, this.squareRadius)) {
+                if(each != this.tank) {
                     each.getComponent(HealthComponent).damage(this.damage * dt)
                 }
             }

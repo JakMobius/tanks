@@ -15,6 +15,7 @@ import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import EffectHost from "../../../../effects/effect-host";
 import DamageSmokeEffect from "../damage-smoke-effect";
+import ClientTank from "../client-tank";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;
@@ -71,7 +72,7 @@ class Drawer extends TankDrawer {
 ClientEntity.associate(EntityType.TANK_BIGBOI, (model) => {
     // TODO: bad copypaste
     EntityModel.Types.get(EntityType.TANK_BIGBOI)(model)
-    model.getComponent(EffectHost).addEffect(new DamageSmokeEffect())
+    ClientTank.configureEntity(model)
 
     let engine = new Engine({
         sound: FX.ENGINE_1,

@@ -32,7 +32,7 @@ export default class Entity extends EventEmitter {
         }
     }
 
-    public destroy() {
+    public removeAllComponents() {
         while(this.components.length) {
             this.components[this.components.length - 1].onDetach();
             this.components.pop();

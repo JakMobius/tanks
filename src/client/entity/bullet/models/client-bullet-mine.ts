@@ -1,7 +1,7 @@
-import ClientBullet, {ClientBulletOptions} from '../client-bullet';
-import BulletModelMine from '../../../../entity/bullets/models/mine-bullet-model';
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
+import ClientEntity, {EntityType} from "../../client-entity";
+import EntityModel from "../../../../entity/entity-model";
 
 class Drawer extends BasicEntityDrawer {
 	public shift: any;
@@ -24,12 +24,7 @@ class Drawer extends BasicEntityDrawer {
     }
 }
 
-export default class ClientBulletMine extends ClientBullet {
-    static Model = BulletModelMine
-
-    constructor(options: ClientBulletOptions) {
-        super(options);
-
-        this.model.addComponent(new Drawer())
-    }
-}
+ClientEntity.associate(EntityType.BULLET_MINE, (model) => {
+    EntityModel.Types.get(EntityType.BULLET_MINE)(model)
+    model.addComponent(new Drawer())
+})

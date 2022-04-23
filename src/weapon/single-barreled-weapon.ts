@@ -1,15 +1,14 @@
 import ReloadableWeapon, {ReloadableWeaponConfig} from "./reloadable-weapon";
-import BulletModel from "../entity/bullets/bullet-model";
+import BulletModel from "../entity/bullet-model";
 import * as Box2D from '../library/box2d'
 
 export interface SingleBarreledWeaponConfig extends ReloadableWeaponConfig {
-    bulletType: typeof BulletModel
     muzzlePoint: Box2D.Vec2
 }
 
 export default class SingleBarreledWeapon extends ReloadableWeapon {
 
-    public bulletType: typeof BulletModel;
+    public bulletType: number
     public muzzlePoint: Box2D.Vec2
 
     constructor(config: SingleBarreledWeaponConfig) {
@@ -20,8 +19,7 @@ export default class SingleBarreledWeapon extends ReloadableWeapon {
     }
 
     shoot() {
-        const bullet = new (this.bulletType)()
-        this.launchBullet(bullet, this.muzzlePoint.x, this.muzzlePoint.y)
+        this.launchBullet(this.bulletType, this.muzzlePoint.x, this.muzzlePoint.y)
         this.popBullet()
     }
 }

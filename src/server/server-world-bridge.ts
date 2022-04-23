@@ -12,7 +12,7 @@ export default class ServerWorldBridge {
         portal.on(PlayerControlsPacket, (packet, client) => {
             const player = client.data.player
             if(!player) return
-            packet.updateControls(player.tank.model.getComponent(TankControls))
+            packet.updateControls(player.tank.getComponent(TankControls))
         })
 
         portal.on(PlayerConfigPacket, (packet, client) => {
@@ -34,7 +34,7 @@ export default class ServerWorldBridge {
             if(player) {
                 client.data.player = null
                 world.removePlayer(player)
-                if(player.tank) world.removeEntity(player.tank)
+                if(player.tank) player.tank.removeFromParent()
             }
         })
     }

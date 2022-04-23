@@ -1,16 +1,13 @@
 import Team from '../team';
 import Color from '../../utils/color';
-import ServerTank from '../entity/tank/server-tank';
 import ServerGameWorld from '../server-game-world';
 import HighPrecisionLoop from '../../utils/loop/high-precision-loop';
 import Room from './room';
 import Logger from '../log/logger';
-import SocketPortalClient from "../socket/socket-portal-client";
 import GameMap from "../../map/game-map";
 
-import 'src/entity/tanks/model-loader'
-import 'src/server/entity/bullet/type-loader';
-import 'src/server/entity/tank/type-loader'
+import 'src/entity/model-loader'
+import 'src/server/entity/type-loader'
 import 'src/server/effects/type-loader';
 import 'src/map/block-state/type-loader';
 
@@ -27,10 +24,7 @@ import TilemapComponent from "../../physics/tilemap-component";
 import HealthComponent from "../../entity/components/health-component";
 import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
 import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
-import {Constructor} from "../../serialization/binary/serializable";
 import EntityModel from "../../entity/entity-model";
-import {EntityType} from "../../client/entity/client-entity";
-import ServerSniperTank from "../entity/tank/types/server-sniper-tank";
 
 interface GameConfig {
     name: string
@@ -116,6 +110,7 @@ export default class Game extends Room {
 
     private onClientDisconnect(client: GameSocketPortalClient) {
         this.log("Disconnected " + client.id)
+        client.data.visibilityManager.setTank(null)
         client.data.visibilityManager.setWorld(null)
 
         if (this.portal.clients.size === 0) {
@@ -198,29 +193,24 @@ export default class Game extends Room {
 
         const model = new EntityModel()
         EntityModel.Types.get(modelId)(model)
-        const tank = new ServerSniperTank({
-            model: model
-        })
-        const oldTank = player.tank
+        ServerEntity.types.get(modelId)(model)
 
-        this.world.createEntity(tank)
-        client.data.visibilityManager.setTank(tank)
-        player.setTank(tank)
+        this.world.appendChild(model)
+        client.data.visibilityManager.setTank(model)
+        player.setTank(model)
 
         this.world.createPlayer(player)
         this.respawnPlayer(player)
-
-        if(oldTank) this.world.removeEntity(oldTank)
     }
 
     respawnPlayer(player: ServerPlayer) {
         const team = player.team
         const tank = player.tank
 
-        tank.model.getComponent(HealthComponent).setHealth((player.tank.model.constructor as typeof TankModel).getMaximumHealth())
+        tank.getComponent(HealthComponent).setHealth((player.tank.constructor as typeof TankModel).getMaximumHealth())
 
         const spawnPoint = this.world.getComponent(TilemapComponent).map.spawnPointForTeam(team.id)
-        const body = tank.model.getComponent(PhysicalComponent).getBody()
+        const body = tank.getComponent(PhysicalComponent).getBody()
         body.SetPosition(spawnPoint)
         body.SetAngle(0)
 

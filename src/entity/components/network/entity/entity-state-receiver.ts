@@ -14,6 +14,8 @@ export default class EntityStateReceiver extends ReceiverComponent {
 
             let configuration = buffer.readUint32()
 
+            newEntity.addComponent(new EntityDataReceiveComponent(identifier))
+
             if(configuration > 0) {
                 let configurationScript = ClientEntity.types.get(configuration)
                 if(!configurationScript) {
@@ -22,8 +24,6 @@ export default class EntityStateReceiver extends ReceiverComponent {
                     configurationScript(newEntity)
                 }
             }
-
-            newEntity.addComponent(new EntityDataReceiveComponent(identifier))
 
             this.entity.appendChild(newEntity)
         })

@@ -1,9 +1,9 @@
 import Axle from "../controls/axle";
-import ServerTank from "../server/entity/tank/server-tank";
 import HealthComponent from "../entity/components/health-component";
+import EntityModel from "../entity/entity-model";
 
 export interface WeaponConfig {
-    tank: ServerTank
+    tank: EntityModel
     triggerAxle: Axle
 }
 
@@ -22,7 +22,7 @@ export default class Weapon {
     /**
      * Tanks that equipped with this weapon
      */
-    tank: ServerTank = null
+    tank: EntityModel = null
 
     constructor(config: WeaponConfig) {
         this.tank = config.tank
@@ -32,7 +32,7 @@ export default class Weapon {
 
     tick(dt: number) {
         if(!this.triggerAxle) return
-        if (this.tank.model.getComponent(HealthComponent).getHealth() <= 0) {
+        if (this.tank.getComponent(HealthComponent).getHealth() <= 0) {
             if(this.engaged) {
                 this.engaged = false
                 this.onDisengage()

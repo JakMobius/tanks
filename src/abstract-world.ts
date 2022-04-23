@@ -73,17 +73,9 @@ export default class AbstractWorld<
         this.emit("tick", dt)
     }
 
-    createEntity(entity: EntityClass): void {
-        this.appendChild(entity.model)
-
-        this.emit("entity-create", entity)
-    }
-
     removeEntity(entity: EntityClass): void {
         entity.model.removeFromParent()
-        entity.model.destroy()
-
-        this.emit("entity-remove", entity)
+        entity.model.removeAllComponents()
     }
 
     createPlayer(player: PlayerClass) {

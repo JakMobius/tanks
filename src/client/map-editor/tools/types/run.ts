@@ -43,8 +43,6 @@ export default class RunTool extends Tool {
             id: 0,
             nick: "Вы"
         })
-
-        this.player.setTank(this.tank)
     }
 
     setupMenu() {
@@ -84,11 +82,11 @@ export default class RunTool extends Tool {
 
         world.createPlayer(this.player)
 
-        const body = this.player.tank.model.getComponent(PhysicalComponent).getBody()
+        const body = this.player.tank.getComponent(PhysicalComponent).getBody()
 
         body.SetPosition(this.spawnPoint)
 
-        this.playerControls.connectTankControls(this.player.tank.model.getComponent(TankControls))
+        this.playerControls.connectTankControls(this.player.tank.getComponent(TankControls))
 
         this.manager.camera.inertial = true
         this.manager.camera.target = body.GetPosition()

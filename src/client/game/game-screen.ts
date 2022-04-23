@@ -8,7 +8,7 @@ import GeneralGameScreen from "./general-game-screen";
 import WebsocketConnection from "../networking/websocket-connection";
 import ConnectionClient from "../../networking/connection-client";
 
-import 'src/entity/tanks/model-loader'
+import 'src/entity/model-loader'
 import 'src/effects/model-loader'
 import 'src/client/entity/bullet/model-loader';
 import 'src/client/entity/tank/model-loader';
