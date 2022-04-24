@@ -21,28 +21,24 @@ const vertices = [
 
 EntityModel.Types.set(EntityType.TANK_NASTY, (entity) => {
     entity.addComponent(new TankControls())
-    entity.addComponent(new AirbagTankBehaviour(entity, {
+    entity.addComponent(new AirbagTankBehaviour({
         power: 120000,
         torque: 90000
     }))
 
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return;
-
-        let world = parent.getComponent(PhysicalHostComponent)
-
+    entity.addComponent(new PhysicalComponent((host) => {
         let bodyFixture = PhysicsUtils.vertexFixture(vertices, {
             filter: physicsFilters.tank,
             density: 200
         })
 
-        const body = PhysicsUtils.dynamicBody(world.world, {
+        const body = PhysicsUtils.dynamicBody(host.world, {
             linearDamping: 0.8,
             angularDamping: 0.7
         });
 
         body.CreateFixture(bodyFixture)
 
-        entity.addComponent(new PhysicalComponent(body, world))
-    })
+        return body
+    }))
 })

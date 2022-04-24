@@ -54,7 +54,7 @@ export default class GameScene extends GeneralGameScene {
         })
 
         this.overlay.on("play", (nick: string) => {
-            let tankId = EntityType.TANK_SNIPER
+            let tankId = EntityType.TANK_MONSTER
 
             new PlayerConfigPacket(nick, tankId).sendTo(this.client.connection)
         })

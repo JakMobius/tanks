@@ -17,6 +17,9 @@ export default class EntityDrawer implements Component {
         this.eventListener.on("attached-to-parent", (child, parent) => {
             if(!this.drawer) this.findDrawer(parent)
         })
+        this.eventListener.on("will-detach-from-parent", (child, parent) => {
+            if(this.drawer) this.findDrawer(this.entity, child)
+        })
     }
 
     /**
@@ -38,12 +41,13 @@ export default class EntityDrawer implements Component {
         }
     }
 
-    private findDrawer(startFrom: Entity = this.entity) {
+    private findDrawer(startFrom: Entity = this.entity, endWith: Entity = null) {
         let entity = startFrom
         let host = null
 
         while(entity && !host) {
             host = entity.getComponent(WorldDrawer)
+            if(entity == endWith) break;
             entity = entity.parent
         }
 

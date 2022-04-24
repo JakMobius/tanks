@@ -1,9 +1,6 @@
-import AbstractEntity from '../../entity/abstract-entity';
+
 import EntityModel from '../../entity/entity-model';
-import {Constructor} from "../../serialization/binary/serializable";
 import ServerPosition from "./server-position";
-import EntityDataDecoder from "./entity-data-decoder";
-import EntityDataReceiveComponent from "../../entity/components/network/entity-data-receive-component";
 import EffectReceiver from "../../entity/components/network/effect/effect-receiver";
 import PositionReceiver from "../../entity/components/network/position/position-receiver";
 import HealthReceiver from "../../entity/components/network/health/health-receiver";
@@ -27,18 +24,12 @@ export const EntityType = {
     TANK_TESLA:           0x0207
 }
 
-export default class ClientEntity extends AbstractEntity {
+export default class ClientEntity {
 
 	static types = new Map<number, (model: EntityModel) => void>()
 
-    constructor(model: EntityModel) {
-        super(model);
-    }
-
     static configureEntity(model: Entity) {
         model.addComponent(new ServerPosition())
-        model.addComponent(new EntityDataDecoder())
-
         model.addComponent(new EntityStateReceiver())
         model.addComponent(new EffectReceiver())
         model.addComponent(new PositionReceiver())

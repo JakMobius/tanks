@@ -7,24 +7,20 @@ import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 
 EntityModel.Types.set(EntityType.BULLET_MINE, (entity) => {
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return
-
-        let world = parent.getComponent(PhysicalHostComponent)
-
+    entity.addComponent(new PhysicalComponent((host) => {
         let bodyFixture = PhysicsUtils.squareFixture(1.25, 1.25, null, {
             filter: physicsFilters.mine,
             isSensor: true
         })
 
-        const body = world.world.CreateBody({
+        const body = host.world.CreateBody({
             type: b2BodyType.b2_staticBody
         })
 
         body.CreateFixture(bodyFixture)
 
-        entity.addComponent(new PhysicalComponent(body, world))
-    })
+        return body;
+    }))
 })
 
 // module.exports = new MineType({

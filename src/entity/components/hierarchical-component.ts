@@ -8,12 +8,12 @@ export default class HierarchicalComponent implements Component {
 
     constructor() {
 
-        this.eventHandler.on("removed-from-parent", (child, parent) => {
+        this.eventHandler.on("will-detach-from-parent", (child) => {
             if(child != this.entity) return;
-            this.detachFromParentComponent(parent)
+            this.detachFromParentComponent()
         })
 
-        this.eventHandler.on("attached-to-parent", (child, parent) => {
+        this.eventHandler.on("attached-to-parent", (child) => {
             if(child != this.entity) return;
             this.attachToParentComponent()
         })
@@ -60,7 +60,8 @@ export default class HierarchicalComponent implements Component {
         parentComponent.childComponentAdded(this)
     }
 
-    protected detachFromParentComponent(parent: Entity = this.entity.parent) {
+    protected detachFromParentComponent() {
+        let parent = this.entity.parent
         if(!parent) return
         let parentComponent = parent.getComponent(this.constructor as typeof HierarchicalComponent)
         if(!parentComponent) return

@@ -4,7 +4,7 @@ import ServerPlayer from "./server-player";
 import EntityDataTransmitComponent from "../entity/components/network/transmitting/entity-data-transmit-component";
 import ExplodeEffectPool from "../effects/world/explode/explode-effect-pool";
 
-export default class ServerGameWorld extends AbstractWorld<ServerEntity, ServerPlayer> {
+export default class ServerGameWorld extends AbstractWorld<ServerPlayer> {
 
     constructor(options: GameWorldConfig) {
         super(options);

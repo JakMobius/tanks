@@ -4,14 +4,13 @@ import PlayerControls from '../../../controls/player-controls';
 import KeyboardController from '../../../controls/interact/keyboard-controller';
 import ToolManager from "../toolmanager";
 import ClientPlayer from "../../../client-player";
-// import MonsterTankModel from "../../../../entity/tanks/models/monster-tank-model";
-import ClientTank from "../../../entity/tank/client-tank";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
+import EntityModel from "../../../../entity/entity-model";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
-	public tank: ClientTank;
+	public tank: EntityModel;
 	public keyboard: KeyboardController;
 	public playerControls: PlayerControls;
 	public running: boolean;
@@ -37,7 +36,7 @@ export default class RunTool extends Tool {
         //     model: new MonsterTankModel()
         // })
         
-        this.playerControls.connectTankControls(this.tank.model.getComponent(TankControls))
+        this.playerControls.connectTankControls(this.tank.getComponent(TankControls))
         
         this.player = new ClientPlayer({
             id: 0,

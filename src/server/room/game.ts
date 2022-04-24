@@ -14,7 +14,6 @@ import 'src/map/block-state/type-loader';
 import HTMLEscape from "../../utils/html-escape";
 import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-packet";
 import AbstractPlayer from "../../abstract-player";
-import TankModel from "../../entity/tanks/tank-model";
 import ServerPlayer from "../server-player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
@@ -207,7 +206,7 @@ export default class Game extends Room {
         const team = player.team
         const tank = player.tank
 
-        tank.getComponent(HealthComponent).setHealth((player.tank.constructor as typeof TankModel).getMaximumHealth())
+        tank.getComponent(HealthComponent).setHealth(10)
 
         const spawnPoint = this.world.getComponent(TilemapComponent).map.spawnPointForTeam(team.id)
         const body = tank.getComponent(PhysicalComponent).getBody()

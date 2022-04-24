@@ -1,4 +1,4 @@
-import TankModel from '../tank-model';
+
 import {Vec2} from "../../../library/box2d";
 import TankControls from "../../../controls/tank-controls";
 import {Component} from "../../../utils/ecs/component";
@@ -19,9 +19,7 @@ export default class TankBehaviour implements Component {
     protected controlsComponent?: TankControls
     private physicsTickHandler?: (dt: number) => void
 
-    constructor(tank: TankModel) {
-        this.entity = tank
-
+    constructor() {
         this.physicsTickHandler = (dt) => this.tick(dt)
     }
 

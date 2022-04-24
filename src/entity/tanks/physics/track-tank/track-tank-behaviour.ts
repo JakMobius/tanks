@@ -1,4 +1,4 @@
-import TankModel from "../../tank-model";
+
 import WheeledTankBehaviour, {WheeledTankBehaviourConfig} from "../wheeled-tank/wheeled-tank-behaviour";
 import {clamp} from "../../../../utils/utils";
 import WheelTruckGenerator, {TrackConfig} from "./wheel-track-generator";
@@ -26,7 +26,7 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
     leftTrackWheels: TankWheel[]
     rightTrackWheels: TankWheel[]
 
-    constructor(tank: TankModel, config: TrackTankBehaviourConfig) {
+    constructor(config: TrackTankBehaviourConfig) {
         const leftTrackConfig = Object.assign({}, config.trackConfig)
         const rightTrackConfig = Object.assign({}, config.trackConfig)
 
@@ -42,7 +42,7 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
             y: trackOffset
         }))
 
-        super(tank, {
+        super({
             wheels: [...leftTrackWheels, ...rightTrackWheels],
             ...config
         })

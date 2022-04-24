@@ -1,6 +1,5 @@
 
 import Team from "./server/team";
-import AbstractEntity from "./entity/abstract-entity";
 import EntityModel from "./entity/entity-model";
 
 
@@ -9,10 +8,6 @@ export interface PlayerConfig {
     id?: number
     team?: Team
     tank?: EntityModel
-}
-
-export type AbstractTank = AbstractEntity & {
-    player: AbstractPlayer
 }
 
 export default class AbstractPlayer {
@@ -34,9 +29,5 @@ export default class AbstractPlayer {
 
     setTank(tank: EntityModel) {
         this.tank = tank
-    }
-
-    destroy() {
-
     }
 }

@@ -6,13 +6,10 @@ import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
 import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import EntityDataEncoder from "../entity-data-encoder";
 import ServerEntity from "../server-entity";
 
 ServerEntity.types.set(EntityType.TANK_MONSTER, (entity: EntityModel) => {
     ServerEntity.setupEntity(entity)
-
-    entity.addComponent(new EntityDataEncoder())
 
     const controlsComponent = entity.getComponent(TankControls)
 

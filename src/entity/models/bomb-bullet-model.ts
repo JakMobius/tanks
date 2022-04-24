@@ -8,11 +8,7 @@ import {EntityType} from "../../client/entity/client-entity";
 
 
 EntityModel.Types.set(EntityType.BULLET_BOMB, (entity) => {
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return
-
-        let world = parent.getComponent(PhysicalHostComponent)
-
+    entity.addComponent(new PhysicalComponent((host) => {
         const shape = new Box2D.CircleShape()
         shape.Set(new Box2D.Vec2(0, 0), 0.375)
         let bodyFixture = PhysicsUtils.createFixture(shape, {
@@ -22,7 +18,7 @@ EntityModel.Types.set(EntityType.BULLET_BOMB, (entity) => {
             restitution: 1
         })
 
-        const body = PhysicsUtils.dynamicBody(world.world, {
+        const body = PhysicsUtils.dynamicBody(host.world, {
             angularDamping: 0.0,
             linearDamping: 0.15,
             bullet: true
@@ -30,8 +26,8 @@ EntityModel.Types.set(EntityType.BULLET_BOMB, (entity) => {
 
         body.CreateFixture(bodyFixture)
 
-        entity.addComponent(new PhysicalComponent(body, world))
-    })
+        return body;
+    }))
 })
 
 // module.exports = new BombType({

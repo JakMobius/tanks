@@ -1,6 +1,5 @@
 import * as Box2D from '../../../library/box2d';
 import TankBehaviour from './tank-behaviour';
-import TankModel from "../tank-model";
 import PhysicalComponent from "../../components/physics-component";
 
 interface AirbagBehaviourConfig {
@@ -9,15 +8,15 @@ interface AirbagBehaviourConfig {
     maxPropellerSpeed?: number
 }
 
-export default class AirbagTankModel extends TankBehaviour {
+export default class AirbagTankBehaviour extends TankBehaviour {
     public power: number
 	public torque: number
     public maxPropellerSpeed: number
 	public propellerSpeed: number = 0
 	public propellerDist: number = 0
 
-    constructor(tank: TankModel, config: AirbagBehaviourConfig) {
-        super(tank)
+    constructor(config: AirbagBehaviourConfig) {
+        super()
 
         this.power = config.power
         this.torque = config.torque

@@ -6,8 +6,8 @@ import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-bl
 
 export class ReceivingEnd {
     private buffer = new WriteBuffer()
-    private currentNode: Entity
     private root: Entity
+    currentNode: Entity
 
     hasData() {
         return this.buffer.offset > 0

@@ -1,11 +1,12 @@
-import BulletModel from "../../entity/bullet-model";
+
 import ClientGameWorld from "../client-game-world";
+import EntityModel from "../../entity/entity-model";
 
 export interface WeaponConfig {
     name: string
     maxAmmo?: number
     reloadTime?: number
-    bulletType?: typeof BulletModel
+    bulletType?: typeof EntityModel
     shootRate?: number,
     sound?: number
     game: ClientGameWorld

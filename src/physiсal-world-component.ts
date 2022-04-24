@@ -38,10 +38,15 @@ export default class PhysicalHostComponent implements Component {
 
     onAttach(entity: Entity) {
         this.entity = entity;
+        this.entity.emit("physical-host-attached", this)
     }
 
     onDetach() {
         this.entity = null
+        for(let component of this.physicalComponents) {
+            component.setHost(null)
+        }
+        this.physicalComponents = []
     }
 
     registerComponent(component: PhysicalComponent) {

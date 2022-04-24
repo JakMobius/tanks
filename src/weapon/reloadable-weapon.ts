@@ -3,6 +3,7 @@ import PhysicalComponent from "../entity/components/physics-component";
 import TransformComponent from "../entity/components/transform-component";
 import EntityModel from "../entity/entity-model";
 import ServerEntity from "../server/entity/server-entity";
+import ServerBullet from "../server/entity/server-bullet";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -57,7 +58,6 @@ export default class ReloadableWeapon extends Weapon {
     }
 
     ready() {
-
         if (!this.shootingTime) return true
         const time = Date.now() - this.shootingTime;
 
@@ -103,17 +103,18 @@ export default class ReloadableWeapon extends Weapon {
         const entity = new EntityModel()
         EntityModel.Types.get(bullet)(entity)
         ServerEntity.types.get(bullet)(entity)
-        // entity.addComponent(new EntityDataTransmitComponent(model.id))
+        ServerBullet.setShooter(entity, this.tank)
+
         world.appendChild(entity)
 
         const bulletBody = entity.getComponent(PhysicalComponent).getBody()
 
-        // let vx = -sin * entity.startVelocity
-        // let vy = cos * entity.startVelocity
+        let vx = -sin * entity.startVelocity
+        let vy = cos * entity.startVelocity
 
-        // bulletBody.SetAngle(rotation)
-        // bulletBody.SetPosition(bulletBody.GetPosition().Set(absoluteX, absoluteY))
-        // bulletBody.SetLinearVelocity(bulletBody.GetLinearVelocity().Set(vx, vy))
+        bulletBody.SetAngle(rotation)
+        bulletBody.SetPosition(bulletBody.GetPosition().Set(absoluteX, absoluteY))
+        bulletBody.SetLinearVelocity(bulletBody.GetLinearVelocity().Set(vx, vy))
         //
         // // TODO: костыль. Этим должен заниматься физ.движок
         // tankBody.ApplyLinearImpulse(

@@ -10,7 +10,7 @@ import PhysicalHostComponent from "../../physiсal-world-component";
 
 EntityModel.Types.set(EntityType.TANK_SNIPER, (entity) => {
     entity.addComponent(new TankControls())
-    entity.addComponent(new TrackTankBehaviour(entity, {
+    entity.addComponent(new TrackTankBehaviour({
         enginePower: 900000,     // 0.9 mW = 1206 horsepower
         engineMaxTorque: 200000, // 200 kN ~ 20 T
         trackConfig: {
@@ -25,9 +25,7 @@ EntityModel.Types.set(EntityType.TANK_SNIPER, (entity) => {
         trackGauge: 3.4
     }));
 
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return;
-
+    entity.addComponent(new PhysicalComponent((host) => {
         let bodyFixture = PhysicsUtils.squareFixture(1.125, 1.0125, new Box2D.Vec2(0, 0), {
             density: 480,
             filter: physicsFilters.tank
@@ -38,9 +36,7 @@ EntityModel.Types.set(EntityType.TANK_SNIPER, (entity) => {
             density: 480
         })
 
-        let worldComponent = parent.getComponent(PhysicalHostComponent)
-
-        const body = PhysicsUtils.dynamicBody(worldComponent.world, {
+        const body = PhysicsUtils.dynamicBody(host.world, {
             angularDamping: 0.2,
             linearDamping: 0.2
         });
@@ -49,6 +45,6 @@ EntityModel.Types.set(EntityType.TANK_SNIPER, (entity) => {
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        entity.addComponent(new PhysicalComponent(body, worldComponent))
-    })
+        return body
+    }))
 })

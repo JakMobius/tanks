@@ -1,5 +1,4 @@
 import ReloadableWeapon, {ReloadableWeaponConfig} from "./reloadable-weapon";
-import BulletModel from "../entity/bullet-model";
 import * as Box2D from '../library/box2d'
 
 export interface SingleBarreledWeaponConfig extends ReloadableWeaponConfig {

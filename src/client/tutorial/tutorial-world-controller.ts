@@ -1,7 +1,6 @@
 import Game from "../../server/room/game";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
 import ServerPlayer from "../../server/server-player";
-import TankModel from "../../entity/tanks/tank-model";
 import PhysicalComponent from "../../entity/components/physics-component";
 import HealthComponent from "../../entity/components/health-component";
 import {EntityType} from "../entity/client-entity";
@@ -71,7 +70,7 @@ export default class TutorialWorldController {
     private respawnPlayer(player: ServerPlayer) {
         const tank = player.tank
 
-        tank.getComponent(HealthComponent).setHealth((tank.constructor as typeof TankModel).getMaximumHealth())
+        tank.getComponent(HealthComponent).setHealth(10)
 
         let body = tank.getComponent(PhysicalComponent).getBody()
         body.SetPositionXY(17.5, 212.5)

@@ -2,7 +2,6 @@ import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import WriteBuffer from "../../serialization/binary/write-buffer";
 import PhysicalComponent from "../../entity/components/physics-component";
-import HealthComponent from "../../entity/components/health-component";
 
 export default class EntityDataEncoder implements Component {
     entity: Entity | null;
@@ -29,19 +28,4 @@ export default class EntityDataEncoder implements Component {
         encoder.writeFloat32(velocity.y)
         encoder.writeFloat32(angular)
     }
-
-    encodeInitialData(encoder: WriteBuffer) {
-        this.encodePositionVelocity(encoder)
-        encoder.writeFloat32(this.entity.getComponent(HealthComponent).getHealth())
-    }
-
-    encodeDynamicData(encoder: WriteBuffer): void {
-        // TODO:
-        let teleport = false
-        // let teleport = this.entity.teleported
-        encoder.writeUint8(teleport as any as number)
-        // this.teleported = false
-        this.encodePositionVelocity(encoder)
-    }
-
 }

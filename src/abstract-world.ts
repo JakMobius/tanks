@@ -1,5 +1,4 @@
 import GameMap from 'src/map/game-map';
-import AbstractEntity from 'src/entity/abstract-entity';
 import AbstractPlayer from 'src/abstract-player';
 import AdapterLoop from "./utils/loop/adapter-loop";
 import ChunkedMapCollider from "./physics/chunked-map-collider";
@@ -19,12 +18,10 @@ export interface GameWorldConfig {
 }
 
 export default class AbstractWorld<
-    EntityClass extends AbstractEntity = AbstractEntity,
     PlayerClass extends AbstractPlayer = AbstractPlayer
 > extends Entity {
     public readonly physicsLoop: AdapterLoop;
 
-    players = new Map<number, PlayerClass>()
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
 
@@ -59,44 +56,25 @@ export default class AbstractWorld<
 
         this.physicsLoop.run = () => this.getComponent(PhysicalHostComponent).tickPhysics()
         this.physicsLoop.start()
-
-        this.on("map-change", () => {
-            this.players.clear()
-        })
     }
 
     tick(dt: number): void {
-        this.emit("before-tick", dt)
-
         this.physicsLoop.timePassed(dt)
-
         this.emit("tick", dt)
     }
 
-    removeEntity(entity: EntityClass): void {
-        entity.model.removeFromParent()
-        entity.model.removeAllComponents()
-    }
-
     createPlayer(player: PlayerClass) {
-        if(!this.players.has(player.id)) {
-            this.players.set(player.id, player)
-            this.emit("player-create", player)
-        } else {
-            this.emit("player-changed-tank", player)
-        }
+        this.emit("player-create", player)
     }
 
     removePlayer(player: PlayerClass) {
-        player.destroy()
-        this.players.delete(player.id)
         this.emit("player-remove", player)
     }
 
     // TODO: move to component
 
     protected setupContactListener() {
-        this.contactListener = new GameWorldContactListener(this)
+        this.contactListener = new GameWorldContactListener()
         this.getComponent(PhysicalHostComponent).world.SetContactListener(this.contactListener)
     }
 

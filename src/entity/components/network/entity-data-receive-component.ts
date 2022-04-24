@@ -33,7 +33,12 @@ export default class EntityDataReceiveComponent extends HierarchicalComponent {
             while(buffer.offset < end) {
                 entity = EntityDataReceiveComponent.performNavigation(buffer, entity)
                 let component = entity.getComponent(EntityDataReceiveComponent)
+                // If entity gets removed from the tree, we are no longer
+                // able to navigate from it to the parent node, so we save
+                // the parent to navigate from it in that case.
+                let oldParent = entity.parent
                 component.parseCommand(buffer)
+                if(!entity.parent && oldParent) entity = oldParent;
             }
         })
     }

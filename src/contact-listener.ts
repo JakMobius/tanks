@@ -4,19 +4,16 @@ import AbstractWorld from "./abstract-world";
 import EntityModel from "./entity/entity-model";
 
 /**
- * This class handles collision events and tells the appropriate
+ * This class handles collision events and tells the
  * entities that they have collided with something else
  */
 export default class GameWorldContactListener extends Box2D.ContactListener {
 
-
-    constructor(world: AbstractWorld) {
+    constructor() {
         super();
     }
 
     BeginContact(contact: b2Contact) {
-        // TODO:
-        return
         const worldManifold = new Box2D.WorldManifold()
         contact.GetWorldManifold(worldManifold)
 
@@ -29,11 +26,11 @@ export default class GameWorldContactListener extends Box2D.ContactListener {
         const dataB = bodyB.GetUserData()
 
         if(dataA instanceof EntityModel) {
-            dataA.onBodyHit(bodyB, contact)
+            dataA.emit("physical-contact", bodyB, contact)
         }
 
         if(dataB instanceof EntityModel) {
-            dataB.onBodyHit(bodyA, contact)
+            dataB.emit("physical-contact", bodyA, contact)
         }
     }
 }

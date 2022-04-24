@@ -12,9 +12,16 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
     constructor() {
         super();
 
+        this.eventHandler.on("will-detach-from-parent", (child, parent) => {
+            for(let set of this.transmitterSets.values()) {
+                // This condition just reduces complexity
+                if(set.isAttachedToRoot()) set.handleParentDetach(parent)
+            }
+        })
+
         this.eventHandler.on("attached-to-parent", () => {
             for(let set of this.transmitterSets.values()) {
-                set.handleTreeChange()
+                if(!set.isAttachedToRoot()) set.handleTreeChange()
             }
         })
     }

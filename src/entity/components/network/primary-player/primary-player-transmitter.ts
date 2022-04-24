@@ -12,6 +12,7 @@ export default class PrimaryPlayerTransmitter extends Transmitter {
     }
 
     attachedToRoot() {
+        super.attachedToRoot()
         this.updateEntity()
     }
 

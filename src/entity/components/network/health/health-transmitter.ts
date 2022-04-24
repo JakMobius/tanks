@@ -10,6 +10,7 @@ export default class HealthTransmitter extends Transmitter {
     }
 
     attachedToRoot() {
+        super.attachedToRoot()
         this.queueHealthUpdate();
     }
 

@@ -21,7 +21,6 @@ export class Transmitter {
 
     attachToSet(set: TransmitterSet): void {
         this.set = set
-        this.eventHandler.setTarget(set.transmitComponent.entity)
         if(set.isAttachedToRoot()) {
             this.attachedToRoot()
         }
@@ -31,9 +30,7 @@ export class Transmitter {
         if(this.set.isAttachedToRoot()) {
             this.detachedFromRoot()
         }
-
         this.set = null
-        this.eventHandler.setTarget(null)
     }
 
     getEntity() {
@@ -41,10 +38,10 @@ export class Transmitter {
     }
 
     attachedToRoot() {
-
+        this.eventHandler.setTarget(this.set.transmitComponent.entity)
     }
 
     detachedFromRoot() {
-
+        this.eventHandler.setTarget(null)
     }
 }

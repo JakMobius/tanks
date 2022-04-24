@@ -1,7 +1,5 @@
 import TankControls from '../../controls/tank-controls';
 import EntityModel from "../entity-model";
-import EffectHost from "../../effects/effect-host";
-import EffectReceiver from "../components/network/effect/effect-receiver";
 
 /**
  * Tank model. Combines the physical model

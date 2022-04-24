@@ -16,7 +16,7 @@ import {
 import WorldDrawer from "../../../graphics/drawers/world-drawer";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
-import AirbagTankModel from "../../../../entity/tanks/physics/airbag-tank-behaviour";
+import AirbagTankBehaviour from "../../../../entity/tanks/physics/airbag-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
 import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
@@ -61,7 +61,7 @@ class Drawer extends TankDrawer {
         const model = this.entity
         const body = model.getComponent(PhysicalComponent).getBody()
         const controlsComponent = model.getComponent(TankControls)
-        const behaviour = model.getComponent(AirbagTankModel)
+        const behaviour = model.getComponent(AirbagTankBehaviour)
         const transform = model.getComponent(TransformComponent).transform
 
         const propellerProgram = phase.getProgram(TextureProgram)

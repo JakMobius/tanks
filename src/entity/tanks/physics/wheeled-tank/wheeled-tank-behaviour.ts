@@ -1,6 +1,5 @@
 import {Vec2} from '../../../../library/box2d'
 import TankBehaviour from '../tank-behaviour';
-import TankModel from "../../tank-model";
 import {TankWheel} from "./wheel";
 import PhysicalComponent from "../../../components/physics-component";
 
@@ -40,8 +39,8 @@ export default class WheeledTankBehaviour extends TankBehaviour {
     public maxEngineTorque: number;
     public enginePower: number
 
-    constructor(tank: TankModel, config: WheeledTankBehaviourConfig) {
-        super(tank)
+    constructor(config: WheeledTankBehaviourConfig) {
+        super()
 
         this.enginePower = config.enginePower
         this.maxEngineTorque = config.engineMaxTorque

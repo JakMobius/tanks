@@ -10,7 +10,7 @@ import TankControls from "../../controls/tank-controls";
 
 EntityModel.Types.set(EntityType.TANK_TESLA, (entity) => {
     entity.addComponent(new TankControls())
-    entity.addComponent(new BasicTankBehaviour(entity, {
+    entity.addComponent(new BasicTankBehaviour({
         engineMaxTorque: 30000,
         enginePower: 30000,
         trackConfig: {
@@ -21,11 +21,7 @@ EntityModel.Types.set(EntityType.TANK_TESLA, (entity) => {
         trackGauge: 3.75
     }))
 
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return;
-
-        let world = parent.getComponent(PhysicalHostComponent)
-
+    entity.addComponent(new PhysicalComponent((host) => {
         const bodyFixture = PhysicsUtils.squareFixture(1.125, 1.8, null, {
             filter: physicsFilters.tank
         })
@@ -33,11 +29,11 @@ EntityModel.Types.set(EntityType.TANK_TESLA, (entity) => {
             filter: physicsFilters.tank
         })
 
-        const body = PhysicsUtils.dynamicBody(world.world)
+        const body = PhysicsUtils.dynamicBody(host.world)
         body.CreateFixture(bodyFixture)
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        entity.addComponent(new PhysicalComponent(body, world))
-    })
+        return body
+    }))
 })

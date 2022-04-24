@@ -2,6 +2,7 @@ import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
+import ClientBullet from "../client-bullet";
 
 class Drawer extends BasicEntityDrawer {
 	public shift: any;
@@ -26,5 +27,6 @@ class Drawer extends BasicEntityDrawer {
 
 ClientEntity.associate(EntityType.BULLET_MINE, (model) => {
     EntityModel.Types.get(EntityType.BULLET_MINE)(model)
+    ClientBullet.configureEntity(model)
     model.addComponent(new Drawer())
 })

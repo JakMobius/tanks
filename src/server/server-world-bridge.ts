@@ -34,7 +34,7 @@ export default class ServerWorldBridge {
             if(player) {
                 client.data.player = null
                 world.removePlayer(player)
-                if(player.tank) player.tank.removeFromParent()
+                if(player.tank) player.tank.die()
             }
         })
     }

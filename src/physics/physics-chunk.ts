@@ -148,4 +148,8 @@ export default class PhysicsChunk {
     setRelevant() {
         this.lastRelevanceTime = this.manager.time
     }
+
+    getMap() {
+        return this.manager.getMap()
+    }
 }

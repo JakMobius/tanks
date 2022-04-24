@@ -1,7 +1,7 @@
 import ClientGameWorld from "./client-game-world";
-import TankModel from "../entity/tanks/tank-model";
 import Sound from "./sound/sound";
 import PhysicalComponent from "../entity/components/physics-component";
+import EntityModel from "../entity/entity-model";
 
 
 export interface EngineConfig {
@@ -26,7 +26,7 @@ export interface EngineGearConfig {
 class Engine {
 	public config: EngineConfig;
 	public game: any;
-	public tank: TankModel;
+	public tank: EntityModel;
 	public sound: Sound;
 	public rpm: number;
 	public gear: number;
@@ -37,7 +37,7 @@ class Engine {
         this.config = config
     }
 
-    configure(game: ClientGameWorld, tank: TankModel) {
+    configure(game: ClientGameWorld, tank: EntityModel) {
         this.game = game
         this.tank = tank
         let tankPosition = tank.getComponent(PhysicalComponent).getBody().GetPosition()

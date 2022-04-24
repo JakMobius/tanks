@@ -7,10 +7,12 @@ import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 import TankControls from "../../controls/tank-controls";
+import {Vec2} from "../../library/box2d";
+import WheeledTankBehaviour from "../tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 
 EntityModel.Types.set(EntityType.TANK_MORTAR, (entity) => {
     entity.addComponent(new TankControls())
-    entity.addComponent(new TrackTankBehaviour(entity, {
+    entity.addComponent(new TrackTankBehaviour({
         engineMaxTorque: 30000,
         enginePower: 30000,
         trackConfig: {
@@ -21,11 +23,7 @@ EntityModel.Types.set(EntityType.TANK_MORTAR, (entity) => {
         trackGauge: 15
     }));
 
-    entity.on("attached-to-parent", (child, parent) => {
-        if(child != entity) return;
-
-        let world = parent.getComponent(PhysicalHostComponent)
-
+    entity.addComponent(new PhysicalComponent((host) => {
         let size = 9
         const segment = size / 4;
 
@@ -39,12 +37,12 @@ EntityModel.Types.set(EntityType.TANK_MORTAR, (entity) => {
             density: 600
         })
 
-        const body = PhysicsUtils.dynamicBody(world.world);
+        const body = PhysicsUtils.dynamicBody(host.world);
 
         body.CreateFixture(bodyFixture)
         for (let fixture of trackFixtures)
             body.CreateFixture(fixture)
 
-        entity.addComponent(new PhysicalComponent(body, world))
-    })
+        return body;
+    }))
 })

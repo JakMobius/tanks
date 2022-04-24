@@ -12,6 +12,7 @@ export default class MapTransmitter extends Transmitter {
     }
 
     attachedToRoot() {
+        super.attachedToRoot()
         const map = this.getEntity().getComponent(TilemapComponent).map
 
         this.pack(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {

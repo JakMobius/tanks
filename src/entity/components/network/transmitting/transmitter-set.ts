@@ -1,6 +1,7 @@
 import {Transmitter} from "./transmitter";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import {ReceivingEnd} from "./receiving-end";
+import Entity from "../../../../utils/ecs/entity";
 
 export class TransmitterSet {
     private treeDepth: number | null = null
@@ -38,21 +39,21 @@ export class TransmitterSet {
         return !this.transmitters.size
     }
 
-    private calculateNodeDepth() {
+    private calculateNodeDepth(detachedParent: Entity = null) {
         if(!this.transmitComponent) {
-            this.treeDepth = null
-            return
+            return null
         }
         // TODO: can be optimised by using parent node depths
-        this.treeDepth = 0
+        let treeDepth = 0
         let entity = this.transmitComponent.entity
-        while(entity != this.receivingEnd.getRoot()) {
+        while(entity && entity != this.receivingEnd.getRoot()) {
             entity = entity.parent
-            this.treeDepth++
+            if(entity == detachedParent) entity = null
+            treeDepth++
         }
 
-        if(entity == this.receivingEnd.getRoot()) return
-        this.treeDepth = null
+        if(entity == this.receivingEnd.getRoot()) return treeDepth
+        return null
     }
 
     detachIfEmpty() {
@@ -62,19 +63,22 @@ export class TransmitterSet {
     }
 
     getNodeDepth() {
-        if(this.treeDepth === null) {
-            this.calculateNodeDepth()
-        }
         return this.treeDepth
     }
 
     handleTreeChange() {
-        this.calculateNodeDepth()
-        this.updateAttachState()
+        this.treeDepth = this.calculateNodeDepth()
+        this.updateAttachState(this.treeDepth)
     }
 
-    private updateAttachState() {
-        let newAttachState = Number.isInteger(this.treeDepth)
+    handleParentDetach(parent: Entity) {
+        let treeDepth = this.calculateNodeDepth(parent)
+        this.updateAttachState(treeDepth)
+        this.treeDepth = treeDepth
+    }
+
+    private updateAttachState(treeDepth: number) {
+        let newAttachState = Number.isInteger(treeDepth)
         if(newAttachState == this.attached) return
         this.attached = newAttachState
 

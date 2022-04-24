@@ -3,17 +3,35 @@ import * as Box2D from "../../library/box2d";
 import Entity from "../../utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "../../physiсal-world-component";
+import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 
 export default class PhysicalComponent implements Component {
     entity: Entity | null
     body: Box2D.Body
     host: PhysicalHostComponent
+    bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body
 
+    private eventListener = new BasicEventHandlerSet()
     private positionComponent?: TransformComponent
 
-    constructor(body: Box2D.Body, host: PhysicalHostComponent) {
-        this.body = body
-        this.host = host
+    constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body) {
+        this.body = null
+        this.host = null
+        this.bodyConstructor = bodyConstructor
+
+        this.eventListener.on("will-detach-from-parent", (child, parent) => {
+            if(child !== this.entity) return;
+            this.setHost(null)
+        })
+
+        this.eventListener.on("attached-to-parent", (child, parent) => {
+            if(child !== this.entity) return;
+            this.setHost(parent.getComponent(PhysicalHostComponent))
+        })
+
+        this.eventListener.on("physical-host-attached", (host) => {
+            this.setHost(host)
+        })
     }
 
     getPositionComponent() {
@@ -36,19 +54,33 @@ export default class PhysicalComponent implements Component {
 
     onDetach() {
         this.entity = null
-        if(this.body.GetWorld()) {
-            this.body.GetWorld().DestroyBody(this.body)
-        }
-        this.host.destroyComponent(this)
+        this.eventListener.setTarget(null)
+        this.setHost(null)
     }
 
     onAttach(entity: Entity) {
         this.entity = entity
-        this.body.SetUserData(entity)
-        this.host.registerComponent(this)
+        this.eventListener.setTarget(entity)
     }
 
     getBody() {
         return this.body
+    }
+
+    setHost(host: PhysicalHostComponent) {
+        if(host == this.host) return;
+
+        if(this.host) {
+            this.host.world.DestroyBody(this.body)
+            this.host.destroyComponent(this)
+        }
+
+        this.host = host
+
+        if(this.host) {
+            this.body = this.bodyConstructor(host)
+            this.body.SetUserData(this.entity)
+            this.host.registerComponent(this)
+        }
     }
 }

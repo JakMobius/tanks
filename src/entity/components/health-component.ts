@@ -2,7 +2,7 @@ import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 
 export default class HealthComponent implements Component {
-    private health: number
+    private health: number = 0
     entity: Entity | null;
 
     onAttach(entity: Entity): void {
@@ -23,6 +23,6 @@ export default class HealthComponent implements Component {
     }
 
     damage(damage: number) {
-        this.setHealth(Math.max(0, this.health - damage))
+        // this.setHealth(Math.max(0, this.health - damage))
     }
 }

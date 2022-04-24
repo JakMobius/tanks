@@ -8,6 +8,7 @@ export default class EntityStateTransmitter extends Transmitter {
     }
 
     attachedToRoot() {
+        super.attachedToRoot()
         const receivingEnd = this.set.receivingEnd
 
         const myTransmitterSet = this.set
@@ -23,6 +24,11 @@ export default class EntityStateTransmitter extends Transmitter {
     }
 
     detachedFromRoot() {
+        super.detachedFromRoot()
         this.pack(Commands.ENTITY_REMOVE_COMMAND, () => {})
+        // As we're no longer able to navigate from this entity after
+        // it's removed from the tree, the further navigation is
+        // performed from its parent node.
+        this.set.receivingEnd.currentNode = this.set.receivingEnd.currentNode.parent
     }
 }
