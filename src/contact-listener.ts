@@ -1,6 +1,6 @@
 import * as Box2D from "./library/box2d";
 import {b2Contact} from "./library/box2d/dynamics/b2_contact";
-import AbstractWorld from "./abstract-world";
+import GameWorld from "./game-world";
 import EntityModel from "./entity/entity-model";
 
 /**

@@ -14,7 +14,6 @@ export default class TutorialWorldController {
     constructor(serverGame: Game) {
         this.game = serverGame
         this.game.portal.on("client-connect", (client) => this.onClientConnect(client))
-        this.game.world.on("player-create", (player) => this.onPlayerCreate(player))
         this.game.world.on("player-chat", (player, text) => {
             if(text.startsWith("#")) {
                 this.onPlayerCommand(player, text)
@@ -46,10 +45,6 @@ export default class TutorialWorldController {
         this.createTank(EntityType.TANK_MONSTER, 30, 205, 0)
     }
 
-    private onPlayerCreate(player: ServerPlayer) {
-
-    }
-
     private onClientConnect(client: SocketPortalClient) {
 
         const selectedIndex = 0
@@ -63,7 +58,6 @@ export default class TutorialWorldController {
         client.data.player = player
 
         this.selectedTanks.set(player, selectedIndex)
-        this.game.world.createPlayer(player)
         this.respawnPlayer(player)
     }
 
@@ -88,7 +82,6 @@ export default class TutorialWorldController {
             this.selectedTanks.set(player, selectedIndex)
             // This may fail if there is more than one player on the map
             player.setTank(this.tanks[selectedIndex])
-            this.game.world.createPlayer(player)
         }
     }
 }

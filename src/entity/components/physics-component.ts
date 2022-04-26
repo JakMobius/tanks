@@ -81,6 +81,7 @@ export default class PhysicalComponent implements Component {
             this.body = this.bodyConstructor(host)
             this.body.SetUserData(this.entity)
             this.host.registerComponent(this)
+            this.entity.emit("physical-body-created", this.body)
         }
     }
 }

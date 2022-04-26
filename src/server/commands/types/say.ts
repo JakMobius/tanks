@@ -1,7 +1,7 @@
 import Command from '../command';
 import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
 
-class SayCommand extends Command {
+export default class SayCommand extends Command {
     onPerform(args: string[]): void {
         let text = args.join(" ")
 
@@ -26,5 +26,3 @@ class SayCommand extends Command {
         return true
     }
 }
-
-export default SayCommand;

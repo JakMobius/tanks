@@ -20,7 +20,7 @@ export default class PlayerVisibilityManager {
     // depends on what you want to rewrite. In such cases,
     // temporary patches are the only way to save the situation.
     // Please, future me, rewrite this code. It should not be
-    // present in that beautiful code I have ahead of me.
+    // present in that beautiful game I have ahead of me.
 
     // TODO: This stuff should be replaced entirely
 
@@ -78,7 +78,7 @@ export default class PlayerVisibilityManager {
 
             let length = Math.sqrt(position.x * position.x + position.y * position.y)
 
-            let visible = length < 20
+            let visible = length < 40
 
             if(visible == this.visibleEntities.has(entity)) continue;
 

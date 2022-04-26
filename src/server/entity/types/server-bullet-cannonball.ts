@@ -5,12 +5,17 @@ import ServerBullet from "../server-bullet";
 import ServerEntity from "../server-entity";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
+import BulletBehaviour from "../bullet-behaviour";
 
 ServerEntity.types.set(EntityType.BULLET_CANNONBALL, (entity: EntityModel) => {
-    ServerBullet.setupEntity(entity)
+    EntityModel.Types.get(EntityType.BULLET_CANNONBALL)(entity)
+    ServerEntity.setupEntity(entity)
+
+    entity.addComponent(new BulletBehaviour({
+        initialVelocity: 150,
+        explodePower: 0,
+        wallDamage: 7600
+    }))
 
     entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.BULLET_CANNONBALL)
-    // this.startVelocity = 150
-    // this.explodePower = 0
-    // this.wallDamage = 7600
 })

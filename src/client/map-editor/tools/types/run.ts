@@ -77,10 +77,6 @@ export default class RunTool extends Tool {
         this.manager.setWorldAlive(true)
         this.manager.setCameraMovementEnabled(false)
 
-        let world = this.manager.world
-
-        world.createPlayer(this.player)
-
         const body = this.player.tank.getComponent(PhysicalComponent).getBody()
 
         body.SetPosition(this.spawnPoint)
@@ -100,8 +96,6 @@ export default class RunTool extends Tool {
         this.manager.camera.shaking.Set(0, 0)
         this.manager.camera.shakeVelocity.Set(0, 0)
         this.manager.camera.inertial = false
-
-        this.manager.world.removePlayer(this.player)
     }
 
     toggleSelectLocation() {

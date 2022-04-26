@@ -4,6 +4,9 @@ import TransformComponent from "../entity/components/transform-component";
 import EntityModel from "../entity/entity-model";
 import ServerEntity from "../server/entity/server-entity";
 import ServerBullet from "../server/entity/server-bullet";
+import BulletLauncher from "../server/entity/bullet-launcher";
+import * as Box2D from "../library/box2d"
+import BulletBehaviour from "../server/entity/bullet-behaviour";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -96,27 +99,20 @@ export default class ReloadableWeapon extends Weapon {
         const absoluteX = transform.transformX(x, y)
         const absoluteY = transform.transformY(x, y)
 
-        const sin = Math.sin(rotation)
-        const cos = Math.cos(rotation)
         const world = tank.parent
 
         const entity = new EntityModel()
-        EntityModel.Types.get(bullet)(entity)
         ServerEntity.types.get(bullet)(entity)
-        ServerBullet.setShooter(entity, this.tank)
+
+        entity.addComponent(new BulletLauncher({
+            x: absoluteX, y: absoluteY
+        }, rotation))
+
+        // TODO: improve
+        entity.getComponent(BulletBehaviour).ignoreCollisions(tank)
 
         world.appendChild(entity)
 
-        const bulletBody = entity.getComponent(PhysicalComponent).getBody()
-
-        let vx = -sin * entity.startVelocity
-        let vy = cos * entity.startVelocity
-
-        bulletBody.SetAngle(rotation)
-        bulletBody.SetPosition(bulletBody.GetPosition().Set(absoluteX, absoluteY))
-        bulletBody.SetLinearVelocity(bulletBody.GetLinearVelocity().Set(vx, vy))
-        //
-        // // TODO: костыль. Этим должен заниматься физ.движок
         // tankBody.ApplyLinearImpulse(
         //     new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
         //     new Box2D.Vec2(absoluteX, absoluteY)

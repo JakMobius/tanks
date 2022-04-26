@@ -33,7 +33,6 @@ export default class ServerWorldBridge {
             const player = client.data.player
             if(player) {
                 client.data.player = null
-                world.removePlayer(player)
                 if(player.tank) player.tank.die()
             }
         })

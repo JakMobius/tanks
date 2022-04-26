@@ -5,12 +5,17 @@ import ServerBullet from "../server-bullet";
 import ServerEntity from "../server-entity";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
+import BulletBehaviour from "../bullet-behaviour";
 
 ServerEntity.types.set(EntityType.BULLET_42MM, (entity: EntityModel) => {
-    ServerBullet.setupEntity(entity)
+    EntityModel.Types.get(EntityType.BULLET_42MM)(entity)
+    ServerEntity.setupEntity(entity)
+
+    entity.addComponent(new BulletBehaviour({
+        initialVelocity: 112.5,
+        explodePower: 5,
+        wallDamage: 3000,
+    }))
 
     entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.BULLET_42MM)
-    // this.wallDamage = 3000
-    // this.startVelocity = 112.5
-    // this.explodePower = 5
 })

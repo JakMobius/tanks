@@ -1,5 +1,4 @@
-import Team from '../team';
-import Color from '../../utils/color';
+
 import ServerGameWorld from '../server-game-world';
 import HighPrecisionLoop from '../../utils/loop/high-precision-loop';
 import Room from './room';
@@ -32,11 +31,6 @@ interface GameConfig {
 }
 
 export default class Game extends Room {
-    public teams = [
-        new Team(0, new Color(58, 104, 193)),
-        new Team(1, new Color(222, 54, 54)),
-        new Team(2, new Color(14, 193, 1))
-    ]
     public loop: Loop;
     public ticks: number = 0;
     public logger: Logger = new Logger();
@@ -61,9 +55,6 @@ export default class Game extends Room {
         this.portal.on("client-connect",    (client) => this.onClientConnect(client))
         this.portal.on("client-disconnect", (client) => this.onClientDisconnect(client))
 
-        this.world.on("player-create",      (player) => this.onPlayerJoin(player))
-        this.world.on("player-changed-tank",(player) => this.onPlayerChangedTank(player))
-        this.world.on("player-remove",      (player) => this.onPlayerLeave(player))
         this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
         this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
         this.world.on("player-config",      (player, tank, nick) => this.onClientConfig(player, tank, nick))
@@ -118,18 +109,6 @@ export default class Game extends Room {
         }
     }
 
-    private onPlayerJoin(player: ServerPlayer) {
-        this.broadcastMessage("§!F00;" + player.nick + "§!; присоединился к игре")
-    }
-
-    private onPlayerChangedTank(player: ServerPlayer) {
-        this.broadcastMessage("§!F00;" + player.nick + "§!; сменил вооружение")
-    }
-
-    private onPlayerLeave(player: ServerPlayer) {
-        this.broadcastMessage("§!F00;" + player.nick + "§!; вышел из игры")
-    }
-
     pause() {
         this.loop.stop()
     }
@@ -140,25 +119,7 @@ export default class Game extends Room {
     }
 
     onPlayerRespawn(player: ServerPlayer) {
-        this.respawnPlayer(player)
-    }
-
-    getFreeTeam() {
-        let mostUnfilled: Team[] = []
-        let minClientCount = Infinity
-
-        for (let i = this.teams.length - 1; i >= 0; i--) {
-            const team = this.teams[i]
-            const length = team.players.size
-            if (length < minClientCount) {
-                mostUnfilled = [team]
-                minClientCount = length
-            } else if (minClientCount === length) {
-                mostUnfilled.push(team)
-            }
-        }
-
-        return mostUnfilled[Math.floor(Math.random() * mostUnfilled.length)]
+        this.respawnPlayer(player.tank)
     }
 
     private onPlayerChat(player: AbstractPlayer, text: string) {
@@ -178,37 +139,29 @@ export default class Game extends Room {
         let player: ServerPlayer = client.data.player
 
         if(!player) {
-            const team = this.getFreeTeam()
-
             player = new ServerPlayer({
                 id: client.id,
                 nick: nick,
-                team: team
             })
 
-            team.players.add(player)
             client.data.player = player
         }
 
         const model = new EntityModel()
-        EntityModel.Types.get(modelId)(model)
         ServerEntity.types.get(modelId)(model)
 
         this.world.appendChild(model)
         client.data.visibilityManager.setTank(model)
         player.setTank(model)
-
-        this.world.createPlayer(player)
-        this.respawnPlayer(player)
+        this.respawnPlayer(model)
     }
 
-    respawnPlayer(player: ServerPlayer) {
-        const team = player.team
-        const tank = player.tank
-
+    respawnPlayer(tank: EntityModel) {
         tank.getComponent(HealthComponent).setHealth(10)
 
-        const spawnPoint = this.world.getComponent(TilemapComponent).map.spawnPointForTeam(team.id)
+        const map = this.world.getComponent(TilemapComponent).map
+
+        const spawnPoint = map.spawnPointForTeam(Math.floor(Math.random() * map.spawnZones.length))
         const body = tank.getComponent(PhysicalComponent).getBody()
         body.SetPosition(spawnPoint)
         body.SetAngle(0)
