@@ -1,4 +1,4 @@
-import {Transmitter} from "../transmitting/transmitter";
+import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import Entity from "../../../../utils/ecs/entity";
 

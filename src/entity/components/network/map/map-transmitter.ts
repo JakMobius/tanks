@@ -1,4 +1,4 @@
-import {Transmitter} from "../transmitting/transmitter";
+import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import BlockState from "../../../../map/block-state/block-state";

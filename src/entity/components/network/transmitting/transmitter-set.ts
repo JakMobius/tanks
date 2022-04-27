@@ -1,4 +1,4 @@
-import {Transmitter} from "./transmitter";
+import Transmitter from "./transmitter";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import {ReceivingEnd} from "./receiving-end";
 import Entity from "../../../../utils/ecs/entity";
@@ -12,6 +12,10 @@ export class TransmitterSet {
 
     constructor(end: ReceivingEnd) {
         this.receivingEnd = end
+    }
+
+    initializeTransmitter<Args extends Array<any>, T extends Transmitter>(TransmitterClass: { new (...args: Args): T }, ...args: Args) {
+        this.attachTransmitter(new TransmitterClass(...args))
     }
 
     attachTransmitter(transmitter: Transmitter) {

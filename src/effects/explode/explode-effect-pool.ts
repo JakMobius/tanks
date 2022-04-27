@@ -1,13 +1,13 @@
 import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
-import BlockState from "../../../map/block-state/block-state";
-import {TwoDimensionalMap} from "../../../utils/two-dimensional-map";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import TilemapComponent from "../../../physics/tilemap-component";
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import HealthComponent from "../../../entity/components/health-component";
+import BlockState from "../../map/block-state/block-state";
+import {TwoDimensionalMap} from "../../utils/two-dimensional-map";
+import PhysicalComponent from "../../entity/components/physics-component";
+import TilemapComponent from "../../physics/tilemap-component";
+import {Component} from "../../utils/ecs/component";
+import Entity from "../../utils/ecs/entity";
+import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import HealthComponent from "../../entity/components/health-component";
 
 interface ExplodePoolWalker {
     // Walker x position

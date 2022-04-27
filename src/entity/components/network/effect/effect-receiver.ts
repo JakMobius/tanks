@@ -1,4 +1,3 @@
-
 import EffectHost from "../../../../effects/effect-host";
 import ClientEffect from "../../../../client/effects/client-effect";
 import {BinarySerializer} from "../../../../serialization/binary/serializable";

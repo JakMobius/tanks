@@ -8,7 +8,7 @@ export interface WorldEffectModelConfig extends EffectModelConfig {
     y: number
 }
 
-class WorldEffectModel extends EffectModel {
+export default class WorldEffectModel extends EffectModel {
 
     x: number
     y: number
@@ -39,5 +39,3 @@ class WorldEffectModel extends EffectModel {
         return model as any as T
     }
 }
-
-export default WorldEffectModel;

@@ -1,4 +1,3 @@
-
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 import HierarchicalComponent from "../hierarchical-component";
 import BinaryBlockCoder from "../../../serialization/binary/parsers/binary-block-coder";

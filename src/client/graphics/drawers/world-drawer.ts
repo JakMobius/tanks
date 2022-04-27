@@ -15,7 +15,7 @@ import TruckProgram from "../programs/truck-program";
 import LightMaskTextureProgram from "../programs/light-mask-texture/light-mask-texture-program";
 import MaskTextureProgramController from "../programs/light-mask-texture/light-mask-texture-program-controller";
 import TilemapComponent from "../../../physics/tilemap-component";
-import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
+import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
 import ParticleHost from "../../particle-host";
 import Entity from "../../../utils/ecs/entity";
 import {Component} from "../../../utils/ecs/component";

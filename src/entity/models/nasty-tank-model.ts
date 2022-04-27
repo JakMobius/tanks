@@ -3,10 +3,9 @@ import * as Box2D from '../../library/box2d';
 import AirbagTankBehaviour from '../tanks/physics/airbag-tank-behaviour';
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
-import TankControls from "../../controls/tank-controls";
+import TankModel from "../tanks/tank-model";
 
 const vertices = [
     [-1.00, -1.10],
@@ -20,7 +19,7 @@ const vertices = [
 ].map(v => new Box2D.Vec2(v[0] * 2.25, v[1] * 2.25))
 
 EntityModel.Types.set(EntityType.TANK_NASTY, (entity) => {
-    entity.addComponent(new TankControls())
+    TankModel.initializeEntity(entity)
     entity.addComponent(new AirbagTankBehaviour({
         power: 120000,
         torque: 90000

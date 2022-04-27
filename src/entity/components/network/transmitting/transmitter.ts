@@ -1,11 +1,10 @@
-
 import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
 import {TransmitterSet} from "./transmitter-set";
 import WriteBuffer from "../../../../serialization/binary/write-buffer";
 import Entity from "../../../../utils/ecs/entity";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 
-export class Transmitter {
+export default class Transmitter {
     set: TransmitterSet | null = null
     eventHandler = new BasicEventHandlerSet()
 
@@ -15,7 +14,7 @@ export class Transmitter {
 
     pointToEntity(entity: Entity) {
         let component = entity.getComponent(EntityDataTransmitComponent)
-        let transmitterSet = component.getTransmitterSet(this.set.receivingEnd)
+        let transmitterSet = component.transmitterSetFor(this.set.receivingEnd)
         this.set.receivingEnd.packNavigationPath(transmitterSet)
     }
 

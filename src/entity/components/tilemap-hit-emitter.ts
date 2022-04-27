@@ -65,6 +65,10 @@ export default class TilemapHitEmitter implements Component {
             if (velocity.x !== 0) nextDistanceFraction = nextDistanceX / velocity.x
             if (velocity.y !== 0) nextDistanceFraction = Math.min(nextDistanceFraction, nextDistanceY / velocity.y)
 
+            if(nextDistanceFraction < Number.EPSILON) {
+                nextDistanceFraction = Number.EPSILON
+            }
+
             const checkX = Math.floor(blockX + velocity.x * nextDistanceFraction * 0.5)
             const checkY = Math.floor(blockY + velocity.y * nextDistanceFraction * 0.5)
 

@@ -6,6 +6,7 @@ import PositionReceiver from "../../entity/components/network/position/position-
 import HealthReceiver from "../../entity/components/network/health/health-receiver";
 import EntityStateReceiver from "../../entity/components/network/entity/entity-state-receiver";
 import Entity from "../../utils/ecs/entity";
+import CollisionIgnoreListReceiver from "../../entity/components/network/collisions/collision-ignore-list-receiver";
 
 export const EntityType = {
     BULLET_16MM:          0x0100,
@@ -34,6 +35,7 @@ export default class ClientEntity {
         model.addComponent(new EffectReceiver())
         model.addComponent(new PositionReceiver())
         model.addComponent(new HealthReceiver())
+        model.addComponent(new CollisionIgnoreListReceiver())
     }
 
     static associate(type: number, configureFunction: (model: EntityModel) => void) {

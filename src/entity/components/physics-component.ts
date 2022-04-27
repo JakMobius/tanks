@@ -4,6 +4,8 @@ import Entity from "../../utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "../../physiсal-world-component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import {TransmitterSet} from "./network/transmitting/transmitter-set";
+import PositionTransmitter from "./network/position/position-transmitter";
 
 export default class PhysicalComponent implements Component {
     entity: Entity | null
@@ -31,6 +33,10 @@ export default class PhysicalComponent implements Component {
 
         this.eventListener.on("physical-host-attached", (host) => {
             this.setHost(host)
+        })
+
+        this.eventListener.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+            transmitterSet.initializeTransmitter(PositionTransmitter)
         })
     }
 

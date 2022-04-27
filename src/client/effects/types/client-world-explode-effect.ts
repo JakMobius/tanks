@@ -1,6 +1,6 @@
 
-import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
-import ExplodeEffectPool from "../../../effects/world/explode/explode-effect-pool";
+import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
+import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
 import ClientEffect from "../client-effect";
 
 export default class ClientWorldExplodeEffect extends ClientEffect {

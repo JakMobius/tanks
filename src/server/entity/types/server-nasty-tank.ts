@@ -9,8 +9,8 @@ import EntityModel from "../../../entity/entity-model";
 import ServerEntity from "../server-entity";
 
 ServerEntity.types.set(EntityType.TANK_NASTY, (entity: EntityModel) => {
-    EntityModel.Types.get(EntityType.TANK_NASTY)(entity)
     ServerEntity.setupEntity(entity)
+    EntityModel.Types.get(EntityType.TANK_NASTY)(entity)
 
     const controlsComponent = entity.getComponent(TankControls)
 

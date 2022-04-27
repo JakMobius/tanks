@@ -8,8 +8,8 @@ import EntityDataTransmitComponent
 import BulletBehaviour from "../bullet-behaviour";
 
 ServerEntity.types.set(EntityType.BULLET_42MM, (entity: EntityModel) => {
-    EntityModel.Types.get(EntityType.BULLET_42MM)(entity)
     ServerEntity.setupEntity(entity)
+    EntityModel.Types.get(EntityType.BULLET_42MM)(entity)
 
     entity.addComponent(new BulletBehaviour({
         initialVelocity: 112.5,

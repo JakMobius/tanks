@@ -2,24 +2,29 @@ import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
 import AbstractEffect from "./abstract-effect";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
+import EffectTransmitter from "../entity/components/network/effect/effect-transmitter";
+import {TransmitterSet} from "../entity/components/network/transmitting/transmitter-set";
 
 export default class EffectHost implements Component {
     entity: Entity | null;
     effects: Map<number, AbstractEffect> = new Map<number, AbstractEffect>()
-    protected worldEventHandler = new BasicEventHandlerSet()
+    protected eventHandler = new BasicEventHandlerSet()
 
     constructor() {
-        this.worldEventHandler.on("map-change", () => this.clearEffects())
+        this.eventHandler.on("map-change", () => this.clearEffects())
+        this.eventHandler.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+            transmitterSet.initializeTransmitter(EffectTransmitter)
+        })
     }
 
     onAttach(entity: Entity): void {
         this.entity = entity
-        this.worldEventHandler.setTarget(this.entity)
+        this.eventHandler.setTarget(this.entity)
     }
 
     onDetach(): void {
         this.entity = null
-        this.worldEventHandler.setTarget(null)
+        this.eventHandler.setTarget(null)
     }
 
     addEffect(effect: AbstractEffect) {

@@ -2,11 +2,11 @@ import PhysicsUtils from "../../utils/physics-utils";
 import {b2BodyType} from "../../library/box2d/dynamics/b2_body";
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 
 EntityModel.Types.set(EntityType.BULLET_MINE, (entity) => {
+    EntityModel.initializeEntity(entity)
     entity.addComponent(new PhysicalComponent((host) => {
         let bodyFixture = PhysicsUtils.squareFixture(1.25, 1.25, null, {
             filter: physicsFilters.mine,

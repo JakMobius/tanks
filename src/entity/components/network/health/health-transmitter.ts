@@ -1,4 +1,4 @@
-import {Transmitter} from "../transmitting/transmitter";
+import Transmitter from "../transmitting/transmitter";
 import HealthComponent from "../../health-component";
 import {Commands} from "../commands";
 

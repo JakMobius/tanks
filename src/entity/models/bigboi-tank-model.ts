@@ -3,13 +3,12 @@ import TrackTankBehaviour from '../tanks/physics/track-tank/track-tank-behaviour
 import * as Box2D from '../../library/box2d';
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
-import TankControls from "../../controls/tank-controls";
+import TankModel from "../tanks/tank-model";
 
 EntityModel.Types.set(EntityType.TANK_BIGBOI, (entity) => {
-    entity.addComponent(new TankControls())
+    TankModel.initializeEntity(entity)
     entity.addComponent(new TrackTankBehaviour({
         enginePower: 900000,     // 0.9 mW = 1206 horsepower
         engineMaxTorque: 200000, // 200 kN ~ 20 T

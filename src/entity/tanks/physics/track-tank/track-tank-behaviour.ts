@@ -1,4 +1,3 @@
-
 import WheeledTankBehaviour, {WheeledTankBehaviourConfig} from "../wheeled-tank/wheeled-tank-behaviour";
 import {clamp} from "../../../../utils/utils";
 import WheelTruckGenerator, {TrackConfig} from "./wheel-track-generator";

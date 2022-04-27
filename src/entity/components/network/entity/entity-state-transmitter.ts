@@ -1,11 +1,8 @@
-import {Transmitter} from "../transmitting/transmitter";
+import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import EntityDataTransmitComponent from "../transmitting/entity-data-transmit-component";
 
 export default class EntityStateTransmitter extends Transmitter {
-    constructor() {
-        super()
-    }
 
     attachedToRoot() {
         super.attachedToRoot()
@@ -14,8 +11,15 @@ export default class EntityStateTransmitter extends Transmitter {
         const myTransmitterSet = this.set
         const myEntity = myTransmitterSet.transmitComponent.entity
         const parentEntity = myEntity.parent
+
+        if(this.set.receivingEnd.getRoot() == myEntity) {
+            // We should not synchronise events of the
+            // root entity
+            return;
+        }
+
         const parentComponent = parentEntity.getComponent(EntityDataTransmitComponent)
-        const parentTransmitterSet = parentComponent.getTransmitterSet(this.set.receivingEnd)
+        const parentTransmitterSet = parentComponent.transmitterSetFor(this.set.receivingEnd)
 
         receivingEnd.packCommand(parentTransmitterSet, Commands.ENTITY_CREATE_COMMAND, (buffer) => {
             buffer.writeUint32(this.set.transmitComponent.networkIdentifier)
@@ -25,6 +29,15 @@ export default class EntityStateTransmitter extends Transmitter {
 
     detachedFromRoot() {
         super.detachedFromRoot()
+
+        const myTransmitterSet = this.set
+        const myEntity = myTransmitterSet.transmitComponent.entity
+        if(this.set.receivingEnd.getRoot() == myEntity) {
+            // We should not synchronise events of the
+            // root entity
+            return;
+        }
+
         this.pack(Commands.ENTITY_REMOVE_COMMAND, () => {})
         // As we're no longer able to navigate from this entity after
         // it's removed from the tree, the further navigation is

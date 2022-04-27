@@ -1,5 +1,5 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
+import TankFireEffectModel from 'src/effects/models/tank-fire-effect-model';
 import PhysicalComponent from "../../entity/components/physics-component";
 import EffectHost from "../../effects/effect-host";
 import ServerEffect from "../../server/effects/server-effect";

@@ -1,4 +1,4 @@
-import WorldExplodeEffectModel from 'src/effects/world/models/world-explode-effect-model';
+import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
 import ServerEntity from './server-entity';
 import * as Box2D from 'src/library/box2d'
 import PhysicalComponent from "../../entity/components/physics-component";

@@ -1,6 +1,5 @@
-
 import AbstractEffect from "../../../../effects/abstract-effect";
-import {Transmitter} from "../transmitting/transmitter";
+import Transmitter from "../transmitting/transmitter";
 import {BinarySerializer} from "../../../../serialization/binary/serializable";
 import {Commands} from "../commands";
 

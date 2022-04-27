@@ -7,6 +7,7 @@ import ServerBullet from "../server/entity/server-bullet";
 import BulletLauncher from "../server/entity/bullet-launcher";
 import * as Box2D from "../library/box2d"
 import BulletBehaviour from "../server/entity/bullet-behaviour";
+import CollisionIgnoreList from "../entity/components/collision-ignore-list";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -94,22 +95,17 @@ export default class ReloadableWeapon extends Weapon {
         const tankBody = tank.getComponent(PhysicalComponent).getBody()
         const transform = tank.getComponent(TransformComponent).transform
 
-        rotation = tankBody.GetAngle()
-
-        const absoluteX = transform.transformX(x, y)
-        const absoluteY = transform.transformY(x, y)
-
         const world = tank.parent
 
         const entity = new EntityModel()
         ServerEntity.types.get(bullet)(entity)
 
         entity.addComponent(new BulletLauncher({
-            x: absoluteX, y: absoluteY
-        }, rotation))
+            x: transform.transformX(x, y),
+            y: transform.transformY(x, y)
+        }, tankBody.GetAngle()))
 
-        // TODO: improve
-        entity.getComponent(BulletBehaviour).ignoreCollisions(tank)
+        CollisionIgnoreList.ignoreCollisions(entity, tank)
 
         world.appendChild(entity)
 

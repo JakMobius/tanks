@@ -3,13 +3,12 @@ import * as Box2D from '../../library/box2d';
 import TrackTankBehaviour from '../tanks/physics/track-tank/track-tank-behaviour';
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
-import TankControls from "../../controls/tank-controls";
+import TankModel from "../tanks/tank-model";
 
 EntityModel.Types.set(EntityType.TANK_SHOTGUN, (entity) => {
-    entity.addComponent(new TankControls())
+    TankModel.initializeEntity(entity)
     entity.addComponent(new TrackTankBehaviour({
         engineMaxTorque: 30000,
         enginePower: 30000,

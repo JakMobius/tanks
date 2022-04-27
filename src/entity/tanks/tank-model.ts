@@ -1,20 +1,14 @@
-import TankControls from '../../controls/tank-controls';
+
 import EntityModel from "../entity-model";
+import TankControls from "../../controls/tank-controls";
+import Entity from "../../utils/ecs/entity";
 
-/**
- * Tank model. Combines the physical model
- * of the tank, its behavior and controls.
- * This class used both on client and server
- * side. Can be updated dynamically through
- * binary serialization.
- */
-
-export default class TankModel extends EntityModel {
+export default class TankModel {
     static Types = new Map();
 
-    constructor() {
-        super()
+    static initializeEntity(entity: Entity) {
+        EntityModel.initializeEntity(entity)
 
-        this.addComponent(new TankControls())
+        entity.addComponent(new TankControls())
     }
 }

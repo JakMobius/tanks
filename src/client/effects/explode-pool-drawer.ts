@@ -1,5 +1,5 @@
 import Camera from "../camera";
-import ExplodeEffectPool from "../../effects/world/explode/explode-effect-pool";
+import ExplodeEffectPool from "../../effects/explode/explode-effect-pool";
 import Screen from "../graphics/screen";
 import ExplodeParticle from "../particles/explode-particle";
 import PostProcessingProgram from "../graphics/programs/post-processing-program";

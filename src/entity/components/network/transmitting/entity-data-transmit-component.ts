@@ -30,14 +30,20 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
         this.configScriptIndex = index
     }
 
-    getTransmitterSet(receivingEnd: ReceivingEnd) {
-        let transmitters = this.transmitterSets.get(receivingEnd)
-        if(!transmitters) {
-            transmitters = new TransmitterSet(receivingEnd)
-            transmitters.setTransmitComponent(this)
-            this.transmitterSets.set(receivingEnd, transmitters)
+    hasTransmitterSetForEnd(receivingEnd: ReceivingEnd) {
+        return this.transmitterSets.has(receivingEnd)
+    }
+
+    // TODO: this method should not create new transmitter set implicitly.
+    transmitterSetFor(receivingEnd: ReceivingEnd) {
+        let transmitterSet = this.transmitterSets.get(receivingEnd)
+        if(!transmitterSet) {
+            transmitterSet = new TransmitterSet(receivingEnd)
+            transmitterSet.setTransmitComponent(this)
+            this.transmitterSets.set(receivingEnd, transmitterSet)
+            this.entity.emit("transmitter-set-attached", transmitterSet)
         }
-        return transmitters
+        return transmitterSet
     }
 
     removeTransmitterSet(receivingEnd: ReceivingEnd) {

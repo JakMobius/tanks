@@ -1,2 +1,4 @@
-import "./world/model-loader"
-import "./tank/model-loader"
+// @ts-ignore
+import Models from "./models/*"
+
+for(let Model of Models) {}

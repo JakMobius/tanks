@@ -1,4 +1,3 @@
-
 import EntityDataReceiveComponent from "../entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiver-component";

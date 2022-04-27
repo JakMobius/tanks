@@ -1,4 +1,3 @@
-
 import Entity from "../../../utils/ecs/entity";
 import EntityDataReceiveComponent from "./entity-data-receive-component";
 

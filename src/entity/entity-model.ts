@@ -1,4 +1,3 @@
-
 import Entity from "../utils/ecs/entity";
 import TransformComponent from "./components/transform-component";
 import HealthComponent from "./components/health-component";
@@ -32,13 +31,6 @@ export default class EntityModel extends Entity {
     constructor() {
         super()
 
-        this.addComponent(new TilemapHitEmitter())
-        this.addComponent(new TransformComponent())
-        this.addComponent(new HealthComponent())
-        this.addComponent(new EffectHost())
-
-        this.getComponent(HealthComponent).setHealth(10)
-
         this.worldEventHandler.on("tick", (dt) => this.tick(dt))
 
         this.on("attached-to-parent", (child, parent) => {
@@ -67,5 +59,14 @@ export default class EntityModel extends Entity {
 
     isDead() {
         return this.dead || !this.parent
+    }
+
+    static initializeEntity(entity: Entity) {
+        entity.addComponent(new TilemapHitEmitter())
+        entity.addComponent(new TransformComponent())
+        entity.addComponent(new HealthComponent())
+        entity.addComponent(new EffectHost())
+
+        entity.getComponent(HealthComponent).setHealth(10)
     }
 }

@@ -3,7 +3,7 @@ import Entity from "../../utils/ecs/entity";
 import EntityModel from "../../entity/entity-model";
 import * as Box2D from "../../library/box2d";
 import PhysicalComponent from "../../entity/components/physics-component";
-import WorldExplodeEffectModel from "../../effects/world/models/world-explode-effect-model";
+import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
 import EffectHost from "../../effects/effect-host";
 import ServerEffect from "../effects/server-effect";
 import HealthComponent from "../../entity/components/health-component";
@@ -96,12 +96,6 @@ export default class BulletBehaviour implements Component {
             world.getComponent(EffectHost).addEffect(ServerEffect.fromModel(effect))
         }
         this.entity.die();
-    }
-
-    ignoreCollisions(entity: Entity) {
-        this.eventHandler.on("should-collide", (body: Box2D.Body) => {
-            return body.GetUserData() !== entity
-        })
     }
 
     onAttach(entity: EntityModel): void {

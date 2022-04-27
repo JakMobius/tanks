@@ -90,7 +90,7 @@ export class ReceivingEnd {
 
     packNavigationPath(target: TransmitterSet) {
         let entityComponent = this.currentNode.getComponent(EntityDataTransmitComponent)
-        let currentTransmitterSet = entityComponent.getTransmitterSet(this)
+        let currentTransmitterSet = entityComponent.transmitterSetFor(this)
 
         this.encodeNavigation(currentTransmitterSet, target)
     }

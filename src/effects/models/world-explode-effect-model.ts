@@ -1,7 +1,9 @@
-import WorldEffectModel, {WorldEffectModelConfig} from '../world-effect-model';
-import {Constructor} from "../../../serialization/binary/serializable";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
-import WriteBuffer from "../../../serialization/binary/write-buffer";
+import WorldEffectModel, {WorldEffectModelConfig} from './world-effect-model';
+import {Constructor} from "../../serialization/binary/serializable";
+import ReadBuffer from "../../serialization/binary/read-buffer";
+import WriteBuffer from "../../serialization/binary/write-buffer";
+import EffectModel from "../effect-model";
+import TankPelletsEffectModel from "./tank-pellets-effect-model";
 
 export interface WorldExplodeEffectModelConfig extends WorldEffectModelConfig {
     x: number
@@ -31,3 +33,5 @@ export default class WorldExplodeEffectModel extends WorldEffectModel {
         return effect as any as T
     }
 }
+
+EffectModel.register(WorldExplodeEffectModel)

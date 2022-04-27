@@ -1,7 +1,7 @@
 // const FX = require("../../sound/fx")
 import FireParticle from '../../particles/fire-particle';
 
-import TankFireEffectModel from 'src/effects/tank/models/tank-fire-effect-model';
+import TankFireEffectModel from 'src/effects/models/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../entity/tank/client-tank";
 import PhysicalComponent from "../../../entity/components/physics-component";

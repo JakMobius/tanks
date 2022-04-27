@@ -4,14 +4,12 @@ import {Vec2} from "../../library/box2d";
 import {physicsFilters} from "../../physics/categories";
 import WheelAxlesGenerator from "../tanks/physics/wheeled-tank/wheel-axles-generator";
 import PhysicalComponent from "../components/physics-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
-import TankControls from "../../controls/tank-controls";
-import {b2BodyType} from "../../library/box2d/dynamics/b2_body";
+import TankModel from "../tanks/tank-model";
 
 EntityModel.Types.set(EntityType.TANK_MONSTER, (entity) => {
-    entity.addComponent(new TankControls())
+    TankModel.initializeEntity(entity)
     entity.addComponent(new WheeledTankBehaviour({
         enginePower: 900000,
         engineMaxTorque: 200000,
