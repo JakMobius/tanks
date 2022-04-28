@@ -7,7 +7,7 @@ import EntityDataTransmitComponent
 import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
 import ServerEntity from "../server-entity";
-import HealthComponent from "../../../entity/components/health-component";
+import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
 
 ServerEntity.types.set(EntityType.TANK_NASTY, (entity: EntityModel) => {
     ServerEntity.setupEntity(entity)
@@ -34,5 +34,7 @@ ServerEntity.types.set(EntityType.TANK_NASTY, (entity: EntityModel) => {
         minerWeapon.tick(dt)
     })
 
-    entity.getComponent(HealthComponent).setMaxHealth(10)
+    entity.getComponent(HealthComponent)
+        .setMaxHealth(10)
+        .addDamageModifier(DamageModifiers.resistance(1), DamageTypes.EXPLOSION)
 })

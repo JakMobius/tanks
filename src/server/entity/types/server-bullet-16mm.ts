@@ -5,7 +5,7 @@ import ServerEntity from "../server-entity";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
 import BulletBehaviour from "../bullet-behaviour";
-import HealthComponent from "../../../entity/components/health-component";
+import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
 
 ServerEntity.types.set(EntityType.BULLET_16MM, (entity: EntityModel) => {
     ServerEntity.setupEntity(entity)
@@ -18,6 +18,8 @@ ServerEntity.types.set(EntityType.BULLET_16MM, (entity: EntityModel) => {
         entityDamage: 0.5
     }))
 
-    entity.getComponent(HealthComponent).setMaxHealth(0.01)
+    entity.getComponent(HealthComponent)
+        .setMaxHealth(0.1)
+        .addDamageModifier(DamageModifiers.resistance(2), DamageTypes.EXPLOSION)
     entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.BULLET_16MM)
 })

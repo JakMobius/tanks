@@ -7,9 +7,11 @@ import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
+import SailingComponent from "../components/sailing-component";
 
 EntityModel.Types.set(EntityType.TANK_MONSTER, (entity) => {
     TankModel.initializeEntity(entity)
+    entity.addComponent(new SailingComponent(10000))
     entity.addComponent(new WheeledTankBehaviour({
         enginePower: 900000,
         engineMaxTorque: 200000,

@@ -1,13 +1,10 @@
 import GameMap from 'src/map/game-map';
-import * as Box2D from 'src/library/box2d';
 import BlockState from "../../map/block-state/block-state";
 import {TwoDimensionalMap} from "../../utils/two-dimensional-map";
-import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import HealthComponent from "../../entity/components/health-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -33,7 +30,6 @@ type ExplodePoolWalkerMap = TwoDimensionalMap<number, number,ExplodePoolWalker>
 
 export interface ExplodeEffectPoolConfig {
     damageBlocks?: boolean
-    damageEntities?: boolean
 }
 
 export default class ExplodeEffectPool implements Component {
@@ -69,19 +65,8 @@ export default class ExplodeEffectPool implements Component {
     // Остальные 90% остаются у блока
 	public damageEnergyFraction = 0.1;
 
-    // Какому усилию соответствует единица скорости волны
-    // Этот коэффициент настраивает силу отталкивания танков
-	public forceCoefficient = 10000
-
-    // Какому урону соответствует единица скорости волны
-    // Этот коэффициент настраивает урон танкам
-    public damageCoefficient = 2
-
-    // Минимальный порог урона
-    public damageThreshold = 1
-
     // Практика показала, что если смотреть на два блока,
-    // а не на один, при рассчете разницы давления, то
+    // а не на один, то при расчете разницы давления
     // сила отталкивания будет рассчитана более правильно.
 	public pressureDifferentialDistance = this.gridSize * 2
 
@@ -94,15 +79,12 @@ export default class ExplodeEffectPool implements Component {
     private eventHandler = new BasicEventHandlerSet()
 
     private damageBlocks = false
-    private damageEntities = false
 
     constructor(config?: ExplodeEffectPoolConfig) {
-        this.eventHandler.on("tick", (dt: number) => this.tick(dt))
+        config = config || {}
+        this.damageBlocks = config.damageBlocks ?? false
 
-        if(config) {
-            if(config.damageBlocks) this.damageBlocks = true
-            if(config.damageEntities) this.damageEntities = true
-        }
+        this.eventHandler.on("tick", (dt: number) => this.tick(dt))
     }
 
     isBlock (x: number, y: number): boolean {
@@ -220,7 +202,6 @@ export default class ExplodeEffectPool implements Component {
     }
 
     private step(dt: number): void {
-        this.tickEntities(dt)
         this.stepsWaiting -= 1
 
         let newWalkers = new TwoDimensionalMap<number, number, ExplodePoolWalker>();
@@ -320,6 +301,7 @@ export default class ExplodeEffectPool implements Component {
         }
 
         this.walkers = newWalkers
+        this.entity.emit("explode-pool-tick", dt)
     }
 
     protected damageBlock(x: number, y: number, damage: number): void {
@@ -328,7 +310,12 @@ export default class ExplodeEffectPool implements Component {
         map.damageBlock(x / GameMap.BLOCK_SIZE, y / GameMap.BLOCK_SIZE, damage * this.blockDamageCoefficient)
     }
 
-    private mapPower(walkers: ExplodePoolWalkerMap, x: number, y: number): number {
+    public normalize(x: number): number {
+        return (1 - 1 / (Math.abs(x) + 1)) * Math.sign(x)
+    }
+
+    poolPressureAt(x: number, y: number): number {
+
         const relX = (x / this.gridSize - 0.5)
         const relY = (y / this.gridSize - 0.5)
 
@@ -358,90 +345,16 @@ export default class ExplodeEffectPool implements Component {
         return resultPower
     }
 
-    private
-
-    private tickEntities(dt: number): void {
-
-        for(let child of this.entity.children) {
-            let physicalComponent = child.getComponent(PhysicalComponent)
-            if(!physicalComponent) continue
-            let position = physicalComponent.getBody().GetPosition()
-
-            const x = position.x
-            const y = position.y
-
-            const sourceWalkerPower = this.mapPower(this.walkers, x, y)
-
-            let resultVx = 0
-            let resultVy = 0
-            let maxPowerDifference = 0
-
-            // Checking nearby walkers
-
-            for(let i = 0; i < ExplodeEffectPool.roundOffsetMap.length;) {
-                let dx = ExplodeEffectPool.roundOffsetMap[i++]
-                let dy = ExplodeEffectPool.roundOffsetMap[i++]
-                let skip = false
-                let gridX
-                let gridY
-
-                for(let distance = this.gridSize; distance <= this.pressureDifferentialDistance; distance += GameMap.BLOCK_SIZE) {
-                    gridX = x + dx * distance
-                    gridY = y + dy * distance
-
-                    if (this.isBlock(gridX, gridY)) {
-                        skip = true
-                        break
-                    }
-                }
-
-                if(skip) continue
-
-                let power = this.mapPower(this.walkers, gridX, gridY)
-                let powerDifference = sourceWalkerPower - power
-
-                if (powerDifference > maxPowerDifference)
-                    maxPowerDifference = powerDifference
-
-                resultVx += dx * powerDifference
-                resultVy += dy * powerDifference
-            }
-
-            let length = Math.sqrt(resultVx ** 2 + resultVy ** 2)
-            if(length == 0) continue
-
-            resultVx /= length
-            resultVy /= length
-
-            const force = maxPowerDifference * this.forceCoefficient
-            resultVx *= force
-            resultVy *= force
-
-            child.getComponent(PhysicalComponent).getBody().ApplyLinearImpulse(new Box2D.Vec2(
-                resultVx,
-                resultVy
-            ), position)
-
-            if (!this.damageEntities) continue;
-
-            const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
-            if (damage <= 0) continue;
-
-            let healthComponent = child.getComponent(HealthComponent)
-            if (healthComponent) healthComponent.damage(damage)
-        }
-    }
-
-    public normalize(x: number): number {
-        return (1 - 1 / (Math.abs(x) + 1)) * Math.sign(x)
-    }
-
     tick(dt: number): void {
         if(this.walkers.rows.size === 0) return
 
         this.stepsWaiting += this.stepsPerSecond * dt
 
-        while(this.stepsWaiting > 1) this.step(1 / this.stepsPerSecond)
+        let stepDt = 1 / this.stepsPerSecond
+
+        while(this.stepsWaiting > 1) {
+            this.step(stepDt)
+        }
     }
 
     onAttach(entity: Entity): void {

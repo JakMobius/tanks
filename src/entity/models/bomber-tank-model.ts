@@ -6,9 +6,11 @@ import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
+import SailingComponent from "../components/sailing-component";
 
 EntityModel.Types.set(EntityType.TANK_BOMBER, (entity) => {
     TankModel.initializeEntity(entity)
+    entity.addComponent(new SailingComponent(8000))
     entity.addComponent(new TrackTankBehaviour({
         enginePower: 600000, // 0.6 mW = 804.6 horsepower
         engineMaxTorque: 100000,

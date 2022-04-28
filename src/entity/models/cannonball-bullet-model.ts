@@ -3,9 +3,11 @@ import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
+import SailingComponent from "../components/sailing-component";
 
 EntityModel.Types.set(EntityType.BULLET_CANNONBALL, (entity) => {
     EntityModel.initializeEntity(entity)
+    entity.addComponent(new SailingComponent(8000))
     entity.addComponent(new PhysicalComponent((host) => {
         const bodyFixtureDef = PhysicsUtils.squareFixture(0.375, 0.375, null, {
             density: 3,

@@ -6,7 +6,7 @@ import PhysicalComponent from "../../entity/components/physics-component";
 import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
 import EffectHost from "../../effects/effect-host";
 import ServerEffect from "../effects/server-effect";
-import HealthComponent from "../../entity/components/health-component";
+import HealthComponent, {DamageModifiers, DamageTypes} from "../../entity/components/health-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 
@@ -63,7 +63,7 @@ export default class BulletBehaviour implements Component {
         if(this.config.entityDamage) {
             world.physicsLoop.scheduleTask(() => {
                 let healthComponent = hitEntity.getComponent(HealthComponent)
-                if (healthComponent) healthComponent.damage(this.config.entityDamage)
+                if (healthComponent) healthComponent.damage(this.config.entityDamage, DamageTypes.IMPACT)
             })
         }
 

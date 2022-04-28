@@ -4,7 +4,7 @@ import ServerGameWorld from "../../server/server-game-world";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TransformComponent from "../../entity/components/transform-component";
 import Entity from "../../utils/ecs/entity";
-import HealthComponent from "../../entity/components/health-component";
+import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
@@ -47,7 +47,7 @@ export default class WeaponStungun extends Weapon {
 
             for(let each of near(px, py, null, world, this.squareRadius)) {
                 if(each != this.tank) {
-                    each.getComponent(HealthComponent).damage(this.damage * dt)
+                    each.getComponent(HealthComponent).damage(this.damage * dt, DamageTypes.ELECTRICAL)
                 }
             }
         }

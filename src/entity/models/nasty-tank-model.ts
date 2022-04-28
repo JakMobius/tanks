@@ -6,6 +6,7 @@ import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
 import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
+import SailingComponent from "../components/sailing-component";
 
 const vertices = [
     [-1.00, -1.10],
@@ -20,6 +21,9 @@ const vertices = [
 
 EntityModel.Types.set(EntityType.TANK_NASTY, (entity) => {
     TankModel.initializeEntity(entity)
+
+    entity.addComponent(new SailingComponent(10000))
+
     entity.addComponent(new AirbagTankBehaviour({
         power: 120000,
         torque: 90000
