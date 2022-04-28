@@ -1,7 +1,15 @@
 
+export type Handler = (...params: any[]) => any
+
+export interface HandlerList {
+    handlers: Array<Handler>
+    iterationIndex: number
+    iterationCount: number
+}
+
 export default class EventEmitter {
 
-    private handlers: Map<string, Array<(...params: any[]) => any>>[]
+    private handlers: Map<string, HandlerList>[]
 
     public static PRIORITY_LOW = 3
     public static PRIORITY_MONITOR = 2
@@ -22,12 +30,10 @@ export default class EventEmitter {
 
         let handlers = priorityBlock.get(type)
         if(handlers) {
-            handlers.push(listener)
+            handlers.handlers.push(listener)
         } else {
-            priorityBlock.set(type, [listener])
+            priorityBlock.set(type, this.handlerList([listener]))
         }
-
-        this.emitArgs('newListener', [type, listener]);
     }
 
     on(type: string, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL){
@@ -38,11 +44,13 @@ export default class EventEmitter {
 
         for(let priorityBlock of this.handlers) {
             if(!priorityBlock) continue
-            let handlers = priorityBlock.get(type)
-            if(!handlers) continue
-            let index = handlers.indexOf(listener)
+            let handlerList = priorityBlock.get(type)
+            if(!handlerList) continue
+            let index = handlerList.handlers.indexOf(listener)
             if(index !== -1) {
-                handlers.splice(index, 1)
+                handlerList.handlers.splice(index, 1)
+                if(index < handlerList.iterationCount) handlerList.iterationCount--
+                if(index <= handlerList.iterationIndex) handlerList.iterationIndex--
             }
         }
     }
@@ -64,7 +72,6 @@ export default class EventEmitter {
         }
     }
 
-
     once(type: string, listener: (...params: any[]) => any) {
         let self = this
         function on() {
@@ -80,10 +87,14 @@ export default class EventEmitter {
 
         for(let priorityBlock of this.handlers) {
             if(!priorityBlock) continue
-            let handlers = priorityBlock.get(type)
-            if(!handlers) continue
-            for(let handler of handlers) {
-                if (handler.apply(this, args) === false) {
+            let handlerList = priorityBlock.get(type)
+            if(!handlerList) continue
+
+            handlerList.iterationIndex = 0
+            handlerList.iterationCount = handlerList.handlers.length
+
+            for(; handlerList.iterationIndex < handlerList.iterationCount; handlerList.iterationIndex++) {
+                if (handlerList.handlers[handlerList.iterationIndex].apply(this, args) === false) {
                     result = false;
                 }
             }
@@ -94,10 +105,19 @@ export default class EventEmitter {
 
     emit(type: string, ...values: any[]) {
         let args = Array.prototype.slice.call(arguments, 1)
-        let params = Array.prototype.slice.call(arguments)
 
-        this.emitArgs('event', params);
+        // Sending the meta-event every time is quite inefficient
+        // let params = Array.prototype.slice.call(arguments)
+        // this.emitArgs('event', params);
 
         return this.emitArgs(type, args) !== false;
+    }
+
+    private handlerList(handlers: Handler[]): HandlerList {
+        return {
+            handlers: handlers,
+            iterationCount: 0,
+            iterationIndex: 0
+        }
     }
 }

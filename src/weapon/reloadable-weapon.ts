@@ -3,10 +3,7 @@ import PhysicalComponent from "../entity/components/physics-component";
 import TransformComponent from "../entity/components/transform-component";
 import EntityModel from "../entity/entity-model";
 import ServerEntity from "../server/entity/server-entity";
-import ServerBullet from "../server/entity/server-bullet";
 import BulletLauncher from "../server/entity/bullet-launcher";
-import * as Box2D from "../library/box2d"
-import BulletBehaviour from "../server/entity/bullet-behaviour";
 import CollisionIgnoreList from "../entity/components/collision-ignore-list";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {

@@ -82,17 +82,17 @@ export default class GameMap extends Entity {
 		x = Math.floor(x)
 		y = Math.floor(y)
 
-		let b = this.getBlock(x, y);
+		let block = this.getBlock(x, y);
 
-		if(!b || b instanceof AirBlockState) return
+		if(!block || block instanceof AirBlockState) return
 
-		let health = b.getHealth()
+		let health = block.getHealth()
 
 		if(health - d <= 0) {
 			this.setBlock(x, y, new AirBlockState())
 		} else {
-			b.setHealth(health - d)
-			b.update(this, x, y)
+			block.setHealth(health - d)
+			block.update(this, x, y)
 			this.emit("block-damage", x, y)
 		}
 	}

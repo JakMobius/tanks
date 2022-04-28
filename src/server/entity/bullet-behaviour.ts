@@ -51,6 +51,10 @@ export default class BulletBehaviour implements Component {
             if(this.entity.isDead()) return;
             this.handleBlockHit(x, y)
         })
+
+        this.eventHandler.on("health-set", (health: number) => {
+            if(health == 0) this.trigger()
+        })
     }
 
     private handleEntityHit(hitEntity: Entity) {

@@ -1,6 +1,5 @@
 
 import EntityModel from "../../entity/entity-model";
-import EntityDataTransmitComponent from "../../entity/components/network/transmitting/entity-data-transmit-component";
 import ServerEntityDataTransmitComponent from "./server-entity-data-transmit-component";
 
 export default class ServerEntity {

@@ -64,13 +64,13 @@ export default class TutorialWorldController {
     private respawnPlayer(player: ServerPlayer) {
         const tank = player.tank
 
-        tank.getComponent(HealthComponent).setHealth(10)
+        tank.emit("respawn")
 
-        let body = tank.getComponent(PhysicalComponent).getBody()
-        body.SetPositionXY(17.5, 212.5)
-        body.SetLinearVelocity({x: 0, y: 0})
-        body.SetAngle(4)
-        body.SetAngularVelocity(0)
+        let body = tank.getComponent(PhysicalComponent)
+        body.setPosition({x: 17.5, y: 212.5})
+        body.setVelocity({x: 0, y: 0})
+        body.setAngle(4)
+        body.setAngularVelocity(0)
     }
 
 

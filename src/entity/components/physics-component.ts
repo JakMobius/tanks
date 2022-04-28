@@ -11,6 +11,7 @@ export default class PhysicalComponent implements Component {
     entity: Entity | null
     body: Box2D.Body
     host: PhysicalHostComponent
+    positionUpdated: boolean = false
     bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body
 
     private eventListener = new BasicEventHandlerSet()
@@ -38,6 +39,10 @@ export default class PhysicalComponent implements Component {
         this.eventListener.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(PositionTransmitter)
         })
+
+        this.eventListener.on("teleport", () => {
+            this.host.entity.emit("entity-teleport", this.entity)
+        })
     }
 
     getPositionComponent() {
@@ -54,6 +59,11 @@ export default class PhysicalComponent implements Component {
         transformComponent.reset()
         transformComponent.translate(position.x, position.y)
         transformComponent.rotate(-this.body.GetAngle())
+
+        if(this.positionUpdated) {
+            this.positionUpdated = false
+            this.entity.emit("teleport")
+        }
 
         this.entity.emit("physics-tick", dt)
     }
@@ -87,7 +97,27 @@ export default class PhysicalComponent implements Component {
             this.body = this.bodyConstructor(host)
             this.body.SetUserData(this.entity)
             this.host.registerComponent(this)
-            this.entity.emit("physical-body-created", this.body)
+            this.entity.emit("physical-body-created", this)
         }
+    }
+
+    setPosition(position: Box2D.XY) {
+        this.body.SetPosition(position)
+        this.positionUpdated = true
+    }
+
+    setAngle(angle: number) {
+        this.body.SetAngle(angle)
+        this.positionUpdated = true
+    }
+
+    setVelocity(velocity: Box2D.XY) {
+        this.body.SetLinearVelocity(velocity)
+        this.positionUpdated = true
+    }
+
+    setAngularVelocity(velocity: number) {
+        this.body.SetAngularVelocity(velocity)
+        this.positionUpdated = true
     }
 }

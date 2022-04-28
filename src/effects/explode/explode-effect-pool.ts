@@ -358,6 +358,8 @@ export default class ExplodeEffectPool implements Component {
         return resultPower
     }
 
+    private
+
     private tickEntities(dt: number): void {
 
         for(let child of this.entity.children) {
@@ -406,7 +408,7 @@ export default class ExplodeEffectPool implements Component {
             }
 
             let length = Math.sqrt(resultVx ** 2 + resultVy ** 2)
-            if(length == 0) return
+            if(length == 0) continue
 
             resultVx /= length
             resultVy /= length
@@ -420,14 +422,13 @@ export default class ExplodeEffectPool implements Component {
                 resultVy
             ), position)
 
-            if(this.damageEntities) {
-                const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
+            if (!this.damageEntities) continue;
 
-                if (damage > 0) {
-                    let healthComponent = child.getComponent(HealthComponent)
-                    if (healthComponent) healthComponent.damage(damage)
-                }
-            }
+            const damage = maxPowerDifference * this.damageCoefficient - this.damageThreshold
+            if (damage <= 0) continue;
+
+            let healthComponent = child.getComponent(HealthComponent)
+            if (healthComponent) healthComponent.damage(damage)
         }
     }
 

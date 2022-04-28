@@ -14,17 +14,18 @@ export default class PlayerVisibilityManager {
     // This code is still not perfect, but it's much
     // better than it was before
 
-    tankEventHandler = new BasicEventHandlerSet()
     client: SocketPortalClient
     end = new ReceivingEnd()
 
+    private worldEventHandler = new BasicEventHandlerSet()
     private primaryPlayerTransmitter = new PrimaryPlayerTransmitter()
     private visibleEntities = new Set<Entity>()
     private world: ServerGameWorld
     private tank: EntityModel
 
     constructor() {
-        this.tankEventHandler.on("tick", () => this.updateEntitiesVisibility())
+        this.worldEventHandler.on("tick", () => this.updateEntitiesVisibility())
+        this.worldEventHandler.on("entity-teleport", (entity) => this.updateEntityVisibility(entity))
     }
 
     setWorld(world: ServerGameWorld) {
@@ -37,6 +38,7 @@ export default class PlayerVisibilityManager {
 
         this.world = world
         this.end.setRoot(world)
+        this.worldEventHandler.setTarget(world)
 
         if(this.world) {
             let transmitComponent = this.world.getComponent(EntityDataTransmitComponent)
@@ -47,10 +49,10 @@ export default class PlayerVisibilityManager {
 
     setTank(tank: EntityModel) {
         this.tank = tank
-        this.tankEventHandler.setTarget(tank)
     }
 
     private updateEntitiesVisibility() {
+        if(!this.tank) return
         let playerPosition = this.tank.getComponent(PhysicalComponent).getBody().GetPosition()
         let entityPosition = new b2Vec2();
 
@@ -63,6 +65,19 @@ export default class PlayerVisibilityManager {
 
             this.setEntityVisibile(entity, visible)
         }
+    }
+
+    private updateEntityVisibility(entity: Entity) {
+        let playerPosition = this.tank.getComponent(PhysicalComponent).getBody().GetPosition()
+        let entityPosition = new b2Vec2();
+
+        let transform = entity.getComponent(TransformComponent)
+        if(!transform) return
+
+        let offset = entityPosition.Copy(transform.getPosition()).SelfSub(playerPosition)
+        let visible = offset.LengthSquared() < 40 ** 2
+
+        this.setEntityVisibile(entity, visible)
     }
 
     private makeEntityVisible(entity: Entity) {

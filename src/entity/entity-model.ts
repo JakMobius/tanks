@@ -66,7 +66,5 @@ export default class EntityModel extends Entity {
         entity.addComponent(new TransformComponent())
         entity.addComponent(new HealthComponent())
         entity.addComponent(new EffectHost())
-
-        entity.getComponent(HealthComponent).setHealth(10)
     }
 }

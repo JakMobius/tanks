@@ -8,8 +8,8 @@ export default class Weapon42mm extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {
 		super({
 			maxAmmo: 5,
-			shootRate: 1000,
-			reloadTime: 5000,
+			shootRate: 300,
+			reloadTime: 300,
 			bulletType: EntityType.BULLET_42MM,
 			muzzlePoint: new Box2D.Vec2(0, 2.5),
 			tank: config.tank,

@@ -77,15 +77,15 @@ export default class RunTool extends Tool {
         this.manager.setWorldAlive(true)
         this.manager.setCameraMovementEnabled(false)
 
-        const body = this.player.tank.getComponent(PhysicalComponent).getBody()
+        const physicalComponent = this.player.tank.getComponent(PhysicalComponent)
 
-        body.SetPosition(this.spawnPoint)
+        physicalComponent.setPosition(this.spawnPoint)
 
         this.playerControls.connectTankControls(this.player.tank.getComponent(TankControls))
 
         this.manager.camera.inertial = true
-        this.manager.camera.target = body.GetPosition()
-        this.manager.camera.targetVelocity = body.GetLinearVelocity()
+        this.manager.camera.target = physicalComponent.body.GetPosition()
+        this.manager.camera.targetVelocity = physicalComponent.body.GetLinearVelocity()
     }
 
     onStop() {

@@ -14,7 +14,7 @@ EntityModel.Types.set(EntityType.BULLET_MINE, (entity) => {
         })
 
         const body = host.world.CreateBody({
-            type: b2BodyType.b2_staticBody
+            // type: b2BodyType.b2_staticBody
         })
 
         body.CreateFixture(bodyFixture)

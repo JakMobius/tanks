@@ -40,6 +40,7 @@ export default class ServerPosition implements Component {
             serverX += this.serverVelocity.x * timePassedSinceUpdate
             serverY += this.serverVelocity.y * timePassedSinceUpdate
 
+            // TODO: should it use component methods?
             body.SetPositionXY(serverX, serverY)
             body.SetLinearVelocity(this.serverVelocity)
             body.SetAngle(this.serverAngle + this.serverAngularVelocity * timePassedSinceUpdate)

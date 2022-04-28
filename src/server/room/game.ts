@@ -147,27 +147,27 @@ export default class Game extends Room {
             client.data.player = player
         }
 
-        const model = new EntityModel()
-        ServerEntity.types.get(modelId)(model)
+        const tank = new EntityModel()
+        ServerEntity.types.get(modelId)(tank)
+        this.world.appendChild(tank)
+        tank.emit("respawn")
 
-        this.world.appendChild(model)
-        client.data.visibilityManager.setTank(model)
-        player.setTank(model)
-        this.respawnPlayer(model)
+        client.data.visibilityManager.setTank(tank)
+        player.setTank(tank)
+        this.respawnPlayer(tank)
     }
 
     respawnPlayer(tank: EntityModel) {
-        tank.getComponent(HealthComponent).setHealth(10)
+        tank.emit("respawn")
 
         const map = this.world.getComponent(TilemapComponent).map
 
         const spawnPoint = map.spawnPointForTeam(Math.floor(Math.random() * map.spawnZones.length))
-        const body = tank.getComponent(PhysicalComponent).getBody()
-        body.SetPosition(spawnPoint)
-        body.SetAngle(0)
 
-        const velocity = body.GetLinearVelocity()
-        velocity.Set(0, 0)
-        body.SetLinearVelocity(velocity)
+        const body = tank.getComponent(PhysicalComponent)
+        body.setPosition(spawnPoint)
+        body.setAngle(0)
+        body.setVelocity({x: 0, y: 0})
+        body.setAngularVelocity(0)
     }
 }
