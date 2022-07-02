@@ -6,6 +6,7 @@ import Entity from "./utils/ecs/entity";
 import PhysicalHostComponent from "./physiсal-world-component";
 import TilemapComponent from "./physics/tilemap-component";
 import EffectHost from "./effects/effect-host";
+import SoundHostComponent from "./client/entity/components/sound-host-component";
 
 export interface GameWorldConfig {
     physicsTick?: number

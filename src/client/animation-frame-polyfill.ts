@@ -3,10 +3,8 @@ type RequestAnimationFrameHolder = { [key: string]: ((callback: FrameRequestCall
 
 let holder = window as any as RequestAnimationFrameHolder
 
-window.requestAnimationFrame =
+export default window.requestAnimationFrame =
     holder["requestAnimationFrame"] ||
     holder["mozRequestAnimationFrame"] ||
     holder["webkitRequestAnimationFrame"] ||
     holder["msRequestAnimationFrame"]
-
-export default window.requestAnimationFrame

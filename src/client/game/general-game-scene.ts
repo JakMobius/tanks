@@ -7,7 +7,7 @@ import PlayerControls from "../controls/player-controls";
 import EventContainer from "../ui/overlay/events/event-container";
 import ChatContainer from "./ui/overlay/chat/chat-container";
 import ClientGameWorld from "../client-game-world";
-import WorldDrawer from "../graphics/drawers/world-drawer";
+import WorldDrawerComponent from "../entity/components/world-drawer-component";
 import * as Box2D from "../../library/box2d";
 import GameMap from "../../map/game-map";
 import Scene, {SceneConfig} from "../scenes/scene";
@@ -19,6 +19,7 @@ import TankControls from "../../controls/tank-controls";
 import EntityModel from "../../entity/entity-model";
 import BlockTreeDecoder from "../../networking/block-tree-decoder";
 import Entity from "../../utils/ecs/entity";
+import SoundHostComponent from "../entity/components/sound-host-component";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
@@ -32,7 +33,8 @@ export default class GeneralGameScene extends Scene {
     public chatContainer: ChatContainer
     public displayedWorld: ClientGameWorld
     public controlledTank: EntityModel
-    public worldDrawer: WorldDrawer
+    public worldDrawer: WorldDrawerComponent
+    public soundHost: SoundHostComponent
 
     public paused: boolean = false
     public didChangeSize: boolean = false
@@ -42,6 +44,7 @@ export default class GeneralGameScene extends Scene {
         super(config)
 
         this.setupControls()
+        this.setupSound()
         this.setupDrawer()
         this.setupChat()
         this.setupEventContainer()
@@ -62,6 +65,10 @@ export default class GeneralGameScene extends Scene {
         this.playerControls.on("pause", () => this.togglePauseOverlay())
     }
 
+    private setupSound() {
+        this.soundHost = new SoundHostComponent(this.screen.soundEngine)
+    }
+
     private setupDrawer() {
         this.camera = new Camera({
             baseScale: 12,
@@ -70,7 +77,7 @@ export default class GeneralGameScene extends Scene {
             inertial: true
         })
 
-        this.worldDrawer = new WorldDrawer(this.camera, this.screen)
+        this.worldDrawer = new WorldDrawerComponent(this.camera, this.screen)
     }
 
     private setupEventContainer() {
@@ -106,6 +113,7 @@ export default class GeneralGameScene extends Scene {
         if(this.displayedWorld) throw new Error("Scene world cannot be changed after it's been set once")
         this.displayedWorld = world
         this.displayedWorld.addComponent(this.worldDrawer)
+        this.displayedWorld.addComponent(this.soundHost)
         this.worldDrawer.setWorld(world)
 
         this.displayedWorld.on("map-change", () => {
@@ -125,7 +133,7 @@ export default class GeneralGameScene extends Scene {
         this.didChangeSize = true
     }
 
-    draw(ctx: WebGLRenderingContext, dt: number) {
+    draw(dt: number) {
         this.gamepad.refresh()
         this.playerControls.refresh()
 

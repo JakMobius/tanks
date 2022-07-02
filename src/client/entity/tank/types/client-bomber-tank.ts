@@ -1,6 +1,6 @@
 
-import Engine from "../../../engine";
-import FX from "../../../sound/fx";
+import EngineSoundComponent from "../../components/engine-sound-component";
+import Sounds from "../../../sound/sounds";
 import TankDrawer from "../../../graphics/drawers/tank-drawer";
 import Sprite from "../../../sprite";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
@@ -68,8 +68,8 @@ ClientEntity.associate(EntityType.TANK_BOMBER, (model) => {
     EntityModel.Types.get(EntityType.TANK_BOMBER)(model)
     ClientTank.configureEntity(model)
 
-    let engine = new Engine({
-        sound: FX.ENGINE_2,
+    model.addComponent(new EngineSoundComponent({
+        sound: Sounds.ENGINE_2,
         gears: [
             {high: 1.9, gearing: 1},
             {low: 1.4, high: 2, gearing: 0.8},
@@ -78,7 +78,7 @@ ClientEntity.associate(EntityType.TANK_BOMBER, (model) => {
         ],
         multiplier: 20,
         pitch: 1
-    })
+    }))
 
     model.addComponent(new Drawer())
 })

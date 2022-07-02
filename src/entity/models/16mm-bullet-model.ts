@@ -7,7 +7,7 @@ import SailingComponent from "../components/sailing-component";
 
 EntityModel.Types.set(EntityType.BULLET_16MM, (entity) => {
     EntityModel.initializeEntity(entity)
-    entity.addComponent(new SailingComponent(10))
+    entity.addComponent(new SailingComponent(1))
     entity.addComponent(new PhysicalComponent((host) => {
         let bodyFixture = PhysicsUtils.squareFixture(0.0825, 0.25, null, {
             density: 48,

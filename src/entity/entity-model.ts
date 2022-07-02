@@ -5,25 +5,9 @@ import EffectHost from "../effects/effect-host";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import TilemapHitEmitter from "./components/tilemap-hit-emitter";
 
-/**
- * Entity model. Describes entity position,
- * velocity and setAngle. Each entity type should
- * inherit this class.
- * This class used both on client and server
- * side. Can be updated dynamically through
- * binary serialization.
- */
-
-export type EntityModelType = {
-    getId(): number,
-    getMaximumHealth(): number
-}
 
 export default class EntityModel extends Entity {
     static Types = new Map<number, (entity: EntityModel) => void>()
-
-    static groupName = 5
-    static typeName = 0
 
     private worldEventHandler = new BasicEventHandlerSet()
     private dead = false

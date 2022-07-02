@@ -1,7 +1,5 @@
 /* @load-resource: '../web/base-style.scss' */
 
-import './game-loader'
-
 import GameScene from './scenes/game-scene';
 import {ScreenConfig} from "../graphics/screen";
 import GeneralGameScreen from "./general-game-screen";

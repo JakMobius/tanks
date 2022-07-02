@@ -34,7 +34,7 @@ export default class SceneScreen extends Screen {
 
     tick(dt: number): void {
         if (this.scene) {
-            this.scene.draw(this.ctx, dt)
+            this.scene.draw(dt)
             // let now = Date.now()
             // if(now >= this.lastSecondDate + 2000) this.lastSecondDate = now - 1000
             // if(now >= this.lastSecondDate + 1000) {

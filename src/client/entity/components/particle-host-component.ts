@@ -1,9 +1,9 @@
-import {Component} from "../utils/ecs/component";
-import Entity from "../utils/ecs/entity";
-import Particle from "./particles/particle";
-import BasicEventHandlerSet from "../utils/basic-event-handler-set";
+import {Component} from "../../../utils/ecs/component";
+import Entity from "../../../utils/ecs/entity";
+import Particle from "../../particles/particle";
+import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 
-export default class ParticleHost implements Component {
+export default class ParticleHostComponent implements Component {
     entity: Entity | null;
 
     particles: Particle[] = []

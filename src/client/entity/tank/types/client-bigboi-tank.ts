@@ -5,9 +5,9 @@ import DrawPhase from "../../../graphics/drawers/draw-phase";
 import TruckProgram from "../../../graphics/programs/truck-program";
 import LightMaskTextureProgram from "../../../graphics/programs/light-mask-texture/light-mask-texture-program";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
-import Engine from "../../../engine";
-import FX from "../../../sound/fx";
-import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import EngineSoundComponent from "../../components/engine-sound-component";
+import Sounds from "../../../sound/sounds";
+import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
@@ -64,7 +64,7 @@ class Drawer extends TankDrawer {
             this.bodyLightMask,
             bodyQuadrangle,
             body.GetAngle(),
-            WorldDrawer.depths.tankBody
+            WorldDrawerComponent.depths.tankBody
         )
     }
 }
@@ -74,15 +74,15 @@ ClientEntity.associate(EntityType.TANK_BIGBOI, (model) => {
     EntityModel.Types.get(EntityType.TANK_BIGBOI)(model)
     ClientTank.configureEntity(model)
 
-    let engine = new Engine({
-        sound: FX.ENGINE_1,
+    model.addComponent(new EngineSoundComponent({
+        sound: Sounds.ENGINE_1,
         gears: [
             {high: 1.9, gearing: 1},
             {low: 1.4, gearing: 0.8},
         ],
         multiplier: 20,
         pitch: 0.8
-    })
+    }))
 
     model.addComponent(new Drawer())
 })

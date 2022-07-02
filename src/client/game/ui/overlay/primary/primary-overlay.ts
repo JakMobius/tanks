@@ -6,7 +6,6 @@ import TankSelectContainer from './tank-select/tank-select-container';
 import RoomListRequestPacket from 'src/networking/packets/game-packets/room-list-request-packet';
 import RoomSelectContainer from './room-select/room-select-container';
 import GameScene from "../../../scenes/game-scene";
-import {ClientTankType} from "../../../../entity/tank/client-tank";
 
 export interface PrimaryOverlayConfig extends OverlayConfig {
     game: GameScene
@@ -21,7 +20,7 @@ export default class PrimaryOverlay extends Overlay {
 	public tankSelectMenu: TankSelectContainer;
 	public steeringMenu: ControlsContainer;
 	public roomSelectContainer: RoomSelectContainer;
-	public selectedTank: ClientTankType;
+	public selectedTank: any;
 	public tankPreviewMenu: TankPreviewContainer;
 
     constructor(options: PrimaryOverlayConfig) {
@@ -99,7 +98,7 @@ export default class PrimaryOverlay extends Overlay {
         this.menuContainer.append(this.tankSelectMenu.element)
     }
 
-    selectTank(tank: ClientTankType): void {
+    selectTank(tank: any): void {
         this.selectedTank = tank
         this.tankPreviewMenu.previewTank(tank)
     }

@@ -23,7 +23,6 @@ describe('Server', function() {
         server = new Server({
             silent: true
         })
-        server.bindClientPort(25566)
         server.terminate()
         server.console.logger.addDestination({
             log: function(text) {

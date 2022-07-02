@@ -3,7 +3,7 @@ import ExplodeEffectPool from "../../effects/explode/explode-effect-pool";
 import Screen from "../graphics/screen";
 import ExplodeParticle from "../particles/explode-particle";
 import PostProcessingProgram from "../graphics/programs/post-processing-program";
-import ParticleHost from "../particle-host";
+import ParticleHostComponent from "../entity/components/particle-host-component";
 
 export default class ExplodePoolDrawer {
 	public screen: Screen;
@@ -28,7 +28,7 @@ export default class ExplodePoolDrawer {
 
         //this.program.textureUniform.set1i(15)
 
-        let particleComponent = pool.entity.getComponent(ParticleHost)
+        let particleComponent = pool.entity.getComponent(ParticleHostComponent)
 
         for(let row of pool.walkers.rows.values()) {
             for(let walker of row.values()) {

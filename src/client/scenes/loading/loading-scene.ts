@@ -80,7 +80,7 @@ class LoadingScene extends Scene {
         this.phrase = newPhrase
     }
 
-    draw(ctx: WebGLRenderingContext, dt: number) {
+    draw(dt: number) {
         this.program.reset()
 
         this.drawScaleBackground()

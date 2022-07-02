@@ -1,7 +1,7 @@
 import GameWorld, {GameWorldConfig} from '../game-world';
 import ClientPlayer from "./client-player";
 import WorldExplodeEffectModelPool from "../effects/explode/explode-effect-pool";
-import ParticleHost from "./particle-host";
+import ParticleHostComponent from "./entity/components/particle-host-component";
 import EntityDataReceiveComponent from "../entity/components/network/entity-data-receive-component";
 import EffectReceiver from "../entity/components/network/effect/effect-receiver";
 import MapReceiver from "../entity/components/network/map/map-receiver";
@@ -19,7 +19,7 @@ export default class ClientGameWorld extends GameWorld {
 
         this.addComponent(new WorldExplodeEffectModelPool())
         this.addComponent(new ExplodeEffectEntityAffectController())
-        this.addComponent(new ParticleHost())
+        this.addComponent(new ParticleHostComponent())
         this.addComponent(new EntityDataReceiveComponent())
         this.addComponent(new EffectReceiver())
         this.addComponent(new MapReceiver())

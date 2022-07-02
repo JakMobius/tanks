@@ -2,7 +2,7 @@
 
 import Scene, {SceneConfig} from '../../scenes/scene';
 
-import WorldDrawer from '../../graphics/drawers/world-drawer';
+import WorldDrawerComponent from '../../entity/components/world-drawer-component';
 import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
 import * as Box2D from '../../../library/box2d';
@@ -26,7 +26,7 @@ export default class MapEditorScene extends Scene {
     public map: EditorMap
 	public dragHandler: DragHandler;
 	public camera: Camera;
-	public worldDrawer: WorldDrawer;
+	public worldDrawer: WorldDrawerComponent;
 	public menuOverlay: MenuOverlay;
 	public toolManager: ToolManager;
 	public eventContainer: EventContainer;
@@ -54,7 +54,7 @@ export default class MapEditorScene extends Scene {
             inertial: false
         })
 
-        this.worldDrawer = new WorldDrawer(this.camera, this.screen)
+        this.worldDrawer = new WorldDrawerComponent(this.camera, this.screen)
 
         this.setupWorkspace()
 
@@ -176,7 +176,7 @@ export default class MapEditorScene extends Scene {
         this.camera.viewport.y = this.screen.height
     }
 
-    draw(ctx: WebGLRenderingContext, dt: number) {
+    draw(dt: number) {
         if(!this.map) return
 
         if(this.worldAlive) {

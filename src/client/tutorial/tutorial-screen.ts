@@ -1,7 +1,6 @@
 /* @load-resource: '../web/base-style.scss' */
 
 import Sprite from '../sprite';
-import '../game/game-loader'
 import TutorialScene from "./scenes/tutorial-scene";
 import {ScreenConfig} from "../graphics/screen";
 import {UserDataRaw} from "../user-data-raw";

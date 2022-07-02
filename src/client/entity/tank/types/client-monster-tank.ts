@@ -1,7 +1,7 @@
 
 import TankDrawer from 'src/client/graphics/drawers/tank-drawer';
-import Engine from 'src/client/engine';
-import FX from 'src/client/sound/fx';
+import EngineSoundComponent from 'src/client/entity/components/engine-sound-component';
+import Sounds from 'src/client/sound/sounds';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
@@ -14,7 +14,7 @@ import {
     turnQuadrangle
 } from "../../../../utils/quadrangle";
 
-import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
@@ -81,7 +81,7 @@ class Drawer extends TankDrawer {
             this.bodyLightMask,
             quadrangle,
             body.GetAngle(),
-            WorldDrawer.depths.tankBody
+            WorldDrawerComponent.depths.tankBody
         )
     }
 }
@@ -91,8 +91,8 @@ ClientEntity.associate(EntityType.TANK_MONSTER, (model) => {
     EntityModel.Types.get(EntityType.TANK_MONSTER)(model)
     ClientTank.configureEntity(model)
 
-    let engine = new Engine({
-        sound: FX.ENGINE_2,
+    model.addComponent(new EngineSoundComponent({
+        sound: Sounds.ENGINE_2,
         gears: [
             {high: 1.9, gearing: 1},
             {low: 1.4, high: 2, gearing: 0.8},
@@ -101,7 +101,7 @@ ClientEntity.associate(EntityType.TANK_MONSTER, (model) => {
         ],
         multiplier: 20,
         pitch: 1
-    })
+    }))
 
     model.addComponent(new Drawer())
 })

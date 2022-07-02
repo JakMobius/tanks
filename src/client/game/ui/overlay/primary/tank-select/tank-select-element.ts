@@ -3,10 +3,9 @@ import CanvasFactory from 'src/client/utils/canvas-factory';
 import Sprite from 'src/client/sprite';
 import * as Box2D from 'src/library/box2d'
 import Camera from "src/client/camera";
-import {ClientTankType} from "../../../../../entity/tank/client-tank";
 
 export interface TankSelectElementViewConfig {
-    Tank: ClientTankType
+    Tank: any
     previewWorld: Box2D.World
     previewCamera: Camera
 }
@@ -22,7 +21,7 @@ export default class TankSelectElement extends View {
 	public hidden: boolean;
     canvasSize = 70;
 
-    Tank: ClientTankType = null;
+    Tank: any = null;
     // tank: ClientTank = null
 
     constructor(options: TankSelectElementViewConfig) {

@@ -14,7 +14,7 @@ export default class Scene {
         this.screen = config.screen
     }
 
-    draw(ctx: WebGLRenderingContext, dt: number) {}
+    draw(dt: number) {}
 
     layout() {}
     appear() {}

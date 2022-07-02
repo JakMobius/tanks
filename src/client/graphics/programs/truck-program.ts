@@ -5,7 +5,7 @@ import GLBuffer from '../glbuffer';
 import Sprite from "../../sprite";
 import CameraProgram from "./camera-program";
 import {Quadrangle} from "../../../utils/quadrangle";
-import WorldDrawer from "../drawers/world-drawer";
+import WorldDrawerComponent from "../../entity/components/world-drawer-component";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/truck-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/truck-fragment.glsl"
@@ -37,7 +37,7 @@ export default class TruckProgram extends CameraProgram {
 
     drawTruck(quadrangle: Quadrangle, distance: number, radius: number, texture: Sprite, lengthInTextures: number, speedCoefficient: number, z?: number) {
 
-        if(z === undefined) z = WorldDrawer.depths.tankTrack
+        if(z === undefined) z = WorldDrawerComponent.depths.tankTrack
 
         distance = -((distance * speedCoefficient) % lengthInTextures)
 

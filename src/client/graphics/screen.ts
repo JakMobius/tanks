@@ -20,10 +20,10 @@ export default class Screen {
 	public activeFramebufferIndex: number;
 	public inactiveFramebufferIndex: number;
 
+    public soundEngine = new SoundEngine();
     public canvas: HTMLCanvasElement = null
     public ctx: WebGLRenderingContext = null
     private resizeHandler: () => void;
-    soundEngine: SoundEngine;
 
     constructor(config: ScreenConfig) {
         config = Object.assign({
@@ -33,7 +33,6 @@ export default class Screen {
 
         this.config = config
         this.root = config.root
-        //this.soundEngine = new SoundEngine()
 
         this.width = null
         this.height = null

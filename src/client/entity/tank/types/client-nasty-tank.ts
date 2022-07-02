@@ -1,7 +1,7 @@
 
 import TankDrawer from 'src/client/graphics/drawers/tank-drawer';
-import Engine from 'src/client/engine';
-import FX from 'src/client/sound/fx';
+import EngineSoundComponent from 'src/client/entity/components/engine-sound-component';
+import Sounds from 'src/client/sound/sounds';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
@@ -13,7 +13,7 @@ import {
     translateQuadrangle,
     turnQuadrangle
 } from "../../../../utils/quadrangle";
-import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import AirbagTankBehaviour from "../../../../entity/tanks/physics/airbag-tank-behaviour";
@@ -97,13 +97,13 @@ class Drawer extends TankDrawer {
             this.bodyLightMask,
             bodyQuadrangle,
             body.GetAngle(),
-            WorldDrawer.depths.tankBody
+            WorldDrawerComponent.depths.tankBody
         )
 
-        propellerProgram.drawSprite(this.ruderSprite, leftRuderQuadrangle, WorldDrawer.depths.tankTop)
-        propellerProgram.drawSprite(this.ruderSprite, rightRuderQuadrangle, WorldDrawer.depths.tankTop)
-        propellerProgram.drawSprite(propeller, leftPropellerQuadrangle, WorldDrawer.depths.tankTop)
-        propellerProgram.drawSprite(propeller, rightPropellerQuadrangle, WorldDrawer.depths.tankTop)
+        propellerProgram.drawSprite(this.ruderSprite, leftRuderQuadrangle, WorldDrawerComponent.depths.tankTop)
+        propellerProgram.drawSprite(this.ruderSprite, rightRuderQuadrangle, WorldDrawerComponent.depths.tankTop)
+        propellerProgram.drawSprite(propeller, leftPropellerQuadrangle, WorldDrawerComponent.depths.tankTop)
+        propellerProgram.drawSprite(propeller, rightPropellerQuadrangle, WorldDrawerComponent.depths.tankTop)
     }
 }
 
@@ -112,12 +112,12 @@ ClientEntity.associate(EntityType.TANK_NASTY, (model) => {
     EntityModel.Types.get(EntityType.TANK_NASTY)(model)
     ClientTank.configureEntity(model)
 
-    let engine = new Engine({
-        sound: FX.ENGINE_4,
+    model.addComponent(new EngineSoundComponent({
+        sound: Sounds.ENGINE_4,
         multiplier: 20,
         pitch: 0.9,
         volume: 0.6
-    })
+    }))
 
     model.addComponent(new Drawer())
 })

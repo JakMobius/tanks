@@ -5,7 +5,7 @@ import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/models/tank-pellets-effect-model';
 import PhysicalComponent from "../../../entity/components/physics-component";
 import TransformComponent from "../../../entity/components/transform-component";
-import ParticleHost from "../../particle-host";
+import ParticleHostComponent from "../../entity/components/particle-host-component";
 import ClientEffect from "../client-effect";
 
 export default class ClientTankPelletsEffect extends ClientEffect {
@@ -45,7 +45,7 @@ export default class ClientTankPelletsEffect extends ClientEffect {
                 color: new Color(50, 50, 50)
             });
 
-            world.getComponent(ParticleHost).particles.push(pellet)
+            world.getComponent(ParticleHostComponent).particles.push(pellet)
         }
     }
 }

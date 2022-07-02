@@ -4,7 +4,7 @@ import GameMap from '../../../../map/game-map';
 import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/block-state/block-state';
 import {squareQuadrangle} from "../../../../utils/quadrangle";
-import WorldDrawer from "../world-drawer";
+import WorldDrawerComponent from "../../../entity/components/world-drawer-component";
 
 export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];
@@ -61,7 +61,7 @@ export default class EdgedBlockDrawer extends BlockDrawer {
         dx += slice.x
         dy += slice.y
 
-        program.drawTexture(squareQuadrangle(x, y, h, h), dx, dy, s, s, WorldDrawer.depths.block)
+        program.drawTexture(squareQuadrangle(x, y, h, h), dx, dy, s, s, WorldDrawerComponent.depths.block)
     }
 
     draw(program: TextureProgram, x: number, y: number, block: BlockState) {

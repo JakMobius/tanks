@@ -2,7 +2,6 @@
 
 import StatScale from './stat-scale';
 import Menu from 'src/client/ui/menu/menu';
-import {ClientTankType} from "../../../../../entity/tank/client-tank";
 
 export interface StatConfig {
     name: string;
@@ -112,7 +111,7 @@ export default class TankPreviewContainer extends Menu {
         }
     }
 
-    drawTank(tank: ClientTankType) {
+    drawTank(tank: any) {
         //this.previewCtx.save()
         //this.previewCtx.clearRect(0, 0, 155, 155)
         //this.previewCtx.translate(155 / 2, 155 / 2);
@@ -124,7 +123,7 @@ export default class TankPreviewContainer extends Menu {
         //this.previewCtx.restore()
     }
 
-    applyStats(tank: ClientTankType) {
+    applyStats(tank: any) {
         // let stats = tank.getStats()
         // for(let [key, element] of this.statElements.entries()) {
         //     const statValue = stats[key];
@@ -133,7 +132,7 @@ export default class TankPreviewContainer extends Menu {
         // }
     }
 
-    previewTank(tank: ClientTankType) {
+    previewTank(tank: any) {
         this.drawTank(tank)
 
         // this.previewTitle.text(tank.getName())

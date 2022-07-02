@@ -3,7 +3,7 @@ import Color from "../../../utils/color";
 import PhysicalComponent from "../../../entity/components/physics-component";
 import SmokeParticle from "../../particles/smoke-particle";
 import HealthComponent from "../../../entity/components/health-component";
-import ParticleHost from "../../particle-host";
+import ParticleHostComponent from "../components/particle-host-component";
 import ClientEffect from "../../effects/client-effect";
 
 export default class DamageSmokeEffect extends ClientEffect {
@@ -32,7 +32,7 @@ export default class DamageSmokeEffect extends ClientEffect {
         }
 
         const physicalComponent = entity.getComponent(PhysicalComponent)
-        const particleComponent = entity.parent.getComponent(ParticleHost)
+        const particleComponent = entity.parent.getComponent(ParticleHostComponent)
 
         const gray = health / 7 * 255
         const color = new Color(gray, gray, gray)

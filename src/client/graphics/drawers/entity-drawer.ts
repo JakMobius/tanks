@@ -2,18 +2,18 @@
 import DrawPhase from "./draw-phase";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
-import WorldDrawer from "./world-drawer";
+import WorldDrawerComponent from "../../entity/components/world-drawer-component";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 import {World} from "../../../library/box2d";
 
 export default class EntityDrawer implements Component {
 	public entity: Entity;
-    public drawer: WorldDrawer
+    public drawer: WorldDrawerComponent
     public enabled: boolean = true
     public eventListener = new BasicEventHandlerSet()
 
     constructor() {
-        this.eventListener.on("world-drawer-attached", (drawer: WorldDrawer) => this.setDrawer(drawer))
+        this.eventListener.on("world-drawer-attached", (drawer: WorldDrawerComponent) => this.setDrawer(drawer))
         this.eventListener.on("attached-to-parent", (child, parent) => {
             if(!this.drawer) this.findDrawer(parent)
         })
@@ -46,7 +46,7 @@ export default class EntityDrawer implements Component {
         let host = null
 
         while(entity && !host) {
-            host = entity.getComponent(WorldDrawer)
+            host = entity.getComponent(WorldDrawerComponent)
             if(entity == endWith) break;
             entity = entity.parent
         }
@@ -54,7 +54,7 @@ export default class EntityDrawer implements Component {
         this.setDrawer(host)
     }
 
-    setDrawer(drawer: WorldDrawer) {
+    setDrawer(drawer: WorldDrawerComponent) {
         if(drawer == this.drawer) return
         if(this.drawer) {
             this.drawer.removeDrawer(this)

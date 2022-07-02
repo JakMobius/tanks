@@ -1,38 +1,30 @@
-import Downloader from '../utils/downloader';
+
 import Sound, {SoundConfig} from './sound';
-import FX from './fx';
-import Progress from "../utils/progress";
 import Camera from "../camera";
+import {SoundAsset} from "./sounds";
 
 window.AudioContext = window.AudioContext || (window as any)["webkitAudioContext"]
 
-class SoundEngine {
-	public context = new AudioContext();
-	public sound: AudioBuffer[] = [];
-	public index: number;
-	public audioEnabled: boolean;
-	public camera: Camera;
+export default class SoundEngine {
+	public audioEnabled: boolean = true;
+    public context = new AudioContext();
 
     constructor() {
 
     }
 
-    download(progress: Progress, index: number) {
-        return Downloader.download(FX.sounds, (response: ArrayBuffer) => {
-            this.context.decodeAudioData(response, (buffer: AudioBuffer) => {
-                this.sound[index] = buffer;
-            });
-        }, "arraybuffer", progress)
-    }
-
-    playSound(s: number, options?: SoundConfig) {
+    async playSound(s: SoundAsset, options?: SoundConfig) {
         options = options || {}
 
         if(options.mapX !== undefined) {
             options.shouldPan = true
         }
 
-        const sound = new Sound(this.context, this.sound[s], options);
+        if(this.context.state === 'suspended') {
+            await this.context.resume()
+        }
+
+        const sound = new Sound(this.context, s.sound, options);
 
         if(this.audioEnabled) {
 
@@ -64,24 +56,22 @@ class SoundEngine {
 
     updateSoundPosition(sound: Sound, camera?: Camera) {
 
-        const options = sound.config;
-
-        const distance = Math.sqrt(Math.pow(options.mapX - camera.position.x, 2) + Math.pow(options.mapY - camera.position.y, 2)) / 20;
-
-        if(sound.lowpass) {
-            const freq = 25000 / (distance + 10) * 10;
-            sound.lowpass.frequency.value = Math.max(0, Math.min(freq, sound.lowpass.frequency.maxValue))
-        }
-
-        sound.setPan((options.mapX - this.camera.position.x) / 200)
-
-        let volume = Math.max(0, 1 - distance / 20) ** 2;
-        if(options.volume !== undefined) {
-            volume *= options.volume
-        }
-
-        if(sound.gainNode) sound.gainNode.gain.value = volume
+        // const options = sound.config;
+        //
+        // const distance = Math.sqrt(Math.pow(options.mapX - camera.position.x, 2) + Math.pow(options.mapY - camera.position.y, 2)) / 20;
+        //
+        // if(sound.lowpass) {
+        //     const freq = 25000 / (distance + 10) * 10;
+        //     sound.lowpass.frequency.value = Math.max(0, Math.min(freq, sound.lowpass.frequency.maxValue))
+        // }
+        //
+        // sound.setPan((options.mapX - this.camera.position.x) / 200)
+        //
+        // let volume = Math.max(0, 1 - distance / 20) ** 2;
+        // if(options.volume !== undefined) {
+        //     volume *= options.volume
+        // }
+        //
+        // if(sound.gainNode) sound.gainNode.gain.value = volume
     }
 }
-
-export default SoundEngine;

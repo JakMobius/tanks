@@ -5,9 +5,9 @@ import LightMaskTextureProgram from "../../../graphics/programs/light-mask-textu
 import TruckProgram from "../../../graphics/programs/truck-program";
 import DrawPhase from "../../../graphics/drawers/draw-phase";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../../utils/quadrangle";
-import Engine from "../../../engine";
-import FX from "../../../sound/fx";
-import WorldDrawer from "../../../graphics/drawers/world-drawer";
+import EngineSoundComponent from "../../components/engine-sound-component";
+import Sounds from "../../../sound/sounds";
+import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
@@ -66,7 +66,7 @@ class Drawer extends TankDrawer {
             this.bodyLightMask,
             quadrangle,
             body.GetAngle(),
-            WorldDrawer.depths.tankBody
+            WorldDrawerComponent.depths.tankBody
         )
     }
 }
@@ -76,8 +76,8 @@ ClientEntity.associate(EntityType.TANK_SNIPER, (model) => {
     EntityModel.Types.get(EntityType.TANK_SNIPER)(model)
     ClientTank.configureEntity(model)
 
-    let engine = new Engine({
-        sound: FX.ENGINE_2,
+    model.addComponent(new EngineSoundComponent({
+        sound: Sounds.ENGINE_2,
         gears: [
             {high: 1.9, gearing: 1},
             {low: 1.4, high: 2, gearing: 0.8},
@@ -86,7 +86,7 @@ ClientEntity.associate(EntityType.TANK_SNIPER, (model) => {
         ],
         multiplier: 20,
         pitch: 1
-    })
+    }))
 
     model.addComponent(new Drawer())
 })

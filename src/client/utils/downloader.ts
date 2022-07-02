@@ -1,7 +1,6 @@
 import Progress from './progress';
 
-class Downloader {
-	public index: any;
+export default class Downloader {
 
     static getXHR(dataType: XMLHttpRequestResponseType, progress: Progress) {
         let xhr = new XMLHttpRequest();
@@ -18,46 +17,21 @@ class Downloader {
         return () => xhr
     }
 
-    static download(urls: string[], handler: ((response: ArrayBuffer, index: number) => void), dataType: any, progress: Progress): Promise<void> {
-        return new Promise((resolve, reject) => {
-            let requests: JQuery.jqXHR[] = []
-            let awaiting = urls.length
-            let cancelled = false
-            const assetReady = () => { if(!--awaiting) resolve() }
+    static download(url: string, handler: (response: ArrayBuffer) => void, dataType: XMLHttpRequestResponseType): Progress {
 
-            for(let [i, url] of urls.entries()) {
-                if(cancelled) break
-                let taskProgress = null
-                if(progress) {
-                    taskProgress = new Progress()
-                    progress.addSubtask(taskProgress)
-                }
+        let progress = new Progress()
 
-                let taskIndex: number = i
-
-                requests.push(
-                    $.ajax({
-                        url: url,
-                        xhr: this.getXHR(dataType, taskProgress)
-                    }).done(function(msg){
-                        if(cancelled) return
-                        handler(msg, taskIndex)
-                        assetReady()
-                    }).fail(function(response, _status, error){
-                        if(cancelled) return
-                        cancelled = true
-                        let reason = "Failed to download " + urls[taskIndex] + ": " + error
-
-                        for(let request of requests) {
-                            if(request !== this) request.abort()
-                        }
-
-                        reject(reason)
-                    })
-                )
-            }
+        let request = $.ajax({
+            url: url,
+            xhr: this.getXHR(dataType, progress)
+        }).done((msg) => {
+            handler(msg)
+        }).fail((response, _status, error) => {
+            progress.fail(error)
         })
+
+        progress.on("abort", () => request.abort())
+
+        return progress
     }
 }
-
-export default Downloader;

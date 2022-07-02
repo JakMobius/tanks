@@ -6,7 +6,7 @@ import EffectModel from 'src/effects/effect-model';
 import ClientTank from "../../entity/tank/client-tank";
 import PhysicalComponent from "../../../entity/components/physics-component";
 import TransformComponent from "../../../entity/components/transform-component";
-import ParticleHost from "../../particle-host";
+import ParticleHostComponent from "../../entity/components/particle-host-component";
 import ClientEffect from "../client-effect";
 
 export default class ClientTankFireEffect extends ClientEffect {
@@ -40,7 +40,7 @@ export default class ClientTankFireEffect extends ClientEffect {
         this.queue += dt * this.frequency
 
         const world = entity.parent
-        const particleComponent = world.getComponent(ParticleHost)
+        const particleComponent = world.getComponent(ParticleHostComponent)
 
         const particlePositionX = transform.transformX(0, 2.5)
         const particlePositionY = transform.transformY(0, 2.5)

@@ -1,6 +1,6 @@
 
 import EntityModel from '../../entity/entity-model';
-import ServerPosition from "./server-position";
+import ServerPositionComponent from "./components/server-position-component";
 import EffectReceiver from "../../entity/components/network/effect/effect-receiver";
 import PositionReceiver from "../../entity/components/network/position/position-receiver";
 import HealthReceiver from "../../entity/components/network/health/health-receiver";
@@ -30,7 +30,7 @@ export default class ClientEntity {
 	static types = new Map<number, (model: EntityModel) => void>()
 
     static configureEntity(model: Entity) {
-        model.addComponent(new ServerPosition())
+        model.addComponent(new ServerPositionComponent())
         model.addComponent(new EntityStateReceiver())
         model.addComponent(new EffectReceiver())
         model.addComponent(new PositionReceiver())

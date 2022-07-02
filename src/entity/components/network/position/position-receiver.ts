@@ -1,7 +1,7 @@
 import EntityDataReceiveComponent from "../entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiver-component";
-import ServerPosition from "../../../../client/entity/server-position";
+import ServerPositionComponent from "../../../../client/entity/components/server-position-component";
 
 export default class PositionReceiver extends ReceiverComponent {
 
@@ -15,7 +15,7 @@ export default class PositionReceiver extends ReceiverComponent {
             const vy = buffer.readFloat32()
             const angularVelocity = buffer.readFloat32()
 
-            const serverPosition = this.entity.getComponent(ServerPosition)
+            const serverPosition = this.entity.getComponent(ServerPositionComponent)
 
             serverPosition.serverVelocity.x = vx
             serverPosition.serverVelocity.y = vy

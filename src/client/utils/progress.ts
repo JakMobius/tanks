@@ -1,12 +1,13 @@
 import EventEmitter from "../../utils/event-emitter";
 
-class Progress extends EventEmitter {
-	public completed: number = 0;
-	public target: number = 0;
-	public subtasks: Progress[] = [];
-	public fraction: number = 0;
-	public refresh: boolean = false;
-	public parent?: Progress = null;
+export default class Progress extends EventEmitter {
+	public completed: number = 0
+	public target: number = 0
+	public subtasks: Progress[] = []
+	public fraction: number = 0
+	public refresh: boolean = false
+	public parent?: Progress = null
+    public failed: boolean = false
 
     constructor() {
         super()
@@ -104,6 +105,30 @@ class Progress extends EventEmitter {
             this.on("error", reject)
         })
     }
-}
 
-export default Progress;
+    abort() {
+        this.failed = true
+        this.emit("abort")
+    }
+
+    fail(reason: string) {
+        if(this.failed) {
+            return
+        }
+        this.failed = true
+        this.emit("error", reason)
+    }
+
+    static all(progresses: Progress[]) {
+        let result = new Progress()
+
+        for(let progress of progresses) {
+            progress.on("error", (reason) => {
+                result.fail(reason)
+            })
+            result.addSubtask(progress)
+        }
+
+        return result
+    }
+}

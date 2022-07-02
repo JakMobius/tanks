@@ -2,12 +2,12 @@
 
 import LoadingScene from '../scenes/loading/loading-scene';
 import Sprite from '../sprite';
-
-import './game-loader'
-import {downloadAssets} from "./game-loader";
 import SceneScreen from "../graphics/scene-screen";
 import {ScreenConfig} from "../graphics/screen";
 import DialogOverlay from "../map-editor/ui/overlay/dialog/dialogoverlay";
+import Downloader from "../utils/downloader";
+import Sounds from "../sound/sounds";
+import Progress from "../utils/progress";
 
 export default class GeneralGameScreen extends SceneScreen {
 
@@ -34,14 +34,23 @@ export default class GeneralGameScreen extends SceneScreen {
     }
 
     async loadGame() {
-        let progress = downloadAssets()
+
+        let assetsProgress = Sprite.download({
+            mipMapLevels: 1
+        })
+
+        let soundProgress = Progress.all(Sounds.ALL.map((sound) => Downloader.download(sound.path, (response) => {
+            this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
+                sound.sound = buffer;
+            });
+        }, "arraybuffer")))
 
         this.setScene(new LoadingScene({
             screen: this,
-            progress: progress
+            progress: Progress.all([assetsProgress, soundProgress])
         }))
 
-        await progress.toPromise()
+        await assetsProgress.toPromise()
 
         Sprite.applyTexture(this.ctx)
     }

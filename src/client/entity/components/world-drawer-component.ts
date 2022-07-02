@@ -1,26 +1,26 @@
 import TextureProgram from '../../graphics/programs/texture-program';
 import Camera from "../../camera";
-import Screen from '../screen'
+import Screen from '../../graphics/screen'
 import ExplodePoolDrawer from "../../effects/explode-pool-drawer";
-import MapDrawer from "./map-drawer";
+import MapDrawer from "../../graphics/drawers/map-drawer";
 import EventEmitter from "../../../utils/event-emitter";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import MapDebugDrawer from "./map-debug-drawer";
-import ParticleDrawer from "./particle-drawer";
-import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
-import EntityDrawer from "./entity-drawer";
-import DrawPhase from "./draw-phase";
-import BasicCameraProgramController from "../programs/controllers/basic-camera-program-controller";
-import TruckProgram from "../programs/truck-program";
-import LightMaskTextureProgram from "../programs/light-mask-texture/light-mask-texture-program";
-import MaskTextureProgramController from "../programs/light-mask-texture/light-mask-texture-program-controller";
+import MapDebugDrawer from "../../graphics/drawers/map-debug-drawer";
+import ParticleDrawer from "../../graphics/drawers/particle-drawer";
+import ConvexShapeProgram from "../../graphics/programs/convex-shapes/convex-shape-program";
+import EntityDrawer from "../../graphics/drawers/entity-drawer";
+import DrawPhase from "../../graphics/drawers/draw-phase";
+import BasicCameraProgramController from "../../graphics/programs/controllers/basic-camera-program-controller";
+import TruckProgram from "../../graphics/programs/truck-program";
+import LightMaskTextureProgram from "../../graphics/programs/light-mask-texture/light-mask-texture-program";
+import MaskTextureProgramController from "../../graphics/programs/light-mask-texture/light-mask-texture-program-controller";
 import TilemapComponent from "../../../physics/tilemap-component";
 import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
-import ParticleHost from "../../particle-host";
+import ParticleHostComponent from "./particle-host-component";
 import Entity from "../../../utils/ecs/entity";
 import {Component} from "../../../utils/ecs/component";
 
-export default class WorldDrawer extends EventEmitter implements Component {
+export default class WorldDrawerComponent extends EventEmitter implements Component {
     public entity: Entity
 	public readonly camera: Camera
 	public readonly screen: Screen
@@ -111,7 +111,7 @@ export default class WorldDrawer extends EventEmitter implements Component {
     }
 
     private drawParticles() {
-        const particleComponent = this.entity.getComponent(ParticleHost)
+        const particleComponent = this.entity.getComponent(ParticleHostComponent)
         if(particleComponent.particles.length) {
             this.particleDrawPhase.prepare()
 
