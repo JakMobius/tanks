@@ -1,6 +1,7 @@
 import "../animation-frame-polyfill"
 import SoundEngine from "../sound/sound-engine";
 import CanvasFactory from '../utils/canvas-factory'
+import Entity from "../../utils/ecs/entity";
 
 export interface ScreenConfig {
     scale?: number
@@ -20,7 +21,8 @@ export default class Screen {
 	public activeFramebufferIndex: number;
 	public inactiveFramebufferIndex: number;
 
-    public soundEngine = new SoundEngine();
+    public soundEngine: SoundEngine;
+    public soundOutput: Entity
     public canvas: HTMLCanvasElement = null
     public ctx: WebGLRenderingContext = null
     private resizeHandler: () => void;
@@ -37,6 +39,7 @@ export default class Screen {
         this.width = null
         this.height = null
 
+        this.initSound()
         this.initCanvas()
         if(this.config.fitRoot) {
             this.initResizeHandling()
@@ -55,6 +58,12 @@ export default class Screen {
         }
 
         this.setScreenFramebuffer()
+    }
+
+    initSound() {
+        let context = new AudioContext()
+        this.soundEngine = new SoundEngine(context)
+        this.soundOutput = this.soundEngine.addOutput(context.destination)
     }
 
     initCanvas(): void {

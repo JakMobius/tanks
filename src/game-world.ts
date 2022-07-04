@@ -5,7 +5,7 @@ import ChunkedMapCollider from "./physics/chunked-map-collider";
 import Entity from "./utils/ecs/entity";
 import PhysicalHostComponent from "./physiсal-world-component";
 import TilemapComponent from "./physics/tilemap-component";
-import EffectHost from "./effects/effect-host";
+import EffectHostComponent from "./effects/effect-host-component";
 import SoundHostComponent from "./client/entity/components/sound-host-component";
 
 export interface GameWorldConfig {
@@ -29,7 +29,7 @@ export default class GameWorld extends Entity {
             velocitySteps: 1
         }, options)
 
-        this.addComponent(new EffectHost());
+        this.addComponent(new EffectHostComponent());
         this.addComponent(new TilemapComponent());
         this.addComponent(new PhysicalHostComponent({
             physicsTick: options.physicsTick,

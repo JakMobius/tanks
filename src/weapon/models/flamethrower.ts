@@ -1,7 +1,7 @@
 import Weapon, {WeaponConfig} from '../weapon';
 import TankFireEffectModel from 'src/effects/models/tank-fire-effect-model';
 import PhysicalComponent from "../../entity/components/physics-component";
-import EffectHost from "../../effects/effect-host";
+import EffectHostComponent from "../../effects/effect-host-component";
 import ServerEffect from "../../server/effects/server-effect";
 
 export interface FlamethrowerConfig extends WeaponConfig {
@@ -75,11 +75,11 @@ export default class FlamethrowerWeapon extends Weapon {
 
 	onEngage() {
 		super.onEngage();
-		this.tank.getComponent(EffectHost).addEffect(this.serverEffect)
+		this.tank.getComponent(EffectHostComponent).addEffect(this.serverEffect)
 	}
 
 	onDisengage() {
 		super.onDisengage();
-		this.tank.getComponent(EffectHost).removeEffect(this.serverEffect)
+		this.tank.getComponent(EffectHostComponent).removeEffect(this.serverEffect)
 	}
 }

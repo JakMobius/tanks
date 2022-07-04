@@ -1,7 +1,7 @@
 import Entity from "../utils/ecs/entity";
 import TransformComponent from "./components/transform-component";
 import HealthComponent from "./components/health-component";
-import EffectHost from "../effects/effect-host";
+import EffectHostComponent from "../effects/effect-host-component";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import TilemapHitEmitter from "./components/tilemap-hit-emitter";
 
@@ -49,6 +49,6 @@ export default class EntityModel extends Entity {
         entity.addComponent(new TilemapHitEmitter())
         entity.addComponent(new TransformComponent())
         entity.addComponent(new HealthComponent())
-        entity.addComponent(new EffectHost())
+        entity.addComponent(new EffectHostComponent())
     }
 }

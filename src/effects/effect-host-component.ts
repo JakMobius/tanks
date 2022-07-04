@@ -5,7 +5,7 @@ import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import EffectTransmitter from "../entity/components/network/effect/effect-transmitter";
 import {TransmitterSet} from "../entity/components/network/transmitting/transmitter-set";
 
-export default class EffectHost implements Component {
+export default class EffectHostComponent implements Component {
     entity: Entity | null;
     effects: Map<number, AbstractEffect> = new Map<number, AbstractEffect>()
     protected eventHandler = new BasicEventHandlerSet()

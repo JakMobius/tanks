@@ -1,4 +1,4 @@
-import Sound from "../../sound/sound";
+import SoundPrimaryComponent from "../../sound/sound/sound-primary-component";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
 import TransformComponent from "../../../entity/components/transform-component";
@@ -8,6 +8,7 @@ import HealthComponent from "../../../entity/components/health-component";
 import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import TankControls from "../../../controls/tank-controls";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import SoundTransformComponent from "../../sound/sound/sound-transform-component";
 
 export interface EngineConfig {
     sound: SoundAsset,
@@ -31,7 +32,7 @@ export interface EngineGearConfig {
 export default class EngineSoundComponent implements Component {
 	public config: EngineConfig;
 	public entity: Entity;
-	public sound: Sound;
+	public sound: Entity;
 	public rpm: number;
 	public gear: number;
     private soundHost: SoundHostComponent | null = null
@@ -56,11 +57,10 @@ export default class EngineSoundComponent implements Component {
     }
 
     destroy() {
-        if(this.sound) this.sound.stop()
+        if(this.sound) this.sound.getComponent(SoundPrimaryComponent).stop()
     }
 
     tick() {
-        let position = this.entity.getComponent(TransformComponent).getPosition()
         let health = this.entity.getComponent(HealthComponent).getHealth()
         let behaviour = this.entity.getComponent(WheeledTankBehaviour)
         let controls = this.entity.getComponent(TankControls)
@@ -68,12 +68,12 @@ export default class EngineSoundComponent implements Component {
         const clutch = Math.min(Math.abs(controls.getThrottle()) * 10, 1.0);
 
         if(this.sound) {
-            this.sound.config.mapX = position.x
-            this.sound.config.mapY = position.y
+            // this.sound.config.mapX = position.x
+            // this.sound.config.mapY = position.y
         }
         if(health === 0) {
             this.destinationRPM = 0
-            this.sound.gainNode.gain.value
+            // this.sound.gainNode.gain.value
         } else {
             const tankSpeed = behaviour.getDrivetrainSpeed()
 
@@ -110,12 +110,12 @@ export default class EngineSoundComponent implements Component {
         }
 
         if(this.sound) {
-            this.sound.source.playbackRate.value = this.rpm * this.config.pitch
+            // this.sound.source.playbackRate.value = this.rpm * this.config.pitch
             let volume = 0.3 + clutch / 4;
             if(this.rpm < 0.7) {
                 volume *= (this.rpm - 0.2) * 2
             }
-            this.sound.config.volume = volume * this.config.volume
+            // this.sound.config.volume = volume * this.config.volume
             // this.game.updateSoundPosition(this.sound)
         }
     }
@@ -134,16 +134,14 @@ export default class EngineSoundComponent implements Component {
 
     startSound() {
         let transformComponent = this.entity.getComponent(TransformComponent)
-        let tankPosition = transformComponent.getPosition()
 
-        this.soundHost.engine.playSound(this.config.sound, {
-            loop: true,
-            mapX: tankPosition.x,
-            mapY: tankPosition.y
-        }).then(sound => {
-            if(!this.entity) sound.stop()
-            else this.sound = sound
-        })
+        this.sound = SoundPrimaryComponent.createSound(this.config.sound.buffer)
+        this.soundHost.engine.addSound(this.sound)
+
+        this.sound.getComponent(SoundPrimaryComponent).loop(true)
+        this.sound.addComponent(new SoundTransformComponent(transformComponent))
+
+        this.sound.getComponent(SoundPrimaryComponent).play();
 
         this.rpm = 1
         this.gear = 0
@@ -158,7 +156,7 @@ export default class EngineSoundComponent implements Component {
         this.entity = null
         this.eventListener.setTarget(null)
         if(this.sound) {
-            this.sound.stop()
+            this.sound.getComponent(SoundPrimaryComponent).stop()
             this.sound = null
         }
     }

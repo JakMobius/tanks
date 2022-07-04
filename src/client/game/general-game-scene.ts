@@ -20,6 +20,8 @@ import EntityModel from "../../entity/entity-model";
 import BlockTreeDecoder from "../../networking/block-tree-decoder";
 import Entity from "../../utils/ecs/entity";
 import SoundHostComponent from "../entity/components/sound-host-component";
+import SoundTransformComponent from "../sound/sound/sound-transform-component";
+import {SoundStreamPositionComponent} from "../sound/stream/sound-stream-position-component";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
@@ -35,6 +37,7 @@ export default class GeneralGameScene extends Scene {
     public controlledTank: EntityModel
     public worldDrawer: WorldDrawerComponent
     public soundHost: SoundHostComponent
+    public soundStreamPositionComponent: SoundStreamPositionComponent
 
     public paused: boolean = false
     public didChangeSize: boolean = false
@@ -44,6 +47,7 @@ export default class GeneralGameScene extends Scene {
         super(config)
 
         this.setupControls()
+        this.setupCamera()
         this.setupSound()
         this.setupDrawer()
         this.setupChat()
@@ -65,18 +69,21 @@ export default class GeneralGameScene extends Scene {
         this.playerControls.on("pause", () => this.togglePauseOverlay())
     }
 
-    private setupSound() {
-        this.soundHost = new SoundHostComponent(this.screen.soundEngine)
-    }
-
-    private setupDrawer() {
+    private setupCamera() {
         this.camera = new Camera({
             baseScale: 12,
             viewport: new Box2D.Vec2(this.screen.width, this.screen.height),
             defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
         })
+    }
 
+    private setupSound() {
+        this.soundHost = new SoundHostComponent(this.screen.soundEngine)
+        this.soundStreamPositionComponent = new SoundStreamPositionComponent()
+    }
+
+    private setupDrawer() {
         this.worldDrawer = new WorldDrawerComponent(this.camera, this.screen)
     }
 
@@ -110,7 +117,7 @@ export default class GeneralGameScene extends Scene {
     }
 
     displayWorld(world: ClientGameWorld) {
-        if(this.displayedWorld) throw new Error("Scene world cannot be changed after it's been set once")
+        if(this.displayedWorld) throw new Error("Scene world cannot be changed after it was set once")
         this.displayedWorld = world
         this.displayedWorld.addComponent(this.worldDrawer)
         this.displayedWorld.addComponent(this.soundHost)
@@ -148,8 +155,15 @@ export default class GeneralGameScene extends Scene {
         this.worldDrawer.draw(dt)
     }
 
+    private tickSound(dt: number) {
+        this.soundStreamPositionComponent.position = this.camera.position
+        this.soundStreamPositionComponent.velocity = this.camera.velocity
+        this.screen.soundEngine.emit("tick", dt)
+    }
+
     tick(dt: number) {
         this.camera.tick(dt)
+        this.tickSound(dt)
     }
 
     protected onWorldPrimaryEntitySet(entity: EntityModel) {
@@ -187,5 +201,15 @@ export default class GeneralGameScene extends Scene {
         this.pauseOverlay.on("close", () => {
             if(this.pauseOverlay) this.togglePauseOverlay()
         })
+    }
+
+    appear() {
+        super.appear();
+        this.screen.soundOutput.addComponent(this.soundStreamPositionComponent)
+    }
+
+    disappear() {
+        super.disappear();
+        this.screen.soundOutput.removeComponent(SoundStreamPositionComponent)
     }
 }

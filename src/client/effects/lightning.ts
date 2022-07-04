@@ -2,14 +2,14 @@
 // import FX from '../sound/fx';
 // import Bonus from "../../server/entity/bonus/bonus";
 // import AbstractPlayer from "../../utils/player";
-// import Sound from "../sound/sound";
+// import SoundComponent from "../sound/sound";
 // import GameScene from "../game/scenes/gamescene";
 //
 //
 // export default class Lightning extends Bonus {
 //
 // 	public player: AbstractPlayer;
-// 	public sound: Sound;
+// 	public sound: SoundComponent;
 // 	public game: GameScene;
 // 	public dead: boolean;
 //

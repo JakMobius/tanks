@@ -13,7 +13,7 @@ import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/trac
 import TransformComponent from "../../../../entity/components/transform-component";
 import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
-import EffectHost from "../../../../effects/effect-host";
+import EffectHostComponent from "../../../../effects/effect-host-component";
 import DamageSmokeEffect from "../damage-smoke-effect";
 import ClientTank from "../client-tank";
 

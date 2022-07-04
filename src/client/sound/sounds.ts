@@ -1,7 +1,7 @@
 
 export class SoundAsset {
     path: string
-    sound: AudioBuffer
+    buffer: AudioBuffer
 
     constructor(path: string) {
         this.path = path
