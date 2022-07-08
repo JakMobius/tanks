@@ -1,5 +1,4 @@
 import GameWorld, {GameWorldConfig} from '../game-world';
-import ClientPlayer from "./client-player";
 import WorldExplodeEffectModelPool from "../effects/explode/explode-effect-pool";
 import ParticleHostComponent from "./entity/components/particle-host-component";
 import EntityDataReceiveComponent from "../entity/components/network/entity-data-receive-component";
@@ -9,10 +8,11 @@ import EntityStateReceiver from "../entity/components/network/entity/entity-stat
 import PrimaryPlayerReceiver from "../entity/components/network/primary-player/primary-player-receiver";
 import CollisionIgnoreListReceiver from "../entity/components/network/collisions/collision-ignore-list-receiver";
 import ExplodeEffectEntityAffectController from "../effects/explode/explode-effect-entity-affect-controller";
+import Player from "../player";
 
 export default class ClientGameWorld extends GameWorld {
 
-    public player: ClientPlayer = null
+    public player: Player = null
 
     constructor(options?: GameWorldConfig) {
         super(options);

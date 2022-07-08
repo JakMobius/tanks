@@ -1,11 +1,9 @@
 import {SceneConfig} from 'src/client/scenes/scene';
 import {getTutorialMap} from "../tutorial-map";
-import ClientPlayer from "../../client-player";
 import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
 import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
 import GeneralGameScene from "../../game/general-game-scene";
-import TankControls from "../../../controls/tank-controls";
 import EntityModel from "../../../entity/entity-model";
 
 export interface TutorialSceneConfig extends SceneConfig {
@@ -57,8 +55,8 @@ export default class TutorialScene extends GeneralGameScene {
         // if(player) {
             // Well, at least this approach is better than updating the tank
             // controls in a timer...
-            //let serverPlayer = this.game.serverGame.world.players.get(player.id)
-            //this.playerControls.connectTankControls(serverPlayer.tank.model.getComponent(TankControls))
+            //let AbstractPlayer = this.game.serverGame.world.players.get(player.id)
+            //this.playerControls.connectTankControls(AbstractPlayer.tank.model.getComponent(TankControls))
         // }
     }
 }

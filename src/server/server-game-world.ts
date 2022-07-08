@@ -1,5 +1,4 @@
 import GameWorld, {GameWorldConfig} from '../game-world';
-import EntityDataTransmitComponent from "../entity/components/network/transmitting/entity-data-transmit-component";
 import ExplodeEffectPool from "../effects/explode/explode-effect-pool";
 import ServerEntityDataTransmitComponent from "./entity/server-entity-data-transmit-component";
 import ExplodeEffectEntityAffectController from "../effects/explode/explode-effect-entity-affect-controller";

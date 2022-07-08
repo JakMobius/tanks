@@ -1,7 +1,6 @@
 import ClientGameWorld from "../client-game-world";
 import Game from "../../server/room/game";
 import GameMap from "../../map/game-map";
-import ClientWorldBridge from "../game/client-world-bridge";
 import AdapterLoop from "../../utils/loop/adapter-loop";
 import ConnectionClient from "../../networking/connection-client";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
@@ -38,8 +37,6 @@ export default class EmbeddedServerGame {
 
         const clientConnection = new LocalConnection()
         this.clientConnection = new ConnectionClient(clientConnection)
-
-        ClientWorldBridge.buildBridge(this.clientConnection, this.clientWorld)
     }
 
     connectClientToServer() {

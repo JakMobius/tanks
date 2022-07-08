@@ -7,7 +7,7 @@ export interface PlayerConfig {
     tank?: EntityModel
 }
 
-export default class AbstractPlayer {
+export default class Player {
 
     public tank: EntityModel
 

@@ -12,17 +12,16 @@ import 'src/map/block-state/type-loader';
 
 import HTMLEscape from "../../utils/html-escape";
 import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-packet";
-import AbstractPlayer from "../../abstract-player";
-import ServerPlayer from "../server-player";
+import Player from "../../player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
 import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
-import HealthComponent from "../../entity/components/health-component";
 import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
 import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
 import EntityModel from "../../entity/entity-model";
+import {EntityType} from "../../client/entity/client-entity";
 
 interface GameConfig {
     name: string
@@ -57,7 +56,6 @@ export default class Game extends Room {
 
         this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
         this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
-        this.world.on("player-config",      (player, tank, nick) => this.onClientConfig(player, tank, nick))
 
         this.world.on("tick", () => {
             for(let client of this.portal.clients.values()) {
@@ -96,6 +94,30 @@ export default class Game extends Room {
         }
 
         client.data.visibilityManager.setWorld(this.world)
+
+        this.spawnPlayer(client)
+    }
+
+    private spawnPlayer(client: GameSocketPortalClient) {
+        let player: Player = client.data.player
+
+        if(!player) {
+            player = new Player({
+                id: client.id,
+                nick: "Player " + Math.floor(Math.random() * 0xFFFF).toString(16),
+            })
+
+            client.data.player = player
+        }
+
+        const tank = new EntityModel()
+        ServerEntity.types.get(EntityType.TANK_MONSTER)(tank)
+        this.world.appendChild(tank)
+        tank.emit("respawn")
+
+        client.data.visibilityManager.setTank(tank)
+        player.setTank(tank)
+        this.respawnPlayer(tank)
     }
 
     private onClientDisconnect(client: GameSocketPortalClient) {
@@ -118,11 +140,11 @@ export default class Game extends Room {
         this.ticks++
     }
 
-    onPlayerRespawn(player: ServerPlayer) {
+    onPlayerRespawn(player: Player) {
         this.respawnPlayer(player.tank)
     }
 
-    private onPlayerChat(player: AbstractPlayer, text: string) {
+    private onPlayerChat(player: Player, text: string) {
         text = text.trim()
 
         if (!text.length) return
@@ -132,29 +154,6 @@ export default class Game extends Room {
 
     private broadcastMessage(text: string) {
         this.portal.broadcast(new PlayerChatPacket(text))
-    }
-
-    private onClientConfig(client: GameSocketPortalClient, modelId: number, nick: string) {
-
-        let player: ServerPlayer = client.data.player
-
-        if(!player) {
-            player = new ServerPlayer({
-                id: client.id,
-                nick: nick,
-            })
-
-            client.data.player = player
-        }
-
-        const tank = new EntityModel()
-        ServerEntity.types.get(modelId)(tank)
-        this.world.appendChild(tank)
-        tank.emit("respawn")
-
-        client.data.visibilityManager.setTank(tank)
-        player.setTank(tank)
-        this.respawnPlayer(tank)
     }
 
     respawnPlayer(tank: EntityModel) {

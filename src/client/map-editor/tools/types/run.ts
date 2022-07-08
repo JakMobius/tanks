@@ -3,10 +3,10 @@ import * as Box2D from '../../../../library/box2d';
 import PlayerControls from '../../../controls/player-controls';
 import KeyboardController from '../../../controls/interact/keyboard-controller';
 import ToolManager from "../toolmanager";
-import ClientPlayer from "../../../client-player";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import EntityModel from "../../../../entity/entity-model";
+import Player from "../../../../player";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
@@ -14,10 +14,9 @@ export default class RunTool extends Tool {
 	public keyboard: KeyboardController;
 	public playerControls: PlayerControls;
 	public running: boolean;
-	public timer: any;
 	public runButton: any;
 	public locationButton: any;
-    private player: ClientPlayer;
+    private player: Player;
     private spawnPoint = new Box2D.Vec2(10, 10)
 
     constructor(manager: ToolManager) {
@@ -38,7 +37,7 @@ export default class RunTool extends Tool {
         
         this.playerControls.connectTankControls(this.tank.getComponent(TankControls))
         
-        this.player = new ClientPlayer({
+        this.player = new Player({
             id: 0,
             nick: "Вы"
         })

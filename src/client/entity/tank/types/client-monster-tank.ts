@@ -90,7 +90,7 @@ ClientEntity.associate(EntityType.TANK_MONSTER, (model) => {
     ClientTank.configureEntity(model)
 
     model.addComponent(new EngineSoundComponent({
-        sound: Sounds.ENGINE_2,
+        sound: Sounds.ENGINE_3,
         gears: [
             {high: 1.9, gearing: 1},
             {low: 1.4, high: 2, gearing: 0.8},

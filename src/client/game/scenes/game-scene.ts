@@ -1,20 +1,14 @@
 import {SceneConfig} from 'src/client/scenes/scene';
 import PlayerControlsPacket from 'src/networking/packets/game-packets/player-controls-packet';
-import PlayerConfigPacket from 'src/networking/packets/game-packets/player-config-packet';
 import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
-import RoomListPacket from 'src/networking/packets/game-packets/room-list-packet';
-import PlayerRoomRequestPacket from 'src/networking/packets/game-packets/player-room-request-packet';
 import PlayerRoomChangePacket from 'src/networking/packets/game-packets/player-room-change-packet';
-import PrimaryOverlay from '../ui/overlay/primary/primary-overlay';
 import ConnectionClient from "src/networking/connection-client";
 import ClientGameWorld from "../../client-game-world";
-import ClientWorldBridge from "../client-world-bridge";
 import GeneralGameScene from "../general-game-scene";
 import TankControls from "../../../controls/tank-controls";
 import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
 import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
-import {EntityType} from "../../entity/client-entity";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient
@@ -24,7 +18,6 @@ export default class GameScene extends GeneralGameScene {
 	public config: GameSceneConfig;
 	public controlsUpdateInterval: number;
 	public client: ConnectionClient;
-	public overlay: PrimaryOverlay;
 
     constructor(config: GameSceneConfig) {
         super(config)
@@ -34,7 +27,6 @@ export default class GameScene extends GeneralGameScene {
         this.client = config.client
 
         this.setupUpdateLoop()
-        this.initOverlay()
         this.setupPacketHandling()
         this.displayWorld(new ClientGameWorld())
 
@@ -42,35 +34,9 @@ export default class GameScene extends GeneralGameScene {
             let buffer = new ReadBuffer(packet.buffer.buffer)
             this.displayedWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
         })
-        ClientWorldBridge.buildBridge(this.client, this.displayedWorld)
 
-        this.overlay.show()
-    }
-
-    private initOverlay() {
-        this.overlay = new PrimaryOverlay({
-            root: this.overlayContainer,
-            game: this
-        })
-
-        this.overlay.on("play", (nick: string) => {
-            let tankId = EntityType.TANK_SNIPER
-
-            new PlayerConfigPacket(nick, tankId).sendTo(this.client.connection)
-        })
-
-        this.overlay.roomSelectContainer.on("select", (room: string) => {
-            new PlayerRoomRequestPacket(room).sendTo(this.client.connection)
-        })
-
-        this.keyboard.keybinding("Escape", () => {
-            if(this.displayedWorld && this.displayedWorld.player) {
-                if (this.overlay.shown) {
-                    this.overlay.hide()
-                } else {
-                    this.overlay.show()
-                }
-            }
+        this.keyboard.keybinding("Cmd-B", () => {
+            this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
         })
     }
 
@@ -92,9 +58,6 @@ export default class GameScene extends GeneralGameScene {
     }
 
     private setupPacketHandling() {
-        this.client.on(RoomListPacket, (packet) => {
-            this.overlay.roomSelectContainer.updateRooms(packet.rooms)
-        })
 
         this.client.on(PlayerRoomChangePacket, (packet) => {
             if(packet.error) {
@@ -102,10 +65,7 @@ export default class GameScene extends GeneralGameScene {
                 this.eventContainer.createEvent(event)
             } else {
                 this.playerControls.disconnectAllTankControls()
-
                 this.chatContainer.clear()
-
-                this.overlay.roomSelectContainer.selectRoom(packet.room)
             }
         })
 
@@ -114,20 +74,8 @@ export default class GameScene extends GeneralGameScene {
         })
     }
 
-    protected onChat(text: string) {
-	    if(text.startsWith("/")) {
-	        this.handleCommand(text)
-        } else {
-            new PlayerChatPacket(text).sendTo(this.client.connection)
-        }
-    }
-
     tick(dt: number) {
         super.tick(dt)
         this.displayedWorld.tick(dt)
-    }
-
-    private handleCommand(text: string) {
-        if(text.startsWith("/debug")) this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
     }
 }

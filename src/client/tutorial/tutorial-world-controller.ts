@@ -1,15 +1,14 @@
 import Game from "../../server/room/game";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
-import ServerPlayer from "../../server/server-player";
 import PhysicalComponent from "../../entity/components/physics-component";
-import HealthComponent from "../../entity/components/health-component";
 import {EntityType} from "../entity/client-entity";
 import EntityModel from "../../entity/entity-model";
+import Player from "../../player";
 
 export default class TutorialWorldController {
     game: Game;
     private tanks: EntityModel[] = []
-    private selectedTanks: Map<ServerPlayer, number> = new Map()
+    private selectedTanks: Map<Player, number> = new Map()
 
     constructor(serverGame: Game) {
         this.game = serverGame
@@ -50,7 +49,7 @@ export default class TutorialWorldController {
         const selectedIndex = 0
         const tank = this.tanks[selectedIndex]
 
-        const player = new ServerPlayer({
+        const player = new Player({
             id: client.id,
             nick: "Вы",
             tank: tank
@@ -61,7 +60,7 @@ export default class TutorialWorldController {
         this.respawnPlayer(player)
     }
 
-    private respawnPlayer(player: ServerPlayer) {
+    private respawnPlayer(player: Player) {
         const tank = player.tank
 
         tank.emit("respawn")
@@ -74,7 +73,7 @@ export default class TutorialWorldController {
     }
 
 
-    private onPlayerCommand(player: ServerPlayer, text: string) {
+    private onPlayerCommand(player: Player, text: string) {
         if(text == "#switch-tank") {
             let selectedIndex = this.selectedTanks.get(player)
             selectedIndex++

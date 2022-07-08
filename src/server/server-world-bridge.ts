@@ -1,5 +1,4 @@
 import PlayerControlsPacket from "../networking/packets/game-packets/player-controls-packet";
-import PlayerConfigPacket from "../networking/packets/game-packets/player-config-packet";
 import PlayerChatPacket from "../networking/packets/game-packets/player-chat-packet";
 import PlayerRespawnPacket from "../networking/packets/game-packets/player-respawn-packet";
 import ServerGameWorld from "./server-game-world";
@@ -13,10 +12,6 @@ export default class ServerWorldBridge {
             const player = client.data.player
             if(!player) return
             packet.updateControls(player.tank.getComponent(TankControls))
-        })
-
-        portal.on(PlayerConfigPacket, (packet, client) => {
-            world.emit("player-config", client, packet.modelId, packet.nick)
         })
 
         portal.on(PlayerRespawnPacket, (packet, client) => {

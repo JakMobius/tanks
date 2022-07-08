@@ -35,23 +35,28 @@ export default class GeneralGameScreen extends SceneScreen {
 
     async loadGame() {
 
-        let assetsProgress = Sprite.download({
-            mipMapLevels: 1
-        })
+        let assetsProgress = Sprite.download()
 
-        let soundProgress = Progress.all(Sounds.ALL.map((sound) => Downloader.download(sound.path, (response) => {
-            this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
-                sound.buffer = buffer;
-                sound.engine = this.soundEngine
-            });
-        }, "arraybuffer")))
+        let soundProgress = Progress.all(
+            Sounds.ALL.map((sound) => Downloader.downloadBinary(
+                sound.path, (response) => {
+                    this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
+                        sound.buffer = buffer;
+                        sound.engine = this.soundEngine
+                    });
+                })
+            ))
+
+        let totalProgress = Progress.all([assetsProgress, soundProgress])
 
         this.setScene(new LoadingScene({
             screen: this,
-            progress: Progress.all([assetsProgress, soundProgress])
+            progress: totalProgress
         }))
 
-        await assetsProgress.toPromise()
+        console.log(totalProgress)
+
+        await totalProgress.toPromise()
 
         Sprite.applyTexture(this.ctx)
     }

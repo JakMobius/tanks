@@ -13,13 +13,13 @@ import RoomConfig from "../../room/room-config";
 import GameMap from "../../../map/game-map";
 import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
-import ServerPlayer from "../../server-player";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
 import PlayerVisibilityManager from "../../player-visibility-manager";
+import Player from "../../../player";
+import MapSerialization from "../../../map/map-serialization";
 
 export interface GameSocketPortalClientData {
-    listeningForRooms: boolean
-    player: ServerPlayer | null
+    player: Player | null
     visibilityManager: PlayerVisibilityManager
 }
 
@@ -31,15 +31,6 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
 
     constructor() {
         super()
-        this.setupRoomsUpdate()
-    }
-
-    setupRoomsUpdate() {
-        this.roomsInterval = setInterval(() => this.updateRooms(), 1000)
-    }
-
-    stopRoomUpdate() {
-        clearInterval(this.roomsInterval)
     }
 
     handleRequest(request: Websocket.request) {
@@ -51,22 +42,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         }
     }
 
-    updateRooms() {
-        if(this.clients.size === 0) {
-            return
-        }
-
-        let packet = new RoomListPacket(Array.from(this.games.values()))
-
-        for(let client of this.clients.values()) {
-            if(client.data.listeningForRooms) {
-                packet.sendTo(client.connection)
-            }
-        }
-    }
-
     terminate() {
-        this.stopRoomUpdate()
         super.terminate()
     }
 
@@ -92,29 +68,6 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
 
     handlePacket(packet: BinaryPacket, client: GameSocketPortalClient) {
         super.handlePacket(packet, client)
-
-        if(packet instanceof RoomListRequestPacket) {
-            client.data.listeningForRooms = packet.request;
-        } else if(packet instanceof PlayerRoomRequestPacket) {
-            const room = this.games.get(packet.room);
-
-            if (room) {
-                if(room.portal.clients.size >= room.maxOnline) {
-                    PlayerRoomChangePacket.deny(
-                        packet.room,
-                        "Эта комната переполнена"
-                    ).sendTo(client.connection)
-                } else {
-                    PlayerRoomChangePacket.allow(room.name).sendTo(client.connection)
-                    this.configureClient(client, room)
-                }
-            } else {
-                PlayerRoomChangePacket.deny(
-                    packet.room,
-                    "Такой комнаты не существует. Возможно, она была закрыта"
-                ).sendTo(client.connection)
-            }
-        }
     }
 
     getFreeGame() {
@@ -160,16 +113,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
     async createRoom(config: RoomConfig) {
         try {
             const gzip = await fs.promises.readFile(config.map)
-            const data = pako.inflate(gzip)
-            const decoder = ReadBuffer.getShared(data.buffer)
-
-            const signature = String.fromCharCode(...decoder.readBytes(4))
-            if(signature != "TNKS") throw "Invalid signature"
-
-            const version = decoder.readUint32()
-            if(version != 1) throw "Unsupported file version: " + version
-
-            const map = GameMap.fromBinary(decoder)
+            const map = MapSerialization.fromBuffer(gzip)
 
             const game = new Game({
                 name: config.name,
@@ -192,7 +136,6 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
             connection: connection,
             data: {
                 player: null,
-                listeningForRooms: false,
                 visibilityManager: visibilityManager
             }
         })

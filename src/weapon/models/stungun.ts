@@ -1,5 +1,5 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import AbstractPlayer from "../../abstract-player";
+import Player from "../../player";
 import ServerGameWorld from "../../server/server-game-world";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TransformComponent from "../../entity/components/transform-component";
@@ -54,7 +54,7 @@ export default class WeaponStungun extends Weapon {
     }
 }
 
-const near = function (x: number, y: number, tplayer: AbstractPlayer, world: Entity, distance: number): Entity[] {
+const near = function (x: number, y: number, tplayer: Player, world: Entity, distance: number): Entity[] {
     const result = [];
 
     for (let entity of world.children.values()) {

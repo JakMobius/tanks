@@ -1,10 +1,7 @@
 import Progress from './utils/progress';
 import Downloader from './utils/downloader';
 import Uniform from "./graphics/uniform";
-
-export interface SpriteDownloadOptions {
-    mipMapLevels: number
-}
+import Sounds from "./sound/sounds";
 
 export interface SpriteRect {
     x: number
@@ -15,13 +12,9 @@ export interface SpriteRect {
     [key: string]: number | null
 }
 
-class Sprite {
+export default class Sprite {
 	public rects: SpriteRect[];
 	public rect: SpriteRect;
-	public mipmaplevel: number;
-	public sprites: any;
-	public mipmapimages: any;
-	public complete: any;
     static sprites = new Map()
     static mipmapatlases: { [key: string]: SpriteRect }[] = []
     static mipmapimages: HTMLImageElement[] = []
@@ -105,97 +98,22 @@ class Sprite {
         }
     }
 
-    // TODO: rewrite this
+    static download(): Progress {
+        let textureProgress = Downloader.downloadImage("assets/img/textures/atlas-mipmap-level-0.png", (image) => {
+            Sprite.mipmapimages[0] = image
+        })
 
-    static download(options?: SpriteDownloadOptions): Progress {
-        let progress = new Progress()
-        progress.setTarget(0.01)
+        let atlasProgress = Downloader.download("assets/img/textures/atlas-mipmap-level-0.json", (response) => {
+            Sprite.mipmapatlases[0] = response
 
-        options = Object.assign( {
-            mipMapLevels: 3
-        }, options)
-
-
-        let mipMapLevels = options.mipMapLevels
-        let succeededMipmapLevels = mipMapLevels
-        let awaiting = succeededMipmapLevels * 2
-
-        const assetReady = () => {
-            if(!--awaiting) {
-                let root = Sprite.mipmapatlases[0]
-
-                for(let key in root) {
-                    if(root.hasOwnProperty(key)) {
-                        Sprite.sprites.set(key, new Sprite(key))
-                    }
+            for(let key in response) {
+                if(response.hasOwnProperty(key)) {
+                    Sprite.sprites.set(key, new Sprite(key))
                 }
-
-                progress.complete()
             }
-        }
+        }, "json")
 
-        for(let level = 0; level < mipMapLevels; level++) {
-            (function(level) {
-                let textureProgress: Progress = null
-                let atlasProgress: Progress = null
-
-                if(progress) {
-                    textureProgress = new Progress()
-                    atlasProgress = new Progress()
-
-                    progress.addSubtask(textureProgress)
-                    progress.addSubtask(atlasProgress)
-                }
-
-                let levelPath = "atlas-mipmap-level-" + level;
-
-                $(new Image()).attr({
-                    src: "assets/img/textures/" + levelPath + ".png"
-                }).on("load", function(){
-                    if (this.complete) {
-                        if(succeededMipmapLevels > level) {
-                            Sprite.mipmapimages[level] = this
-                            textureProgress.complete()
-                        }
-
-                        assetReady()
-                    } else {
-                        if(level === 0) {
-                            progress.emit("error", "Failed to load first mipmap level")
-                        } else {
-                            succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
-                            assetReady()
-                        }
-                    }
-                }).on("error", () => {
-                    if(level === 0) {
-                        progress.emit("error", "Failed to load first mipmap level")
-                    } else {
-                        succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
-                        assetReady()
-                    }
-                })
-
-                $.ajax({
-                    url: "assets/img/textures/" + levelPath + ".json",
-                    xhr: Downloader.getXHR(null, atlasProgress)
-                }).done((data) => {
-                    if(succeededMipmapLevels > level) {
-                        Sprite.mipmapatlases[level] = data
-                    }
-                    assetReady()
-                }).fail((response, status, error) => {
-                    if(level === 0) {
-                        progress.emit("error", "Failed to load first mipmap level atlas descriptor: " + error)
-                    } else {
-                        succeededMipmapLevels = Math.min(succeededMipmapLevels, level)
-                        assetReady()
-                    }
-                })
-            })(level)
-        }
-
-        return progress
+        return Progress.all([textureProgress, atlasProgress])
     }
 
     /**
@@ -207,5 +125,3 @@ class Sprite {
         return Sprite.sprites.get(name)
     }
 }
-
-export default Sprite;
