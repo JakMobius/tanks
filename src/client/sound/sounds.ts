@@ -1,7 +1,9 @@
+import SoundEngine from "./sound-engine";
 
 export class SoundAsset {
     path: string
-    buffer: AudioBuffer
+    buffer: AudioBuffer | null = null
+    engine: SoundEngine | null = null
 
     constructor(path: string) {
         this.path = path
@@ -24,6 +26,10 @@ export default class Sounds {
     static ENGINE_2 =           new SoundAsset("assets/sound/engine-2.wav")
     static ENGINE_3 =           new SoundAsset("assets/sound/engine-3.wav")
     static ENGINE_4 =           new SoundAsset("assets/sound/engine-4.wav")
+    static EXPLODE_1 =           new SoundAsset("assets/sound/explode-1.wav")
+    static EXPLODE_2 =           new SoundAsset("assets/sound/explode-2.wav")
+    static EXPLODE_3 =           new SoundAsset("assets/sound/explode-3.wav")
+    static EXPLODE_4 =           new SoundAsset("assets/sound/explode-4.wav")
 
     static ALL = [
         Sounds.RELOAD_START,
@@ -40,6 +46,10 @@ export default class Sounds {
         Sounds.ENGINE_1,
         Sounds.ENGINE_2,
         Sounds.ENGINE_3,
-        Sounds.ENGINE_4
+        Sounds.ENGINE_4,
+        Sounds.EXPLODE_1,
+        Sounds.EXPLODE_2,
+        Sounds.EXPLODE_3,
+        Sounds.EXPLODE_4
     ]
 }

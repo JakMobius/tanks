@@ -20,8 +20,6 @@ import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/
 import TransformComponent from "../../../../entity/components/transform-component";
 import ClientEntity, {EntityType} from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
-import EffectHostComponent from "../../../../effects/effect-host-component";
-import DamageSmokeEffect from "../damage-smoke-effect";
 import ClientTank from "../client-tank";
 
 class Drawer extends TankDrawer {
@@ -99,7 +97,7 @@ ClientEntity.associate(EntityType.TANK_MONSTER, (model) => {
             {low: 1.4, high: 2, gearing: 0.6},
             {low: 1.4, high: 2, gearing: 0.4},
         ],
-        multiplier: 20,
+        multiplier: 5,
         pitch: 1
     }))
 

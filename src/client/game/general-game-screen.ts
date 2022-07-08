@@ -42,6 +42,7 @@ export default class GeneralGameScreen extends SceneScreen {
         let soundProgress = Progress.all(Sounds.ALL.map((sound) => Downloader.download(sound.path, (response) => {
             this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
                 sound.buffer = buffer;
+                sound.engine = this.soundEngine
             });
         }, "arraybuffer")))
 

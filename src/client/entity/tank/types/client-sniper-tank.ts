@@ -84,7 +84,7 @@ ClientEntity.associate(EntityType.TANK_SNIPER, (model) => {
             {low: 1.4, high: 2, gearing: 0.6},
             {low: 1.4, high: 2, gearing: 0.4},
         ],
-        multiplier: 20,
+        multiplier: 5,
         pitch: 1
     }))
 

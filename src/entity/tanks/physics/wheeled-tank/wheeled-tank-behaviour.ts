@@ -50,13 +50,17 @@ export default class WheeledTankBehaviour extends TankBehaviour {
         this.driveWheelCount = this.calculateDriveWheelCount()
     }
 
+    getEngineThrottle() {
+        return Math.abs(this.controlsComponent.getThrottle())
+    }
+
     /**
      * @returns number average speed of all driving wheels
      */
     getDrivetrainSpeed(): number {
         let totalSpeed = 0
         for(let wheel of this.wheels) {
-            if(wheel.isDriving) totalSpeed += wheel.speed
+            if(wheel.isDriving) totalSpeed += Math.abs(wheel.speed)
         }
         return Math.abs(totalSpeed / this.driveWheelCount)
     }

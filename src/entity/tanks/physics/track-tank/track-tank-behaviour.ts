@@ -54,6 +54,10 @@ export default class TrackTankBehaviour extends WheeledTankBehaviour {
 
     }
 
+    getEngineThrottle(): number {
+        return Math.abs(this.controlsComponent.getThrottle()) + Math.abs(this.controlsComponent.getSteer());
+    }
+
     getLeftTrackSpeed() {
         let totalSpeed = 0
         for(let wheel of this.leftTrackWheels) totalSpeed += wheel.speed

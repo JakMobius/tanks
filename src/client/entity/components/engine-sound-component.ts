@@ -2,13 +2,12 @@ import SoundPrimaryComponent from "../../sound/sound/sound-primary-component";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
 import TransformComponent from "../../../entity/components/transform-component";
-import SoundHostComponent from "./sound-host-component";
 import {SoundAsset} from "../../sound/sounds";
 import HealthComponent from "../../../entity/components/health-component";
 import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
-import TankControls from "../../../controls/tank-controls";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import SoundTransformComponent from "../../sound/sound/sound-transform-component";
+import SoundPositionComponent from "../../sound/sound/sound-position-component";
+import SoundGainFilter from "../../sound/sound/sound-gain-filter";
 
 export interface EngineConfig {
     sound: SoundAsset,
@@ -33,23 +32,20 @@ export default class EngineSoundComponent implements Component {
 	public config: EngineConfig;
 	public entity: Entity;
 	public sound: Entity;
-	public rpm: number;
-	public gear: number;
-    private soundHost: SoundHostComponent | null = null
-    private destinationRPM: number = 0
+	public rpm: number = 0;
+	public gear: number = 1;
+    private targetRPM: number = 0
     private eventListener: BasicEventHandlerSet = new BasicEventHandlerSet()
+    private gainFilter: SoundGainFilter | null = null
+    private soundPosition: SoundPositionComponent | null = null
 
     constructor(config: EngineConfig) {
         this.config = Object.assign({
-            multiplier: 11,
+            multiplier: 3,
             gears: [{gearing: 1}],
             pitch: 1,
             volume: 1
         }, config)
-
-        this.eventListener.on("attached-to-parent", (child, parent) => {
-            if(!this.soundHost) this.findHostComponent(parent)
-        })
 
         this.eventListener.on("tick", () => {
             this.tick()
@@ -61,22 +57,20 @@ export default class EngineSoundComponent implements Component {
     }
 
     tick() {
-        let health = this.entity.getComponent(HealthComponent).getHealth()
-        let behaviour = this.entity.getComponent(WheeledTankBehaviour)
-        let controls = this.entity.getComponent(TankControls)
+        const health = this.entity.getComponent(HealthComponent).getHealth()
+        const behaviour = this.entity.getComponent(WheeledTankBehaviour)
 
-        const clutch = Math.min(Math.abs(controls.getThrottle()) * 10, 1.0);
+        const minRPM = 1
+        const tankSpeed = behaviour.getDrivetrainSpeed()
+        const gearboxRPM = tankSpeed / this.config.multiplier;
 
-        if(this.sound) {
-            // this.sound.config.mapX = position.x
-            // this.sound.config.mapY = position.y
-        }
+        const clutch = Math.max(Math.min((gearboxRPM - minRPM / 2) / (minRPM / 2), 1), 0) *
+                       Math.min(Math.abs(behaviour.getEngineThrottle()) * 10, 1.0);
+
         if(health === 0) {
-            this.destinationRPM = 0
-            // this.sound.gainNode.gain.value
+            this.targetRPM = 0
+            this.gainFilter.node.gain.value = 0
         } else {
-            const tankSpeed = behaviour.getDrivetrainSpeed()
-
             const rpm = tankSpeed / this.config.multiplier;
 
             const currentGear = this.config.gears[this.gear];
@@ -92,56 +86,46 @@ export default class EngineSoundComponent implements Component {
                 this.gear++
             }
 
-            const minRPM = 1 - behaviour.enginePower
-
-            this.destinationRPM = (Math.max(minRPM, rpm) * this.config.gears[this.gear].gearing) * clutch + (1 - clutch)
+            this.targetRPM = (Math.max(minRPM, rpm) * this.config.gears[this.gear].gearing) * clutch + (1 - clutch)
         }
 
-        if(this.destinationRPM < this.rpm) {
+        if(this.targetRPM < this.rpm) {
             this.rpm -= 0.1
-            if(this.destinationRPM > this.rpm) {
-                this.rpm = this.destinationRPM
+            if(this.targetRPM > this.rpm) {
+                this.rpm = this.targetRPM
             }
-        } else if(this.destinationRPM > this.rpm) {
+        } else if(this.targetRPM > this.rpm) {
             this.rpm += 0.05
-            if(this.destinationRPM < this.rpm) {
-                this.rpm = this.destinationRPM
+            if(this.targetRPM < this.rpm) {
+                this.rpm = this.targetRPM
             }
         }
 
         if(this.sound) {
-            // this.sound.source.playbackRate.value = this.rpm * this.config.pitch
+            this.sound.getComponent(SoundPrimaryComponent).source.playbackRate.value = this.rpm * this.config.pitch
             let volume = 0.3 + clutch / 4;
             if(this.rpm < 0.7) {
                 volume *= (this.rpm - 0.2) * 2
             }
-            // this.sound.config.volume = volume * this.config.volume
-            // this.game.updateSoundPosition(this.sound)
-        }
-    }
-
-    private findHostComponent(entity: Entity) {
-        while(entity) {
-            let component = entity.getComponent(SoundHostComponent)
-            if(component) {
-                this.soundHost = component
-                this.startSound();
-                return;
-            }
-            entity = entity.parent
+            this.gainFilter.node.gain.value = volume
+            let tankTransform = this.entity.getComponent(TransformComponent)
+            this.soundPosition.setPosition(tankTransform.getPosition())
         }
     }
 
     startSound() {
         let transformComponent = this.entity.getComponent(TransformComponent)
 
-        this.sound = SoundPrimaryComponent.createSound(this.config.sound.buffer)
-        this.soundHost.engine.addSound(this.sound)
+        this.sound = SoundPrimaryComponent.createSound(this.config.sound)
+        let soundComponent = this.sound.getComponent(SoundPrimaryComponent)
 
-        this.sound.getComponent(SoundPrimaryComponent).loop(true)
-        this.sound.addComponent(new SoundTransformComponent(transformComponent))
+        this.gainFilter = new SoundGainFilter(this.config.sound.engine, soundComponent.inputStream)
+        this.gainFilter.ensureConnected()
 
-        this.sound.getComponent(SoundPrimaryComponent).play();
+        this.soundPosition = new SoundPositionComponent(transformComponent.getPosition())
+
+        this.sound.addComponent(this.soundPosition)
+        this.sound.getComponent(SoundPrimaryComponent).loop(true).play();
 
         this.rpm = 1
         this.gear = 0
@@ -150,6 +134,7 @@ export default class EngineSoundComponent implements Component {
     onAttach(entity: Entity): void {
         this.entity = entity
         this.eventListener.setTarget(entity)
+        this.startSound()
     }
 
     onDetach(): void {

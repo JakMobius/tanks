@@ -1,12 +1,10 @@
 import GameMap from 'src/map/game-map';
-import AbstractPlayer from 'src/abstract-player';
 import AdapterLoop from "./utils/loop/adapter-loop";
 import ChunkedMapCollider from "./physics/chunked-map-collider";
 import Entity from "./utils/ecs/entity";
 import PhysicalHostComponent from "./physiсal-world-component";
 import TilemapComponent from "./physics/tilemap-component";
 import EffectHostComponent from "./effects/effect-host-component";
-import SoundHostComponent from "./client/entity/components/sound-host-component";
 
 export interface GameWorldConfig {
     physicsTick?: number

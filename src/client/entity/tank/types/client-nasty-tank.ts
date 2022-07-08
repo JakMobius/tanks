@@ -114,7 +114,7 @@ ClientEntity.associate(EntityType.TANK_NASTY, (model) => {
 
     model.addComponent(new EngineSoundComponent({
         sound: Sounds.ENGINE_4,
-        multiplier: 20,
+        multiplier: 5,
         pitch: 0.9,
         volume: 0.6
     }))

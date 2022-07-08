@@ -6,7 +6,7 @@ import PhysicalComponent from "../../entity/components/physics-component";
 import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
 import EffectHostComponent from "../../effects/effect-host-component";
 import ServerEffect from "../effects/server-effect";
-import HealthComponent, {DamageModifiers, DamageTypes} from "../../entity/components/health-component";
+import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 

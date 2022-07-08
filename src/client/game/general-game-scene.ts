@@ -11,17 +11,12 @@ import WorldDrawerComponent from "../entity/components/world-drawer-component";
 import * as Box2D from "../../library/box2d";
 import GameMap from "../../map/game-map";
 import Scene, {SceneConfig} from "../scenes/scene";
-import ClientPlayer from "../client-player";
 import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
 import EntityModel from "../../entity/entity-model";
-import BlockTreeDecoder from "../../networking/block-tree-decoder";
-import Entity from "../../utils/ecs/entity";
-import SoundHostComponent from "../entity/components/sound-host-component";
-import SoundTransformComponent from "../sound/sound/sound-transform-component";
-import {SoundStreamPositionComponent} from "../sound/stream/sound-stream-position-component";
+import {SoundStreamPosition} from "../sound/stream/sound-stream-position-component";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
@@ -36,8 +31,7 @@ export default class GeneralGameScene extends Scene {
     public displayedWorld: ClientGameWorld
     public controlledTank: EntityModel
     public worldDrawer: WorldDrawerComponent
-    public soundHost: SoundHostComponent
-    public soundStreamPositionComponent: SoundStreamPositionComponent
+    public soundStreamPosition: SoundStreamPosition = new SoundStreamPosition()
 
     public paused: boolean = false
     public didChangeSize: boolean = false
@@ -48,7 +42,6 @@ export default class GeneralGameScene extends Scene {
 
         this.setupControls()
         this.setupCamera()
-        this.setupSound()
         this.setupDrawer()
         this.setupChat()
         this.setupEventContainer()
@@ -76,11 +69,6 @@ export default class GeneralGameScene extends Scene {
             defaultPosition: new Box2D.Vec2(0, 0),
             inertial: true
         })
-    }
-
-    private setupSound() {
-        this.soundHost = new SoundHostComponent(this.screen.soundEngine)
-        this.soundStreamPositionComponent = new SoundStreamPositionComponent()
     }
 
     private setupDrawer() {
@@ -120,7 +108,6 @@ export default class GeneralGameScene extends Scene {
         if(this.displayedWorld) throw new Error("Scene world cannot be changed after it was set once")
         this.displayedWorld = world
         this.displayedWorld.addComponent(this.worldDrawer)
-        this.displayedWorld.addComponent(this.soundHost)
         this.worldDrawer.setWorld(world)
 
         this.displayedWorld.on("map-change", () => {
@@ -156,8 +143,8 @@ export default class GeneralGameScene extends Scene {
     }
 
     private tickSound(dt: number) {
-        this.soundStreamPositionComponent.position = this.camera.position
-        this.soundStreamPositionComponent.velocity = this.camera.velocity
+        this.soundStreamPosition.position = this.camera.position
+        this.soundStreamPosition.velocity = this.camera.velocity
         this.screen.soundEngine.emit("tick", dt)
     }
 
@@ -205,11 +192,11 @@ export default class GeneralGameScene extends Scene {
 
     appear() {
         super.appear();
-        this.screen.soundOutput.addComponent(this.soundStreamPositionComponent)
+        this.screen.soundOutput.position = this.soundStreamPosition
     }
 
     disappear() {
         super.disappear();
-        this.screen.soundOutput.removeComponent(SoundStreamPositionComponent)
+        this.screen.soundOutput.position = null
     }
 }

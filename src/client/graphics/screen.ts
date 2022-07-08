@@ -2,6 +2,7 @@ import "../animation-frame-polyfill"
 import SoundEngine from "../sound/sound-engine";
 import CanvasFactory from '../utils/canvas-factory'
 import Entity from "../../utils/ecs/entity";
+import {SoundStream} from "../sound/stream/sound-stream";
 
 export interface ScreenConfig {
     scale?: number
@@ -21,8 +22,8 @@ export default class Screen {
 	public activeFramebufferIndex: number;
 	public inactiveFramebufferIndex: number;
 
-    public soundEngine: SoundEngine;
-    public soundOutput: Entity
+    public soundEngine: SoundEngine
+    public soundOutput: SoundStream
     public canvas: HTMLCanvasElement = null
     public ctx: WebGLRenderingContext = null
     private resizeHandler: () => void;
