@@ -2,6 +2,7 @@ import {PauseMenuView} from "../pause-menu-view";
 import GraphicsController from "./graphics-controller";
 import ControlsController from "./controls-controller";
 import GamePauseViewController from "./pause-view-controller";
+import SoundController from "./sound-controller";
 
 export class SettingsView extends PauseMenuView {
     constructor(controller: SettingsController) {
@@ -9,6 +10,7 @@ export class SettingsView extends PauseMenuView {
 
         this.addButton("Графика").blue().target(GraphicsController)
         this.addButton("Управление").blue().target(ControlsController)
+        this.addButton("Звук").blue().target(SoundController)
     }
 }
 

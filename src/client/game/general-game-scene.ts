@@ -175,9 +175,12 @@ export default class GeneralGameScene extends Scene {
         if(this.paused) {
             this.pauseOverlay.show()
             this.keyboard.stopListening()
+            // TODO: ugly
+            this.screen.soundOutput.output.gain.value = 0
         } else {
             this.pauseOverlay.hide()
             this.keyboard.startListening()
+            this.screen.soundOutput.output.gain.value = 1
         }
     }
 

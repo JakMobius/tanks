@@ -20,6 +20,13 @@ export class PauseMenuView extends View {
         return button
     }
 
+    addSubtitle(text: string) {
+        let subtitle = $("<div>").addClass("subtitle").text(text)
+        this.element.append(subtitle)
+        return subtitle
+    }
+
+
     onFocus() {
 
     }
