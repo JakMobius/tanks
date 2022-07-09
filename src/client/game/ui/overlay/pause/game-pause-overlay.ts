@@ -16,7 +16,6 @@ export class GamePauseOverlay extends Overlay {
 
         this.navigationView.blockClass = GamePauseNavigationBlock
         this.navigationView.on("close", () => this.emit("close"))
-        this.navigationView.pushController(new MainController())
 
         this.overlay.append(this.navigationView.element)
     }
@@ -24,6 +23,7 @@ export class GamePauseOverlay extends Overlay {
     show(): void {
         if(this.shown) return
         super.show()
+        this.navigationView.pushController(new MainController())
 
         this.overlay.addClass("shown")
     }
@@ -31,6 +31,7 @@ export class GamePauseOverlay extends Overlay {
     hide(callback?: () => void): void {
         if(!this.shown) return
         super.hide()
+        this.navigationView.clearControllers()
 
         this.overlay.removeClass("shown")
     }

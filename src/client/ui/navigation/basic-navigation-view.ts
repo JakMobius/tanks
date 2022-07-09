@@ -77,6 +77,19 @@ export default class BasicNavigationView extends View {
         return false
     }
 
+    clearControllers() {
+        let topBlock = this.stack[this.stack.length - 1]
+        if(topBlock) {
+            topBlock.controller.onBlur()
+            topBlock.element.detach()
+        }
+        this.stack = []
+    }
+
+    topController() {
+        return this.stack[this.stack.length - 1].controller
+    }
+
     private performDefaultTransition(oldBlock: NavigationBlock, newBlock: NavigationBlock) {
         if(oldBlock) oldBlock.element.detach()
         if(newBlock) this.element.append(newBlock.element)
