@@ -95,7 +95,9 @@ export default class Progress extends EventEmitter {
 
     private checkCompleted() {
         let fraction = this.completeFraction()
-        if(fraction == 1.0) this.emit("completed")
+        if(fraction == 1.0) {
+            this.emit("completed")
+        }
         if(this.parent)this.parent.checkCompleted()
     }
 

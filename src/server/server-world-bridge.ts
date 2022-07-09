@@ -3,33 +3,24 @@ import PlayerChatPacket from "../networking/packets/game-packets/player-chat-pac
 import PlayerRespawnPacket from "../networking/packets/game-packets/player-respawn-packet";
 import ServerGameWorld from "./server-game-world";
 import RoomPortal from "./room-portal";
-import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
-import TankControls from "../controls/tank-controls";
+import SocketPortalClient from "./socket/socket-portal-client";
 
 export default class ServerWorldBridge {
     static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
         portal.on(PlayerControlsPacket, (packet, client) => {
-            const player = client.data.player
-            if(!player) return
-            packet.updateControls(player.tank.getComponent(TankControls))
+            client.emit(packet)
         })
 
         portal.on(PlayerRespawnPacket, (packet, client) => {
-            if (!client.data.player) return
-            world.emit("player-respawn", client.data.player)
+            client.emit(packet)
         })
 
         portal.on(PlayerChatPacket, (packet, client) => {
-            if(!client.data.player) return
-            world.emit("player-chat", client.data.player, packet.text)
+            client.emit(packet)
         })
 
-        portal.on("client-disconnect", (client: GameSocketPortalClient) => {
-            const player = client.data.player
-            if(player) {
-                client.data.player = null
-                if(player.tank) player.tank.die()
-            }
+        portal.on("client-disconnect", (client: SocketPortalClient) => {
+            client.emit("disconnect")
         })
     }
 }

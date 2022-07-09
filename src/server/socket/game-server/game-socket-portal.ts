@@ -1,32 +1,17 @@
 import SocketPortalClient from '../socket-portal-client';
 import SocketPortal from '../socket-portal';
-import RoomListRequestPacket from '../../../networking/packets/game-packets/room-list-request-packet';
-import RoomListPacket from '../../../networking/packets/game-packets/room-list-packet';
-import PlayerRoomRequestPacket from '../../../networking/packets/game-packets/player-room-request-packet';
-import PlayerRoomChangePacket from '../../../networking/packets/game-packets/player-room-change-packet';
 import pako from 'pako';
 import Room from "../../room/room";
 import * as Websocket from "websocket";
 import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
-import GameMap from "../../../map/game-map";
 import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
-import PlayerVisibilityManager from "../../player-visibility-manager";
-import Player from "../../../player";
 import MapSerialization from "../../../map/map-serialization";
+import ServerGame from "../../room/server-game";
 
-export interface GameSocketPortalClientData {
-    player: Player | null
-    visibilityManager: PlayerVisibilityManager
-}
-
-export type GameSocketPortalClient = SocketPortalClient<GameSocketPortalClientData>
-
-export default class GameSocketPortal extends SocketPortal<GameSocketPortalClientData> {
-	public roomsInterval: NodeJS.Timeout;
+export default class GameSocketPortal extends SocketPortal {
     public games = new Map<string, Room>()
 
     constructor() {
@@ -46,7 +31,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         super.terminate()
     }
 
-    configureClient(client: GameSocketPortalClient, game: Room) {
+    configureClient(client: SocketPortalClient, game: Room) {
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
             client.game.portal.clientDisconnected(client)
@@ -58,7 +43,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         client.game = game
     }
 
-    clientDisconnected(client: GameSocketPortalClient) {
+    clientDisconnected(client: SocketPortalClient) {
         super.clientDisconnected(client);
         if(client.game) {
             this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
@@ -66,7 +51,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         }
     }
 
-    handlePacket(packet: BinaryPacket, client: GameSocketPortalClient) {
+    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
         super.handlePacket(packet, client)
     }
 
@@ -87,7 +72,7 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         return game
     }
 
-    clientConnected(client: GameSocketPortalClient) {
+    clientConnected(client: SocketPortalClient) {
         let connection = client.connection
 
         // if(this.banned.indexOf(connection.remoteAddress) !== -1) {
@@ -113,9 +98,9 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
     async createRoom(config: RoomConfig) {
         try {
             const gzip = await fs.promises.readFile(config.map)
-            const map = MapSerialization.fromBuffer(gzip)
+            const map = MapSerialization.fromBuffer(pako.inflate(gzip))
 
-            const game = new Game({
+            const game = new ServerGame({
                 name: config.name,
                 map: map
             })
@@ -128,20 +113,10 @@ export default class GameSocketPortal extends SocketPortal<GameSocketPortalClien
         }
     }
 
-    createClient(connection: WebsocketConnection): GameSocketPortalClient {
-
-        let visibilityManager = new PlayerVisibilityManager()
-
-        let client = new SocketPortalClient<GameSocketPortalClientData>({
+    createClient(connection: WebsocketConnection): SocketPortalClient {
+        return new SocketPortalClient({
             connection: connection,
-            data: {
-                player: null,
-                visibilityManager: visibilityManager
-            }
+            data: {}
         })
-
-        visibilityManager.client = client
-
-        return client
     }
 }

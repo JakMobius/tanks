@@ -15,18 +15,19 @@ class BanIPCommand extends Command {
         const name = args.join(" ")
         let kicked = false
 
-        for(let c of this.server.clients.values()) {
-            if (c.data.player && c.data.player.nick.trim() === name) {
-                c.connection.close(1000, "Администратор внёс Ваш ip в бан-лист")
-
-                const ip = c.connection._socket.remoteAddress
-
-                this.server.banned.push(ip)
-
-                logger.log(" - Забанен игрок #" + c.id + " с ником " + name + " и ip " + ip)
-                kicked = true
-            }
-        }
+        // TODO:
+        // for(let c of this.server.clients.values()) {
+        //     if (c.data.player && c.data.player.nick.trim() === name) {
+        //         c.connection.close(1000, "Администратор внёс Ваш ip в бан-лист")
+        //
+        //         const ip = c.connection._socket.remoteAddress
+        //
+        //         this.server.banned.push(ip)
+        //
+        //         logger.log(" - Забанен игрок #" + c.id + " с ником " + name + " и ip " + ip)
+        //         kicked = true
+        //     }
+        // }
 
         if(!kicked) {
             logger.log("Не найдено игрока (игроков) с ником " + name)

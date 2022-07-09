@@ -15,15 +15,13 @@ import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-
 import Player from "../../player";
 import Loop from "../../utils/loop/loop";
 import ServerWorldBridge from "../server-world-bridge";
-import ServerEntity from "../entity/server-entity";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
-import WorldCommunicationPacket from "../../networking/packets/game-packets/world-communication-packet";
-import {GameSocketPortalClient} from "../socket/game-server/game-socket-portal";
 import EntityModel from "../../entity/entity-model";
-import {EntityType} from "../../client/entity/client-entity";
+import PlayerConnectionManager from "../player-connection-manager";
+import SocketPortalClient from "../socket/socket-portal-client";
 
-interface GameConfig {
+export interface GameConfig {
     name: string
     map: GameMap
     loop?: Loop
@@ -57,14 +55,6 @@ export default class Game extends Room {
         this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
         this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
 
-        this.world.on("tick", () => {
-            for(let client of this.portal.clients.values()) {
-                let manager = client.data.visibilityManager
-                if (!manager.end.hasData()) continue;
-                new WorldCommunicationPacket(manager.end.spitBuffer()).sendTo(client.connection)
-            }
-        })
-
         if(options.loop) {
             this.loop = options.loop
         } else {
@@ -87,43 +77,15 @@ export default class Game extends Room {
         }
     }
 
-    private onClientConnect(client: GameSocketPortalClient) {
+    protected onClientConnect(client: SocketPortalClient) {
         if (!this.timer) {
             this.log("Player connected, resuming the screen...")
             this.loop.start()
         }
-
-        client.data.visibilityManager.setWorld(this.world)
-
-        this.spawnPlayer(client)
     }
 
-    private spawnPlayer(client: GameSocketPortalClient) {
-        let player: Player = client.data.player
-
-        if(!player) {
-            player = new Player({
-                id: client.id,
-                nick: "Player " + Math.floor(Math.random() * 0xFFFF).toString(16),
-            })
-
-            client.data.player = player
-        }
-
-        const tank = new EntityModel()
-        ServerEntity.types.get(EntityType.TANK_MONSTER)(tank)
-        this.world.appendChild(tank)
-        tank.emit("respawn")
-
-        client.data.visibilityManager.setTank(tank)
-        player.setTank(tank)
-        this.respawnPlayer(tank)
-    }
-
-    private onClientDisconnect(client: GameSocketPortalClient) {
+    protected onClientDisconnect(client: SocketPortalClient) {
         this.log("Disconnected " + client.id)
-        client.data.visibilityManager.setTank(null)
-        client.data.visibilityManager.setWorld(null)
 
         if (this.portal.clients.size === 0) {
             this.log("No players, pausing the screen...")
@@ -144,7 +106,7 @@ export default class Game extends Room {
         this.respawnPlayer(player.tank)
     }
 
-    private onPlayerChat(player: Player, text: string) {
+    protected onPlayerChat(player: Player, text: string) {
         text = text.trim()
 
         if (!text.length) return
@@ -152,7 +114,7 @@ export default class Game extends Room {
         this.broadcastMessage("§!F00;" + player.nick + "§;: " + HTMLEscape(text))
     }
 
-    private broadcastMessage(text: string) {
+    protected broadcastMessage(text: string) {
         this.portal.broadcast(new PlayerChatPacket(text))
     }
 

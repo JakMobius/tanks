@@ -4,7 +4,11 @@ import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
 import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
 import GeneralGameScene from "../../game/general-game-scene";
-import EntityModel from "../../../entity/entity-model";
+import TankControls from "../../../controls/tank-controls";
+import PlayerControlsPacket from "../../../networking/packets/game-packets/player-controls-packet";
+import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
+import ReadBuffer from "../../../serialization/binary/read-buffer";
+import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string
@@ -30,6 +34,11 @@ export default class TutorialScene extends GeneralGameScene {
             this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
         })
 
+        this.game.clientConnection.on(WorldCommunicationPacket, (packet) => {
+            let buffer = new ReadBuffer(packet.buffer.buffer)
+            this.game.clientWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+        })
+
         this.game.connectClientToServer()
     }
 
@@ -43,20 +52,18 @@ export default class TutorialScene extends GeneralGameScene {
 
     tick(dt: number) {
         super.tick(dt)
+
+        if(this.controlledTank) {
+            let component = this.controlledTank.getComponent(TankControls)
+            if (component.shouldUpdate()) {
+                new PlayerControlsPacket(component).sendTo(this.game.clientConnection.connection)
+            }
+        }
+
         this.game.tick(dt)
     }
 
     performClientCommand(command: string) {
         new PlayerChatPacket(command).sendTo(this.game.clientConnection.connection)
-    }
-
-    onWorldPrimaryEntitySet(entity: EntityModel) {
-        super.onWorldPrimaryEntitySet(entity)
-        // if(player) {
-            // Well, at least this approach is better than updating the tank
-            // controls in a timer...
-            //let AbstractPlayer = this.game.serverGame.world.players.get(player.id)
-            //this.playerControls.connectTankControls(AbstractPlayer.tank.model.getComponent(TankControls))
-        // }
     }
 }

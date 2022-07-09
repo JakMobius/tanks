@@ -1,10 +1,9 @@
-import pako from "pako";
+
 import ReadBuffer from "../serialization/binary/read-buffer";
 import GameMap from "./game-map";
 
 export default class MapSerialization {
-    public static fromBuffer(buffer: Buffer) {
-        const data = pako.inflate(buffer)
+    public static fromBuffer(data: Uint8Array): GameMap {
         const decoder = ReadBuffer.getShared(data.buffer)
 
         const signature = String.fromCharCode(...decoder.readBytes(4))

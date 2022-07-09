@@ -9,11 +9,18 @@ import {ReceivingEnd} from "../entity/components/network/transmitting/receiving-
 import PrimaryPlayerTransmitter from "../entity/components/network/primary-player/primary-player-transmitter";
 import EntityModel from "../entity/entity-model";
 import {b2Vec2} from "../library/box2d/common/b2_math";
+import Player from "../player";
+import WorldCommunicationPacket from "../networking/packets/game-packets/world-communication-packet";
+import PlayerControlsPacket from "../networking/packets/game-packets/player-controls-packet";
+import TankControls from "../controls/tank-controls";
+import PlayerRespawnPacket from "../networking/packets/game-packets/player-respawn-packet";
+import PlayerChatPacket from "../networking/packets/game-packets/player-chat-packet";
 
-export default class PlayerVisibilityManager {
+export default class PlayerConnectionManager {
     // This code is still not perfect, but it's much
     // better than it was before
 
+    player: Player
     client: SocketPortalClient
     end = new ReceivingEnd()
 
@@ -23,12 +30,44 @@ export default class PlayerVisibilityManager {
     private world: ServerGameWorld
     private tank: EntityModel
 
-    constructor() {
-        this.worldEventHandler.on("tick", () => this.updateEntitiesVisibility())
+    constructor(player: Player, client: SocketPortalClient) {
+        this.player = player
+        this.client = client
+
+        this.worldEventHandler.on("tick", () => this.onTick())
         this.worldEventHandler.on("entity-teleport", (entity) => this.updateEntityVisibility(entity))
+
+        player.on("world-set", () => this.setWorld(player.world))
+        player.on("tank-set", () => this.setTank(player.tank))
+
+        client.on(PlayerControlsPacket, (packet) => {
+            if(this.tank) packet.updateControls(this.tank.getComponent(TankControls))
+        })
+
+        client.on(PlayerRespawnPacket, (packet) => {
+            if(this.world) this.world.emit("player-respawn", this.player)
+        })
+
+        client.on(PlayerChatPacket, (packet) => {
+            if(this.world) this.world.emit("player-chat", this.player, packet.text)
+        })
+
+        client.on("disconnect", (client: SocketPortalClient) => {
+            if(this.tank) this.tank.die()
+        })
     }
 
-    setWorld(world: ServerGameWorld) {
+    private updateClient() {
+        if (!this.end.hasData()) return;
+        new WorldCommunicationPacket(this.end.spitBuffer()).sendTo(this.client.connection)
+    }
+
+    private onTick() {
+        this.updateEntitiesVisibility()
+        this.updateClient()
+    }
+
+    private setWorld(world: ServerGameWorld) {
         if(this.world) {
             let transmitComponent = this.world.getComponent(EntityDataTransmitComponent)
             if(transmitComponent.hasTransmitterSetForEnd(this.end)) {
@@ -47,8 +86,9 @@ export default class PlayerVisibilityManager {
         }
     }
 
-    setTank(tank: EntityModel) {
+    private setTank(tank: EntityModel) {
         this.tank = tank
+        this.makeEntityVisible(this.tank)
     }
 
     private updateEntitiesVisibility() {
@@ -108,5 +148,9 @@ export default class PlayerVisibilityManager {
             this.visibleEntities.delete(entity)
             this.makeEntityInvisible(entity)
         }
+    }
+
+    static attach(player: Player, client: SocketPortalClient) {
+        return new PlayerConnectionManager(player, client)
     }
 }

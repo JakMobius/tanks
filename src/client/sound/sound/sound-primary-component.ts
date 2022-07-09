@@ -80,6 +80,7 @@ export default class SoundPrimaryComponent implements Component {
 
     disconnect() {
         if(!this.connected) return
+        this.stop()
         this.connected = false
 
         for (let output of this.outputStreams) {

@@ -1,5 +1,7 @@
 import Progress from './progress';
 
+// TODO: copy-paste
+
 export default class Downloader {
 
     static getXHR(dataType: XMLHttpRequestResponseType, progress: Progress) {
@@ -10,24 +12,23 @@ export default class Downloader {
             xhr.addEventListener("progress", (evt) => {
                 if (evt.lengthComputable) {
                     // Avoid triggering completion event
-                    if(evt.loaded == evt.total) return;
-                    progress.setCompleted(evt.loaded)
+                    if(evt.loaded >= evt.total) return;
                     progress.setTarget(evt.total)
+                    progress.setCompleted(evt.loaded)
                 }
             }, false);
         }
         return () => xhr
     }
 
-    static downloadBinary(url: string, handler: (response: ArrayBuffer) => void): Progress {
+    static downloadBinary(url: string, handler: (response: ArrayBuffer) => void | Promise<void>): Progress {
         let progress = new Progress()
 
         let request = $.ajax({
             url: url,
             xhr: this.getXHR("arraybuffer", progress),
         }).done((msg) => {
-            handler(msg)
-            progress.complete()
+            Promise.resolve(handler(msg)).then(() => progress.complete())
         }).fail((response, _status, error) => {
             progress.fail(error)
         })
@@ -37,7 +38,7 @@ export default class Downloader {
         return progress
     }
 
-    static download(url: string, handler: (response: any) => void, contentType: string): Progress {
+    static download(url: string, handler: (response: any) => void | Promise<void>, contentType: string): Progress {
 
         let progress = new Progress()
 
@@ -46,8 +47,7 @@ export default class Downloader {
             xhr: this.getXHR(null, progress),
             contentType: contentType,
         }).done((msg) => {
-            handler(msg)
-            progress.complete()
+            Promise.resolve(handler(msg)).then(() => progress.complete())
         }).fail((response, _status, error) => {
             progress.fail(error)
         })
@@ -57,7 +57,7 @@ export default class Downloader {
         return progress
     }
 
-    static downloadImage(url: string, handler: (image: HTMLImageElement) => void) {
+    static downloadImage(url: string, handler: (image: HTMLImageElement) => void | Promise<void>) {
 
         let progress = new Progress()
 
@@ -67,8 +67,7 @@ export default class Downloader {
             src: url
         }).on("load", () => {
             if (image.complete) {
-                handler(image)
-                progress.complete()
+                Promise.resolve(handler(image)).then(() => progress.complete())
             } else {
                 progress.fail("Failed to download image")
             }

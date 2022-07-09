@@ -39,9 +39,9 @@ export default class GeneralGameScreen extends SceneScreen {
 
         let soundProgress = Progress.all(
             Sounds.ALL.map((sound) => Downloader.downloadBinary(
-                sound.path, (response) => {
-                    this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
-                        sound.buffer = buffer;
+                sound.path, async (response) => {
+                    await this.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
+                        sound.buffer = buffer
                         sound.engine = this.soundEngine
                     });
                 })
@@ -53,8 +53,6 @@ export default class GeneralGameScreen extends SceneScreen {
             screen: this,
             progress: totalProgress
         }))
-
-        console.log(totalProgress)
 
         await totalProgress.toPromise()
 

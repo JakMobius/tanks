@@ -58,7 +58,7 @@ export default class BinaryPacket implements BinarySerializable<typeof BinaryPac
     encode() {
         WriteBuffer.shared.reset();
         BinarySerializer.serialize(this, WriteBuffer.shared)
-        return WriteBuffer.shared.spitBuffer()
+        return WriteBuffer.shared.spitBuffer().buffer
     }
 
     /**

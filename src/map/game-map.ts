@@ -114,7 +114,9 @@ export default class GameMap extends Entity {
 	static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
 		let options = GameMap.BinaryOptions.bufferToObject(decoder)
 
-		return new this(options)
+		let map = new this(options) as T
+		(map as any as GameMap).update()
+		return map
 	}
 
 	toBinary(encoder: WriteBuffer) {

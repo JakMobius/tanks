@@ -50,6 +50,13 @@ export default class EngineSoundComponent implements Component {
         this.eventListener.on("tick", () => {
             this.tick()
         })
+
+        this.eventListener.on("detached-from-parent", (entity) => {
+            if(entity == this.entity) {
+                this.sound.getComponent(SoundPrimaryComponent).disconnect()
+                this.destroy()
+            }
+        })
     }
 
     destroy() {
@@ -59,6 +66,8 @@ export default class EngineSoundComponent implements Component {
     tick() {
         const health = this.entity.getComponent(HealthComponent).getHealth()
         const behaviour = this.entity.getComponent(WheeledTankBehaviour)
+
+        if(!behaviour) return;
 
         const minRPM = 1
         const tankSpeed = behaviour.getDrivetrainSpeed()

@@ -13,13 +13,14 @@ class KickCommand extends Command {
         const name = args.join(" ")
         let kicked = false
 
-        for(let c of this.console.server.gameSocket.clients.values()) {
-            if (c.data.player && c.data.player.nick.trim() === name) {
-                c.connection.close("You were kicked from this server")
-                logger.log(" - Kicked '" + name + "' (id = " + c.id + ")")
-                kicked = true
-            }
-        }
+        // TODO:
+        // for(let c of this.console.server.gameSocket.clients.values()) {
+        //     if (c.data.player && c.data.player.nick.trim() === name) {
+        //         c.connection.close("You were kicked from this server")
+        //         logger.log(" - Kicked '" + name + "' (id = " + c.id + ")")
+        //         kicked = true
+        //     }
+        // }
 
         if(!kicked) {
             logger.log("'" + name + "' is offline")

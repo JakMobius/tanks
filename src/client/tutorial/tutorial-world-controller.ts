@@ -4,6 +4,8 @@ import PhysicalComponent from "../../entity/components/physics-component";
 import {EntityType} from "../entity/client-entity";
 import EntityModel from "../../entity/entity-model";
 import Player from "../../player";
+import ServerEntity from "../../server/entity/server-entity";
+import PlayerConnectionManager from "../../server/player-connection-manager";
 
 export default class TutorialWorldController {
     game: Game;
@@ -23,17 +25,16 @@ export default class TutorialWorldController {
     }
 
     private createTank(entityType: number, x: number, y: number, angle: number) {
-        throw "Not implemented"
+        const tank = new EntityModel()
+        ServerEntity.types.get(entityType)(tank)
+        this.game.world.appendChild(tank)
+        tank.emit("respawn")
 
-        // let model = new modelClass()
-        // let tank = ServerEntity.fromModel(model) as ServerTank
-        // this.game.world.createEntity(tank)
-        //
-        // const body = model.getComponent(PhysicalComponent).getBody()
-        // body.SetPositionXY(x, y)
-        // body.SetAngle(angle)
-        //
-        // this.tanks.push(tank)
+        const body = tank.getComponent(PhysicalComponent).getBody()
+        body.SetPositionXY(x, y)
+        body.SetAngle(angle)
+
+        this.tanks.push(tank)
     }
 
     private createDummies() {
@@ -46,23 +47,24 @@ export default class TutorialWorldController {
 
     private onClientConnect(client: SocketPortalClient) {
 
+        const player = new Player({
+            id: client.id,
+            nick: "Вы"
+        })
+
+        PlayerConnectionManager.attach(player, client)
+        player.setWorld(this.game.world)
+
         const selectedIndex = 0
         const tank = this.tanks[selectedIndex]
 
-        const player = new Player({
-            id: client.id,
-            nick: "Вы",
-            tank: tank
-        })
-        client.data.player = player
-
         this.selectedTanks.set(player, selectedIndex)
+        player.setTank(tank)
         this.respawnPlayer(player)
     }
 
     private respawnPlayer(player: Player) {
         const tank = player.tank
-
         tank.emit("respawn")
 
         let body = tank.getComponent(PhysicalComponent)
@@ -71,7 +73,6 @@ export default class TutorialWorldController {
         body.setAngle(4)
         body.setAngularVelocity(0)
     }
-
 
     private onPlayerCommand(player: Player, text: string) {
         if(text == "#switch-tank") {

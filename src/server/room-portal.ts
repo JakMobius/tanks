@@ -1,28 +1,30 @@
 import TypedEventHandler from "../utils/typed-event-handler";
 import BinaryPacket from "../networking/binary-packet";
-import {GameSocketPortalClient} from "./socket/game-server/game-socket-portal";
+import SocketPortalClient from "./socket/socket-portal-client";
 
-export default class RoomPortal extends TypedEventHandler<[GameSocketPortalClient]> {
-    clients = new Map<Number, GameSocketPortalClient>()
+export default class RoomPortal extends TypedEventHandler<[SocketPortalClient]> {
+    clients = new Map<Number, SocketPortalClient>()
     packetHandlers = new Map<Number, (packet: BinaryPacket) => void>()
 
     constructor() {
         super();
     }
 
-    clientConnected(client: GameSocketPortalClient) {
+    clientConnected(client: SocketPortalClient) {
         this.setupPacketHandling(client)
         this.clients.set(client.id, client)
+        client.emit("connect")
         this.emit("client-connect", client)
     }
 
-    clientDisconnected(client: GameSocketPortalClient) {
+    clientDisconnected(client: SocketPortalClient) {
         this.resetPacketHandling(client)
         this.clients.delete(client.id)
+        client.emit("disconnect")
         this.emit("client-disconnect", client)
     }
 
-    private setupPacketHandling(client: GameSocketPortalClient) {
+    private setupPacketHandling(client: SocketPortalClient) {
         const handler = (packet: BinaryPacket) => {
             this.emit(packet, client)
         }
@@ -31,7 +33,7 @@ export default class RoomPortal extends TypedEventHandler<[GameSocketPortalClien
         client.connection.on("incoming-packet", handler)
     }
 
-    private resetPacketHandling(client: GameSocketPortalClient) {
+    private resetPacketHandling(client: SocketPortalClient) {
         const handler = this.packetHandlers.get(client.id)
         this.packetHandlers.delete(client.id)
         client.connection.off("incoming-packet", handler)
