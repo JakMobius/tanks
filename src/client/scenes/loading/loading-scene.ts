@@ -12,7 +12,7 @@ export interface LoadingSceneConfig extends SceneConfig {
     progress: Progress
 }
 
-class LoadingScene extends Scene {
+export default class LoadingScene extends Scene {
     public static scaleBackground = 0xFFC8C8C8
     public static scaleForeground = 0xFF96F096
 
@@ -55,6 +55,7 @@ class LoadingScene extends Scene {
         super.disappear()
         clearInterval(this.interval)
     }
+
     appear() {
         super.appear();
         this.interval = setInterval(() => this.updatePhrase(), 2500) as any as number
@@ -93,13 +94,11 @@ class LoadingScene extends Scene {
     }
 
     drawScaleBackground() {
-        this.program.drawRectangle(-200, -10, 400, 10, LoadingScene.scaleBackground)
+        this.program.drawRectangle(-200, -10, 200, 10, LoadingScene.scaleBackground)
     }
 
     drawScaleForeground() {
         const fraction = this.progress.completeFraction()
-        this.program.drawRectangle(-200, -10, 400 * fraction, 10, LoadingScene.scaleForeground)
+        this.program.drawRectangle(-200, -10, 400 * fraction - 200, 10, LoadingScene.scaleForeground)
     }
 }
-
-export default LoadingScene;
