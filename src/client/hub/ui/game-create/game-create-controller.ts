@@ -1,10 +1,9 @@
 import Controller from "../../../ui/controller/controller";
 import {HubPage} from "../hub-page";
 import AccountBarButton from "../account-bar-button/account-bar-button";
+import GameCreateView from "./game-create-view";
 
-import RoomListView from "./room-list-view";
-
-export default class RoomListController extends Controller {
+export default class GameCreateController extends Controller {
 
     page: HubPage;
     userButton = new AccountBarButton()
@@ -15,6 +14,6 @@ export default class RoomListController extends Controller {
         this.page = page
         this.userButton.setUsername(this.page.userData.username)
         this.rightBarItems = [this.userButton]
-        this.view = new RoomListView(page)
+        this.view = new GameCreateView(page)
     }
 }

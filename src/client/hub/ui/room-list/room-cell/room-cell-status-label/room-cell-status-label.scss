@@ -1,0 +1,30 @@
+
+.room-cell-status {
+  display: flex;
+  flex-direction: row;
+  padding: 3px 6px;
+  height: 21px;
+  background: #FFFFFF;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 2px;
+
+  .room-cell-status-text {
+    font-size: 10px;
+    line-height: 12px;
+    color: #808080;
+  }
+
+  .room-cell-status-icon {
+    width: 11px;
+    height: 11px;
+    background-size: contain;
+
+    &.turned {
+      margin: 0 4px;
+      transform: rotate(-45deg);
+    }
+  }
+}

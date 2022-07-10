@@ -1,0 +1,50 @@
+
+.game-create-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  max-height: 680px;
+  padding: 20px 0 0 0;
+  box-sizing: border-box;
+
+  .game-create-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 20px;
+
+    box-sizing: border-box;
+    width: 793px;
+    height: 100%;
+
+    background: #FFFFFF;
+    border-radius: 13px;
+
+    .game-create-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 0;
+      flex-grow: 1;
+      width: 100%;
+
+      .game-create-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0 5px 10px;
+        width: 100%;
+        box-sizing: border-box;
+
+        .game-create-title {
+          font-size: 24px;
+          line-height: 28px;
+          color: black;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

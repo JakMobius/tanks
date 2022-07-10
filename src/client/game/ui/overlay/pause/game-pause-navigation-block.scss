@@ -6,6 +6,7 @@
   padding: 10px 20px;
   max-height: 100%;
   overflow: scroll;
+  box-sizing: border-box;
 
   >.content-view {
     max-height: 100%;
