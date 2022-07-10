@@ -1,4 +1,4 @@
-/* @load-resource: './navigation.scss' */
+/* @load-resource: './navigation-view.scss' */
 
 import View from "../view";
 import Controller from "../controller/controller";

@@ -15,7 +15,8 @@ export default class AuthorizedWelcomeView extends View {
         this.page = page
 
         this.element.addClass("authorized-welcome-view")
-
         this.element.append(this.button.element, this.roomListButton.element)
+
+        this.roomListButton.element.on("click", () => this.emit("navigate-to-room-list"))
     }
 }

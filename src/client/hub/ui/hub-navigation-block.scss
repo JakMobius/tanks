@@ -1,5 +1,12 @@
 
-.hub-navigation-block {
+.navigation-block.hub-navigation-block {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  >.content-view {
+    height: 100%;
+    justify-content: center;
+  }
 }

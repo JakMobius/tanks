@@ -35,15 +35,15 @@ export default class ServerPositionComponent implements Component {
             let serverX = this.serverPosition.x
             let serverY = this.serverPosition.y
 
-            let timePassedSinceUpdate = (Date.now() - this.serverPositionUpdateDate) / 1000
+            let timeSinceUpdate = (Date.now() - this.serverPositionUpdateDate) / 1000
 
-            serverX += this.serverVelocity.x * timePassedSinceUpdate
-            serverY += this.serverVelocity.y * timePassedSinceUpdate
+            serverX += this.serverVelocity.x * timeSinceUpdate
+            serverY += this.serverVelocity.y * timeSinceUpdate
 
             // TODO: should it use component methods?
             body.SetPositionXY(serverX, serverY)
             body.SetLinearVelocity(this.serverVelocity)
-            body.SetAngle(this.serverAngle + this.serverAngularVelocity * timePassedSinceUpdate)
+            body.SetAngle(this.serverAngle + this.serverAngularVelocity * timeSinceUpdate)
             body.SetAngularVelocity(this.serverAngularVelocity)
 
             this.isFirstTick = false

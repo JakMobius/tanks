@@ -1,6 +1,6 @@
 /* @load-resource: ./game-pause-navigation-transition.scss */
 
-import NavigationTransition from "../../../../ui/navigation/navigation-transition";
+import  NavigationTransition from "../../../../ui/navigation/navigation-transition";
 import BasicNavigationView from "../../../../ui/navigation/basic-navigation-view";
 import NavigationBlock from "../../../../ui/navigation/navigation-block";
 import NavigationCloud from "../../cloud/navigation-cloud";
@@ -14,14 +14,14 @@ export default class GamePauseNavigationTransition extends NavigationTransition 
     }
 
     private setNoMargin(element: JQuery) {
-        let margin = -element.outerHeight() / 2 + "px"
-        element.css("margin-top", margin)
-        element.css("margin-bottom", margin)
+        let margin = -element.outerWidth() / 2 + "px"
+        element.css("margin-left", margin)
+        element.css("margin-right", margin)
     }
 
     private resetNoMargin(element: JQuery) {
-        element.css("margin-top", "0")
-        element.css("margin-bottom", "0")
+        element.css("margin-left", "0")
+        element.css("margin-right", "0")
     }
 
     private performTransition(view: BasicNavigationView, from: NavigationBlock, to: NavigationBlock, reverse: boolean, callback: () => void) {

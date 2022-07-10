@@ -2,7 +2,7 @@
 
 import View from '../../view';
 
-import EventView from './eventview';
+import EventView from './event-view';
 
 class EventContainer extends View {
     constructor() {

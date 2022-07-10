@@ -2,7 +2,7 @@
 
 import Menu from "../../menu/menu";
 
-class EventView extends Menu {
+export default class EventView extends Menu {
     constructor(text: string) {
         super();
 
@@ -20,5 +20,3 @@ class EventView extends Menu {
         setTimeout(callback, 500)
     }
 }
-
-export default EventView;
