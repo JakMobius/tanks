@@ -35,6 +35,7 @@ export default class ButtonAxle extends Axle {
     }
 
     keyReleased() {
+        if(this.target == this.min) return;
         this.target = this.min
         this.keypressTimestamp = Date.now()
         this.setNeedsUpdate()

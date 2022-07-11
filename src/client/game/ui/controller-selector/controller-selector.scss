@@ -1,0 +1,44 @@
+
+.controller-selector {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px 0;
+  gap: 10px;
+  height: 100px;
+  align-self: stretch;
+  box-sizing: border-box;
+
+  .controller {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 117px;
+    height: 80px;
+    background: rgba(66, 66, 66, 0.56);
+    border-radius: 10px;
+
+    .controller-name {
+      height: 15px;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 15px;
+      color: #FFFFFF;
+    }
+
+    .controller-icon {
+      width: 58px;
+      height: 24px;
+    }
+
+    .controller-subtitle {
+      height: 13px;
+      font-size: 11px;
+      line-height: 13px;
+      color: #FFFFFF;
+    }
+  }
+}

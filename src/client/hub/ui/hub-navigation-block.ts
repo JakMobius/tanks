@@ -12,12 +12,14 @@ export default class HubNavigationBlock extends NavigationBlock {
     }
 
     onPush() {
-        const backButton = $("<button>").addClass("navigation-back-button")
-
         const navigationView = this.controller.navigationView
         const previousController = navigationView.stack[navigationView.stack.length - 2]
 
-        if(previousController && previousController.controller.title) backButton.text(previousController.controller.title)
+        if(!previousController) return;
+
+        const backButton = $("<button>").addClass("navigation-back-button")
+
+        if(previousController.controller.title) backButton.text(previousController.controller.title)
         else backButton.text("Назад")
 
         this.topBar.leftElement.prepend(backButton)

@@ -1,13 +1,17 @@
 import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
 import AxisSelector from "../../../axis-selector/axis-selector";
+import ControllerSelector from "../../../controller-selector/controller-selector";
 
 export class ControlsView extends PauseMenuView {
     constructor(controller: ControlsController) {
         super(controller);
 
         this.addSubtitle("Обнаруженные контроллеры")
-        this.addButton("Настроить контроллер").stretch().blue()
+
+        this.element.append(new ControllerSelector().element)
+
+        this.addButton("Настройки контроллера").stretch().blue()
 
         this.addSubtitle("Управление танком")
         this.element.append(new AxisSelector("Газ")           .setAxes(["W", "↑"]).element)

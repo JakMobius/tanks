@@ -8,6 +8,9 @@ export default class KeyAxle extends ButtonAxle {
         super(min, max)
         this.key = key
 
+        keyboard.on("stopped-listening", () => {
+            this.keyReleased();
+        })
         keyboard.on("keydown", (event) => {
             if(event.code === this.key) this.keyPressed()
         })

@@ -75,4 +75,9 @@ export default class KeyboardController extends DocumentEventHandler {
     createKeyAxle(key: string, min?: number, max?: number) {
         return new KeyAxle(this, key, min, max)
     }
+
+    stopListening() {
+        super.stopListening();
+        this.emit("stopped-listening")
+    }
 }
