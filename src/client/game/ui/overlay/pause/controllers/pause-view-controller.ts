@@ -1,6 +1,6 @@
 import Controller from "../../../../../ui/controller/controller";
 import {PauseMenuView} from "../pause-menu-view";
-import KeyboardController from "../../../../../controls/interact/keyboard-controller";
+import KeyboardController from "../../../../../controls/input/keyboard/keyboard-controller";
 
 export default class GamePauseViewController extends Controller<PauseMenuView> {
 
@@ -9,7 +9,7 @@ export default class GamePauseViewController extends Controller<PauseMenuView> {
     constructor() {
         super();
 
-        this.keyboard.keybinding("Escape", () => this.navigateBack())
+        // this.keyboard.keybinding("Escape", () => this.navigateBack())
     }
 
     navigateBack() {
@@ -20,11 +20,11 @@ export default class GamePauseViewController extends Controller<PauseMenuView> {
 
     onFocus() {
         super.onFocus();
-        this.keyboard.startListening()
+        // this.keyboard.startListening()
     }
 
     onBlur() {
         super.onBlur();
-        this.keyboard.stopListening()
+        // this.keyboard.stopListening()
     }
 }

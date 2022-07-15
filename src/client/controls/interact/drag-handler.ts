@@ -26,9 +26,9 @@ export default class DragHandler extends DocumentEventHandler {
         this.bind("mousedown", this.mouseDown)
         this.bind("mousemove", this.mouseMove)
         this.bind("wheel", this.wheel)
-        this.bind('gesturestart', this.zoomStart)
-        this.bind('gesturechange', this.zoomChange)
-        this.bind('gestureend', this.zoomChange)
+        this.bind("gesturestart", this.zoomStart)
+        this.bind("gesturechange", this.zoomChange)
+        this.bind("gestureend", this.zoomChange)
     }
 
     zoomStart(event: MSGestureEvent) {

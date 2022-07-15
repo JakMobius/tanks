@@ -1,13 +1,13 @@
-import Axle from '../../controls/axle';
-import GamepadManager from "./interact/gamepad-manager";
+import Axle from '../../../../controls/axle';
+import GamepadController from "./gamepad-controller";
 
 export default class GamepadAxle extends Axle {
 	public axle: number;
-	public controller: GamepadManager;
+	public controller: GamepadController;
 	public power: number;
 	public inverted: boolean;
 
-    constructor(controller: GamepadManager, axle: number) {
+    constructor(controller: GamepadController, axle: number) {
         super();
         this.axle = axle
         this.controller = controller

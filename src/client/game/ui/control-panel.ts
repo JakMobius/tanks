@@ -1,5 +1,5 @@
-import Vidget from "../../controls/interact/vidget";
-import {Touch} from "../../controls/interact/touch-controller";
+import Vidget from "../../controls/input/touch/vidget";
+import {Touch} from "../../controls/input/touch/touch-controller";
 
 class ControlPanel {
 	public vidgets: Vidget[] = []

@@ -1,6 +1,6 @@
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import KeyboardController from '../../../controls/interact/keyboard-controller';
+import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import MapDrawer from '../../../graphics/drawers/map-drawer';
 import EditorMap from '../../editor-map';
 import MapAreaModification from '../../history/modification/map-area-modification';
@@ -8,13 +8,14 @@ import ToolManager from "../toolmanager";
 import BlockState from "../../../../map/block-state/block-state";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "../../../../physics/tilemap-component";
+import KeyboardListener from "../../../controls/input/keyboard/keyboard-listener";
 
 export default class AreaTool extends Tool {
 	public area: Rectangle;
 	public program: ConvexShapeProgram;
 	public copyBufferDrawer: MapDrawer;
 	public copyBuffer: EditorMap;
-	public keyboard: KeyboardController;
+	public keyboard: KeyboardListener;
 	public initialAreaState: boolean;
 	public movingArea: boolean;
 	public pasting: boolean;
@@ -31,13 +32,13 @@ export default class AreaTool extends Tool {
         this.copyBufferDrawer = new MapDrawer(this.manager.screen)
 
         this.copyBuffer = null
-        this.keyboard = new KeyboardController()
+        this.keyboard = new KeyboardListener()
 
-        this.keyboard.keybinding("Cmd-C", () => this.copy(false))
-        this.keyboard.keybinding("Cmd-V", () => this.paste())
-        this.keyboard.keybinding("Cmd-X", () => this.copy(true))
-        this.keyboard.keybinding("Cmd-D", () => this.resetSelection())
-        this.keyboard.keybinding("Backspace", () => this.deleteArea())
+        this.keyboard.onKeybinding("Cmd-C", () => this.copy(false))
+        this.keyboard.onKeybinding("Cmd-V", () => this.paste())
+        this.keyboard.onKeybinding("Cmd-X", () => this.copy(true))
+        this.keyboard.onKeybinding("Cmd-D", () => this.resetSelection())
+        this.keyboard.onKeybinding("Backspace", () => this.deleteArea())
 
         this.initialAreaState = false
         this.movingArea = false

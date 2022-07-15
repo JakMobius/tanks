@@ -1,9 +1,9 @@
 import Camera from "../camera";
-import KeyboardController from "../controls/interact/keyboard-controller";
+import KeyboardController from "../controls/input/keyboard/keyboard-controller";
 import ControlPanel from "./ui/control-panel";
-import GamepadManager from "../controls/interact/gamepad-manager";
-import TouchController from "../controls/interact/touch-controller";
-import PlayerControls from "../controls/player-controls";
+import GamepadController from "../controls/input/gamepad/gamepad-controller";
+import TouchController from "../controls/input/touch/touch-controller";
+import PlayerControls from "../controls/interact/player-controls";
 import EventContainer from "../ui/overlay/events/event-container";
 import ChatContainer from "./ui/overlay/chat/chat-container";
 import ClientGameWorld from "../client-game-world";
@@ -17,12 +17,13 @@ import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
 import EntityModel from "../../entity/entity-model";
 import {SoundStreamPosition} from "../sound/stream/sound-stream-position-component";
+import KeyboardListener from "../controls/input/keyboard/keyboard-listener";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
     public keyboard = new KeyboardController()
     public controls = new ControlPanel()
-    public gamepad = new GamepadManager()
+    public gamepad = new GamepadController()
     public touchController: TouchController
     public playerControls: PlayerControls
 
@@ -55,9 +56,9 @@ export default class GeneralGameScene extends Scene {
         this.playerControls.setupKeyboard(this.keyboard)
         this.playerControls.setupGamepad(this.gamepad)
 
-        this.keyboard.startListening()
-        this.touchController.startListening()
-        this.gamepad.startListening()
+        // this.keyboard.startListening()
+        // this.touchController.startListening()
+        // this.gamepad.startListening()
 
         this.playerControls.on("pause", () => this.togglePauseOverlay())
     }
@@ -84,22 +85,23 @@ export default class GeneralGameScene extends Scene {
         this.chatContainer = new ChatContainer()
         this.overlayContainer.append(this.chatContainer.element)
 
-        this.keyboard.keybinding("Enter", () => {
-            if(this.displayedWorld && this.displayedWorld.player) {
-                this.chatContainer.showInput()
-            }
-        })
+        // TODO
+        // this.keyboard.onKeybinding("Enter", () => {
+        //     if(this.displayedWorld && this.displayedWorld.player) {
+        //         this.chatContainer.showInput()
+        //     }
+        // })
 
         this.chatContainer.on("chat", (text: string) => {
             this.onChat(text)
         })
 
         this.chatContainer.on("input-focus", () => {
-            this.keyboard.stopListening()
+            // this.keyboard.stopListening()
         })
 
         this.chatContainer.on("input-blur", () => {
-            this.keyboard.startListening()
+            // this.keyboard.startListening()
             this.screen.canvas.focus()
         })
     }
@@ -174,12 +176,12 @@ export default class GeneralGameScene extends Scene {
 
         if(this.paused) {
             this.pauseOverlay.show()
-            this.keyboard.stopListening()
+            // this.keyboard.stopListening()
             // TODO: ugly
             this.screen.soundOutput.output.gain.value = 0
         } else {
             this.pauseOverlay.hide()
-            this.keyboard.startListening()
+            // this.keyboard.startListening()
             this.screen.soundOutput.output.gain.value = 1
         }
     }

@@ -1,4 +1,11 @@
-import Axle from '../../controls/axle';
+import Axle from '../../../controls/axle';
+
+export interface ButtonAxleConfig {
+    min?: number
+    max?: number
+    smooth?: number
+    reverse?: boolean
+}
 
 export default class ButtonAxle extends Axle {
 	public min: number;
@@ -8,15 +15,17 @@ export default class ButtonAxle extends Axle {
 	public keypressTimestamp: number;
 	public pressed: boolean;
 
-    constructor(min: number, max: number) {
+    constructor(config: ButtonAxleConfig) {
         super()
-        this.min = min === undefined ? 0 : min
-        this.max = max === undefined ? 1 : max
+        this.min = config.min === undefined ? 0 : config.min
+        this.max = config.max === undefined ? 1 : config.max
 
         this.ownValue = this.min
 
-        this.animationTime = 0
+        this.animationTime = config.smooth === undefined ? 0 : config.smooth
         this.target = 0
+
+        if(config.reverse) this.reverse()
 
         // Internals
         this.keypressTimestamp = 0

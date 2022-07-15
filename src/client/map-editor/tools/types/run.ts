@@ -1,7 +1,7 @@
 import Tool from '../tool';
 import * as Box2D from '../../../../library/box2d';
-import PlayerControls from '../../../controls/player-controls';
-import KeyboardController from '../../../controls/interact/keyboard-controller';
+import PlayerControls from '../../../controls/interact/player-controls';
+import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import ToolManager from "../toolmanager";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
@@ -105,13 +105,13 @@ export default class RunTool extends Tool {
     becomeActive() {
         super.becomeActive();
         this.manager.setNeedsRedraw()
-        this.keyboard.startListening()
+        // this.keyboard.startListening()
     }
 
     resignActive() {
         super.resignActive();
         this.manager.setNeedsRedraw()
-        this.keyboard.stopListening()
+        // this.keyboard.stopListening()
 
         if(this.running) {
             this.onStop()

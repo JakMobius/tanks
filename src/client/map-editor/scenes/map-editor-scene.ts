@@ -7,7 +7,7 @@ import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
 import * as Box2D from '../../../library/box2d';
 import GameMap from '../../../map/game-map';
-import KeyboardController from '../../controls/interact/keyboard-controller';
+import KeyboardController from '../../controls/input/keyboard/keyboard-controller';
 import DragHandler from '../../controls/interact/drag-handler';
 import ToolbarView from '../ui/overlay/workspace/toolbar/toolbar';
 import ToolManager from '../tools/toolmanager';
@@ -39,7 +39,7 @@ export default class MapEditorScene extends Scene {
     constructor(config: SceneConfig) {
         super(config)
 
-        this.keyboard.startListening()
+        // this.keyboard.startListening()
         this.world = new ClientGameWorld({})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
@@ -97,36 +97,36 @@ export default class MapEditorScene extends Scene {
             }
         })
 
-        this.keyboard.keybinding("Escape", (event) => {
-            if (this.menuOverlay.shown) {
-                this.menuOverlay.hide()
-            } else {
-                this.menuOverlay.redraw()
-                this.menuOverlay.show()
-            }
-        })
-
-        this.keyboard.keybinding("Cmd-Z", (event) => {
-            let entry = this.map.history.goBack()
-
-            if(entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
-            else this.eventContainer.createEvent("Нечего отменять")
-        })
-
-        this.keyboard.keybinding("Cmd-Y", (event) => {
-            let entry = this.map.history.goForward()
-
-            if(entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
-            else this.eventContainer.createEvent("Нечего повторять")
-        })
-
-        this.keyboard.keybinding("Cmd-S", (event) => {
-            if(this.menuOverlay.saveMaps()) {
-                this.eventContainer.createEvent("Карты сохранены")
-            } else {
-                this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
-            }
-        })
+        // this.keyboard.keybinding("Escape", (event) => {
+        //     if (this.menuOverlay.shown) {
+        //         this.menuOverlay.hide()
+        //     } else {
+        //         this.menuOverlay.redraw()
+        //         this.menuOverlay.show()
+        //     }
+        // })
+        //
+        // this.keyboard.keybinding("Cmd-Z", (event) => {
+        //     let entry = this.map.history.goBack()
+        //
+        //     if(entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
+        //     else this.eventContainer.createEvent("Нечего отменять")
+        // })
+        //
+        // this.keyboard.keybinding("Cmd-Y", (event) => {
+        //     let entry = this.map.history.goForward()
+        //
+        //     if(entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
+        //     else this.eventContainer.createEvent("Нечего повторять")
+        // })
+        //
+        // this.keyboard.keybinding("Cmd-S", (event) => {
+        //     if(this.menuOverlay.saveMaps()) {
+        //         this.eventContainer.createEvent("Карты сохранены")
+        //     } else {
+        //         this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
+        //     }
+        // })
 
         this.menuOverlay.show()
         this.layout()

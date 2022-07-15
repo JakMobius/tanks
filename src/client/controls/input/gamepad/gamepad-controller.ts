@@ -1,10 +1,10 @@
-import DocumentEventHandler from './document-event-handler';
-import GamepadAxle from '../gamepad-axle';
-import GamepadButton from '../gamepad-button';
+import DocumentEventHandler from '../../interact/document-event-handler';
+import GamepadAxle from './gamepad-axle';
+import GamepadButton from './gamepad-button';
 
 navigator.getGamepads = navigator.getGamepads || (navigator as any)["webkitGetGamepads"]
 
-export default class GamepadManager extends DocumentEventHandler {
+export default class GamepadControllers extends DocumentEventHandler {
 	public gamepad: number;
 	public axes: number[];
 	public buttons: number[];
