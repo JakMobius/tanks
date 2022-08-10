@@ -63,23 +63,24 @@ export default class ButtonAxle extends Axle {
 
     getValue() {
         if(this.animationTime <= 0) {
-            this.ownValue = this.keyPressed ? this.max : this.min
+            this.ownValue = this.target
+        } else {
+            this.needsUpdate = false
+            let now = Date.now()
+            let dt = (now - this.keypressTimestamp) / 1000
+            this.keypressTimestamp = now
+
+            if (this.target > this.ownValue) {
+                this.ownValue += dt / this.animationTime
+
+                if (this.target < this.ownValue) this.ownValue = this.target
+            } else if (this.target < this.ownValue) {
+                this.ownValue -= dt / this.animationTime
+
+                if (this.target > this.ownValue) this.ownValue = this.target
+            }
+            if (this.ownValue !== this.target) this.setNeedsUpdate()
         }
-        this.needsUpdate = false
-        let now = Date.now()
-        let dt = (now - this.keypressTimestamp) / 1000
-        this.keypressTimestamp = now
-
-        if(this.target > this.ownValue) {
-            this.ownValue += dt / this.animationTime
-
-            if(this.target < this.ownValue) this.ownValue = this.target
-        } else if(this.target < this.ownValue) {
-            this.ownValue -= dt / this.animationTime
-
-            if(this.target > this.ownValue) this.ownValue = this.target
-        }
-        if(this.ownValue !== this.target) this.setNeedsUpdate()
         return this.ownValue
     }
 }

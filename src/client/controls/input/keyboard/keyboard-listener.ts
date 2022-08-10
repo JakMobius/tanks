@@ -58,4 +58,8 @@ export default class KeyboardListener extends DocumentEventHandler {
         super.stopListening();
         this.emit("stopped-listening")
     }
+
+    clearAxles() {
+        this.emit("clear-axles")
+    }
 }

@@ -23,4 +23,8 @@ export default class KeyboardController extends InputDevice {
     createAxle(config: KeyAxleConfig) {
         return new KeyAxle(this.listener, config)
     }
+
+    clearAxles() {
+        this.listener.clearAxles()
+    }
 }

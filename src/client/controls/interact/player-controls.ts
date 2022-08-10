@@ -61,13 +61,6 @@ export default class PlayerControls extends EventEmitter {
         }
     }
 
-    setupGamepad(gamepad: GamepadController) {
-    }
-
-    setupKeyboard(keyboard: KeyboardController) {
-
-    }
-
     refresh() {
 	    if(this.axlesToUpdate.length) {
 	        // When calling getValue(), key axles may call their

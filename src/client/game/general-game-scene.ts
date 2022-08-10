@@ -1,9 +1,4 @@
 import Camera from "../camera";
-import KeyboardController from "../controls/input/keyboard/keyboard-controller";
-import ControlPanel from "./ui/control-panel";
-import GamepadController from "../controls/input/gamepad/gamepad-controller";
-import TouchController from "../controls/input/touch/touch-controller";
-import PlayerControls from "../controls/interact/player-controls";
 import EventContainer from "../ui/overlay/events/event-container";
 import ChatContainer from "./ui/overlay/chat/chat-container";
 import ClientGameWorld from "../client-game-world";
@@ -17,15 +12,11 @@ import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
 import EntityModel from "../../entity/entity-model";
 import {SoundStreamPosition} from "../sound/stream/sound-stream-position-component";
-import KeyboardListener from "../controls/input/keyboard/keyboard-listener";
+import ControlsManager from "../controls/controls-manager";
+import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
-    public keyboard = new KeyboardController()
-    public controls = new ControlPanel()
-    public gamepad = new GamepadController()
-    public touchController: TouchController
-    public playerControls: PlayerControls
 
     public eventContainer: EventContainer
     public chatContainer: ChatContainer
@@ -37,6 +28,8 @@ export default class GeneralGameScene extends Scene {
     public paused: boolean = false
     public didChangeSize: boolean = false
     private pauseOverlay?: GamePauseOverlay
+
+    private controlsEventHandler = new BasicEventHandlerSet()
 
     constructor(config: SceneConfig) {
         super(config)
@@ -51,16 +44,7 @@ export default class GeneralGameScene extends Scene {
     }
 
     private setupControls() {
-        this.touchController = new TouchController(this.controls, this.screen.canvas)
-        this.playerControls = new PlayerControls()
-        this.playerControls.setupKeyboard(this.keyboard)
-        this.playerControls.setupGamepad(this.gamepad)
-
-        // this.keyboard.startListening()
-        // this.touchController.startListening()
-        // this.gamepad.startListening()
-
-        this.playerControls.on("pause", () => this.togglePauseOverlay())
+        this.controlsEventHandler.on("game-pause", () => this.togglePauseOverlay())
     }
 
     private setupCamera() {
@@ -130,8 +114,7 @@ export default class GeneralGameScene extends Scene {
     }
 
     draw(dt: number) {
-        this.gamepad.refresh()
-        this.playerControls.refresh()
+        ControlsManager.getInstance().refresh()
 
         if(this.paused && !this.didChangeSize) return
         this.didChangeSize = false
@@ -157,11 +140,11 @@ export default class GeneralGameScene extends Scene {
 
     protected onWorldPrimaryEntitySet(entity: EntityModel) {
         this.controlledTank = entity
-        this.playerControls.disconnectAllTankControls()
+        ControlsManager.getInstance().disconnectAllTankControls()
 
         if(entity) {
             let body = entity.getComponent(PhysicalComponent).getBody()
-            this.playerControls.connectTankControls(this.controlledTank.getComponent(TankControls))
+            ControlsManager.getInstance().connectTankControls(this.controlledTank.getComponent(TankControls))
             this.camera.target = body.GetPosition()
             this.camera.targetVelocity = body.GetLinearVelocity()
         }
@@ -176,12 +159,12 @@ export default class GeneralGameScene extends Scene {
 
         if(this.paused) {
             this.pauseOverlay.show()
-            // this.keyboard.stopListening()
+            this.controlsEventHandler.setTarget(null)
             // TODO: ugly
             this.screen.soundOutput.output.gain.value = 0
         } else {
             this.pauseOverlay.hide()
-            // this.keyboard.startListening()
+            this.controlsEventHandler.setTarget(ControlsManager.getInstance())
             this.screen.soundOutput.output.gain.value = 1
         }
     }
@@ -198,10 +181,12 @@ export default class GeneralGameScene extends Scene {
     appear() {
         super.appear();
         this.screen.soundOutput.position = this.soundStreamPosition
+        this.controlsEventHandler.setTarget(ControlsManager.getInstance())
     }
 
     disappear() {
         super.disappear();
         this.screen.soundOutput.position = null
+        this.controlsEventHandler.setTarget(null)
     }
 }

@@ -1,68 +1,49 @@
-import DocumentEventHandler from '../../interact/document-event-handler';
-import GamepadAxle from './gamepad-axle';
-import GamepadButton from './gamepad-button';
 
-navigator.getGamepads = navigator.getGamepads || (navigator as any)["webkitGetGamepads"]
+import GamepadAxle, {GamepadAxleConfig} from './gamepad-axle';
+import GamepadButton, {GamepadButtonConfig} from './gamepad-button';
+import GamepadListener from "./gamepad-listener";
+import InputDevice, {InputDeviceType} from "../input-device";
+import Axle from "../../../../controls/axle";
 
-export default class GamepadControllers extends DocumentEventHandler {
-	public gamepad: number;
-	public axes: number[];
-	public buttons: number[];
+export enum GamepadInputType {
+    button, axle
+}
 
-    constructor() {
+export type GamepadInputConfig =
+    (GamepadButtonConfig & { type: GamepadInputType.button }) |
+    (GamepadAxleConfig   & { type: GamepadInputType.axle });
+
+export default class GamepadController extends InputDevice {
+	public listener: GamepadListener
+
+    constructor(gamepadIndex: number) {
         super();
-
-        this.gamepad = null
-        this.axes = []
-        this.buttons = []
-        this.target = window
+        this.listener = new GamepadListener(gamepadIndex)
     }
 
-    startListening() {
-        if(navigator.getGamepads) {
-            this.bind("gamepadconnected", this.gamepadConnected)
-            this.bind("gamepaddisconnected", this.gamepadDisconnected)
+    createAxle(config: GamepadInputConfig): Axle | null {
+        if(config.type === GamepadInputType.button) {
+            return new GamepadButton(this.listener, config)
+        } else if(config.type == GamepadInputType.axle) {
+            return new GamepadAxle(this.listener, config)
+        } else {
+            return null
         }
+    }
+
+    clearAxles(): void {
+        this.listener.emit("clear-axles")
+    }
+
+    getName(): string {
+        return navigator.getGamepads()[this.listener.gamepadIndex].id;
+    }
+
+    getType(): InputDeviceType {
+        return InputDeviceType.gamepad;
     }
 
     refresh() {
-        if(this.gamepad === null) return
-
-        for(let [i, button] of navigator.getGamepads()[this.gamepad].buttons.entries()) {
-            let value = typeof button === "number" ? button : button.value
-            if(this.buttons[i] !== value) {
-                this.emit("button", i, value)
-                this.buttons[i] = value
-            }
-        }
-
-        for(let [i, axis] of navigator.getGamepads()[this.gamepad].axes.entries()) {
-            if(this.axes[i] !== axis) {
-                this.emit("axle", i, axis)
-                this.axes[i] = axis
-            }
-        }
-    }
-
-    gamepadConnected(event: GamepadEvent) {
-        if(this.gamepad !== null) {
-            return
-        }
-        this.gamepad = event.gamepad.index
-        this.axes = new Array(navigator.getGamepads()[this.gamepad].axes.length)
-    }
-
-    gamepadDisconnected(event: GamepadEvent) {
-        if(event.gamepad.index === this.gamepad) {
-            this.gamepad = null
-        }
-    }
-
-    createAxle(index: number): GamepadAxle {
-        return new GamepadAxle(this, index)
-    }
-
-    createButton(index: number): GamepadButton {
-        return new GamepadButton(this, index)
+        this.listener.refresh();
     }
 }

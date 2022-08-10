@@ -1,5 +1,4 @@
 import ButtonAxle, {ButtonAxleConfig} from '../../interact/button-axle';
-import KeyboardController from "./keyboard-controller";
 import KeyboardListener from "./keyboard-listener";
 
 export interface KeyAxleConfig extends ButtonAxleConfig {
@@ -13,14 +12,20 @@ export default class KeyAxle extends ButtonAxle {
         super(config)
         this.key = config.key
 
-        keyboard.on("stopped-listening", () => {
-            this.keyReleased();
-        })
-        keyboard.on("keydown", (event) => {
-            if(event.code === this.key) this.keyPressed()
-        })
-        keyboard.on("keyup", (event) => {
-            if(event.code === this.key) this.keyReleased()
-        })
+        const stoppedListeningHandler = () => { this.keyReleased(); }
+        const keydownHandler = (event: KeyboardEvent) => { if(event.code === this.key) this.keyPressed() }
+        const keyupHandler   = (event: KeyboardEvent) => { if(event.code === this.key) this.keyReleased() }
+        const clearAxlesHandler = () => {
+            keyboard.off("keydown", keydownHandler)
+            keyboard.off("keyup", keyupHandler)
+            keyboard.off("stopped-listening", stoppedListeningHandler)
+            keyboard.off("clear-axles", clearAxlesHandler)
+            this.disconnectAll()
+        }
+
+        keyboard.on("keydown", keydownHandler)
+        keyboard.on("keyup", keyupHandler)
+        keyboard.on("stopped-listening", stoppedListeningHandler)
+        keyboard.on("clear-axles", clearAxlesHandler)
     }
 }

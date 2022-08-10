@@ -1,22 +1,34 @@
 import {ControllerControlsConfig} from "../game-controls-settings";
-import {AxleConfig} from "../../controls/input/input-device";
+import {GamepadInputConfig, GamepadInputType} from "../../controls/input/gamepad/gamepad-controller";
 
-export function getDefaultGamepadSettings(): ControllerControlsConfig<AxleConfig> {
+export function getDefaultGamepadSettings(): ControllerControlsConfig<GamepadInputConfig> {
     return {
-        "tank-throttle": [
-            {axis: 1, invert: true}
+        "tank-throttle-forward": [
+            {type: GamepadInputType.button, buttonIndex: 12},
+            {type: GamepadInputType.button, buttonIndex: 7},
+            {type: GamepadInputType.axle, axleIndex: 1, inverted: true}
         ],
-        "tank-steer": [
-            {axis: 2},
+        "tank-throttle-backward": [
+            {type: GamepadInputType.button, buttonIndex: 13},
+            {type: GamepadInputType.button, buttonIndex: 6},
+            {type: GamepadInputType.axle, axleIndex: 1}
+        ],
+        "tank-steer-left": [
+            {type: GamepadInputType.button, buttonIndex: 14},
+            {type: GamepadInputType.axle, axleIndex: 2, inverted: true},
+        ],
+        "tank-steer-right": [
+            {type: GamepadInputType.button, buttonIndex: 15},
+            {type: GamepadInputType.axle, axleIndex: 2},
         ],
         "tank-miner": [
-            {button: 4}
+            {type: GamepadInputType.button, buttonIndex: 4}
         ],
         "tank-primary-weapon": [
-            {button: 5}
+            {type: GamepadInputType.button, buttonIndex: 5}
         ],
         "tank-respawn": [
-            {button: 2}
+            {type: GamepadInputType.button, buttonIndex: 2}
         ]
     }
 }

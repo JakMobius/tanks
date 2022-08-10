@@ -1,20 +1,27 @@
 import Axle from '../../../../controls/axle';
-import GamepadController from "./gamepad-controller";
+import {AxleConfig} from "../input-device";
+import GamepadListener from "./gamepad-listener";
+
+export interface GamepadAxleConfig extends AxleConfig {
+    axleIndex: number
+    power?: number
+    inverted?: boolean
+}
 
 export default class GamepadAxle extends Axle {
 	public axle: number;
-	public controller: GamepadController;
+	public listener: GamepadListener;
 	public power: number;
 	public inverted: boolean;
 
-    constructor(controller: GamepadController, axle: number) {
+    constructor(listener: GamepadListener, config: GamepadAxleConfig) {
         super();
-        this.axle = axle
-        this.controller = controller
+        this.axle = config.axleIndex
+        this.power = config.power ?? 1
+        this.inverted = config.inverted ?? false
+        this.listener = listener
         this.value = 0
-        this.power = 1
-        this.inverted = false
-        this.controller.on("axle", (index, value) => {
+        this.listener.on("axle", (index, value) => {
             if(index === this.axle) {
                 this.value = Math.pow(value, this.power)
                 this.setNeedsUpdate()

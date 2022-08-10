@@ -19,9 +19,13 @@ export default class AxisSelector extends View {
 
     setAxes(axes: string[]) {
         this.keys.empty()
-        axes.forEach(axle => {
-            this.keys.append(new Cloud().text(axle).blue().element)
-        })
+        if(axes.length > 0) {
+            axes.forEach(axle => {
+                this.keys.append(new Cloud().text(axle).blue().element)
+            })
+        } else {
+            this.keys.append(new Cloud().text("Не установлено").element)
+        }
         return this
     }
 }

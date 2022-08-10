@@ -16,6 +16,8 @@ export default abstract class InputDevice {
 
     abstract getType(): InputDeviceType;
     abstract getName(): string;
-    abstract createAxle(config: AxleConfig): Axle;
+    abstract createAxle(config: AxleConfig): Axle | null;
     abstract clearAxles(): void;
+    destroy(): void {}
+    refresh(): void {}
 }

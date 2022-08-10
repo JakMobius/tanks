@@ -18,7 +18,6 @@ export default class DocumentEventHandler extends EventEmitter {
         const self = this
         const listener = function(){ handler.apply(self, arguments) }
 
-
         this.listeners.set(event, listener)
 
         if(Array.isArray(this.target)) {

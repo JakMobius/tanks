@@ -1,13 +1,17 @@
-import ButtonAxle from '../../interact/button-axle';
-import GamepadController from "./gamepad-controller";
+import ButtonAxle, {ButtonAxleConfig} from '../../interact/button-axle';
+import GamepadListener from "./gamepad-listener";
+
+export interface GamepadButtonConfig extends ButtonAxleConfig {
+    buttonIndex: number
+}
 
 export default class GamepadButton extends ButtonAxle {
 	public button: any;
 
-    constructor(gamepad: GamepadController, button: number, min?: number, max?: number) {
-        super(min, max);
+    constructor(gamepad: GamepadListener, config: GamepadButtonConfig) {
+        super(config);
 
-        this.button = button
+        this.button = config.buttonIndex
         gamepad.on("button", (index, value) => {
             if(index === this.button) {
                 this.keyPressed(value)

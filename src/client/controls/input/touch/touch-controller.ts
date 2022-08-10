@@ -1,5 +1,5 @@
 import DocumentEventHandler from '../../interact/document-event-handler';
-import Vidget from "./vidget";
+import TouchVidget from "./touch-vidget";
 import ControlPanel from "../../../game/ui/control-panel";
 
 export interface Touch {
@@ -8,7 +8,7 @@ export interface Touch {
     bottom: number,
     right: number,
     id: number,
-    vidget?: Vidget
+    vidget?: TouchVidget
     captured?: ControlPanel
 }
 

@@ -3,11 +3,11 @@ import {KeyAxleConfig} from "../../controls/input/keyboard/key-axle";
 
 export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyAxleConfig> {
     return {
-        "tank-throttle": [
+        "tank-throttle-forward": [
             {key: "KeyW", smooth: 0.4},
             {key: "ArrowUp", smooth: 0.4}
         ],
-        "tank-break": [
+        "tank-throttle-backward": [
             {key: "KeyS", smooth: 0.4},
             {key: "ArrowDown", smooth: 0.4}
         ],
@@ -29,7 +29,13 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyAxleCo
             {key: "KeyR"}
         ],
         "game-pause": [
-            {key: "Escape"},
-        ]
+            {key: "Escape"}
+        ],
+        "player-chat": [
+            {key: "Enter"}
+        ],
+        "game-player-list": [
+            {key: "Tab"}
+        ],
     }
 }
