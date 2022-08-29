@@ -10,6 +10,8 @@ import Sprite from 'src/client/sprite';
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
 import Screen from "src/client/graphics/screen";
 import GameMapNameComponent from "../../../../map-name-component";
+import MapSerialization from "../../../../../../map/map-serialization";
+import pako from "pako";
 
 export default class MapPreviewContainer extends Menu {
 	public map: GameMap;
@@ -123,7 +125,7 @@ export default class MapPreviewContainer extends Menu {
         document.body.appendChild(a);
         a.style.display = "none";
 
-        let data = MapStorage.writeMap(this.map)
+        let data = pako.gzip(MapSerialization.toBuffer(this.map))
 
         const blob = new Blob([data], { type: "octet/stream" })
         const url = window.URL.createObjectURL(blob);

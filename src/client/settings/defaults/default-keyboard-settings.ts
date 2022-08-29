@@ -28,6 +28,7 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardI
 
         "editor-undo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Z"}],
         "editor-redo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Y"}],
+        "editor-save-maps": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-S"}],
         "editor-copy": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-C"}],
         "editor-paste": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-V"}],
         "editor-cut": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-X"}],

@@ -49,6 +49,7 @@ export default class ControlsManager extends EventEmitter {
 
         this.createTriggerAxle("editor-undo")
         this.createTriggerAxle("editor-redo")
+        this.createTriggerAxle("editor-save-maps")
         this.createTriggerAxle("editor-copy")
         this.createTriggerAxle("editor-paste")
         this.createTriggerAxle("editor-cut")

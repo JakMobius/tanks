@@ -52,6 +52,7 @@ export default class HealthComponent implements Component {
         this.entityHandler.setTarget(this.entity)
     }
 
+    // TODO: For now, max health is only set on server side, which can lead to weird smoke effects on first spawn.
     setMaxHealth(health: number) {
         this.maxHealth = health
         return this

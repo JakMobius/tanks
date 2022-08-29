@@ -8,16 +8,16 @@ import TankControls from "../../../../controls/tank-controls";
 import EntityModel from "../../../../entity/entity-model";
 import Player from "../../../../player";
 import ControlsManager from "../../../controls/controls-manager";
+import EntityDataReceiveComponent from "../../../../entity/components/network/entity-data-receive-component";
+import ClientEntity, {EntityType} from "../../../entity/client-entity";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
 	public tank: EntityModel;
 	public keyboard: KeyboardController;
-	public playerControls: PlayerControls;
 	public running: boolean;
 	public runButton: any;
 	public locationButton: any;
-    private player: Player;
     private spawnPoint = new Box2D.Vec2(10, 10)
 
     constructor(manager: ToolManager) {
@@ -28,15 +28,6 @@ export default class RunTool extends Tool {
         this.selectingLocation = false
 
         this.keyboard = new KeyboardController()
-
-        // this.tank = new ClientMonsterTank({
-        //     model: new MonsterTankModel()
-        // })
-        
-        this.player = new Player({
-            id: 0,
-            nick: "Вы"
-        })
     }
 
     setupMenu() {
@@ -72,11 +63,19 @@ export default class RunTool extends Tool {
         this.manager.setWorldAlive(true)
         this.manager.setCameraMovementEnabled(false)
 
-        const physicalComponent = this.player.tank.getComponent(PhysicalComponent)
+        // TODO: Setup an embedded server to run the game on
+        // Client-only implementation limits the game functionality a lot
 
+        this.tank = new EntityModel()
+        let configurationScript = ClientEntity.types.get(EntityType.TANK_MONSTER)
+        configurationScript(this.tank)
+
+        this.manager.world.appendChild(this.tank)
+        this.tank.emit("respawn")
+
+        const physicalComponent = this.tank.getComponent(PhysicalComponent)
         physicalComponent.setPosition(this.spawnPoint)
-
-        ControlsManager.getInstance().connectTankControls(this.player.tank.getComponent(TankControls))
+        ControlsManager.getInstance().connectTankControls(this.tank.getComponent(TankControls))
 
         this.manager.camera.inertial = true
         this.manager.camera.target = physicalComponent.body.GetPosition()
@@ -87,7 +86,9 @@ export default class RunTool extends Tool {
         this.manager.setWorldAlive(false)
         this.manager.setCameraMovementEnabled(true)
 
-        ControlsManager.getInstance().disconnectTankControls(this.player.tank.getComponent(TankControls))
+        this.tank.removeFromParent()
+
+        ControlsManager.getInstance().disconnectTankControls(this.tank.getComponent(TankControls))
 
         this.manager.camera.target = this.manager.camera.getPosition()
         this.manager.camera.shaking.Set(0, 0)

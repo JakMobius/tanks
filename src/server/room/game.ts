@@ -18,7 +18,6 @@ import ServerWorldBridge from "../server-world-bridge";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import EntityModel from "../../entity/entity-model";
-import PlayerConnectionManager from "../player-connection-manager";
 import SocketPortalClient from "../socket/socket-portal-client";
 
 export interface GameConfig {

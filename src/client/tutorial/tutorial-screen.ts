@@ -6,15 +6,7 @@ import {ScreenConfig} from "../graphics/screen";
 import {UserDataRaw} from "../user-data-raw";
 import GeneralGameScreen from "../game/general-game-screen";
 
-/* Loading all necessary stuff for the game */
-import 'src/entity/model-loader'
-import 'src/client/entity/bullet/model-loader';
-import 'src/client/entity/tank/model-loader';
-import 'src/client/graphics/drawers/block/type-loader';
-import 'src/client/effects/type-loader';
-import 'src/effects/model-loader'
-import 'src/map/block-state/type-loader';
-
+import 'src/client/game-preloader'
 
 export interface TutorialConfig extends ScreenConfig {
     userData: UserDataRaw

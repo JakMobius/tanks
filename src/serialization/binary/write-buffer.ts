@@ -36,7 +36,6 @@ export default class WriteBuffer {
         let pos = this.offset
         this.prepareSpace(data.length)
         this.buffer.set(data, pos)
-        this.offset += data.length
     }
 
     writeFloat64(num: number) {
