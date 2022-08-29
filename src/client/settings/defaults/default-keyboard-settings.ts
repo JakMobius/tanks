@@ -1,41 +1,38 @@
 import {ControllerControlsConfig} from "../game-controls-settings";
-import {KeyAxleConfig} from "../../controls/input/keyboard/key-axle";
+import {KeyboardInputConfig, KeyboardInputType} from "../../controls/input/keyboard/keyboard-controller";
 
-export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyAxleConfig> {
+export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardInputConfig> {
     return {
         "tank-throttle-forward": [
-            {key: "KeyW", smooth: 0.4},
-            {key: "ArrowUp", smooth: 0.4}
+            {type: KeyboardInputType.key, key: "KeyW", smooth: 0.4},
+            {type: KeyboardInputType.key, key: "ArrowUp", smooth: 0.4}
         ],
         "tank-throttle-backward": [
-            {key: "KeyS", smooth: 0.4},
-            {key: "ArrowDown", smooth: 0.4}
+            {type: KeyboardInputType.key, key: "KeyS", smooth: 0.4},
+            {type: KeyboardInputType.key, key: "ArrowDown", smooth: 0.4}
         ],
         "tank-steer-right": [
-            {key: "KeyD", smooth: 0.4},
-            {key: "ArrowRight", smooth: 0.4}
+            {type: KeyboardInputType.key, key: "KeyD", smooth: 0.4},
+            {type: KeyboardInputType.key, key: "ArrowRight", smooth: 0.4}
         ],
         "tank-steer-left": [
-            {key: "KeyA", smooth: 0.4},
-            {key: "ArrowLeft", smooth: 0.4}
+            {type: KeyboardInputType.key, key: "KeyA", smooth: 0.4},
+            {type: KeyboardInputType.key, key: "ArrowLeft", smooth: 0.4}
         ],
-        "tank-miner": [
-            {key: "KeyQ"}
-        ],
-        "tank-primary-weapon": [
-            {key: "Space"}
-        ],
-        "tank-respawn": [
-            {key: "KeyR"}
-        ],
-        "game-pause": [
-            {key: "Escape"}
-        ],
-        "player-chat": [
-            {key: "Enter"}
-        ],
-        "game-player-list": [
-            {key: "Tab"}
-        ],
+        "tank-miner": [{type: KeyboardInputType.key, key: "KeyQ"}],
+        "tank-primary-weapon": [{type: KeyboardInputType.key, key: "Space"}],
+        "tank-respawn": [{type: KeyboardInputType.key, key: "KeyR"}],
+        "game-pause": [{type: KeyboardInputType.key, key: "Escape"}],
+        "player-chat": [{type: KeyboardInputType.key, key: "Enter"}],
+        "game-player-list": [{type: KeyboardInputType.key, key: "Tab"}],
+
+        "editor-undo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Z"}],
+        "editor-redo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Y"}],
+        "editor-copy": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-C"}],
+        "editor-paste": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-V"}],
+        "editor-cut": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-X"}],
+        "editor-reset-selection": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-D"}],
+        "editor-select-all": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-A"}],
+        "editor-clear-area": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Backspace"}]
     }
 }

@@ -1,20 +1,26 @@
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import MapDrawer from '../../../graphics/drawers/map-drawer';
-import EditorMap from '../../editor-map';
 import MapAreaModification from '../../history/modification/map-area-modification';
 import ToolManager from "../toolmanager";
 import BlockState from "../../../../map/block-state/block-state";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import KeyboardListener from "../../../controls/input/keyboard/keyboard-listener";
+import GameMap from "../../../../map/game-map";
+import GameMapHistoryComponent from "../../history/game-map-history-component";
+import {createOverlappingModel} from "../../../../utils/wfc/overlapping-model";
+import {createSuperposition} from "../../../../utils/wfc/superposition";
+import {createObservation} from "../../../../utils/wfc/observe";
+import {propagate} from "../../../../utils/wfc/propagate";
+import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
+import ControlsManager from "../../../controls/controls-manager";
 
 export default class AreaTool extends Tool {
 	public area: Rectangle;
 	public program: ConvexShapeProgram;
 	public copyBufferDrawer: MapDrawer;
-	public copyBuffer: EditorMap;
+	public copyBuffer: GameMap;
 	public keyboard: KeyboardListener;
 	public initialAreaState: boolean;
 	public movingArea: boolean;
@@ -22,6 +28,8 @@ export default class AreaTool extends Tool {
 	public hover: boolean;
 	public oldX: number;
 	public oldY: number;
+
+    public controlsEventHandler = new BasicEventHandlerSet()
 
     constructor(manager: ToolManager) {
         super(manager);
@@ -32,13 +40,13 @@ export default class AreaTool extends Tool {
         this.copyBufferDrawer = new MapDrawer(this.manager.screen)
 
         this.copyBuffer = null
-        this.keyboard = new KeyboardListener()
 
-        this.keyboard.onKeybinding("Cmd-C", () => this.copy(false))
-        this.keyboard.onKeybinding("Cmd-V", () => this.paste())
-        this.keyboard.onKeybinding("Cmd-X", () => this.copy(true))
-        this.keyboard.onKeybinding("Cmd-D", () => this.resetSelection())
-        this.keyboard.onKeybinding("Backspace", () => this.deleteArea())
+        this.controlsEventHandler.on("editor-copy", () => this.copy(false))
+        this.controlsEventHandler.on("editor-paste", () => this.paste())
+        this.controlsEventHandler.on("editor-cut", () => this.copy(true))
+        this.controlsEventHandler.on("editor-reset-selection", () => this.resetSelection())
+        this.controlsEventHandler.on("editor-clear-area", () => this.deleteArea())
+        this.controlsEventHandler.on("editor-select-all", () => this.selectAll())
 
         this.initialAreaState = false
         this.movingArea = false
@@ -46,6 +54,123 @@ export default class AreaTool extends Tool {
         this.hover = false
         this.oldX = 0
         this.oldY = 0
+
+        this.setupMenu()
+    }
+
+    setupMenu() {
+        let label = $("<div>")
+            .addClass("text")
+            .text("Автогенерация на базе буфера обмена")
+            .on("click", () => {
+                this.fillWFC()
+            })
+        let labelContainer = $("<div>").addClass("container")
+            .css("width", "300px")
+            .append(label)
+
+        this.settingsView = $("<div>")
+            .append(labelContainer)
+            .css("width", "300px")
+            .css("height", "100%")
+
+    }
+
+    private fillWFC() {
+        if(!this.copyBuffer) {
+            this.manager.createEvent("Буфер обмена пуст")
+            return
+        }
+
+        const image = {
+            width: this.copyBuffer.width,
+            height: this.copyBuffer.height,
+            data: new Uint8ClampedArray(this.copyBuffer.data.map(block => (block.constructor as typeof BlockState).typeId))
+        }
+        const model = createOverlappingModel(image, { periodicInput: false });
+        const superpos = createSuperposition(
+            model.numCoefficients,
+            { width: this.area.width(), height: this.area.height(), periodic: false },
+        );
+
+        const observe = createObservation(model, superpos);
+
+        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
+        let modification = new MapAreaModification(map, this.area.clone(), [])
+        let newData = modification.fetchData()
+        modification.newData = newData
+        const history = map.getComponent(GameMapHistoryComponent)
+
+        history.registerModification(modification)
+        history.commitActions("Автозаполнение")
+
+        const step = () => {
+            let result = observe()
+            if(result === null) {
+                while(true) {
+                    const waveIndex = propagate(model, superpos)
+                    if(waveIndex === null) {
+                        break
+                    }
+                    const w = superpos.wave[waveIndex];
+
+                    const patternCount = model.patternCount
+
+                    let activeCoefficients = 0;
+                    let sum = 0;
+                    let lastPatternIndex = 0;
+
+                    for (let i = 0; i < w.length; i++) {
+                        if (w[i]) {
+                            activeCoefficients++;
+                            sum += patternCount[i];
+                            lastPatternIndex = i;
+                        }
+                    }
+
+                    const x = waveIndex % superpos.width;
+                    const y = Math.floor(waveIndex / superpos.width);
+
+                    if (activeCoefficients === 1) {
+                        const pattern = model.patterns[lastPatternIndex];
+                        if (!superpos.periodic && (x >= superpos.width - model.N || y >= superpos.height - model.N)) {
+                            for (let i = 0; i < model.N; i++) {
+                                for (let j = 0; j < model.N; j++) {
+                                    let id = model.colors[pattern[i + j * model.N]]
+                                    let clazz = BlockState.getBlockStateClass(id)
+                                    newData[x + i + (y + j) * superpos.width] = new clazz()
+                                    modification.perform()
+                                }
+                            }
+                        } else {
+                            let id = model.colors[pattern[0]]
+                            let clazz = BlockState.getBlockStateClass(id)
+                            newData[x + y * superpos.width] = new clazz()
+                            modification.perform()
+                        }
+                    }
+                }
+
+                requestAnimationFrame(() => step())
+
+            } else if(result === false) {
+                this.manager.createEvent("Не удалось заполнить область")
+                return
+            } else {
+                return
+            }
+        }
+
+        step()
+    }
+
+    selectAll() {
+        const map = this.manager.world.getComponent(TilemapComponent).map
+
+        this.area.setFrom(0, 0)
+        this.area.setTo(map.width, map.height)
+
+        this.manager.setNeedsRedraw()
     }
 
     deleteArea() {
@@ -53,11 +178,13 @@ export default class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
+        const map = this.manager.world.getComponent(TilemapComponent).map
+        const history = map.getComponent(GameMapHistoryComponent)
+
         let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
         areaModification.perform()
-        map.history.registerModification(areaModification)
-        map.history.commitActions("Удаление")
+        history.registerModification(areaModification)
+        history.commitActions("Удаление")
         this.resetSelection()
         this.manager.setNeedsRedraw()
     }
@@ -65,7 +192,7 @@ export default class AreaTool extends Tool {
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
+        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
 
         let bound = this.area.bounding(0, 0, map.width, map.height)
 
@@ -74,11 +201,10 @@ export default class AreaTool extends Tool {
         let width = bound.width()
         let height = bound.height()
 
-        this.copyBuffer = new EditorMap({
+        this.copyBuffer = new GameMap({
             width: width,
             height: height,
-            data: new Array(width * height),
-            name: "Буфер обмена"
+            data: new Array(width * height)
         })
 
         let sourceIndex = bound.minX + bound.minY * map.width
@@ -89,18 +215,19 @@ export default class AreaTool extends Tool {
                 this.copyBuffer.data[destinationIndex++] = map.data[sourceIndex++]
             }
 
-            sourceIndex -= (width - map.height);
+            sourceIndex += map.width - width;
         }
 
         if(cut) {
             this.manager.createEvent(width * height + " блок(-ов) вырезано")
+            const history = map.getComponent(GameMapHistoryComponent)
 
             let bound = this.area.bounding(0, 0, map.width, map.height)
 
             let areaModification = new MapAreaModification(map, bound, void 0)
             areaModification.perform()
-            map.history.registerModification(areaModification)
-            map.history.commitActions("Вырезание")
+            history.registerModification(areaModification)
+            history.commitActions("Вырезание")
 
             this.resetSelection()
 
@@ -123,8 +250,8 @@ export default class AreaTool extends Tool {
         let width = this.copyBuffer.width
         let height = this.copyBuffer.height
         let position = this.manager.camera.position
-        let cameraX = Math.floor(position.x / EditorMap.BLOCK_SIZE)
-        let cameraY = Math.floor(position.y / EditorMap.BLOCK_SIZE)
+        let cameraX = Math.floor(position.x / GameMap.BLOCK_SIZE)
+        let cameraY = Math.floor(position.y / GameMap.BLOCK_SIZE)
 
         this.area.setFrom(Math.floor(cameraX - width / 2), Math.floor(cameraY - height / 2))
         this.area.setTo(Math.floor(cameraX + width / 2), Math.floor(cameraY + height / 2))
@@ -142,25 +269,31 @@ export default class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
+        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
+        const history = map.getComponent(GameMapHistoryComponent)
 
         let modification = new MapAreaModification(map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
 
         modification.perform()
-        map.history.registerModification(modification)
-        map.history.commitActions("Вставка")
+        history.registerModification(modification)
+        history.commitActions("Вставка")
 
         this.manager.setNeedsRedraw()
+    }
+
+    clampX(x: number) {
+        return Math.max(0, Math.min(this.manager.world.getComponent(TilemapComponent).map.width - 1, x))
+    }
+
+    clampY(y: number) {
+        return Math.max(0, Math.min(this.manager.world.getComponent(TilemapComponent).map.height - 1, y))
     }
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
-        x = Math.floor(x / EditorMap.BLOCK_SIZE)
-        y = Math.floor(y / EditorMap.BLOCK_SIZE)
-
-        this.oldX = x
-        this.oldY = y
+        x = Math.floor(x / GameMap.BLOCK_SIZE)
+        y = Math.floor(y / GameMap.BLOCK_SIZE)
 
         if(this.area.isValid()) {
             if(this.area.contains(x, y)) {
@@ -168,6 +301,12 @@ export default class AreaTool extends Tool {
                 return
             }
         }
+
+        x = this.clampX(x)
+        y = this.clampY(y)
+
+        this.oldX = x
+        this.oldY = y
 
         if(this.pasting) {
             this.commitPaste()
@@ -198,8 +337,11 @@ export default class AreaTool extends Tool {
     mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
-        x = Math.floor(x / EditorMap.BLOCK_SIZE)
-        y = Math.floor(y / EditorMap.BLOCK_SIZE)
+        x = Math.floor(x / GameMap.BLOCK_SIZE)
+        y = Math.floor(y / GameMap.BLOCK_SIZE)
+
+        x = this.clampX(x)
+        y = this.clampY(y)
 
         if(this.dragging) {
             if(this.initialAreaState) {
@@ -236,10 +378,10 @@ export default class AreaTool extends Tool {
         if(this.area.isValid()) {
 
             this.program.drawRectangle(
-                this.area.minX * EditorMap.BLOCK_SIZE,
-                this.area.minY * EditorMap.BLOCK_SIZE,
-                this.area.maxX * EditorMap.BLOCK_SIZE,
-                this.area.maxY * EditorMap.BLOCK_SIZE,
+                this.area.minX * GameMap.BLOCK_SIZE,
+                this.area.minY * GameMap.BLOCK_SIZE,
+                this.area.maxX * GameMap.BLOCK_SIZE,
+                this.area.maxY * GameMap.BLOCK_SIZE,
                 0x7F7F7F7F
             )
         }
@@ -251,8 +393,8 @@ export default class AreaTool extends Tool {
         if(this.pasting) {
             this.manager.camera.matrix.save()
 
-            let x = this.area.minX * EditorMap.BLOCK_SIZE
-            let y = this.area.minY * EditorMap.BLOCK_SIZE
+            let x = this.area.minX * GameMap.BLOCK_SIZE
+            let y = this.area.minY * GameMap.BLOCK_SIZE
 
             this.manager.camera.position.x -= x
             this.manager.camera.position.y -= y
@@ -270,13 +412,13 @@ export default class AreaTool extends Tool {
         super.becomeActive();
 
         this.manager.setNeedsRedraw()
-        this.keyboard.startListening()
+        this.controlsEventHandler.setTarget(ControlsManager.getInstance())
     }
 
     resignActive() {
         super.resignActive();
 
         this.manager.setNeedsRedraw()
-        this.keyboard.stopListening()
+        this.controlsEventHandler.setTarget(null)
     }
 }

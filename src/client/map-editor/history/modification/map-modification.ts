@@ -1,10 +1,10 @@
-import EditorMap from "../../editor-map";
+import GameMap from "../../../../map/game-map";
 
-class MapModification {
+export default class MapModification {
 
-    map: EditorMap = null
+    map: GameMap = null
 
-    constructor(map: EditorMap) {
+    constructor(map: GameMap) {
         this.map = map
     }
 
@@ -16,5 +16,3 @@ class MapModification {
 
     }
 }
-
-export default MapModification;

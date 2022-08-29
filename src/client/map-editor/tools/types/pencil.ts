@@ -1,5 +1,4 @@
 import Tool from '../tool';
-import GameMap from '../../../../map/game-map';
 import RangeView from '../../../ui/elements/range/range';
 import BrushProgram from '../../../graphics/programs/brush-program/brush-program';
 import ToolManager from "../toolmanager";
@@ -8,7 +7,8 @@ import BrushProgramController from "../../../graphics/programs/brush-program/bru
 import Color from "../../../../utils/color";
 import {squareQuadrangleFromPoints} from "../../../../utils/quadrangle";
 import TilemapComponent from "../../../../physics/tilemap-component";
-import EditorMap from "../../editor-map";
+import GameMap from "../../../../map/game-map";
+import GameMapHistoryComponent from "../../history/game-map-history-component";
 
 export default class Pencil extends Tool {
 	public actionName = "Карандаш";
@@ -34,6 +34,7 @@ export default class Pencil extends Tool {
         const brushProgram = new BrushProgram(this.manager.screen.ctx)
         this.brushProgramController = new BrushProgramController(brushProgram, this.manager.camera)
         this.brushProgramController.brushColor = new Color(0, 1, 0, 0.5)
+        this.brushProgramController.camera = this.manager.camera
 
         this.setupMenu()
         this.setThickness(1)
@@ -133,10 +134,11 @@ export default class Pencil extends Tool {
 
     mouseUp() {
         super.mouseUp();
-        // History should be map component, I guess...
-        const map = this.manager.world.getComponent(TilemapComponent).map as EditorMap
 
-        map.history.commitActions(this.actionName)
+        const map = this.manager.world.getComponent(TilemapComponent).map
+        const history = map.getComponent(GameMapHistoryComponent)
+
+        history.commitActions(this.actionName)
     }
 
     draw(x: number, y: number) {

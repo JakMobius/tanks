@@ -1,11 +1,10 @@
 import DocumentEventHandler from "../../interact/document-event-handler";
+import {isMacOS} from "../../../../utils/meta-key-name";
 
 export default class KeyboardListener extends DocumentEventHandler {
-    public isMacOS: boolean;
 
     constructor() {
         super();
-        this.isMacOS = navigator.userAgent.indexOf("Mac") !== -1
         this.keys = new Set()
     }
 
@@ -31,7 +30,7 @@ export default class KeyboardListener extends DocumentEventHandler {
         let key = parts.pop()
 
         this.on("keydown", (event: KeyboardEvent) => {
-            let eventCmd = this.isMacOS ? event.metaKey : event.ctrlKey
+            let eventCmd = isMacOS ? event.metaKey : event.ctrlKey
             let eventShift = event.shiftKey
             let eventAlt = event.altKey
 

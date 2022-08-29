@@ -7,23 +7,23 @@ import Camera from '../../camera';
 import MenuOverlay from '../ui/overlay/menu/menuoverlay';
 import * as Box2D from '../../../library/box2d';
 import GameMap from '../../../map/game-map';
-import KeyboardController from '../../controls/input/keyboard/keyboard-controller';
 import DragHandler from '../../controls/interact/drag-handler';
 import ToolbarView from '../ui/overlay/workspace/toolbar/toolbar';
 import ToolManager from '../tools/toolmanager';
 import EventContainer from '../../ui/overlay/events/event-container';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
 import Tools from "../tools/type-loader"
-import EditorMap from "../editor-map";
 import ClientGameWorld from "../../client-game-world";
 import EditorWorld from "../editor-world";
 import TilemapComponent from "../../../physics/tilemap-component";
+import GameMapHistoryComponent from "../history/game-map-history-component";
+import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import ControlsManager from "../../controls/controls-manager";
 
 export default class MapEditorScene extends Scene {
 
-	public keyboard = new KeyboardController();
 	public world: EditorWorld
-    public map: EditorMap
+    public map: GameMap
 	public dragHandler: DragHandler;
 	public camera: Camera;
 	public worldDrawer: WorldDrawerComponent;
@@ -35,11 +35,12 @@ export default class MapEditorScene extends Scene {
     private worldAlive: boolean;
     private cameraMovementEnabled = true
     private cameraZoomEnabled = true
+    private controlsEventHandler = new BasicEventHandlerSet()
+    private needsRedraw = false
 
     constructor(config: SceneConfig) {
         super(config)
 
-        // this.keyboard.startListening()
         this.world = new ClientGameWorld({})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
@@ -55,6 +56,7 @@ export default class MapEditorScene extends Scene {
         })
 
         this.worldDrawer = new WorldDrawerComponent(this.camera, this.screen)
+        this.world.addComponent(this.worldDrawer)
 
         this.setupWorkspace()
 
@@ -79,61 +81,65 @@ export default class MapEditorScene extends Scene {
                 this.camera.target = null
             }
 
-            this.screen.loop.start()
+            this.setNeedsRedraw()
         })
 
         this.dragHandler.on("drag", (dx, dy) => {
             if(this.map && this.cameraMovementEnabled) {
                 this.camera.target.x += dx / this.camera.baseScale
                 this.camera.target.y += dy / this.camera.baseScale
-                this.screen.loop.start()
+                this.setNeedsRedraw()
             }
         })
 
         this.dragHandler.on("zoom", (zoom) => {
             if(this.map && this.cameraZoomEnabled) {
                 this.camera.baseScale *= zoom;
-                this.screen.loop.start()
+                this.setNeedsRedraw()
             }
         })
 
-        // this.keyboard.keybinding("Escape", (event) => {
-        //     if (this.menuOverlay.shown) {
-        //         this.menuOverlay.hide()
-        //     } else {
-        //         this.menuOverlay.redraw()
-        //         this.menuOverlay.show()
-        //     }
-        // })
-        //
-        // this.keyboard.keybinding("Cmd-Z", (event) => {
-        //     let entry = this.map.history.goBack()
-        //
-        //     if(entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
-        //     else this.eventContainer.createEvent("Нечего отменять")
-        // })
-        //
-        // this.keyboard.keybinding("Cmd-Y", (event) => {
-        //     let entry = this.map.history.goForward()
-        //
-        //     if(entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
-        //     else this.eventContainer.createEvent("Нечего повторять")
-        // })
-        //
-        // this.keyboard.keybinding("Cmd-S", (event) => {
-        //     if(this.menuOverlay.saveMaps()) {
-        //         this.eventContainer.createEvent("Карты сохранены")
-        //     } else {
-        //         this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
-        //     }
-        // })
+        this.controlsEventHandler.on("game-pause", (event) => {
+            if (this.menuOverlay.shown) {
+                this.menuOverlay.hide()
+            } else {
+                this.menuOverlay.redraw()
+                this.menuOverlay.show()
+            }
+        })
+
+        this.controlsEventHandler.on("editor-undo", (event) => {
+            const history = this.map.getComponent(GameMapHistoryComponent)
+            let entry = history.goBack()
+
+            if(entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
+            else this.eventContainer.createEvent("Нечего отменять")
+        })
+
+        this.controlsEventHandler.on("editor-redo", (event) => {
+            const history = this.map.getComponent(GameMapHistoryComponent)
+            let entry = history.goForward()
+
+            if(entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
+            else this.eventContainer.createEvent("Нечего повторять")
+        })
+
+        this.controlsEventHandler.on("editor-save-maps", (event) => {
+            if(this.menuOverlay.saveMaps()) {
+                this.eventContainer.createEvent("Карты сохранены")
+            } else {
+                this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
+            }
+        })
 
         this.menuOverlay.show()
         this.layout()
+
+        this.controlsEventHandler.setTarget(ControlsManager.getInstance())
     }
 
     setNeedsRedraw() {
-        this.screen.loop.start()
+        this.needsRedraw = true
     }
 
     setupWorkspace() {
@@ -171,13 +177,14 @@ export default class MapEditorScene extends Scene {
 
     layout() {
         super.layout();
-        this.screen.loop.start()
         this.camera.viewport.x = this.screen.width
         this.camera.viewport.y = this.screen.height
     }
 
     draw(dt: number) {
-        if(!this.map) return
+        ControlsManager.getInstance().refresh()
+
+        if(!this.map || !this.needsRedraw) return
 
         if(this.worldAlive) {
             this.world.tick(dt)

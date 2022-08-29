@@ -1,15 +1,16 @@
 import MapModification from './map-modification';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
-import EditorMap from "../../editor-map";
 import Rectangle from "../../../../utils/rectangle";
 import BlockState from "../../../../map/block-state/block-state";
+import GameMap from "../../../../map/game-map";
+import GameMapHistoryComponent from "../game-map-history-component";
 
-class MapAreaModification extends MapModification {
-	public area: any;
-	public oldData: any;
-	public newData: any;
+export default class MapAreaModification extends MapModification {
+	public area: Rectangle;
+	public oldData: BlockState[];
+	public newData: BlockState[];
 
-    constructor(map: EditorMap, area: Rectangle, newData: BlockState[]) {
+    constructor(map: GameMap, area: Rectangle, newData: BlockState[]) {
         super(map);
 
         this.area = area
@@ -34,7 +35,10 @@ class MapAreaModification extends MapModification {
         return result
     }
 
-    setArea(data: BlockState[]) {
+    private setArea(data: BlockState[]) {
+        let history = this.map.getComponent(GameMapHistoryComponent)
+        history.preventNativeModificationRegistering = true
+
         let sourceIndex = 0
 
         let minX = Math.max(0, this.area.minX)
@@ -49,11 +53,9 @@ class MapAreaModification extends MapModification {
 
         for(let y = minY; y < maxY; y++) {
             for(let x = minX; x < maxX; x++) {
-                if(data) {
-                    this.map.data[destinationIndex++] = data[sourceIndex++]
-                } else {
-                    this.map.data[destinationIndex++] = new AirBlockState()
-                }
+                let newBlock: BlockState = data ? data[sourceIndex++] : new AirBlockState()
+                this.map.emit("block-will-change", x, y, newBlock)
+                this.map.data[destinationIndex++] = newBlock
             }
             destinationIndex -= (width - this.map.width)
             sourceIndex += delta
@@ -72,9 +74,12 @@ class MapAreaModification extends MapModification {
         for(let y = minY; y < maxY; y++) {
             for(let x = minX; x < maxX; x++) {
                 this.map.data[destinationIndex++].update(this.map, x, y)
+                this.map.emit("block-change", x, y)
             }
             destinationIndex -= (width - this.map.width)
         }
+
+        history.preventNativeModificationRegistering = false
     }
 
     perform() {
@@ -85,5 +90,3 @@ class MapAreaModification extends MapModification {
         this.setArea(this.oldData)
     }
 }
-
-export default MapAreaModification;

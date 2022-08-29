@@ -1,10 +1,10 @@
 import DocumentEventHandler from './document-event-handler';
+import {isMacOS} from "../../../utils/meta-key-name";
 
 export default class DragHandler extends DocumentEventHandler {
 	public dragging: any;
 	public oldX: any;
 	public oldY: any;
-	public isMacOS: any;
 	public draggingEnabled: any;
 	public oldScale: any;
 
@@ -16,7 +16,6 @@ export default class DragHandler extends DocumentEventHandler {
         this.oldX = 0
         this.oldY = 0
 
-        this.isMacOS = navigator.userAgent.indexOf("Mac") !== -1
         this.draggingEnabled = true
         this.oldScale = 1
     }
@@ -38,7 +37,7 @@ export default class DragHandler extends DocumentEventHandler {
 
     zoomChange(event: MSGestureEvent) {
         event.preventDefault()
-        if(this.isMacOS) {
+        if(isMacOS) {
             if(event.scale) {
                 this.emit("zoom", event.scale / this.oldScale)
                 this.oldScale = event.scale
@@ -80,7 +79,7 @@ export default class DragHandler extends DocumentEventHandler {
         if(event.ctrlKey) {
             if(event.deltaY)
                 this.emit("zoom", 1 - (event.deltaY / 200))
-        } else if(this.isMacOS) {
+        } else if(isMacOS) {
             if(event.deltaX || event.deltaY)
                 this.emit("drag", event.deltaX, event.deltaY)
 

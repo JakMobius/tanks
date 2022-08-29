@@ -2,9 +2,12 @@ import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import MapSelectContainer from './map-list/mapselectcontainer';
 import MapPreviewContainer from './map-preview/mappreviewcontainer';
 import DialogOverlay from '../../overlay/dialog/dialogoverlay';
-import EditorMap from '../../../editor-map';
+import AirBlockState from "../../../../../map/block-state/types/air-block-state";
+import GameMap from "../../../../../map/game-map";
+import GameMapNameComponent from "../../../map-name-component";
+import GameMapHistoryComponent from "../../../history/game-map-history-component";
 
-class MenuOverlay extends Overlay {
+export default class MenuOverlay extends Overlay {
 	public mapSelect = new MapSelectContainer();
 	public mapPreview = new MapPreviewContainer();
 
@@ -14,11 +17,11 @@ class MenuOverlay extends Overlay {
         this.overlay.append(this.mapPreview.element)
         this.overlay.append(this.mapSelect.element)
 
-        this.mapSelect.on("select", (map: EditorMap) => {
+        this.mapSelect.on("select", (map: GameMap) => {
             this.mapPreview.previewMap(map)
         })
 
-        this.mapPreview.on("rename", (map: EditorMap) => {
+        this.mapPreview.on("rename", (map: GameMap) => {
             this.mapSelect.updateMapTitle(map)
         })
 
@@ -26,7 +29,7 @@ class MenuOverlay extends Overlay {
             this.mapSelect.saveMaps()
         })
 
-        this.mapPreview.on("open", (map: EditorMap) => {
+        this.mapPreview.on("open", (map: GameMap) => {
             this.emit("open", map)
         })
 
@@ -34,7 +37,7 @@ class MenuOverlay extends Overlay {
             this.createMap()
         })
 
-        this.mapPreview.on("delete", (map: EditorMap) => {
+        this.mapPreview.on("delete", (map: GameMap) => {
             this.deleteMap(map)
         })
     }
@@ -90,12 +93,20 @@ class MenuOverlay extends Overlay {
                     return
                 }
 
-                let map = new EditorMap({
-                    name: name,
+                let map = new GameMap({
                     width: width,
                     height: height,
-                    data: EditorMap.emptyMapData(width, height)
+                    data: Array.from({length: width * height}, (_, i) => new AirBlockState())
                 })
+
+                // TODO: this should be done by prefab alterator
+
+                let nameComponent = new GameMapNameComponent()
+                nameComponent.name = name
+                map.addComponent(nameComponent)
+
+                let historyComponent = new GameMapHistoryComponent()
+                map.addComponent(historyComponent)
 
                 this.mapSelect.maps.push(map)
                 this.mapSelect.saveMaps()
@@ -113,7 +124,7 @@ class MenuOverlay extends Overlay {
         creationOverlay.show()
     }
 
-    deleteMap(map: EditorMap) {
+    deleteMap(map: GameMap) {
         let step = 0
 
         let deletionOverlay = new DialogOverlay({
@@ -234,5 +245,3 @@ class MenuOverlay extends Overlay {
         return this.mapSelect.saveMaps()
     }
 }
-
-export default MenuOverlay;

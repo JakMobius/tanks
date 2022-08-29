@@ -1,8 +1,9 @@
 import {base64ToBytes, bytesToBase64} from '../../utils/base64';
 import pako from 'pako';
-import EditorMap from './editor-map';
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import WriteBuffer from "../../serialization/binary/write-buffer";
+import MapSerialization from "../../map/map-serialization";
+import GameMap from "../../map/game-map";
 
 export default class MapStorage {
 
@@ -33,7 +34,7 @@ export default class MapStorage {
         return []
     }
 
-    static write(maps: EditorMap[]) {
+    static write(maps: GameMap[]) {
         WriteBuffer.shared.reset()
 
         WriteBuffer.shared.writeInt16(maps.length)
@@ -41,7 +42,6 @@ export default class MapStorage {
 
         for(let i = 0; i < length; i++) {
             let bytes = this.writeMap(maps[i])
-            maps[i].size = bytes.length
 
             WriteBuffer.shared.writeInt16(bytes.length)
             WriteBuffer.shared.writeBytes(bytes)
@@ -54,12 +54,10 @@ export default class MapStorage {
     static readMap(buffer: Uint8Array) {
         let raw = pako.inflate(buffer)
 
-        let map = EditorMap.fromBinary(ReadBuffer.getShared(raw.buffer))
-        map.size = buffer.length
-        return map
+        return MapSerialization.fromBuffer(raw)
     }
 
-    static writeMap(map: EditorMap): Uint8Array {
+    static writeMap(map: GameMap): Uint8Array {
         WriteBuffer.shared.reset()
         map.toBinary(WriteBuffer.shared)
         return pako.gzip(WriteBuffer.shared.spitBuffer())

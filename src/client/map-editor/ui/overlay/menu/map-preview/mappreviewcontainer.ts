@@ -7,12 +7,12 @@ import Camera from 'src/client/camera';
 import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
-import EditorMap from "../../../../editor-map";
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
 import Screen from "src/client/graphics/screen";
+import GameMapNameComponent from "../../../../map-name-component";
 
 export default class MapPreviewContainer extends Menu {
-	public map: EditorMap;
+	public map: GameMap;
 	public mapDrawer: MapDrawer;
 	public camera: Camera;
 	public noMapSelectedLabel: JQuery;
@@ -58,14 +58,16 @@ export default class MapPreviewContainer extends Menu {
 
         this.header.on("change", () => {
             if(this.map) {
-                this.map.name = this.header.val()
+                let nameComponent = this.map.getComponent(GameMapNameComponent)
+                nameComponent.name = this.header.val() as string
                 this.emit("rename-commit", this.map)
             }
         })
 
         this.header.on("input", () => {
             if(this.map) {
-                this.map.name = this.header.val()
+                let nameComponent = this.map.getComponent(GameMapNameComponent)
+                nameComponent.name = this.header.val() as string
                 this.emit("rename", this.map)
             }
         })
@@ -133,7 +135,7 @@ export default class MapPreviewContainer extends Menu {
         a.remove()
     }
 
-    previewMap(map: EditorMap) {
+    previewMap(map: GameMap) {
         if (!!map !== !!this.map) {
             if (map) {
                 this.preview.show()

@@ -1,5 +1,5 @@
-/* @load-resource: '../shaders/fragment/brush-fragment.glsl' */
-/* @load-resource: '../shaders/vertex/brush-vertex.glsl' */
+/* @load-resource: '../../shaders/fragment/brush-fragment.glsl' */
+/* @load-resource: '../../shaders/vertex/brush-vertex.glsl' */
 
 import GLBuffer from '../../glbuffer';
 import GameMap from '../../../../map/game-map';
@@ -75,7 +75,7 @@ export default class BrushProgram extends CameraProgram {
     draw() {
         this.ctx.disable(this.ctx.DEPTH_TEST)
         this.ctx.enable(this.ctx.BLEND)
-
+        this.indexBuffer.bind()
         this.vertexBuffer.bindAndSendDataToGPU()
         this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
     }

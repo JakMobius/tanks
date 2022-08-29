@@ -4,7 +4,6 @@ import Color from '../../../../utils/color';
 import SpawnZone from '../../../../map/spawn-zone';
 import GameMap from '../../../../map/game-map';
 import ToolManager from "../toolmanager";
-import EditorMap from "../../editor-map";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "../../../../physics/tilemap-component";
 
@@ -89,10 +88,10 @@ class SpawnZoneTool extends Tool {
 
         for(let zone of map.spawnZones) {
             this.program.drawRectangle(
-                zone.minX * EditorMap.BLOCK_SIZE,
-                zone.minY * EditorMap.BLOCK_SIZE,
-                zone.maxX * EditorMap.BLOCK_SIZE,
-                zone.maxY * EditorMap.BLOCK_SIZE,
+                zone.minX * GameMap.BLOCK_SIZE,
+                zone.minY * GameMap.BLOCK_SIZE,
+                zone.maxX * GameMap.BLOCK_SIZE,
+                zone.maxY * GameMap.BLOCK_SIZE,
                 0x7F7F7F7F
             )
         }

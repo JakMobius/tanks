@@ -43,6 +43,8 @@ export default class GameMap extends Entity {
 	setBlock(x: number, y: number, block: BlockState) {
 		let index = x + y * this.width;
 
+		this.emit("block-will-change", x, y, block)
+
 		this.data[index] = block
 
 		const lowX = Math.max(0, x - 1)

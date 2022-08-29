@@ -21,17 +21,7 @@ export default class ControlsManager extends EventEmitter {
         super()
         this.devices = [];
 
-        this.createSeparatedAxle("tank-steer", "tank-steer-right", "tank-steer-left")
-        this.createSeparatedAxle("tank-throttle", "tank-throttle-forward", "tank-throttle-backward")
-
-        this.createAxle("tank-primary-weapon")
-        this.createAxle("tank-miner")
-
-        this.createActivatorAxle("tank-respawn", () => this.emit("tank-respawn"))
-        this.createActivatorAxle("game-pause", () => this.emit("game-pause"))
-        this.createActivatorAxle("game-player-list",
-            () => this.emit("game-player-list-show"),
-            () => this.emit("game-player-list-hide"))
+        this.createControlAxles()
 
         this.addDevice(new KeyboardController())
         this.addDevice(new MouseController())
@@ -43,6 +33,28 @@ export default class ControlsManager extends EventEmitter {
         this.gamepadManager.on("gamepad-disconnected", (gamepad) => {
             this.removeDevice(gamepad)
         })
+    }
+
+    private createControlAxles() {
+        this.createSeparatedAxle("tank-steer", "tank-steer-right", "tank-steer-left")
+        this.createSeparatedAxle("tank-throttle", "tank-throttle-forward", "tank-throttle-backward")
+
+        this.createAxle("tank-primary-weapon")
+        this.createAxle("tank-miner")
+
+        this.createTriggerAxle("tank-respawn")
+        this.createTriggerAxle("game-pause")
+        this.createTriggerAxle("game-toggle-debug")
+        this.createTriggerAxle("game-player-list", "game-player-list-show", "game-player-list-hide")
+
+        this.createTriggerAxle("editor-undo")
+        this.createTriggerAxle("editor-redo")
+        this.createTriggerAxle("editor-copy")
+        this.createTriggerAxle("editor-paste")
+        this.createTriggerAxle("editor-cut")
+        this.createTriggerAxle("editor-reset-selection")
+        this.createTriggerAxle("editor-select-all")
+        this.createTriggerAxle("editor-clear-area")
     }
 
     public static getInstance(): ControlsManager {
@@ -82,8 +94,11 @@ export default class ControlsManager extends EventEmitter {
         return this.controlAxles.get(name)
     }
 
-    createActivatorAxle(name: string, onActivate?: () => void, onDeactivate?: () => void) {
-        let axle = new CallbackActivatorAxle(this.axleUpdateCallback, onActivate, onDeactivate)
+    createTriggerAxle(name: string, activateName?: string, deactivateName?: string) {
+        if (!activateName) activateName = name
+        let axle = new CallbackActivatorAxle(this.axleUpdateCallback,
+            () => this.emit(activateName),
+            deactivateName ? () => this.emit(deactivateName) : null)
         this.controlAxles.set(name, axle)
     }
 
@@ -127,7 +142,7 @@ export default class ControlsManager extends EventEmitter {
     }
 
     refresh() {
-        for(let device of this.devices) {
+        for (let device of this.devices) {
             device.refresh()
         }
 

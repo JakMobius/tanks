@@ -7,6 +7,7 @@ import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import EntityModel from "../../../../entity/entity-model";
 import Player from "../../../../player";
+import ControlsManager from "../../../controls/controls-manager";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
@@ -28,14 +29,9 @@ export default class RunTool extends Tool {
 
         this.keyboard = new KeyboardController()
 
-        this.playerControls = new PlayerControls()
-        this.playerControls.setupKeyboard(this.keyboard)
-
         // this.tank = new ClientMonsterTank({
         //     model: new MonsterTankModel()
         // })
-        
-        this.playerControls.connectTankControls(this.tank.getComponent(TankControls))
         
         this.player = new Player({
             id: 0,
@@ -80,7 +76,7 @@ export default class RunTool extends Tool {
 
         physicalComponent.setPosition(this.spawnPoint)
 
-        this.playerControls.connectTankControls(this.player.tank.getComponent(TankControls))
+        ControlsManager.getInstance().connectTankControls(this.player.tank.getComponent(TankControls))
 
         this.manager.camera.inertial = true
         this.manager.camera.target = physicalComponent.body.GetPosition()
@@ -90,6 +86,8 @@ export default class RunTool extends Tool {
     onStop() {
         this.manager.setWorldAlive(false)
         this.manager.setCameraMovementEnabled(true)
+
+        ControlsManager.getInstance().disconnectTankControls(this.player.tank.getComponent(TankControls))
 
         this.manager.camera.target = this.manager.camera.getPosition()
         this.manager.camera.shaking.Set(0, 0)
@@ -105,13 +103,11 @@ export default class RunTool extends Tool {
     becomeActive() {
         super.becomeActive();
         this.manager.setNeedsRedraw()
-        // this.keyboard.startListening()
     }
 
     resignActive() {
         super.resignActive();
         this.manager.setNeedsRedraw()
-        // this.keyboard.stopListening()
 
         if(this.running) {
             this.onStop()

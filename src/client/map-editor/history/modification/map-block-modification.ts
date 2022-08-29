@@ -1,14 +1,15 @@
 import MapModification from './map-modification';
-import EditorMap from "../../editor-map";
 import BlockState from "../../../../map/block-state/block-state";
+import GameMap from "../../../../map/game-map";
+import GameMapHistoryComponent from "../game-map-history-component";
 
-class MapBlockModification extends MapModification {
+export default class MapBlockModification extends MapModification {
 	public x: any;
 	public y: any;
 	public oldBlock: any;
 	public newBlock: any;
 
-    constructor(map: EditorMap, x: number, y: number, newBlock: BlockState) {
+    constructor(map: GameMap, x: number, y: number, newBlock: BlockState) {
         super(map);
 
         this.x = x
@@ -18,16 +19,16 @@ class MapBlockModification extends MapModification {
     }
 
     perform() {
-        this.map.preventNativeModificationRegistering = true
+        let history = this.map.getComponent(GameMapHistoryComponent)
+        history.preventNativeModificationRegistering = true
         this.map.setBlock(this.x, this.y, this.newBlock)
-        this.map.preventNativeModificationRegistering = false
+        history.preventNativeModificationRegistering = false
     }
 
     revert() {
-        this.map.preventNativeModificationRegistering = true
+        let history = this.map.getComponent(GameMapHistoryComponent)
+        history.preventNativeModificationRegistering = true
         this.map.setBlock(this.x, this.y, this.oldBlock)
-        this.map.preventNativeModificationRegistering = false
+        history.preventNativeModificationRegistering = false
     }
 }
-
-export default MapBlockModification;

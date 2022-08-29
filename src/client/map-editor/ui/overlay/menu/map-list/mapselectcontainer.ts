@@ -5,17 +5,18 @@ import Menu from '../../../../../ui/menu/menu';
 import MapStorage from '../../../../map-storage';
 import DragListener from '../../../element/dragoverlay';
 import {trimFileExtension} from '../../../../../../utils/utils';
-import EditorMap from "../../../../editor-map";
+import GameMapNameComponent from "../../../../map-name-component";
+import GameMapHistoryComponent from "../../../../history/game-map-history-component";
 
-class MapSelectContainer extends Menu {
+export default class MapSelectContainer extends Menu {
 	public noMapsLabel: JQuery;
 	public mapContainer: JQuery;
 	public mapList: JQuery;
 	public footer: JQuery;
 	public createNewMapButton: JQuery;
-	public maps: EditorMap[];
+	public maps: GameMap[];
 	public dragListener: DragListener;
-	public selectedMap: EditorMap;
+	public selectedMap: GameMap;
 
     constructor() {
         super();
@@ -47,7 +48,21 @@ class MapSelectContainer extends Menu {
             try {
                 let map = MapStorage.readMap(file.buffer)
 
-                if(!map.name) map.name = trimFileExtension(file.name)
+                // TODO: this should be done by prefab alterator
+
+                let nameComponent = map.getComponent(GameMapNameComponent)
+                let historyComponent = map.getComponent(GameMapHistoryComponent)
+
+                if(!nameComponent) {
+                    nameComponent = new GameMapNameComponent()
+                    nameComponent.name = trimFileExtension(file.name)
+                    map.addComponent(nameComponent)
+                }
+
+                if(!historyComponent) {
+                    historyComponent = new GameMapHistoryComponent()
+                    map.addComponent(historyComponent)
+                }
 
                 this.maps.push(map)
 
@@ -79,7 +94,7 @@ class MapSelectContainer extends Menu {
         return true
     }
 
-    updateMapTitle(map: EditorMap) {
+    updateMapTitle(map: GameMap) {
         let index = this.maps.indexOf(map)
         if(index === -1) return
 
@@ -131,12 +146,10 @@ class MapSelectContainer extends Menu {
         }
     }
 
-    selected(map: EditorMap) {
+    selected(map: GameMap) {
         if(this.selectedMap !== map) {
             this.emit("select", map)
             this.selectedMap = map
         }
     }
 }
-
-export default MapSelectContainer;

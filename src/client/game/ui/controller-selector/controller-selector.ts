@@ -2,7 +2,7 @@
 
 import View from "../../../ui/view";
 import ControllerView from "./controller-view/controller-view";
-import InputDevice, {InputDeviceType} from "../../../controls/input/input-device";
+import InputDevice from "../../../controls/input/input-device";
 import ControlsManager from "../../../controls/controls-manager";
 import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
 

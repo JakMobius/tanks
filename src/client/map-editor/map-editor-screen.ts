@@ -5,15 +5,10 @@ import RequestFrameLoop from '../../utils/loop/request-frame-loop';
 import 'src/client/graphics/drawers/block/type-loader';
 import 'src/map/block-state/type-loader';
 import GeneralGameScreen from "../game/general-game-screen";
+import RenderLoop from "../../utils/loop/render-loop";
 
 export default class MapEditorScreen extends GeneralGameScreen {
     public editorScene: MapEditorScene;
-
-    initLoop() {
-        this.loop = new RequestFrameLoop({
-            timeMultiplier: 0.001
-        })
-    }
 
     async loadGame() {
         await super.loadGame()
