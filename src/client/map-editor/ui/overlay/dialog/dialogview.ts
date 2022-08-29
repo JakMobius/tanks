@@ -11,7 +11,7 @@ export interface DialogButtonConfig {
     closes?: boolean
 }
 
-class DialogView extends Menu {
+export default class DialogView extends Menu {
 	public header: any;
 	public message: any;
 	public footer: any;
@@ -30,10 +30,17 @@ class DialogView extends Menu {
 
     title(text: string) {
         this.header.text(text)
+        return this
     }
 
     text(text: string) {
         this.message.text(text)
+        return this
+    }
+
+    withButton(config: DialogButtonConfig) {
+        this.addButton(config)
+        return this
     }
 
     addButton(config: DialogButtonConfig) {
@@ -60,5 +67,3 @@ class DialogView extends Menu {
         return button
     }
 }
-
-export default DialogView;

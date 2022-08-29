@@ -1,20 +1,20 @@
-import Vidget from "../../controls/interact/vidget";
-import {Touch} from "../../controls/interact/touch-controller";
+import TouchVidget from "../../controls/input/touch/touch-vidget";
+import {Touch} from "../../controls/input/touch/touch-controller";
 
 class ControlPanel {
-	public vidgets: Vidget[] = []
+	public vidgets: TouchVidget[] = []
 
     constructor() {
 
     }
 
-    addVidget(vidget: Vidget) {
+    addVidget(vidget: TouchVidget) {
         this.vidgets.push(vidget)
     }
 
     draw(ctx: WebGLRenderingContext, dt: number) {
 
-        this.vidgets.forEach(function(vidget: Vidget){
+        this.vidgets.forEach(function(vidget: TouchVidget){
             if(vidget.hidden) return
 
             //ctx.translate(vidget.x, vidget.y)

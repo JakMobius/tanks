@@ -27,10 +27,16 @@ export default abstract class Program {
         for (let shader of this.shaders)
             gl.attachShader(this.raw, shader.raw)
         gl.linkProgram(this.raw)
+        gl.validateProgram(this.raw)
 
         if (!gl.getProgramParameter(this.raw, gl.LINK_STATUS)) {
             throw new Error("Failed to link program: " + gl.getProgramInfoLog(this.raw));
         }
+
+        if (!gl.getProgramParameter(this.raw, gl.VALIDATE_STATUS)) {
+            throw new Error("Failed to validate program: " + gl.getProgramInfoLog(this.raw));
+        }
+
         this.ctx = gl
         return this
     }

@@ -1,13 +1,22 @@
 
+export type Activator = (input: number) => number
+
 export default class Axle {
-	public sources = new Set<Axle>();
+
+    public static Activators = {
+        linear: (input: number) => input,
+        linearPositive: (input: number) => Math.max(0, input),
+        linearNegative: (input: number) => -Math.max(0, input)
+    }
+
+	public sources = new Map<Axle, Activator>();
 	public ownValue: number = 0;
 	public value: number = 0;
 	public destinations = new Set<Axle>();
 	public needsUpdate: boolean = false;
 
-    addSource(source: Axle) {
-        this.sources.add(source)
+    addSource(source: Axle, activator: Activator = Axle.Activators.linear) {
+        this.sources.set(source, activator)
         source.destinations.add(this)
         this.setNeedsUpdate()
         return this
@@ -34,7 +43,9 @@ export default class Axle {
         if (this.needsUpdate) {
             this.needsUpdate = false
             let result = this.ownValue
-            for (let source of this.sources.values()) result += source.getValue()
+            for (let [source, activator] of this.sources.entries()) {
+                result += activator(source.getValue())
+            }
             this.value = result
         }
         return this.value

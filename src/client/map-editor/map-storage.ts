@@ -1,8 +1,12 @@
 import {base64ToBytes, bytesToBase64} from '../../utils/base64';
 import pako from 'pako';
-import EditorMap from './editor-map';
 import ReadBuffer from "../../serialization/binary/read-buffer";
 import WriteBuffer from "../../serialization/binary/write-buffer";
+import MapSerialization from "../../map/map-serialization";
+import GameMap from "../../map/game-map";
+import GameMapNameComponent from "./map-name-component";
+import GameMapHistoryComponent from "./history/game-map-history-component";
+import {trimFileExtension} from "../../utils/utils";
 
 export default class MapStorage {
 
@@ -14,54 +18,58 @@ export default class MapStorage {
             try {
                 let data = base64ToBytes(base64)
 
-                let decoder = ReadBuffer.getShared(data.buffer);
+                let decoder = new ReadBuffer(data.buffer);
 
                 let maps = decoder.readInt16()
 
-                while (maps--) {
+                for (let i = 0; i < maps; i++) {
                     let length = decoder.readInt32()
                     let bytes = decoder.readBytes(length)
 
-                    result.push(this.readMap(bytes))
+                    try {
+                        let map = MapSerialization.fromBuffer(pako.inflate(bytes))
+
+                        let nameComponent = map.getComponent(GameMapNameComponent)
+                        let historyComponent = map.getComponent(GameMapHistoryComponent)
+
+                        if (!nameComponent) {
+                            nameComponent = new GameMapNameComponent()
+                            nameComponent.name = "Карта"
+                            map.addComponent(nameComponent)
+                        }
+
+                        if (!historyComponent) {
+                            historyComponent = new GameMapHistoryComponent()
+                            map.addComponent(historyComponent)
+                        }
+
+                        result.push(map)
+
+                    } catch (error) {
+                        console.error("Failed to read map #" + i, error)
+                    }
                 }
-            } catch (ignored) {
-                console.log(ignored)
-                return []
+            } catch (error) {
+                console.error("Failed to read saved maps", error)
+                return null
             }
             return result
         }
         return []
     }
 
-    static write(maps: EditorMap[]) {
-        WriteBuffer.shared.reset()
-
-        WriteBuffer.shared.writeInt16(maps.length)
+    static write(maps: GameMap[]) {
+        let buffer = new WriteBuffer()
+        buffer.writeInt16(maps.length)
         let length = maps.length
 
         for(let i = 0; i < length; i++) {
-            let bytes = this.writeMap(maps[i])
-            maps[i].size = bytes.length
+            let bytes = pako.gzip(MapSerialization.toBuffer(maps[i]))
 
-            WriteBuffer.shared.writeInt16(bytes.length)
-            WriteBuffer.shared.writeBytes(bytes)
+            buffer.writeInt32(bytes.length)
+            buffer.writeBytes(bytes)
         }
 
-        let buffer = WriteBuffer.shared.spitBuffer()
-        window.localStorage.setItem("editor-maps", bytesToBase64(buffer))
-    }
-
-    static readMap(buffer: Uint8Array) {
-        let raw = pako.inflate(buffer)
-
-        let map = EditorMap.fromBinary(ReadBuffer.getShared(raw.buffer))
-        map.size = buffer.length
-        return map
-    }
-
-    static writeMap(map: EditorMap): Uint8Array {
-        WriteBuffer.shared.reset()
-        map.toBinary(WriteBuffer.shared)
-        return pako.gzip(WriteBuffer.shared.spitBuffer())
+        window.localStorage.setItem("editor-maps", bytesToBase64(buffer.spitBuffer()))
     }
 }

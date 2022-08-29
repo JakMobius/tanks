@@ -25,13 +25,4 @@ export class PauseMenuView extends View {
         this.element.append(subtitle)
         return subtitle
     }
-
-
-    onFocus() {
-
-    }
-
-    onBlur() {
-
-    }
 }

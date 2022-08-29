@@ -35,9 +35,10 @@ export default class GameScene extends GeneralGameScene {
             this.displayedWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
         })
 
-        this.keyboard.keybinding("Cmd-B", () => {
-            this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
-        })
+        // TODO
+        // this.keyboard.onKeybinding("Cmd-B", () => {
+        //     this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
+        // })
     }
 
     private setupUpdateLoop() {

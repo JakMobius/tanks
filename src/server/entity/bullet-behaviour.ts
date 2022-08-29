@@ -1,7 +1,6 @@
 import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import EntityModel from "../../entity/entity-model";
-import * as Box2D from "../../library/box2d";
 import PhysicalComponent from "../../entity/components/physics-component";
 import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
 import EffectHostComponent from "../../effects/effect-host-component";
@@ -47,7 +46,7 @@ export default class BulletBehaviour implements Component {
             this.handleEntityHit(hitEntity)
         })
 
-        this.eventHandler.on("block-hit", (x: number, y: number, point: Box2D.Vec2) => {
+        this.eventHandler.on("block-hit", (x: number, y: number) => {
             if(this.entity.isDead()) return;
             this.handleBlockHit(x, y)
         })

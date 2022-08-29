@@ -26,13 +26,13 @@ export default class TutorialScene extends GeneralGameScene {
 
         this.worldController = new TutorialWorldController(this.game.serverGame)
 
-        this.keyboard.keybinding("Tab", () => {
-            this.performClientCommand("#switch-tank")
-        })
-
-        this.keyboard.keybinding("Cmd-B", () => {
-            this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
-        })
+        // this.keyboard.keybinding("Tab", () => {
+        //     this.performClientCommand("#switch-tank")
+        // })
+        //
+        // this.keyboard.keybinding("Cmd-B", () => {
+        //     this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
+        // })
 
         this.game.clientConnection.on(WorldCommunicationPacket, (packet) => {
             let buffer = new ReadBuffer(packet.buffer.buffer)

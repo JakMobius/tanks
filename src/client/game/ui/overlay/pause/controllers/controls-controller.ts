@@ -2,33 +2,80 @@ import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
 import AxisSelector from "../../../axis-selector/axis-selector";
 import ControllerSelector from "../../../controller-selector/controller-selector";
+import InputDevice from "../../../../../controls/input/input-device";
+import GameSettings from "../../../../../settings/game-settings";
+import ControlsManager from "../../../../../controls/controls-manager";
+import ControlsPrinter from "../../../../../controls/controls-printer";
 
 export class ControlsView extends PauseMenuView {
+
+    private controllerSelectorView = new ControllerSelector()
+    private selectors = new Map<string, AxisSelector>()
+
     constructor(controller: ControlsController) {
         super(controller);
 
         this.addSubtitle("Обнаруженные контроллеры")
 
-        this.element.append(new ControllerSelector().element)
+        this.element.append(this.controllerSelectorView.element)
 
         this.addButton("Настройки контроллера").stretch().blue()
 
         this.addSubtitle("Управление танком")
-        this.element.append(new AxisSelector("Газ")           .setAxes(["W", "↑"]).element)
-        this.element.append(new AxisSelector("Тормоз/назад")  .setAxes(["S", "↓"]).element)
-        this.element.append(new AxisSelector("Влево")         .setAxes(["A", "←"]).element)
-        this.element.append(new AxisSelector("Вправо")        .setAxes(["D", "→"]).element)
-        this.element.append(new AxisSelector("Выстрел")       .setAxes(["Пробел"]).element)
-        this.element.append(new AxisSelector("Поставить мину").setAxes(["Q"]).element)
+        this.addAxisSelector("Газ", "tank-throttle-forward")
+        this.addAxisSelector("Тормоз / назад", "tank-throttle-backward")
+        this.addAxisSelector("Влево", "tank-steer-left")
+        this.addAxisSelector("Вправо", "tank-steer-right")
+        this.addAxisSelector("Выстрел", "tank-primary-weapon")
+        this.addAxisSelector("Поставить мину", "tank-miner")
 
         this.addSubtitle("Игровой процесс")
-        this.element.append(new AxisSelector("Чат")           .setAxes(["Enter"]).element)
-        this.element.append(new AxisSelector("Респавн")       .setAxes(["R"]).element)
-        this.element.append(new AxisSelector("Список игроков").setAxes(["Tab"]).element)
-        this.element.append(new AxisSelector("Пауза")         .setAxes(["Esc"]).element)
+        this.addAxisSelector("Чат", "player-chat")
+        this.addAxisSelector("Респавн", "tank-respawn")
+        this.addAxisSelector("Список игроков", "game-player-list")
+        this.addAxisSelector("Пауза", "game-pause")
 
         this.addSubtitle("Сброс")
         this.addButton("Настройки по умолчанию").stretch().red()
+
+        this.controllerSelectorView.on("select", () => {
+            this.updateController()
+        })
+
+        this.updateController()
+    }
+
+    private addAxisSelector(title: string, axisName: string) {
+        let selector = new AxisSelector(title)
+        this.selectors.set(axisName, selector)
+        this.element.append(selector.element)
+    }
+
+    private updateController() {
+        let index = this.controllerSelectorView.selectedIndex
+        let device = ControlsManager.getInstance().devices[index]
+        this.showControlsForController(device)
+    }
+
+    private showControlsForController(device: InputDevice) {
+        let settings = GameSettings.getInstance().controls.getConfigForDevice(device)
+
+        for(let [axisName, selector] of this.selectors) {
+            let axes = settings.get(axisName)
+            if(axes) {
+                selector.setAxes(axes.map(axle => ControlsPrinter.getPrintedNameOfAxle(axle, device)))
+            } else {
+                selector.setAxes([])
+            }
+        }
+    }
+
+    public onFocus() {
+        this.controllerSelectorView.startListening()
+    }
+
+    public onBlur() {
+        this.controllerSelectorView.stopListening()
     }
 }
 
@@ -37,5 +84,13 @@ export default class ControlsController extends GamePauseViewController {
         super();
         this.title = "Управление"
         this.view = new ControlsView(this)
+    }
+
+    onFocus() {
+        (this.view as ControlsView).onFocus()
+    }
+
+    onBlur() {
+        (this.view as ControlsView).onBlur()
     }
 }

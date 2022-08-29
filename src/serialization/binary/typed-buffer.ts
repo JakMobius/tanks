@@ -83,13 +83,14 @@ export default class Buffer<T extends ByteArray = Uint8Array> {
      */
 
     extend(minimumCapacity?: number): boolean {
-        if (minimumCapacity === undefined) {
-            this.capacity *= this.reallocationFactor
-        } else {
-            if (minimumCapacity <= this.capacity)
-                return false
-            this.capacity = Math.ceil(minimumCapacity / this.initialCapacity) * this.initialCapacity
+
+        if(this.capacity === 0) {
+            this.capacity = this.initialCapacity
         }
+
+        do {
+            this.capacity *= this.reallocationFactor
+        } while(this.capacity < minimumCapacity);
 
         let oldBuffer = this.array
         this.array = new (this.clazz)(this.capacity)
@@ -138,7 +139,7 @@ export default class Buffer<T extends ByteArray = Uint8Array> {
     appendArray(array: number[] | T) {
         let newSize = this.pointer + array.length
         if(newSize >= this.capacity) {
-            this.extend(newSize)
+            this.extend()
         }
 
         this.array.set(array, this.pointer)

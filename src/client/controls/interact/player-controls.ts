@@ -1,8 +1,8 @@
-import Axle from '../../controls/axle';
-import EventEmitter from '../../utils/event-emitter';
-import TankControls from "../../controls/tank-controls";
-import GamepadManager from "./interact/gamepad-manager";
-import KeyboardController from "./interact/keyboard-controller";
+import Axle from '../../../controls/axle';
+import EventEmitter from '../../../utils/event-emitter';
+import TankControls from "../../../controls/tank-controls";
+import GamepadController from "../input/gamepad/gamepad-controller";
+import KeyboardController from "../input/keyboard/keyboard-controller";
 import CallbackActivatorAxle, {AxleCallback} from "./callback-activator-axle";
 
 export default class PlayerControls extends EventEmitter {
@@ -59,33 +59,6 @@ export default class PlayerControls extends EventEmitter {
         for(let controls of this.controlledTanks) {
             this.disconnectTankControls(controls)
         }
-    }
-
-    setupGamepad(gamepad: GamepadManager) {
-        this.axles.get("tank-throttle")      .addSource(gamepad.createAxle(1).invert())
-        this.axles.get("tank-steer")         .addSource(gamepad.createAxle(2))
-        this.axles.get("tank-miner")         .addSource(gamepad.createButton(4))
-        this.axles.get("tank-primary-weapon").addSource(gamepad.createButton(5))
-        this.axles.get("tank-respawn")       .addSource(gamepad.createButton(2))
-    }
-
-    setupKeyboard(keyboard: KeyboardController) {
-        this.axles.get("tank-throttle")
-            .addSource(keyboard.createKeyAxle("KeyW")     .smooth())
-            .addSource(keyboard.createKeyAxle("ArrowUp")  .smooth())
-            .addSource(keyboard.createKeyAxle("KeyS")     .smooth().reverse())
-            .addSource(keyboard.createKeyAxle("ArrowDown").smooth().reverse())
-
-        this.axles.get("tank-steer")
-            .addSource(keyboard.createKeyAxle("KeyD")      .smooth(0.4))
-            .addSource(keyboard.createKeyAxle("ArrowRight").smooth(0.4))
-            .addSource(keyboard.createKeyAxle("KeyA")      .smooth(0.4).reverse())
-            .addSource(keyboard.createKeyAxle("ArrowLeft") .smooth(0.4).reverse())
-
-        this.axles.get("tank-miner")         .addSource(keyboard.createKeyAxle("KeyQ"))
-        this.axles.get("tank-primary-weapon").addSource(keyboard.createKeyAxle("Space"))
-        this.axles.get("tank-respawn")       .addSource(keyboard.createKeyAxle("KeyR"))
-        this.axles.get("game-pause")         .addSource(keyboard.createKeyAxle("Escape"))
     }
 
     refresh() {

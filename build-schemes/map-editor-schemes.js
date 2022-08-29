@@ -73,6 +73,10 @@ module.exports = {
                 }
             }),
             beelder.copy("src/client/web/map-editor", `${constants.cacheFolder}/map-editor`),
+
+            // TODO: It's not good to steal game assets for the map editor.
+            // It's probably better to combine hub, game and map editor into a single page.
+            beelder.copy("src/client/web/game/assets", `${constants.cacheFolder}/map-editor/`),
             beelder.copy("#texture-atlas", `${constants.cacheFolder}/map-editor/assets/img/textures`)
         ],
         targets: [ `#map-editor-build = ${constants.cacheFolder}/map-editor` ]
@@ -80,7 +84,7 @@ module.exports = {
     "release-map-editor": {
         steps: [
             beelder.delete("#map-editor"),
-            beelder.copy("#map-editor-build, #map-editor = dist/map-editor")
+            beelder.copy("#map-editor-build", "#map-editor = dist/map-editor")
         ]
     }
 }

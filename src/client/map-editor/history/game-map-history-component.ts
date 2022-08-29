@@ -1,14 +1,32 @@
 import MapModification from "./modification/map-modification";
+import {Component} from "../../../utils/ecs/component";
+import Entity from "../../../utils/ecs/entity";
+import BlockState from "../../../map/block-state/block-state";
+import MapBlockModification from "./modification/map-block-modification";
+import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import GameMap from "../../../map/game-map";
 
-class History {
-	public history: any;
-	public currentModifications: any;
-	public historyIndex: any;
+export interface GameMapModification {
+    modifications: MapModification[]
+    actionName: string
+}
+
+export default class GameMapHistoryComponent implements Component {
+    entity: Entity | null
+    preventNativeModificationRegistering: boolean = false
+
+	public history: GameMapModification[];
+	public currentModifications: MapModification[];
+	public historyIndex: number;
+
+    private eventHandler = new BasicEventHandlerSet()
 
     constructor() {
         this.history = []
         this.currentModifications = []
         this.historyIndex = -1
+
+        this.eventHandler.on("block-will-change", (x, y, block) => this.onBlockSet(x, y, block))
     }
 
     commitActions(name: string) {
@@ -56,6 +74,22 @@ class History {
         this.performModifications(this.history[this.historyIndex].modifications)
         return this.history[this.historyIndex]
     }
-}
 
-export default History;
+    onBlockSet(x: number, y: number, block: BlockState) {
+        if(!this.preventNativeModificationRegistering) {
+            this.registerModification(
+                new MapBlockModification(this.entity as GameMap, x, y, block)
+            )
+        }
+    }
+
+    onAttach(entity: Entity) {
+        this.entity = entity
+        this.eventHandler.setTarget(entity)
+    }
+
+    onDetach() {
+        this.entity = null
+        this.eventHandler.setTarget(null)
+    }
+}

@@ -1,4 +1,4 @@
-export default class Vidget {
+export default class TouchVidget {
     id: number
     hidden: boolean
     touched: boolean;

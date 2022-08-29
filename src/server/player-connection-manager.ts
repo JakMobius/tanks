@@ -96,6 +96,7 @@ export default class PlayerConnectionManager {
         let playerPosition = this.tank.getComponent(PhysicalComponent).getBody().GetPosition()
         let entityPosition = new b2Vec2();
 
+        // TODO: crashes here sometimes
         for(let entity of this.tank.parent.children) {
             let transform = entity.getComponent(TransformComponent)
             if(!transform) continue

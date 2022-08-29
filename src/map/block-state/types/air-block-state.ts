@@ -14,5 +14,7 @@ export default class AirBlockState extends BlockState {
     static typeName = "air";
     static typeId = 0;
 
-    update(map: GameMap, x: number, y: number) { }
+    update(map: GameMap, x: number, y: number) {
+        map.emit("block-update", x, y)
+    }
 }
