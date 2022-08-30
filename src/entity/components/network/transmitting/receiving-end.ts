@@ -3,11 +3,13 @@ import Entity from "../../../../utils/ecs/entity";
 import {TransmitterSet} from "./transmitter-set";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-block-coder";
+import BulletBehaviour from "../../../../server/entity/bullet-behaviour";
 
 export class ReceivingEnd {
     private buffer = new WriteBuffer()
     private root: Entity
     currentNode: Entity
+    transmitterSets = new Set<TransmitterSet>()
 
     hasData() {
         return this.buffer.offset > 0
@@ -47,6 +49,11 @@ export class ReceivingEnd {
 
         const targetEntity = transmitterSet.transmitComponent.entity
         const targetDepth = transmitterSet.getNodeDepth()
+
+        // Prevent nasty bugs
+        if(sourceDepth === null || targetDepth === null) {
+            throw new Error("Illegal navigation")
+        }
 
         // Finding the nearest common parent
 

@@ -13,7 +13,7 @@ export type KeyboardInputConfig =
     (ShortcutTriggerAxleConfig & { type: KeyboardInputType.shortcutTrigger });
 
 export default class KeyboardController extends InputDevice {
-    private listener: KeyboardListener;
+    listener: KeyboardListener;
 
     constructor() {
         super()

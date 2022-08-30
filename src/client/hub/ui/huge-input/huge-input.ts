@@ -1,18 +1,16 @@
-/* @load-resource: './auth-input.scss' */
+/* @load-resource: './huge-input.scss' */
 
 import View from "../../../ui/view";
 import InputTipList from "../input-tip-list/input-tip-list-view";
 
-export default class AuthInput extends View {
+export default class HugeInput extends View {
 
-    input = $("<input>").addClass("auth-input")
     tips: InputTipList = null
     button: JQuery;
 
     constructor() {
         super();
-        this.element.addClass("auth-container")
-        this.element.append(this.input)
+        this.element.addClass("huge-input-container")
     }
 
     addTips() {
@@ -21,12 +19,8 @@ export default class AuthInput extends View {
     }
 
     addButton(text: string) {
-        this.button = $("<button>").addClass("auth-button").text(text)
+        this.button = $("<button>").addClass("huge-input-button").text(text)
         this.element.append(this.button)
         this.element.addClass("with-button")
-    }
-
-    setPlaceholder(placeholder: string) {
-        this.input.attr("placeholder", placeholder)
     }
 }

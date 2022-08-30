@@ -59,8 +59,9 @@ export default class HealthComponent implements Component {
     }
 
     setHealth(health: number) {
+        let oldHealth = this.health
         this.health = health
-        this.entity.emit("health-set", this.health)
+        this.entity.emit("health-set", this.health, oldHealth)
         return this
     }
 

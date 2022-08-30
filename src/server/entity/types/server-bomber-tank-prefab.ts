@@ -1,23 +1,24 @@
 
 import WeaponMiner from "src/weapon/models/miner";
-import WeaponMachineGun from "src/weapon/models/machinegun";
+import WeaponBomber from "../../../weapon/models/bomber";
 import TankControls from "../../../controls/tank-controls";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
-import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import ServerEntity from "../server-entity";
+import ServerEntityPrefabs from "../server-entity-prefabs";
 import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
+import ExplodeOnDeathComponent from "../../../entity/components/explode-on-death-component";
+import {EntityType} from "../../../entity/entity-type";
 
-ServerEntity.types.set(EntityType.TANK_MONSTER, (entity: EntityModel) => {
-    ServerEntity.setupEntity(entity)
-    EntityModel.Types.get(EntityType.TANK_MONSTER)(entity)
+ServerEntityPrefabs.types.set(EntityType.TANK_BOMBER, (entity: EntityModel) => {
+    ServerEntityPrefabs.setupEntity(entity)
+    EntityModel.Types.get(EntityType.TANK_BOMBER)(entity)
 
     const controlsComponent = entity.getComponent(TankControls)
 
     // TODO: Organize weapons via some kind of weapon controller, i guess?
 
-    const primaryWeapon = new WeaponMachineGun({
+    const primaryWeapon = new WeaponBomber({
         tank: entity,
         triggerAxle: controlsComponent.getPrimaryWeaponAxle()
     })
@@ -27,7 +28,8 @@ ServerEntity.types.set(EntityType.TANK_MONSTER, (entity: EntityModel) => {
         triggerAxle: controlsComponent.getMinerWeaponAxle()
     })
 
-    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_MONSTER)
+    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_BOMBER)
+    entity.addComponent(new ExplodeOnDeathComponent())
 
     entity.on("tick", (dt) => {
         primaryWeapon.tick(dt)

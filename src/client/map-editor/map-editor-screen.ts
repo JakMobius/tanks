@@ -3,8 +3,6 @@
 import MapEditorScene from './scenes/map-editor-scene';
 import GeneralGameScreen from '../game/general-game-screen';
 
-import 'src/client/game-preloader'
-
 export default class MapEditorScreen extends GeneralGameScreen {
     public editorScene: MapEditorScene;
 

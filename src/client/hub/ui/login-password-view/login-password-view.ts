@@ -1,16 +1,16 @@
 /* @load-resource: './login-password-view.scss' */
 
 import View from "../../../ui/view";
-import AuthInput from "../auth-input/auth-input";
-import AuthTitle from "../auth-title/auth-title";
+import HugeTextInput from "../huge-text-input/huge-text-input";
+import HugeTitle from "../huge-title/huge-title";
 import {HubPage} from "../hub-page";
 
 export default class LoginPasswordView extends View {
 
-    title = new AuthTitle()
+    title = new HugeTitle()
     fieldContainer = $("<div>").addClass("field-container")
-    loginInput = new AuthInput()
-    passwordInput = new AuthInput()
+    loginInput = new HugeTextInput()
+    passwordInput = new HugeTextInput()
     buttonContainer = $("<div>").addClass("auth-button-container")
     page: HubPage
 

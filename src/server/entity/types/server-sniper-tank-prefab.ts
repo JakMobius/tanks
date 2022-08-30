@@ -1,33 +1,35 @@
 
+import Weapon42mm from "src/weapon/models/42mm";
 import WeaponMiner from "src/weapon/models/miner";
-import WeaponBomber from "../../../weapon/models/bomber";
 import TankControls from "../../../controls/tank-controls";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
-import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import ServerEntity from "../server-entity";
+import ServerEntityPrefabs from "../server-entity-prefabs";
 import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
+import ExplodeOnDeathComponent from "../../../entity/components/explode-on-death-component";
+import {EntityType} from "../../../entity/entity-type";
 
-ServerEntity.types.set(EntityType.TANK_BOMBER, (entity: EntityModel) => {
-    ServerEntity.setupEntity(entity)
-    EntityModel.Types.get(EntityType.TANK_BOMBER)(entity)
+ServerEntityPrefabs.types.set(EntityType.TANK_SNIPER, (entity: EntityModel) => {
+    ServerEntityPrefabs.setupEntity(entity)
+    EntityModel.Types.get(EntityType.TANK_SNIPER)(entity)
 
     const controlsComponent = entity.getComponent(TankControls)
 
     // TODO: Organize weapons via some kind of weapon controller, i guess?
 
-    const primaryWeapon = new WeaponBomber({
+    let primaryWeapon = new Weapon42mm({
         tank: entity,
         triggerAxle: controlsComponent.getPrimaryWeaponAxle()
     })
 
-    const minerWeapon = new WeaponMiner({
+    let minerWeapon = new WeaponMiner({
         tank: entity,
         triggerAxle: controlsComponent.getMinerWeaponAxle()
     })
 
-    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_BOMBER)
+    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_SNIPER)
+    entity.addComponent(new ExplodeOnDeathComponent())
 
     entity.on("tick", (dt) => {
         primaryWeapon.tick(dt)
@@ -37,4 +39,5 @@ ServerEntity.types.set(EntityType.TANK_BOMBER, (entity: EntityModel) => {
     entity.getComponent(HealthComponent)
         .setMaxHealth(10)
         .addDamageModifier(DamageModifiers.resistance(1), DamageTypes.EXPLOSION)
+
 })

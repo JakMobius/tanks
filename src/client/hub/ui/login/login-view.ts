@@ -42,7 +42,7 @@ export default class LoginView extends LoginPasswordView {
     }
 
     private loginSuccessful() {
-
+        window.location.reload()
     }
 
     private invalidCredentials() {

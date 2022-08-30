@@ -4,7 +4,7 @@ import path from "path";
 
 const scriptsFolder = path.join(__dirname, "resources/scripts")
 
-class RunCommand extends Command {
+export default class RunCommand extends Command {
 
     onPerform(args: string[]): void {
         if(args.length !== 1) {
@@ -31,5 +31,3 @@ class RunCommand extends Command {
         return "Run script"
     }
 }
-
-export default RunCommand;

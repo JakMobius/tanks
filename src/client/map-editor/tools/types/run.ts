@@ -9,7 +9,8 @@ import EntityModel from "../../../../entity/entity-model";
 import Player from "../../../../player";
 import ControlsManager from "../../../controls/controls-manager";
 import EntityDataReceiveComponent from "../../../../entity/components/network/entity-data-receive-component";
-import ClientEntity, {EntityType} from "../../../entity/client-entity";
+import ClientEntity from "../../../entity/client-entity";
+import {EntityType} from "../../../../entity/entity-type";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;

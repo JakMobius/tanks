@@ -46,42 +46,44 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
         if(req.method == 'GET') requestFields = req.query
         else if(req.method == 'POST') requestFields = req.body
 
-        for(let field of schema) {
-            let fieldValue = requestFields[field.name]
-            if(!fieldValue) {
-                res.status(400).send({
-                    error: 'missing-field',
-                    field: field.name
-                })
-                return;
-            }
-            let type = field.type
+        if(schema) {
+            for (let field of schema) {
+                let fieldValue = requestFields[field.name]
+                if (fieldValue === undefined) {
+                    res.status(400).send({
+                        error: 'missing-field',
+                        field: field.name
+                    })
+                    return;
+                }
+                let type = field.type
 
-            switch(type) {
-                case AjaxFieldType.boolean:
-                    fieldValue = this.convertBoolean(fieldValue)
-                    fields[field.name] = fieldValue
-                    break
-                case AjaxFieldType.json:
-                    fieldValue = this.convertJson(fieldValue)
-                    fields[field.name] = fieldValue
-                    break
-                case AjaxFieldType.number:
-                    fieldValue = this.convertNumber(fieldValue)
-                    fields[field.name] = fieldValue
-                    break
-                case AjaxFieldType.string:
-                    fieldValue = this.convertString(fieldValue)
-                    fields[field.name] = fieldValue
-                    break
-            }
+                switch (type) {
+                    case AjaxFieldType.boolean:
+                        fieldValue = this.convertBoolean(fieldValue)
+                        fields[field.name] = fieldValue
+                        break
+                    case AjaxFieldType.json:
+                        fieldValue = this.convertJson(fieldValue)
+                        fields[field.name] = fieldValue
+                        break
+                    case AjaxFieldType.number:
+                        fieldValue = this.convertNumber(fieldValue)
+                        fields[field.name] = fieldValue
+                        break
+                    case AjaxFieldType.string:
+                        fieldValue = this.convertString(fieldValue)
+                        fields[field.name] = fieldValue
+                        break
+                }
 
-            if(fieldValue === null) {
-                res.status(400).send({
-                    'error': 'malformed-input-data',
-                    'message': 'value of "' + field.name + '" expected to be ' + AjaxFieldType[type]
-                })
-                return
+                if (fieldValue === null) {
+                    res.status(400).send({
+                        'error': 'malformed-input-data',
+                        'message': 'value of "' + field.name + '" expected to be ' + AjaxFieldType[type]
+                    })
+                    return
+                }
             }
         }
 

@@ -6,6 +6,7 @@ import PhysicalHostComponent from "../../physiсal-world-component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import PositionTransmitter from "./network/position/position-transmitter";
+import EventEmitter from "../../utils/event-emitter";
 
 export default class PhysicalComponent implements Component {
     entity: Entity | null

@@ -9,9 +9,10 @@ import TruckProgram from "../../../graphics/programs/truck-program";
 import TextureProgram from "../../../graphics/programs/texture-program";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
-import ClientEntity, {EntityType} from "../../client-entity";
+import ClientEntity from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import ClientTank from "../client-tank";
+import {EntityType} from "../../../../entity/entity-type";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;

@@ -1,15 +1,9 @@
 /* @load-resource: './room-list-view.scss' */
 
 import View from "../../../ui/view";
-import InputTipList, {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import {checkNick} from "../../../../utils/nick-checker";
-import {textFromNickCheckResult} from "../../localizations";
-import AuthInput from "../auth-input/auth-input";
-import AuthTitle from "../auth-title/auth-title";
 import {HubPage} from "../hub-page";
 import RoomCell from "./room-cell/room-cell";
 import Button from "../../../ui/button/button";
-import GamePauseNavigationTransition from "../../../game/ui/overlay/pause/game-pause-navigation-transition";
 import GameCreateController from "../game-create/game-create-controller";
 
 export default class RoomListView extends View {

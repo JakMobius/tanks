@@ -1,6 +1,6 @@
 import Command from '../command';
 
-class KickCommand extends Command {
+export default class KickCommand extends Command {
     onPerform(args: string[]): void {
 
         let logger = this.console.logger
@@ -28,7 +28,7 @@ class KickCommand extends Command {
     }
 
     getDescription(): string {
-        return "Кикнуть клиента"
+        return "Kick player"
     }
 
     getName(): string {
@@ -43,5 +43,3 @@ class KickCommand extends Command {
         return true
     }
 }
-
-export default KickCommand;

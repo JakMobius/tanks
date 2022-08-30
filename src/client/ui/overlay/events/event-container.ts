@@ -4,7 +4,7 @@ import View from '../../view';
 
 import EventView from './event-view';
 
-class EventContainer extends View {
+export default class EventContainer extends View {
     constructor() {
         super();
 
@@ -38,5 +38,3 @@ class EventContainer extends View {
         }, 2000)
     }
 }
-
-export default EventContainer;

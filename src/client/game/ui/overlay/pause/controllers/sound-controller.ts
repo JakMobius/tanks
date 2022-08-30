@@ -5,7 +5,7 @@ import GraphicsController from "./graphics-controller";
 export class SoundView extends PauseMenuView {
     constructor(controller: GraphicsController) {
         super(controller);
-
+        this.addSubtitle("Он есть. Нечего тут смотреть.")
 
     }
 }

@@ -1,9 +1,10 @@
 
 import BasicEntityDrawer from '../../../graphics/drawers/basic-entity-drawer';
 import DrawPhase from "../../../graphics/drawers/draw-phase";
-import ClientEntity, {EntityType} from "../../client-entity";
+import ClientEntity from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import ClientBullet from "../client-bullet";
+import {EntityType} from "../../../../entity/entity-type";
 
 class Drawer extends BasicEntityDrawer {
     static spriteNames = ["bullets/bomb/bomb"]

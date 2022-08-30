@@ -17,7 +17,7 @@ export interface CommandParsedFlags {
     incompleteFlag: string
 }
 
-class Command {
+export default class Command {
 
 	console: Console = null
 	subcommands: Command[] = []
@@ -399,5 +399,3 @@ class Command {
         return autocompletes
     }
 }
-
-export default Command;

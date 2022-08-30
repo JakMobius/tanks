@@ -18,11 +18,10 @@ import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
 import AirbagTankBehaviour from "../../../../entity/tanks/physics/airbag-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
-import ClientEntity, {EntityType} from "../../client-entity";
+import ClientEntity from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
-import EffectHostComponent from "../../../../effects/effect-host-component";
-import DamageSmokeEffect from "../damage-smoke-effect";
 import ClientTank from "../client-tank";
+import {EntityType} from "../../../../entity/entity-type";
 
 class Drawer extends TankDrawer {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)

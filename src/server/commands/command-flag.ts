@@ -30,7 +30,7 @@ export interface CommandFlagConfig {
  *  })
  */
 
-class CommandFlag {
+export default class CommandFlag {
 
     constructor(options: CommandFlagConfig) {
         this.type = options.type || "flag"
@@ -44,5 +44,3 @@ class CommandFlag {
     name: string;
     type: "key" | "flag";
 }
-
-export default CommandFlag;

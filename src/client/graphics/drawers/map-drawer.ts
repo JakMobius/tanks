@@ -6,6 +6,7 @@ import BlockState from "../../../map/block-state/block-state";
 import Camera from "../../camera";
 import TextureProgram from "../programs/texture-program";
 import Screen from "../screen";
+import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 
 export interface DrawerBounds {
     x0: number
@@ -17,6 +18,7 @@ export interface DrawerBounds {
 export default class MapDrawer {
     public oldBounds: DrawerBounds
     public blockProgram: TextureProgram
+    public gridDrawingProgram: ConvexShapeProgram
     public screen: Screen
 
     constructor(screen: Screen) {
@@ -24,6 +26,8 @@ export default class MapDrawer {
         this.blockProgram = new TextureProgram(this.screen.ctx, {
             largeIndices: true
         })
+
+        this.gridDrawingProgram = new ConvexShapeProgram(this.screen.ctx)
 
         this.reset()
     }
@@ -75,20 +79,60 @@ export default class MapDrawer {
                 }
             }
 
-            this.blockProgram.bind()
-            Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
-            this.blockProgram.setCamera(camera)
-            this.blockProgram.draw()
-        } else {
-            this.blockProgram.bind()
-            this.blockProgram.setCamera(camera)
-            Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
-            this.blockProgram.draw()
+            this.gridDrawingProgram.reset()
+            this.drawGrid(map)
         }
+
+        this.gridDrawingProgram.bind()
+        this.gridDrawingProgram.setCamera(camera)
+        this.gridDrawingProgram.draw()
+
+        this.blockProgram.bind()
+        this.blockProgram.setCamera(camera)
+        Sprite.setGLMipMapLevel(this.screen.ctx, this.blockProgram.textureUniform, mipmaplevel)
+        this.blockProgram.draw()
 
         if(mipmaplevel !== oldmipmaplevel) {
             Sprite.setMipMapLevel(oldmipmaplevel)
         }
+    }
+
+    drawLine(x0: number, y0: number, width: number, height: number, color: number) {
+        x0 *= GameMap.BLOCK_SIZE
+        y0 *= GameMap.BLOCK_SIZE
+        width *= GameMap.BLOCK_SIZE
+        height *= GameMap.BLOCK_SIZE
+
+        this.gridDrawingProgram.drawRectangle(x0, y0, x0 + width, y0 + height, color)
+    }
+
+    drawGrid(map: GameMap) {
+        const gridColor = 0xffe6e6e6
+
+        let gridThickness = 0.2 / GameMap.BLOCK_SIZE
+        let halfGridThickness = gridThickness / 2
+
+        for(let x = this.oldBounds.x0; x <= this.oldBounds.x1; x ++) {
+            if (x != 0 && x != map.width) {
+                this.drawLine(x - halfGridThickness, 0, gridThickness, this.oldBounds.y1, gridColor)
+            }
+        }
+
+        for(let y = this.oldBounds.y0; y <= this.oldBounds.y1; y ++) {
+            if (y != 0 && y != map.height) {
+                this.drawLine(0, y - halfGridThickness, this.oldBounds.x1, gridThickness, gridColor)
+            }
+        }
+
+        const borderColor = 0xffd4d4d4
+        let borderThickness = 0.3 / GameMap.BLOCK_SIZE
+        let halfBorderThickness = borderThickness / 2
+
+        this.drawLine(-halfBorderThickness, 0, borderThickness, this.oldBounds.y1, borderColor)
+        this.drawLine(0, -halfBorderThickness, this.oldBounds.x1, borderThickness, borderColor)
+        this.drawLine(map.width - halfBorderThickness, 0, borderThickness, this.oldBounds.y1, borderColor)
+        this.drawLine(0, map.height - halfBorderThickness, this.oldBounds.x1, borderThickness, borderColor)
+
     }
 
     private drawBlock(block: BlockState, x: number, y: number, map: GameMap) {

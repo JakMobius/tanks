@@ -6,8 +6,6 @@ import {ScreenConfig} from "../graphics/screen";
 import {UserDataRaw} from "../user-data-raw";
 import GeneralGameScreen from "../game/general-game-screen";
 
-import 'src/client/game-preloader'
-
 export interface TutorialConfig extends ScreenConfig {
     userData: UserDataRaw
 }

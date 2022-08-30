@@ -3,7 +3,7 @@ import {b2BodyType} from "../../library/box2d/dynamics/b2_body";
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
-import {EntityType} from "../../client/entity/client-entity";
+import {EntityType} from "../entity-type";
 
 EntityModel.Types.set(EntityType.BULLET_MINE, (entity) => {
     EntityModel.initializeEntity(entity)

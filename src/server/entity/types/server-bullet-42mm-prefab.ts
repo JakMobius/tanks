@@ -1,25 +1,24 @@
 
-import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import ServerEntity from "../server-entity";
+import ServerEntityPrefabs from "../server-entity-prefabs";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
 import BulletBehaviour from "../bullet-behaviour";
 import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
+import {EntityType} from "../../../entity/entity-type";
 
-ServerEntity.types.set(EntityType.BULLET_16MM, (entity: EntityModel) => {
-    ServerEntity.setupEntity(entity)
-    EntityModel.Types.get(EntityType.BULLET_16MM)(entity)
+ServerEntityPrefabs.types.set(EntityType.BULLET_42MM, (entity: EntityModel) => {
+    ServerEntityPrefabs.setupEntity(entity)
+    EntityModel.Types.get(EntityType.BULLET_42MM)(entity)
 
     entity.addComponent(new BulletBehaviour({
-        initialVelocity: 150,
-        explodePower: 0,
-        wallDamage: 1000,
-        entityDamage: 0.5
+        initialVelocity: 112.5,
+        explodePower: 5,
+        wallDamage: 3000,
     }))
 
     entity.getComponent(HealthComponent)
         .setMaxHealth(0.1)
         .addDamageModifier(DamageModifiers.resistance(2), DamageTypes.EXPLOSION)
-    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.BULLET_16MM)
+    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.BULLET_42MM)
 })

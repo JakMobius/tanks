@@ -5,6 +5,7 @@ import Entity from "../utils/ecs/entity";
 import TransformComponent from "../entity/components/transform-component";
 import WriteBuffer from "../serialization/binary/write-buffer";
 import ReadBuffer from "../serialization/binary/read-buffer";
+import HealthComponent from "../entity/components/health-component";
 
 export default class TankControls implements BinaryEncodable, Component {
 	public throttle = 0
@@ -77,10 +78,16 @@ export default class TankControls implements BinaryEncodable, Component {
     }
 
     updateAxes() {
+        this.updated = true
+
+        let health = this.entity.getComponent(HealthComponent).getHealth()
+        if(health <= 0) {
+            this.throttle = 0
+            return
+        }
+
         let x = this.axles.get("x").getValue()
         let y = this.axles.get("y").getValue()
-
-        this.updated = true
 
         if (this.directional) {
             const transform = this.entity.getComponent(TransformComponent).transform

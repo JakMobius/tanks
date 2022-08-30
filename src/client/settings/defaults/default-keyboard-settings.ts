@@ -23,8 +23,9 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardI
         "tank-primary-weapon": [{type: KeyboardInputType.key, key: "Space"}],
         "tank-respawn": [{type: KeyboardInputType.key, key: "KeyR"}],
         "game-pause": [{type: KeyboardInputType.key, key: "Escape"}],
-        "player-chat": [{type: KeyboardInputType.key, key: "Enter"}],
+        "game-toggle-debug": [{type: KeyboardInputType.key, key: "KeyF3"}],
         "game-player-list": [{type: KeyboardInputType.key, key: "Tab"}],
+        "game-chat": [{type: KeyboardInputType.key, key: "Enter"}],
 
         "editor-undo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Z"}],
         "editor-redo": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-Y"}],

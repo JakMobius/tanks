@@ -20,7 +20,6 @@ export default class RoomPortal extends TypedEventHandler<[SocketPortalClient]> 
     clientDisconnected(client: SocketPortalClient) {
         this.resetPacketHandling(client)
         this.clients.delete(client.id)
-        client.emit("disconnect")
         this.emit("client-disconnect", client)
     }
 

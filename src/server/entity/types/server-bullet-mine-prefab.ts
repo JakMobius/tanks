@@ -1,14 +1,14 @@
 
-import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import ServerEntity from "../server-entity";
+import ServerEntityPrefabs from "../server-entity-prefabs";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
 import BulletBehaviour from "../bullet-behaviour";
 import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
+import {EntityType} from "../../../entity/entity-type";
 
-ServerEntity.types.set(EntityType.BULLET_MINE, (entity: EntityModel) => {
-    ServerEntity.setupEntity(entity)
+ServerEntityPrefabs.types.set(EntityType.BULLET_MINE, (entity: EntityModel) => {
+    ServerEntityPrefabs.setupEntity(entity)
     EntityModel.Types.get(EntityType.BULLET_MINE)(entity)
 
     entity.addComponent(new BulletBehaviour({

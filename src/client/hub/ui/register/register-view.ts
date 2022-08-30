@@ -1,9 +1,9 @@
 import LoginPasswordView from "../login-password-view/login-password-view";
 import {HubPage} from "../hub-page";
 import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import {checkNick} from "../../../../utils/nick-checker";
+import {checkNick} from "../../../../data-checkers/nick-checker";
 import {textFromNickCheckResult} from "../../localizations";
-import {passwordScore} from "../../../../utils/password-checker";
+import {passwordScore} from "../../../../data-checkers/password-checker";
 
 export default class RegisterView extends LoginPasswordView {
 
@@ -104,7 +104,7 @@ export default class RegisterView extends LoginPasswordView {
     }
 
     private onSuccessfulRegister() {
-
+        window.location.reload()
     }
 
     private onLoginUsed() {

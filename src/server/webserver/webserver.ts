@@ -124,7 +124,7 @@ export default class WebServer {
     onError(err: Error, req: express.Request, res: express.Response, next: express.NextFunction) {
         res.status(500);
 
-        console.log(err)
+        console.error("An error occurred in the webserver while handling a request: " + req.method + " " + req.url + " with body: ", req.body, err)
 
         if (req.accepts('html')) {
             res.render('default/views/500.hbs');

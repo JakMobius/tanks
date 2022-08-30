@@ -6,8 +6,10 @@ import LoginAjaxHandler from "./ajax/login-handler";
 import RegisterAjaxHandler from "./ajax/register-handler";
 import {WebserverSession} from "../webserver-session";
 import ProfileImageAjaxHandler from "./ajax/profile-image";
+import MapListAjaxHandler from "./ajax/map-list";
+import RoomCreateAjaxHandler from "./ajax/room-create";
 
-class HubModule extends WebserverModule {
+export default class HubModule extends WebserverModule {
 
     private userDataFromSession(session: WebserverSession) {
         return JSON.stringify({
@@ -37,9 +39,7 @@ class HubModule extends WebserverModule {
         this.addAjaxHandler(new LoginAjaxHandler())
         this.addAjaxHandler(new RegisterAjaxHandler())
         this.addAjaxHandler(new ProfileImageAjaxHandler())
-
-
+        this.addAjaxHandler(new MapListAjaxHandler())
+        this.addAjaxHandler(new RoomCreateAjaxHandler())
     }
 }
-
-export default HubModule;

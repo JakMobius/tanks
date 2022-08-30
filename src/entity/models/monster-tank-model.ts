@@ -5,9 +5,9 @@ import {physicsFilters} from "../../physics/categories";
 import WheelAxlesGenerator from "../tanks/physics/wheeled-tank/wheel-axles-generator";
 import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
-import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
 import SailingComponent from "../components/sailing-component";
+import {EntityType} from "../entity-type";
 
 EntityModel.Types.set(EntityType.TANK_MONSTER, (entity) => {
     TankModel.initializeEntity(entity)

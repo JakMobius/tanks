@@ -6,8 +6,6 @@ import GeneralGameScreen from "./general-game-screen";
 import WebsocketConnection from "../networking/websocket-connection";
 import ConnectionClient from "../../networking/connection-client";
 
-import 'src/client/game-preloader'
-
 export interface GameConfig extends ScreenConfig {
     ip: string
 }

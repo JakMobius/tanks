@@ -1,6 +1,6 @@
 
 export default abstract class AbstractEventHandlerSet<T> {
-    public listeners = new Map<any, Set<(...params: any[]) => any>>();
+    public listeners = new Map<any, Array<(...params: any[]) => any>>();
     public target: T | T[];
 
     protected constructor(target?: T | T[]) {
@@ -9,9 +9,9 @@ export default abstract class AbstractEventHandlerSet<T> {
 
     on(event: any, listener: (...params: any[]) => any){
         if(this.listeners.has(event)) {
-            this.listeners.get(event).add(listener)
+            this.listeners.get(event).push(listener)
         } else {
-            this.listeners.set(event, new Set([listener]))
+            this.listeners.set(event, [listener])
         }
         if(this.target) this.setEventListeners(event, listener)
     }
@@ -19,8 +19,8 @@ export default abstract class AbstractEventHandlerSet<T> {
     off(event: any, listener: (...params: any[]) => any) {
         if(this.listeners.has(event)) {
             let set = this.listeners.get(event)
-            set.delete(listener)
-            if(set.size === 0) this.listeners.delete(event)
+            set.splice(set.indexOf(listener), 1)
+            if(set.length === 0) this.listeners.delete(event)
         }
         if(this.target) this.setEventListeners(event, listener)
     }

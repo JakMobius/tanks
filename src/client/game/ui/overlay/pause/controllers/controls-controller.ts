@@ -30,7 +30,7 @@ export class ControlsView extends PauseMenuView {
         this.addAxisSelector("Поставить мину", "tank-miner")
 
         this.addSubtitle("Игровой процесс")
-        this.addAxisSelector("Чат", "player-chat")
+        this.addAxisSelector("Чат", "game-chat")
         this.addAxisSelector("Респавн", "tank-respawn")
         this.addAxisSelector("Список игроков", "game-player-list")
         this.addAxisSelector("Пауза", "game-pause")

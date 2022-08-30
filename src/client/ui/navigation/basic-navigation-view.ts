@@ -49,32 +49,56 @@ export default class BasicNavigationView extends View {
         return true
     }
 
-    popController(): boolean {
+    popController(which: Controller | null = null): boolean {
         if(this.locked) return false
 
-        const currentBlock = this.stack.pop()
+        if(which) {
+            const index = this.stack.findIndex(b => b.controller === which)
+            // Cannot pop root view controller as well as absent view controller
+            if(index < 1) return false
+        }
+
+        if (this.stack.length <= 1) {
+            return false
+        }
+
+        const currentBlock = this.stack[this.stack.length - 1]
         if(currentBlock) currentBlock.controller.onBlur()
 
-        if(this.stack.length > 0) {
-            this.locked = true
+        this.locked = true
+
+        this.transitionToController(which).then(() => {
+            this.locked = false
+            const newBlock = this.stack[this.stack.length - 1]
+            if(newBlock) newBlock.controller.onFocus()
+        })
+
+        return true
+    }
+
+    private async transitionToController(which: Controller | null) {
+        while(true) {
+            let poppedController = this.stack[this.stack.length - 1].controller
+            await this.transitionToPreviousController()
+            if(poppedController == which || !which) return
+        }
+    }
+
+    private transitionToPreviousController(): Promise<void> {
+        return new Promise<void>(resolve => {
+            const currentBlock = this.stack.pop()
             const newBlock = this.stack[this.stack.length - 1]
 
             let transition = this.transitionStack.pop()
-            if(transition) {
+            if (transition) {
                 transition.performBackwardTransition(this, currentBlock, newBlock, () => {
-                    newBlock.controller.onFocus()
-                    this.locked = false
+                    resolve()
                 })
             } else {
                 this.performDefaultTransition(currentBlock, newBlock)
-                newBlock.controller.onFocus()
-                this.locked = false
+                resolve()
             }
-
-            return true
-        }
-
-        return false
+        })
     }
 
     clearControllers() {

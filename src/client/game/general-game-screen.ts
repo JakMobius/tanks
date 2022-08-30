@@ -9,6 +9,8 @@ import Downloader from "../utils/downloader";
 import Sounds from "../sound/sounds";
 import Progress from "../utils/progress";
 
+import 'src/client/game-preloader'
+
 export default class GeneralGameScreen extends SceneScreen {
 
     constructor(config: ScreenConfig) {

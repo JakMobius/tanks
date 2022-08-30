@@ -91,12 +91,14 @@ export class TransmitterSet {
     }
 
     private attachedToRoot() {
+        this.receivingEnd.transmitterSets.add(this)
         for(let transmitter of this.transmitters.values()) {
             transmitter.attachedToRoot()
         }
     }
 
     private detachedFromRoot() {
+        this.receivingEnd.transmitterSets.delete(this)
         for(let transmitter of this.transmitters.values()) {
             transmitter.detachedFromRoot()
         }

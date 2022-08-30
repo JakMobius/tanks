@@ -25,12 +25,16 @@ export default class CollisionIgnoreListTransmitter extends Transmitter {
     }
 
     writeEntityCollisionListRemove(entity: Entity) {
+        if(!this.entityCanBePointed(entity)) return;
+
         this.pack(Commands.COLLISION_IGNORE_LIST_REMOVE, (buffer) => {
             this.pointToEntity(entity)
         })
     }
 
     writeEntityCollisionListAdd(entity: Entity) {
+        if(!this.entityCanBePointed(entity)) return;
+
         this.pack(Commands.COLLISION_IGNORE_LIST_ADD, (buffer) => {
             this.pointToEntity(entity)
         })

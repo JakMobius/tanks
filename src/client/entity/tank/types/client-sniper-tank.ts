@@ -11,11 +11,10 @@ import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TrackTankBehaviour from "../../../../entity/tanks/physics/track-tank/track-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
-import ClientEntity, {EntityType} from "../../client-entity";
+import ClientEntity from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
-import EffectHostComponent from "../../../../effects/effect-host-component";
-import DamageSmokeEffect from "../damage-smoke-effect";
 import ClientTank from "../client-tank";
+import {EntityType} from "../../../../entity/entity-type";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

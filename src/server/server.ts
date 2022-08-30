@@ -24,11 +24,16 @@ export interface WebServerConfig {
     sessionKey: string
 }
 
+export interface GeneralServerConfig {
+    port: number,
+    mapsDirectory: string
+}
+
 export interface ServerConfig {
-    webServer: WebServerConfig
+    general: GeneralServerConfig,
+    webServer: WebServerConfig,
     cluster?: ServerClusterConfig,
     database: ServerDatabase,
-    port: number
 }
 
 export default class Server extends EventEmitter {
@@ -84,7 +89,7 @@ export default class Server extends EventEmitter {
         if(active) {
             if(this.webServer) return
 
-            let portListener = this.getPortListener(this.config.port)
+            let portListener = this.getPortListener(this.config.general.port)
             portListener.retainHTTP()
 
             this.webServer = new WebServer(this)
@@ -94,7 +99,7 @@ export default class Server extends EventEmitter {
 
             this.webServer.disable()
             this.webServer = null
-            this.getPortListener(this.config.port).releaseHTTP()
+            this.getPortListener(this.config.general.port).releaseHTTP()
         }
     }
 
@@ -102,7 +107,7 @@ export default class Server extends EventEmitter {
         if(active) {
             if (this.gameSocket) return
 
-            let portListener = this.getPortListener(this.config.port)
+            let portListener = this.getPortListener(this.config.general.port)
             portListener.retainWebsocket()
 
             this.gameSocket = new GameSocket();
@@ -111,7 +116,7 @@ export default class Server extends EventEmitter {
             if(!this.gameSocket) return
             this.gameSocket.terminate()
             this.gameSocket = null
-            this.getPortListener(this.config.port).releaseWebsocket()
+            this.getPortListener(this.config.general.port).releaseWebsocket()
         }
     }
 

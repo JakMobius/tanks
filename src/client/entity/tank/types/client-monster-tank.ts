@@ -18,9 +18,10 @@ import WorldDrawerComponent from "../../components/world-drawer-component";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import WheeledTankBehaviour from "../../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
 import TransformComponent from "../../../../entity/components/transform-component";
-import ClientEntity, {EntityType} from "../../client-entity";
+import ClientEntity from "../../client-entity";
 import EntityModel from "../../../../entity/entity-model";
 import ClientTank from "../client-tank";
+import {EntityType} from "../../../../entity/entity-type";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

@@ -49,11 +49,15 @@ export default class PlayerConnectionManager {
         })
 
         client.on(PlayerChatPacket, (packet) => {
-            if(this.world) this.world.emit("player-chat", this.player, packet.text)
+            if(this.world) this.world.emit("game-chat", this.player, packet.text)
         })
 
         client.on("disconnect", (client: SocketPortalClient) => {
-            if(this.tank) this.tank.die()
+            if(this.tank) {
+                this.tank.die()
+                this.tank = null
+            }
+            this.setWorld(null)
         })
     }
 
@@ -68,11 +72,13 @@ export default class PlayerConnectionManager {
     }
 
     private setWorld(world: ServerGameWorld) {
-        if(this.world) {
-            let transmitComponent = this.world.getComponent(EntityDataTransmitComponent)
-            if(transmitComponent.hasTransmitterSetForEnd(this.end)) {
-                transmitComponent.transmitterSetFor(this.end).detachTransmitters()
-            }
+        // Detach all transmitters from old world, because otherwise they will
+        // be mixed with new world transmitters. It might also lead to issues
+        // when new world is null, when player leaves the game. Transmitters
+        // will keep send events to the disconnected player and server will crash.
+
+        for(let transmitterSet of this.end.transmitterSets.values()) {
+            transmitterSet.detachTransmitters()
         }
 
         this.world = world
@@ -96,7 +102,6 @@ export default class PlayerConnectionManager {
         let playerPosition = this.tank.getComponent(PhysicalComponent).getBody().GetPosition()
         let entityPosition = new b2Vec2();
 
-        // TODO: crashes here sometimes
         for(let entity of this.tank.parent.children) {
             let transform = entity.getComponent(TransformComponent)
             if(!transform) continue

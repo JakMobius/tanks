@@ -1,12 +1,12 @@
 import Command from '../command';
 
-class UnbanCommand extends Command {
+export default class UnbanCommand extends Command {
 	public server: any;
 
     onPerform(args: string[]) {
         let logger = this.console.logger
         if(args.length !== 1) {
-            logger.log("Использование: " + this.getUsage())
+            logger.log("Usage: " + this.getUsage())
             return
         }
 
@@ -14,15 +14,15 @@ class UnbanCommand extends Command {
         const index = this.server.banned.indexOf(ip)
 
         if(index === -1) {
-            logger.log("ip " + ip + " не был забанен")
+            logger.log("ip " + ip + " is not banned")
         } else {
             this.server.banned.splice(index, 1)
-            logger.log(" - Разбанен ip " + ip)
+            logger.log(" - Unbanned ip " + ip)
         }
     }
 
     getDescription() {
-        return "Разбанить игрока"
+        return "Unban player"
     }
 
     getName() {
@@ -37,5 +37,3 @@ class UnbanCommand extends Command {
         return false
     }
 }
-
-export default UnbanCommand;

@@ -1,33 +1,35 @@
 
-import Weapon42mm from "src/weapon/models/42mm";
-import WeaponMiner from "src/weapon/models/miner";
+import WeaponMiner from "../../../weapon/models/miner";
+import WeaponCannon from "../../../weapon/models/cannon";
 import TankControls from "../../../controls/tank-controls";
 import EntityDataTransmitComponent
     from "../../../entity/components/network/transmitting/entity-data-transmit-component";
-import {EntityType} from "../../../client/entity/client-entity";
 import EntityModel from "../../../entity/entity-model";
-import ServerEntity from "../server-entity";
+import ServerEntityPrefabs from "../server-entity-prefabs";
 import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
+import ExplodeOnDeathComponent from "../../../entity/components/explode-on-death-component";
+import {EntityType} from "../../../entity/entity-type";
 
-ServerEntity.types.set(EntityType.TANK_SNIPER, (entity: EntityModel) => {
-    ServerEntity.setupEntity(entity)
-    EntityModel.Types.get(EntityType.TANK_SNIPER)(entity)
+ServerEntityPrefabs.types.set(EntityType.TANK_BIGBOI, (entity: EntityModel) => {
+    ServerEntityPrefabs.setupEntity(entity)
+    EntityModel.Types.get(EntityType.TANK_BIGBOI)(entity)
 
     const controlsComponent = entity.getComponent(TankControls)
 
     // TODO: Organize weapons via some kind of weapon controller, i guess?
 
-    let primaryWeapon = new Weapon42mm({
+    const primaryWeapon = new WeaponCannon({
         tank: entity,
         triggerAxle: controlsComponent.getPrimaryWeaponAxle()
     })
 
-    let minerWeapon = new WeaponMiner({
+    const minerWeapon = new WeaponMiner({
         tank: entity,
         triggerAxle: controlsComponent.getMinerWeaponAxle()
     })
 
-    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_SNIPER)
+    entity.getComponent(EntityDataTransmitComponent).setConfigScriptIndex(EntityType.TANK_BIGBOI)
+    entity.addComponent(new ExplodeOnDeathComponent())
 
     entity.on("tick", (dt) => {
         primaryWeapon.tick(dt)
@@ -37,5 +39,4 @@ ServerEntity.types.set(EntityType.TANK_SNIPER, (entity: EntityModel) => {
     entity.getComponent(HealthComponent)
         .setMaxHealth(10)
         .addDamageModifier(DamageModifiers.resistance(1), DamageTypes.EXPLOSION)
-
 })

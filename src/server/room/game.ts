@@ -5,11 +5,6 @@ import Room from './room';
 import Logger from '../log/logger';
 import GameMap from "../../map/game-map";
 
-import 'src/entity/model-loader'
-import 'src/server/entity/type-loader'
-import 'src/server/effects/type-loader';
-import 'src/map/block-state/type-loader';
-
 import HTMLEscape from "../../utils/html-escape";
 import PlayerChatPacket from "../../networking/packets/game-packets/player-chat-packet";
 import Player from "../../player";
@@ -52,7 +47,7 @@ export default class Game extends Room {
         this.portal.on("client-disconnect", (client) => this.onClientDisconnect(client))
 
         this.world.on("player-respawn",     (player) => this.onPlayerRespawn(player))
-        this.world.on("player-chat",        (player, text) => this.onPlayerChat(player, text))
+        this.world.on("game-chat",        (player, text) => this.onPlayerChat(player, text))
 
         if(options.loop) {
             this.loop = options.loop

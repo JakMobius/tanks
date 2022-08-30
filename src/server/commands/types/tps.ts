@@ -1,6 +1,6 @@
 import Command from '../command';
 
-class TPSCommand extends Command {
+export default class TPSCommand extends Command {
 
 	onPerform(args: string[]) {
 	    // let logger = this.console.logger
@@ -25,7 +25,7 @@ class TPSCommand extends Command {
     }
 
     getDescription() {
-        return "Посчитать среднее количество миллисекунд, затраченное на один тик";
+        return "Count average tick time";
     }
 
     getUsage() {
@@ -36,5 +36,3 @@ class TPSCommand extends Command {
         return true
     }
 }
-
-export default TPSCommand;

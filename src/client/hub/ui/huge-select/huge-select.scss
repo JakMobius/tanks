@@ -1,0 +1,10 @@
+
+.huge-input-container {
+  .huge-select {
+    appearance: none;
+    background-image: url(../assets/dropdown.png);
+    background-repeat: no-repeat;
+    background-position: calc(100% - 10px) center;
+    background-size: 15px;
+  }
+}

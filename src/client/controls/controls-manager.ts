@@ -17,13 +17,17 @@ export default class ControlsManager extends EventEmitter {
     private controlledTanks = new Set<TankControls>()
     private readonly axleUpdateCallback: AxleCallback = (axle) => this.axlesToUpdate.push(axle)
 
+    public keyboard: KeyboardController
+
     private constructor() {
         super()
         this.devices = [];
 
         this.createControlAxles()
 
-        this.addDevice(new KeyboardController())
+        this.keyboard = new KeyboardController()
+
+        this.addDevice(this.keyboard)
         this.addDevice(new MouseController())
 
         this.gamepadManager.on("gamepad-connected", (gamepad) => {
@@ -43,6 +47,7 @@ export default class ControlsManager extends EventEmitter {
         this.createAxle("tank-miner")
 
         this.createTriggerAxle("tank-respawn")
+        this.createTriggerAxle("game-chat")
         this.createTriggerAxle("game-pause")
         this.createTriggerAxle("game-toggle-debug")
         this.createTriggerAxle("game-player-list", "game-player-list-show", "game-player-list-hide")

@@ -4,9 +4,9 @@ import TrackTankBehaviour from "../tanks/physics/track-tank/track-tank-behaviour
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
-import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
 import SailingComponent from "../components/sailing-component";
+import {EntityType} from "../entity-type";
 
 EntityModel.Types.set(EntityType.TANK_BOMBER, (entity) => {
     TankModel.initializeEntity(entity)

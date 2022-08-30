@@ -2,7 +2,7 @@ import Weapon, {WeaponConfig} from "./weapon";
 import PhysicalComponent from "../entity/components/physics-component";
 import TransformComponent from "../entity/components/transform-component";
 import EntityModel from "../entity/entity-model";
-import ServerEntity from "../server/entity/server-entity";
+import ServerEntityPrefabs from "../server/entity/server-entity-prefabs";
 import BulletLauncher from "../server/entity/bullet-launcher";
 import CollisionIgnoreList from "../entity/components/collision-ignore-list";
 
@@ -95,7 +95,7 @@ export default class ReloadableWeapon extends Weapon {
         const world = tank.parent
 
         const entity = new EntityModel()
-        ServerEntity.types.get(bullet)(entity)
+        ServerEntityPrefabs.types.get(bullet)(entity)
 
         entity.addComponent(new BulletLauncher({
             x: transform.transformX(x, y),

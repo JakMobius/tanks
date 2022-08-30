@@ -15,5 +15,10 @@ export default class GameCreateController extends Controller {
         this.userButton.setUsername(this.page.userData.username)
         this.rightBarItems = [this.userButton]
         this.view = new GameCreateView(page)
+        this.view.on("close", () => this.navigationView.popController(this))
     }
+
+     onBlur() {
+         (this.view as GameCreateView).onBlur()
+     }
 }

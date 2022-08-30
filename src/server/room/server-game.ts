@@ -1,10 +1,10 @@
 import Game, {GameConfig} from "./game";
 import Player from "../../player";
 import EntityModel from "../../entity/entity-model";
-import ServerEntity from "../entity/server-entity";
-import {EntityType} from "../../client/entity/client-entity";
+import ServerEntityPrefabs from "../entity/server-entity-prefabs";
 import SocketPortalClient from "../socket/socket-portal-client";
 import PlayerConnectionManager from "../player-connection-manager";
+import {EntityType} from "../../entity/entity-type";
 
 export default class ServerGame extends Game {
     constructor(options: GameConfig) {
@@ -28,7 +28,7 @@ export default class ServerGame extends Game {
     private spawnPlayer(player: Player) {
 
         const tank = new EntityModel()
-        ServerEntity.types.get(EntityType.TANK_MONSTER)(tank)
+        ServerEntityPrefabs.types.get(EntityType.TANK_MONSTER)(tank)
         this.world.appendChild(tank)
         tank.emit("respawn")
 

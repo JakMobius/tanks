@@ -1,4 +1,4 @@
-import { IOverlappingModel } from "./overlappingModel";
+import { IOverlappingModel } from "./overlapping-model";
 import { ISuperposition } from "./superposition";
 
 export function propagate(

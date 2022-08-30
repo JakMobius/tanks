@@ -1,6 +1,6 @@
 import {URL} from "url";
 import {PreferencesSection} from "./preferences/preferences";
-import {ServerClusterConfig, ServerConfig, WebServerConfig} from "./server";
+import {GeneralServerConfig, ServerClusterConfig, ServerConfig, WebServerConfig} from "./server";
 import ServerDatabase from "./db/server-database";
 import MongoDatabase from "./db/mongo/mongo-database";
 import FileDatabase from "./db/file/file-database";
@@ -11,6 +11,7 @@ export function parseServerConfig(config: PreferencesSection): ServerConfig {
     const clusterSection = config.section("cluster")
     const webserverSection = config.section("webserver")
     const databaseSection = config.section("database")
+    const generalSection = config.section("general")
 
     let clusterConfig: ServerClusterConfig = null
 
@@ -22,7 +23,14 @@ export function parseServerConfig(config: PreferencesSection): ServerConfig {
         cluster: clusterConfig,
         database: createDatabaseFromConfig(databaseSection),
         webServer: parseWebserverConfig(webserverSection),
-        port: config.port("port")
+        general: parseGeneralConfig(generalSection)
+    }
+}
+
+export function parseGeneralConfig(config: PreferencesSection): GeneralServerConfig {
+    return {
+        port: config.port("port"),
+        mapsDirectory: path.join(__dirname, config.string("maps-directory"))
     }
 }
 

@@ -4,8 +4,14 @@
 */
 
 {
-	// Determines which port to bind for both websocket and express server
-	"port": 25565,
+	"general": {
+		// Determines which port to bind for both websocket and express server
+		"port": 25565,
+
+		// The server will treat files in this directory as game maps and allow
+		// players to play on them. The directory must be relative to the server
+		"maps-directory": "resources/maps"
+	},
 
 	// The database configuration
 	"database": {
@@ -26,7 +32,7 @@
 		// The following option is passed as session.SessionOptions.secret
 		// option to express.js session constructor. You should probably
 		// change it to something else.
-		"session-key": "f1qbc248ecd09bdh0j5r7o8"
+		"session-key": "please change this line to your unique key",
 	},
 
 	// Settings for the cluster communication mechanism

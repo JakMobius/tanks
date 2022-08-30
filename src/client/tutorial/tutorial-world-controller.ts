@@ -1,11 +1,11 @@
 import Game from "../../server/room/game";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
 import PhysicalComponent from "../../entity/components/physics-component";
-import {EntityType} from "../entity/client-entity";
 import EntityModel from "../../entity/entity-model";
 import Player from "../../player";
-import ServerEntity from "../../server/entity/server-entity";
+import ServerEntityPrefabs from "../../server/entity/server-entity-prefabs";
 import PlayerConnectionManager from "../../server/player-connection-manager";
+import {EntityType} from "../../entity/entity-type";
 
 export default class TutorialWorldController {
     game: Game;
@@ -15,7 +15,7 @@ export default class TutorialWorldController {
     constructor(serverGame: Game) {
         this.game = serverGame
         this.game.portal.on("client-connect", (client) => this.onClientConnect(client))
-        this.game.world.on("player-chat", (player, text) => {
+        this.game.world.on("game-chat", (player, text) => {
             if(text.startsWith("#")) {
                 this.onPlayerCommand(player, text)
             }
@@ -26,7 +26,7 @@ export default class TutorialWorldController {
 
     private createTank(entityType: number, x: number, y: number, angle: number) {
         const tank = new EntityModel()
-        ServerEntity.types.get(entityType)(tank)
+        ServerEntityPrefabs.types.get(entityType)(tank)
         this.game.world.appendChild(tank)
         tank.emit("respawn")
 

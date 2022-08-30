@@ -6,10 +6,31 @@ import * as Websocket from "websocket";
 import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
-import Game from "../../room/game";
 import WebsocketConnection from "../../websocket-connection";
-import MapSerialization from "../../../map/map-serialization";
+import MapSerialization, {MalformedMapFileError} from "../../../map/map-serialization";
 import ServerGame from "../../room/server-game";
+
+import 'src/effects/model-loader'
+import 'src/map/block-state/type-loader'
+import 'src/server/entity/type-loader'
+import 'src/server/entity/type-loader'
+import 'src/entity/model-loader'
+import GameMap from "../../../map/game-map";
+import {checkRoomName} from "../../../data-checkers/room-name-checker";
+
+export class NoSuchMapError extends Error {
+    constructor(message?: string) {
+        super(message);
+        this.name = "NoSuchMapError";
+    }
+}
+
+export class RoomNameUsedError extends Error {
+    constructor(message?: string) {
+        super(message);
+        this.name = "RoomNameUsedError";
+    }
+}
 
 export default class GameSocketPortal extends SocketPortal {
     public games = new Map<string, Room>()
@@ -96,21 +117,30 @@ export default class GameSocketPortal extends SocketPortal {
     }
 
     async createRoom(config: RoomConfig) {
-        try {
-            const gzip = await fs.promises.readFile(config.map)
-            const map = MapSerialization.fromBuffer(pako.inflate(gzip))
-
-            const game = new ServerGame({
-                name: config.name,
-                map: map
-            })
-
-            this.games.set(config.name, game)
-
-        } catch(e) {
-            console.error("Failed to load map: ", e)
-            return;
+        if(this.games.has(config.name)) {
+            throw new RoomNameUsedError("There is already a room with name " + config.name)
         }
+
+        let file: Buffer
+        try {
+            file = await fs.promises.readFile(config.map)
+        } catch(e) {
+            throw new NoSuchMapError("No such map: " + config.map)
+        }
+
+        let map: GameMap
+        try {
+            map = MapSerialization.fromBuffer(pako.inflate(file))
+        } catch(e) {
+            throw new MalformedMapFileError("Could not read map file " + config.map + ": " + e.message)
+        }
+
+        const game = new ServerGame({
+            name: config.name,
+            map: map
+        })
+
+        this.games.set(config.name, game)
     }
 
     createClient(connection: WebsocketConnection): SocketPortalClient {

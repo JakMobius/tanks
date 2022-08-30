@@ -2,18 +2,16 @@
 
 import View from "../../../ui/view";
 import InputTipList, {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import {checkNick} from "../../../../utils/nick-checker";
+import {checkNick} from "../../../../data-checkers/nick-checker";
 import {textFromNickCheckResult} from "../../localizations";
-import AuthInput from "../auth-input/auth-input";
-import AuthTitle from "../auth-title/auth-title";
+import HugeTextInput from "../huge-text-input/huge-text-input";
+import HugeTitle from "../huge-title/huge-title";
 import {HubPage} from "../hub-page";
 
 export default class WelcomeView extends View {
 
-    title = new AuthTitle()
-    input = new AuthInput()
+    input = new HugeTextInput()
     errorList = new InputTipList();
-    inputHandler: () => void;
     private page: HubPage;
 
     constructor(page: HubPage) {
@@ -22,16 +20,16 @@ export default class WelcomeView extends View {
         this.page = page
         this.element.addClass("welcome-view")
 
-        this.title.element.text("Твой позывной?")
+        let title = new HugeTitle()
+        title.element.text("Твой позывной?")
 
         this.input.setPlaceholder("Например, \"Уничтожитель 3000\"")
         this.input.addButton("В атаку!")
         this.input.addTips()
 
-        this.element.append(this.title.element, this.input.element)
+        this.element.append(title.element, this.input.element)
 
-        this.inputHandler = () => this.handleInput();
-        this.input.input.on("input", this.inputHandler)
+        this.input.input.on("input", () => this.handleInput())
     }
 
     private handleInput() {

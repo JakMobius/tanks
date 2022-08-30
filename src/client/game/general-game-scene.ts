@@ -45,6 +45,9 @@ export default class GeneralGameScene extends Scene {
 
     private setupControls() {
         this.controlsEventHandler.on("game-pause", () => this.togglePauseOverlay())
+        this.controlsEventHandler.on("game-toggle-debug", () => {
+             this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
+        })
     }
 
     private setupCamera() {
@@ -69,23 +72,22 @@ export default class GeneralGameScene extends Scene {
         this.chatContainer = new ChatContainer()
         this.overlayContainer.append(this.chatContainer.element)
 
-        // TODO
-        // this.keyboard.onKeybinding("Enter", () => {
-        //     if(this.displayedWorld && this.displayedWorld.player) {
-        //         this.chatContainer.showInput()
-        //     }
-        // })
+        this.controlsEventHandler.on("game-chat", () => {
+            if(this.displayedWorld) {
+                this.chatContainer.showInput()
+            }
+        })
 
         this.chatContainer.on("chat", (text: string) => {
             this.onChat(text)
         })
 
         this.chatContainer.on("input-focus", () => {
-            // this.keyboard.stopListening()
+            ControlsManager.getInstance().keyboard.listener.stopListening()
         })
 
         this.chatContainer.on("input-blur", () => {
-            // this.keyboard.startListening()
+            ControlsManager.getInstance().keyboard.listener.startListening()
             this.screen.canvas.focus()
         })
     }

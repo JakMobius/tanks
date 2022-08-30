@@ -4,9 +4,9 @@ import AirbagTankBehaviour from '../tanks/physics/airbag-tank-behaviour';
 import {physicsFilters} from "../../physics/categories";
 import PhysicalComponent from "../components/physics-component";
 import EntityModel from "../entity-model";
-import {EntityType} from "../../client/entity/client-entity";
 import TankModel from "../tanks/tank-model";
 import SailingComponent from "../components/sailing-component";
+import {EntityType} from "../entity-type";
 
 const vertices = [
     [-1.00, -1.10],

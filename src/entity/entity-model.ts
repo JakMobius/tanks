@@ -34,7 +34,9 @@ export default class EntityModel extends Entity {
     }
 
     afterTick() {
-        if(this.dead) this.removeFromParent()
+        if(this.dead) {
+            this.removeFromParent()
+        }
     }
 
     die() {

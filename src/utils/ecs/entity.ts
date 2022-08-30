@@ -12,7 +12,7 @@ export default class Entity extends EventEmitter {
         component.onAttach(this);
     }
 
-    public getComponent<C extends Component>(ComponentType: Constructor<C> ): C | null {
+    public getComponent<C extends Component>(ComponentType: Constructor<C>): C | null {
         for (const component of this.components) {
             if (component instanceof ComponentType) {
                 return component as C

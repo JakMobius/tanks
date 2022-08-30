@@ -12,6 +12,12 @@ export default class Transmitter {
         this.set.receivingEnd.packCommand(this.set, command, callback)
     }
 
+    entityCanBePointed(entity: Entity) {
+        let component = entity.getComponent(EntityDataTransmitComponent)
+        let transmitterSet = component.transmitterSetFor(this.set.receivingEnd)
+        return transmitterSet.isAttachedToRoot()
+    }
+
     pointToEntity(entity: Entity) {
         let component = entity.getComponent(EntityDataTransmitComponent)
         let transmitterSet = component.transmitterSetFor(this.set.receivingEnd)

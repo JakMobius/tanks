@@ -1,0 +1,11 @@
+
+.huge-input-container {
+
+  .huge-text-input::placeholder {
+    color: #B5B5B5;
+  }
+
+  &.with-button .huge-text-input {
+    border-radius: 5px 0 0 5px;
+  }
+}

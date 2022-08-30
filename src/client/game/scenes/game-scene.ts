@@ -9,6 +9,7 @@ import TankControls from "../../../controls/tank-controls";
 import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
 import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
+import ControlsManager from "../../controls/controls-manager";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient
@@ -34,11 +35,10 @@ export default class GameScene extends GeneralGameScene {
             let buffer = new ReadBuffer(packet.buffer.buffer)
             this.displayedWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
         })
+    }
 
-        // TODO
-        // this.keyboard.onKeybinding("Cmd-B", () => {
-        //     this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
-        // })
+    protected onChat(text: string) {
+        new PlayerChatPacket(text).sendTo(this.client.connection)
     }
 
     private setupUpdateLoop() {
@@ -65,7 +65,7 @@ export default class GameScene extends GeneralGameScene {
                 let event = "Не удалось подключиться к игре '" + packet.room + "': " + packet.error
                 this.eventContainer.createEvent(event)
             } else {
-                this.playerControls.disconnectAllTankControls()
+                ControlsManager.getInstance().disconnectAllTankControls()
                 this.chatContainer.clear()
             }
         })

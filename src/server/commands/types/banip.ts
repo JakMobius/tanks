@@ -8,7 +8,7 @@ class BanIPCommand extends Command {
         let logger = this.console.logger
 
         if(args.length < 1) {
-            logger.log("Использование: " + this.getUsage())
+            logger.log("Usage: " + this.getUsage())
             return
         }
 
@@ -30,12 +30,12 @@ class BanIPCommand extends Command {
         // }
 
         if(!kicked) {
-            logger.log("Не найдено игрока (игроков) с ником " + name)
+            logger.log("Player " + name + " is offline")
         }
     }
 
     getDescription(): string {
-        return "Забанить игрока по айпи (до перезагрузки сервера)"
+        return "Ban player by ip address (resets on server restart)"
     }
 
     getName(): string {

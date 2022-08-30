@@ -6,6 +6,7 @@ import WelcomeController from "./welcome/welcome-controller";
 import EventContainer from "../../ui/overlay/events/event-container";
 import AuthorizedWelcomeController from "./authorised-welcome/authorized-welcome-controller";
 import HubNavigationView from "./hub-navigation-view";
+import {localizeAjaxError} from "../localizations";
 
 export class HubPage extends View {
     userData: UserDataRaw;
@@ -34,24 +35,7 @@ export class HubPage extends View {
 
 
     handleAjaxError(xhr: JQuery.jqXHR, exception: string) {
-        let msg = ""
-
-        if (xhr.status === 0) {
-            msg = 'Не удалось выполнить подключение к серверу. Убедитесь, что с вашим интернетом все в порядке.';
-        } else if (xhr.status >= 500 && xhr.status <= 599) {
-            msg = 'Сервер прилёг отдохнуть. Пожалуйста, сообщите об этом разработчикам. Пусть разбудят. (Ошибка ' + xhr.status + ')';
-        } else if (xhr.status >= 400 && xhr.status <= 499) {
-            msg = 'Не удалось выполнить запрос. Серверу он почему-то не понравился. Обратитесь за помощью к разработчикам. (Ошибка' + xhr.status + ')'
-        }  else if (exception === 'parsererror') {
-            msg = 'Произошла ошибка разбора при выполнении запроса. Как это вообще могло произойти?...';
-        } else if (exception === 'timeout') {
-            msg = 'Не удалось выполнить запрос. Истекло время ожидания.';
-        } else if (exception === 'abort') {
-            msg = 'Не удалось выполнить запрос, так как он был отменен';
-        } else {
-            msg = 'Не удалось выполнить запрос: ' + xhr.responseText;
-        }
-
+        let msg = localizeAjaxError(xhr, exception)
         this.eventContainer.createEvent(msg)
     }
 }

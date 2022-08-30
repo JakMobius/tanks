@@ -115,7 +115,6 @@ export default class MapDebugDrawer {
     }
 
     private drawB2Debug() {
-        // TODO: This hurts my eyes. Should be easy to fix later
         this.world.getComponent(PhysicalHostComponent).world.SetDebugDraw(this.b2DebugDraw)
         this.world.getComponent(PhysicalHostComponent).world.DebugDraw()
     }

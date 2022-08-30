@@ -1,7 +1,7 @@
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"
 import {WeaponConfig} from "../weapon";
-import {EntityType} from "../../client/entity/client-entity";
+import {EntityType} from "../../entity/entity-type";
 
 export default class WeaponMiner extends SingleBarreledWeapon {
     constructor(config: WeaponConfig) {

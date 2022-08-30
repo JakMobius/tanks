@@ -6,9 +6,7 @@ import RoomConfig from "../../../room/room-config";
 import {ConsoleAutocompleteOptions} from "../../../console/console";
 import CLIStyle from "../../cli-style";
 
-const mapFolder = path.resolve(__dirname, "resources/maps")
-
-class RoomCreateCommand extends Command {
+export default class RoomCreateCommand extends Command {
 
     constructor(options: CommandConfig) {
         super(options);
@@ -17,14 +15,14 @@ class RoomCreateCommand extends Command {
             type: "key",
             name: "name",
             aliases: ["n"],
-            description: "Название комнаты"
+            description: "Map name"
         }))
 
         this.addFlag(new CommandFlag({
-                type: "key",
-                name: "map",
-                aliases: ["m"],
-                description: "Путь к файлу с картой (обязательно)"
+            type: "key",
+            name: "map",
+            aliases: ["m"],
+            description: "Path to the map file (required)"
         }))
     }
 
@@ -58,7 +56,8 @@ class RoomCreateCommand extends Command {
             return
         }
 
-        let mapPath = path.resolve(mapFolder, mapName + ".map")
+        let mapsDirectory = this.console.server.config.general.mapsDirectory
+        let mapPath = path.resolve(mapsDirectory, mapName + ".map")
 
         if (!fs.existsSync(mapPath)) {
             logger.log("§F00;No such map: '" + mapName + "'")
@@ -82,7 +81,8 @@ class RoomCreateCommand extends Command {
         let currentFlag = found.currentFlag
 
         if(currentFlag && currentFlag.name === "map") {
-            return this.autocompletePath(args[args.length - 1], mapFolder, ".map", options)
+            let mapsDirectory = this.console.server.config.general.mapsDirectory
+            return this.autocompletePath(args[args.length - 1], mapsDirectory, ".map", options)
         } else if(found.incompleteFlag) {
             return super.autocompleteFlags(found.incompleteFlag, options)
         } else {
@@ -95,8 +95,6 @@ class RoomCreateCommand extends Command {
     }
 
     getDescription() {
-        return "Создать комнату"
+        return "Create room"
     }
 }
-
-export default RoomCreateCommand;
