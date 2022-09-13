@@ -1,6 +1,5 @@
 import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
-import EntityModel from "../../entity/entity-model";
 import PhysicalComponent from "../../entity/components/physics-component";
 import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
 import EffectHostComponent from "../../effects/effect-host-component";
@@ -8,6 +7,9 @@ import ServerEffect from "../effects/server-effect";
 import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import DamageReason from "../damage-reason/damage-reason";
+import BulletShootersComponent from "../../entity/components/bullet-shooters-component";
+import WorldPhysicalLoopComponent from "../../entity/components/world-physical-loop-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -19,11 +21,13 @@ export interface BulletBehaviourConfig {
 }
 
 export default class BulletBehaviour implements Component {
-    entity: EntityModel
+    entity: Entity
     eventHandler = new BasicEventHandlerSet()
+    worldEventHandler = new BasicEventHandlerSet()
     config: BulletBehaviourConfig
 
     private lifeTime: number
+    private isDead = false;
 
     constructor(config: BulletBehaviourConfig) {
         this.config = Object.assign({
@@ -34,20 +38,23 @@ export default class BulletBehaviour implements Component {
         this.lifeTime = this.config.lifeTime
 
         this.eventHandler.on("tick", (dt: number) => {
-            if(this.entity.isDead()) return;
-            this.lifeTime -= dt
-            if(this.lifeTime <= 0) this.trigger()
+            if(this.isDead) {
+                this.entity.removeFromParent()
+            } else {
+                this.lifeTime -= dt
+                if (this.lifeTime <= 0) this.trigger()
+            }
         })
 
         this.eventHandler.on("bullet-launch", () => this.onLaunch())
 
-        this.eventHandler.on("entity-hit", (hitEntity: EntityModel) => {
-            if(this.entity.isDead()) return;
+        this.eventHandler.on("entity-hit", (hitEntity: Entity) => {
+            if(this.isDead) return;
             this.handleEntityHit(hitEntity)
         })
 
         this.eventHandler.on("block-hit", (x: number, y: number) => {
-            if(this.entity.isDead()) return;
+            if(this.isDead) return;
             this.handleBlockHit(x, y)
         })
 
@@ -60,9 +67,20 @@ export default class BulletBehaviour implements Component {
         const world = this.entity.parent
 
         if(this.config.entityDamage) {
-            world.physicsLoop.scheduleTask(() => {
+            world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
                 let healthComponent = hitEntity.getComponent(HealthComponent)
-                if (healthComponent) healthComponent.damage(this.config.entityDamage, DamageTypes.IMPACT)
+                let damageReason = new DamageReason()
+                damageReason.damageType = DamageTypes.IMPACT
+
+                // TODO: Maybe bullet shooter component should handle this by itself?
+                // i.e shooter component is not even set on the client side, so this
+                // code becomes useless
+                let shooterComponent = this.entity.getComponent(BulletShootersComponent)
+                if(shooterComponent) {
+                    damageReason.players = shooterComponent.shooters
+                }
+
+                if (healthComponent) healthComponent.damage(this.config.entityDamage, damageReason)
             })
         }
 
@@ -73,7 +91,7 @@ export default class BulletBehaviour implements Component {
         const world = this.entity.parent
 
         if(this.config.wallDamage) {
-            world.physicsLoop.scheduleTask(() => {
+            world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
                 const mapComponent = world.getComponent(TilemapComponent)
                 if (mapComponent) {
                     mapComponent.map.damageBlock(x, y, this.config.wallDamage)
@@ -98,10 +116,14 @@ export default class BulletBehaviour implements Component {
 
             world.getComponent(EffectHostComponent).addEffect(ServerEffect.fromModel(effect))
         }
-        this.entity.die();
+        this.die();
     }
 
-    onAttach(entity: EntityModel): void {
+    die() {
+        this.isDead = true
+    }
+
+    onAttach(entity: Entity): void {
         this.entity = entity
         this.eventHandler.setTarget(this.entity)
     }

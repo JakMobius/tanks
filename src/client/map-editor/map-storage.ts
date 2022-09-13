@@ -6,7 +6,6 @@ import MapSerialization from "../../map/map-serialization";
 import GameMap from "../../map/game-map";
 import GameMapNameComponent from "./map-name-component";
 import GameMapHistoryComponent from "./history/game-map-history-component";
-import {trimFileExtension} from "../../utils/utils";
 
 export default class MapStorage {
 

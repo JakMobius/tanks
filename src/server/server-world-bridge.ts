@@ -1,12 +1,12 @@
 import PlayerControlsPacket from "../networking/packets/game-packets/player-controls-packet";
 import PlayerChatPacket from "../networking/packets/game-packets/player-chat-packet";
 import PlayerRespawnPacket from "../networking/packets/game-packets/player-respawn-packet";
-import ServerGameWorld from "./server-game-world";
 import RoomPortal from "./room-portal";
 import SocketPortalClient from "./socket/socket-portal-client";
+import Entity from "../utils/ecs/entity";
 
 export default class ServerWorldBridge {
-    static buildBridge(world: ServerGameWorld, portal: RoomPortal) {
+    static buildBridge(world: Entity, portal: RoomPortal) {
         portal.on(PlayerControlsPacket, (packet, client) => {
             client.emit(packet)
         })

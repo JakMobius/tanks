@@ -1,11 +1,13 @@
-import ClientGameWorld from "../client-game-world";
-import Game from "../../server/room/game";
 import GameMap from "../../map/game-map";
 import AdapterLoop from "../../utils/loop/adapter-loop";
 import ConnectionClient from "../../networking/connection-client";
 import Connection from "../../networking/connection";
 import LocalConnection from "../../networking/local-connection";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
+import serverGameRoomPrefab from "../../server/room/server-game-room-prefab";
+import Entity from "../../utils/ecs/entity";
+import RoomClientComponent from "../../server/room/components/room-client-component";
+import {clientGameWorldEntityPrefab} from "../client-game-world-entity-prefab";
 
 export class EmbeddedServerGameConfig {
     map: GameMap
@@ -13,24 +15,26 @@ export class EmbeddedServerGameConfig {
 
 export default class EmbeddedServerGame {
     clientConnection: ConnectionClient<Connection>
-    clientWorld: ClientGameWorld
-    serverGame: Game
+    clientWorld: Entity
+    serverGame: Entity
 
     serverLoop = new AdapterLoop()
 
     constructor(config: EmbeddedServerGameConfig) {
         const map = config.map
 
-        this.serverGame = new Game({
+        this.serverGame = new Entity()
+        serverGameRoomPrefab(this.serverGame, {
             map: map,
             name: "Embedded Server Game",
-            loop: this.serverLoop
+            loop: this.serverLoop,
         })
 
-        this.serverLoop.setInterval(this.serverGame.spt)
+        this.serverLoop.setInterval(50)
         this.serverLoop.start()
 
-        this.clientWorld = new ClientGameWorld({
+        this.clientWorld = new Entity()
+        clientGameWorldEntityPrefab(this.clientWorld, {
             map: map
         })
 
@@ -48,11 +52,12 @@ export default class EmbeddedServerGame {
             data: {}
         })
 
-        this.serverGame.portal.clientConnected(client)
+        let clientComponent = this.serverGame.getComponent(RoomClientComponent)
+        clientComponent.portal.clientConnected(client)
     }
 
     tick(dt: number) {
-        this.clientWorld.tick(dt)
+        this.clientWorld.propagateEvent("tick", dt)
         this.serverLoop.timePassed(dt)
     }
 }

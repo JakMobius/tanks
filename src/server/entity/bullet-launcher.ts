@@ -1,5 +1,4 @@
 import * as Box2D from "../../library/box2d";
-import EntityModel from "../../entity/entity-model";
 import {Component} from "../../utils/ecs/component";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 import Entity from "../../utils/ecs/entity";
@@ -18,7 +17,7 @@ export default class BulletLauncher implements Component {
         })
     }
 
-    onAttach(entity: EntityModel): void {
+    onAttach(entity: Entity): void {
         this.entity = entity
         this.eventHandler.setTarget(this.entity)
     }

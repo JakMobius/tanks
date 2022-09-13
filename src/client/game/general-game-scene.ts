@@ -1,7 +1,6 @@
 import Camera from "../camera";
 import EventContainer from "../ui/overlay/events/event-container";
 import ChatContainer from "./ui/overlay/chat/chat-container";
-import ClientGameWorld from "../client-game-world";
 import WorldDrawerComponent from "../entity/components/world-drawer-component";
 import * as Box2D from "../../library/box2d";
 import GameMap from "../../map/game-map";
@@ -10,26 +9,35 @@ import {GamePauseOverlay} from "./ui/overlay/pause/game-pause-overlay";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TilemapComponent from "../../physics/tilemap-component";
 import TankControls from "../../controls/tank-controls";
-import EntityModel from "../../entity/entity-model";
 import {SoundStreamPosition} from "../sound/stream/sound-stream-position-component";
 import ControlsManager from "../controls/controls-manager";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import PlayerListOverlay from "./ui/overlay/player-list/player-list-overlay";
+import {Constructor} from "../../serialization/binary/serializable";
+import GameOverlay from "./ui/overlay/game-overlay/game-overlay";
+import Entity from "../../utils/ecs/entity";
+import PlayerNickOverlay from "./ui/overlay/player-nick-overlay/player-nick-overlay";
+import Overlay from "../ui/overlay/overlay";
 
 export default class GeneralGameScene extends Scene {
     public camera: Camera
 
     public eventContainer: EventContainer
     public chatContainer: ChatContainer
-    public displayedWorld: ClientGameWorld
-    public controlledTank: EntityModel
+    public displayedWorld: Entity
+    public controlledTank: Entity
     public worldDrawer: WorldDrawerComponent
     public soundStreamPosition: SoundStreamPosition = new SoundStreamPosition()
 
     public paused: boolean = false
     public didChangeSize: boolean = false
-    private pauseOverlay?: GamePauseOverlay
+    protected pauseOverlay?: GamePauseOverlay
+    protected playerListOverlay?: PlayerListOverlay
+    protected playerNickOverlay?: PlayerNickOverlay
+    protected modeSpecificOverlay?: Overlay
 
-    private controlsEventHandler = new BasicEventHandlerSet()
+    protected controlsEventHandler = new BasicEventHandlerSet()
+    private gameOverlays = new Map<Constructor<GameOverlay>, GameOverlay>();
 
     constructor(config: SceneConfig) {
         super(config)
@@ -39,15 +47,28 @@ export default class GeneralGameScene extends Scene {
         this.setupDrawer()
         this.setupChat()
         this.setupEventContainer()
+        this.setupPlayerNickOverlay()
+        this.setupPlayerListOverlay()
+        this.setupModeSpecificOverlays()
         this.setupPauseOverlay()
         this.layout()
     }
 
     private setupControls() {
         this.controlsEventHandler.on("game-pause", () => this.togglePauseOverlay())
+        this.controlsEventHandler.on("game-player-list-show", () => this.openPlayerList())
+        this.controlsEventHandler.on("game-player-list-hide", () => this.closePlayerList())
         this.controlsEventHandler.on("game-toggle-debug", () => {
              this.worldDrawer.debugDrawOn = !this.worldDrawer.debugDrawOn
         })
+    }
+
+    private openPlayerList() {
+        this.playerListOverlay.show()
+    }
+
+    private closePlayerList() {
+        this.playerListOverlay.hide()
     }
 
     private setupCamera() {
@@ -92,7 +113,7 @@ export default class GeneralGameScene extends Scene {
         })
     }
 
-    displayWorld(world: ClientGameWorld) {
+    displayWorld(world: Entity) {
         if(this.displayedWorld) throw new Error("Scene world cannot be changed after it was set once")
         this.displayedWorld = world
         this.displayedWorld.addComponent(this.worldDrawer)
@@ -104,9 +125,16 @@ export default class GeneralGameScene extends Scene {
             this.camera.defaultPosition.y = map.height / 2 * GameMap.BLOCK_SIZE
         })
 
-        this.displayedWorld.on("primary-entity-set", (entity: EntityModel) => {
+        this.displayedWorld.on("primary-entity-set", (entity: Entity) => {
             this.onWorldPrimaryEntitySet(entity)
         })
+
+        this.displayedWorld.on("overlay-data", (overlayClass: Constructor<GameOverlay>, data: any) => {
+            this.handleOverlayData(overlayClass, data)
+        })
+
+        this.playerListOverlay.setGameWorld(world)
+        this.playerNickOverlay.setWorld(world)
     }
 
     layout() {
@@ -140,7 +168,7 @@ export default class GeneralGameScene extends Scene {
         this.tickSound(dt)
     }
 
-    protected onWorldPrimaryEntitySet(entity: EntityModel) {
+    protected onWorldPrimaryEntitySet(entity: Entity) {
         this.controlledTank = entity
         ControlsManager.getInstance().disconnectAllTankControls()
 
@@ -178,6 +206,40 @@ export default class GeneralGameScene extends Scene {
         this.pauseOverlay.on("close", () => {
             if(this.pauseOverlay) this.togglePauseOverlay()
         })
+    }
+
+    private setupPlayerListOverlay() {
+        this.playerListOverlay = new PlayerListOverlay({
+            root: this.overlayContainer
+        })
+    }
+
+    private setupPlayerNickOverlay() {
+        this.playerNickOverlay = new PlayerNickOverlay({
+            root: this.overlayContainer
+        })
+        this.playerNickOverlay.setCamera(this.camera)
+        this.playerNickOverlay.show()
+    }
+
+    private setupModeSpecificOverlays() {
+        this.modeSpecificOverlay = new Overlay({
+            root: this.overlayContainer
+        })
+        this.modeSpecificOverlay.show()
+        this.overlayContainer.append(this.modeSpecificOverlay.overlay)
+    }
+
+    private handleOverlayData(overlayClass: Constructor<GameOverlay>, data: any) {
+        let overlay = this.gameOverlays.get(overlayClass)
+        if(!overlay) {
+            overlay = new overlayClass({
+                root: this.modeSpecificOverlay.overlay,
+                world: this.displayedWorld
+            })
+            this.gameOverlays.set(overlayClass, overlay)
+        }
+        overlay.setData(data)
     }
 
     appear() {

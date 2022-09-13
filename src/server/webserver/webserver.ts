@@ -7,8 +7,12 @@ import HubModule from './hub/hub-module';
 import BaseModule from './base-module';
 import WebserverModule from "./webserver-module";
 import * as HTTP from "http";
+import * as http from "http";
 import StaticModule from "./static/static-module";
 import Server from "../server";
+import {WebserverSession} from "./webserver-session";
+
+const init = require('express/lib/middleware/init').init
 
 export default class WebServer {
 	public app: express.Application;
@@ -23,6 +27,8 @@ export default class WebServer {
     gameModule = new GameModule()
     baseModule = new BaseModule()
     staticModule = new StaticModule()
+
+    private requestInit: (req: http.IncomingMessage, res: any, next: () => void) => void
 
     constructor(server: Server) {
         this.server = server
@@ -78,12 +84,15 @@ export default class WebServer {
     setupApp() {
         this.app.set('view engine', 'hbs')
         this.app.set('views', path.resolve(__dirname, "resources/web"))
+        this.app.disable("x-powered-by")
 
         this.app.use(function(req, res, next) {
             //res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             next();
         });
+
+        this.requestInit = init(this.app)
 
         this.session = session({
             secret: this.server.config.webServer.sessionKey,
@@ -142,5 +151,18 @@ export default class WebServer {
 
     disable() {
         this.httpServer.off("request", this.app)
+    }
+
+    getSessionFor(httpRequest: http.IncomingMessage, callback: (session: WebserverSession) => void) {
+        // Hacky way to get the session from the express session middleware
+        let httpResult = {}
+        this.requestInit(httpRequest, httpResult, () => {
+            let req = httpRequest as express.Request
+            let res = httpResult as express.Response
+
+            this.session(req, res, () => {
+                callback(req.session as WebserverSession)
+            })
+        })
     }
 }

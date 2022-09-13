@@ -5,6 +5,7 @@ import BlockState from "../../../map/block-state/block-state";
 import MapBlockModification from "./modification/map-block-modification";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 import GameMap from "../../../map/game-map";
+import BlockChangeEvent from "../../../events/block-change-event";
 
 export interface GameMapModification {
     modifications: MapModification[]
@@ -26,7 +27,7 @@ export default class GameMapHistoryComponent implements Component {
         this.currentModifications = []
         this.historyIndex = -1
 
-        this.eventHandler.on("block-will-change", (x, y, block) => this.onBlockSet(x, y, block))
+        this.eventHandler.on("block-change", (event) => this.onBlockChange(event))
     }
 
     commitActions(name: string) {
@@ -75,10 +76,10 @@ export default class GameMapHistoryComponent implements Component {
         return this.history[this.historyIndex]
     }
 
-    onBlockSet(x: number, y: number, block: BlockState) {
+    onBlockChange(event: BlockChangeEvent) {
         if(!this.preventNativeModificationRegistering) {
             this.registerModification(
-                new MapBlockModification(this.entity as GameMap, x, y, block)
+                new MapBlockModification(this.entity as GameMap, event.x, event.y, event.oldBlock, event.newBlock)
             )
         }
     }

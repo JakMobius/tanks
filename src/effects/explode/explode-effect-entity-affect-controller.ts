@@ -7,6 +7,7 @@ import {Component} from "../../utils/ecs/component";
 import Entity from "../../utils/ecs/entity";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 import SailingComponent from "../../entity/components/sailing-component";
+import DamageReason from "../../server/damage-reason/damage-reason";
 
 export interface ExplodeEffectEntityAffectControllerConfig {
     damageEntities?: boolean
@@ -94,7 +95,10 @@ export default class ExplodeEffectEntityAffectController implements Component {
             if (power <= 0) return;
 
             let healthComponent = entity.getComponent(HealthComponent)
-            if (healthComponent) healthComponent.damage(power, DamageTypes.EXPLOSION)
+            let damageReason = new DamageReason()
+            // TODO: Figure out how to get the shooter
+            damageReason.damageType = DamageTypes.EXPLOSION
+            if (healthComponent) healthComponent.damage(power, damageReason)
         }
     }
 

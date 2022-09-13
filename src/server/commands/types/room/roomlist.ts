@@ -2,6 +2,7 @@ import Chalk from 'chalk';
 import Command from '../../command';
 import ConsoleTableDrawer from "../../../console/console-table-drawer";
 import CLIStyle from "../../cli-style";
+import RoomClientComponent from "../../../room/components/room-client-component";
 
 class RoomListCommand extends Command {
     onPerform(args: string[]) {
@@ -25,7 +26,8 @@ class RoomListCommand extends Command {
             lines.push([Chalk.bold("Room name"), Chalk.bold("Players online")])
 
             for (let [id, room] of rooms.entries()) {
-                let online = room.getCurrentOnline()
+                let clientComponent = room.getComponent(RoomClientComponent)
+                let online = clientComponent.getCurrentOnline()
                 totalOnline += online
 
                 lines.push([dot + id, Chalk.cyanBright(online)])

@@ -1,5 +1,5 @@
 import * as Box2D from "../../library/box2d";
-import EntityModel from "../entity-model";
+import EntityPrefabs from "../entity-prefabs";
 import PhysicsChunk from "../../physics/physics-chunk";
 import PhysicalComponent from "./physics-component";
 import GameMap from "../../map/game-map";
@@ -19,7 +19,7 @@ export default class TilemapHitEmitter implements Component {
 
     onBodyHit(body: Box2D.Body, contact: Box2D.Contact) {
         const data = body.GetUserData()
-        if(data instanceof EntityModel) this.entity.emit("entity-hit", data)
+        if(data instanceof Entity) this.entity.emit("entity-hit", data)
         if(data instanceof PhysicsChunk) {
             const worldManifold = new Box2D.WorldManifold()
             contact.GetWorldManifold(worldManifold)

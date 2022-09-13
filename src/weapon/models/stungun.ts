@@ -1,10 +1,11 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import Player from "../../player";
-import ServerGameWorld from "../../server/server-game-world";
+import Player from "../../server/player";
 import PhysicalComponent from "../../entity/components/physics-component";
 import TransformComponent from "../../entity/components/transform-component";
 import Entity from "../../utils/ecs/entity";
 import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
+import ServerEntityPilotListComponent from "../../server/entity/components/server-entity-pilot-list-component";
+import DamageReason from "../../server/damage-reason/damage-reason";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number
@@ -19,7 +20,7 @@ export default class WeaponStungun extends Weapon {
 
     constructor(config: WeaponStungunConfig) {
         super(config)
-        this.damage = config.damage || 1.4 // Для каждой точки (то есть если точки две, то суммарный урон в два раза больше)
+        this.damage = config.damage || 1.4
         this.radius = config.radius || 12.5
         this.squareRadius = this.radius ** 2
         this.points = [[-1.875, 0.5], [1.875, 0.5]]
@@ -47,7 +48,10 @@ export default class WeaponStungun extends Weapon {
 
             for(let each of near(px, py, null, world, this.squareRadius)) {
                 if(each != this.tank) {
-                    each.getComponent(HealthComponent).damage(this.damage * dt, DamageTypes.ELECTRICAL)
+                    let damageReason = new DamageReason()
+                    damageReason.damageType = DamageTypes.ELECTRICAL
+                    damageReason.players = tank.getComponent(ServerEntityPilotListComponent).players
+                    each.getComponent(HealthComponent).damage(this.damage * dt, damageReason)
                 }
             }
         }

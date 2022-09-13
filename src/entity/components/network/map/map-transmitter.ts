@@ -2,20 +2,27 @@ import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import TilemapComponent from "../../../../physics/tilemap-component";
 import BlockState from "../../../../map/block-state/block-state";
+import BlockDamageEvent from "../../../../events/block-damage-event";
+import BlockChangeEvent from "../../../../events/block-change-event";
 
 export default class MapTransmitter extends Transmitter {
     constructor() {
         super()
 
-        this.eventHandler.on("map-block-damage", (x, y) => this.queueBlockUpdate(x, y))
-        this.eventHandler.on("map-block-change", (x, y) => this.queueBlockUpdate(x, y))
+        this.eventHandler.on("map-block-damage", (event: BlockDamageEvent) => {
+            if(event.cancelled) return
+            this.queueBlockUpdate(event.x, event.y)
+        })
+        this.eventHandler.on("map-block-change", (event: BlockChangeEvent) => {
+            this.queueBlockUpdate(event.x, event.y)
+        })
     }
 
-    attachedToRoot() {
-        super.attachedToRoot()
+    onEnable() {
+        super.onEnable()
         const map = this.getEntity().getComponent(TilemapComponent).map
 
-        this.pack(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
+        this.packIfEnabled(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
             map.toBinary(buffer)
         })
     }
@@ -23,7 +30,7 @@ export default class MapTransmitter extends Transmitter {
     queueBlockUpdate(x: number, y: number) {
         const map = this.getEntity().getComponent(TilemapComponent).map
 
-        this.pack(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {
+        this.packIfEnabled(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {
             buffer.writeUint16(x)
             buffer.writeUint16(y)
             let block = map.getBlock(x, y)

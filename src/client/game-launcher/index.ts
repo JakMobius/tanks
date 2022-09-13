@@ -10,10 +10,14 @@ function startGame() {
     var root = $("<div>").addClass("game-root")
     $(document.body).append(root)
 
+    let url = new URL(location.href)
+    let room = url.searchParams.get("room")
+
     var Game = (window as any)['Game']
     var game = new Game({
         scale: window.devicePixelRatio,
         ip: "ws://" + window.location.host + "/game-socket",
+        room: room,
         root: root
     })
 

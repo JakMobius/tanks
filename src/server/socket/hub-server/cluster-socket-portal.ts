@@ -4,10 +4,9 @@ import HandshakePacket from 'src/networking/packets/cluster-packets/handshake-pa
 import HandshakeSuccessPacket from 'src/networking/packets/cluster-packets/handshake-success-packet';
 import RoomCreateRequestPacket from 'src/networking/packets/cluster-packets/room-creation-request-packet';
 import RoomConfig from 'src/server/room/room-config';
-import {request} from "websocket";
+import * as Websocket from "websocket";
 import SocketPortalClient from "../socket-portal-client";
 import BinaryPacket from "../../../networking/binary-packet";
-import WebsocketConnection from "../../websocket-connection";
 
 export interface ClusterSocketPortalClientData {
     authorizationSalt: Buffer | null
@@ -32,11 +31,21 @@ export default class ClusterSocketPortal extends SocketPortal<ClusterSocketPorta
         this.logger.setPrefix("CLink hub")
     }
 
-    handleRequest(request: request) {
+    handleRequest(request: Websocket.request) {
         // Only handling /cluster-link requests
 
-        if(request.resourceURL.path === "/cluster-link") {
-            super.handleRequest(request);
+        if(request.resourceURL.pathname === "/cluster-link") {
+            const connection = this.allowRequest(request);
+
+            let client = new SocketPortalClient<ClusterSocketPortalClientData>({
+                connection: connection,
+                data: {
+                    authorizationSalt: null,
+                    authorized: false
+                }
+            })
+
+            this.setupClient(client)
         }
     }
 
@@ -110,15 +119,5 @@ export default class ClusterSocketPortal extends SocketPortal<ClusterSocketPorta
     handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
         if (client.data.authorized) this.handleAuthorizedPacket(packet, client)
         else this.handleUnauthorizedPacket(packet, client)
-    }
-
-    createClient(connection: WebsocketConnection): ClusterSocketPortalClient {
-        return new SocketPortalClient<ClusterSocketPortalClientData>({
-            connection: connection,
-            data: {
-                authorizationSalt: null,
-                authorized: false
-            }
-        })
     }
 }

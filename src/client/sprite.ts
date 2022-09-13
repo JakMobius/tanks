@@ -1,7 +1,6 @@
 import Progress from './utils/progress';
 import Downloader from './utils/downloader';
 import Uniform from "./graphics/uniform";
-import Sounds from "./sound/sounds";
 
 export interface SpriteRect {
     x: number

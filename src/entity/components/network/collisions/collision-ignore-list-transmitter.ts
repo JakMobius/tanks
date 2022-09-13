@@ -15,8 +15,8 @@ export default class CollisionIgnoreListTransmitter extends Transmitter {
         })
     }
 
-    attachedToRoot() {
-        super.attachedToRoot()
+    onEnable() {
+        super.onEnable()
 
         let component = this.set.transmitComponent.entity.getComponent(CollisionIgnoreList)
         for(let entity of component.ignoreList) {
@@ -27,7 +27,7 @@ export default class CollisionIgnoreListTransmitter extends Transmitter {
     writeEntityCollisionListRemove(entity: Entity) {
         if(!this.entityCanBePointed(entity)) return;
 
-        this.pack(Commands.COLLISION_IGNORE_LIST_REMOVE, (buffer) => {
+        this.packIfEnabled(Commands.COLLISION_IGNORE_LIST_REMOVE, (buffer) => {
             this.pointToEntity(entity)
         })
     }
@@ -35,7 +35,7 @@ export default class CollisionIgnoreListTransmitter extends Transmitter {
     writeEntityCollisionListAdd(entity: Entity) {
         if(!this.entityCanBePointed(entity)) return;
 
-        this.pack(Commands.COLLISION_IGNORE_LIST_ADD, (buffer) => {
+        this.packIfEnabled(Commands.COLLISION_IGNORE_LIST_ADD, (buffer) => {
             this.pointToEntity(entity)
         })
     }

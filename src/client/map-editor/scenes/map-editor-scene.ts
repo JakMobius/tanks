@@ -13,16 +13,16 @@ import ToolManager from '../tools/toolmanager';
 import EventContainer from '../../ui/overlay/events/event-container';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
 import Tools from "../tools/type-loader"
-import ClientGameWorld from "../../client-game-world";
-import EditorWorld from "../editor-world";
 import TilemapComponent from "../../../physics/tilemap-component";
 import GameMapHistoryComponent from "../history/game-map-history-component";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
 import ControlsManager from "../../controls/controls-manager";
+import Entity from "../../../utils/ecs/entity";
+import {clientGameWorldEntityPrefab} from "../../client-game-world-entity-prefab";
 
 export default class MapEditorScene extends Scene {
 
-	public world: EditorWorld
+	public world: Entity
     public map: GameMap
 	public dragHandler: DragHandler;
 	public camera: Camera;
@@ -41,7 +41,8 @@ export default class MapEditorScene extends Scene {
     constructor(config: SceneConfig) {
         super(config)
 
-        this.world = new ClientGameWorld({})
+        this.world = new Entity()
+        clientGameWorldEntityPrefab(this.world, {})
 
         this.dragHandler = new DragHandler(this.screen.canvas)
         this.dragHandler.draggingEnabled = false
@@ -187,7 +188,7 @@ export default class MapEditorScene extends Scene {
         if(!this.map || !this.needsRedraw) return
 
         if(this.worldAlive) {
-            this.world.tick(dt)
+            this.world.propagateEvent("tick", dt)
         }
         this.camera.tick(dt)
         this.worldDrawer.draw(dt)

@@ -1,6 +1,5 @@
 import UniversalPortListener from './universal-port-listener';
 import WebServer from './webserver/webserver';
-import GameSocket from './socket/game-server/game-socket-portal';
 import GameSocketPortal from './socket/game-server/game-socket-portal';
 import ClusterSocket from './socket/hub-server/cluster-socket-portal';
 import ClusterSocketPortal from './socket/hub-server/cluster-socket-portal';
@@ -110,7 +109,7 @@ export default class Server extends EventEmitter {
             let portListener = this.getPortListener(this.config.general.port)
             portListener.retainWebsocket()
 
-            this.gameSocket = new GameSocket();
+            this.gameSocket = new GameSocketPortal(this);
             this.gameSocket.bindToWebsocket(portListener.webSocketServer)
         } else {
             if(!this.gameSocket) return

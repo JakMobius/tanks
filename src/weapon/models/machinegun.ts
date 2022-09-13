@@ -1,4 +1,3 @@
-
 import ReloadableWeapon from "../reloadable-weapon";
 import {WeaponConfig} from "../weapon";
 import {EntityType} from "../../entity/entity-type";

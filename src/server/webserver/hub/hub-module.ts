@@ -8,6 +8,7 @@ import {WebserverSession} from "../webserver-session";
 import ProfileImageAjaxHandler from "./ajax/profile-image";
 import MapListAjaxHandler from "./ajax/map-list";
 import RoomCreateAjaxHandler from "./ajax/room-create";
+import RoomListAjaxHandler from "./ajax/room-list";
 
 export default class HubModule extends WebserverModule {
 
@@ -41,5 +42,6 @@ export default class HubModule extends WebserverModule {
         this.addAjaxHandler(new ProfileImageAjaxHandler())
         this.addAjaxHandler(new MapListAjaxHandler())
         this.addAjaxHandler(new RoomCreateAjaxHandler())
+        this.addAjaxHandler(new RoomListAjaxHandler())
     }
 }

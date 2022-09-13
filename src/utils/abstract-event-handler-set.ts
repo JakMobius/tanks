@@ -1,26 +1,29 @@
+import EventEmitter from "./event-emitter";
+
+export interface PrioritizedHandler {
+    handler: (...params: any[]) => any
+    priority: number
+}
 
 export default abstract class AbstractEventHandlerSet<T> {
-    public listeners = new Map<any, Array<(...params: any[]) => any>>();
+    public listeners = new Map<any, Array<PrioritizedHandler>>();
     public target: T | T[];
 
     protected constructor(target?: T | T[]) {
         this.setTarget(target)
     }
 
-    on(event: any, listener: (...params: any[]) => any){
+    on(event: any, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL){
         if(this.listeners.has(event)) {
-            this.listeners.get(event).push(listener)
+            this.listeners.get(event).push({
+                handler: listener,
+                priority: priority
+            })
         } else {
-            this.listeners.set(event, [listener])
-        }
-        if(this.target) this.setEventListeners(event, listener)
-    }
-
-    off(event: any, listener: (...params: any[]) => any) {
-        if(this.listeners.has(event)) {
-            let set = this.listeners.get(event)
-            set.splice(set.indexOf(listener), 1)
-            if(set.length === 0) this.listeners.delete(event)
+            this.listeners.set(event, [{
+                handler: listener,
+                priority: priority
+            }])
         }
         if(this.target) this.setEventListeners(event, listener)
     }
@@ -28,7 +31,7 @@ export default abstract class AbstractEventHandlerSet<T> {
     setAllListeners() {
         for(let [event, listeners] of this.listeners) {
             for (let listener of listeners) {
-                this.setEventListeners(event, listener)
+                this.setEventListeners(event, listener.handler, listener.priority)
             }
         }
     }
@@ -36,7 +39,7 @@ export default abstract class AbstractEventHandlerSet<T> {
     resetAllListeners() {
         for(let [event, listeners] of this.listeners) {
             for (let listener of listeners) {
-                this.resetEventListeners(event, listener)
+                this.resetEventListeners(event, listener.handler)
             }
         }
     }
@@ -46,7 +49,7 @@ export default abstract class AbstractEventHandlerSet<T> {
         if(!listeners) return
 
         for(let listener of listeners) {
-            this.resetEventListeners(event, listener)
+            this.resetEventListeners(event, listener.handler)
         }
     }
 
@@ -59,16 +62,16 @@ export default abstract class AbstractEventHandlerSet<T> {
         }
     }
 
-    setEventListeners(event: any, listener: (...params: any[]) => any) {
+    setEventListeners(event: any, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL) {
         if (Array.isArray(this.target)) {
             for (let target of this.target)
-                this.setEventListener(target, event, listener)
+                this.setEventListener(target, event, listener, priority)
         } else {
-            this.setEventListener(this.target, event, listener)
+            this.setEventListener(this.target, event, listener, priority)
         }
     }
 
-    protected abstract setEventListener(target: T, event: any, listener: (...params: any[]) => any): void
+    protected abstract setEventListener(target: T, event: any, listener: (...params: any[]) => any, priority: number): void
     protected abstract resetEventListener(target: T, event: any, listener: (...params: any[]) => any): void
 
     setTarget(target: T | T[]) {

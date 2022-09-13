@@ -3,7 +3,6 @@ import FireParticle from '../../particles/fire-particle';
 
 import TankFireEffectModel from 'src/effects/models/tank-fire-effect-model';
 import EffectModel from 'src/effects/effect-model';
-import ClientTank from "../../entity/tank/client-tank";
 import PhysicalComponent from "../../../entity/components/physics-component";
 import TransformComponent from "../../../entity/components/transform-component";
 import ParticleHostComponent from "../../entity/components/particle-host-component";

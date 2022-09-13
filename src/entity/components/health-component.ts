@@ -3,6 +3,8 @@ import Entity from "../../utils/ecs/entity";
 import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import HealthTransmitter from "./network/health/health-transmitter";
+import DamageReason from "../../server/damage-reason/damage-reason";
+import EntityDamageEvent from "../../events/tank-damage-event";
 
 export type DamageType = number
 export const DamageTypes = {
@@ -62,6 +64,17 @@ export default class HealthComponent implements Component {
         let oldHealth = this.health
         this.health = health
         this.entity.emit("health-set", this.health, oldHealth)
+
+        if(this.entity.parent) {
+            this.entity.parent.emit("entity-health-set", this.entity, this.health, oldHealth)
+        }
+
+        if(this.health <= 0 && oldHealth > 0) {
+            this.entity.emit("death")
+            if(this.entity.parent) {
+                this.entity.parent.emit("entity-death", this.entity)
+            }
+        }
         return this
     }
 
@@ -78,7 +91,11 @@ export default class HealthComponent implements Component {
         return this.health
     }
 
-    getModifiedDamage(damage: number, damageType: DamageType = DamageTypes.UNKNOWN) {
+    getModifiedDamage(damage: number, damageReason: DamageReason) {
+        let damageType = DamageTypes.UNKNOWN
+        if(damageReason) {
+            damageType = damageReason.damageType
+        }
         let modifiers = this.damageModifiers.get(damageType)
         if(!modifiers) return damage
 
@@ -90,11 +107,22 @@ export default class HealthComponent implements Component {
         return damage
     }
 
-    damage(damage: number, damageType: DamageType = DamageTypes.UNKNOWN) {
-        damage = this.getModifiedDamage(damage, damageType)
+    damage(damage: number, damageReason: DamageReason = null) {
+        damage = this.getModifiedDamage(damage, damageReason)
 
-        if(damage > 0) {
-            this.setHealth(Math.max(0, this.health - damage))
+        if (damage <= 0) {
+            return;
         }
+
+        let event = new EntityDamageEvent(this.entity, damage, damageReason)
+
+        this.entity.emit("damage", event)
+        if(this.entity.parent) {
+            this.entity.parent.emit("entity-damage", event)
+        }
+
+        if(event.cancelled) return
+
+        this.setHealth(Math.max(0, this.health - damage))
     }
 }

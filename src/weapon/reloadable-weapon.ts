@@ -1,10 +1,12 @@
 import Weapon, {WeaponConfig} from "./weapon";
 import PhysicalComponent from "../entity/components/physics-component";
 import TransformComponent from "../entity/components/transform-component";
-import EntityModel from "../entity/entity-model";
 import ServerEntityPrefabs from "../server/entity/server-entity-prefabs";
 import BulletLauncher from "../server/entity/bullet-launcher";
 import CollisionIgnoreList from "../entity/components/collision-ignore-list";
+import Entity from "../utils/ecs/entity";
+import BulletShootersComponent from "../entity/components/bullet-shooters-component";
+import ServerEntityPilotListComponent from "../server/entity/components/server-entity-pilot-list-component";
 
 export interface ReloadableWeaponConfig extends WeaponConfig {
     maxAmmo?: number
@@ -94,7 +96,7 @@ export default class ReloadableWeapon extends Weapon {
 
         const world = tank.parent
 
-        const entity = new EntityModel()
+        const entity = new Entity()
         ServerEntityPrefabs.types.get(bullet)(entity)
 
         entity.addComponent(new BulletLauncher({
@@ -102,10 +104,16 @@ export default class ReloadableWeapon extends Weapon {
             y: transform.transformY(x, y)
         }, tankBody.GetAngle()))
 
+        let shooters = tank.getComponent(ServerEntityPilotListComponent).players
+        entity.addComponent(new BulletShootersComponent(shooters))
+
         CollisionIgnoreList.ignoreCollisions(entity, tank)
+
+        this.tank.emit("bullet-shot", this, entity)
 
         world.appendChild(entity)
 
+        // TODO:
         // tankBody.ApplyLinearImpulse(
         //     new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
         //     new Box2D.Vec2(absoluteX, absoluteY)

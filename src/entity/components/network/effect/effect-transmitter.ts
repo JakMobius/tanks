@@ -8,13 +8,13 @@ export default class EffectTransmitter extends Transmitter {
         super()
 
         this.eventHandler.on("effect-create", (effect: AbstractEffect) => {
-            this.pack(Commands.EFFECT_CREATE_COMMAND, (buffer) => {
+            this.packIfEnabled(Commands.EFFECT_CREATE_COMMAND, (buffer) => {
                 BinarySerializer.serialize(effect.model, buffer)
             })
         })
 
         this.eventHandler.on("effect-remove", (effect: AbstractEffect) => {
-            this.pack(Commands.EFFECT_REMOVE_COMMAND, (buffer) => {
+            this.packIfEnabled(Commands.EFFECT_REMOVE_COMMAND, (buffer) => {
                 buffer.writeFloat64(effect.model.id)
             })
         })

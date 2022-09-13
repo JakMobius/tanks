@@ -1,4 +1,3 @@
-
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
 import {SoundStream} from "../stream/sound-stream";

@@ -83,5 +83,7 @@ export default class FileDatabase implements ServerDatabase {
         return fs.promises.mkdir(path.join(this.path, "users"), { recursive: true }).then()
     }
 
-    async disconnect(force: boolean): Promise<void> {}
+    async disconnect(force: boolean): Promise<void> {
+        return Promise.resolve()
+    }
 }

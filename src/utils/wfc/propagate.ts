@@ -1,5 +1,5 @@
-import { IOverlappingModel } from "./overlapping-model";
-import { ISuperposition } from "./superposition";
+import {IOverlappingModel} from "./overlapping-model";
+import {ISuperposition} from "./superposition";
 
 export function propagate(
   { N, propagator }: IOverlappingModel,

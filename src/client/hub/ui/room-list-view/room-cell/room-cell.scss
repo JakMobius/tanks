@@ -1,0 +1,92 @@
+
+.room-cell-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 0 3px;
+  width: 100%;
+  box-sizing: border-box;
+
+  .room-cell-line {
+    background: #009EE0;
+    height: 63px;
+    width: 2px;
+  }
+
+  .room-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 10px 10px 4px;
+    height: 77px;
+    box-sizing: border-box;
+
+    .room-cell-top-line {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      height: 21px;
+      gap: 6px;
+
+      .room-cell-title {
+        height: 16px;
+        font-size: 14px;
+        line-height: 16px;
+        font-weight: bold;
+      }
+    }
+
+    .room-cell-bottom-line {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      padding: 5px 0 0;
+      height: 31px;
+      gap: 10px;
+
+      .room-cell-map-icon {
+        width: 26px;
+        height: 26px;
+        background: #7CD8FF;
+      }
+
+      .room-cell-map-description {
+        height: 13px;
+        font-size: 11px;
+        line-height: 13px;
+        color: #605F5F;
+
+        span.map-name {
+          font-weight: normal;
+        }
+
+        span.map-mode {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .spacer {
+    flex-grow: 1;
+  }
+
+  .room-cell-button {
+    width: 183px;
+    height: 50px;
+    border-radius: 13px;
+    font-size: 24px;
+    font-weight: bold;
+    transform: translateX(-10px);
+    opacity: 0;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  }
+
+  &:hover>.room-cell-button {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

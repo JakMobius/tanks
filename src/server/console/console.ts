@@ -6,13 +6,12 @@ import * as path from 'path';
 import CommandList from "../commands/types/*"
 import Command from "../commands/command";
 import Server from "../server";
-import StdCatchLogger from "../log/std-catch-logger";
 import ConsoleWindow from "./console-window";
 import Parser, {CommandASTNode, CommandParameterASTNode, CommentASTNode, GlobalASTNode} from "./language/parser";
 
 import Serializer from "./language/serializer";
 import Lexer, {StringLexeme} from "./language/lexer";
-import Game from "../room/game";
+import Entity from "../../utils/ecs/entity";
 
 export interface ConsoleAutocompleteOptions {
     /// Indicates whether only one completion unit is required
@@ -20,7 +19,7 @@ export interface ConsoleAutocompleteOptions {
 }
 
 export default class Console {
-    public observingRoom: Game;
+    public observingRoom: Entity;
     public prompt: any;
     public tabCompleteIndex: number;
     public tabCompletions?: string[];

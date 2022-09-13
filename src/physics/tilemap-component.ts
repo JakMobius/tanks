@@ -2,7 +2,6 @@ import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
 import GameMap from "../map/game-map";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
-import EffectTransmitter from "../entity/components/network/effect/effect-transmitter";
 import {TransmitterSet} from "../entity/components/network/transmitting/transmitter-set";
 import MapTransmitter from "../entity/components/network/map/map-transmitter";
 
@@ -15,8 +14,8 @@ export default class TilemapComponent implements Component {
 
     constructor() {
         this.mapEventHandler.on("block-update", (x, y) => this.entity.emit("map-block-update", x, y))
-        this.mapEventHandler.on("block-damage", (x, y) => this.entity.emit("map-block-damage", x, y))
-        this.mapEventHandler.on("block-change", (x, y) => this.entity.emit("map-block-change", x, y))
+        this.mapEventHandler.on("block-damage", (event) => this.entity.emit("map-block-damage", event))
+        this.mapEventHandler.on("block-change", (event) => this.entity.emit("map-block-change", event))
 
         this.eventHandler.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(MapTransmitter)

@@ -1,20 +1,17 @@
 import Tool from '../tool';
 import * as Box2D from '../../../../library/box2d';
-import PlayerControls from '../../../controls/interact/player-controls';
 import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import ToolManager from "../toolmanager";
 import PhysicalComponent from "../../../../entity/components/physics-component";
 import TankControls from "../../../../controls/tank-controls";
-import EntityModel from "../../../../entity/entity-model";
-import Player from "../../../../player";
 import ControlsManager from "../../../controls/controls-manager";
-import EntityDataReceiveComponent from "../../../../entity/components/network/entity-data-receive-component";
-import ClientEntity from "../../../entity/client-entity";
+import ClientEntityPrefabs from "../../../entity/client-entity-prefabs";
 import {EntityType} from "../../../../entity/entity-type";
+import Entity from "../../../../utils/ecs/entity";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;
-	public tank: EntityModel;
+	public tank: Entity;
 	public keyboard: KeyboardController;
 	public running: boolean;
 	public runButton: any;
@@ -67,10 +64,8 @@ export default class RunTool extends Tool {
         // TODO: Setup an embedded server to run the game on
         // Client-only implementation limits the game functionality a lot
 
-        this.tank = new EntityModel()
-        let configurationScript = ClientEntity.types.get(EntityType.TANK_MONSTER)
-        configurationScript(this.tank)
-
+        this.tank = new Entity()
+        ClientEntityPrefabs.types.get(EntityType.TANK_MONSTER)(this.tank)
         this.manager.world.appendChild(this.tank)
         this.tank.emit("respawn")
 

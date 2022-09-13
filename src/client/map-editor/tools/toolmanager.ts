@@ -4,7 +4,7 @@ import Tool from '../tools/tool';
 import KeyboardController from "../../controls/input/keyboard/keyboard-controller";
 import BlockState from "../../../map/block-state/block-state";
 import SceneScreen from "../../graphics/scene-screen";
-import EditorWorld from "../editor-world";
+import Entity from "../../../utils/ecs/entity";
 
 export default class ToolManager extends DocumentEventHandler {
 
@@ -12,11 +12,11 @@ export default class ToolManager extends DocumentEventHandler {
     canvas: HTMLCanvasElement = null
     keyboard: KeyboardController = null
     selectedTool: Tool = null
-    world: EditorWorld = null
+    world: Entity = null
     screen: SceneScreen = null
     selectedBlock: BlockState = null
 
-    constructor(screen: SceneScreen, camera: Camera, world: EditorWorld) {
+    constructor(screen: SceneScreen, camera: Camera, world: Entity) {
         super()
         this.screen = screen
         this.camera = camera

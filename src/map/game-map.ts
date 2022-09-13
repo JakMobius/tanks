@@ -6,6 +6,8 @@ import {Constructor} from "../serialization/binary/serializable";
 import Entity from "../utils/ecs/entity";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
+import BlockDamageEvent from "../events/block-damage-event";
+import BlockChangeEvent from "../events/block-change-event";
 
 export interface GameMapConfig {
 	spawnZones?: SpawnZone[]
@@ -43,8 +45,7 @@ export default class GameMap extends Entity {
 	setBlock(x: number, y: number, block: BlockState) {
 		let index = x + y * this.width;
 
-		this.emit("block-will-change", x, y, block)
-
+		let oldBlock = this.data[index]
 		this.data[index] = block
 
 		const lowX = Math.max(0, x - 1)
@@ -61,7 +62,9 @@ export default class GameMap extends Entity {
 			}
 			index = (base += this.width)
 		}
-		this.emit("block-change", x, y)
+
+		let event = new BlockChangeEvent(oldBlock, block, x, y)
+		this.emit("block-change", event)
 	}
 
 	spawnPointForTeam(id: number) {
@@ -90,12 +93,15 @@ export default class GameMap extends Entity {
 
 		let health = block.getHealth()
 
+		let event = new BlockDamageEvent(block, x, y, d)
+		this.emit("block-damage", event)
+		if(event.cancelled) return
+
 		if(health - d <= 0) {
 			this.setBlock(x, y, new AirBlockState())
 		} else {
 			block.setHealth(health - d)
 			block.update(this, x, y)
-			this.emit("block-damage", x, y)
 		}
 	}
 

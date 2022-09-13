@@ -13,6 +13,7 @@ export interface AvailableMap {
 export default class MapListAjaxHandler extends AjaxHandler {
     static url = '/hub/ajax/map-list/'
     static method = 'GET'
+    static requiresAuthentication = true
 
     maps: AvailableMap[] | null = null
 
@@ -62,6 +63,7 @@ export default class MapListAjaxHandler extends AjaxHandler {
         }
 
         res.status(200).send({
+            result: "ok",
             maps: this.maps
         })
     }

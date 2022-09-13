@@ -1,4 +1,3 @@
-
 import ReadBuffer from "../serialization/binary/read-buffer";
 import GameMap from "./game-map";
 import WriteBuffer from "../serialization/binary/write-buffer";

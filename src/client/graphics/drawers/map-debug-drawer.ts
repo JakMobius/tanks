@@ -1,4 +1,3 @@
-import ClientGameWorld from "../../client-game-world";
 import PhysicsChunk from "../../../physics/physics-chunk";
 import GameMap from "../../../map/game-map";
 import LineDrawer from "./line-drawer";

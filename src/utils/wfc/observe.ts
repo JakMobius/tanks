@@ -1,5 +1,5 @@
-import { ISuperposition } from "./superposition";
-import { IOverlappingModel } from "./overlapping-model";
+import {ISuperposition} from "./superposition";
+import {IOverlappingModel} from "./overlapping-model";
 
 const sumFunc = (a: any, b: any) => a + b;
 

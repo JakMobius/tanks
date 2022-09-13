@@ -1,6 +1,5 @@
 import ButtonAxle, {ButtonAxleConfig} from '../../interact/button-axle';
 import KeyboardListener from "./keyboard-listener";
-import {isMacOS} from "../../../../utils/meta-key-name";
 
 export interface KeyAxleConfig extends ButtonAxleConfig {
     key: string

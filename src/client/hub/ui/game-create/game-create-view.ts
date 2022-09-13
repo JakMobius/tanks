@@ -117,7 +117,7 @@ export default class GameCreateView extends View {
 
         switch(result.result) {
             case "ok":
-                this.page.eventContainer.createEvent("Комната создана")
+                window.location.href = result.url
                 break;
             case "not-authenticated":
                 window.location.reload()

@@ -1,0 +1,17 @@
+
+.player-nick-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+
+  .nick-block {
+    position: absolute;
+    font-weight: bold;
+    background: #ffffff;
+    padding: 3px 9px;
+    border-radius: 7px;
+    opacity: 0.75;
+  }
+}

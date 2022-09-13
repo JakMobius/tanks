@@ -85,7 +85,7 @@ export interface BinarySerializableStatic<C extends BinarySerializableStatic<C>>
      * Used to separate different serialization groups.
      * @example
      * // If you are about to serialize both `Entity`
-     * // and `Particle` classes, you would separate them
+     * // and `Particle` classes, you should separate them
      * // in different groups. With that being done, you will be
      * // able to use same hardcoded type names for your entities
      * // and particles.

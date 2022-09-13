@@ -50,13 +50,13 @@ export class TransmitterSet {
         // TODO: can be optimised by using parent node depths
         let treeDepth = 0
         let entity = this.transmitComponent.entity
-        while(entity && entity != this.receivingEnd.getRoot()) {
+        while(entity && entity != this.receivingEnd.root) {
             entity = entity.parent
             if(entity == detachedParent) entity = null
             treeDepth++
         }
 
-        if(entity == this.receivingEnd.getRoot()) return treeDepth
+        if(entity == this.receivingEnd.root) return treeDepth
         return null
     }
 
@@ -91,14 +91,12 @@ export class TransmitterSet {
     }
 
     private attachedToRoot() {
-        this.receivingEnd.transmitterSets.add(this)
         for(let transmitter of this.transmitters.values()) {
             transmitter.attachedToRoot()
         }
     }
 
     private detachedFromRoot() {
-        this.receivingEnd.transmitterSets.delete(this)
         for(let transmitter of this.transmitters.values()) {
             transmitter.detachedFromRoot()
         }

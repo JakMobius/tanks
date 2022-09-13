@@ -1,4 +1,3 @@
-
 import SingleBarreledWeapon from "../single-barreled-weapon";
 import * as Box2D from "../../library/box2d"
 import {WeaponConfig} from "../weapon";

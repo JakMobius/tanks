@@ -3,13 +3,12 @@ import Entity from "../../../../utils/ecs/entity";
 import {TransmitterSet} from "./transmitter-set";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-block-coder";
-import BulletBehaviour from "../../../../server/entity/bullet-behaviour";
+import EventEmitter from "../../../../utils/event-emitter";
 
-export class ReceivingEnd {
-    private buffer = new WriteBuffer()
-    private root: Entity
+export class ReceivingEnd extends EventEmitter {
+    buffer = new WriteBuffer()
+    root: Entity
     currentNode: Entity
-    transmitterSets = new Set<TransmitterSet>()
 
     hasData() {
         return this.buffer.offset > 0
@@ -37,10 +36,6 @@ export class ReceivingEnd {
         let buffer = this.buffer.spitBuffer()
         this.reset()
         return buffer
-    }
-
-    getRoot() {
-        return this.root
     }
 
     private encodeNavigation(source: TransmitterSet, transmitterSet: TransmitterSet) {
@@ -98,7 +93,6 @@ export class ReceivingEnd {
     packNavigationPath(target: TransmitterSet) {
         let entityComponent = this.currentNode.getComponent(EntityDataTransmitComponent)
         let currentTransmitterSet = entityComponent.transmitterSetFor(this)
-
         this.encodeNavigation(currentTransmitterSet, target)
     }
 
@@ -111,5 +105,22 @@ export class ReceivingEnd {
             this.buffer.writeUint16(command)
             callback(this.buffer)
         });
+    }
+
+    detachSubtree(subtree: EntityDataTransmitComponent = null) {
+        if(!subtree) {
+            if(!this.root) return
+            subtree = this.root.getComponent(EntityDataTransmitComponent)
+        }
+
+        // Detach children first
+        for(let [, child] of subtree.childTransmitComponents.entries()) {
+            this.detachSubtree(child)
+        }
+
+        let transmitterSet = subtree.transmitterSetFor(this)
+        if(transmitterSet) {
+            transmitterSet.detachTransmitters()
+        }
     }
 }

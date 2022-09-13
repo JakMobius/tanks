@@ -1,4 +1,3 @@
-
 import Pellet from 'src/client/particles/pellet-particle'
 import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
@@ -42,7 +41,7 @@ export default class ClientTankPelletsEffect extends ClientEffect {
                 dx: tankVelocity.x + sin * vel,
                 dy: tankVelocity.y + cos * vel,
                 lifetime: 150,
-                color: new Color(50, 50, 50)
+                color: new Color().setRGB(0.19, 0.19, 0.19)
             });
 
             world.getComponent(ParticleHostComponent).particles.push(pellet)

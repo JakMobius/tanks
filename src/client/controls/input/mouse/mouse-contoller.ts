@@ -1,4 +1,3 @@
-
 import InputDevice, {InputDeviceType} from "../input-device";
 import Axle from "../../../../controls/axle";
 import MouseListener from "./mouse-listener";

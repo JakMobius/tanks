@@ -4,15 +4,15 @@ import EntityDataTransmitComponent from "../transmitting/entity-data-transmit-co
 
 export default class EntityStateTransmitter extends Transmitter {
 
-    attachedToRoot() {
-        super.attachedToRoot()
+    onEnable() {
+        super.onEnable()
         const receivingEnd = this.set.receivingEnd
 
         const myTransmitterSet = this.set
         const myEntity = myTransmitterSet.transmitComponent.entity
         const parentEntity = myEntity.parent
 
-        if(this.set.receivingEnd.getRoot() == myEntity) {
+        if(this.set.receivingEnd.root == myEntity) {
             // We should not synchronise events of the
             // root entity
             return;
@@ -27,18 +27,18 @@ export default class EntityStateTransmitter extends Transmitter {
         })
     }
 
-    detachedFromRoot() {
-        super.detachedFromRoot()
-
-        const myTransmitterSet = this.set
-        const myEntity = myTransmitterSet.transmitComponent.entity
-        if(this.set.receivingEnd.getRoot() == myEntity) {
+    onDisable() {
+        if(this.set.receivingEnd.root == this.set.transmitComponent.entity) {
             // We should not synchronise events of the
             // root entity
             return;
         }
 
-        this.pack(Commands.ENTITY_REMOVE_COMMAND, () => {})
+        this.packIfEnabled(Commands.ENTITY_REMOVE_COMMAND, () => {})
+
+        // Disable transmitter after sending the remove command
+        super.onDisable()
+
         // As we're no longer able to navigate from this entity after
         // it's removed from the tree, the further navigation is
         // performed from its parent node.

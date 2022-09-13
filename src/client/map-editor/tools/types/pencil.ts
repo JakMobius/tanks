@@ -33,7 +33,7 @@ export default class Pencil extends Tool {
 
         const brushProgram = new BrushProgram(this.manager.screen.ctx)
         this.brushProgramController = new BrushProgramController(brushProgram, this.manager.camera)
-        this.brushProgramController.brushColor = new Color(0, 1, 0, 0.5)
+        this.brushProgramController.brushColor = new Color().setRGB(0, 1, 0, 0.5)
         this.brushProgramController.camera = this.manager.camera
 
         this.setupMenu()

@@ -1,22 +1,22 @@
 import SocketPortalClient from '../socket-portal-client';
 import SocketPortal from '../socket-portal';
 import pako from 'pako';
-import Room from "../../room/room";
 import * as Websocket from "websocket";
 import BinaryPacket from "../../../networking/binary-packet";
 import * as fs from "fs"
 import RoomConfig from "../../room/room-config";
 import WebsocketConnection from "../../websocket-connection";
 import MapSerialization, {MalformedMapFileError} from "../../../map/map-serialization";
-import ServerGame from "../../room/server-game";
 
-import 'src/effects/model-loader'
-import 'src/map/block-state/type-loader'
-import 'src/server/entity/type-loader'
-import 'src/server/entity/type-loader'
-import 'src/entity/model-loader'
 import GameMap from "../../../map/game-map";
-import {checkRoomName} from "../../../data-checkers/room-name-checker";
+import * as url from "url";
+import Server from "../../server";
+import {WebserverSession} from "../../webserver/webserver-session";
+import Entity from "../../../utils/ecs/entity";
+import serverGameRoomPrefab from "../../room/server-game-room-prefab";
+import ServerEntityPrefabs from "../../entity/server-entity-prefabs";
+import {EntityType} from "../../../entity/entity-type";
+import RoomClientComponent from "../../room/components/room-client-component";
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -32,87 +32,119 @@ export class RoomNameUsedError extends Error {
     }
 }
 
-export default class GameSocketPortal extends SocketPortal {
-    public games = new Map<string, Room>()
+export interface GameSocketPortalClientData {
+    name: string
+    room: string
+}
 
-    constructor() {
+export type GameSocketPortalClient = SocketPortalClient<GameSocketPortalClientData>
+
+export default class GameSocketPortal extends SocketPortal {
+    public games = new Map<string, Entity>()
+    public server: Server
+
+    constructor(server: Server) {
         super()
+
+        this.server = server
+    }
+
+    private getQueryFromRequest(request: Websocket.request) {
+        if(typeof request.resourceURL.query === "string") {
+            return url.parse(request.resourceURL.href, true).query
+        } else {
+            return request.resourceURL.query
+        }
+    }
+
+    private getRoomFromRequest(request: Websocket.request) {
+        return this.getQueryFromRequest(request).room as string
     }
 
     handleRequest(request: Websocket.request) {
 
         // Only handling /game-socket requests
 
-        if(request.resourceURL.path === "/game-socket") {
-            super.handleRequest(request);
+        if(request.resourceURL.pathname === "/game-socket") {
+            this.handleGameSocketRequest(request)
         }
+    }
+
+    handleGameSocketRequest(request: Websocket.request) {
+        let roomName = this.getRoomFromRequest(request)
+
+        if (!roomName) {
+            request.reject(400, "no-room-name")
+            return
+        }
+
+        let room = this.games.get(roomName)
+        if (!room) {
+            request.reject(200, "no-such-room")
+            return
+        }
+
+        let clientComponent = room.getComponent(RoomClientComponent)
+
+        if(clientComponent.getCurrentOnline() >= clientComponent.getMaxOnline()) {
+            request.reject(200, "room-is-full")
+            return
+        }
+
+        this.server.webServer.getSessionFor(request.httpRequest, (session: WebserverSession) => {
+            if(!session.username) {
+                request.reject(403, "not-authenticated")
+                return
+            }
+
+            if(this.clientIsAlreadyInRoom(clientComponent, session.username)) {
+                request.reject(200, "already-in-room")
+                return
+            }
+
+            const connection = this.allowRequest(request)
+            const client = this.createClient(connection, request, session)
+            this.setupClient(client)
+        })
+    }
+
+    private clientIsAlreadyInRoom(clientComponent: RoomClientComponent, username: string) {
+        // TODO: should check if client is in any room. Maybe it should be stored in a session
+
+        for(let client of clientComponent.portal.clients.values()) {
+            if(client.data.name === username) {
+                return true
+            }
+        }
+        return false
     }
 
     terminate() {
         super.terminate()
     }
 
-    configureClient(client: SocketPortalClient, game: Room) {
+    configureClient(client: GameSocketPortalClient, game: Entity) {
         if(client.game) {
-            this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
-            client.game.portal.clientDisconnected(client)
+            client.game.getComponent(RoomClientComponent).portal.clientDisconnected(client)
         }
 
-        this.logger.log("Клиент " + client.id + " подключен к игре " + game.name)
-
-        game.portal.clientConnected(client)
+        game.getComponent(RoomClientComponent).portal.clientConnected(client)
         client.game = game
     }
 
-    clientDisconnected(client: SocketPortalClient) {
+    clientDisconnected(client: GameSocketPortalClient) {
         super.clientDisconnected(client);
         if(client.game) {
-            this.logger.log("Клиент " + client.id + " отключен от игры " + client.game.name)
-            client.game.portal.clientDisconnected(client)
+            client.game.getComponent(RoomClientComponent).portal.clientDisconnected(client)
         }
     }
 
-    handlePacket(packet: BinaryPacket, client: SocketPortalClient) {
+    handlePacket(packet: BinaryPacket, client: GameSocketPortalClient) {
         super.handlePacket(packet, client)
     }
 
-    getFreeGame() {
-        let game, online = -1
-
-        for(let eachGame of this.games.values()) {
-            const eachOnline = eachGame.portal.clients.size
-
-            if(eachOnline < eachGame.maxOnline) {
-                if(eachOnline > online) {
-                    game = eachGame
-                    online = eachOnline
-                }
-            }
-        }
-
-        return game
-    }
-
-    clientConnected(client: SocketPortalClient) {
-        let connection = client.connection
-
-        // if(this.banned.indexOf(connection.remoteAddress) !== -1) {
-        //     connection.close("Администратор внёс Ваш ip в бан-лист")
-        //     return
-        // }
-
-        if(this.games.size === 0) {
-            connection.close("Нет запущенных игр, попробуйте позже")
-            return
-        }
-
-        let game = this.getFreeGame();
-
-        if(!game) {
-            connection.close("Сервер переполнен, попробуйте позже")
-            return
-        }
-
+    clientConnected(client: GameSocketPortalClient) {
+        let game = this.games.get(client.data.room)
         this.configureClient(client, game)
     }
 
@@ -135,18 +167,29 @@ export default class GameSocketPortal extends SocketPortal {
             throw new MalformedMapFileError("Could not read map file " + config.map + ": " + e.message)
         }
 
-        const game = new ServerGame({
+        let game = new Entity()
+
+        serverGameRoomPrefab(game, {
             name: config.name,
             map: map
         })
 
+        let gameModeController = new Entity()
+        ServerEntityPrefabs.types.get(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
+        game.appendChild(gameModeController)
+
         this.games.set(config.name, game)
     }
 
-    createClient(connection: WebsocketConnection): SocketPortalClient {
-        return new SocketPortalClient({
+    createClient(connection: WebsocketConnection, request: Websocket.request, session: WebserverSession): GameSocketPortalClient {
+        let roomName = this.getRoomFromRequest(request)
+
+        return new SocketPortalClient<GameSocketPortalClientData>({
             connection: connection,
-            data: {}
+            data: {
+                name: session.username,
+                room: roomName
+            }
         })
     }
 }

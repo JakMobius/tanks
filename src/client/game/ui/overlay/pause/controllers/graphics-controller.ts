@@ -1,6 +1,5 @@
 import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
-import ControlsController from "./controls-controller";
 import PreferenceSelector from "../../../preference-selector/preference-selector";
 
 export class GraphicsView extends PauseMenuView {

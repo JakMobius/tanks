@@ -3,7 +3,7 @@ import RoomCreateCommand from './roomcreate';
 import RoomListCommand from './roomlist';
 import RoomViewCommand from './roomview';
 
-class RoomCommand extends Command {
+export default class RoomCommand extends Command {
 
     constructor(options: CommandConfig) {
         super(options);
@@ -21,5 +21,3 @@ class RoomCommand extends Command {
         return "room"
     }
 }
-
-export default RoomCommand;

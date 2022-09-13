@@ -1,6 +1,6 @@
 /* @load-resource: ./game-pause-navigation-transition.scss */
 
-import  NavigationTransition from "../../../../ui/navigation/navigation-transition";
+import NavigationTransition from "../../../../ui/navigation/navigation-transition";
 import BasicNavigationView from "../../../../ui/navigation/basic-navigation-view";
 import NavigationBlock from "../../../../ui/navigation/navigation-block";
 import NavigationCloud from "../../cloud/navigation-cloud";

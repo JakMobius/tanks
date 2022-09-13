@@ -7,8 +7,8 @@ export default class WeaponMiner extends SingleBarreledWeapon {
     constructor(config: WeaponConfig) {
         super({
             maxAmmo: 1,
-            shootRate: 1000,
-            reloadTime: 1000,
+            shootRate: 100,
+            reloadTime: 100,
             bulletType: EntityType.BULLET_MINE,
             muzzlePoint: new Box2D.Vec2(0, 0),
             tank: config.tank,

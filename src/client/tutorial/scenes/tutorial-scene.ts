@@ -8,7 +8,7 @@ import TankControls from "../../../controls/tank-controls";
 import PlayerControlsPacket from "../../../networking/packets/game-packets/player-controls-packet";
 import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
 import ReadBuffer from "../../../serialization/binary/read-buffer";
-import EntityDataReceiveComponent from "../../../entity/components/network/entity-data-receive-component";
+import EntityDataReceiveComponent from "../../../entity/components/network/receiving/entity-data-receive-component";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string

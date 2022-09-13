@@ -9,7 +9,7 @@ export class MainView extends PauseMenuView {
         this.addButton("Настройки").blue().target(SettingsController)
         this.addButton("Сменить танк").blue()
         this.addButton("Продолжить игру").blue().click(() => controller.navigationView.emit("close"))
-        this.addButton("Покинуть бой").red()
+        this.addButton("Покинуть бой").red().click(() => location.href = "/hub")
     }
 }
 

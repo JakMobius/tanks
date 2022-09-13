@@ -6,10 +6,6 @@ export default class RoomPortal extends TypedEventHandler<[SocketPortalClient]> 
     clients = new Map<Number, SocketPortalClient>()
     packetHandlers = new Map<Number, (packet: BinaryPacket) => void>()
 
-    constructor() {
-        super();
-    }
-
     clientConnected(client: SocketPortalClient) {
         this.setupPacketHandling(client)
         this.clients.set(client.id, client)

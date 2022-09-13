@@ -1,6 +1,4 @@
-
 import Axle from "../../../controls/axle";
-import {ButtonAxleConfig} from "./button-axle";
 
 export interface TriggerAxleConfig {
     min?: number

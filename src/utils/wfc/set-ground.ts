@@ -1,5 +1,4 @@
-
-import { ISuperposition } from "./superposition";
+import {ISuperposition} from "./superposition";
 
 export function setGround(
   ground = 0,

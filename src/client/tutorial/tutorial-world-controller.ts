@@ -1,21 +1,21 @@
-import Game from "../../server/room/game";
 import SocketPortalClient from "../../server/socket/socket-portal-client";
 import PhysicalComponent from "../../entity/components/physics-component";
-import EntityModel from "../../entity/entity-model";
-import Player from "../../player";
+import Player from "../../server/player";
 import ServerEntityPrefabs from "../../server/entity/server-entity-prefabs";
 import PlayerConnectionManager from "../../server/player-connection-manager";
 import {EntityType} from "../../entity/entity-type";
+import Entity from "../../utils/ecs/entity";
 
 export default class TutorialWorldController {
-    game: Game;
-    private tanks: EntityModel[] = []
+    game: Entity;
+    private tanks: Entity[] = []
     private selectedTanks: Map<Player, number> = new Map()
 
-    constructor(serverGame: Game) {
+    constructor(serverGame: Entity) {
         this.game = serverGame
-        this.game.portal.on("client-connect", (client) => this.onClientConnect(client))
-        this.game.world.on("game-chat", (player, text) => {
+
+        this.game.on("client-connect", (client) => this.onClientConnect(client))
+        this.game.on("game-chat", (player, text) => {
             if(text.startsWith("#")) {
                 this.onPlayerCommand(player, text)
             }
@@ -25,9 +25,9 @@ export default class TutorialWorldController {
     }
 
     private createTank(entityType: number, x: number, y: number, angle: number) {
-        const tank = new EntityModel()
+        const tank = new Entity()
         ServerEntityPrefabs.types.get(entityType)(tank)
-        this.game.world.appendChild(tank)
+        this.game.appendChild(tank)
         tank.emit("respawn")
 
         const body = tank.getComponent(PhysicalComponent).getBody()
@@ -48,12 +48,11 @@ export default class TutorialWorldController {
     private onClientConnect(client: SocketPortalClient) {
 
         const player = new Player({
-            id: client.id,
             nick: "Вы"
         })
 
         PlayerConnectionManager.attach(player, client)
-        player.setWorld(this.game.world)
+        player.connectToWorld(this.game)
 
         const selectedIndex = 0
         const tank = this.tanks[selectedIndex]
@@ -65,8 +64,6 @@ export default class TutorialWorldController {
 
     private respawnPlayer(player: Player) {
         const tank = player.tank
-        tank.emit("respawn")
-
         let body = tank.getComponent(PhysicalComponent)
         body.setPosition({x: 17.5, y: 212.5})
         body.setVelocity({x: 0, y: 0})

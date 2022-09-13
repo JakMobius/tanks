@@ -7,7 +7,7 @@ import ToolManager from "../toolmanager";
 import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "../../../../physics/tilemap-component";
 
-class SpawnZoneTool extends Tool {
+export default class SpawnZoneTool extends Tool {
     public image = "assets/img/spawnzones.png"
 	public actionName = "Зона спавна";
 	public selectedTeam: number | null = null;
@@ -16,9 +16,9 @@ class SpawnZoneTool extends Tool {
 	public decorations = new Map<number, Particle>();
 
     public readonly colors = new Map<number, Color>([
-        [0, new Color(255, 0, 0)],
-        [1, new Color(0, 255, 0)],
-        [2, new Color(0, 0, 255)]
+        [0, new Color().setRGB(1, 0, 0)],
+        [1, new Color().setRGB(0, 1, 0)],
+        [2, new Color().setRGB(0, 0, 1)]
     ])
 
     constructor(manager: ToolManager) {
@@ -34,7 +34,7 @@ class SpawnZoneTool extends Tool {
         return $("<div>").addClass("tool inline").append(
             $("<div>").addClass("wrapper")
                 .css("background-color", color.code())
-        ).click((e) => this.selectTeam($(e.target).closest(".tool"), i))
+        ).on("click", (e) => this.selectTeam($(e.target).closest(".tool"), i))
     }
 
     selectTeam(button: JQuery, i: number) {
@@ -170,5 +170,3 @@ class SpawnZoneTool extends Tool {
     }
 
 }
-
-export default SpawnZoneTool;

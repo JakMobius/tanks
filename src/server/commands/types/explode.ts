@@ -39,7 +39,7 @@ export default class ExplodeCommand extends Command {
             return
         }
 
-        let world = this.console.observingRoom.world
+        let world = this.console.observingRoom
         let effect = new WorldExplodeEffectModel({
             x: x,
             y: y,

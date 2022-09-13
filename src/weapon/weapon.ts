@@ -1,9 +1,9 @@
 import Axle from "../controls/axle";
 import HealthComponent from "../entity/components/health-component";
-import EntityModel from "../entity/entity-model";
+import Entity from "../utils/ecs/entity";
 
 export interface WeaponConfig {
-    tank: EntityModel
+    tank: Entity
     triggerAxle: Axle
 }
 
@@ -20,9 +20,9 @@ export default class Weapon {
     triggerAxle: Axle | null = null
 
     /**
-     * Tanks that equipped with this weapon
+     * Tanks that is equipped with this weapon
      */
-    tank: EntityModel = null
+    tank: Entity = null
 
     constructor(config: WeaponConfig) {
         this.tank = config.tank

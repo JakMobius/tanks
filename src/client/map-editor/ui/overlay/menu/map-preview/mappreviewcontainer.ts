@@ -1,10 +1,7 @@
 /* @load-resource: './map-preview.scss' */
 
 import Menu from 'src/client/ui/menu/menu';
-
-import MapStorage from 'src/client/map-editor/map-storage';
 import Camera from 'src/client/camera';
-import GameMap from 'src/map/game-map';
 import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
@@ -12,6 +9,7 @@ import Screen from "src/client/graphics/screen";
 import GameMapNameComponent from "../../../../map-name-component";
 import MapSerialization from "../../../../../../map/map-serialization";
 import pako from "pako";
+import GameMap from "../../../../../../map/game-map";
 
 export default class MapPreviewContainer extends Menu {
 	public map: GameMap;

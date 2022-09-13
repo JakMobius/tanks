@@ -4,17 +4,17 @@ import GameMap from "../../../../map/game-map";
 import GameMapHistoryComponent from "../game-map-history-component";
 
 export default class MapBlockModification extends MapModification {
-	public x: any;
-	public y: any;
-	public oldBlock: any;
-	public newBlock: any;
+	public x: number;
+	public y: number;
+	public oldBlock: BlockState;
+	public newBlock: BlockState;
 
-    constructor(map: GameMap, x: number, y: number, newBlock: BlockState) {
+    constructor(map: GameMap, x: number, y: number, oldBlock: BlockState, newBlock: BlockState) {
         super(map);
 
         this.x = x
         this.y = y
-        this.oldBlock = map.getBlock(x, y)
+        this.oldBlock = oldBlock
         this.newBlock = newBlock
     }
 

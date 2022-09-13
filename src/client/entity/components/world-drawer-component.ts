@@ -13,7 +13,8 @@ import DrawPhase from "../../graphics/drawers/draw-phase";
 import BasicCameraProgramController from "../../graphics/programs/controllers/basic-camera-program-controller";
 import TruckProgram from "../../graphics/programs/truck-program";
 import LightMaskTextureProgram from "../../graphics/programs/light-mask-texture/light-mask-texture-program";
-import MaskTextureProgramController from "../../graphics/programs/light-mask-texture/light-mask-texture-program-controller";
+import MaskTextureProgramController
+    from "../../graphics/programs/light-mask-texture/light-mask-texture-program-controller";
 import TilemapComponent from "../../../physics/tilemap-component";
 import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
 import ParticleHostComponent from "./particle-host-component";

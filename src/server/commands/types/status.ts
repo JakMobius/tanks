@@ -3,8 +3,9 @@ import CommandFlag from '../command-flag';
 import Chalk from 'chalk';
 import filesize from 'src/utils/fs/file-size';
 import Server from "../../server";
+import RoomClientComponent from "../../room/components/room-client-component";
 
-class StatusCommand extends Command {
+export default class StatusCommand extends Command {
 	public groupDepth: any;
     static activeText = "§!0F0;active"
     static inactiveText = "§!F00;inactive"
@@ -179,7 +180,10 @@ class StatusCommand extends Command {
             this.beginStatusGroup()
             this.printStatus("active games", Chalk.green(server.gameSocket.games.size))
             let totalPlayers = 0
-            for(let game of server.gameSocket.games.values()) totalPlayers += game.getCurrentOnline()
+            for(let game of server.gameSocket.games.values()) {
+                let clientComponent = game.getComponent(RoomClientComponent)
+                totalPlayers += clientComponent.getCurrentOnline()
+            }
             this.printStatus("total players", Chalk.green(totalPlayers))
             this.endStatusGroup()
         }
@@ -221,5 +225,3 @@ class StatusCommand extends Command {
         return "status";
     }
 }
-
-export default StatusCommand;

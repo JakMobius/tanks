@@ -2,7 +2,7 @@ import WebserverModule from '../webserver-module';
 import * as path from 'path';
 import {redirectToSlash} from "../redirest-to-slash";
 
-class GameModule extends WebserverModule {
+export default class GameModule extends WebserverModule {
     constructor() {
         super();
 
@@ -14,5 +14,3 @@ class GameModule extends WebserverModule {
         })
     }
 }
-
-export default GameModule;

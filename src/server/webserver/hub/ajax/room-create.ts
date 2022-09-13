@@ -1,6 +1,5 @@
 import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
 import express from "express";
-import {WebserverSession} from "../../webserver-session";
 import RoomConfig from "../../../room/room-config";
 import path from "path";
 import {NoSuchMapError, RoomNameUsedError} from "../../../socket/game-server/game-socket-portal";
@@ -15,15 +14,9 @@ export default class RoomCreateAjaxHandler extends AjaxHandler {
         { name: 'map', type: AjaxFieldType.string },
         { name: 'mode', type: AjaxFieldType.string }
     ]
+    static requiresAuthentication = true
 
     handle(req: express.Request, res: express.Response, fields: AjaxFields, next: express.NextFunction) {
-        let session = (req.session as WebserverSession)
-
-        if(!session.username) {
-            res.status(403).send({ result: "not-authenticated" })
-            return;
-        }
-
         let map = fields.map as string
         let mode = fields.mode as string
         let name = fields.name as string
@@ -47,7 +40,10 @@ export default class RoomCreateAjaxHandler extends AjaxHandler {
 
         let server = this.module.webServer.server
         server.gameSocket.createRoom(roomConfig).then(() => {
-            res.status(200).send({ result: "ok" })
+            res.status(200).send({
+                result: "ok",
+                url: "/game/?room=" + name
+            })
             console.log("Room " + name + " was successfully created!")
         }).catch(e => {
             if(e instanceof NoSuchMapError || e instanceof MalformedMapFileError) {

@@ -11,8 +11,8 @@ export default class BasicEventHandlerSet extends AbstractEventHandlerSet<EventE
         target.off(event, listener)
     }
 
-    protected setEventListener(target: EventEmitter, event: any, listener: (...params: any[]) => any): void {
-        target.on(event, listener)
+    protected setEventListener(target: EventEmitter, event: any, listener: (...params: any[]) => any, priority: number): void {
+        target.on(event, listener, priority)
     }
 
 }

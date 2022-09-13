@@ -1,8 +1,7 @@
 import Command from '../../command';
-import Game from "../../../room/game";
 import {ConsoleAutocompleteOptions} from "../../../console/console";
 
-class RoomViewCommand extends Command {
+export default class RoomViewCommand extends Command {
     onPerform(args: string[]) {
         let logger = this.console.logger
         if (args.length !== 1) {
@@ -11,7 +10,7 @@ class RoomViewCommand extends Command {
         }
 
         let id = args[0]
-        let world = this.console.server.gameSocket.games.get(id) as Game
+        let world = this.console.server.gameSocket.games.get(id)
 
         if (!world) {
             logger.log("No such room: '" + id)
@@ -20,7 +19,7 @@ class RoomViewCommand extends Command {
 
         this.console.observingRoom = world
         this.console.window.setPrompt(id)
-        this.console.switchToLogger(world.logger)
+        // this.console.switchToLogger(world.logger)
     }
 
     onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {
@@ -51,5 +50,3 @@ class RoomViewCommand extends Command {
         return "Switch to room"
     }
 }
-
-export default RoomViewCommand;

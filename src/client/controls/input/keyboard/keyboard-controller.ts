@@ -1,4 +1,3 @@
-
 import KeyAxle, {KeyAxleConfig} from './key-axle';
 import InputDevice, {InputDeviceType} from "../input-device";
 import KeyboardListener from "./keyboard-listener";

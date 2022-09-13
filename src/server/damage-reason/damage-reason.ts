@@ -1,6 +1,10 @@
+import {DamageTypes} from "../../entity/components/health-component";
+import Player from "../player";
 
 export default class DamageReason {
-	public time: any;
+
+    damageType = DamageTypes.UNKNOWN
+    players: Player[] | null = null
 
     constructor() {
 

@@ -1,10 +1,8 @@
-
 import DrawPhase from "./draw-phase";
 import {Component} from "../../../utils/ecs/component";
 import Entity from "../../../utils/ecs/entity";
 import WorldDrawerComponent from "../../entity/components/world-drawer-component";
 import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import {World} from "../../../library/box2d";
 
 export default class EntityDrawer implements Component {
 	public entity: Entity;

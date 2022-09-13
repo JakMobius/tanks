@@ -37,7 +37,7 @@ export default class Particle {
         this.lifetime = config.lifetime || 0.4
         this.lifespan = config.lifespan || 0
         this.damping = config.damping || 1
-        this.color = config.color || new Color(0, 0, 0)
+        this.color = config.color || new Color()
         this.width = config.width || 0
         this.height = config.height || 0
         this.scaling = config.scaling || 0

@@ -1,0 +1,62 @@
+.player-list-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+
+  .player-list-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 706px;
+    padding: 10px 20px;
+    gap: 10px;
+
+    .player-list-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .player-list-cloud {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px 10px 5px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid #D7D7D7;
+      border-radius: 20px;
+      box-sizing: border-box;
+      width: 100%;
+
+      .player-list-table {
+        box-sizing: border-box;
+        width: 100%;
+        position: relative;
+
+        tr {
+          height: 36px;
+        }
+
+        .player-list-table-separator {
+          left: 0;
+          right: 0;
+          height: 1px;
+          position: absolute;
+
+          &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            height: 1px;
+            background: black;
+          }
+        }
+      }
+    }
+  }
+}

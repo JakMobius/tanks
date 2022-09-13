@@ -18,8 +18,8 @@ interface ExplodePoolWalker {
 
     // Walker y velocity
     vy: number
-
-    // Amount of velocity modifiers
+    
+    // Count of velocity modifiers
     vn: number
 
     // Walker energy
@@ -188,7 +188,7 @@ export default class ExplodeEffectPool implements Component {
         }
     }
 
-    // Не хочется оборачивать эту структуру в класс, потому что это замедлит код.
+    // Avoid wrapping this structure in a class, because it will slow down the code.
 
     private walker(x: number, y: number, vx: number, vy: number, power: number): ExplodePoolWalker {
         return {

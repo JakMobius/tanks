@@ -1,4 +1,3 @@
-
 import GamepadAxle, {GamepadAxleConfig} from './gamepad-axle';
 import GamepadButton, {GamepadButtonConfig} from './gamepad-button';
 import GamepadListener from "./gamepad-listener";

@@ -29,7 +29,9 @@ export default abstract class SocketPortal<ClientDataClass = any> {
 
     protected constructor() {
 
-        this.dynamicConnectionHandler = (request: Websocket.request) => this.handleRequest(request)
+        this.dynamicConnectionHandler = (request: Websocket.request) => {
+            this.handleRequest(request)
+        }
     }
 
     /**
@@ -53,21 +55,20 @@ export default abstract class SocketPortal<ClientDataClass = any> {
      * origin.
      */
     handleRequest(request: Websocket.request) {
-        this.handleConnection(request.accept(null, request.origin));
+        this.allowRequest(request)
     }
 
-    abstract createClient(connection: WebsocketConnection): SocketPortalClient<ClientDataClass>
+    allowRequest(request: Websocket.request) {
+        return new WebsocketConnection(request.accept(null, request.origin))
+    }
 
     // noinspection JSValidateJSDoc
     /**
      * This method is called up when this socket instance handles and
      * permits the connection to the socket.
-     * @param connection {WebSocketConnection}
      */
 
-    handleConnection(connection: Websocket.connection) {
-        const client = this.createClient(new WebsocketConnection(connection))
-
+    setupClient(client: SocketPortalClient<ClientDataClass>) {
         this.clientConnected(client)
         this.clients.set(client.id, client)
 

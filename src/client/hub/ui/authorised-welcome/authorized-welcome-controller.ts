@@ -2,7 +2,7 @@ import Controller from "../../../ui/controller/controller";
 import {HubPage} from "../hub-page";
 import AuthorizedWelcomeView from "./authorized-welcome-view";
 import AccountBarButton from "../account-bar-button/account-bar-button";
-import RoomListController from "../room-list/room-list-controller";
+import RoomListController from "../room-list-view/room-list-controller";
 
 export default class AuthorizedWelcomeController extends Controller {
     page: HubPage;

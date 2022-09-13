@@ -1,7 +1,7 @@
 import WebSocket from 'websocket';
 import * as HTTP from 'http';
 
-class UniversalPortListener {
+export default class UniversalPortListener {
 
     /**
      * Port that is being listened by this instance
@@ -19,12 +19,12 @@ class UniversalPortListener {
     httpRetainCounter = 0
 
     /**
-     * HTTPServer binded to this port
+     * HTTPServer bound to this port
      */
     httpServer: HTTP.Server
 
     /**
-     * WebSocket server binded to this port
+     * WebSocket server bound to this port
      */
     webSocketServer: WebSocket.server
 
@@ -52,8 +52,7 @@ class UniversalPortListener {
 
     retainWebsocket() {
         // since WebSocket uses HTTP server,
-        // we are ensuring it is configured and will
-        // not be destroyed.
+        // ensure it is configured and will not be destroyed.
 
         this.retainHTTP()
         this.socketRetainCounter++
@@ -76,5 +75,3 @@ class UniversalPortListener {
         this.releaseHTTP()
     }
 }
-
-export default UniversalPortListener;

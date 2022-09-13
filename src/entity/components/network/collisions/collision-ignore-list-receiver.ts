@@ -1,6 +1,6 @@
-import EntityDataReceiveComponent from "../entity-data-receive-component";
+import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
-import ReceiverComponent from "../receiver-component";
+import ReceiverComponent from "../receiving/receiver-component";
 import CollisionIgnoreList from "../../collision-ignore-list";
 
 export default class CollisionIgnoreListReceiver extends ReceiverComponent {

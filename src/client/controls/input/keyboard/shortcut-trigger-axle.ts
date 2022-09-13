@@ -1,4 +1,3 @@
-
 import KeyboardListener from "./keyboard-listener";
 import {isMacOS} from "../../../../utils/meta-key-name";
 import TriggerAxle, {TriggerAxleConfig} from "../../interact/trigger-axle";

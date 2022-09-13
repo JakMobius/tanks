@@ -1,6 +1,6 @@
 import Connection from "../../networking/connection";
-import Room from "../room/room";
 import TypedEventHandler from "../../utils/typed-event-handler";
+import Entity from "../../utils/ecs/entity";
 
 export interface SocketPortalClientConfig<DataClass> {
 	data: DataClass
@@ -14,7 +14,7 @@ export default class SocketPortalClient<DataClass = any> extends TypedEventHandl
 	data: DataClass
 	connection: Connection
 
-	game: Room = null
+	game: Entity = null
 
 	constructor(config?: SocketPortalClientConfig<DataClass>) {
 		super()

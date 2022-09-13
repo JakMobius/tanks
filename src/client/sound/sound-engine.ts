@@ -1,6 +1,3 @@
-
-import SoundPrimaryComponent from './sound/sound-primary-component';
-import Entity from "../../utils/ecs/entity";
 import {SoundStream} from "./stream/sound-stream";
 import EventEmitter from "../../utils/event-emitter";
 

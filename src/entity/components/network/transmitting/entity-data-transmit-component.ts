@@ -7,6 +7,8 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
     transmitterSets = new Map<ReceivingEnd, TransmitterSet>()
     networkIdentifier: number | null = null
     configScriptIndex: number = 0
+    visibleAnywhere: boolean = false
+
     private entitiesCreated: number = 0
 
     constructor() {
@@ -34,20 +36,26 @@ export default class EntityDataTransmitComponent extends HierarchicalComponent {
         return this.transmitterSets.has(receivingEnd)
     }
 
-    // TODO: this method should not create new transmitter set implicitly.
-    transmitterSetFor(receivingEnd: ReceivingEnd) {
-        let transmitterSet = this.transmitterSets.get(receivingEnd)
-        if(!transmitterSet) {
-            transmitterSet = new TransmitterSet(receivingEnd)
-            transmitterSet.setTransmitComponent(this)
-            this.transmitterSets.set(receivingEnd, transmitterSet)
-            this.entity.emit("transmitter-set-attached", transmitterSet)
+    createTransmitterSetFor(receivingEnd: ReceivingEnd) {
+        if(this.hasTransmitterSetForEnd(receivingEnd)) {
+            throw new Error("Transmitter set already exists for this receiving end")
         }
+
+        let transmitterSet = new TransmitterSet(receivingEnd)
+        transmitterSet.setTransmitComponent(this)
+        this.transmitterSets.set(receivingEnd, transmitterSet)
+        this.entity.emit("transmitter-set-attached", transmitterSet)
+        receivingEnd.emit("transmitter-set-attached", transmitterSet)
         return transmitterSet
+    }
+
+    transmitterSetFor(receivingEnd: ReceivingEnd) {
+        return this.transmitterSets.get(receivingEnd)
     }
 
     removeTransmitterSet(receivingEnd: ReceivingEnd) {
         let transmitterSet = this.transmitterSets.get(receivingEnd)
+        receivingEnd.emit("transmitter-set-detached", transmitterSet)
         if(transmitterSet) {
             transmitterSet.setTransmitComponent(null)
             this.transmitterSets.delete(receivingEnd)

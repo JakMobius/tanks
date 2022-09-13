@@ -1,5 +1,6 @@
 import express from "express";
 import WebserverModule from "../webserver-module";
+import {WebserverSession} from "../webserver-session";
 
 export enum AjaxFieldType {
     string, number, json, boolean
@@ -20,6 +21,7 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
     static url: string
     static method: string
     static schema: AjaxSchema
+    static requiresAuthentication = false
     module: T
 
     handle(req: express.Request, res: express.Response, fields: AjaxFields, next: express.NextFunction) {
@@ -85,6 +87,11 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
                     return
                 }
             }
+        }
+
+        if(ctor.requiresAuthentication && !(req.session as WebserverSession).username) {
+            res.status(403).send({ result: "not-authenticated" })
+            return;
         }
 
         this.handle(req, res, fields, next)

@@ -11,13 +11,13 @@ export default class PrimaryPlayerTransmitter extends Transmitter {
         this.updateEntity()
     }
 
-    attachedToRoot() {
-        super.attachedToRoot()
+    onEnable() {
+        super.onEnable()
         this.updateEntity()
     }
 
     updateEntity() {
-        this.pack(Commands.PLAYER_TANK_SET, (buffer) => {
+        this.packIfEnabled(Commands.PLAYER_TANK_SET, (buffer) => {
             buffer.writeInt8(this.entity != null ? 1 : 0)
             if(this.entity) {
                 this.pointToEntity(this.entity)

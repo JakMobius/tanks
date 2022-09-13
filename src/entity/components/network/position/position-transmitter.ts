@@ -15,14 +15,16 @@ export default class PositionTransmitter extends Transmitter {
         })
     }
 
-    attachedToRoot() {
-        super.attachedToRoot();
+    onEnable() {
+        super.onEnable();
         this.sendPositionUpdate()
     }
 
     sendPositionUpdate() {
-        this.pack(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-            let body = this.getEntity().getComponent(PhysicalComponent).getBody()
+        let body = this.getEntity().getComponent(PhysicalComponent).getBody()
+        if(!body) return;
+
+        this.packIfEnabled(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
             let position = body.GetPosition()
             buffer.writeFloat32(position.x)
             buffer.writeFloat32(position.y)

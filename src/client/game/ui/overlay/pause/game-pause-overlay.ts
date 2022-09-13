@@ -2,11 +2,11 @@
 
 import Overlay, {OverlayConfig} from "../../../../ui/overlay/overlay";
 import MainController from "./controllers/main-controller";
-import BasicNavigationView from "../../../../ui/navigation/basic-navigation-view";
 import GamePauseNavigationBlock from "./game-pause-navigation-block";
 import GamePauseNavigationView from "./game-pause-navigation-view";
+import MenuOverlay from "../../../../ui/menu-overlay/menu-overlay";
 
-export class GamePauseOverlay extends Overlay {
+export class GamePauseOverlay extends MenuOverlay {
 
     navigationView = new GamePauseNavigationView()
 

@@ -36,7 +36,7 @@ export default class PhysicsChunk {
         this.meshGenerationContext = new MeshGenerationContext(this)
 
         this.eventHandlers = new BasicEventHandlerSet()
-        this.eventHandlers.on("map-block-change", (x, y) => this.onBlockUpdate(x, y))
+        this.eventHandlers.on("map-block-change", (event) => this.onBlockUpdate(event.x, event.y))
     }
 
     onBlockUpdate(x: number, y: number) {

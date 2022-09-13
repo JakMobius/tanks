@@ -9,13 +9,13 @@ export default class HealthTransmitter extends Transmitter {
         this.eventHandler.on("health-set", () => this.queueHealthUpdate())
     }
 
-    attachedToRoot() {
-        super.attachedToRoot()
+    onEnable() {
+        super.onEnable()
         this.queueHealthUpdate();
     }
 
     queueHealthUpdate() {
-        this.pack(Commands.HEALTH_UPDATE_COMMAND, (buffer) => {
+        this.packIfEnabled(Commands.HEALTH_UPDATE_COMMAND, (buffer) => {
             buffer.writeFloat32(this.getEntity().getComponent(HealthComponent).getHealth())
         })
     }
