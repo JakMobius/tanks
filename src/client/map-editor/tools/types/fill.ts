@@ -1,9 +1,9 @@
 import Tool from '../tool';
 import GameMap from '../../../../map/game-map';
 import ToolManager from '../toolmanager';
-import BlockState from "../../../../map/block-state/block-state";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import GameMapHistoryComponent from "../../history/game-map-history-component";
+import BlockState from "src/map/block-state/block-state";
+import TilemapComponent from "src/physics/tilemap-component";
+import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 
 export default class Fill extends Tool {
     public actionName: any;

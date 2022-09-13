@@ -6,10 +6,10 @@ import * as Box2D from 'src/library/box2d';
 import Sprite from 'src/client/sprite';
 import MapDrawer from "src/client/graphics/drawers/map-drawer";
 import Screen from "src/client/graphics/screen";
-import GameMapNameComponent from "../../../../map-name-component";
-import MapSerialization from "../../../../../../map/map-serialization";
+import GameMapNameComponent from "src/client/map-editor/map-name-component";
+import MapSerialization from "src/map/map-serialization";
 import pako from "pako";
-import GameMap from "../../../../../../map/game-map";
+import GameMap from "src/map/game-map";
 
 export default class MapPreviewContainer extends Menu {
 	public map: GameMap;

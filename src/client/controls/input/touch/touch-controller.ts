@@ -1,6 +1,6 @@
 import DocumentEventHandler from '../../interact/document-event-handler';
 import TouchVidget from "./touch-vidget";
-import ControlPanel from "../../../game/ui/control-panel";
+import ControlPanel from "src/client/game/ui/control-panel";
 
 export interface Touch {
     left: number,

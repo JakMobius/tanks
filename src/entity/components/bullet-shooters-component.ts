@@ -1,6 +1,6 @@
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import Player from "../../server/player";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import Player from "src/server/player";
 
 export default class BulletShootersComponent implements Component {
     entity: Entity | null;

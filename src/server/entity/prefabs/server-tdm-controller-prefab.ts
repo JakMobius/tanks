@@ -1,9 +1,8 @@
 import ServerEntityPrefabs from "../server-entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import EntityDataTransmitComponent
-    from "../../../entity/components/network/transmitting/entity-data-transmit-component";
-import ServerTDMControllerComponent from "../../room/game-modes/tdm/server-tdm-controller-component";
+import {EntityType} from "src/entity/entity-type";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
+import ServerTDMControllerComponent from "src/server/room/game-modes/tdm/server-tdm-controller-component";
 
 ServerEntityPrefabs.types.set(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)

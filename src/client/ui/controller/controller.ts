@@ -1,5 +1,5 @@
 import View from "../view";
-import EventEmitter from "../../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 import BasicNavigationView from "../navigation/basic-navigation-view";
 
 export default class Controller<ViewClass extends View = View> extends EventEmitter {

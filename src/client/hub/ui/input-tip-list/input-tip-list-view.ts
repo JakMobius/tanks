@@ -1,6 +1,6 @@
 /* @load-resource: 'input-tip-list-view.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 
 export enum TipStyle {
     FINE = "fine",

@@ -1,5 +1,5 @@
 import InputDevice, {InputDeviceType} from "../input-device";
-import Axle from "../../../../controls/axle";
+import Axle from "src/controls/axle";
 import MouseListener from "./mouse-listener";
 import MouseAxle, {MouseAxleConfig} from "./mouse-axle";
 import MouseButtonAxle, {MouseButtonConfig} from "./mouse-button";

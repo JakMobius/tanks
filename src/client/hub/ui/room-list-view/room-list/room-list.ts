@@ -1,7 +1,7 @@
 /* @load-resource: './room-list.scss' */
 
-import View from "../../../../ui/view";
-import LoadingView from "../../loading-view/loading-view";
+import View from "src/client/ui/view";
+import LoadingView from "src/client/hub/ui/loading-view/loading-view";
 import RoomCell from "../room-cell/room-cell";
 
 export interface RoomConfig {

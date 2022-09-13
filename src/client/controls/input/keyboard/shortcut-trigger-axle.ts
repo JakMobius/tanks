@@ -1,6 +1,6 @@
 import KeyboardListener from "./keyboard-listener";
-import {isMacOS} from "../../../../utils/meta-key-name";
-import TriggerAxle, {TriggerAxleConfig} from "../../interact/trigger-axle";
+import {isMacOS} from "src/utils/meta-key-name";
+import TriggerAxle, {TriggerAxleConfig} from "src/client/controls/interact/trigger-axle";
 
 export interface ShortcutTriggerAxleConfig extends TriggerAxleConfig {
     triggerShortcut: string

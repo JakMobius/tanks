@@ -1,7 +1,7 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
-import CollisionIgnoreList from "../../collision-ignore-list";
-import Entity from "../../../../utils/ecs/entity";
+import CollisionIgnoreList from "src/entity/components/collision-ignore-list";
+import Entity from "src/utils/ecs/entity";
 
 export default class CollisionIgnoreListTransmitter extends Transmitter {
     constructor() {

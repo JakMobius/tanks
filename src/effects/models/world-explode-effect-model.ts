@@ -1,7 +1,7 @@
 import WorldEffectModel, {WorldEffectModelConfig} from './world-effect-model';
-import {Constructor} from "../../serialization/binary/serializable";
-import ReadBuffer from "../../serialization/binary/read-buffer";
-import WriteBuffer from "../../serialization/binary/write-buffer";
+import {Constructor} from "src/serialization/binary/serializable";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import WriteBuffer from "src/serialization/binary/write-buffer";
 import EffectModel from "../effect-model";
 
 export interface WorldExplodeEffectModelConfig extends WorldEffectModelConfig {

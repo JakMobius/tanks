@@ -1,5 +1,5 @@
 import {ControllerControls, ControllerControlsConfig} from "../game-controls-settings";
-import InputDevice, {AxleConfig, InputDeviceType} from "../../controls/input/input-device";
+import InputDevice, {AxleConfig, InputDeviceType} from "src/client/controls/input/input-device";
 import {getDefaultKeyboardControls} from "./default-keyboard-settings";
 import {getDefaultGamepadSettings} from "./default-gamepad-settings";
 

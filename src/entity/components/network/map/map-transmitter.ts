@@ -1,9 +1,9 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import BlockState from "../../../../map/block-state/block-state";
-import BlockDamageEvent from "../../../../events/block-damage-event";
-import BlockChangeEvent from "../../../../events/block-change-event";
+import TilemapComponent from "src/physics/tilemap-component";
+import BlockState from "src/map/block-state/block-state";
+import BlockDamageEvent from "src/events/block-damage-event";
+import BlockChangeEvent from "src/events/block-change-event";
 
 export default class MapTransmitter extends Transmitter {
     constructor() {

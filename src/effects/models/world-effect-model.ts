@@ -1,7 +1,7 @@
 import EffectModel, {EffectModelConfig} from '../effect-model';
 import {Constructor} from 'src/serialization/binary/serializable';
-import WriteBuffer from "../../serialization/binary/write-buffer";
-import ReadBuffer from "../../serialization/binary/read-buffer";
+import WriteBuffer from "src/serialization/binary/write-buffer";
+import ReadBuffer from "src/serialization/binary/read-buffer";
 
 export interface WorldEffectModelConfig extends EffectModelConfig {
     x: number

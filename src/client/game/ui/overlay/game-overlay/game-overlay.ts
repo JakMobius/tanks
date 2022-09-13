@@ -1,7 +1,7 @@
-import Overlay, {OverlayConfig} from "../../../../ui/overlay/overlay";
-import Entity from "../../../../../utils/ecs/entity";
+import Overlay, {OverlayConfig} from "src/client/ui/overlay/overlay";
+import Entity from "src/utils/ecs/entity";
 import GameStateView from "./game-state-view";
-import {Constructor} from "../../../../../serialization/binary/serializable";
+import {Constructor} from "src/serialization/binary/serializable";
 
 export interface GameOverlayConfig extends OverlayConfig {
     world: Entity

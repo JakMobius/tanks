@@ -1,8 +1,8 @@
-import * as Box2D from "../../library/box2d";
-import {Component} from "../../utils/ecs/component";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import Entity from "../../utils/ecs/entity";
-import PhysicalComponent from "../../entity/components/physics-component";
+import * as Box2D from "src/library/box2d";
+import {Component} from "src/utils/ecs/component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Entity from "src/utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
 
 export default class BulletLauncher implements Component {
     entity: Entity

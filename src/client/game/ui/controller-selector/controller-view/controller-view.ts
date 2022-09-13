@@ -1,7 +1,7 @@
 /* @load-resource: ./controller-view.scss */
 
-import View from "../../../../ui/view";
-import InputDevice, {InputDeviceType} from "../../../../controls/input/input-device";
+import View from "src/client/ui/view";
+import InputDevice, {InputDeviceType} from "src/client/controls/input/input-device";
 
 export default class ControllerView extends View {
 

@@ -1,6 +1,6 @@
 import ReloadableWeapon from "../reloadable-weapon";
 import {WeaponConfig} from "../weapon";
-import {EntityType} from "../../entity/entity-type";
+import {EntityType} from "src/entity/entity-type";
 
 export default class WeaponMachineGun extends ReloadableWeapon {
 	public state: number;

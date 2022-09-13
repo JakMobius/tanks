@@ -1,11 +1,10 @@
-import * as Box2D from "../../library/box2d";
-import EntityPrefabs from "../entity-prefabs";
-import PhysicsChunk from "../../physics/physics-chunk";
+import * as Box2D from "src/library/box2d";
+import PhysicsChunk from "src/physics/physics-chunk";
 import PhysicalComponent from "./physics-component";
-import GameMap from "../../map/game-map";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
+import GameMap from "src/map/game-map";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
 
 export default class TilemapHitEmitter implements Component {
     entity: Entity | null;

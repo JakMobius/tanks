@@ -1,7 +1,7 @@
 import Scene from "../scenes/scene";
 import Screen, {ScreenConfig} from "./screen";
-import Loop from "../../utils/loop/loop";
-import RenderLoop from "../../utils/loop/render-loop";
+import Loop from "src/utils/loop/loop";
+import RenderLoop from "src/utils/loop/render-loop";
 
 export default class SceneScreen extends Screen {
 

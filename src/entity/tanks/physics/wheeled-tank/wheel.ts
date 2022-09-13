@@ -1,4 +1,4 @@
-import {Vec2} from "../../../../library/box2d";
+import {Vec2} from "src/library/box2d";
 
 export interface TankWheelConfig {
     x: number

@@ -1,14 +1,14 @@
 import {SceneConfig} from 'src/client/scenes/scene';
 import {getTutorialMap} from "../tutorial-map";
-import EmbeddedServerGame from "../../embedded-server/embedded-server-game";
+import EmbeddedServerGame from "src/client/embedded-server/embedded-server-game";
 import TutorialWorldController from "../tutorial-world-controller";
-import PlayerChatPacket from "../../../networking/packets/game-packets/player-chat-packet";
-import GeneralGameScene from "../../game/general-game-scene";
-import TankControls from "../../../controls/tank-controls";
-import PlayerControlsPacket from "../../../networking/packets/game-packets/player-controls-packet";
-import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
-import EntityDataReceiveComponent from "../../../entity/components/network/receiving/entity-data-receive-component";
+import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
+import GeneralGameScene from "src/client/game/general-game-scene";
+import TankControls from "src/controls/tank-controls";
+import PlayerControlsPacket from "src/networking/packets/game-packets/player-controls-packet";
+import WorldCommunicationPacket from "src/networking/packets/game-packets/world-communication-packet";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
 
 export interface TutorialSceneConfig extends SceneConfig {
     username: string

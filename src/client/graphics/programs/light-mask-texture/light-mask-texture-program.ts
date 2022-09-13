@@ -3,9 +3,9 @@
 
 import GLBuffer from '../../glbuffer';
 import Sprite from '../../../sprite';
-import Uniform from "../../uniform";
+import Uniform from "src/client/graphics/uniform";
 import CameraProgram from "../camera-program";
-import {Quadrangle} from "../../../../utils/quadrangle";
+import {Quadrangle} from "src/utils/quadrangle";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/light-mask-texture-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl"

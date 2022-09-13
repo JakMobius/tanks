@@ -1,9 +1,9 @@
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import CollisionIgnoreListTransmitter from "./network/collisions/collision-ignore-list-transmitter";
-import * as Box2D from "../../library/box2d"
+import * as Box2D from "src/library/box2d"
 
 export default class CollisionIgnoreList implements Component {
     entity: Entity | null;

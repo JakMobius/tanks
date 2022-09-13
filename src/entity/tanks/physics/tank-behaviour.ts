@@ -1,7 +1,7 @@
-import {Vec2} from "../../../library/box2d";
-import TankControls from "../../../controls/tank-controls";
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
+import {Vec2} from "src/library/box2d";
+import TankControls from "src/controls/tank-controls";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
 
 /**
  * Class which defines the physical behaviour of each specific type of tank (tracked, wheeled, etc.)

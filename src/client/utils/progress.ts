@@ -1,4 +1,4 @@
-import EventEmitter from "../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 
 export default class Progress extends EventEmitter {
 	public completed: number = 0

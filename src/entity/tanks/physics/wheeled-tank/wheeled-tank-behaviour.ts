@@ -1,7 +1,7 @@
 import {Vec2} from '../../../../library/box2d'
 import TankBehaviour from '../tank-behaviour';
 import {TankWheel} from "./wheel";
-import PhysicalComponent from "../../../components/physics-component";
+import PhysicalComponent from "src/entity/components/physics-component";
 
 export interface WheeledTankBehaviourConfig {
 

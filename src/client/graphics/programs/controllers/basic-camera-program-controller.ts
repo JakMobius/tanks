@@ -1,6 +1,6 @@
 import ProgramController from "./program-controller";
 import CameraProgram from "../camera-program";
-import Camera from "../../../camera";
+import Camera from "src/client/camera";
 
 export default class BasicCameraProgramController<ProgramClass extends CameraProgram = CameraProgram> extends ProgramController<ProgramClass> {
 

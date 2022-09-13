@@ -1,6 +1,6 @@
 import TransmitterPrecondition from "./transmitter-precondition";
-import Entity from "../../../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../../../utils/basic-event-handler-set";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import Transmitter from "../transmitter";
 import {TransmitterSet} from "../transmitter-set";
 

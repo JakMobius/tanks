@@ -2,7 +2,7 @@
 
 
 import BlockState from 'src/map/block-state/block-state';
-import Menu from "../../../../../ui/menu/menu";
+import Menu from "src/client/ui/menu/menu";
 
 export default class BlockSelectMenu extends Menu {
 	public list: JQuery;

@@ -1,9 +1,9 @@
-import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
+import AjaxHandler, {AjaxFields, AjaxFieldType} from "src/server/webserver/ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import {nickIsValid} from "../../../../data-checkers/nick-checker";
-import {passwordIsValid} from "../../../../data-checkers/password-checker";
-import {WebserverSession} from "../../webserver-session";
+import {nickIsValid} from "src/data-checkers/nick-checker";
+import {passwordIsValid} from "src/data-checkers/password-checker";
+import {WebserverSession} from "src/server/webserver/webserver-session";
 
 interface RegisterAjaxFields extends AjaxFields {
     login: string

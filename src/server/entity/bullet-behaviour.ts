@@ -1,15 +1,15 @@
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import PhysicalComponent from "../../entity/components/physics-component";
-import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
-import EffectHostComponent from "../../effects/effect-host-component";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
+import WorldExplodeEffectModel from "src/effects/models/world-explode-effect-model";
+import EffectHostComponent from "src/effects/effect-host-component";
 import ServerEffect from "../effects/server-effect";
-import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
-import TilemapComponent from "../../physics/tilemap-component";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
+import TilemapComponent from "src/physics/tilemap-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import DamageReason from "../damage-reason/damage-reason";
-import BulletShootersComponent from "../../entity/components/bullet-shooters-component";
-import WorldPhysicalLoopComponent from "../../entity/components/world-physical-loop-component";
+import BulletShootersComponent from "src/entity/components/bullet-shooters-component";
+import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;

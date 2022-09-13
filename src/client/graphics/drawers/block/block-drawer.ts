@@ -1,9 +1,9 @@
 import Sprite from '../../../sprite';
 import GameMap from 'src/map/game-map';
-import BlockState from "../../../../map/block-state/block-state";
-import TextureProgram from "../../programs/texture-program";
-import {squareQuadrangle} from "../../../../utils/quadrangle";
-import WorldDrawerComponent from "../../../entity/components/world-drawer-component";
+import BlockState from "src/map/block-state/block-state";
+import TextureProgram from "src/client/graphics/programs/texture-program";
+import {squareQuadrangle} from "src/utils/quadrangle";
+import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 export default class BlockDrawer {
 	public id: number;

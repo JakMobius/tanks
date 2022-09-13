@@ -1,5 +1,5 @@
 import Command, {CommandConfig} from '../../command';
-import {ConsoleAutocompleteOptions} from "../../../console/console";
+import {ConsoleAutocompleteOptions} from "src/server/console/console";
 
 export interface ServerServiceConfig {
     hubPage: boolean

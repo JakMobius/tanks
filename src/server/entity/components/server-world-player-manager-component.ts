@@ -1,10 +1,10 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import Player from "../../player";
-import EventEmitter from "../../../utils/event-emitter";
-import PlayerConnectEvent from "../../../events/player-connect-event";
-import PlayerDisconnectEvent from "../../../events/player-disconnect-event";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Player from "src/server/player";
+import EventEmitter from "src/utils/event-emitter";
+import PlayerConnectEvent from "src/events/player-connect-event";
+import PlayerDisconnectEvent from "src/events/player-disconnect-event";
 
 export default class ServerWorldPlayerManagerComponent implements Component {
     entity: Entity | null;

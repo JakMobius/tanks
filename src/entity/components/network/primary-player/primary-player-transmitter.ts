@@ -1,6 +1,6 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
-import Entity from "../../../../utils/ecs/entity";
+import Entity from "src/utils/ecs/entity";
 
 export default class PrimaryPlayerTransmitter extends Transmitter {
 

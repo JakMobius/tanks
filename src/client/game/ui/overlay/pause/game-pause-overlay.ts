@@ -1,10 +1,10 @@
 /* @load-resource: ./game-pause-overlay.scss */
 
-import Overlay, {OverlayConfig} from "../../../../ui/overlay/overlay";
+import {OverlayConfig} from "src/client/ui/overlay/overlay";
 import MainController from "./controllers/main-controller";
 import GamePauseNavigationBlock from "./game-pause-navigation-block";
 import GamePauseNavigationView from "./game-pause-navigation-view";
-import MenuOverlay from "../../../../ui/menu-overlay/menu-overlay";
+import MenuOverlay from "src/client/ui/menu-overlay/menu-overlay";
 
 export class GamePauseOverlay extends MenuOverlay {
 

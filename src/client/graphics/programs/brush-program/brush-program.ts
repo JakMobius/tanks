@@ -3,9 +3,9 @@
 
 import GLBuffer from '../../glbuffer';
 import GameMap from '../../../../map/game-map';
-import Uniform from "../../uniform";
+import Uniform from "src/client/graphics/uniform";
 import CameraProgram from "../camera-program";
-import {Quadrangle} from "../../../../utils/quadrangle";
+import {Quadrangle} from "src/utils/quadrangle";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/brush-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/brush-fragment.glsl"

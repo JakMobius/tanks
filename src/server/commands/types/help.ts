@@ -1,5 +1,5 @@
 import Command from '../command';
-import ConsoleTableDrawer from "../../console/console-table-drawer";
+import ConsoleTableDrawer from "src/server/console/console-table-drawer";
 
 export default class HelpCommand extends Command {
 

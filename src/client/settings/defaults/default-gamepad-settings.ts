@@ -1,5 +1,5 @@
 import {ControllerControlsConfig} from "../game-controls-settings";
-import {GamepadInputConfig, GamepadInputType} from "../../controls/input/gamepad/gamepad-controller";
+import {GamepadInputConfig, GamepadInputType} from "src/client/controls/input/gamepad/gamepad-controller";
 
 export function getDefaultGamepadSettings(): ControllerControlsConfig<GamepadInputConfig> {
     return {

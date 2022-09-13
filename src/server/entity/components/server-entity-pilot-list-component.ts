@@ -1,9 +1,8 @@
-import {Component} from "../../../utils/ecs/component";
-import Player from "../../player";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import EntityPilotListTransmitter
-    from "../../../entity/components/network/entity-player-list/entity-pilot-list-transmitter";
+import {Component} from "src/utils/ecs/component";
+import Player from "src/server/player";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import EntityPilotListTransmitter from "src/entity/components/network/entity-player-list/entity-pilot-list-transmitter";
 
 export default class ServerEntityPilotListComponent implements Component {
     entity: Entity | null;

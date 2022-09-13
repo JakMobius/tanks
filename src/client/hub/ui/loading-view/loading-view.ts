@@ -1,6 +1,6 @@
 /* @load-resource: './loading-view.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 
 export default class LoadingView extends View {
 

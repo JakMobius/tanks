@@ -1,5 +1,5 @@
 import {Component} from "./component";
-import {Constructor} from "../../serialization/binary/serializable";
+import {Constructor} from "src/serialization/binary/serializable";
 import EventEmitter from "../event-emitter";
 
 export default class Entity extends EventEmitter {

@@ -1,4 +1,4 @@
-import {UserDataRaw} from "../../client/user-data-raw";
+import {UserDataRaw} from "src/client/user-data-raw";
 import session from "express-session";
 
 export default interface ServerDatabase {

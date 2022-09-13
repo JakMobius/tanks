@@ -1,11 +1,11 @@
 import Weapon, {WeaponConfig} from '../weapon';
-import Player from "../../server/player";
-import PhysicalComponent from "../../entity/components/physics-component";
-import TransformComponent from "../../entity/components/transform-component";
-import Entity from "../../utils/ecs/entity";
-import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
-import ServerEntityPilotListComponent from "../../server/entity/components/server-entity-pilot-list-component";
-import DamageReason from "../../server/damage-reason/damage-reason";
+import Player from "src/server/player";
+import PhysicalComponent from "src/entity/components/physics-component";
+import TransformComponent from "src/entity/components/transform-component";
+import Entity from "src/utils/ecs/entity";
+import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
+import ServerEntityPilotListComponent from "src/server/entity/components/server-entity-pilot-list-component";
+import DamageReason from "src/server/damage-reason/damage-reason";
 
 export interface WeaponStungunConfig extends WeaponConfig {
     damage: number

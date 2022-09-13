@@ -5,11 +5,11 @@ import Menu from '../../../../../ui/menu/menu';
 import MapStorage from '../../../../map-storage';
 import DragListener from '../../../element/dragoverlay';
 import {trimFileExtension} from '../../../../../../utils/utils';
-import GameMapNameComponent from "../../../../map-name-component";
-import GameMapHistoryComponent from "../../../../history/game-map-history-component";
-import DialogOverlay from "../../dialog/dialogoverlay";
-import GameMap from "../../../../../../map/game-map";
-import MapSerialization from "../../../../../../map/map-serialization";
+import GameMapNameComponent from "src/client/map-editor/map-name-component";
+import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
+import DialogOverlay from "src/client/map-editor/ui/overlay/dialog/dialogoverlay";
+import GameMap from "src/map/game-map";
+import MapSerialization from "src/map/map-serialization";
 import pako from "pako";
 
 export default class MapSelectContainer extends Menu {

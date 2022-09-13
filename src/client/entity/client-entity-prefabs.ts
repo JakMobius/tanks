@@ -1,10 +1,10 @@
 import ServerPositionComponent from "./components/server-position-component";
-import EffectReceiver from "../../entity/components/network/effect/effect-receiver";
-import PositionReceiver from "../../entity/components/network/position/position-receiver";
-import HealthReceiver from "../../entity/components/network/health/health-receiver";
-import EntityStateReceiver from "../../entity/components/network/entity/entity-state-receiver";
-import Entity from "../../utils/ecs/entity";
-import CollisionIgnoreListReceiver from "../../entity/components/network/collisions/collision-ignore-list-receiver";
+import EffectReceiver from "src/entity/components/network/effect/effect-receiver";
+import PositionReceiver from "src/entity/components/network/position/position-receiver";
+import HealthReceiver from "src/entity/components/network/health/health-receiver";
+import EntityStateReceiver from "src/entity/components/network/entity/entity-state-receiver";
+import Entity from "src/utils/ecs/entity";
+import CollisionIgnoreListReceiver from "src/entity/components/network/collisions/collision-ignore-list-receiver";
 
 export default class ClientEntityPrefabs {
 

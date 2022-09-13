@@ -1,11 +1,10 @@
 import TDMGameStateController from "./tdm-game-state-controller";
 import ServerTDMControllerComponent from "./server-tdm-controller-component";
-import {TDMGameState, TDMGameStateType} from "../../../../game-modes/tdm-game-state";
-import EntityDamageEvent from "../../../../events/tank-damage-event";
-import BlockDamageEvent from "../../../../events/block-damage-event";
+import {TDMGameState, TDMGameStateType} from "src/game-modes/tdm-game-state";
+import EntityDamageEvent from "src/events/tank-damage-event";
+import BlockDamageEvent from "src/events/block-damage-event";
 import {TDMPlayerWaitingStateController} from "./tdm-player-waiting-state";
 import {TDMTeamStatistics} from "./tdm-playing-state-controller";
-import MapLoaderComponent from "../../components/map-loader-component";
 
 export class TDMMatchOverStateController extends TDMGameStateController {
 

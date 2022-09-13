@@ -1,6 +1,6 @@
 /* @load-resource: './huge-input.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import InputTipList from "../input-tip-list/input-tip-list-view";
 
 export default class HugeInput extends View {

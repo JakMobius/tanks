@@ -1,5 +1,5 @@
 import Server from "../server";
-import Entity from "../../utils/ecs/entity";
+import Entity from "src/utils/ecs/entity";
 
 export interface AIConfig {
 	server: Server

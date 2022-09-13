@@ -1,12 +1,12 @@
 import InputDevice from "./input/input-device";
-import EventEmitter from "../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 import KeyboardController from "./input/keyboard/keyboard-controller";
-import Axle from "../../controls/axle";
+import Axle from "src/controls/axle";
 import GameSettings from "../settings/game-settings";
 import GamepadManager from "./input/gamepad/gamepad-manager";
 import MouseController from "./input/mouse/mouse-contoller";
 import CallbackActivatorAxle, {AxleCallback} from "./interact/callback-activator-axle";
-import TankControls from "../../controls/tank-controls";
+import TankControls from "src/controls/tank-controls";
 
 export default class ControlsManager extends EventEmitter {
     private static instance: ControlsManager;

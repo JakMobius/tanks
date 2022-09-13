@@ -1,6 +1,6 @@
-import {Component} from "../../../../utils/ecs/component";
-import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
-import Entity from "../../../../utils/ecs/entity";
+import {Component} from "src/utils/ecs/component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Entity from "src/utils/ecs/entity";
 import TimerTransmitter from "./timer-transmitter";
 
 // Timer component is the only component of the timer entity.

@@ -5,8 +5,8 @@ import View from 'src/client/ui/view';
 import BrickBlockState from 'src/map/block-state/types/brick-block-state';
 import BlockSelectOverlay from '../blockselect/blockselectoverlay';
 import BlockSelectButton from '../blockselect/blockselectbutton';
-import BlockState from "../../../../../../map/block-state/block-state";
-import Tool from "../../../../tools/tool";
+import BlockState from "src/map/block-state/block-state";
+import Tool from "src/client/map-editor/tools/tool";
 
 export interface ToolbarViewOptions {
     root: JQuery

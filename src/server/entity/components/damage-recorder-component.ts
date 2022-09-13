@@ -1,10 +1,10 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import Player from "../../player";
-import DamageReason from "../../damage-reason/damage-reason";
-import PlayerDisconnectEvent from "../../../events/player-disconnect-event";
-import EntityDamageEvent from "../../../events/tank-damage-event";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Player from "src/server/player";
+import DamageReason from "src/server/damage-reason/damage-reason";
+import PlayerDisconnectEvent from "src/events/player-disconnect-event";
+import EntityDamageEvent from "src/events/tank-damage-event";
 import ServerEntityPilotListComponent from "./server-entity-pilot-list-component";
 
 export class PlayerDamageData {

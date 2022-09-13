@@ -1,20 +1,20 @@
 import TDMGameStateController from "./tdm-game-state-controller";
 import ServerTDMControllerComponent from "./server-tdm-controller-component";
 import {TDMPlayingStateController} from "./tdm-playing-state-controller";
-import EventEmitter from "../../../../utils/event-emitter";
-import PlayerRespawnEvent from "../../../../events/player-respawn-event";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import PlayerConnectEvent from "../../../../events/player-connect-event";
-import EntityDamageEvent from "../../../../events/tank-damage-event";
-import BlockDamageEvent from "../../../../events/block-damage-event";
-import ServerWorldPlayerManagerComponent from "../../../entity/components/server-world-player-manager-component";
-import PlayerDisconnectEvent from "../../../../events/player-disconnect-event";
-import Entity from "../../../../utils/ecs/entity";
-import ServerEntityPrefabs from "../../../entity/server-entity-prefabs";
-import {EntityType} from "../../../../entity/entity-type";
-import TimerComponent from "../../../../entity/components/network/timer/timer-component";
-import {TDMGameState, TDMGameStateType} from "../../../../game-modes/tdm-game-state";
-import WorldPlayerStatisticsComponent from "../../../entity/components/world-player-statistics-component";
+import EventEmitter from "src/utils/event-emitter";
+import PlayerRespawnEvent from "src/events/player-respawn-event";
+import TilemapComponent from "src/physics/tilemap-component";
+import PlayerConnectEvent from "src/events/player-connect-event";
+import EntityDamageEvent from "src/events/tank-damage-event";
+import BlockDamageEvent from "src/events/block-damage-event";
+import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
+import PlayerDisconnectEvent from "src/events/player-disconnect-event";
+import Entity from "src/utils/ecs/entity";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import TimerComponent from "src/entity/components/network/timer/timer-component";
+import {TDMGameState, TDMGameStateType} from "src/game-modes/tdm-game-state";
+import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 
 export class TDMPlayerWaitingStateController extends TDMGameStateController {
 

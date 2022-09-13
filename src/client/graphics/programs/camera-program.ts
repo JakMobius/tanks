@@ -1,5 +1,5 @@
 import Uniform from "../uniform";
-import Camera from "../../camera";
+import Camera from "src/client/camera";
 import VertexFragmentShaderProgram from "./vertex-fragment-shader-program";
 
 export default abstract class CameraProgram extends VertexFragmentShaderProgram {

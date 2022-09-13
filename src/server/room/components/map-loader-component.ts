@@ -1,8 +1,8 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import GameMap from "../../../map/game-map";
-import BlockState from "../../../map/block-state/block-state";
-import BlockChangeEvent from "../../../events/block-change-event";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import GameMap from "src/map/game-map";
+import BlockState from "src/map/block-state/block-state";
+import BlockChangeEvent from "src/events/block-change-event";
 
 export default class MapLoaderComponent implements Component {
     entity: Entity | null = null

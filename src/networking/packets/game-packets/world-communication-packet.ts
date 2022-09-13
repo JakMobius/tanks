@@ -1,7 +1,7 @@
 import BinaryPacket from '../../binary-packet';
-import {BinarySerializer, Constructor} from "../../../serialization/binary/serializable";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
-import WriteBuffer from "../../../serialization/binary/write-buffer";
+import {BinarySerializer, Constructor} from "src/serialization/binary/serializable";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import WriteBuffer from "src/serialization/binary/write-buffer";
 
 export default class WorldCommunicationPacket extends BinaryPacket {
     static typeName = 22

@@ -1,9 +1,9 @@
 /* @load-resource: './welcome.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import InputTipList, {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import {checkNick} from "../../../../data-checkers/nick-checker";
-import {textFromNickCheckResult} from "../../localizations";
+import {checkNick} from "src/data-checkers/nick-checker";
+import {textFromNickCheckResult} from "src/client/hub/localizations";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import HugeTitle from "../huge-title/huge-title";
 import {HubPage} from "../hub-page";

@@ -1,7 +1,7 @@
 import EventEmitter from '../../utils/event-emitter';
 import HistoryEntry from "./console-history-entry";
 import CallbackLogger from "./callback-logger";
-import ServerLine, {Keypress, Suggestion} from "../../library/serverline"
+import ServerLine, {Keypress, Suggestion} from "src/library/serverline"
 
 export default class ConsoleWindow extends EventEmitter {
     public destination: CallbackLogger;

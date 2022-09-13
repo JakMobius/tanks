@@ -4,7 +4,7 @@ import GameScene from './scenes/game-scene';
 import {ScreenConfig} from "../graphics/screen";
 import GeneralGameScreen from "./general-game-screen";
 import WebsocketConnection from "../networking/websocket-connection";
-import ConnectionClient from "../../networking/connection-client";
+import ConnectionClient from "src/networking/connection-client";
 import DialogOverlay from "../map-editor/ui/overlay/dialog/dialogoverlay";
 
 export interface GameConfig extends ScreenConfig {

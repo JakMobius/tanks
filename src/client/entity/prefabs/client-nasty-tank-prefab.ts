@@ -4,26 +4,25 @@ import Sounds from 'src/client/sound/sounds';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
-import DrawPhase from "../../graphics/drawers/draw-phase";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import {
     copyQuadrangle,
     squareQuadrangle,
     transformQuadrangle,
     translateQuadrangle,
     turnQuadrangle
-} from "../../../utils/quadrangle";
+} from "src/utils/quadrangle";
 import WorldDrawerComponent from "../components/world-drawer-component";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import TankControls from "../../../controls/tank-controls";
-import AirbagTankBehaviour from "../../../entity/tanks/physics/airbag-tank-behaviour";
-import TransformComponent from "../../../entity/components/transform-component";
+import PhysicalComponent from "src/entity/components/physics-component";
+import TankControls from "src/controls/tank-controls";
+import AirbagTankBehaviour from "src/entity/tanks/physics/airbag-tank-behaviour";
+import TransformComponent from "src/entity/components/transform-component";
 import ClientEntityPrefabs from "../client-entity-prefabs";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import EffectHostComponent from "../../../effects/effect-host-component";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import EffectHostComponent from "src/effects/effect-host-component";
 import DamageSmokeEffect from "../components/damage-smoke-effect";
-import EntityPilotListReceiver
-    from "../../../entity/components/network/entity-player-list/entity-pilot-list-receiver";
+import EntityPilotListReceiver from "src/entity/components/network/entity-player-list/entity-pilot-list-receiver";
 
 class Drawer extends TankDrawer {
     static bodyQuadrangle           = squareQuadrangle(-2.16,  -2.97, 4.32, 5.94)

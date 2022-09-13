@@ -1,8 +1,8 @@
 import Pencil from './pencil';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../map/block-state/block-state";
-import TilemapComponent from "../../../../physics/tilemap-component";
+import BlockState from "src/map/block-state/block-state";
+import TilemapComponent from "src/physics/tilemap-component";
 
 export default class Eraser extends Pencil {
     constructor(manager: ToolManager) {

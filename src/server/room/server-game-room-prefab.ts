@@ -1,13 +1,13 @@
-import GameMap from "../../map/game-map";
-import Loop from "../../utils/loop/loop";
-import Entity from "../../utils/ecs/entity";
+import GameMap from "src/map/game-map";
+import Loop from "src/utils/loop/loop";
+import Entity from "src/utils/ecs/entity";
 import {serverGameWorldEntityPrefab} from "../server-game-world";
 import RoomLoopComponent from "./components/room-loop-component";
-import HighPrecisionLoop from "../../utils/loop/high-precision-loop";
+import HighPrecisionLoop from "src/utils/loop/high-precision-loop";
 import WorldEventBroadcastComponent from "./components/world-event-broadcast-component";
 import RoomClientComponent from "./components/room-client-component";
 import EmptyServerPauseComponent from "./components/empty-server-pause-component";
-import WorldStatisticsComponent from "../../entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
 import MapLoaderComponent from "./components/map-loader-component";
 
 

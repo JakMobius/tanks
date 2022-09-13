@@ -1,6 +1,6 @@
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import {Component} from "../../utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
 
 export default class HierarchicalComponent implements Component {
     entity: Entity | null;

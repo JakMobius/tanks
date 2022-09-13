@@ -2,10 +2,10 @@ import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
 import MapSelectContainer from './map-list/mapselectcontainer';
 import MapPreviewContainer from './map-preview/mappreviewcontainer';
 import DialogOverlay from '../../overlay/dialog/dialogoverlay';
-import AirBlockState from "../../../../../map/block-state/types/air-block-state";
-import GameMap from "../../../../../map/game-map";
-import GameMapNameComponent from "../../../map-name-component";
-import GameMapHistoryComponent from "../../../history/game-map-history-component";
+import AirBlockState from "src/map/block-state/types/air-block-state";
+import GameMap from "src/map/game-map";
+import GameMapNameComponent from "src/client/map-editor/map-name-component";
+import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 
 export default class MenuOverlay extends Overlay {
 	public mapSelect = new MapSelectContainer();

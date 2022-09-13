@@ -1,4 +1,4 @@
-import Controller from "../../../ui/controller/controller";
+import Controller from "src/client/ui/controller/controller";
 import {HubPage} from "../hub-page";
 import AuthorizedWelcomeView from "./authorized-welcome-view";
 import AccountBarButton from "../account-bar-button/account-bar-button";

@@ -1,9 +1,9 @@
 import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
-import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
+import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
 import ClientEffect from "../client-effect";
-import SoundPrimaryComponent from "../../sound/sound/sound-primary-component";
-import SoundPositionComponent from "../../sound/sound/sound-position-component";
-import Sounds from "../../sound/sounds";
+import SoundPrimaryComponent from "src/client/sound/sound/sound-primary-component";
+import SoundPositionComponent from "src/client/sound/sound/sound-position-component";
+import Sounds from "src/client/sound/sounds";
 
 const sounds = [
     Sounds.EXPLODE_1,

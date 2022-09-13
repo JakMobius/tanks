@@ -1,5 +1,5 @@
 import Command from '../command';
-import {ConsoleAutocompleteOptions} from "../../console/console";
+import {ConsoleAutocompleteOptions} from "src/server/console/console";
 import path from "path";
 
 const scriptsFolder = path.join(__dirname, "resources/scripts")

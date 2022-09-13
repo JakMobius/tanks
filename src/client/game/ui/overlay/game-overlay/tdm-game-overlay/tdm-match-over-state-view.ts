@@ -1,7 +1,7 @@
 
 
-import {TDMGameStateMatchOver} from "../../../../../../game-modes/tdm-game-state";
-import TeamColor from "../../../../../../utils/team-color";
+import {TDMGameStateMatchOver} from "src/game-modes/tdm-game-state";
+import TeamColor from "src/utils/team-color";
 import GameStateView from "../game-state-view";
 
 export default class TDMMatchOverStateView extends GameStateView {

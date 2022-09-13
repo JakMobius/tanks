@@ -1,6 +1,6 @@
 /* @load-resource: './account-bar-button.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 
 export default class AccountBarButton extends View {
 

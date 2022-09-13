@@ -1,9 +1,9 @@
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
-import BlockState from "../../../../map/block-state/block-state";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import GameMap from "../../../../map/game-map";
+import BlockState from "src/map/block-state/block-state";
+import TilemapComponent from "src/physics/tilemap-component";
+import GameMap from "src/map/game-map";
 
 export default class MapReceiver extends ReceiverComponent {
 

@@ -1,9 +1,9 @@
 /* @load-resource: './room-list-view.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";
 import GameCreateController from "../game-create/game-create-controller";
-import {localizeAjaxError} from "../../localizations";
+import {localizeAjaxError} from "src/client/hub/localizations";
 import HugeTitle from "../huge-title/huge-title";
 import RoomLoadingPlaceholderMenu from "./room-loading-placeholder-menu/room-loading-placeholder-menu";
 import UserRoomList from "./room-list/user-room-list";

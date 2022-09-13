@@ -1,8 +1,8 @@
 /* @load-resource: ./pause-menu-view.scss */
 
-import View from "../../../../ui/view";
-import NavigationCloud from "../../cloud/navigation-cloud";
-import Controller from "../../../../ui/controller/controller";
+import View from "src/client/ui/view";
+import NavigationCloud from "src/client/game/ui/cloud/navigation-cloud";
+import Controller from "src/client/ui/controller/controller";
 
 export class PauseMenuView extends View {
 

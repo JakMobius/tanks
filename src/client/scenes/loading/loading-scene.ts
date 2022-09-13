@@ -4,9 +4,9 @@ import Scene, {SceneConfig} from '../scene';
 
 import Camera from '../../camera';
 import * as Box2D from '../../../library/box2d';
-import Progress from "../../utils/progress";
+import Progress from "src/client/utils/progress";
 import phrases from "./phrases";
-import ConvexShapeProgram from "../../graphics/programs/convex-shapes/convex-shape-program";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 
 export interface LoadingSceneConfig extends SceneConfig {
     progress: Progress

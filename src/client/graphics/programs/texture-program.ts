@@ -2,12 +2,12 @@
 /* @load-resource: '../shaders/vertex/texture-vertex.glsl' */
 
 import GLBuffer from '../glbuffer';
-import Sprite from "../../sprite";
+import Sprite from "src/client/sprite";
 import Uniform from "../uniform";
 import CameraProgram from "./camera-program";
-import Matrix3 from "../../../utils/matrix3";
-import {Quadrangle} from "../../../utils/quadrangle";
-import {ByteArray} from "../../../serialization/binary/typed-buffer";
+import Matrix3 from "src/utils/matrix3";
+import {Quadrangle} from "src/utils/quadrangle";
+import {ByteArray} from "src/serialization/binary/typed-buffer";
 
 export interface TextureProgramConfig {
     largeIndices: boolean

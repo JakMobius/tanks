@@ -1,7 +1,7 @@
 import ServerDatabase from "../server-database";
-import {UserDataRaw} from "../../../client/user-data-raw";
-import hashToString from "../../../utils/hash-to-string";
-import murmurhash3_32_gc from "../../../utils/murmurhash";
+import {UserDataRaw} from "src/client/user-data-raw";
+import hashToString from "src/utils/hash-to-string";
+import murmurhash3_32_gc from "src/utils/murmurhash";
 import * as fs from "fs";
 import session from "express-session";
 import FileSessionStorage from "./file-session-storage";

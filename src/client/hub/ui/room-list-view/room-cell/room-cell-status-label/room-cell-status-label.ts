@@ -1,6 +1,6 @@
 /* @load-resource: './room-cell-status-label.scss' */
 
-import View from "../../../../../ui/view";
+import View from "src/client/ui/view";
 
 export default class RoomCellStatusLabel extends View {
 

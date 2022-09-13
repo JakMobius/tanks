@@ -1,4 +1,4 @@
-import Axle from "../../../../controls/axle";
+import Axle from "src/controls/axle";
 import {AxleConfig} from "../input-device";
 import MouseListener from "./mouse-listener";
 

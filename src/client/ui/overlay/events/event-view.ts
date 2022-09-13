@@ -1,6 +1,6 @@
 /* @load-resource: './event-view.scss' */
 
-import Menu from "../../menu/menu";
+import Menu from "src/client/ui/menu/menu";
 
 export default class EventView extends Menu {
     constructor(text: string) {

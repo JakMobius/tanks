@@ -1,5 +1,5 @@
 import Command from '../../command';
-import {ConsoleAutocompleteOptions} from "../../../console/console";
+import {ConsoleAutocompleteOptions} from "src/server/console/console";
 
 export default class RoomViewCommand extends Command {
     onPerform(args: string[]) {

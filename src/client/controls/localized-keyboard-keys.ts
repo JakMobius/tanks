@@ -1,4 +1,4 @@
-import {metaKeyName} from "../../utils/meta-key-name";
+import {metaKeyName} from "src/utils/meta-key-name";
 
 export const keyboardKeyMapping: { [key: string]: string | undefined } = {
     "ControlLeft": "Л. Ctrl",

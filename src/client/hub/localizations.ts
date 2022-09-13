@@ -1,5 +1,5 @@
-import {NickCheckResult} from "../../data-checkers/nick-checker";
-import {RoomNameCheckResult} from "../../data-checkers/room-name-checker";
+import {NickCheckResult} from "src/data-checkers/nick-checker";
+import {RoomNameCheckResult} from "src/data-checkers/room-name-checker";
 
 export function textFromNickCheckResult(reason: NickCheckResult) {
     switch (reason) {

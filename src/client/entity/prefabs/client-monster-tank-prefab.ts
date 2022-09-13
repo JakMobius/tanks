@@ -4,26 +4,25 @@ import Sounds from 'src/client/sound/sounds';
 import Sprite from 'src/client/sprite';
 import LightMaskTextureProgram from 'src/client/graphics/programs/light-mask-texture/light-mask-texture-program';
 import TextureProgram from 'src/client/graphics/programs/texture-program';
-import DrawPhase from "../../graphics/drawers/draw-phase";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import {
     copyQuadrangle,
     squareQuadrangle,
     transformQuadrangle,
     translateQuadrangle,
     turnQuadrangle
-} from "../../../utils/quadrangle";
+} from "src/utils/quadrangle";
 
 import WorldDrawerComponent from "../components/world-drawer-component";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
-import TransformComponent from "../../../entity/components/transform-component";
+import PhysicalComponent from "src/entity/components/physics-component";
+import WheeledTankBehaviour from "src/entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
+import TransformComponent from "src/entity/components/transform-component";
 import ClientEntityPrefabs from "../client-entity-prefabs";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import EffectHostComponent from "../../../effects/effect-host-component";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import EffectHostComponent from "src/effects/effect-host-component";
 import DamageSmokeEffect from "../components/damage-smoke-effect";
-import EntityPilotListReceiver
-    from "../../../entity/components/network/entity-player-list/entity-pilot-list-receiver";
+import EntityPilotListReceiver from "src/entity/components/network/entity-player-list/entity-pilot-list-receiver";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

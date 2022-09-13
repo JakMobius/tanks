@@ -1,15 +1,15 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import WorldStatisticsComponent, {
-    PlayerStatistics, TeamStatistics
-} from "../../../entity/components/network/world-statistics/world-statistics-component";
+    PlayerStatistics
+} from "src/entity/components/network/world-statistics/world-statistics-component";
 import DamageRecorderComponent from "./damage-recorder-component";
-import EventEmitter from "../../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 import ServerWorldPlayerManagerComponent from "./server-world-player-manager-component";
-import Player from "../../player";
-import PlayerConnectEvent from "../../../events/player-connect-event";
-import PlayerDisconnectEvent from "../../../events/player-disconnect-event";
+import Player from "src/server/player";
+import PlayerConnectEvent from "src/events/player-connect-event";
+import PlayerDisconnectEvent from "src/events/player-disconnect-event";
 
 export default class WorldPlayerStatisticsComponent implements Component {
     entity: Entity | null

@@ -1,22 +1,21 @@
 import TDMGameStateController from "./tdm-game-state-controller";
 import ServerTDMControllerComponent from "./server-tdm-controller-component";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import PlayerRespawnEvent from "../../../../events/player-respawn-event";
-import ServerWorldPlayerManagerComponent from "../../../entity/components/server-world-player-manager-component";
-import EntityDamageEvent from "../../../../events/tank-damage-event";
-import ServerEntityPilotListComponent from "../../../entity/components/server-entity-pilot-list-component";
-import PlayerConnectEvent from "../../../../events/player-connect-event";
+import TilemapComponent from "src/physics/tilemap-component";
+import PlayerRespawnEvent from "src/events/player-respawn-event";
+import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
+import EntityDamageEvent from "src/events/tank-damage-event";
+import ServerEntityPilotListComponent from "src/server/entity/components/server-entity-pilot-list-component";
+import PlayerConnectEvent from "src/events/player-connect-event";
 import {TDMMatchOverStateController} from "./tdm-match-over-state-controller";
-import WorldStatisticsComponent
-    from "../../../../entity/components/network/world-statistics/world-statistics-component";
-import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
-import {TDMGameState, TDMGameStateType} from "../../../../game-modes/tdm-game-state";
-import WorldPlayerStatisticsComponent from "../../../entity/components/world-player-statistics-component";
-import Player from "../../../player";
+import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import {TDMGameState, TDMGameStateType} from "src/game-modes/tdm-game-state";
+import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
+import Player from "src/server/player";
 import {TDMPlayerWaitingStateController} from "./tdm-player-waiting-state";
-import DamageRecorderComponent from "../../../entity/components/damage-recorder-component";
-import Team from "../../../team";
-import MapLoaderComponent from "../../components/map-loader-component";
+import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
+import Team from "src/server/team";
+import MapLoaderComponent from "src/server/room/components/map-loader-component";
 
 export interface TDMTeamStatistics {
     team: number

@@ -1,10 +1,10 @@
-import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
+import AjaxHandler, {AjaxFields, AjaxFieldType} from "src/server/webserver/ajax/ajax-handler";
 import express from "express";
-import RoomConfig from "../../../room/room-config";
+import RoomConfig from "src/server/room/room-config";
 import path from "path";
-import {NoSuchMapError, RoomNameUsedError} from "../../../socket/game-server/game-socket-portal";
-import {MalformedMapFileError} from "../../../../map/map-serialization";
-import {checkRoomName} from "../../../../data-checkers/room-name-checker";
+import {NoSuchMapError, RoomNameUsedError} from "src/server/socket/game-server/game-socket-portal";
+import {MalformedMapFileError} from "src/map/map-serialization";
+import {checkRoomName} from "src/data-checkers/room-name-checker";
 
 export default class RoomCreateAjaxHandler extends AjaxHandler {
     static url = '/hub/ajax/room-create/'

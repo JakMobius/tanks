@@ -1,7 +1,7 @@
 import LoginPasswordView from "../login-password-view/login-password-view";
 import {TipStyle} from "../input-tip-list/input-tip-list-view";
 import {HubPage} from "../hub-page";
-import Button from "../../../ui/button/button";
+import Button from "src/client/ui/button/button";
 
 export default class LoginView extends LoginPasswordView {
     loginButton = new Button("Вход").largeStyle()

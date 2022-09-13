@@ -1,4 +1,4 @@
-import stringRepeat from "../../utils/string-repeat";
+import stringRepeat from "src/utils/string-repeat";
 import Logger from "../log/logger";
 
 function consoleStringWidth(text: string) {

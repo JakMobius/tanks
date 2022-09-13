@@ -1,10 +1,10 @@
-import TransformComponent from "../../../entity/components/transform-component";
-import Color from "../../../utils/color";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import SmokeParticle from "../../particles/smoke-particle";
-import HealthComponent from "../../../entity/components/health-component";
+import TransformComponent from "src/entity/components/transform-component";
+import Color from "src/utils/color";
+import PhysicalComponent from "src/entity/components/physics-component";
+import SmokeParticle from "src/client/particles/smoke-particle";
+import HealthComponent from "src/entity/components/health-component";
 import ParticleHostComponent from "./particle-host-component";
-import ClientEffect from "../../effects/client-effect";
+import ClientEffect from "src/client/effects/client-effect";
 
 export default class DamageSmokeEffect extends ClientEffect {
     private smokeTimer: number = 0;

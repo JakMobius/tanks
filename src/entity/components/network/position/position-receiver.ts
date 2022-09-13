@@ -1,7 +1,7 @@
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
-import ServerPositionComponent from "../../../../client/entity/components/server-position-component";
+import ServerPositionComponent from "src/client/entity/components/server-position-component";
 
 export default class PositionReceiver extends ReceiverComponent {
 

@@ -3,13 +3,13 @@ import PlayerControlsPacket from 'src/networking/packets/game-packets/player-con
 import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
 import ConnectionClient from "src/networking/connection-client";
 import GeneralGameScene from "../general-game-scene";
-import TankControls from "../../../controls/tank-controls";
-import WorldCommunicationPacket from "../../../networking/packets/game-packets/world-communication-packet";
-import EntityDataReceiveComponent from "../../../entity/components/network/receiving/entity-data-receive-component";
-import ReadBuffer from "../../../serialization/binary/read-buffer";
-import PlayerRespawnPacket from "../../../networking/packets/game-packets/player-respawn-packet";
-import Entity from "../../../utils/ecs/entity";
-import {clientGameWorldEntityPrefab} from "../../client-game-world-entity-prefab";
+import TankControls from "src/controls/tank-controls";
+import WorldCommunicationPacket from "src/networking/packets/game-packets/world-communication-packet";
+import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import PlayerRespawnPacket from "src/networking/packets/game-packets/player-respawn-packet";
+import Entity from "src/utils/ecs/entity";
+import {clientGameWorldEntityPrefab} from "src/client/client-game-world-entity-prefab";
 
 export interface GameSceneConfig extends SceneConfig {
     client: ConnectionClient

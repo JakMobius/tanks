@@ -1,7 +1,7 @@
-import FlagHandler from "../../serialization/binary/parsers/flag-handler";
-import BinaryFlaggedCoder from "../../serialization/binary/parsers/binary-flagged-coder";
-import WriteBuffer from "../../serialization/binary/write-buffer";
-import ReadBuffer from "../../serialization/binary/read-buffer";
+import FlagHandler from "src/serialization/binary/parsers/flag-handler";
+import BinaryFlaggedCoder from "src/serialization/binary/parsers/binary-flagged-coder";
+import WriteBuffer from "src/serialization/binary/write-buffer";
+import ReadBuffer from "src/serialization/binary/read-buffer";
 import BlockState from "./block-state";
 
 export default class BlockStateBinaryOptions extends BinaryFlaggedCoder {

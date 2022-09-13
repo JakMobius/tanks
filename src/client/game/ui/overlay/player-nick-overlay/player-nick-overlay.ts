@@ -1,13 +1,12 @@
 /* @load-resource: './player-nick-overlay.scss' */
 
-import Overlay, {OverlayConfig} from "../../../../ui/overlay/overlay";
-import BasicEventHandlerSet from "../../../../../utils/basic-event-handler-set";
-import Entity from "../../../../../utils/ecs/entity";
-import PhysicalComponent from "../../../../../entity/components/physics-component";
-import Camera from "../../../../camera";
-import EntityPilotListReceiver
-    from "../../../../../entity/components/network/entity-player-list/entity-pilot-list-receiver";
-import TeamColor from "../../../../../utils/team-color";
+import Overlay, {OverlayConfig} from "src/client/ui/overlay/overlay";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Entity from "src/utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
+import Camera from "src/client/camera";
+import EntityPilotListReceiver from "src/entity/components/network/entity-player-list/entity-pilot-list-receiver";
+import TeamColor from "src/utils/team-color";
 
 class NickBlock {
     entity: Entity

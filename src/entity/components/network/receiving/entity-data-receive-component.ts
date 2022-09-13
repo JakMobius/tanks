@@ -1,7 +1,7 @@
-import ReadBuffer from "../../../../serialization/binary/read-buffer";
-import HierarchicalComponent from "../../hierarchical-component";
-import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-block-coder";
-import Entity from "../../../../utils/ecs/entity";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import HierarchicalComponent from "src/entity/components/hierarchical-component";
+import BinaryBlockCoder from "src/serialization/binary/parsers/binary-block-coder";
+import Entity from "src/utils/ecs/entity";
 
 export default class EntityDataReceiveComponent extends HierarchicalComponent {
 

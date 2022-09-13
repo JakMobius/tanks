@@ -1,5 +1,5 @@
 import MapBinaryOptions from '../../map/map-binary-options';
-import FlagHandler from "../../serialization/binary/parsers/flag-handler";
+import FlagHandler from "src/serialization/binary/parsers/flag-handler";
 
 export default class EditorMapBinaryOptions extends MapBinaryOptions {
 

@@ -1,9 +1,9 @@
-import WriteBuffer from "../../../../serialization/binary/write-buffer";
-import Entity from "../../../../utils/ecs/entity";
+import WriteBuffer from "src/serialization/binary/write-buffer";
+import Entity from "src/utils/ecs/entity";
 import {TransmitterSet} from "./transmitter-set";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
-import BinaryBlockCoder from "../../../../serialization/binary/parsers/binary-block-coder";
-import EventEmitter from "../../../../utils/event-emitter";
+import BinaryBlockCoder from "src/serialization/binary/parsers/binary-block-coder";
+import EventEmitter from "src/utils/event-emitter";
 
 export class ReceivingEnd extends EventEmitter {
     buffer = new WriteBuffer()

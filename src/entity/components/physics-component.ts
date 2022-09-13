@@ -1,9 +1,9 @@
-import {Component} from "../../utils/ecs/component";
-import * as Box2D from "../../library/box2d";
-import Entity from "../../utils/ecs/entity";
+import {Component} from "src/utils/ecs/component";
+import * as Box2D from "src/library/box2d";
+import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
-import PhysicalHostComponent from "../../physiсal-world-component";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import PhysicalHostComponent from "src/physiсal-world-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import PositionTransmitter from "./network/position/position-transmitter";
 

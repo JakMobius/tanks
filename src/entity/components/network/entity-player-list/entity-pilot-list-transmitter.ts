@@ -1,7 +1,7 @@
 
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
-import ServerEntityPilotListComponent from "../../../../server/entity/components/server-entity-pilot-list-component";
+import ServerEntityPilotListComponent from "src/server/entity/components/server-entity-pilot-list-component";
 
 export default class EntityPilotListTransmitter extends Transmitter {
     constructor() {

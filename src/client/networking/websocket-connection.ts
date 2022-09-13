@@ -1,4 +1,4 @@
-import Connection from "../../networking/connection";
+import Connection from "src/networking/connection";
 
 export default class WebsocketConnection extends Connection {
 

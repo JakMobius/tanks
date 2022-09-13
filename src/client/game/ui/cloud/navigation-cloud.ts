@@ -1,6 +1,6 @@
 import Cloud from './cloud'
-import {Constructor} from "../../../../serialization/binary/serializable";
-import Controller from "../../../ui/controller/controller";
+import {Constructor} from "src/serialization/binary/serializable";
+import Controller from "src/client/ui/controller/controller";
 import GamePauseNavigationTransition from "../overlay/pause/game-pause-navigation-transition";
 
 export default class NavigationCloud extends Cloud {

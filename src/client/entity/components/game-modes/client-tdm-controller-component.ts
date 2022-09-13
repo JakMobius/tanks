@@ -1,8 +1,8 @@
-import {Component} from "../../../../utils/ecs/component";
-import Entity from "../../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
-import {TDMGameState} from "../../../../game-modes/tdm-game-state";
-import TDMGameOverlay from "../../../game/ui/overlay/game-overlay/tdm-game-overlay/tdm-game-overlay";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import {TDMGameState} from "src/game-modes/tdm-game-state";
+import TDMGameOverlay from "src/client/game/ui/overlay/game-overlay/tdm-game-overlay/tdm-game-overlay";
 
 export class ClientTDMControllerComponent implements Component {
     entity: Entity | null;

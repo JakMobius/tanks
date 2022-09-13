@@ -1,6 +1,6 @@
-import Entity from "../../../utils/ecs/entity";
-import {Component} from "../../../utils/ecs/component";
-import Loop from "../../../utils/loop/loop";
+import Entity from "src/utils/ecs/entity";
+import {Component} from "src/utils/ecs/component";
+import Loop from "src/utils/loop/loop";
 
 export default class RoomLoopComponent implements Component {
     entity: Entity | null;

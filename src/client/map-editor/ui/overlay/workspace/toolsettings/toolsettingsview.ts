@@ -1,7 +1,7 @@
 /* @load-resource: './tool-settings.scss' */
 
-import Tool from "../../../../tools/tool";
-import Menu from "../../../../../ui/menu/menu";
+import Tool from "src/client/map-editor/tools/tool";
+import Menu from "src/client/ui/menu/menu";
 
 class ToolSettingsView extends Menu {
 	public hidden: boolean;

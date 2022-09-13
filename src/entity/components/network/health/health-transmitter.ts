@@ -1,5 +1,5 @@
 import Transmitter from "../transmitting/transmitter";
-import HealthComponent from "../../health-component";
+import HealthComponent from "src/entity/components/health-component";
 import {Commands} from "../commands";
 
 export default class HealthTransmitter extends Transmitter {

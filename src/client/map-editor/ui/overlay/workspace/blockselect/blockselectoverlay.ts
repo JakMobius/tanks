@@ -1,6 +1,6 @@
-import Overlay, {OverlayConfig} from 'src/client/ui/overlay/overlay';
+import {OverlayConfig} from 'src/client/ui/overlay/overlay';
 import BlockSelectMenu from './blockselectmenu';
-import MenuOverlay from "../../../../../ui/menu-overlay/menu-overlay";
+import MenuOverlay from "src/client/ui/menu-overlay/menu-overlay";
 
 class BlockSelectOverlay extends MenuOverlay {
 	public menu = new BlockSelectMenu();

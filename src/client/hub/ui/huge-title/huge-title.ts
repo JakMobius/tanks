@@ -1,6 +1,6 @@
 /* @load-resource: './huge-title.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 
 export default class HugeTitle extends View {
     constructor() {

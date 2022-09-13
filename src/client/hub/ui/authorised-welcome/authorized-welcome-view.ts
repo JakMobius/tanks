@@ -1,9 +1,9 @@
 /* @load-resource: 'authorized-welcome.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";
 import LargePlayButton from "../large-play-button/large-play-button";
-import Button from "../../../ui/button/button";
+import Button from "src/client/ui/button/button";
 
 export default class AuthorizedWelcomeView extends View {
     private page: HubPage;

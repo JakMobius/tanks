@@ -1,9 +1,9 @@
 import {base64ToBytes, bytesToBase64} from '../../utils/base64';
 import pako from 'pako';
-import ReadBuffer from "../../serialization/binary/read-buffer";
-import WriteBuffer from "../../serialization/binary/write-buffer";
-import MapSerialization from "../../map/map-serialization";
-import GameMap from "../../map/game-map";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import WriteBuffer from "src/serialization/binary/write-buffer";
+import MapSerialization from "src/map/map-serialization";
+import GameMap from "src/map/game-map";
 import GameMapNameComponent from "./map-name-component";
 import GameMapHistoryComponent from "./history/game-map-history-component";
 

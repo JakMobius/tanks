@@ -1,20 +1,19 @@
 import EngineSoundComponent from "../components/engine-sound-component";
-import Sounds from "../../sound/sounds";
-import TankDrawer from "../../graphics/drawers/tank-drawer";
-import Sprite from "../../sprite";
-import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../utils/quadrangle";
-import DrawPhase from "../../graphics/drawers/draw-phase";
-import TruckProgram from "../../graphics/programs/truck-program";
-import TextureProgram from "../../graphics/programs/texture-program";
-import TrackTankBehaviour from "../../../entity/tanks/physics/track-tank/track-tank-behaviour";
-import TransformComponent from "../../../entity/components/transform-component";
+import Sounds from "src/client/sound/sounds";
+import TankDrawer from "src/client/graphics/drawers/tank-drawer";
+import Sprite from "src/client/sprite";
+import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import TruckProgram from "src/client/graphics/programs/truck-program";
+import TextureProgram from "src/client/graphics/programs/texture-program";
+import TrackTankBehaviour from "src/entity/tanks/physics/track-tank/track-tank-behaviour";
+import TransformComponent from "src/entity/components/transform-component";
 import ClientEntityPrefabs from "../client-entity-prefabs";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import EffectHostComponent from "../../../effects/effect-host-component";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import EffectHostComponent from "src/effects/effect-host-component";
 import DamageSmokeEffect from "../components/damage-smoke-effect";
-import EntityPilotListReceiver
-    from "../../../entity/components/network/entity-player-list/entity-pilot-list-receiver";
+import EntityPilotListReceiver from "src/entity/components/network/entity-player-list/entity-pilot-list-receiver";
 
 class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;

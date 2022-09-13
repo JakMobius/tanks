@@ -1,10 +1,10 @@
 /* @load-resource: ./controller-selector.scss */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import ControllerView from "./controller-view/controller-view";
-import InputDevice from "../../../controls/input/input-device";
-import ControlsManager from "../../../controls/controls-manager";
-import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
+import InputDevice from "src/client/controls/input/input-device";
+import ControlsManager from "src/client/controls/controls-manager";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 export default class ControllerSelector extends View {
     deviceViews: ControllerView[] = []

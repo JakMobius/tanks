@@ -1,5 +1,5 @@
 import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
-import ExplodeEffectPool from "../../../effects/explode/explode-effect-pool";
+import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
 import ServerEffect from "../server-effect";
 
 export default class ServerWorldExplodeEffect extends ServerEffect {

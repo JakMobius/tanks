@@ -2,13 +2,13 @@ import Tool from '../tool';
 import RangeView from '../../../ui/elements/range/range';
 import BrushProgram from '../../../graphics/programs/brush-program/brush-program';
 import ToolManager from "../toolmanager";
-import BlockState from "../../../../map/block-state/block-state";
-import BrushProgramController from "../../../graphics/programs/brush-program/brush-program-controller";
-import Color from "../../../../utils/color";
-import {squareQuadrangleFromPoints} from "../../../../utils/quadrangle";
-import TilemapComponent from "../../../../physics/tilemap-component";
-import GameMap from "../../../../map/game-map";
-import GameMapHistoryComponent from "../../history/game-map-history-component";
+import BlockState from "src/map/block-state/block-state";
+import BrushProgramController from "src/client/graphics/programs/brush-program/brush-program-controller";
+import Color from "src/utils/color";
+import {squareQuadrangleFromPoints} from "src/utils/quadrangle";
+import TilemapComponent from "src/physics/tilemap-component";
+import GameMap from "src/map/game-map";
+import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 
 export default class Pencil extends Tool {
 	public actionName = "Карандаш";

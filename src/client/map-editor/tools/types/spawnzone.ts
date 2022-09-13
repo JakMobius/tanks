@@ -4,8 +4,8 @@ import Color from '../../../../utils/color';
 import SpawnZone from '../../../../map/spawn-zone';
 import GameMap from '../../../../map/game-map';
 import ToolManager from "../toolmanager";
-import ConvexShapeProgram from "../../../graphics/programs/convex-shapes/convex-shape-program";
-import TilemapComponent from "../../../../physics/tilemap-component";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
+import TilemapComponent from "src/physics/tilemap-component";
 
 export default class SpawnZoneTool extends Tool {
     public image = "assets/img/spawnzones.png"

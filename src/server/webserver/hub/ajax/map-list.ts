@@ -1,9 +1,9 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import MapSerialization from "../../../../map/map-serialization";
+import MapSerialization from "src/map/map-serialization";
 import pako from "pako";
-import AjaxHandler, {AjaxFields} from "../../ajax/ajax-handler";
+import AjaxHandler, {AjaxFields} from "src/server/webserver/ajax/ajax-handler";
 
 export interface AvailableMap {
     name: string

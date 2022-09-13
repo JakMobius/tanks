@@ -1,7 +1,7 @@
 import Transmitter from "./transmitter";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import {ReceivingEnd} from "./receiving-end";
-import Entity from "../../../../utils/ecs/entity";
+import Entity from "src/utils/ecs/entity";
 
 export class TransmitterSet {
     private treeDepth: number | null = null

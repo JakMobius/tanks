@@ -1,4 +1,4 @@
-import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
+import AjaxHandler, {AjaxFields, AjaxFieldType} from "src/server/webserver/ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
 

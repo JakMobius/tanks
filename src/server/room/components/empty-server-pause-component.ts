@@ -1,7 +1,7 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import {GameSocketPortalClient} from "../../socket/game-server/game-socket-portal";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import {GameSocketPortalClient} from "src/server/socket/game-server/game-socket-portal";
 import RoomLoopComponent from "./room-loop-component";
 import RoomClientComponent from "./room-client-component";
 

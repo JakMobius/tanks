@@ -2,8 +2,8 @@ import Command, {CommandConfig} from '../command';
 import CommandFlag from '../command-flag';
 import Chalk from 'chalk';
 import filesize from 'src/utils/fs/file-size';
-import Server from "../../server";
-import RoomClientComponent from "../../room/components/room-client-component";
+import Server from "src/server/server";
+import RoomClientComponent from "src/server/room/components/room-client-component";
 
 export default class StatusCommand extends Command {
 	public groupDepth: any;

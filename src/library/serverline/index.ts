@@ -1,6 +1,6 @@
 import stream from 'stream'
 import {createReadline, Readline} from "./readline";
-import EventEmitter from "../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 import * as KeypressListener from "./keypress-listener";
 import * as readline from "readline";
 import chalk from "chalk";

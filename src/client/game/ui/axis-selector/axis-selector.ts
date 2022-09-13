@@ -1,6 +1,6 @@
 /* @load-resource: ./axis-selector.scss */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import Cloud from "../cloud/cloud";
 
 export default class AxisSelector extends View {

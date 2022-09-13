@@ -1,5 +1,5 @@
 import GamepadController from "./gamepad-controller";
-import DocumentEventHandler from "../../interact/document-event-handler";
+import DocumentEventHandler from "src/client/controls/interact/document-event-handler";
 
 navigator.getGamepads = navigator.getGamepads || (navigator as any)["webkitGetGamepads"]
 

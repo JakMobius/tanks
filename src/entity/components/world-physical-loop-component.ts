@@ -1,8 +1,8 @@
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import AdapterLoop from "../../utils/loop/adapter-loop";
-import PhysicalHostComponent from "../../physiсal-world-component";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import AdapterLoop from "src/utils/loop/adapter-loop";
+import PhysicalHostComponent from "src/physiсal-world-component";
 
 export default class WorldPhysicalLoopComponent implements Component {
     entity: Entity | null;

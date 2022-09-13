@@ -1,9 +1,9 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
-import ServerGameController from "../../../../server/room/game-modes/server-game-controller";
+import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import TransmitterVisibilityPrecondition from "../transmitting/precondition/transmitter-visibility-precondition";
 import GameObjectWriter from "../receiving/game-object-writer";
-import Entity from "../../../../utils/ecs/entity";
+import Entity from "src/utils/ecs/entity";
 
 export default class GameModeEventTransmitter extends Transmitter {
     private controller: ServerGameController

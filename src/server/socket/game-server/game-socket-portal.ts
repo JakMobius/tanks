@@ -2,21 +2,21 @@ import SocketPortalClient from '../socket-portal-client';
 import SocketPortal from '../socket-portal';
 import pako from 'pako';
 import * as Websocket from "websocket";
-import BinaryPacket from "../../../networking/binary-packet";
+import BinaryPacket from "src/networking/binary-packet";
 import * as fs from "fs"
-import RoomConfig from "../../room/room-config";
-import WebsocketConnection from "../../websocket-connection";
-import MapSerialization, {MalformedMapFileError} from "../../../map/map-serialization";
+import RoomConfig from "src/server/room/room-config";
+import WebsocketConnection from "src/server/websocket-connection";
+import MapSerialization, {MalformedMapFileError} from "src/map/map-serialization";
 
-import GameMap from "../../../map/game-map";
+import GameMap from "src/map/game-map";
 import * as url from "url";
-import Server from "../../server";
-import {WebserverSession} from "../../webserver/webserver-session";
-import Entity from "../../../utils/ecs/entity";
-import serverGameRoomPrefab from "../../room/server-game-room-prefab";
-import ServerEntityPrefabs from "../../entity/server-entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import RoomClientComponent from "../../room/components/room-client-component";
+import Server from "src/server/server";
+import {WebserverSession} from "src/server/webserver/webserver-session";
+import Entity from "src/utils/ecs/entity";
+import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import RoomClientComponent from "src/server/room/components/room-client-component";
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {

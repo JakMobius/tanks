@@ -1,8 +1,8 @@
 import Chalk from 'chalk';
 import Command from '../../command';
-import ConsoleTableDrawer from "../../../console/console-table-drawer";
-import CLIStyle from "../../cli-style";
-import RoomClientComponent from "../../../room/components/room-client-component";
+import ConsoleTableDrawer from "src/server/console/console-table-drawer";
+import CLIStyle from "src/server/commands/cli-style";
+import RoomClientComponent from "src/server/room/components/room-client-component";
 
 class RoomListCommand extends Command {
     onPerform(args: string[]) {

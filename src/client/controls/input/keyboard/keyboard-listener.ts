@@ -1,5 +1,5 @@
-import DocumentEventHandler from "../../interact/document-event-handler";
-import {isMacOS} from "../../../../utils/meta-key-name";
+import DocumentEventHandler from "src/client/controls/interact/document-event-handler";
+import {isMacOS} from "src/utils/meta-key-name";
 
 export default class KeyboardListener extends DocumentEventHandler {
 

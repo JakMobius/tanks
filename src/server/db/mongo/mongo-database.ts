@@ -1,6 +1,6 @@
 import {Db, MongoClient} from 'mongodb';
 import ServerDatabase from "../server-database";
-import {UserDataRaw} from "../../../client/user-data-raw";
+import {UserDataRaw} from "src/client/user-data-raw";
 import MongoStore from "connect-mongo";
 import session from "express-session";
 

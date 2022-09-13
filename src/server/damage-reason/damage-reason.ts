@@ -1,4 +1,4 @@
-import {DamageTypes} from "../../entity/components/health-component";
+import {DamageTypes} from "src/entity/components/health-component";
 import Player from "../player";
 
 export default class DamageReason {

@@ -2,9 +2,9 @@ import Pellet from 'src/client/particles/pellet-particle'
 import Color from 'src/utils/color';
 import EffectModel from 'src/effects/effect-model';
 import TankPelletsEffectModel from 'src/effects/models/tank-pellets-effect-model';
-import PhysicalComponent from "../../../entity/components/physics-component";
-import TransformComponent from "../../../entity/components/transform-component";
-import ParticleHostComponent from "../../entity/components/particle-host-component";
+import PhysicalComponent from "src/entity/components/physics-component";
+import TransformComponent from "src/entity/components/transform-component";
+import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import ClientEffect from "../client-effect";
 
 export default class ClientTankPelletsEffect extends ClientEffect {

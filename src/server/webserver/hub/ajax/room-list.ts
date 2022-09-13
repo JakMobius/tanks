@@ -1,6 +1,6 @@
 import express from "express";
-import AjaxHandler, {AjaxFields} from "../../ajax/ajax-handler";
-import RoomClientComponent from "../../../room/components/room-client-component";
+import AjaxHandler, {AjaxFields} from "src/server/webserver/ajax/ajax-handler";
+import RoomClientComponent from "src/server/room/components/room-client-component";
 
 export default class RoomListAjaxHandler extends AjaxHandler {
     static url = '/hub/ajax/room-list/'

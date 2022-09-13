@@ -1,13 +1,12 @@
 import WeaponMiner from "src/weapon/models/miner";
-import WeaponBomber from "../../../weapon/models/bomber";
-import TankControls from "../../../controls/tank-controls";
-import EntityDataTransmitComponent
-    from "../../../entity/components/network/transmitting/entity-data-transmit-component";
-import EntityPrefabs from "../../../entity/entity-prefabs";
+import WeaponBomber from "src/weapon/models/bomber";
+import TankControls from "src/controls/tank-controls";
+import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
+import EntityPrefabs from "src/entity/entity-prefabs";
 import ServerEntityPrefabs from "../server-entity-prefabs";
-import HealthComponent, {DamageModifiers, DamageTypes} from "../../../entity/components/health-component";
-import ExplodeOnDeathComponent from "../../../entity/components/explode-on-death-component";
-import {EntityType} from "../../../entity/entity-type";
+import HealthComponent, {DamageModifiers, DamageTypes} from "src/entity/components/health-component";
+import ExplodeOnDeathComponent from "src/entity/components/explode-on-death-component";
+import {EntityType} from "src/entity/entity-type";
 import ServerEntityPilotListComponent from "../components/server-entity-pilot-list-component";
 
 ServerEntityPrefabs.types.set(EntityType.TANK_BOMBER, (entity) => {

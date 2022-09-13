@@ -1,9 +1,8 @@
 
-import {TDMGameStatePlaying} from "../../../../../../game-modes/tdm-game-state";
-import WorldStatisticsComponent
-    from "../../../../../../entity/components/network/world-statistics/world-statistics-component";
+import {TDMGameStatePlaying} from "src/game-modes/tdm-game-state";
+import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
 import GameStateView from "../game-state-view";
-import BasicEventHandlerSet from "../../../../../../utils/basic-event-handler-set";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import TDMGameOverlay from "./tdm-game-overlay";
 
 export default class TDMPlayingStateView extends GameStateView {

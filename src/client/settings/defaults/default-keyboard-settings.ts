@@ -1,5 +1,5 @@
 import {ControllerControlsConfig} from "../game-controls-settings";
-import {KeyboardInputConfig, KeyboardInputType} from "../../controls/input/keyboard/keyboard-controller";
+import {KeyboardInputConfig, KeyboardInputType} from "src/client/controls/input/keyboard/keyboard-controller";
 
 export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardInputConfig> {
     return {

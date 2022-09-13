@@ -1,8 +1,8 @@
-import {TransmitterSet} from "../../../entity/components/network/transmitting/transmitter-set";
-import EntityStateTransmitter from "../../../entity/components/network/entity/entity-state-transmitter";
-import {Component} from "../../../utils/ecs/component";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import Entity from "../../../utils/ecs/entity";
+import {TransmitterSet} from "src/entity/components/network/transmitting/transmitter-set";
+import EntityStateTransmitter from "src/entity/components/network/entity/entity-state-transmitter";
+import {Component} from "src/utils/ecs/component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import Entity from "src/utils/ecs/entity";
 
 export default class EntityStateTransmitComponent implements Component {
 

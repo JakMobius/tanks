@@ -1,4 +1,4 @@
-import Controller from "../../../ui/controller/controller";
+import Controller from "src/client/ui/controller/controller";
 import RegisterView from "../register/register-view";
 import {HubPage} from "../hub-page";
 

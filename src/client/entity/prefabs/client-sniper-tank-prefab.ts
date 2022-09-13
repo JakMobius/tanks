@@ -1,22 +1,21 @@
-import TankDrawer from "../../graphics/drawers/tank-drawer";
-import Sprite from "../../sprite";
-import LightMaskTextureProgram from "../../graphics/programs/light-mask-texture/light-mask-texture-program";
-import TruckProgram from "../../graphics/programs/truck-program";
-import DrawPhase from "../../graphics/drawers/draw-phase";
-import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "../../../utils/quadrangle";
+import TankDrawer from "src/client/graphics/drawers/tank-drawer";
+import Sprite from "src/client/sprite";
+import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
+import TruckProgram from "src/client/graphics/programs/truck-program";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
 import EngineSoundComponent from "../components/engine-sound-component";
-import Sounds from "../../sound/sounds";
+import Sounds from "src/client/sound/sounds";
 import WorldDrawerComponent from "../components/world-drawer-component";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import TrackTankBehaviour from "../../../entity/tanks/physics/track-tank/track-tank-behaviour";
-import TransformComponent from "../../../entity/components/transform-component";
+import PhysicalComponent from "src/entity/components/physics-component";
+import TrackTankBehaviour from "src/entity/tanks/physics/track-tank/track-tank-behaviour";
+import TransformComponent from "src/entity/components/transform-component";
 import ClientEntityPrefabs from "../client-entity-prefabs";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
-import EffectHostComponent from "../../../effects/effect-host-component";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import EffectHostComponent from "src/effects/effect-host-component";
 import DamageSmokeEffect from "../components/damage-smoke-effect";
-import EntityPilotListReceiver
-    from "../../../entity/components/network/entity-player-list/entity-pilot-list-receiver";
+import EntityPilotListReceiver from "src/entity/components/network/entity-player-list/entity-pilot-list-receiver";
 
 class Drawer extends TankDrawer {
 	public bodyBrightSprite: Sprite;

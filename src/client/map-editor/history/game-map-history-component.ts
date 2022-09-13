@@ -1,11 +1,10 @@
 import MapModification from "./modification/map-modification";
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import BlockState from "../../../map/block-state/block-state";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
 import MapBlockModification from "./modification/map-block-modification";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import GameMap from "../../../map/game-map";
-import BlockChangeEvent from "../../../events/block-change-event";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import GameMap from "src/map/game-map";
+import BlockChangeEvent from "src/events/block-change-event";
 
 export interface GameMapModification {
     modifications: MapModification[]

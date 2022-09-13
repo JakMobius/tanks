@@ -1,10 +1,10 @@
-import Controller from "../../../ui/controller/controller";
+import Controller from "src/client/ui/controller/controller";
 import {HubPage} from "../hub-page";
 import RegisterController from "../register/register-controller";
 import LoginController from "../login/login-controller";
 import WelcomeView from "./welcome-view";
 import BarSeparator from "../bar-separator/bar-separator";
-import Button from "../../../ui/button/button";
+import Button from "src/client/ui/button/button";
 
 export default class WelcomeController extends Controller {
 

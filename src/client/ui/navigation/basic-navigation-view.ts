@@ -4,7 +4,7 @@ import View from "../view";
 import Controller from "../controller/controller";
 import NavigationTransition from "./navigation-transition";
 import NavigationBlock from "./navigation-block";
-import {Constructor} from "../../../serialization/binary/serializable";
+import {Constructor} from "src/serialization/binary/serializable";
 
 export default class BasicNavigationView extends View {
 

@@ -1,6 +1,6 @@
-import Controller from "../../../../../ui/controller/controller";
+import Controller from "src/client/ui/controller/controller";
 import {PauseMenuView} from "../pause-menu-view";
-import KeyboardController from "../../../../../controls/input/keyboard/keyboard-controller";
+import KeyboardController from "src/client/controls/input/keyboard/keyboard-controller";
 
 export default class GamePauseViewController extends Controller<PauseMenuView> {
 

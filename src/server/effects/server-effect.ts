@@ -1,6 +1,6 @@
 import AbstractEffect from 'src/effects/abstract-effect';
-import EffectModel from "../../effects/effect-model";
-import {Constructor} from "../../serialization/binary/serializable";
+import EffectModel from "src/effects/effect-model";
+import {Constructor} from "src/serialization/binary/serializable";
 
 export default class ServerEffect extends AbstractEffect {
     static Model: Constructor<EffectModel>

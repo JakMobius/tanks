@@ -1,6 +1,6 @@
 /* @load-resource: ./cloud.scss */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 
 export default class Cloud extends View {
     constructor(text?: string) {

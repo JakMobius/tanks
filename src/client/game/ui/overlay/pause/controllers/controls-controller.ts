@@ -1,11 +1,11 @@
 import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
-import AxisSelector from "../../../axis-selector/axis-selector";
-import ControllerSelector from "../../../controller-selector/controller-selector";
-import InputDevice from "../../../../../controls/input/input-device";
-import GameSettings from "../../../../../settings/game-settings";
-import ControlsManager from "../../../../../controls/controls-manager";
-import ControlsPrinter from "../../../../../controls/controls-printer";
+import AxisSelector from "src/client/game/ui/axis-selector/axis-selector";
+import ControllerSelector from "src/client/game/ui/controller-selector/controller-selector";
+import InputDevice from "src/client/controls/input/input-device";
+import GameSettings from "src/client/settings/game-settings";
+import ControlsManager from "src/client/controls/controls-manager";
+import ControlsPrinter from "src/client/controls/controls-printer";
 
 export class ControlsView extends PauseMenuView {
 

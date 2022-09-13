@@ -6,7 +6,7 @@ import RoomCreateRequestPacket from 'src/networking/packets/cluster-packets/room
 import RoomConfig from 'src/server/room/room-config';
 import * as Websocket from "websocket";
 import SocketPortalClient from "../socket-portal-client";
-import BinaryPacket from "../../../networking/binary-packet";
+import BinaryPacket from "src/networking/binary-packet";
 
 export interface ClusterSocketPortalClientData {
     authorizationSalt: Buffer | null

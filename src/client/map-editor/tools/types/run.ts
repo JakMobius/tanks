@@ -2,12 +2,12 @@ import Tool from '../tool';
 import * as Box2D from '../../../../library/box2d';
 import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import ToolManager from "../toolmanager";
-import PhysicalComponent from "../../../../entity/components/physics-component";
-import TankControls from "../../../../controls/tank-controls";
-import ControlsManager from "../../../controls/controls-manager";
-import ClientEntityPrefabs from "../../../entity/client-entity-prefabs";
-import {EntityType} from "../../../../entity/entity-type";
-import Entity from "../../../../utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
+import TankControls from "src/controls/tank-controls";
+import ControlsManager from "src/client/controls/controls-manager";
+import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import Entity from "src/utils/ecs/entity";
 
 export default class RunTool extends Tool {
 	public selectingLocation: any;

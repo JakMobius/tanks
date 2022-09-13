@@ -1,6 +1,6 @@
 import * as Box2D from '../../../library/box2d';
 import TankBehaviour from './tank-behaviour';
-import PhysicalComponent from "../../components/physics-component";
+import PhysicalComponent from "src/entity/components/physics-component";
 
 interface AirbagBehaviourConfig {
     power: number

@@ -1,4 +1,4 @@
-import ButtonAxle, {ButtonAxleConfig} from "../../interact/button-axle";
+import ButtonAxle, {ButtonAxleConfig} from "src/client/controls/interact/button-axle";
 import MouseListener from "./mouse-listener";
 
 export interface MouseButtonConfig extends ButtonAxleConfig {

@@ -1,4 +1,4 @@
-import DocumentEventHandler from "../../interact/document-event-handler";
+import DocumentEventHandler from "src/client/controls/interact/document-event-handler";
 
 export default class GamepadListener extends DocumentEventHandler {
     public gamepadIndex: number | null;

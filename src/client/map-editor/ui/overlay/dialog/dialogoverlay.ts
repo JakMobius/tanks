@@ -1,6 +1,6 @@
-import Overlay, {OverlayConfig} from '../../../../ui/overlay/overlay';
+import {OverlayConfig} from '../../../../ui/overlay/overlay';
 import DialogView from './dialogview';
-import MenuOverlay from "../../../../ui/menu-overlay/menu-overlay";
+import MenuOverlay from "src/client/ui/menu-overlay/menu-overlay";
 
 export interface DialogOverlayConfig extends OverlayConfig {
     requiresDecision?: boolean

@@ -1,9 +1,9 @@
 /* @load-resource: './hub-page.scss' */
 
-import View from "../../ui/view";
-import {UserDataRaw} from "../../user-data-raw";
+import View from "src/client/ui/view";
+import {UserDataRaw} from "src/client/user-data-raw";
 import WelcomeController from "./welcome/welcome-controller";
-import EventContainer from "../../ui/overlay/events/event-container";
+import EventContainer from "src/client/ui/overlay/events/event-container";
 import AuthorizedWelcomeController from "./authorised-welcome/authorized-welcome-controller";
 import HubNavigationView from "./hub-navigation-view";
 import {localizeAjaxError} from "../localizations";

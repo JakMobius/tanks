@@ -1,7 +1,7 @@
-import RoomPortal from "../../room-portal";
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import ServerWorldBridge from "../../server-world-bridge";
+import RoomPortal from "src/server/room-portal";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import ServerWorldBridge from "src/server/server-world-bridge";
 
 export interface ServerRoomClientComponentOptions {
     name: string

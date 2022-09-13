@@ -1,6 +1,6 @@
 import {PauseMenuView} from "../pause-menu-view";
 import GamePauseViewController from "./pause-view-controller";
-import PreferenceSelector from "../../../preference-selector/preference-selector";
+import PreferenceSelector from "src/client/game/ui/preference-selector/preference-selector";
 
 export class GraphicsView extends PauseMenuView {
     constructor(controller: GraphicsController) {

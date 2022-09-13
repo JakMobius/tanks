@@ -1,5 +1,5 @@
 import BlockState from '../block-state';
-import GameMap from "../../game-map";
+import GameMap from "src/map/game-map";
 import BlockStateBinaryOptions from "../block-state-binary-options";
 
 class AirBinaryOptions extends BlockStateBinaryOptions {

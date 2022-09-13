@@ -2,7 +2,7 @@ import Uniform from '../uniform';
 import GLBuffer from '../glbuffer';
 import Shader from "../shader";
 import VertexArrayBuffer, {VertexArrayBufferConfig, VertexAttribute} from "../vertex-array-buffer";
-import {ByteArray, ByteArrayConstructor} from "../../../serialization/binary/typed-buffer";
+import {ByteArray, ByteArrayConstructor} from "src/serialization/binary/typed-buffer";
 
 export type AttributeConfig = {
     name: string,

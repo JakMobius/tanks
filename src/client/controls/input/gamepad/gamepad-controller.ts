@@ -2,7 +2,7 @@ import GamepadAxle, {GamepadAxleConfig} from './gamepad-axle';
 import GamepadButton, {GamepadButtonConfig} from './gamepad-button';
 import GamepadListener from "./gamepad-listener";
 import InputDevice, {InputDeviceType} from "../input-device";
-import Axle from "../../../../controls/axle";
+import Axle from "src/controls/axle";
 
 export enum GamepadInputType {
     button, axle

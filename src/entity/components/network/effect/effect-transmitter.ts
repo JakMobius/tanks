@@ -1,6 +1,6 @@
-import AbstractEffect from "../../../../effects/abstract-effect";
+import AbstractEffect from "src/effects/abstract-effect";
 import Transmitter from "../transmitting/transmitter";
-import {BinarySerializer} from "../../../../serialization/binary/serializable";
+import {BinarySerializer} from "src/serialization/binary/serializable";
 import {Commands} from "../commands";
 
 export default class EffectTransmitter extends Transmitter {

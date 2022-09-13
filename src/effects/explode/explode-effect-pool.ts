@@ -1,10 +1,10 @@
 import GameMap from 'src/map/game-map';
-import BlockState from "../../map/block-state/block-state";
-import {TwoDimensionalMap} from "../../utils/two-dimensional-map";
-import TilemapComponent from "../../physics/tilemap-component";
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import BlockState from "src/map/block-state/block-state";
+import {TwoDimensionalMap} from "src/utils/two-dimensional-map";
+import TilemapComponent from "src/physics/tilemap-component";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 interface ExplodePoolWalker {
     // Walker x position

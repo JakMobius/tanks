@@ -1,8 +1,8 @@
-import PipedConnection from "../../../networking/piped-connection";
-import BinaryPacket from "../../../networking/binary-packet";
-import HandshakePacket from "../../../networking/packets/cluster-packets/handshake-packet";
+import PipedConnection from "src/networking/piped-connection";
+import BinaryPacket from "src/networking/binary-packet";
+import HandshakePacket from "src/networking/packets/cluster-packets/handshake-packet";
 import ClusterHandshake from "../cluster-handshake";
-import HandshakeSuccessPacket from "../../../networking/packets/cluster-packets/handshake-success-packet";
+import HandshakeSuccessPacket from "src/networking/packets/cluster-packets/handshake-success-packet";
 
 export default class ClusterHandshakeConnection extends PipedConnection {
 

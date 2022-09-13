@@ -1,4 +1,4 @@
-import HierarchicalComponent from "../../hierarchical-component";
+import HierarchicalComponent from "src/entity/components/hierarchical-component";
 import {TransmitterSet} from "./transmitter-set";
 import {ReceivingEnd} from "./receiving-end";
 

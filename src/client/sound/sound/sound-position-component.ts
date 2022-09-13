@@ -1,11 +1,11 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
 import SoundEffect from "./sound-effect";
 import SoundEngine from "../sound-engine";
 import {SoundStream} from "../stream/sound-stream";
 import SoundPrimaryComponent from "./sound-primary-component";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import * as Box2D from "../../../library/box2d"
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import * as Box2D from "src/library/box2d"
 
 class StreamPositionFilters extends SoundEffect {
     panFilter: PannerNode

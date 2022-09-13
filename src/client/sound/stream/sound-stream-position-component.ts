@@ -1,4 +1,4 @@
-import * as Box2D from "../../../library/box2d";
+import * as Box2D from "src/library/box2d";
 
 export class SoundStreamPosition {
     position: Box2D.XY | null = null

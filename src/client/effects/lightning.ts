@@ -1,7 +1,7 @@
 //
 // import FX from '../sound/fx';
-// import Bonus from "../../server/entity/bonus/bonus";
-// import AbstractPlayer from "../../utils/player";
+// import Bonus from "src/server/entity/bonus/bonus";
+// import AbstractPlayer from "src/utils/player";
 // import SoundComponent from "../sound/sound";
 // import GameScene from "../game/scenes/gamescene";
 //

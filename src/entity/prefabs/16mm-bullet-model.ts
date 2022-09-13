@@ -7,7 +7,7 @@ import {EntityType} from "../entity-type";
 import TilemapHitEmitter from "../components/tilemap-hit-emitter";
 import TransformComponent from "../components/transform-component";
 import HealthComponent from "../components/health-component";
-import EffectHostComponent from "../../effects/effect-host-component";
+import EffectHostComponent from "src/effects/effect-host-component";
 
 EntityPrefabs.Types.set(EntityType.BULLET_16MM, (entity) => {
     entity.addComponent(new TilemapHitEmitter())

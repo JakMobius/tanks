@@ -1,6 +1,6 @@
-import Connection from "../../networking/connection";
-import TypedEventHandler from "../../utils/typed-event-handler";
-import Entity from "../../utils/ecs/entity";
+import Connection from "src/networking/connection";
+import TypedEventHandler from "src/utils/typed-event-handler";
+import Entity from "src/utils/ecs/entity";
 
 export interface SocketPortalClientConfig<DataClass> {
 	data: DataClass

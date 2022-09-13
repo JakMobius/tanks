@@ -1,5 +1,5 @@
 import DocumentEventHandler from './document-event-handler';
-import {isMacOS} from "../../../utils/meta-key-name";
+import {isMacOS} from "src/utils/meta-key-name";
 
 export default class DragHandler extends DocumentEventHandler {
 	public dragging: any;

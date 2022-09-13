@@ -1,10 +1,10 @@
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import PhysicalComponent from "./physics-component";
-import WorldExplodeEffectModel from "../../effects/models/world-explode-effect-model";
-import ServerEffect from "../../server/effects/server-effect";
-import EffectHostComponent from "../../effects/effect-host-component";
+import WorldExplodeEffectModel from "src/effects/models/world-explode-effect-model";
+import ServerEffect from "src/server/effects/server-effect";
+import EffectHostComponent from "src/effects/effect-host-component";
 
 export interface ExplodeOnDeathComponentConfig {
     explodePower?: number

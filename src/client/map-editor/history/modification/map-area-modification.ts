@@ -1,10 +1,10 @@
 import MapModification from './map-modification';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
-import Rectangle from "../../../../utils/rectangle";
-import BlockState from "../../../../map/block-state/block-state";
-import GameMap from "../../../../map/game-map";
+import Rectangle from "src/utils/rectangle";
+import BlockState from "src/map/block-state/block-state";
+import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "../game-map-history-component";
-import BlockChangeEvent from "../../../../events/block-change-event";
+import BlockChangeEvent from "src/events/block-change-event";
 
 export default class MapAreaModification extends MapModification {
 	public area: Rectangle;

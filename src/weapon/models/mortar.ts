@@ -1,7 +1,7 @@
 import {WeaponConfig} from '../weapon';
-import * as Box2D from "../../library/box2d";
+import * as Box2D from "src/library/box2d";
 import SingleBarreledWeapon from "../single-barreled-weapon";
-import {EntityType} from "../../entity/entity-type";
+import {EntityType} from "src/entity/entity-type";
 
 export default class WeaponMortar extends SingleBarreledWeapon {
 	constructor(config: WeaponConfig) {

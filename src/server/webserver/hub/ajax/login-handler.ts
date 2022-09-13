@@ -1,7 +1,7 @@
-import AjaxHandler, {AjaxFields, AjaxFieldType} from "../../ajax/ajax-handler";
+import AjaxHandler, {AjaxFields, AjaxFieldType} from "src/server/webserver/ajax/ajax-handler";
 import express from "express";
 import HubModule from "../hub-module";
-import {WebserverSession} from "../../webserver-session";
+import {WebserverSession} from "src/server/webserver/webserver-session";
 
 interface LoginAjaxFields extends AjaxFields {
     login: string

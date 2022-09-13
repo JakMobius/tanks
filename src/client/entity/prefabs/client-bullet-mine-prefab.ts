@@ -1,8 +1,8 @@
 import BasicEntityDrawer from '../../graphics/drawers/basic-entity-drawer';
-import DrawPhase from "../../graphics/drawers/draw-phase";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import ClientEntityPrefabs from "../client-entity-prefabs";
-import EntityPrefabs from "../../../entity/entity-prefabs";
-import {EntityType} from "../../../entity/entity-type";
+import EntityPrefabs from "src/entity/entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
 
 class Drawer extends BasicEntityDrawer {
 	public shift: any;

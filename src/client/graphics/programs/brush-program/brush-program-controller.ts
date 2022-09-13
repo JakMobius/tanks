@@ -1,8 +1,8 @@
 import BasicCameraProgramController from "../controllers/basic-camera-program-controller";
 import BrushProgram from "./brush-program";
-import GameMap from "../../../../map/game-map";
-import {Quadrangle} from "../../../../utils/quadrangle";
-import Color from "../../../../utils/color";
+import GameMap from "src/map/game-map";
+import {Quadrangle} from "src/utils/quadrangle";
+import Color from "src/utils/color";
 
 export default class BrushProgramController extends BasicCameraProgramController<BrushProgram> {
 

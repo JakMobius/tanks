@@ -2,10 +2,10 @@
 /* @load-resource: '../shaders/vertex/truck-vertex.glsl' */
 
 import GLBuffer from '../glbuffer';
-import Sprite from "../../sprite";
+import Sprite from "src/client/sprite";
 import CameraProgram from "./camera-program";
-import {Quadrangle} from "../../../utils/quadrangle";
-import WorldDrawerComponent from "../../entity/components/world-drawer-component";
+import {Quadrangle} from "src/utils/quadrangle";
+import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/truck-vertex.glsl"
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/truck-fragment.glsl"

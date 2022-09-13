@@ -1,8 +1,8 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import {Vec2} from "../../../library/box2d";
-import PhysicalComponent from "../../../entity/components/physics-component";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import {Vec2} from "src/library/box2d";
+import PhysicalComponent from "src/entity/components/physics-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 export default class ServerPositionComponent implements Component {
     public entity: Entity | null;

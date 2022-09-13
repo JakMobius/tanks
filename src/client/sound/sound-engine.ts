@@ -1,5 +1,5 @@
 import {SoundStream} from "./stream/sound-stream";
-import EventEmitter from "../../utils/event-emitter";
+import EventEmitter from "src/utils/event-emitter";
 
 window.AudioContext = window.AudioContext || (window as any)["webkitAudioContext"]
 

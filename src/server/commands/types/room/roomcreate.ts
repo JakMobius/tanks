@@ -2,9 +2,9 @@ import Command, {CommandConfig} from '../../command';
 import CommandFlag from '../../command-flag';
 import fs from 'fs';
 import path from 'path';
-import RoomConfig from "../../../room/room-config";
-import {ConsoleAutocompleteOptions} from "../../../console/console";
-import CLIStyle from "../../cli-style";
+import RoomConfig from "src/server/room/room-config";
+import {ConsoleAutocompleteOptions} from "src/server/console/console";
+import CLIStyle from "src/server/commands/cli-style";
 
 export default class RoomCreateCommand extends Command {
 

@@ -13,12 +13,12 @@ import ToolManager from '../tools/toolmanager';
 import EventContainer from '../../ui/overlay/events/event-container';
 import ToolSettingsView from '../ui/overlay/workspace/toolsettings/toolsettingsview';
 import Tools from "../tools/type-loader"
-import TilemapComponent from "../../../physics/tilemap-component";
+import TilemapComponent from "src/physics/tilemap-component";
 import GameMapHistoryComponent from "../history/game-map-history-component";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import ControlsManager from "../../controls/controls-manager";
-import Entity from "../../../utils/ecs/entity";
-import {clientGameWorldEntityPrefab} from "../../client-game-world-entity-prefab";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import ControlsManager from "src/client/controls/controls-manager";
+import Entity from "src/utils/ecs/entity";
+import {clientGameWorldEntityPrefab} from "src/client/client-game-world-entity-prefab";
 
 export default class MapEditorScene extends Scene {
 

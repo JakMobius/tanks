@@ -1,15 +1,15 @@
 /* @load-resource: './game-create-view.scss' */
 
-import View from "../../../ui/view";
+import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";
 import HugeTitle from "../huge-title/huge-title";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import HugeSelect from "../huge-select/huge-select";
-import Button from "../../../ui/button/button";
-import {checkRoomName} from "../../../../data-checkers/room-name-checker";
-import {localizeAjaxError, textFromRoomNameCheckResult} from "../../localizations";
+import Button from "src/client/ui/button/button";
+import {checkRoomName} from "src/data-checkers/room-name-checker";
+import {localizeAjaxError, textFromRoomNameCheckResult} from "src/client/hub/localizations";
 import {TipStyle} from "../input-tip-list/input-tip-list-view";
-import DialogOverlay from "../../../map-editor/ui/overlay/dialog/dialogoverlay";
+import DialogOverlay from "src/client/map-editor/ui/overlay/dialog/dialogoverlay";
 
 export default class GameCreateView extends View {
     private page: HubPage;

@@ -1,7 +1,7 @@
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
-import HealthComponent from "../../health-component";
+import HealthComponent from "src/entity/components/health-component";
 
 export default class HealthReceiver extends ReceiverComponent {
 

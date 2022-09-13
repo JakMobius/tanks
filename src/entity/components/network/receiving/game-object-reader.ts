@@ -1,5 +1,5 @@
-import ObjectReader from "../../../../serialization/binary/parsers/object-reader";
-import ReadBuffer from "../../../../serialization/binary/read-buffer";
+import ObjectReader from "src/serialization/binary/parsers/object-reader";
+import ReadBuffer from "src/serialization/binary/read-buffer";
 import ReceiverComponent from "./receiver-component";
 
 export default class GameObjectReader extends ObjectReader {

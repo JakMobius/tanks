@@ -3,8 +3,8 @@ import Sprite, {SpriteRect} from '../../../sprite';
 import GameMap from '../../../../map/game-map';
 import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/block-state/block-state';
-import {squareQuadrangle} from "../../../../utils/quadrangle";
-import WorldDrawerComponent from "../../../entity/components/world-drawer-component";
+import {squareQuadrangle} from "src/utils/quadrangle";
+import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];

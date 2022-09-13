@@ -11,7 +11,7 @@ import Parser, {CommandASTNode, CommandParameterASTNode, CommentASTNode, GlobalA
 
 import Serializer from "./language/serializer";
 import Lexer, {StringLexeme} from "./language/lexer";
-import Entity from "../../utils/ecs/entity";
+import Entity from "src/utils/ecs/entity";
 
 export interface ConsoleAutocompleteOptions {
     /// Indicates whether only one completion unit is required

@@ -1,7 +1,6 @@
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
-import Entity from "../../../../utils/ecs/entity";
 
 export default class PrimaryPlayerReceiver extends ReceiverComponent {
 

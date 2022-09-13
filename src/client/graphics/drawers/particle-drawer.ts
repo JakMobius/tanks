@@ -1,4 +1,4 @@
-import Particle from "../../particles/particle";
+import Particle from "src/client/particles/particle";
 import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 

@@ -1,13 +1,13 @@
-import SoundPrimaryComponent from "../../sound/sound/sound-primary-component";
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
-import TransformComponent from "../../../entity/components/transform-component";
-import {SoundAsset} from "../../sound/sounds";
-import HealthComponent from "../../../entity/components/health-component";
-import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
-import BasicEventHandlerSet from "../../../utils/basic-event-handler-set";
-import SoundPositionComponent from "../../sound/sound/sound-position-component";
-import SoundGainFilter from "../../sound/sound/sound-gain-filter";
+import SoundPrimaryComponent from "src/client/sound/sound/sound-primary-component";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import TransformComponent from "src/entity/components/transform-component";
+import {SoundAsset} from "src/client/sound/sounds";
+import HealthComponent from "src/entity/components/health-component";
+import WheeledTankBehaviour from "src/entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import SoundPositionComponent from "src/client/sound/sound/sound-position-component";
+import SoundGainFilter from "src/client/sound/sound/sound-gain-filter";
 
 export interface EngineConfig {
     sound: SoundAsset,

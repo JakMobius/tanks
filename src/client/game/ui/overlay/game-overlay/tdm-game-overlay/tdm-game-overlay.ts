@@ -1,9 +1,7 @@
 /* @load-resource: './tdm-game-overlay.scss' */
 
 import GameOverlay, {GameOverlayConfig} from "../game-overlay";
-import {TDMGameState, TDMGameStateType} from "../../../../../../game-modes/tdm-game-state";
-import {Constructor} from "../../../../../../serialization/binary/serializable";
-import GameStateView from "../game-state-view";
+import {TDMGameState, TDMGameStateType} from "src/game-modes/tdm-game-state";
 import TDMWaitingStateView from "./tdm-waiting-state-view";
 import TDMMatchOverStateView from "./tdm-match-over-state-view";
 import TDMPlayingStateView from "./tdm-playing-state-view";

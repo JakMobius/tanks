@@ -1,4 +1,4 @@
-import PhysicalComponent from "../../physics-component";
+import PhysicalComponent from "src/entity/components/physics-component";
 import {Commands} from "../commands";
 import Transmitter from "../transmitting/transmitter";
 

@@ -1,4 +1,4 @@
-import GameMap from "../../../../map/game-map";
+import GameMap from "src/map/game-map";
 
 export default class MapModification {
 

@@ -1,10 +1,10 @@
-import SocketPortalClient from "../../server/socket/socket-portal-client";
-import PhysicalComponent from "../../entity/components/physics-component";
-import Player from "../../server/player";
-import ServerEntityPrefabs from "../../server/entity/server-entity-prefabs";
-import PlayerConnectionManager from "../../server/player-connection-manager";
-import {EntityType} from "../../entity/entity-type";
-import Entity from "../../utils/ecs/entity";
+import SocketPortalClient from "src/server/socket/socket-portal-client";
+import PhysicalComponent from "src/entity/components/physics-component";
+import Player from "src/server/player";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import PlayerConnectionManager from "src/server/player-connection-manager";
+import {EntityType} from "src/entity/entity-type";
+import Entity from "src/utils/ecs/entity";
 
 export default class TutorialWorldController {
     game: Entity;

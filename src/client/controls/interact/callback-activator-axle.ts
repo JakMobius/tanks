@@ -1,4 +1,4 @@
-import ActivatorAxle from "../../../controls/activator-axle";
+import ActivatorAxle from "src/controls/activator-axle";
 
 export type AxleCallback = (axle: CallbackActivatorAxle) => void
 

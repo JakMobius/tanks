@@ -1,9 +1,9 @@
 /* @load-resource: ./game-pause-navigation-transition.scss */
 
-import NavigationTransition from "../../../../ui/navigation/navigation-transition";
-import BasicNavigationView from "../../../../ui/navigation/basic-navigation-view";
-import NavigationBlock from "../../../../ui/navigation/navigation-block";
-import NavigationCloud from "../../cloud/navigation-cloud";
+import NavigationTransition from "src/client/ui/navigation/navigation-transition";
+import BasicNavigationView from "src/client/ui/navigation/basic-navigation-view";
+import NavigationBlock from "src/client/ui/navigation/navigation-block";
+import NavigationCloud from "src/client/game/ui/cloud/navigation-cloud";
 
 export default class GamePauseNavigationTransition extends NavigationTransition {
     private cloud: NavigationCloud;

@@ -1,13 +1,13 @@
-import PhysicalComponent from "../../entity/components/physics-component";
-import GameMap from "../../map/game-map";
-import * as Box2D from "../../library/box2d";
-import HealthComponent, {DamageTypes} from "../../entity/components/health-component";
+import PhysicalComponent from "src/entity/components/physics-component";
+import GameMap from "src/map/game-map";
+import * as Box2D from "src/library/box2d";
+import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
 import ExplodeEffectPool from "./explode-effect-pool";
-import {Component} from "../../utils/ecs/component";
-import Entity from "../../utils/ecs/entity";
-import BasicEventHandlerSet from "../../utils/basic-event-handler-set";
-import SailingComponent from "../../entity/components/sailing-component";
-import DamageReason from "../../server/damage-reason/damage-reason";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import SailingComponent from "src/entity/components/sailing-component";
+import DamageReason from "src/server/damage-reason/damage-reason";
 
 export interface ExplodeEffectEntityAffectControllerConfig {
     damageEntities?: boolean

@@ -1,5 +1,5 @@
 import ClientDataHandler from "./client-packet-handler";
-import Queue from "../../utils/queue";
+import Queue from "src/utils/queue";
 import Connection from "../connection";
 
 export default class NetworkLatencyImitator extends ClientDataHandler {

@@ -1,7 +1,7 @@
 import Command, {CommandConfig} from '../command';
 import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
-import ServerEffect from "../../effects/server-effect";
-import EffectHostComponent from "../../../effects/effect-host-component";
+import ServerEffect from "src/server/effects/server-effect";
+import EffectHostComponent from "src/effects/effect-host-component";
 
 export default class ExplodeCommand extends Command {
 	public defaultPower: number;

@@ -1,8 +1,7 @@
 import ServerTDMControllerComponent from "./server-tdm-controller-component";
-import BasicEventHandlerSet from "../../../../utils/basic-event-handler-set";
-import Entity from "../../../../utils/ecs/entity";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import ServerGameStateController from "../server-game-state-controller";
-import {TDMGameState} from "../../../../game-modes/tdm-game-state";
+import {TDMGameState} from "src/game-modes/tdm-game-state";
 
 export default abstract class TDMGameStateController implements ServerGameStateController {
 

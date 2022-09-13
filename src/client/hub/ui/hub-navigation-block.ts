@@ -1,7 +1,7 @@
 /* @load-resource: ./hub-navigation-block.scss */
 
-import Controller from "../../ui/controller/controller";
-import NavigationBlock from "../../ui/navigation/navigation-block";
+import Controller from "src/client/ui/controller/controller";
+import NavigationBlock from "src/client/ui/navigation/navigation-block";
 
 export default class HubNavigationBlock extends NavigationBlock {
 

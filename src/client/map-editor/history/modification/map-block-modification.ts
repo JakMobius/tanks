@@ -1,6 +1,6 @@
 import MapModification from './map-modification';
-import BlockState from "../../../../map/block-state/block-state";
-import GameMap from "../../../../map/game-map";
+import BlockState from "src/map/block-state/block-state";
+import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "../game-map-history-component";
 
 export default class MapBlockModification extends MapModification {

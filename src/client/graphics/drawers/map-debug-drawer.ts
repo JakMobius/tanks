@@ -1,17 +1,17 @@
-import PhysicsChunk from "../../../physics/physics-chunk";
-import GameMap from "../../../map/game-map";
+import PhysicsChunk from "src/physics/physics-chunk";
+import GameMap from "src/map/game-map";
 import LineDrawer from "./line-drawer";
 import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import B2DebugDraw from "./b2-debug-draw";
-import {b2DrawFlags} from "../../../library/box2d/common/b2_draw";
-import WheeledTankBehaviour from "../../../entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
-import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "../../../utils/quadrangle";
-import PhysicalHostComponent from "../../../physiсal-world-component";
-import ChunkedMapCollider from "../../../physics/chunked-map-collider";
-import TransformComponent from "../../../entity/components/transform-component";
-import TankBehaviour from "../../../entity/tanks/physics/tank-behaviour";
-import Entity from "../../../utils/ecs/entity";
+import {b2DrawFlags} from "src/library/box2d/common/b2_draw";
+import WheeledTankBehaviour from "src/entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
+import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
+import PhysicalHostComponent from "src/physiсal-world-component";
+import ChunkedMapCollider from "src/physics/chunked-map-collider";
+import TransformComponent from "src/entity/components/transform-component";
+import TankBehaviour from "src/entity/tanks/physics/tank-behaviour";
+import Entity from "src/utils/ecs/entity";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;

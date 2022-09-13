@@ -1,5 +1,5 @@
-import {Component} from "../../../utils/ecs/component";
-import Entity from "../../../utils/ecs/entity";
+import {Component} from "src/utils/ecs/component";
+import Entity from "src/utils/ecs/entity";
 import {SoundStream} from "../stream/sound-stream";
 import {SoundAsset} from "../sounds";
 

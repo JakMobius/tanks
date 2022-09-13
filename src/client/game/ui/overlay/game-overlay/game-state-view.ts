@@ -1,6 +1,6 @@
 /* @load-resource: './state-view.scss' */
 
-import View from "../../../../ui/view";
+import View from "src/client/ui/view";
 import TDMGameOverlay from "./tdm-game-overlay/tdm-game-overlay";
 
 export default class GameStateView extends View {

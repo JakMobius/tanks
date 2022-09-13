@@ -1,10 +1,10 @@
 import DocumentEventHandler from '../../controls/interact/document-event-handler';
 import Camera from '../../camera';
 import Tool from '../tools/tool';
-import KeyboardController from "../../controls/input/keyboard/keyboard-controller";
-import BlockState from "../../../map/block-state/block-state";
-import SceneScreen from "../../graphics/scene-screen";
-import Entity from "../../../utils/ecs/entity";
+import KeyboardController from "src/client/controls/input/keyboard/keyboard-controller";
+import BlockState from "src/map/block-state/block-state";
+import SceneScreen from "src/client/graphics/scene-screen";
+import Entity from "src/utils/ecs/entity";
 
 export default class ToolManager extends DocumentEventHandler {
 

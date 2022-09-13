@@ -1,8 +1,8 @@
 /* @load-resource: './room-cell.scss' */
 
-import View from "../../../../ui/view";
+import View from "src/client/ui/view";
 import RoomCellStatusLabel from "./room-cell-status-label/room-cell-status-label";
-import Button from "../../../../ui/button/button";
+import Button from "src/client/ui/button/button";
 
 export interface RoomCellConfig {
     name: string

@@ -1,8 +1,8 @@
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
-import ClientEntityPrefabs from "../../../../client/entity/client-entity-prefabs";
-import Entity from "../../../../utils/ecs/entity";
+import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
+import Entity from "src/utils/ecs/entity";
 
 export default class EntityStateReceiver extends ReceiverComponent {
 

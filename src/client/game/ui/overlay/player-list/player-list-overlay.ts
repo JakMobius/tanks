@@ -1,13 +1,13 @@
 /* @load-resource: './player-list-overlay.scss' */
 
-import Overlay, {OverlayConfig} from "../../../../ui/overlay/overlay";
-import Entity from "../../../../../utils/ecs/entity";
+import Overlay, {OverlayConfig} from "src/client/ui/overlay/overlay";
+import Entity from "src/utils/ecs/entity";
 import WorldStatisticsComponent, {
     PlayerStatistics
-} from "../../../../../entity/components/network/world-statistics/world-statistics-component";
-import TimerComponent from "../../../../../entity/components/network/timer/timer-component";
-import BasicEventHandlerSet from "../../../../../utils/basic-event-handler-set";
-import TeamColor from "../../../../../utils/team-color";
+} from "src/entity/components/network/world-statistics/world-statistics-component";
+import TimerComponent from "src/entity/components/network/timer/timer-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import TeamColor from "src/utils/team-color";
 
 export default class PlayerListOverlay extends Overlay {
 

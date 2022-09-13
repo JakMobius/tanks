@@ -1,4 +1,4 @@
-import Axle from "../../../controls/axle";
+import Axle from "src/controls/axle";
 
 export enum InputDeviceType {
     keyboard,
