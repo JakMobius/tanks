@@ -1,0 +1,21 @@
+.pause-key-value-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    gap: 10px;
+    height: 40px;
+    font-weight: 700;
+    font-size: 24px;
+}
+.pause-key-value-row.small {
+    height: 31px;
+    font-size: 20px;
+    font-weight: 700;
+}
+.pause-select-row.small {
+    height: 31px;
+    font-size: 20px;
+    font-weight: 700;
+}

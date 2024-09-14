@@ -1,0 +1,32 @@
+.tank-stat-row .tank-stat-label {
+    width: 40px;
+    font-weight: bold;
+    font-size: 14px;
+}
+.tank-stat-row .tank-stat-value {
+    width: 40px;
+    font-weight: bold;
+    font-size: 14px;
+}
+.tank-stat-row .tank-stat-scale {
+    flex-grow: 1;
+    padding: 1px;
+    background: #008FCC;
+    height: 22px;
+}
+.tank-stat-row .tank-stat-scale .tank-stat-scale-bar {
+    width: 100%;
+    height: 100%;
+    background: #7CD8FF;
+}
+.tank-stat-row {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 9px;
+    height: 40px;
+    border-left: 2px solid #008FCC;
+    width: 100%;
+}

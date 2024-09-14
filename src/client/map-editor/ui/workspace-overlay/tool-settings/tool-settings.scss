@@ -1,0 +1,35 @@
+.editor-tool-settings {
+    position: absolute;
+    top: 30px;
+    left: 90px;
+    height: 47px;
+    width: auto;
+    transition: opacity 0.5s, width 0.3s;
+}
+
+.editor-tool-settings .container {
+    display: inline-block;
+    height: 47px;
+    position: relative;
+    margin-right: 8px;
+}
+
+.editor-tool-settings .container .text {
+    position: absolute;
+    line-height: 47px;
+    width: 100%;
+    text-align: center;
+}
+
+.editor-tool-settings button {
+    height: 35px;
+    display: inline-block;
+    margin: 5px;
+    line-height: 0;
+    font-size: 12px;
+    font-weight: 200;
+    background: white;
+    box-shadow: none;
+    border: 1px solid #bbb;
+    color: #444444;
+}

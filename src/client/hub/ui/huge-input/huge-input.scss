@@ -1,25 +1,29 @@
-
+.huge-input-container .huge-text-input::placeholder {
+    color: #B5B5B5;
+}
+.huge-input-container.with-button .huge-text-input {
+    border-radius: 5px 0 0 5px;
+}
 .huge-input-container {
-  position: relative;
-  width: 488px;
-  height: 42px;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: 15px;
-
-  .huge-input-button {
+    position: relative;
+    width: 488px;
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+}
+.huge-input-container .huge-input-button {
     height: 100%;
     border: none;
     background: #009EE0;
     border-radius: 0 5px 5px 0;
     color: white;
     font-size: 14px;
-    cursor:pointer;
+    cursor: pointer;
     padding: 0 16px;
     box-sizing: border-box;
-  }
-
-  .huge-input {
+}
+.huge-input-container .huge-input {
     height: 42px;
     border: none;
     background: white;
@@ -30,5 +34,11 @@
     font-size: 14px;
     padding: 10px 20px;
     font-weight: bold;
-  }
+}
+.huge-input-container .huge-select {
+    appearance: none;
+    background-image: url(../assets/hub/dropdown.png);
+    background-repeat: no-repeat;
+    background-position: calc(100% - 10px) center;
+    background-size: 15px;
 }

@@ -1,0 +1,36 @@
+.controller-view .controller-name {
+    height: 15px;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 15px;
+    color: #FFFFFF;
+}
+.controller-view .controller-icon {
+    width: 58px;
+    height: 24px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.controller-view .controller-subtitle {
+    height: 13px;
+    font-size: 11px;
+    line-height: 13px;
+    color: #FFFFFF;
+}
+.controller-view {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    width: 117px;
+    height: 80px;
+    background: rgba(192, 192, 192, 0.56);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease-out;
+}
+.controller-view.selected {
+    background: rgba(66, 66, 66, 0.56);
+}
