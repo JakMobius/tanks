@@ -10,11 +10,9 @@ export default class EntityStateReceiver extends ReceiverComponent {
         receiveComponent.commandHandlers.set(Commands.ENTITY_CREATE_COMMAND, (buffer) => {
             let identifier = buffer.readUint32()
             let newEntity = new Entity()
-
-            let configuration = buffer.readUint32()
-
             newEntity.addComponent(new EntityDataReceiveComponent(identifier))
 
+            let configuration = buffer.readUint32()
             if(configuration > 0) {
                 let configurationScript = ClientEntityPrefabs.types.get(configuration)
                 if(!configurationScript) {

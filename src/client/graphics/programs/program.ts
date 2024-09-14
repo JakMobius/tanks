@@ -1,7 +1,7 @@
-import Uniform from '../uniform';
-import GLBuffer from '../glbuffer';
-import Shader from "../shader";
-import VertexArrayBuffer, {VertexArrayBufferConfig, VertexAttribute} from "../vertex-array-buffer";
+import Uniform from 'src/client/graphics/gl/uniform';
+import GLBuffer from 'src/client/graphics/gl/glbuffer';
+import Shader from "src/client/graphics/shaders/shader";
+import VertexArrayBuffer, {VertexArrayBufferConfig, VertexAttribute} from "src/client/graphics/gl/vertex-array-buffer";
 import {ByteArray, ByteArrayConstructor} from "src/serialization/binary/typed-buffer";
 
 export type AttributeConfig = {

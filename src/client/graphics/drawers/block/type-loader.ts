@@ -1,8 +1,8 @@
 // @ts-ignore
 import Models from './types/*'
-import MapDrawer from 'src/client/graphics/drawers/map-drawer';
+import MapDrawerComponent from 'src/client/graphics/drawers/map-drawer-component';
 
 for(let Model of Models) {
     let drawer = new Model()
-    MapDrawer.registerBlockLoader(drawer.id, drawer)
+    MapDrawerComponent.registerBlockLoader(drawer.id, drawer)
 }

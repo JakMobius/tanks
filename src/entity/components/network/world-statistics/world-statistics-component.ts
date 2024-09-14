@@ -1,9 +1,8 @@
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "../transmitting/transmitter-set";
 import WorldStatisticsTransmitter from "./world-statistics-transmitter";
 import TimerComponent from "../timer/timer-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export interface PlayerStatistics {
     name: string
@@ -13,21 +12,15 @@ export interface PlayerStatistics {
     deaths: number
 }
 
-export interface TeamStatistics {
-    score: number
-}
-
-export default class WorldStatisticsComponent implements Component {
-    entity: Entity | null
+export default class WorldStatisticsComponent extends EventHandlerComponent {
 
     playerStatistics: PlayerStatistics[] = []
     mapName: string | null = null
     matchTimeLeftTimer?: Entity | null = null
 
-    eventListener = new BasicEventHandlerSet()
-
     constructor() {
-        this.eventListener.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+        super()
+        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(WorldStatisticsTransmitter)
         })
     }
@@ -50,15 +43,5 @@ export default class WorldStatisticsComponent implements Component {
     getMatchLeftTimerComponent() {
         if(!this.matchTimeLeftTimer) return null
         return this.matchTimeLeftTimer.getComponent(TimerComponent)
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventListener.setTarget(this.entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventListener.setTarget(null)
     }
 }

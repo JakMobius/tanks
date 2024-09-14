@@ -1,9 +1,9 @@
 import EntityDrawer from './entity-drawer';
-import Sprite from '../../sprite';
+import Sprite from 'src/client/graphics/sprite';
 import TextureProgram from "../programs/texture-program";
 import DrawPhase from "./draw-phase";
-import {squareQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
-import PhysicalComponent from "src/entity/components/physics-component";
+import {squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
+import TransformComponent from "src/entity/components/transform-component";
 
 export default class BasicEntityDrawer extends EntityDrawer {
     static sprites: Sprite[];
@@ -22,21 +22,16 @@ export default class BasicEntityDrawer extends EntityDrawer {
         return this.sprites[i]
     }
 
-    constructor() {
-        super()
-    }
-
     drawSprite(sprite: Sprite, width: number, height: number, phase: DrawPhase, z: number = 1) {
         let program = phase.getProgram(TextureProgram)
-        const entityBody = this.entity.getComponent(PhysicalComponent).getBody()
-        const entityPosition = entityBody.GetPosition()
-        const entityAngle = entityBody.GetAngle()
-        const sine = Math.sin(entityAngle)
-        const cos = Math.cos(entityAngle)
+        this.drawSpriteWithProgram(sprite, width, height, program, z)
+    }
+
+    drawSpriteWithProgram(sprite: Sprite, width: number, height: number, program: TextureProgram, z: number = 1) {
+        const transform = this.entity.getComponent(TransformComponent)
 
         const quadrangle = squareQuadrangle(-width / 2, -height / 2, width, height)
-        turnQuadrangle(quadrangle, sine, cos)
-        translateQuadrangle(quadrangle, entityPosition.x, entityPosition.y)
+        transformQuadrangle(quadrangle, transform.transform)
 
         program.drawSprite(sprite, quadrangle, z)
     }

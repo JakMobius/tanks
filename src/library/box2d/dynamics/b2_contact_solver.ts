@@ -17,17 +17,21 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_linearSlop, b2_maxManifoldPoints, b2_maxLinearCorrection, b2_baumgarte, b2_toiBaumgarte, b2MakeArray } from "../common/b2_settings";
-import { b2Min, b2Max, b2Clamp, b2Vec2, b2Mat22, b2Rot, b2Transform } from "../common/b2_math";
-import { b2Manifold } from "../collision/b2_collision";
-import { b2ManifoldPoint } from "../collision/b2_collision";
-import { b2WorldManifold } from "../collision/b2_collision";
-import { b2ManifoldType } from "../collision/b2_collision";
-import { b2Shape } from "../collision/b2_shape";
-import { b2Contact } from "./b2_contact";
-import { b2Body } from "./b2_body";
-import { b2Fixture } from "./b2_fixture";
-import { b2TimeStep, b2Position, b2Velocity } from "./b2_time_step";
+import {
+    b2_baumgarte,
+    b2_linearSlop,
+    b2_maxLinearCorrection,
+    b2_maxManifoldPoints,
+    b2_toiBaumgarte,
+    b2MakeArray
+} from "../common/b2_settings";
+import {b2Clamp, b2Mat22, b2Max, b2Min, b2Rot, b2Transform, b2Vec2} from "../common/b2_math";
+import {b2Manifold, b2ManifoldPoint, b2ManifoldType, b2WorldManifold} from "../collision/b2_collision";
+import {b2Shape} from "../collision/b2_shape";
+import {b2Contact} from "./b2_contact";
+import {b2Body} from "./b2_body";
+import {b2Fixture} from "./b2_fixture";
+import {b2Position, b2TimeStep, b2Velocity} from "./b2_time_step";
 
 // Solver debugging is normally disabled because the block solver sometimes has to deal with a poorly conditioned effective mass matrix.
 // #define B2_DEBUG_SOLVER 0

@@ -1,14 +1,25 @@
 import ProgramController from "../programs/controllers/program-controller";
-import {Constructor} from "src/serialization/binary/serializable";
+import {Constructor} from "src/utils/constructor"
 import Program from "../programs/program";
+import ProgramPool from "src/client/graphics/program-pool";
+import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
+import EventEmitter from "src/utils/event-emitter";
 
-export default class DrawPhase {
+export default class DrawPhase extends EventEmitter {
+    private programPool: ProgramPool
     private controllers = new Map<Constructor<Program>, ProgramController>()
+
+    constructor(programPool: ProgramPool) {
+        super()
+        this.programPool = programPool
+    }
 
     getProgram<T extends Program>(programType: Constructor<T>): T {
         let controller = this.controllers.get(programType)
-        if(!controller) {
-            throw new Error("Could not handle getProgram request: controller for program with type '" + programType.name + "' has not been registered")
+        if (!controller) {
+            controller = this.programPool.getController(programType)
+            controller.reset()
+            this.controllers.set(programType, controller)
         }
         return (controller as any as ProgramController<T>).program
     }
@@ -18,10 +29,18 @@ export default class DrawPhase {
     }
 
     prepare() {
-        for(let controller of this.controllers.values()) controller.reset()
+        this.controllers.clear()
+    }
+
+    runPrograms() {
+        for (let controller of this.controllers.values()) controller.draw()
     }
 
     draw() {
-        for(let controller of this.controllers.values()) controller.draw()
+        this.prepare()
+
+        this.emit("draw", this)
+
+        this.runPrograms()
     }
 }

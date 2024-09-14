@@ -17,13 +17,12 @@
 */
 
 // DEBUG: import { b2Assert, b2_linearSlop } from "../common/b2_settings";
-import { b2_polygonRadius } from "../common/b2_settings";
-import { b2Vec2, b2Transform, XY } from "../common/b2_math";
-import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
-import { b2DistanceProxy } from "./b2_distance";
-import { b2MassData } from "./b2_shape";
-import { b2Shape, b2ShapeType } from "./b2_shape";
-import { b2EdgeShape } from "./b2_edge_shape";
+import {b2_polygonRadius} from "../common/b2_settings";
+import {b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2AABB, b2RayCastInput, b2RayCastOutput} from "./b2_collision";
+import {b2DistanceProxy} from "./b2_distance";
+import {b2MassData, b2Shape, b2ShapeType} from "./b2_shape";
+import {b2EdgeShape} from "./b2_edge_shape";
 
 /// A chain shape is a free form sequence of line segments.
 /// The chain has one-sided collision, with the surface normal pointing to the right of the edge.

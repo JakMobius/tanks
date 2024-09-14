@@ -169,6 +169,10 @@ export default class Color {
     getAlpha() {
         return this.alpha
     }
+
+    getUint32() {
+        return ((this.alpha * 255) & 0xff) << 24 | ((this.b * 255) & 0xff) << 16 | ((this.g * 255) & 0xff) << 8 | ((this.r * 255) & 0xff)
+    }
 }
 
 function hue2rgb(p: number, q: number, t: number) {

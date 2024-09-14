@@ -1,7 +1,8 @@
-import "../animation-frame-polyfill"
-import SoundEngine from "../sound/sound-engine";
-import CanvasFactory from '../utils/canvas-factory'
-import {SoundStream} from "../sound/stream/sound-stream";
+import "src/client/utils/animation-frame-polyfill"
+import SoundEngine from "src/client/sound/sound-engine";
+import CanvasFactory from 'src/client/utils/canvas-factory'
+import {SoundStream} from "src/client/sound/stream/sound-stream";
+import GameSettings from "src/client/settings/game-settings";
 
 export interface ScreenConfig {
     scale?: number
@@ -9,20 +10,20 @@ export interface ScreenConfig {
     fitRoot?: boolean
     width?: number
     height?: number
+    withSound?: boolean
 }
 
 export default class Screen {
-	public config: ScreenConfig;
-	public root: JQuery;
-	public width: number;
-	public height: number;
-	public framebufferTextures: WebGLTexture[];
-	public framebuffers: WebGLFramebuffer[];
-	public activeFramebufferIndex: number;
-	public inactiveFramebufferIndex: number;
+    public config: ScreenConfig;
+    public root: JQuery;
+    public width: number;
+    public height: number;
+    public framebufferTextures: WebGLTexture[];
+    public framebuffers: WebGLFramebuffer[];
+    public activeFramebufferIndex: number;
+    public inactiveFramebufferIndex: number;
 
     public soundEngine: SoundEngine
-    public soundOutput: SoundStream
     public canvas: HTMLCanvasElement = null
     public ctx: WebGLRenderingContext = null
     private resizeHandler: () => void;
@@ -30,7 +31,8 @@ export default class Screen {
     constructor(config: ScreenConfig) {
         config = Object.assign({
             scale: window.devicePixelRatio,
-            fitRoot: true
+            fitRoot: true,
+            withSound: true
         }, config)
 
         this.config = config
@@ -39,9 +41,11 @@ export default class Screen {
         this.width = null
         this.height = null
 
-        this.initSound()
+        if (config.withSound) {
+            this.initSound()
+        }
         this.initCanvas()
-        if(this.config.fitRoot) {
+        if (this.config.fitRoot) {
             this.initResizeHandling()
         } else {
             this.setSize(this.config.width ?? 300, this.config.height ?? 150)
@@ -50,7 +54,7 @@ export default class Screen {
     }
 
     initialize(): void {
-        for(let texture of this.framebufferTextures) {
+        for (let texture of this.framebufferTextures) {
             let framebuffer = this.ctx.createFramebuffer()
             this.ctx.bindFramebuffer(this.ctx.FRAMEBUFFER, framebuffer)
             this.ctx.framebufferTexture2D(this.ctx.FRAMEBUFFER, this.ctx.COLOR_ATTACHMENT0, this.ctx.TEXTURE_2D, texture, 0);
@@ -63,7 +67,7 @@ export default class Screen {
     initSound() {
         let context = new AudioContext()
         this.soundEngine = new SoundEngine(context)
-        this.soundOutput = this.soundEngine.addOutput(context.destination)
+        this.soundEngine.input.connect(context.destination)
     }
 
     initCanvas(): void {
@@ -84,17 +88,17 @@ export default class Screen {
     }
 
     activeFramebufferTexture(): WebGLTexture {
-        if(this.activeFramebufferIndex === null) return null
+        if (this.activeFramebufferIndex === null) return null
         return this.framebufferTextures[this.activeFramebufferIndex]
     }
 
     inactiveFramebufferTexture(): WebGLTexture {
-        if(this.inactiveFramebufferIndex === null) return null
+        if (this.inactiveFramebufferIndex === null) return null
         return this.framebufferTextures[this.inactiveFramebufferIndex]
     }
 
     swapFramebuffers(): void {
-        if(this.activeFramebufferIndex === null) {
+        if (this.activeFramebufferIndex === null) {
             this.activeFramebufferIndex = 0
             this.inactiveFramebufferIndex = 1
         }
@@ -133,7 +137,7 @@ export default class Screen {
 
         this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
 
-        for(let texture of this.framebufferTextures) {
+        for (let texture of this.framebufferTextures) {
             this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
             this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
 

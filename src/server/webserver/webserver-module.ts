@@ -4,8 +4,8 @@ import AjaxHandler from "./ajax/ajax-handler";
 import WebServer from "./webserver";
 
 export default class WebserverModule {
-	public priority: number;
-	public router = express.Router();
+    public priority: number;
+    public router = express.Router();
 	public webServer: WebServer
 
     // The lower priority, the later the handler is called.

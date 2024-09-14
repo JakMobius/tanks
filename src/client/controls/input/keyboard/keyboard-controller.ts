@@ -4,7 +4,8 @@ import KeyboardListener from "./keyboard-listener";
 import ShortcutTriggerAxle, {ShortcutTriggerAxleConfig} from "./shortcut-trigger-axle";
 
 export enum KeyboardInputType {
-    key, shortcutTrigger
+    key,
+    shortcutTrigger
 }
 
 export type KeyboardInputConfig =
@@ -17,7 +18,7 @@ export default class KeyboardController extends InputDevice {
     constructor() {
         super()
         this.listener = new KeyboardListener()
-        this.listener.startListening()
+        this.listener.setTarget(document.body)
     }
 
     getType(): InputDeviceType {

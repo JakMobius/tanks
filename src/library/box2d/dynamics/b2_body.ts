@@ -18,15 +18,15 @@
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
 // DEBUG: import { b2IsValid } from "../common/b2_math";
-import { b2Maybe } from "../common/b2_common";
-import { b2Vec2, b2Rot, b2Transform, b2Sweep, XY } from "../common/b2_math"
-import { b2Shape, b2MassData } from "../collision/b2_shape";
-import { b2ContactEdge } from "./b2_contact";
-import { b2JointEdge } from "./b2_joint";
-import { b2Fixture, b2FixtureDef, b2IFixtureDef } from "./b2_fixture";
-import { b2World } from "./b2_world";
+import {b2Maybe} from "../common/b2_common";
+import {b2Rot, b2Sweep, b2Transform, b2Vec2, XY} from "../common/b2_math"
+import {b2MassData, b2Shape} from "../collision/b2_shape";
+import {b2ContactEdge} from "./b2_contact";
+import {b2JointEdge} from "./b2_joint";
+import {b2Fixture, b2FixtureDef, b2IFixtureDef} from "./b2_fixture";
+import {b2World} from "./b2_world";
 // #if B2_ENABLE_CONTROLLER
-import { b2ControllerEdge } from "../controllers/b2_controller";
+import {b2ControllerEdge} from "../controllers/b2_controller";
 // #endif
 
 /// The body type.

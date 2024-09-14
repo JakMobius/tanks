@@ -16,12 +16,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2Transform } from "../common/b2_math";
-import { b2CollidePolygonAndCircle } from "../collision/b2_collide_circle";
-import { b2Manifold } from "../collision/b2_collision";
-import { b2CircleShape } from "../collision/b2_circle_shape";
-import { b2PolygonShape } from "../collision/b2_polygon_shape";
-import { b2Contact } from "./b2_contact";
+import {b2Transform} from "../common/b2_math";
+import {b2CollidePolygonAndCircle} from "../collision/b2_collide_circle";
+import {b2Manifold} from "../collision/b2_collision";
+import {b2CircleShape} from "../collision/b2_circle_shape";
+import {b2PolygonShape} from "../collision/b2_polygon_shape";
+import {b2Contact} from "./b2_contact";
 
 export class b2PolygonAndCircleContact extends b2Contact<b2PolygonShape, b2CircleShape> {
   public static Create(): b2Contact {

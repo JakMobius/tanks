@@ -1,77 +1,84 @@
-import HierarchicalComponent from "src/entity/components/hierarchical-component";
 import {TransmitterSet} from "./transmitter-set";
 import {ReceivingEnd} from "./receiving-end";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
-export default class EntityDataTransmitComponent extends HierarchicalComponent {
-    childTransmitComponents = new Map<number, EntityDataTransmitComponent>()
+export default class EntityDataTransmitComponent extends EventHandlerComponent {
     transmitterSets = new Map<ReceivingEnd, TransmitterSet>()
-    networkIdentifier: number | null = null
-    configScriptIndex: number = 0
     visibleAnywhere: boolean = false
-
-    private entitiesCreated: number = 0
+    ends = new Set<ReceivingEnd>()
+    parentEventHandler = new BasicEventHandlerSet()
 
     constructor() {
         super();
 
-        this.eventHandler.on("will-detach-from-parent", (child, parent) => {
-            for(let set of this.transmitterSets.values()) {
-                // This condition just reduces complexity
-                if(set.isAttachedToRoot()) set.handleParentDetach(parent)
-            }
+        this.eventHandler.on("detached-from-parent", (parent) => {
+            this.parentEventHandler.setTarget(parent)
+            this.updateParent()
         })
 
-        this.eventHandler.on("attached-to-parent", () => {
-            for(let set of this.transmitterSets.values()) {
-                if(!set.isAttachedToRoot()) set.handleTreeChange()
-            }
+        this.eventHandler.on("attached-to-parent", (parent) => {
+            this.parentEventHandler.setTarget(null)
+            this.updateParent()
         })
     }
 
-    setConfigScriptIndex(index: number) {
-        this.configScriptIndex = index
+    private updateParent() {
+        for (let transmitterSet of this.transmitterSets.values()) {
+            transmitterSet.updateParent()
+        }
     }
 
     hasTransmitterSetForEnd(receivingEnd: ReceivingEnd) {
         return this.transmitterSets.has(receivingEnd)
     }
 
-    createTransmitterSetFor(receivingEnd: ReceivingEnd) {
-        if(this.hasTransmitterSetForEnd(receivingEnd)) {
-            throw new Error("Transmitter set already exists for this receiving end")
-        }
-
-        let transmitterSet = new TransmitterSet(receivingEnd)
-        transmitterSet.setTransmitComponent(this)
-        this.transmitterSets.set(receivingEnd, transmitterSet)
-        this.entity.emit("transmitter-set-attached", transmitterSet)
-        receivingEnd.emit("transmitter-set-attached", transmitterSet)
-        return transmitterSet
-    }
-
     transmitterSetFor(receivingEnd: ReceivingEnd) {
         return this.transmitterSets.get(receivingEnd)
     }
 
-    removeTransmitterSet(receivingEnd: ReceivingEnd) {
+    createTransmitterSetFor(receivingEnd: ReceivingEnd) {
+        if (this.hasTransmitterSetForEnd(receivingEnd)) {
+            throw new Error("Transmitter set already exists for this receiving end")
+        }
+
+        let transmitterSet = new TransmitterSet(receivingEnd)
+        transmitterSet.transmitComponent = this
+        this.transmitterSets.set(receivingEnd, transmitterSet)
+        this.entity.emit("transmitter-set-added", transmitterSet)
+        receivingEnd.emit("transmitter-set-added", transmitterSet)
+
+        transmitterSet.updateParent()
+
+        return transmitterSet
+    }
+
+    clearTransmitterSets() {
+        for(let end of this.transmitterSets.keys()) {
+            this.removeTransmitterSetFor(end)
+        }
+    }
+
+    removeTransmitterSetFor(receivingEnd: ReceivingEnd) {
         let transmitterSet = this.transmitterSets.get(receivingEnd)
-        receivingEnd.emit("transmitter-set-detached", transmitterSet)
-        if(transmitterSet) {
-            transmitterSet.setTransmitComponent(null)
+        this.entity.emit("transmitter-set-removed", transmitterSet)
+        receivingEnd.emit("transmitter-set-removed", transmitterSet)
+        if (transmitterSet) {
+            // Notify the transmitter set that it's about to detach
+            transmitterSet.setIdTable(null)
+            transmitterSet.transmitComponent = null
+            transmitterSet.updateParent()
             this.transmitterSets.delete(receivingEnd)
         }
     }
 
-    protected childComponentAdded(component: EntityDataTransmitComponent) {
-        component.networkIdentifier = this.nextUnusedNetworkIdentifier()
-        this.childTransmitComponents.set(component.networkIdentifier, component)
+    detachReceivingEnd(end: ReceivingEnd) {
+        this.ends.delete(end)
+        this.transmitterSets.get(end)?.updateParent()
     }
 
-    protected childComponentDetached(component: EntityDataTransmitComponent) {
-        this.childTransmitComponents.delete(component.networkIdentifier)
-    }
-
-    private nextUnusedNetworkIdentifier() {
-        return this.entitiesCreated++
+    attachReceivingEnd(end: ReceivingEnd) {
+        this.ends.add(end)
+        this.transmitterSets.get(end)?.updateParent()
     }
 }

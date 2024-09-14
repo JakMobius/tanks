@@ -1,9 +1,11 @@
+import {ByteArray} from "src/serialization/binary/typed-buffer";
+import {Constructor} from "src/utils/constructor";
 
 export const epsilon = 1e-10
 
 export function trimFileExtension(name: string) {
     let parts = name.split(".")
-    if(parts.length > 1) parts.pop()
+    if (parts.length > 1) parts.pop()
     return parts.join(".")
 }
 
@@ -28,8 +30,8 @@ export function random(min: number, max: number) {
 }
 
 export function clamp(value: number, min: number, max: number) {
-    if(value < min) return min
-    if(value > max) return max
+    if (value < min) return min
+    if (value > max) return max
     return value
 }
 
@@ -37,7 +39,7 @@ export function clamp(value: number, min: number, max: number) {
  * Projects a number in [-inf, +inf] range to [-1, 1] range
  */
 export function makeLimited(n: number) {
-    if(n >= 0) return (1 - 1 / (1 + n))
+    if (n >= 0) return (1 - 1 / (1 + n))
     return (-1 - 1 / (n - 1))
 }
 
@@ -53,7 +55,7 @@ export function angleTangent(aX: number, aY: number, bX: number, bY: number, cX:
     let numerator = wY * vX - wX * vY
     let denominator = wX * vX + wY * vY
 
-    if(denominator === 0) return Infinity
+    if (denominator === 0) return Infinity
     return numerator / denominator
 }
 
@@ -108,4 +110,57 @@ export function areCollinear(aX: number, aY: number, bX: number, bY: number, cX:
  */
 export function areEqualToTheFlip(aX: number, aY: number, bX: number, bY: number, cX: number, cY: number, dX: number, dY: number) {
     return (aX == cX && aY == cY && bX == dX && bY == dY) || (aX == dX && aY == dY && bX == cX && bY == cY)
+}
+
+export function nonStrictSignComparator(a: number, b: number) {
+    const aSign = Math.sign(a)
+    const bSign = Math.sign(b)
+
+    return aSign == 0 || bSign == 0 || aSign == bSign
+}
+
+/**
+ * Returns radians-per-second value for given revolutions-per-minute value
+ */
+
+export function siValueFromRPM(rpm: number): number {
+    return rpm * 0.10471;
+}
+
+export function rpmFromSiValue(value: number): number {
+    return value * 9.55018;
+}
+
+export function siValueFromHorsepower(hp: number): number {
+    return hp * 735.5;
+}
+
+export function horsepowerFromSiValue(hp: number): number {
+    return hp / 735.5;
+}
+
+export function nextPowerOfTwo(x: number) {
+    x |= (x >> 1) & 0x7FFFFFFF;
+    x |= (x >> 2) & 0x3FFFFFFF;
+    x |= (x >> 4) & 0x0FFFFFFF;
+    x |= (x >> 8) & 0x00FFFFFF;
+    x |= (x >> 16) & 0x0000FFFF;
+    return x + 1;
+}
+
+export function expandTypedArray<T extends ByteArray>(constructor: Constructor<T>, array: T | null, size: number): T {
+    let newArray = new constructor(size)
+    if (array) newArray.set(array)
+    return newArray
+}
+
+export function chooseRandomIndex(from: Array<any>) {
+    return Math.floor(Math.random() * from.length)
+}
+
+export function chooseRandom<T>(from: Array<T>) {
+    if (!from.length) {
+        return undefined
+    }
+    return from[chooseRandomIndex(from)]
 }

@@ -17,12 +17,12 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2Maybe, b2_pi } from "../common/b2_common";
-import { b2Vec2, XY, b2Transform } from "../common/b2_math";
-import { b2Body } from "./b2_body";
-import { b2SolverData } from "./b2_time_step";
-import { b2Draw, b2Color } from "../common/b2_draw";
-import { b2PulleyJoint } from "./b2_pulley_joint";
+import {b2_pi, b2Maybe} from "../common/b2_common";
+import {b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2Body} from "./b2_body";
+import {b2SolverData} from "./b2_time_step";
+import {b2Color, b2Draw} from "../common/b2_draw";
+import {b2PulleyJoint} from "./b2_pulley_joint";
 
 export enum b2JointType {
   e_unknownJoint = 0,

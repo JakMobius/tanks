@@ -5,13 +5,13 @@ import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import B2DebugDraw from "./b2-debug-draw";
 import {b2DrawFlags} from "src/library/box2d/common/b2_draw";
-import WheeledTankBehaviour from "src/entity/tanks/physics/wheeled-tank/wheeled-tank-behaviour";
+import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
-import PhysicalHostComponent from "src/physiсal-world-component";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import ChunkedMapCollider from "src/physics/chunked-map-collider";
 import TransformComponent from "src/entity/components/transform-component";
-import TankBehaviour from "src/entity/tanks/physics/tank-behaviour";
 import Entity from "src/utils/ecs/entity";
+import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -41,10 +41,10 @@ export default class MapDebugDrawer {
 
     draw() {
         this.drawPhase.prepare()
-        //this.drawChunksDebug()
+        // this.drawChunksDebug()
         this.drawB2Debug()
         this.drawTanksWheelDebug()
-        this.drawPhase.draw()
+        this.drawPhase.runPrograms()
     }
 
     private drawChunksDebug() {
@@ -106,7 +106,7 @@ export default class MapDebugDrawer {
 
     private drawTanksWheelDebug() {
         for(let entity of this.world.children) {
-            let behaviourComponent = entity.getComponent(TankBehaviour)
+            let behaviourComponent = entity.getComponent(TankWheelsComponent)
             if(behaviourComponent) {
                 this.drawTankWheelDebug(entity)
             }
@@ -119,26 +119,28 @@ export default class MapDebugDrawer {
     }
 
     private drawTankWheelDebug(entity: Entity) {
-        const behaviour = entity.getComponent(WheeledTankBehaviour)
+        const behaviour = entity.getComponent(TankWheelsComponent)
         const transform = entity.getComponent(TransformComponent).transform
 
         if(!behaviour) return
 
-        let wheels = behaviour.wheels
+        let wheels = behaviour.getWheelGroups()
 
         let convexShapeProgram = this.drawPhase.getProgram(ConvexShapeProgram)
         let wheelSize = MapDebugDrawer.wheelSize
 
-        for(let wheel of wheels) {
-            let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
+        for(let wheelGroup of wheels) {
+            for(let wheel of wheelGroup.wheels) {
+                let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
 
-            turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
-            translateQuadrangle(wheelQuadrangle, wheel.position.x, wheel.position.y)
-            transformQuadrangle(wheelQuadrangle, transform)
+                turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
+                translateQuadrangle(wheelQuadrangle, wheel.x, wheel.y)
+                transformQuadrangle(wheelQuadrangle, transform)
 
-            let color = wheel.isSliding ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
+                let color = wheel.slideVelocity > 0 ? MapDebugDrawer.slidingWheelColor : MapDebugDrawer.wheelColor
 
-            convexShapeProgram.drawQuadrangle(wheelQuadrangle, color)
+                convexShapeProgram.drawQuadrangle(wheelQuadrangle, color)
+            }
         }
     }
 }

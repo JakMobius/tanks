@@ -16,12 +16,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2_linearSlop, b2_angularSlop, b2_maxAngularCorrection, b2Maybe } from "../common/b2_settings";
-import { b2Abs, b2Clamp, b2Vec2, b2Mat22, b2Rot, XY, b2Max, b2Transform } from "../common/b2_math";
-import { b2Body } from "./b2_body";
-import { b2Joint, b2JointDef, b2JointType, b2IJointDef } from "./b2_joint";
-import { b2SolverData } from "./b2_time_step";
-import { b2Draw, b2Color } from "../common/b2_draw";
+import {b2_angularSlop, b2_linearSlop, b2_maxAngularCorrection, b2Maybe} from "../common/b2_settings";
+import {b2Abs, b2Clamp, b2Mat22, b2Max, b2Rot, b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2Body} from "./b2_body";
+import {b2IJointDef, b2Joint, b2JointDef, b2JointType} from "./b2_joint";
+import {b2SolverData} from "./b2_time_step";
+import {b2Color, b2Draw} from "../common/b2_draw";
 
 export interface b2IRevoluteJointDef extends b2IJointDef {
   localAnchorA?: XY;

@@ -1,9 +1,9 @@
 /* @load-resource: '../../shaders/fragment/light-mask-texture-fragment.glsl' */
 /* @load-resource: '../../shaders/vertex/light-mask-texture-vertex.glsl' */
 
-import GLBuffer from '../../glbuffer';
-import Sprite from '../../../sprite';
-import Uniform from "src/client/graphics/uniform";
+import GLBuffer from 'src/client/graphics/gl/glbuffer';
+import Sprite from 'src/client/graphics/sprite';
+import Uniform from "src/client/graphics/gl/uniform";
 import CameraProgram from "../camera-program";
 import {Quadrangle} from "src/utils/quadrangle";
 
@@ -11,11 +11,13 @@ export const vertexShaderPath = "src/client/graphics/shaders/vertex/light-mask-t
 export const fragmentShaderPath = "src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl"
 
 export default class LightMaskTextureProgram extends CameraProgram {
-	public vertexBuffer: GLBuffer<Float32Array>;
-	public samplerUniform: Uniform;
-	public textureSizeUniform: Uniform;
-	public angleUniform: Uniform;
-	public vertices: number
+    public vertexBuffer: GLBuffer<Float32Array>;
+    public samplerUniform: Uniform;
+    public textureSizeUniform: Uniform;
+    public angleUniform: Uniform;
+    public vertices: number
+
+    public lightAngle: number = 0
 
     constructor(ctx: WebGLRenderingContext) {
         super(vertexShaderPath, fragmentShaderPath, ctx)
@@ -24,11 +26,11 @@ export default class LightMaskTextureProgram extends CameraProgram {
             clazz: Float32Array,
             drawMode: this.ctx.STATIC_DRAW,
             attributes: this.createVertexArrayAttributes([
-                { name: "a_vertex_position",         size: 3 },
-                { name: "a_vertex_angle",            size: 1 },
-                { name: "a_bright_texture_position", size: 2 },
-                { name: "a_dark_texture_position",   size: 2 },
-                { name: "a_mask_position",           size: 2 }
+                {name: "a_vertex_position", size: 3},
+                {name: "a_vertex_angle", size: 1},
+                {name: "a_bright_texture_position", size: 2},
+                {name: "a_dark_texture_position", size: 2},
+                {name: "a_mask_position", size: 2}
             ])
         })
 
@@ -45,12 +47,12 @@ export default class LightMaskTextureProgram extends CameraProgram {
 
     private normalizeAngle(angle: number) {
         let normalizedAngle = (angle / Math.PI / 2) % 1
-        if(normalizedAngle < 0) normalizedAngle += 1
+        if (normalizedAngle < 0) normalizedAngle += 1
         return normalizedAngle
     }
 
     setLightAngle(angle: number) {
-        this.angleUniform.set1f(this.normalizeAngle(angle))
+        this.lightAngle = angle
     }
 
     drawMaskedSprite(bright: Sprite, dark: Sprite, mask: Sprite, pos: Quadrangle, angle: number, z: number = 1) {
@@ -65,11 +67,11 @@ export default class LightMaskTextureProgram extends CameraProgram {
 
         this.vertexBuffer.appendArray([
             pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x2, pos.y2, z, angle, b.x + b.w, b.y,       d.x + d.w, d.y,       m.x + m.w, m.y,
-            pos.x4, pos.y4, z, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y,
+            pos.x2, pos.y2, z, angle, b.x + b.w, b.y, d.x + d.w, d.y, m.x + m.w, m.y,
+            pos.x4, pos.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y,
             pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x3, pos.y3, z, angle, b.x,       b.y + b.h, d.x,       d.y + d.h, m.x,       m.y + m.h,
-            pos.x4, pos.y4, z, angle, b.x,       b.y,       d.x,       d.y,       m.x,       m.y
+            pos.x3, pos.y3, z, angle, b.x, b.y + b.h, d.x, d.y + d.h, m.x, m.y + m.h,
+            pos.x4, pos.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y
         ])
 
         this.vertices += 6
@@ -82,6 +84,12 @@ export default class LightMaskTextureProgram extends CameraProgram {
 
     shouldDraw(): boolean {
         return this.vertexBuffer.pointer !== 0
+    }
+
+    bind() {
+        super.bind();
+
+        this.angleUniform.set1f(this.normalizeAngle(this.lightAngle))
     }
 
     draw() {

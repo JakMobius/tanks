@@ -1,6 +1,6 @@
 import {Db, MongoClient} from 'mongodb';
 import ServerDatabase from "../server-database";
-import {UserDataRaw} from "src/client/user-data-raw";
+import {UserDataRaw} from "src/client/utils/user-data-raw";
 import MongoStore from "connect-mongo";
 import session from "express-session";
 
@@ -29,6 +29,10 @@ export default class MongoDatabase implements ServerDatabase {
             useUnifiedTopology: true,
             auth: config.auth
         })
+    }
+
+    modifyUserInfo(login: string, data: UserDataRaw): Promise<void> {
+        throw new Error("Method not implemented.");
     }
 
     async connect() {

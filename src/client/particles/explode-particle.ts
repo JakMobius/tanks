@@ -8,14 +8,14 @@ export interface ExplodeParticleConfig extends ParticleConfig {
 
 export default class ExplodeParticle extends FireParticle {
     createColors(config: ExplodeParticleConfig) {
-        let varying = 30
+        let varying = 0.11
         return [
-            [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, config.startOpacity],
-            [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, 0.2],
-            [255 - Math.random() * varying, 128 - Math.random() * varying, Math.random() * varying, 0.3],
-            [255 - Math.random() * varying, 128 - Math.random() * varying, Math.random() * varying, 0.2 * (1 + Math.min(0, config.shifting))],
-            [115 - Math.random() * varying, 115 - Math.random() * varying, 115 - Math.random() * varying, 0.2 * (1 + Math.min(0, config.shifting))],
-            [115 - Math.random() * varying, 115 - Math.random() * varying, 115 - Math.random() * varying, 0]
+            [1 - Math.random() * varying, 1 - Math.random() * varying, Math.random() * varying, config.startOpacity],
+            [1 - Math.random() * varying, 1 - Math.random() * varying, Math.random() * varying, 0.2],
+            [1 - Math.random() * varying, 0.5 - Math.random() * varying, Math.random() * varying, 0.3],
+            [1 - Math.random() * varying, 0.5 - Math.random() * varying, Math.random() * varying, 0.2 * (1 + Math.min(0, config.shifting))],
+            [0.45 - Math.random() * varying, 0.45 - Math.random() * varying, 0.45 - Math.random() * varying, 0.2 * (1 + Math.min(0, config.shifting))],
+            [0.45 - Math.random() * varying, 0.45 - Math.random() * varying, 0.45 - Math.random() * varying, 0]
         ]
     }
 

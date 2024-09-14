@@ -5,8 +5,8 @@ export default class MaskTextureProgramController extends BasicCameraProgramCont
 
     public lightAngle: number = 1.5
 
-    protected didBind() {
-        super.didBind();
+    reset() {
+        super.reset();
         this.program.setLightAngle(this.lightAngle)
     }
 }

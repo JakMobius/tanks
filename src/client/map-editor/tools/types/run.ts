@@ -4,7 +4,7 @@ import KeyboardController from '../../../controls/input/keyboard/keyboard-contro
 import ToolManager from "../toolmanager";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TankControls from "src/controls/tank-controls";
-import ControlsManager from "src/client/controls/controls-manager";
+import RootControlsResponder from "src/client/controls/root-controls-responder";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
@@ -21,7 +21,7 @@ export default class RunTool extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/img/tank.png"
+        this.image = "assets/map-editor/tank.png"
         this.setupMenu()
         this.selectingLocation = false
 
@@ -32,12 +32,12 @@ export default class RunTool extends Tool {
 
         this.runButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/img/start.png)")
+            .css("background-image", "url(assets/map-editor/start.png)")
             .on("click",() => this.toggle())
 
         this.locationButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/img/locate.png)")
+            .css("background-image", "url(assets/map-editor/locate.png)")
             .on("click",() => this.toggleSelectLocation())
 
         this.settingsView = $("<div>")
@@ -59,37 +59,36 @@ export default class RunTool extends Tool {
     onRun() {
         this.manager.setNeedsRedraw()
         this.manager.setWorldAlive(true)
-        this.manager.setCameraMovementEnabled(false)
+        // this.manager.setCameraMovementEnabled(false)
 
         // TODO: Setup an embedded server to run the game on
         // Client-only implementation limits the game functionality a lot
 
         this.tank = new Entity()
-        ClientEntityPrefabs.types.get(EntityType.TANK_MONSTER)(this.tank)
+        ClientEntityPrefabs.types.get(EntityType.TANK_SNIPER)(this.tank)
         this.manager.world.appendChild(this.tank)
-        this.tank.emit("respawn")
 
         const physicalComponent = this.tank.getComponent(PhysicalComponent)
         physicalComponent.setPosition(this.spawnPoint)
-        ControlsManager.getInstance().connectTankControls(this.tank.getComponent(TankControls))
+        RootControlsResponder.getInstance().connectTankControls(this.tank.getComponent(TankControls))
 
-        this.manager.camera.inertial = true
-        this.manager.camera.target = physicalComponent.body.GetPosition()
-        this.manager.camera.targetVelocity = physicalComponent.body.GetLinearVelocity()
+        // this.manager.camera.inertial = true
+        // this.manager.camera.target = physicalComponent.body.GetPosition()
+        // this.manager.camera.targetVelocity = physicalComponent.body.GetLinearVelocity()
     }
 
     onStop() {
         this.manager.setWorldAlive(false)
-        this.manager.setCameraMovementEnabled(true)
+        // this.manager.setCameraMovementEnabled(true)
 
         this.tank.removeFromParent()
 
-        ControlsManager.getInstance().disconnectTankControls(this.tank.getComponent(TankControls))
+        RootControlsResponder.getInstance().disconnectTankControls(this.tank.getComponent(TankControls))
 
-        this.manager.camera.target = this.manager.camera.getPosition()
-        this.manager.camera.shaking.Set(0, 0)
-        this.manager.camera.shakeVelocity.Set(0, 0)
-        this.manager.camera.inertial = false
+        // this.manager.camera.target = this.manager.camera.getPosition()
+        // this.manager.camera.shaking.Set(0, 0)
+        // this.manager.camera.shakeVelocity.Set(0, 0)
+        // this.manager.camera.inertial = false
     }
 
     toggleSelectLocation() {

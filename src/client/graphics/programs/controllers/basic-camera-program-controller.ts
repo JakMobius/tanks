@@ -1,6 +1,6 @@
 import ProgramController from "./program-controller";
 import CameraProgram from "../camera-program";
-import Camera from "src/client/camera";
+import Camera from "src/client/graphics/camera";
 
 export default class BasicCameraProgramController<ProgramClass extends CameraProgram = CameraProgram> extends ProgramController<ProgramClass> {
 
@@ -13,16 +13,12 @@ export default class BasicCameraProgramController<ProgramClass extends CameraPro
 
     reset() {
         this.program.reset()
-    }
-
-    protected didBind() {
         this.program.setCamera(this.camera)
     }
 
     draw() {
         if(this.program.shouldDraw()) {
             this.program.bind()
-            this.didBind()
             this.program.draw()
             this.program.clean()
         }

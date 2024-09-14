@@ -16,9 +16,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2Vec2, XY } from "../common/b2_math";
-import { b2AABB, b2RayCastInput } from "./b2_collision";
-import { b2TreeNode, b2DynamicTree } from "./b2_dynamic_tree";
+import {b2Vec2, XY} from "../common/b2_math";
+import {b2AABB, b2RayCastInput} from "./b2_collision";
+import {b2DynamicTree, b2TreeNode} from "./b2_dynamic_tree";
 
 export class b2Pair<T> {
   constructor(public proxyA: b2TreeNode<T>, public proxyB: b2TreeNode<T>) { }

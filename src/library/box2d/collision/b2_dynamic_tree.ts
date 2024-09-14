@@ -17,10 +17,10 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_aabbExtension, b2_aabbMultiplier } from "../common/b2_settings";
-import { b2Abs, b2Min, b2Max, b2Vec2, XY } from "../common/b2_math";
-import { b2GrowableStack } from "../common/b2_growable_stack";
-import { b2AABB, b2RayCastInput, b2TestOverlapAABB } from "./b2_collision";
+import {b2_aabbExtension, b2_aabbMultiplier} from "../common/b2_settings";
+import {b2Abs, b2Max, b2Min, b2Vec2, XY} from "../common/b2_math";
+import {b2GrowableStack} from "../common/b2_growable_stack";
+import {b2AABB, b2RayCastInput, b2TestOverlapAABB} from "./b2_collision";
 
 function verify<T>(value: T | null): T {
   if (value === null) { throw new Error(); }

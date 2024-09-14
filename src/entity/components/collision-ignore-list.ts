@@ -1,33 +1,23 @@
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import CollisionIgnoreListTransmitter from "./network/collisions/collision-ignore-list-transmitter";
 import * as Box2D from "src/library/box2d"
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import PhysicalComponent from "src/entity/components/physics-component";
 
-export default class CollisionIgnoreList implements Component {
-    entity: Entity | null;
+export default class CollisionIgnoreList extends EventHandlerComponent {
     ignoreList = new Set<Entity>()
-    private entityHandler = new BasicEventHandlerSet()
 
     constructor() {
-        this.entityHandler.on("should-collide", (body: Box2D.Body) => {
-            return !this.ignoreList.has(body.GetUserData());
+        super()
+        this.eventHandler.on("should-collide", (body: Box2D.Body) => {
+            let entity = PhysicalComponent.getEntityFromBody(body)
+            return !this.ignoreList.has(entity);
         })
 
-        this.entityHandler.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(CollisionIgnoreListTransmitter)
         })
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.entityHandler.setTarget(this.entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.entityHandler.setTarget(this.entity)
     }
 
     private ignoreCollisionsWith(entity: Entity) {

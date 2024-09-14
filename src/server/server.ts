@@ -12,6 +12,7 @@ import ClusterHandshakeConnection from "./socket/participant-client/cluster-hand
 import WebsocketConnection from "./websocket-connection";
 import Connection from "../networking/connection";
 import ConnectionClient from "../networking/connection-client";
+import * as path from "path";
 
 export interface ServerClusterConfig {
     url: string
@@ -25,7 +26,8 @@ export interface WebServerConfig {
 
 export interface GeneralServerConfig {
     port: number,
-    mapsDirectory: string
+    mapsDirectory: string,
+    resourcesDirectory: string
 }
 
 export interface ServerConfig {
@@ -67,9 +69,6 @@ export default class Server extends EventEmitter {
         this.hubPageActive = active
 
         this.setWebServerActive(this.hubPageActive || this.gamePageActive)
-        if(this.webServer) {
-            this.webServer.hubModule.enabled = active
-        }
 
         this.setClusterSocketServerActive(active)
         this.setClusterClientActive(!active)
@@ -120,7 +119,7 @@ export default class Server extends EventEmitter {
     }
 
     setClusterClientActive(active: boolean): void {
-        if(this.config.cluster === null) return
+        if(!this.config.cluster) return
 
         if(active) {
             if(this.clusterClient) return
@@ -140,7 +139,7 @@ export default class Server extends EventEmitter {
     }
 
     setClusterSocketServerActive(active: boolean): void {
-        if(this.config.cluster === null) return
+        if(!this.config.cluster) return
 
         if(active) {
             if(this.clusterSocket) return
@@ -197,5 +196,9 @@ export default class Server extends EventEmitter {
         await this.db.disconnect(false)
 
         this.emit("terminate")
+    }
+
+    getResourcePath(web: string) {
+        return path.resolve(this.config.general.resourcesDirectory, web)
     }
 }

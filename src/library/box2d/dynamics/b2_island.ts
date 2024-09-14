@@ -17,19 +17,24 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxFloat, b2_timeToSleep } from "../common/b2_settings";
-import { b2_maxTranslation, b2_maxTranslationSquared } from "../common/b2_settings";
-import { b2_maxRotation, b2_maxRotationSquared } from "../common/b2_settings";
-import { b2_linearSleepTolerance, b2_angularSleepTolerance } from "../common/b2_settings";
-import { b2Abs, b2Min, b2Max, b2Vec2 } from "../common/b2_math";
-import { b2Timer } from "../common/b2_timer";
-import { b2Contact } from "./b2_contact";
-import { b2ContactSolver, b2ContactSolverDef } from "./b2_contact_solver";
-import { b2ContactVelocityConstraint } from "./b2_contact_solver";
-import { b2Joint } from "./b2_joint";
-import { b2Body, b2BodyType } from "./b2_body";
-import { b2TimeStep, b2Profile, b2SolverData, b2Position, b2Velocity } from "./b2_time_step";
-import { b2ContactImpulse, b2ContactListener } from "./b2_world_callbacks";
+import {
+    b2_angularSleepTolerance,
+    b2_linearSleepTolerance,
+    b2_maxFloat,
+    b2_maxRotation,
+    b2_maxRotationSquared,
+    b2_maxTranslation,
+    b2_maxTranslationSquared,
+    b2_timeToSleep
+} from "../common/b2_settings";
+import {b2Abs, b2Max, b2Min, b2Vec2} from "../common/b2_math";
+import {b2Timer} from "../common/b2_timer";
+import {b2Contact} from "./b2_contact";
+import {b2ContactSolver, b2ContactSolverDef, b2ContactVelocityConstraint} from "./b2_contact_solver";
+import {b2Joint} from "./b2_joint";
+import {b2Body, b2BodyType} from "./b2_body";
+import {b2Position, b2Profile, b2SolverData, b2TimeStep, b2Velocity} from "./b2_time_step";
+import {b2ContactImpulse, b2ContactListener} from "./b2_world_callbacks";
 
 /*
 Position Correction Notes

@@ -81,6 +81,10 @@ export default class Loop {
         }
     }
 
+    clearScheduledTask(index: number) {
+        this.schedule.delete(index)
+    }
+
     scheduleTask(func: () => void, time: number = 0) {
         time = time || 0
         let index = this.schedules ++

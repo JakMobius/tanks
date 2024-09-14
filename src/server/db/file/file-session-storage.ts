@@ -31,6 +31,6 @@ export default class FileSessionStorage extends session.Store {
     }
 
     set(sid: string, session: session.SessionData, callback?: (err?: any) => void): void {
-        this.config.db.createStorageAtPath("sessions/" + sid, session).then(() => callback()).catch(callback)
+        this.config.db.writeStorageAtPath("sessions/" + sid, session).then(() => callback()).catch(callback)
     }
 }

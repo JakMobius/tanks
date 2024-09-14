@@ -1,8 +1,8 @@
-import { b2_maxFloat, b2_epsilon } from "../common/b2_settings";
-import { b2Vec2, b2Transform } from "../common/b2_math";
-import { b2Manifold, b2ManifoldType } from "./b2_collision";
-import { b2CircleShape } from "./b2_circle_shape";
-import { b2PolygonShape } from "./b2_polygon_shape";
+import {b2_epsilon, b2_maxFloat} from "../common/b2_settings";
+import {b2Transform, b2Vec2} from "../common/b2_math";
+import {b2Manifold, b2ManifoldType} from "./b2_collision";
+import {b2CircleShape} from "./b2_circle_shape";
+import {b2PolygonShape} from "./b2_polygon_shape";
 
 const b2CollideCircles_s_pA: b2Vec2 = new b2Vec2();
 const b2CollideCircles_s_pB: b2Vec2 = new b2Vec2();

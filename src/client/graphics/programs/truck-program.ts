@@ -1,8 +1,8 @@
 /* @load-resource: '../shaders/fragment/truck-fragment.glsl' */
 /* @load-resource: '../shaders/vertex/truck-vertex.glsl' */
 
-import GLBuffer from '../glbuffer';
-import Sprite from "src/client/sprite";
+import GLBuffer from 'src/client/graphics/gl/glbuffer';
+import Sprite from "src/client/graphics/sprite";
 import CameraProgram from "./camera-program";
 import {Quadrangle} from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";

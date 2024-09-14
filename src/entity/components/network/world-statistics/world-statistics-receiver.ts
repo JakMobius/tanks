@@ -7,7 +7,7 @@ export default class WorldStatisticsReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
         receiveComponent.commandHandlers.set(Commands.WORLD_PLAYER_STATISTICS_COMMAND, (buffer) => {
-            this.getWorldStatistics().setPlayerStatistics(this.readObject(buffer))
+            this.getWorldStatistics().setPlayerStatistics(receiveComponent.readObject(buffer))
         })
 
         receiveComponent.commandHandlers.set(Commands.WORLD_MAP_NAME_COMMAND, (buffer) => {
@@ -15,7 +15,7 @@ export default class WorldStatisticsReceiver extends ReceiverComponent {
         })
 
         receiveComponent.commandHandlers.set(Commands.WORLD_MATCH_TIMER_COMMAND, (buffer) => {
-            this.getWorldStatistics().setMatchLeftTimer(this.readEntity(buffer))
+            this.getWorldStatistics().setMatchLeftTimer(receiveComponent.readEntity(buffer))
         })
     }
 

@@ -1,14 +1,14 @@
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2ShapeType } from "../collision/b2_shape";
-import { b2Contact } from "./b2_contact";
-import { b2CircleContact } from "./b2_circle_contact";
-import { b2PolygonContact } from "./b2_polygon_contact";
-import { b2PolygonAndCircleContact } from "./b2_polygon_circle_contact";
-import { b2EdgeAndCircleContact } from "./b2_edge_circle_contact";
-import { b2EdgeAndPolygonContact } from "./b2_edge_polygon_contact";
-import { b2ChainAndCircleContact } from "./b2_chain_circle_contact";
-import { b2ChainAndPolygonContact } from "./b2_chain_polygon_contact";
-import { b2Fixture } from "./b2_fixture";
+import {b2ShapeType} from "../collision/b2_shape";
+import {b2Contact} from "./b2_contact";
+import {b2CircleContact} from "./b2_circle_contact";
+import {b2PolygonContact} from "./b2_polygon_contact";
+import {b2PolygonAndCircleContact} from "./b2_polygon_circle_contact";
+import {b2EdgeAndCircleContact} from "./b2_edge_circle_contact";
+import {b2EdgeAndPolygonContact} from "./b2_edge_polygon_contact";
+import {b2ChainAndCircleContact} from "./b2_chain_circle_contact";
+import {b2ChainAndPolygonContact} from "./b2_chain_polygon_contact";
+import {b2Fixture} from "./b2_fixture";
 
 export class b2ContactRegister {
   public pool: b2Contact[] = [];

@@ -37,7 +37,7 @@
  * @module webgl-2d-math
  */
 
-function multiply(a: Float32Array, b: Float32Array) {
+export function multiply(a: Float32Array, b: Float32Array) {
     const a00 = a[0];
     const a01 = a[1];
     const a02 = a[2];
@@ -71,7 +71,7 @@ function multiply(a: Float32Array, b: Float32Array) {
 }
 
 
-function identity() {
+export function identity() {
     return new Float32Array([
         1, 0, 0,
         0, 1, 0,
@@ -79,7 +79,7 @@ function identity() {
     ]);
 }
 
-function translation(tx: number, ty: number) {
+export function translation(tx: number, ty: number) {
     return new Float32Array([
         1, 0, 0,
         0, 1, 0,
@@ -87,11 +87,11 @@ function translation(tx: number, ty: number) {
     ]);
 }
 
-function translate(m: Float32Array, tx: number, ty: number) {
+export function translate(m: Float32Array, tx: number, ty: number) {
     return multiply(m, translation(tx, ty));
 }
 
-function rotation(s: number, c: number) {
+export function rotation(s: number, c: number) {
     return new Float32Array([
         c, -s, 0,
         s, c, 0,
@@ -99,15 +99,15 @@ function rotation(s: number, c: number) {
     ]);
 }
 
-function rotate(m: Float32Array, angle: number) {
+export function rotate(m: Float32Array, angle: number) {
     return multiply(m, rotation(Math.sin(angle), Math.cos(angle)));
 }
 
-function turn(m: Float32Array, s: number, c: number) {
+export function turn(m: Float32Array, s: number, c: number) {
     return multiply(m, rotation(s, c));
 }
 
-function scaling(sx: number, sy: number) {
+export function scaling(sx: number, sy: number) {
     return new Float32Array([
         sx, 0, 0,
         0, sy, 0,
@@ -115,11 +115,11 @@ function scaling(sx: number, sy: number) {
     ]);
 }
 
-function scale(m: Float32Array, sx: number, sy: number) {
+export function scale(m: Float32Array, sx: number, sy: number) {
     return multiply(m, scaling(sx, sy));
 }
 
-function inverse(m: Float32Array) {
+export function inverse(m: Float32Array) {
     const t00 = m[3 + 1] * m[2 * 3 + 2] - m[3 + 2] * m[2 * 3 + 1];
     const t10 = m[1] * m[2 * 3 + 2] - m[2] * m[2 * 3 + 1];
     const t20 = m[1] * m[3 + 2] - m[2] * m[3 + 1];
@@ -140,12 +140,16 @@ export default class Matrix3 {
     public m: Float32Array;
     public stack: Float32Array[];
 
-    constructor() {
-        this.m = new Float32Array([
-            1, 0, 0,
-            0, 1, 0,
-            0, 0, 1,
-        ])
+    constructor(data?: Float32Array) {
+        if(!data) {
+            this.m = new Float32Array([
+                1, 0, 0,
+                0, 1, 0,
+                0, 0, 1,
+            ])
+        } else {
+            this.m = data
+        }
         this.stack = []
     }
 
@@ -159,6 +163,10 @@ export default class Matrix3 {
 
     inverse() {
         this.m = inverse(this.m)
+    }
+
+    inverted() {
+        return new Matrix3(inverse(this.m))
     }
 
     rotate(angle: number) {
@@ -187,6 +195,10 @@ export default class Matrix3 {
 
     transformY(x: number, y: number, z: number = 1) {
         return this.m[1] * x + this.m[4] * y + this.m[7] * z
+    }
+
+    multiply(other: Matrix3) {
+        this.m = multiply(this.m, other.m)
     }
 
     reset() {

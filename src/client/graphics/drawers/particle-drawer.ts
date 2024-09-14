@@ -14,10 +14,7 @@ export default class ParticleDrawer {
         const w = particle.width / 2
         const h = particle.height / 2
 
-        const r = particle.color.getRed() & 0xff
-        const g = particle.color.getGreen() & 0xff
-        const b = particle.color.getBlue() & 0xff
-        const colorData = ConvexShapeProgram.getColor(r, g, b, alpha)
+        const colorData = particle.color.getUint32()
 
         program.drawConvexShape([
             particle.x - w, particle.y - h,

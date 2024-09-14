@@ -18,10 +18,12 @@ export default class PositionTransmitter extends Transmitter {
     onEnable() {
         super.onEnable();
         this.sendPositionUpdate()
+        // console.log("enable")
     }
 
     sendPositionUpdate() {
-        let body = this.getEntity().getComponent(PhysicalComponent).getBody()
+        let component = this.getEntity().getComponent(PhysicalComponent)
+        let body = component.getBody()
         if(!body) return;
 
         this.packIfEnabled(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
@@ -36,6 +38,9 @@ export default class PositionTransmitter extends Transmitter {
             buffer.writeFloat32(velocity.x)
             buffer.writeFloat32(velocity.y)
             buffer.writeFloat32(angular)
+
+            buffer.writeUint16(component.host.worldTicks)
+            buffer.writeFloat32(component.host.physicsTick)
         })
     }
 }

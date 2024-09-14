@@ -1,10 +1,11 @@
 import Command, {CommandConfig} from '../command';
-import WorldExplodeEffectModel from 'src/effects/models/world-explode-effect-model';
-import ServerEffect from "src/server/effects/server-effect";
-import EffectHostComponent from "src/effects/effect-host-component";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import Entity from "src/utils/ecs/entity";
+import {EntityType} from "src/entity/entity-type";
+import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 
 export default class ExplodeCommand extends Command {
-	public defaultPower: number;
+    public defaultPower: number;
 
     constructor(options?: CommandConfig) {
         super(options);
@@ -15,7 +16,7 @@ export default class ExplodeCommand extends Command {
     onPerform(args: string[]): void {
         let logger = this.console.logger
 
-        if(args.length < 2) {
+        if (args.length < 2) {
             logger.log(this.getHelp())
             return
         }
@@ -24,30 +25,28 @@ export default class ExplodeCommand extends Command {
         let y = Number(args[1])
         let power = args.length > 2 ? Number(args[2]) : this.defaultPower
 
-        if(!Number.isFinite(x)) {
+        if (!Number.isFinite(x)) {
             logger.log("'" + args[0] + "' is not a number")
             return
         }
 
-        if(!Number.isFinite(y)) {
+        if (!Number.isFinite(y)) {
             logger.log("'" + args[1] + "' is not a number")
             return
         }
 
-        if(!Number.isFinite(power)) {
+        if (!Number.isFinite(power)) {
             logger.log("'" + args[2] + "' is not a number")
             return
         }
 
         let world = this.console.observingRoom
-        let effect = new WorldExplodeEffectModel({
-            x: x,
-            y: y,
-            power: power
-        })
 
-        let serverEffect = ServerEffect.fromModel(effect)
-        world.getComponent(EffectHostComponent).addEffect(serverEffect)
+        let explodeEntity = new Entity()
+        ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
+        world.appendChild(explodeEntity)
+        explodeEntity.getComponent(ExplodeComponent).explode(x, y, power)
+        explodeEntity.removeFromParent()
     }
 
     getName() {

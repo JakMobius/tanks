@@ -1,23 +1,21 @@
-import {Component} from "../utils/ecs/component";
 import Entity from "../utils/ecs/entity";
 import GameMap from "../map/game-map";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {TransmitterSet} from "../entity/components/network/transmitting/transmitter-set";
 import MapTransmitter from "../entity/components/network/map/map-transmitter";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
-export default class TilemapComponent implements Component {
-
-    entity: Entity | null
+export default class TilemapComponent extends EventHandlerComponent {
     map?: GameMap
     private mapEventHandler = new BasicEventHandlerSet()
-    private eventHandler = new BasicEventHandlerSet()
 
     constructor() {
+        super()
         this.mapEventHandler.on("block-update", (x, y) => this.entity.emit("map-block-update", x, y))
         this.mapEventHandler.on("block-damage", (event) => this.entity.emit("map-block-damage", event))
         this.mapEventHandler.on("block-change", (event) => this.entity.emit("map-block-change", event))
 
-        this.eventHandler.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(MapTransmitter)
         })
     }
@@ -29,14 +27,12 @@ export default class TilemapComponent implements Component {
     }
 
     onAttach(entity: Entity) {
-        this.entity = entity;
-        this.eventHandler.setTarget(this.entity)
+        super.onAttach(entity)
     }
 
     onDetach() {
-        this.entity = null;
-        this.mapEventHandler.setTarget(null)
-        this.eventHandler.setTarget(this.entity)
+        super.onDetach()
+        this.setMap(null)
     }
 
 }

@@ -1,4 +1,4 @@
-import {base64ToBytes, bytesToBase64} from '../../utils/base64';
+import {base64ToBytes, bytesToBase64} from 'src/utils/base64';
 import pako from 'pako';
 import ReadBuffer from "src/serialization/binary/read-buffer";
 import WriteBuffer from "src/serialization/binary/write-buffer";
@@ -6,6 +6,7 @@ import MapSerialization from "src/map/map-serialization";
 import GameMap from "src/map/game-map";
 import GameMapNameComponent from "./map-name-component";
 import GameMapHistoryComponent from "./history/game-map-history-component";
+import GameMapSizeComponent from "src/client/map-editor/map-size-component";
 
 export default class MapStorage {
 
@@ -30,6 +31,9 @@ export default class MapStorage {
 
                         let nameComponent = map.getComponent(GameMapNameComponent)
                         let historyComponent = map.getComponent(GameMapHistoryComponent)
+                        let sizeComponent = new GameMapSizeComponent()
+                        sizeComponent.size = bytes.byteLength
+                        map.addComponent(sizeComponent)
 
                         if (!nameComponent) {
                             nameComponent = new GameMapNameComponent()
@@ -54,7 +58,7 @@ export default class MapStorage {
             }
             return result
         }
-        return []
+        return [] as GameMap[]
     }
 
     static write(maps: GameMap[]) {
@@ -64,6 +68,8 @@ export default class MapStorage {
 
         for(let i = 0; i < length; i++) {
             let bytes = pako.gzip(MapSerialization.toBuffer(maps[i]))
+
+            maps[i].getComponent(GameMapSizeComponent).size = bytes.byteLength
 
             buffer.writeInt32(bytes.length)
             buffer.writeBytes(bytes)

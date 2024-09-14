@@ -1,10 +1,10 @@
 import {DamageTypes} from "src/entity/components/health-component";
-import Player from "../player";
+import Entity from "src/utils/ecs/entity";
 
 export default class DamageReason {
 
     damageType = DamageTypes.UNKNOWN
-    players: Player[] | null = null
+    player: Entity | null = null
 
     constructor() {
 

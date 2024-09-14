@@ -1,6 +1,5 @@
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import MapDrawer from '../../../graphics/drawers/map-drawer';
 import MapAreaModification from '../../history/modification/map-area-modification';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
@@ -13,31 +12,56 @@ import {createOverlappingModel} from "src/utils/wfc/overlapping-model";
 import {createSuperposition} from "src/utils/wfc/superposition";
 import {createObservation} from "src/utils/wfc/observe";
 import {propagate} from "src/utils/wfc/propagate";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import ControlsManager from "src/client/controls/controls-manager";
+import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import Entity from "src/utils/ecs/entity";
+
+export class AreaToolDrawer extends EntityDrawer {
+    private tool: AreaTool;
+
+    constructor(tool: AreaTool) {
+        super();
+
+        this.tool = tool
+    }
+
+    draw(phase: DrawPhase) {
+        const program = phase.getProgram(ConvexShapeProgram)
+
+        if(this.tool.area.isValid()) {
+
+            program.drawRectangle(
+                this.tool.area.minX * GameMap.BLOCK_SIZE,
+                this.tool.area.minY * GameMap.BLOCK_SIZE,
+                this.tool.area.maxX * GameMap.BLOCK_SIZE,
+                this.tool.area.maxY * GameMap.BLOCK_SIZE,
+                0x7F7F7F7F
+            )
+        }
+    }
+}
 
 export default class AreaTool extends Tool {
 	public area: Rectangle;
 	public program: ConvexShapeProgram;
-	public copyBufferDrawer: MapDrawer;
 	public copyBuffer: GameMap;
 	public keyboard: KeyboardListener;
 	public initialAreaState: boolean;
 	public movingArea: boolean;
 	public pasting: boolean;
 	public hover: boolean;
-	public oldX: number;
-	public oldY: number;
+	public oldX: number | null = null;
+	public oldY: number | null = null;
 
-    public controlsEventHandler = new BasicEventHandlerSet()
+    public visibleEntity = new Entity()
 
     constructor(manager: ToolManager) {
         super(manager);
 
+        this.visibleEntity.addComponent(new AreaToolDrawer(this))
+
         this.area = new Rectangle()
-        this.image = "assets/img/area.png"
-        this.program = new ConvexShapeProgram(this.manager.screen.ctx)
-        this.copyBufferDrawer = new MapDrawer(this.manager.screen)
+        this.image = "assets/map-editor/area.png"
 
         this.copyBuffer = null
 
@@ -86,7 +110,7 @@ export default class AreaTool extends Tool {
             width: this.copyBuffer.width,
             height: this.copyBuffer.height,
             data: new Uint8ClampedArray(this.copyBuffer.data.map(block => (block.constructor as typeof BlockState).typeId))
-        }
+        } as ImageData
         const model = createOverlappingModel(image, { periodicInput: false });
         const superpos = createSuperposition(
             model.numCoefficients,
@@ -154,7 +178,9 @@ export default class AreaTool extends Tool {
                 requestAnimationFrame(() => step())
 
             } else if(result === false) {
-                this.manager.createEvent("Не удалось заполнить область")
+                modification.fetchData()
+                modification.newData = newData
+                modification.perform()
                 return
             } else {
                 return
@@ -249,9 +275,9 @@ export default class AreaTool extends Tool {
         this.pasting = true
         let width = this.copyBuffer.width
         let height = this.copyBuffer.height
-        let position = this.manager.camera.position
-        let cameraX = Math.floor(position.x / GameMap.BLOCK_SIZE)
-        let cameraY = Math.floor(position.y / GameMap.BLOCK_SIZE)
+
+        let cameraX = 0
+        let cameraY = 0
 
         this.area.setFrom(Math.floor(cameraX - width / 2), Math.floor(cameraY - height / 2))
         this.area.setTo(Math.floor(cameraX + width / 2), Math.floor(cameraY + height / 2))
@@ -319,8 +345,8 @@ export default class AreaTool extends Tool {
         this.initialAreaState = true
     }
 
-    mouseUp() {
-        super.mouseUp();
+    mouseUp(x: number, y: number) {
+        super.mouseUp(x, y);
 
         if(this.area.width() === 0 && this.area.height() === 0) {
             if(this.pasting) {
@@ -370,55 +396,17 @@ export default class AreaTool extends Tool {
         this.oldY = y
     }
 
-    drawDecorations() {
-        super.drawDecorations();
-
-        this.program.reset()
-
-        if(this.area.isValid()) {
-
-            this.program.drawRectangle(
-                this.area.minX * GameMap.BLOCK_SIZE,
-                this.area.minY * GameMap.BLOCK_SIZE,
-                this.area.maxX * GameMap.BLOCK_SIZE,
-                this.area.maxY * GameMap.BLOCK_SIZE,
-                0x7F7F7F7F
-            )
-        }
-
-        this.program.bind()
-        this.program.setCamera(this.manager.camera)
-        this.program.draw()
-
-        if(this.pasting) {
-            this.manager.camera.matrix.save()
-
-            let x = this.area.minX * GameMap.BLOCK_SIZE
-            let y = this.area.minY * GameMap.BLOCK_SIZE
-
-            this.manager.camera.position.x -= x
-            this.manager.camera.position.y -= y
-
-            this.manager.camera.matrix.translate(x, y)
-            this.copyBufferDrawer.drawMap(this.copyBuffer, this.manager.camera)
-            this.manager.camera.matrix.restore()
-
-            this.manager.camera.position.x += x
-            this.manager.camera.position.y += y
-        }
-    }
-
     becomeActive() {
         super.becomeActive();
 
         this.manager.setNeedsRedraw()
-        this.controlsEventHandler.setTarget(ControlsManager.getInstance())
+        this.manager.world.appendChild(this.visibleEntity)
     }
 
     resignActive() {
         super.resignActive();
 
         this.manager.setNeedsRedraw()
-        this.controlsEventHandler.setTarget(null)
+        this.visibleEntity.removeFromParent()
     }
 }

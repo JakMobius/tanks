@@ -1,20 +1,21 @@
 import Tool from '../tool';
 import ToolManager from "../toolmanager";
 
-class Drag extends Tool {
+export default class Drag extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/img/drag.png"
+        this.image = "assets/map-editor/drag.png"
         this.locksDragging = false
     }
 
     becomeActive() {
+        super.becomeActive()
         this.setCursor("grab")
     }
 
     mouseDown(x: number, y: number) {
-        super.mouseUp()
+        super.mouseUp(x, y)
         this.setCursor("grabbing")
     }
 
@@ -26,5 +27,3 @@ class Drag extends Tool {
         this.setCursor(null)
     }
 }
-
-export default Drag;

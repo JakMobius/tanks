@@ -1,15 +1,17 @@
+import EventEmitter from "src/utils/event-emitter";
 
 export interface SerializedGameGraphicsSettings {
 
 }
 
-export default class GameGraphicsSettings {
+export default class GameGraphicsSettings extends EventEmitter {
 
 
     constructor(serialized?: SerializedGameGraphicsSettings) {
-        if(!serialized) {
-            serialized = {}
-        }
+        super()
+        serialized = Object.assign({
+
+        }, serialized)
 
     }
 

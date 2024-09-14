@@ -26,7 +26,7 @@ export default class WebsocketConnection extends Connection {
     }
 
     close(reason?: string): void {
-        this.socket.close(0, reason)
+        this.socket.close(1000, reason)
     }
 
     getIpAddress(): string {

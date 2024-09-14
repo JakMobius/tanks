@@ -1,6 +1,7 @@
 import * as Box2D from './library/box2d'
 import {b2Fixture} from "./library/box2d/dynamics/b2_fixture";
 import Entity from "./utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
 
 export default class GameWorldContactFilter extends Box2D.ContactFilter {
 
@@ -9,8 +10,8 @@ export default class GameWorldContactFilter extends Box2D.ContactFilter {
 
         const bodyA = fixtureA.GetBody()
         const bodyB = fixtureB.GetBody()
-        const dataA = bodyA.GetUserData()
-        const dataB = bodyB.GetUserData()
+        const dataA = PhysicalComponent.getEntityFromBody(bodyA)
+        const dataB = PhysicalComponent.getEntityFromBody(bodyB)
 
         if(dataA instanceof Entity) {
             if(!dataA.emit("should-collide", bodyB)) return false

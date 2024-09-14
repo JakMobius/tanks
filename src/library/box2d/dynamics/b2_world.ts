@@ -17,48 +17,51 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_epsilon, b2_maxSubSteps, b2_maxTOIContacts } from "../common/b2_settings";
-import { b2Min, b2Vec2, b2Transform, b2Sweep, XY } from "../common/b2_math";
-import { b2Timer } from "../common/b2_timer";
-import { b2Color, b2Draw, b2DrawFlags } from "../common/b2_draw";
-import { b2AABB, b2RayCastInput, b2RayCastOutput, b2TestOverlapShape } from "../collision/b2_collision";
-import { b2TreeNode } from "../collision/b2_dynamic_tree";
-import { b2TimeOfImpact, b2TOIInput, b2TOIOutput, b2TOIOutputState } from "../collision/b2_time_of_impact";
-import { b2Shape, b2ShapeType } from "../collision/b2_shape";
-import { b2ChainShape } from "../collision/b2_chain_shape";
-import { b2CircleShape } from "../collision/b2_circle_shape";
-import { b2EdgeShape } from "../collision/b2_edge_shape";
-import { b2PolygonShape } from "../collision/b2_polygon_shape";
-import { b2Contact, b2ContactEdge } from "./b2_contact";
-import { b2Joint, b2IJointDef, b2JointType, b2JointEdge } from "./b2_joint";
-import { b2AreaJoint, b2IAreaJointDef } from "./b2_area_joint";
-import { b2DistanceJoint, b2IDistanceJointDef } from "./b2_distance_joint";
-import { b2FrictionJoint, b2IFrictionJointDef } from "./b2_friction_joint";
-import { b2GearJoint, b2IGearJointDef } from "./b2_gear_joint";
-import { b2MotorJoint, b2IMotorJointDef } from "./b2_motor_joint";
-import { b2MouseJoint, b2IMouseJointDef } from "./b2_mouse_joint";
-import { b2PrismaticJoint, b2IPrismaticJointDef } from "./b2_prismatic_joint";
-import { b2PulleyJoint, b2IPulleyJointDef } from "./b2_pulley_joint";
-import { b2RevoluteJoint, b2IRevoluteJointDef } from "./b2_revolute_joint";
-import { b2WeldJoint, b2IWeldJointDef } from "./b2_weld_joint";
-import { b2WheelJoint, b2IWheelJointDef } from "./b2_wheel_joint";
-import { b2Body, b2IBodyDef, b2BodyType } from "./b2_body";
-import { b2ContactManager } from "./b2_contact_manager";
-import { b2Fixture, b2FixtureProxy } from "./b2_fixture";
-import { b2Island } from "./b2_island";
-import { b2Profile, b2TimeStep } from "./b2_time_step";
-import { b2ContactFilter } from "./b2_world_callbacks";
-import { b2ContactListener } from "./b2_world_callbacks";
-import { b2DestructionListener } from "./b2_world_callbacks";
-import { b2QueryCallback, b2QueryCallbackFunction } from "./b2_world_callbacks";
-import { b2RayCastCallback, b2RayCastCallbackFunction } from "./b2_world_callbacks";
 // #if B2_ENABLE_PARTICLE
-import { b2_maxFloat } from "../common/b2_settings";
-import { b2CalculateParticleIterations } from "../particle/b2_particle";
-import { b2ParticleSystemDef, b2ParticleSystem } from "../particle/b2_particle_system";
+import {b2_epsilon, b2_maxFloat, b2_maxSubSteps, b2_maxTOIContacts} from "../common/b2_settings";
+import {b2Min, b2Sweep, b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2Timer} from "../common/b2_timer";
+import {b2Color, b2Draw, b2DrawFlags} from "../common/b2_draw";
+import {b2AABB, b2RayCastInput, b2RayCastOutput, b2TestOverlapShape} from "../collision/b2_collision";
+import {b2TreeNode} from "../collision/b2_dynamic_tree";
+import {b2TimeOfImpact, b2TOIInput, b2TOIOutput, b2TOIOutputState} from "../collision/b2_time_of_impact";
+import {b2Shape, b2ShapeType} from "../collision/b2_shape";
+import {b2ChainShape} from "../collision/b2_chain_shape";
+import {b2CircleShape} from "../collision/b2_circle_shape";
+import {b2EdgeShape} from "../collision/b2_edge_shape";
+import {b2PolygonShape} from "../collision/b2_polygon_shape";
+import {b2Contact, b2ContactEdge} from "./b2_contact";
+import {b2IJointDef, b2Joint, b2JointEdge, b2JointType} from "./b2_joint";
+import {b2AreaJoint, b2IAreaJointDef} from "./b2_area_joint";
+import {b2DistanceJoint, b2IDistanceJointDef} from "./b2_distance_joint";
+import {b2FrictionJoint, b2IFrictionJointDef} from "./b2_friction_joint";
+import {b2GearJoint, b2IGearJointDef} from "./b2_gear_joint";
+import {b2IMotorJointDef, b2MotorJoint} from "./b2_motor_joint";
+import {b2IMouseJointDef, b2MouseJoint} from "./b2_mouse_joint";
+import {b2IPrismaticJointDef, b2PrismaticJoint} from "./b2_prismatic_joint";
+import {b2IPulleyJointDef, b2PulleyJoint} from "./b2_pulley_joint";
+import {b2IRevoluteJointDef, b2RevoluteJoint} from "./b2_revolute_joint";
+import {b2IWeldJointDef, b2WeldJoint} from "./b2_weld_joint";
+import {b2IWheelJointDef, b2WheelJoint} from "./b2_wheel_joint";
+import {b2Body, b2BodyType, b2IBodyDef} from "./b2_body";
+import {b2ContactManager} from "./b2_contact_manager";
+import {b2Fixture, b2FixtureProxy} from "./b2_fixture";
+import {b2Island} from "./b2_island";
+import {b2Profile, b2TimeStep} from "./b2_time_step";
+import {
+    b2ContactFilter,
+    b2ContactListener,
+    b2DestructionListener,
+    b2QueryCallback,
+    b2QueryCallbackFunction,
+    b2RayCastCallback,
+    b2RayCastCallbackFunction
+} from "./b2_world_callbacks";
+import {b2CalculateParticleIterations} from "../particle/b2_particle";
+import {b2ParticleSystem, b2ParticleSystemDef} from "../particle/b2_particle_system";
 // #endif
 // #if B2_ENABLE_CONTROLLER
-import { b2Controller, b2ControllerEdge } from "../controllers/b2_controller";
+import {b2Controller, b2ControllerEdge} from "../controllers/b2_controller";
 // #endif
 
 /// The world class manages all physics entities, dynamic simulation,

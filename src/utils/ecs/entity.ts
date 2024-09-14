@@ -1,49 +1,51 @@
 import {Component} from "./component";
-import {Constructor} from "src/serialization/binary/serializable";
 import EventEmitter from "../event-emitter";
 
+type ComponentConstructor<T = any> = {
+    new (...args: any[]): T
+    symbol?: Symbol
+}
+
 export default class Entity extends EventEmitter {
-    public components: Component[] = []
     public children: Entity[] = []
     public parent: Entity | null
 
     public addComponent(component: Component): void {
-        this.components.push(component)
+        let symbol: Symbol = (component.constructor as ComponentConstructor).symbol
+        if(!symbol) {
+            symbol = Symbol(component.constructor.name);
+            (component.constructor as ComponentConstructor).symbol = symbol
+        }
+
+        (this as any)[symbol as any] = component
         component.onAttach(this);
     }
 
-    public getComponent<C extends Component>(ComponentType: Constructor<C>): C | null {
-        for (const component of this.components) {
-            if (component instanceof ComponentType) {
-                return component as C
-            }
+    public getComponent<C extends Component>(ComponentType: ComponentConstructor<C>): C | null {
+        let symbol: Symbol = (ComponentType).symbol
+        if(!symbol) {
+            return null
         }
-        return null
+
+        return (this as any)[symbol as any] as C || null
     }
 
-    public removeComponent<C extends Component>(ComponentType: Constructor<C>): void {
-        for (let i = 0; i < this.components.length; i++) {
-            const component = this.components[i]
-            if (component instanceof ComponentType) {
-                component.onDetach();
-                this.components.splice(i, 1)
-                break
-            }
+    public removeComponent<C extends Component>(ComponentType: ComponentConstructor<C>): void {
+        let symbol: Symbol = ComponentType.symbol
+        if(!symbol) {
+            return null
         }
-    }
 
-    public removeAllComponents() {
-        while(this.components.length) {
-            this.components[this.components.length - 1].onDetach();
-            this.components.pop();
-        }
+        let component = (this as any)[symbol as any] as C
+        (this as any)[symbol as any] = undefined
+        component.onDetach()
     }
 
     public appendChild(child: Entity) {
         this.children.push(child)
         child.parent = this
 
-        child.propagateEvent("attached-to-parent", child, this)
+        child.emit("attached-to-parent", this)
         this.emit("child-added", child)
     }
 
@@ -52,18 +54,18 @@ export default class Entity extends EventEmitter {
         let index = this.parent.children.indexOf(this)
         if(index == -1) return
         let parent = this.parent
-        this.propagateEvent("will-detach-from-parent", this, parent)
+        this.emit("will-detach-from-parent", this)
         parent.emit("will-remove-child", this)
         this.parent.children.splice(index, 1)
         this.parent = null
-        this.propagateEvent("detached-from-parent", this, parent)
+        this.emit("detached-from-parent", this)
         parent.emit("did-remove-child", this)
     }
 
     public propagateEvent(event: string, ...args: any[]) {
-        this.emit(event, ...args);
         for(let child of this.children) {
             child.propagateEvent(event, ...args)
         }
+        this.emit(event, ...args)
     }
 }

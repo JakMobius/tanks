@@ -2,23 +2,20 @@ import * as Box2D from "src/library/box2d";
 import PhysicsChunk from "src/physics/physics-chunk";
 import PhysicalComponent from "./physics-component";
 import GameMap from "src/map/game-map";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
-export default class TilemapHitEmitter implements Component {
-    entity: Entity | null;
-    private eventHandler = new BasicEventHandlerSet()
-
+export default class TilemapHitEmitter extends EventHandlerComponent {
     constructor() {
-        this.eventHandler.on("physical-contact", (body, contact) => {
+        super()
+        this.eventHandler.on("physical-contact-begin", (body, contact) => {
             this.onBodyHit(body, contact)
         })
     }
 
     onBodyHit(body: Box2D.Body, contact: Box2D.Contact) {
-        const data = body.GetUserData()
-        if(data instanceof Entity) this.entity.emit("entity-hit", data)
+        const data = PhysicalComponent.getObjectFromBody(body)
+        if(data instanceof Entity) this.entity.emit("entity-hit", data, contact)
         if(data instanceof PhysicsChunk) {
             const worldManifold = new Box2D.WorldManifold()
             contact.GetWorldManifold(worldManifold)
@@ -42,7 +39,7 @@ export default class TilemapHitEmitter implements Component {
         const gridY = Math.floor(blockY)
 
         const block = map.getBlock(gridX, gridY)
-        if(block && block.solid) {
+        if (block && block.solid) {
             this.entity.emit("block-hit", gridX, gridY, point)
             return
         }
@@ -50,9 +47,9 @@ export default class TilemapHitEmitter implements Component {
         const velocity = new Box2D.Vec2()
         this.entity.getComponent(PhysicalComponent).getBody().GetLinearVelocityFromWorldPoint(point, velocity)
 
-        if(velocity.x === 0 && velocity.y === 0) return
+        if (velocity.x === 0 && velocity.y === 0) return
 
-        while(true) {
+        while (true) {
             let nextDistanceX = velocity.x > 0 ? Math.ceil(blockX) - blockX : Math.floor(blockX) - blockX
             let nextDistanceY = velocity.y > 0 ? Math.ceil(blockY) - blockY : Math.floor(blockY) - blockY
 
@@ -64,14 +61,14 @@ export default class TilemapHitEmitter implements Component {
             if (velocity.x !== 0) nextDistanceFraction = nextDistanceX / velocity.x
             if (velocity.y !== 0) nextDistanceFraction = Math.min(nextDistanceFraction, nextDistanceY / velocity.y)
 
-            if(nextDistanceFraction < Number.EPSILON) {
+            if (nextDistanceFraction < Number.EPSILON) {
                 nextDistanceFraction = Number.EPSILON
             }
 
             const checkX = Math.floor(blockX + velocity.x * nextDistanceFraction * 0.5)
             const checkY = Math.floor(blockY + velocity.y * nextDistanceFraction * 0.5)
 
-            if(checkX !== gridX || checkY !== gridY) {
+            if (checkX !== gridX || checkY !== gridY) {
                 this.entity.emit("block-hit", checkX, checkY, point)
                 return
             }
@@ -79,15 +76,5 @@ export default class TilemapHitEmitter implements Component {
             blockX += velocity.x * nextDistanceFraction
             blockY += velocity.y * nextDistanceFraction
         }
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(null)
     }
 }

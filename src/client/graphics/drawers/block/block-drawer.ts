@@ -1,4 +1,4 @@
-import Sprite from '../../../sprite';
+import Sprite from 'src/client/graphics/sprite';
 import GameMap from 'src/map/game-map';
 import BlockState from "src/map/block-state/block-state";
 import TextureProgram from "src/client/graphics/programs/texture-program";

@@ -7,20 +7,19 @@ import WorldStatisticsComponent, {
 import DamageRecorderComponent from "./damage-recorder-component";
 import EventEmitter from "src/utils/event-emitter";
 import ServerWorldPlayerManagerComponent from "./server-world-player-manager-component";
-import Player from "src/server/player";
-import PlayerConnectEvent from "src/events/player-connect-event";
-import PlayerDisconnectEvent from "src/events/player-disconnect-event";
+import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
+import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
 
 export default class WorldPlayerStatisticsComponent implements Component {
     entity: Entity | null
     worldEventHandler = new BasicEventHandlerSet()
     needsSerialize = true
 
-    playerStatistics = new Map<Player, PlayerStatistics>()
+    playerStatistics = new Map<Entity, PlayerStatistics>()
 
     constructor() {
-        this.worldEventHandler.on("player-connect", (event) => this.onPlayerConnect(event), EventEmitter.PRIORITY_MONITOR)
-        this.worldEventHandler.on("player-disconnect", (event) => this.onPlayerDisconnect(event), EventEmitter.PRIORITY_MONITOR)
+        this.worldEventHandler.on("player-connect", (player) => this.onPlayerConnect(player))
+        this.worldEventHandler.on("player-disconnect", (player) => this.onPlayerDisconnect(player))
         this.worldEventHandler.on("player-team-set", (player) => this.onPlayerTeamSet(player))
         this.worldEventHandler.on("player-death", (player) => this.onPlayerDeath(player), EventEmitter.PRIORITY_MONITOR)
         this.worldEventHandler.on("tick", () => {
@@ -51,24 +50,26 @@ export default class WorldPlayerStatisticsComponent implements Component {
         this.resetAllStatistics()
     }
 
-    private onPlayerConnect(event: PlayerConnectEvent) {
-        if(event.declined) return
-        this.resetStatistics(event.player)
+    private onPlayerConnect(player: Entity) {
+        this.resetStatistics(player)
     }
 
-    private onPlayerDisconnect(event: PlayerDisconnectEvent) {
-        this.playerStatistics.delete(event.player)
+    private onPlayerDisconnect(player: Entity) {
+        this.playerStatistics.delete(player)
         this.markUpdated()
     }
 
-    private onPlayerTeamSet(player: Player) {
+    private onPlayerTeamSet(player: Entity) {
+        const playerTeamComponent = player.getComponent(PlayerTeamComponent)
+
         let statistics = this.playerStatistics.get(player)
         if(!statistics) return
-        statistics.teamId = player.team ? player.team.id : -1
+
+        statistics.teamId = playerTeamComponent.team ? playerTeamComponent.team.id : -1
         this.markUpdated()
     }
 
-    private onPlayerDeath(player: Player) {
+    private onPlayerDeath(player: Entity) {
         let damageRecorder = this.entity.getComponent(DamageRecorderComponent)
         if(damageRecorder) {
             let damager = damageRecorder.getDamageData(player).damagers[0]
@@ -81,13 +82,15 @@ export default class WorldPlayerStatisticsComponent implements Component {
         this.markUpdated()
     }
 
-    resetStatistics(player: Player) {
+    resetStatistics(player: Entity) {
+        const playerTeamComponent = player.getComponent(PlayerTeamComponent)
+
         this.playerStatistics.set(player, {
-            name: player.nick,
+            name: player.getComponent(PlayerNickComponent).nick,
             kills: 0,
             deaths: 0,
             score: 0,
-            teamId: player.team ? player.team.id : -1
+            teamId: playerTeamComponent.team ? playerTeamComponent.team.id : -1
         })
         this.markUpdated()
     }
@@ -106,7 +109,7 @@ export default class WorldPlayerStatisticsComponent implements Component {
         this.needsSerialize = true
     }
 
-    scorePlayer(killer: Player, score: number) {
+    scorePlayer(killer: Entity, score: number) {
         let playerStatistics = this.playerStatistics.get(killer)
 
         if(playerStatistics) {

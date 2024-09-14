@@ -17,12 +17,11 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_pi, b2_epsilon } from "../common/b2_settings";
-import { b2Sq, b2Sqrt, b2Asin, b2Pow, b2Vec2, b2Transform, XY } from "../common/b2_math";
-import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
-import { b2DistanceProxy } from "./b2_distance";
-import { b2MassData } from "./b2_shape";
-import { b2Shape, b2ShapeType } from "./b2_shape";
+import {b2_epsilon, b2_pi} from "../common/b2_settings";
+import {b2Asin, b2Pow, b2Sq, b2Sqrt, b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2AABB, b2RayCastInput, b2RayCastOutput} from "./b2_collision";
+import {b2DistanceProxy} from "./b2_distance";
+import {b2MassData, b2Shape, b2ShapeType} from "./b2_shape";
 
 /// A solid circle shape
 export class b2CircleShape extends b2Shape {

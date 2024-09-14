@@ -2,7 +2,7 @@
 /* @load-resource: '../../shaders/vertex/convex-shape-vertex.glsl' */
 
 import CameraProgram from "../camera-program";
-import GLBuffer from "src/client/graphics/glbuffer";
+import GLBuffer from "src/client/graphics/gl/glbuffer";
 import {Quadrangle} from "src/utils/quadrangle";
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"

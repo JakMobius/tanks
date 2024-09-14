@@ -3,7 +3,6 @@ import EventEmitter from '../../../utils/event-emitter';
 export default class DocumentEventHandler extends EventEmitter {
 	public listeners = new Map<string, () => void>();
 	public target: GlobalEventHandlers | GlobalEventHandlers[];
-	public keys: any;
 
     constructor() {
         super()
@@ -44,7 +43,6 @@ export default class DocumentEventHandler extends EventEmitter {
         for(let event of this.listeners.keys()) {
             this.unbind(event)
         }
-        this.keys.clear()
         this.listeners.clear()
     }
 }

@@ -21,7 +21,8 @@ export default class TimerTransmitter extends Transmitter {
         let timer = entity.getComponent(TimerComponent)
 
         this.packIfEnabled(Commands.TIMER_VALUE_COMMAND, (buffer) => {
-            buffer.writeFloat64(timer.time)
+            buffer.writeFloat32(timer.currentTime)
+            buffer.writeFloat32(timer.originalTime)
         })
     }
 }

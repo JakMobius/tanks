@@ -1,9 +1,9 @@
 /* @load-resource: '../shaders/fragment/texture-fragment.glsl' */
 /* @load-resource: '../shaders/vertex/texture-vertex.glsl' */
 
-import GLBuffer from '../glbuffer';
-import Sprite from "src/client/sprite";
-import Uniform from "../uniform";
+import GLBuffer from 'src/client/graphics/gl/glbuffer';
+import Sprite from "src/client/graphics/sprite";
+import Uniform from "src/client/graphics/gl/uniform";
 import CameraProgram from "./camera-program";
 import Matrix3 from "src/utils/matrix3";
 import {Quadrangle} from "src/utils/quadrangle";
@@ -11,6 +11,8 @@ import {ByteArray} from "src/serialization/binary/typed-buffer";
 
 export interface TextureProgramConfig {
     largeIndices: boolean
+    vertexShaderPath?: string
+    fragmentShaderPath?: string
 }
 
 export const vertexShaderPath = "src/client/graphics/shaders/vertex/texture-vertex.glsl"
@@ -26,10 +28,13 @@ export default class TextureProgram extends CameraProgram {
 
     constructor(ctx: WebGLRenderingContext, options?: TextureProgramConfig) {
         options = Object.assign({
-            largeIndices: false
+            // largeIndices: false,
+            largeIndices: true,
+            vertexShaderPath: vertexShaderPath,
+            fragmentShaderPath: fragmentShaderPath
         }, options)
 
-        super(vertexShaderPath, fragmentShaderPath, ctx)
+        super(options.vertexShaderPath, options.fragmentShaderPath, ctx)
 
         if(options.largeIndices) this.getExtensionOrThrow("OES_element_index_uint")
 
@@ -89,8 +94,7 @@ export default class TextureProgram extends CameraProgram {
 
     draw() {
         if(this.updated === true) {
-            this.vertexBuffer.bindAndSendDataToGPU()
-            this.indexBuffer.bindAndSendDataToGPU()
+            this.updateBuffers()
             this.updated = false
         } else {
             this.indexBuffer.bind()
@@ -100,5 +104,10 @@ export default class TextureProgram extends CameraProgram {
         this.ctx.disable(this.ctx.BLEND)
 
         this.ctx.drawElements(this.ctx.TRIANGLES, this.indexBuffer.pointer, this.indexBuffer.glType, 0);
+    }
+
+    updateBuffers() {
+        this.vertexBuffer.bindAndSendDataToGPU()
+        this.indexBuffer.bindAndSendDataToGPU()
     }
 }

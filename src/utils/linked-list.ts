@@ -1,14 +1,24 @@
-
 export class LinkedListItem<T> {
-    item: T | null
-    next: LinkedListItem<T> | null
-    prev: LinkedListItem<T> | null
+    item: T
+    next: LinkedListItem<T> | undefined
+    prev: LinkedListItem<T> | undefined
+
+    unlink() {
+        if(this.prev) {
+            this.prev.next = this.next
+        }
+        if(this.next) {
+            this.next.prev = this.prev
+        }
+        this.prev = undefined
+        this.next = undefined
+    }
 }
 
 export default class LinkedList<ItemClass> {
     private unused: LinkedListItem<ItemClass>[] = []
-    private head: LinkedListItem<ItemClass> | null
-    private tail: LinkedListItem<ItemClass> | null
+    head: LinkedListItem<ItemClass> | undefined = undefined
+    tail: LinkedListItem<ItemClass> | undefined = undefined
 
     private getUnusedItem() {
         if (this.unused.length) return this.unused.pop()
@@ -16,20 +26,20 @@ export default class LinkedList<ItemClass> {
     }
 
     private reuseItem(head: LinkedListItem<ItemClass>) {
-        head.item = null
-        head.prev = null
-        head.next = null
+        head.item = undefined
+        head.prev = undefined
+        head.next = undefined
         this.unused.push(head)
     }
 
     public insertHead(item: ItemClass) {
         let unused = this.getUnusedItem()
         unused.item = item
-        unused.prev = null
+        unused.prev = undefined
         unused.next = this.head
-        if(this.head) this.head.prev = unused
+        if (this.head) this.head.prev = unused
         this.head = unused
-        if(!this.tail) this.tail = unused
+        if (!this.tail) this.tail = unused
         return unused
     }
 
@@ -37,42 +47,42 @@ export default class LinkedList<ItemClass> {
         let unused = this.getUnusedItem()
         unused.item = item
         unused.prev = this.tail
-        unused.next = null
-        if(this.tail) this.tail.next = unused
+        unused.next = undefined
+        if (this.tail) this.tail.next = unused
         this.tail = unused
-        if(!this.head) this.head = unused
+        if (!this.head) this.head = unused
         return unused
     }
 
-    public removeHead(): ItemClass {
-        if (!this.head) return null
+    public removeHead(): ItemClass | undefined {
+        if (!this.head) return undefined
 
         const result = this.head.item
         const next = this.head.next
         this.reuseItem(this.head)
-        if(next) next.prev = null
-        else this.tail = null
+        if (next) next.prev = undefined
+        else this.tail = undefined
         this.head = next
         return result
     }
 
-    public removeTail(): ItemClass {
-        if(!this.tail) return null
+    public removeTail(): ItemClass | undefined {
+        if (!this.tail) return undefined
 
         const result = this.tail.item
         const prev = this.tail.prev
         this.reuseItem(this.tail)
-        if(prev) prev.next = null
-        else this.head = null
+        if (prev) prev.next = undefined
+        else this.head = undefined
         this.tail = prev
         return result
     }
 
-    public getHead(): ItemClass {
-        return this.head.item
+    public getHead(): ItemClass | undefined {
+        return this.head?.item
     }
 
-    public getTail(): ItemClass {
-        return this.tail.item
+    public getTail(): ItemClass | undefined {
+        return this.tail?.item
     }
 }

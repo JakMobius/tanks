@@ -14,9 +14,8 @@ import Server from "src/server/server";
 import {WebserverSession} from "src/server/webserver/webserver-session";
 import Entity from "src/utils/ecs/entity";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import RoomClientComponent from "src/server/room/components/room-client-component";
+import {serverCTFControllerPrefab} from "src/entity/types/controller-ctf/server-side/server-prefab";
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -145,7 +144,14 @@ export default class GameSocketPortal extends SocketPortal {
 
     clientConnected(client: GameSocketPortalClient) {
         let game = this.games.get(client.data.room)
-        this.configureClient(client, game)
+
+        try {
+            this.configureClient(client, game)
+        } catch(e) {
+            console.error("Failed to connect client", e)
+            client.connection.close("Internal server error")
+            return
+        }
     }
 
     async createRoom(config: RoomConfig) {
@@ -168,16 +174,22 @@ export default class GameSocketPortal extends SocketPortal {
         }
 
         let game = new Entity()
-
         serverGameRoomPrefab(game, {
             name: config.name,
-            map: map
+            map: map,
+            gameSocket: this
         })
 
         let gameModeController = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
-        game.appendChild(gameModeController)
+        serverCTFControllerPrefab(gameModeController, {
+            // TODO: world should be determined when controller is attached to it
+            world: game,
+            socket: this,
+            minPlayers: 2,
+            teams: 2
+        })
 
+        game.appendChild(gameModeController)
         this.games.set(config.name, game)
     }
 

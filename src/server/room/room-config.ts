@@ -1,6 +1,7 @@
-import {BinaryCodable, Constructor} from 'src/serialization/binary/serializable';
+import {BinaryCodable} from 'src/serialization/binary/serializable';
 import WriteBuffer from "src/serialization/binary/write-buffer";
 import ReadBuffer from "src/serialization/binary/read-buffer";
+import {Constructor} from "src/utils/constructor";
 
 export default class RoomConfig implements BinaryCodable<typeof RoomConfig> {
 

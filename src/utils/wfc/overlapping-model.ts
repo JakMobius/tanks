@@ -7,8 +7,14 @@ export interface IOverlappingModel {
     readonly patternCount: number[];
 }
 
+export interface OverlappingModelImage {
+    data: Uint8ClampedArray;
+    height: number;
+    width: number;
+}
+
 export function createOverlappingModel(
-    {width, height, data}: ImageData,
+    {width, height, data}: OverlappingModelImage,
     {N = 3, periodicInput = true, symmetry = 8} = {},
 ): IOverlappingModel {
 

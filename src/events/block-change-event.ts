@@ -6,9 +6,9 @@ export default class BlockChangeEvent {
     x?: number
     y?: number
 
-    constructor(block?: BlockState, oldBlock?: BlockState, x?: number, y?: number) {
-        this.newBlock = block
-        this.oldBlock = block
+    constructor(oldBlock?: BlockState, newBlock?: BlockState, x?: number, y?: number) {
+        this.newBlock = newBlock
+        this.oldBlock = oldBlock
         this.x = x
         this.y = y
     }

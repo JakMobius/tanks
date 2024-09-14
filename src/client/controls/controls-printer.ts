@@ -26,7 +26,7 @@ export default class ControlsPrinter {
     }
 
     static getPrintedNameOfKeyboardAxle(axleConfig: KeyAxleConfig) {
-        let rawKey = axleConfig.key
+        let rawKey = axleConfig.code
 
         if (rawKey.startsWith("Digit")) return rawKey.substring(5);
         if (rawKey.startsWith("Key")) return rawKey.substring(3);

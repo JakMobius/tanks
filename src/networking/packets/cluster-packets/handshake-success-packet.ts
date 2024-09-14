@@ -1,6 +1,7 @@
 import BinaryPacket from '../../binary-packet';
-import {BinarySerializer, Constructor} from "src/serialization/binary/serializable";
+import {BinarySerializer} from "src/serialization/binary/serializable";
 import ReadBuffer from "src/serialization/binary/read-buffer";
+import {Constructor} from "src/utils/constructor";
 
 /**
  * This packet is sent by hub when handshake succeeds

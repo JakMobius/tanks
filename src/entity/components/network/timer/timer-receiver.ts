@@ -6,9 +6,10 @@ import TimerComponent from "./timer-component";
 export default class TimerReceiverComponent extends ReceiverComponent {
     hook(component: EntityDataReceiveComponent) {
         component.commandHandlers.set(Commands.TIMER_VALUE_COMMAND, (buffer) => {
-            let time = buffer.readFloat64()
+            let currentTime = buffer.readFloat32()
+            let originalTime = buffer.readFloat32()
             let timer = this.entity.getComponent(TimerComponent)
-            timer.setTime(time)
+            timer.setCountdownState(currentTime, originalTime)
         })
     }
 }

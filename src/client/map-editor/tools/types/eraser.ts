@@ -8,7 +8,7 @@ export default class Eraser extends Pencil {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/img/eraser.png"
+        this.image = "assets/map-editor/eraser.png"
         this.actionName = "Ластик"
     }
 
@@ -20,6 +20,7 @@ export default class Eraser extends Pencil {
     }
 
     becomeActive() {
-        this.setCursor("url(assets/img/cursors/eraser.png) 0 32, auto")
+        super.becomeActive()
+        this.setCursor("url(assets/map-editor/cursors/eraser.png) 0 32, auto")
     }
 }

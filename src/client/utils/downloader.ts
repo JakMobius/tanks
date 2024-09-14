@@ -1,10 +1,11 @@
-import Progress from './progress';
+import {ProgressLeaf} from './progress';
+import DOMEventHandlerSet from "src/utils/dom-event-handler-set";
 
 // TODO: copy-paste
 
 export default class Downloader {
 
-    static getXHR(dataType: XMLHttpRequestResponseType, progress: Progress) {
+    static getXHR(dataType: XMLHttpRequestResponseType, progress: ProgressLeaf) {
         let xhr = new XMLHttpRequest();
         if(dataType)
             xhr.responseType = dataType;
@@ -13,16 +14,15 @@ export default class Downloader {
                 if (evt.lengthComputable) {
                     // Avoid triggering completion event
                     if(evt.loaded >= evt.total) return;
-                    progress.setTarget(evt.total)
-                    progress.setCompleted(evt.loaded)
+                    progress.setFraction2(evt.total, evt.loaded)
                 }
             }, false);
         }
         return () => xhr
     }
 
-    static downloadBinary(url: string, handler: (response: ArrayBuffer) => void | Promise<void>): Progress {
-        let progress = new Progress()
+    static downloadBinary(url: string, handler: (response: ArrayBuffer) => void | Promise<void>) {
+        let progress = new ProgressLeaf()
 
         let request = $.ajax({
             url: url,
@@ -38,9 +38,9 @@ export default class Downloader {
         return progress
     }
 
-    static download(url: string, handler: (response: any) => void | Promise<void>, contentType: string): Progress {
+    static download(url: string, handler: (response: any) => void | Promise<void>, contentType: string) {
 
-        let progress = new Progress()
+        let progress = new ProgressLeaf()
 
         let request = $.ajax({
             url: url,
@@ -59,21 +59,30 @@ export default class Downloader {
 
     static downloadImage(url: string, handler: (image: HTMLImageElement) => void | Promise<void>) {
 
-        let progress = new Progress()
-
+        let progress = new ProgressLeaf()
         let image = new Image()
 
-        $(image).attr({
-            src: url
-        }).on("load", () => {
+        // DOMEventHandlerSet is used here to remove event handlers
+        // from image once load is finished. Since image is a long-living
+        // entity, it's better to remove as many references from it as possible
+        // to prevent memory leaks.
+
+        let eventSet = new DOMEventHandlerSet()
+        eventSet.setTarget(image)
+        eventSet.on("load", () => {
+            eventSet.setTarget(null)
             if (image.complete) {
                 Promise.resolve(handler(image)).then(() => progress.complete())
             } else {
                 progress.fail("Failed to download image")
             }
-        }).on("error", () => {
+        })
+        eventSet.on("error", () => {
+            eventSet.setTarget(null)
             progress.fail("Failed to download image")
         })
+
+        image.setAttribute("src", url)
 
         progress.on("abort", () => image.src = "")
 
