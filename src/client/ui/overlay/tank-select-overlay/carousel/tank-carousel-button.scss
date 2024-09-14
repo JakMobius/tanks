@@ -26,3 +26,25 @@
     animation-name: tank-carousel-button-bounce-right;
 }
 
+@keyframes tank-carousel-button-bounce-right {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+@keyframes tank-carousel-button-bounce-left {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(-5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}

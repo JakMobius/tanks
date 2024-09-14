@@ -4,17 +4,18 @@ import NavigationTransition from "src/client/ui/navigation/navigation-transition
 import BasicNavigationView from "src/client/ui/navigation/basic-navigation-view";
 import NavigationBlock from "src/client/ui/navigation/navigation-block";
 import PauseNavigationCloud from "src/client/ui/overlay/pause-overlay/elements/pause-navigation-cloud";
+import NavigationCloud from "../../../../game/ui/cloud/navigation-cloud";
 
 export default class PauseNavigationTransition extends NavigationTransition {
-    private cloud: PauseNavigationCloud;
+    protected cloud: NavigationCloud;
     transitionDuration: number = 0.5
 
-    constructor(cloud: PauseNavigationCloud) {
+    constructor(cloud: NavigationCloud) {
         super();
         this.cloud = cloud
     }
 
-    private performTransition(view: BasicNavigationView, from: NavigationBlock, to: NavigationBlock, reverse: boolean, callback: () => void) {
+    protected performTransition(view: BasicNavigationView, from: NavigationBlock, to: NavigationBlock, reverse: boolean, callback: () => void) {
         if(reverse) view.element.append(from.element)
         else view.element.append(to.element)
 

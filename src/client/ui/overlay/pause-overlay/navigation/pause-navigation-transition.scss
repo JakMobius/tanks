@@ -1,23 +1,19 @@
 
-
 @keyframes pause-navigation-slide-out {
   0% {
     transform: translateX(0px);
     opacity: 1;
   }
-
   100% {
-    transform: translateX(-450px);
+    transform: translateX(-550px);
     opacity: 0;
   }
 }
-
 @keyframes pause-navigation-slide-in {
   0% {
-    transform: translateX(450px);
+    transform: translateX(550px);
     opacity: 0;
   }
-
   100% {
     transform: translateX(0px);
     opacity: 1;

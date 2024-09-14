@@ -10,7 +10,7 @@ module.exports = {
     "prepare-game-resources": {
         "steps": [
             getClientResources({
-                source: "src/client/game/index.ts",
+                source: "src/client/index.ts",
                 targetName: "game"
             }),
             getClientResources({
@@ -30,23 +30,25 @@ module.exports = {
             // Writing styles directly in the bundle
             exportStylesheets({
                 targetName: "game",
-                target: `#game-styles = ${constants.cacheFolder}/game/styles/game-styles.css`
+                target: `#game-styles = ${constants.cacheFolder}/web/styles/styles.css`
             }),
             exportStylesheets({
                 targetName: "game-launcher",
-                target: `#game-launcher-styles = ${constants.cacheFolder}/game/styles/game-launcher-styles.css`
-            })
-        ]
+                target: `#game-launcher-styles = ${constants.cacheFolder}/web/styles/launcher-styles.css`
+            }),
+            beelder.copy("src/client/web", `${constants.cacheFolder}/web`),
+            beelder.copy("#texture-atlas", `${constants.cacheFolder}/web/assets/img/textures`)
+        ],
     },
     "build-game": {
         "steps": [
-            beelder.bundleJavascript("src/client/game-launcher/index.ts", `#game-launcher = ${constants.cacheFolder}/game/scripts/index.js`, {
+            beelder.bundleJavascript("src/client/game-launcher/index.ts", `#game-launcher = ${constants.cacheFolder}/web/scripts/index.js`, {
                 "compilerOptions": constants.clientCompilerConfig,
                 ...constants.clientBundlerConfig
             }),
             beelder.bundleJavascript(
                 "src/client/game/index.ts",
-                `#game-executable = ${constants.cacheFolder}/game/scripts/game.js`, {
+                `#game-executable = ${constants.cacheFolder}/web/scripts/main.js`, {
                     compilerOptions: {
                         ...constants.clientCompilerConfig,
                         plugins: [
@@ -56,10 +58,8 @@ module.exports = {
                         ]
                     },
                     ...constants.clientBundlerConfig
-            }),
-            beelder.copy("src/client/web/game", `${constants.cacheFolder}/game`),
-            beelder.copy("#texture-atlas", `${constants.cacheFolder}/game/assets/img/textures`)
+            })
         ],
-        "targets": [ `#game = ${constants.cacheFolder}/game` ]
+        "targets": [ `#web-resources = ${constants.cacheFolder}/web` ]
     },
 }

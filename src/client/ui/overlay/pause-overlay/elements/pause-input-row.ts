@@ -1,4 +1,3 @@
-/* @load-resource: ./pause-input-row.scss */
 
 import PauseKeyValueRow from "src/client/ui/overlay/pause-overlay/elements/pause-key-value-row";
 import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
