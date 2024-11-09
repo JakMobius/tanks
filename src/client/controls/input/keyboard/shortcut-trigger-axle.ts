@@ -10,16 +10,18 @@ export default class ShortcutTriggerAxle extends TriggerAxle {
     public key: string;
     public ctrlKey: boolean;
     public altKey: boolean;
+    public shiftKey: boolean;
 
     constructor(keyboard: KeyboardListener, config: ShortcutTriggerAxleConfig) {
         super(config)
         let parts = config.triggerShortcut.split("-")
-        this.key = parts[parts.length - 1].toLowerCase()
+        this.key = parts[parts.length - 1]
         this.ctrlKey = parts.indexOf("Ctrl") !== -1
         this.altKey = parts.indexOf("Alt") !== -1
+        this.shiftKey = parts.indexOf("Shift") !== -1
 
         const keydownHandler = (event: KeyboardEvent) => {
-            if(this.modifierKeysMatch(event) && event.key.toLowerCase() === this.key) {
+            if(this.modifierKeysMatch(event) && event.code === this.key) {
                 event.preventDefault()
                 this.trigger()
             }
@@ -42,7 +44,10 @@ export default class ShortcutTriggerAxle extends TriggerAxle {
     modifierKeysMatch(event: KeyboardEvent): boolean {
         let requiredCtrlKey = this.ctrlKey || false
         let requiredAltKey = this.altKey || false
+        let requiredShiftKey = this.shiftKey || false
 
-        return requiredCtrlKey === ShortcutTriggerAxle.isCtrlPressed(event) && requiredAltKey === event.altKey
+        return requiredCtrlKey === ShortcutTriggerAxle.isCtrlPressed(event) &&
+            requiredAltKey === event.altKey &&
+            requiredShiftKey === event.shiftKey
     }
 }

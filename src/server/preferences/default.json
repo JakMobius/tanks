@@ -8,9 +8,13 @@
 		// Determines which port to bind for both websocket and express server
 		"port": 25565,
 
+		// Resources directory contains the web files, scripts, etc.
+		"resources-directory": "resources",
+
 		// The server will treat files in this directory as game maps and allow
-		// players to play on them. The directory must be relative to the server
-		"maps-directory": "resources/maps"
+		// players to play on them. The directory must be relative to the server.
+		// By default, the maps are located in the 'resources' folder.
+		"maps-directory": "resources/maps",
 	},
 
 	// The database configuration

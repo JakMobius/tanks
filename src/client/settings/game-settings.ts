@@ -14,19 +14,51 @@ export default class GameSettings {
     public controls: GameControlsSettings
     public audio:    GameAudioSettings
 
+    private needsSave = false
+
     constructor(serialized?: SerializedGameSettings) {
-        if(!serialized) {
-            serialized = {}
-        }
+        serialized = Object.assign({
+            graphics: {},
+            controls: {},
+            audio:    {}
+        }, serialized)
 
         this.graphics = new GameGraphicsSettings(serialized.graphics)
         this.controls = new GameControlsSettings(serialized.controls)
         this.audio    = new GameAudioSettings   (serialized.audio)
+
+        this.graphics.on("update", () => this.update())
+        this.controls.on("update", () => this.update())
+        this.audio   .on("update", () => this.update())
+    }
+
+    update() {
+        this.needsSave = true
+    }
+
+    saveIfNeeded() {
+        if(this.needsSave) {
+            this.save()
+        }
+    }
+
+    save() {
+        localStorage.setItem("game-settings", JSON.stringify(this.serialize()))
+        this.needsSave = false
     }
 
     public static getInstance(): GameSettings {
         if(!GameSettings.instance) {
-            GameSettings.instance = new GameSettings()
+            const configString = localStorage.getItem("game-settings")
+            let config: SerializedGameSettings = {}
+            if(configString) {
+                try {
+                    config = JSON.parse(configString)
+                } catch(e) {
+                    console.error(e)
+                }
+            }
+            GameSettings.instance = new GameSettings(config)
         }
         return GameSettings.instance
     }

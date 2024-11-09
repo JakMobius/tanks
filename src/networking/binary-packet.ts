@@ -1,7 +1,8 @@
-import BinarySerializable, {BinarySerializer, Constructor} from '../serialization/binary/serializable';
+import BinarySerializable, {BinarySerializer} from '../serialization/binary/serializable';
 import Connection from "./connection";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
+import {Constructor} from "src/utils/constructor";
 
 /**
  * This class is a binary data packet that can be transmitted over a

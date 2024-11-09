@@ -17,7 +17,7 @@
 */
 
 // DEBUG: import { b2Assert } from "./b2_settings";
-import { b2_pi, b2_epsilon, b2MakeArray } from "./b2_common";
+import {b2_epsilon, b2_pi, b2MakeArray} from "./b2_common";
 
 export const b2_pi_over_180: number = b2_pi / 180;
 export const b2_180_over_pi: number = 180 / b2_pi;

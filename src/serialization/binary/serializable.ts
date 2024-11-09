@@ -1,8 +1,7 @@
 import BinarySerializationGroup from '../serialization-group';
 import WriteBuffer from "./write-buffer";
 import ReadBuffer from "./read-buffer";
-
-export type Constructor<T> = { new (...args: any[]): T }
+import {Constructor} from "src/utils/constructor"
 
 export class BinarySerializer {
 

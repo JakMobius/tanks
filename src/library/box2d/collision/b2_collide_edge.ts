@@ -1,11 +1,18 @@
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxManifoldPoints } from "../common/b2_settings";
-import { b2Min, b2Vec2, b2Rot, b2Transform } from "../common/b2_math";
-import { b2ContactFeatureType, b2ContactID } from "./b2_collision";
-import { b2Manifold, b2ManifoldType, b2ManifoldPoint, b2ClipVertex, b2ClipSegmentToLine } from "./b2_collision";
-import { b2CircleShape } from "./b2_circle_shape";
-import { b2PolygonShape } from "./b2_polygon_shape";
-import { b2EdgeShape } from "./b2_edge_shape";
+import {b2_maxManifoldPoints} from "../common/b2_settings";
+import {b2Min, b2Rot, b2Transform, b2Vec2} from "../common/b2_math";
+import {
+    b2ClipSegmentToLine,
+    b2ClipVertex,
+    b2ContactFeatureType,
+    b2ContactID,
+    b2Manifold,
+    b2ManifoldPoint,
+    b2ManifoldType
+} from "./b2_collision";
+import {b2CircleShape} from "./b2_circle_shape";
+import {b2PolygonShape} from "./b2_polygon_shape";
+import {b2EdgeShape} from "./b2_edge_shape";
 
 const b2CollideEdgeAndCircle_s_Q: b2Vec2 = new b2Vec2();
 const b2CollideEdgeAndCircle_s_e: b2Vec2 = new b2Vec2();

@@ -16,15 +16,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-import { b2_linearSlop } from "../common/b2_settings";
-import { b2Sqrt, b2Transform, b2Sweep } from "../common/b2_math";
-import { b2Manifold, b2WorldManifold, b2ManifoldPoint, b2ContactID } from "../collision/b2_collision";
-import { b2TestOverlapShape } from "../collision/b2_collision";
-import { b2TimeOfImpact, b2TOIInput, b2TOIOutput } from "../collision/b2_time_of_impact";
-import { b2Body } from "./b2_body";
-import { b2Fixture } from "./b2_fixture";
-import { b2Shape } from "../collision/b2_shape";
-import { b2ContactListener } from "./b2_world_callbacks";
+import {b2_linearSlop} from "../common/b2_settings";
+import {b2Sqrt, b2Sweep, b2Transform} from "../common/b2_math";
+import {b2ContactID, b2Manifold, b2ManifoldPoint, b2TestOverlapShape, b2WorldManifold} from "../collision/b2_collision";
+import {b2TimeOfImpact, b2TOIInput, b2TOIOutput} from "../collision/b2_time_of_impact";
+import {b2Body} from "./b2_body";
+import {b2Fixture} from "./b2_fixture";
+import {b2Shape} from "../collision/b2_shape";
+import {b2ContactListener} from "./b2_world_callbacks";
 
 /// Friction mixing law. The idea is to allow either fixture to drive the friction to zero.
 /// For example, anything slides on ice.

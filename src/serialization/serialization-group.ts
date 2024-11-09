@@ -1,4 +1,5 @@
-import BinarySerializable, {BinarySerializableStatic, Constructor} from "./binary/serializable";
+import BinarySerializable, {BinarySerializableStatic} from "./binary/serializable";
+import {Constructor} from "src/utils/constructor";
 
 export default class BinarySerializationGroup {
     map = new Map<number, BinarySerializableStatic<any>>();

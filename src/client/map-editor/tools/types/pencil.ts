@@ -1,43 +1,101 @@
 import Tool from '../tool';
 import RangeView from '../../../ui/elements/range/range';
-import BrushProgram from '../../../graphics/programs/brush-program/brush-program';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
-import BrushProgramController from "src/client/graphics/programs/brush-program/brush-program-controller";
 import Color from "src/utils/color";
 import {squareQuadrangleFromPoints} from "src/utils/quadrangle";
 import TilemapComponent from "src/physics/tilemap-component";
 import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
+import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import Entity from "src/utils/ecs/entity";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
+import {clamp} from "src/utils/utils";
+
+export class PencilDrawer extends EntityDrawer {
+    tool: Pencil
+
+    constructor(tool: Pencil) {
+        super()
+
+        this.tool = tool
+    }
+
+    draw(phase: DrawPhase) {
+        if(!this.tool.brushPositionKnown) {
+            return
+        }
+
+        const program = phase.getProgram(ConvexShapeProgram)
+
+        const map = this.tool.manager.world.getComponent(TilemapComponent).map
+
+        const scale = GameMap.BLOCK_SIZE
+        const x = this.tool.brushX
+        const y = this.tool.brushY
+
+        let dyStart = Math.max(0, -y)
+        let dyEnd = Math.min(this.tool.thickness, map.height - y)
+
+        for (let dy = dyStart; dy < dyEnd; dy++) {
+            let bounds = this.tool.brushRowBoundsFor(dy)
+
+            bounds[0] = clamp(bounds[0] + x, 0, map.width) * scale
+            bounds[1] = clamp(bounds[1] + x, 0, map.width) * scale
+
+            let quadrangle = squareQuadrangleFromPoints(bounds[0], (y + dy) * scale, bounds[1], (y + dy + 1) * scale)
+
+            program.drawQuadrangle(quadrangle, this.tool.brushColor.getUint32())
+        }
+    }
+}
 
 export default class Pencil extends Tool {
-	public actionName = "Карандаш";
-    public image = "assets/img/pencil.png"
+    public actionName = "Карандаш";
+    public image = "assets/map-editor/pencil.png"
 
-    public brushProgramController: BrushProgramController
-	public brushX = 0;
-	public brushY = 0;
-	public brushPositionKnown = false;
-	public isSquare = false;
-	public thicknessRangeInput = new RangeView();
-	public thicknessLabel: JQuery;
-	public thicknessContainer: JQuery;
-	public roundModeButton: JQuery;
-	public squareModeButton: JQuery;
-	public thickness: number;
-	public oldX: number;
-	public oldY: number;
+    public mouseX = 0
+    public mouseY = 0
+
+    // Coordinates of the top-left corner of the brush
+    public brushX = 0;
+    public brushY = 0;
+
+    public brushPositionKnown = false;
+
+    public isSquare = false;
+    public thicknessRangeInput = new RangeView();
+    public thicknessLabel: JQuery;
+    public thicknessContainer: JQuery;
+    public roundModeButton: JQuery;
+    public squareModeButton: JQuery;
+    public thickness: number;
+    public oldX: number | null = null;
+    public oldY: number | null = null;
+    public brushColor = new Color().setRGB(0, 1, 0, 0.5)
+
+    public maxSize = 32
+
+    public visibleEntity = new Entity()
 
     constructor(manager: ToolManager) {
         super(manager);
 
-        const brushProgram = new BrushProgram(this.manager.screen.ctx)
-        this.brushProgramController = new BrushProgramController(brushProgram, this.manager.camera)
-        this.brushProgramController.brushColor = new Color().setRGB(0, 1, 0, 0.5)
-        this.brushProgramController.camera = this.manager.camera
+        this.visibleEntity.addComponent(new PencilDrawer(this))
 
         this.setupMenu()
         this.setThickness(1)
+
+        this.controlsEventHandler.on("editor-increase-brush-size", () => {
+            this.setThickness(this.thickness + 1)
+            this.thicknessRangeInput.setValue(this.thickness / this.maxSize)
+        })
+
+        this.controlsEventHandler.on("editor-decrease-brush-size", () => {
+            this.setThickness(this.thickness - 1)
+            this.thicknessRangeInput.setValue(this.thickness / this.maxSize)
+        })
     }
 
     setupMenu() {
@@ -50,8 +108,8 @@ export default class Pencil extends Tool {
 
         this.roundModeButton = $("<div>")
             .addClass("tool inline selected")
-            .css("background-image", "url(assets/img/round-brush.png)")
-            .on("click",() => {
+            .css("background-image", "url(assets/map-editor/round-brush.png)")
+            .on("click", () => {
                 this.roundModeButton.addClass("selected")
                 this.squareModeButton.removeClass("selected")
                 this.isSquare = false
@@ -59,7 +117,7 @@ export default class Pencil extends Tool {
 
         this.squareModeButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/img/square-brush.png)")
+            .css("background-image", "url(assets/map-editor/square-brush.png)")
             .on("click", () => {
                 this.roundModeButton.removeClass("selected")
                 this.squareModeButton.addClass("selected")
@@ -67,7 +125,7 @@ export default class Pencil extends Tool {
             })
 
         this.thicknessRangeInput.on("value", (value: number) => {
-            this.setThickness(Math.round(value * 16) + 1)
+            this.setThickness(Math.round(value * this.maxSize) + 1)
         })
 
         this.settingsView = $("<div>")
@@ -80,49 +138,43 @@ export default class Pencil extends Tool {
     }
 
     setThickness(thickness: number) {
+        thickness = clamp(thickness, 1, this.maxSize)
+        if(thickness === this.thickness) {
+            return
+        }
+
         this.thickness = thickness
         this.thicknessLabel.text(String(this.thickness))
+
+        this.refreshBrush()
+        this.manager.setNeedsRedraw()
     }
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
-        this.onMouse(x, y, false)
+        this.onMouse(x, y)
     }
 
     mouseMove(x: number, y: number) {
-        this.onMouse(x, y, true)
+        super.mouseMove(x, y)
+        this.onMouse(x, y)
     }
 
-    onMouse(x: number, y: number, continuous: boolean) {
-        this.brushPositionKnown = true
+    onMouse(x: number, y: number) {
+        this.mouseX = x
+        this.mouseY = y
 
-        let blockX
-        let blockY
-
-        if (this.thickness % 2 === 0) {
-            blockX = (Math.floor(x / GameMap.BLOCK_SIZE + 0.5)) * GameMap.BLOCK_SIZE
-            blockY = (Math.floor(y / GameMap.BLOCK_SIZE + 0.5)) * GameMap.BLOCK_SIZE
-        } else {
-            blockX = (Math.floor(x / GameMap.BLOCK_SIZE) + 0.5) * GameMap.BLOCK_SIZE
-            blockY = (Math.floor(y / GameMap.BLOCK_SIZE) + 0.5) * GameMap.BLOCK_SIZE
+        if (this.dragging) {
+            this.performDrawing(this.brushX, this.brushY)
         }
 
-        if(!continuous || blockX !== this.brushX || blockY !== this.brushY) {
-            this.brushX = blockX
-            this.brushY = blockY
-            if(this.dragging) {
-                this.performDrawing(this.brushX, this.brushY, continuous)
-            } else {
-                this.manager.setNeedsRedraw()
-            }
+        if (this.refreshBrush()) {
+            this.manager.setNeedsRedraw()
         }
     }
 
-    performDrawing(x: number, y: number, trace: boolean) {
-        x = Math.floor(x / GameMap.BLOCK_SIZE)
-        y = Math.floor(y / GameMap.BLOCK_SIZE)
-
-        if(trace) {
+    performDrawing(x: number, y: number) {
+        if (this.oldX !== null) {
             this.trace(this.oldX, this.oldY, x, y, (x, y) => this.draw(x, y))
         } else {
             this.draw(x, y)
@@ -132,51 +184,53 @@ export default class Pencil extends Tool {
         this.oldY = y
     }
 
-    mouseUp() {
-        super.mouseUp();
+    mouseUp(x: number, y: number) {
+        super.mouseUp(x, y);
 
         const map = this.manager.world.getComponent(TilemapComponent).map
         const history = map.getComponent(GameMapHistoryComponent)
 
         history.commitActions(this.actionName)
+
+        this.oldX = null
+        this.oldY = null
+    }
+
+    brushRowBoundsFor(column: number) {
+        if (this.isSquare) {
+            return [0, this.thickness]
+        }
+
+        const radius = this.thickness / 2
+        const area = Math.ceil(radius)
+
+        let dy = column - radius + 0.5
+        let boundary = Math.sqrt(radius ** 2 - dy ** 2)
+
+        if (this.thickness % 2 === 0) {
+            boundary = Math.round(boundary)
+            return [area - boundary, area + boundary]
+        } else {
+            boundary = Math.round(boundary + 0.5)
+            return [area - boundary, area + boundary - 1]
+        }
     }
 
     draw(x: number, y: number) {
         const map = this.manager.world.getComponent(TilemapComponent).map
-        const radius = this.thickness / 2
-        const area = Math.ceil(radius)
 
-        let lowX = x - area
-        let lowY = y - area
-        let highX = Math.min(map.width - 1, x + area - 1)
-        let highY = Math.min(map.height - 1, y + area - 1)
+        for (let by = 0; by < this.thickness; by++) {
 
-        if(this.thickness % 2 !== 0) {
-            lowX++
-            lowY++
-        }
+            let row = this.brushRowBoundsFor(by)
 
-        lowX = Math.max(0, x - area)
-        lowY = Math.max(0, y - area)
+            for (let bx = row[0]; bx < row[1]; bx++) {
 
+                let px = x + bx
+                let py = y + by
 
-        if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
+                if (px < 0 || py < 0 || px >= map.width || py >= map.height) continue
 
-        let squareThickness = radius ** 2;
-
-        let sdx = lowX - x;
-        let sdy = lowY - y;
-
-        if(this.thickness % 2 === 0) {
-            sdx += 0.5;
-            sdy += 0.5;
-        }
-
-        for(let bx = lowX, dx = sdx; bx <= highX; bx++, dx++) {
-            for (let by = lowY, dy = sdy; by <= highY; by++, dy++) {
-                if (this.isSquare || dx ** 2 + dy ** 2 <= squareThickness) {
-                    this.fragment(bx, by)
-                }
+                this.fragment(px, py)
             }
         }
 
@@ -186,7 +240,7 @@ export default class Pencil extends Tool {
     fragment(x: number, y: number) {
         const map = this.manager.world.getComponent(TilemapComponent).map
 
-        if((map.getBlock(x, y).constructor as typeof BlockState).typeId ===
+        if ((map.getBlock(x, y).constructor as typeof BlockState).typeId ===
             (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
             return
 
@@ -196,32 +250,41 @@ export default class Pencil extends Tool {
     }
 
     becomeActive() {
-        this.setCursor("url(assets/img/cursors/pencil.png) 0 32, auto")
+        super.becomeActive()
+        this.setCursor("url(assets/map-editor/cursors/pencil.png) 0 32, auto")
         this.brushPositionKnown = false
+        this.manager.world.appendChild(this.visibleEntity)
     }
 
-    drawDecorations() {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+    resignActive() {
+        super.resignActive();
+        this.visibleEntity.removeFromParent()
+    }
 
-        const s = GameMap.BLOCK_SIZE
-        const x = this.brushX / s
-        const y = this.brushY / s
+    refreshBrush() {
+        this.brushPositionKnown = true
+
+        let brushX = (Math.floor(this.mouseX / GameMap.BLOCK_SIZE))
+        let brushY = (Math.floor(this.mouseY / GameMap.BLOCK_SIZE))
+
+        if (this.thickness % 2 !== 0) {
+            brushX++
+            brushY++
+        }
 
         const radius = this.thickness / 2
+        const area = Math.ceil(radius)
 
-        const lowX = Math.max(0, x - radius)
-        const lowY = Math.max(0, y - radius)
-        const highX = Math.min(map.width, x + radius)
-        const highY = Math.min(map.height, y + radius)
+        brushX -= area
+        brushY -= area
 
-        if(highX < 0 || highY < 0 || lowX >= map.width || lowY >= map.height) return
+        if (brushX !== this.brushX || brushY !== this.brushY) {
+            this.brushX = brushX
+            this.brushY = brushY
 
-        this.brushProgramController.brushBounds = squareQuadrangleFromPoints(lowX * s, lowY * s, highX * s, highY * s)
-        this.brushProgramController.brushX = this.brushX
-        this.brushProgramController.brushY = this.brushY
-        this.brushProgramController.brushIsSquare = this.isSquare
-        this.brushProgramController.brushDiameter = this.thickness
+            return true
+        }
 
-        this.brushProgramController.draw()
+        return false
     }
 }

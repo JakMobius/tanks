@@ -12,6 +12,14 @@ export default class BinaryBlockCoder {
         let savedPosition = decoder.offset
         let size = decoder.readUint32()
 
+        if(size === 0) {
+            throw new Error("Zero-size blocks are invalid")
+        }
+
+        if(savedPosition + size > decoder.buffer.byteLength) {
+            throw new Error("Oversize blocks are invalid")
+        }
+
         lambda(decoder, size + savedPosition - decoder.offset)
 
         decoder.offset = savedPosition + size
@@ -27,5 +35,9 @@ export default class BinaryBlockCoder {
         encoder.offset = startPosition
         encoder.writeUint32(endPosition - startPosition)
         encoder.offset = endPosition
+    }
+
+    static skipBlock(decoder: ReadBuffer)  {
+        return this.decodeBlock(decoder, () => {})
     }
 }

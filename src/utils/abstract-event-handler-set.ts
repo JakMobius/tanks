@@ -13,8 +13,8 @@ export default abstract class AbstractEventHandlerSet<T> {
         this.setTarget(target)
     }
 
-    on(event: any, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL){
-        if(this.listeners.has(event)) {
+    on(event: any, listener: (...params: any[]) => any, priority: number = EventEmitter.PRIORITY_NORMAL) {
+        if (this.listeners.has(event)) {
             this.listeners.get(event).push({
                 handler: listener,
                 priority: priority
@@ -25,11 +25,11 @@ export default abstract class AbstractEventHandlerSet<T> {
                 priority: priority
             }])
         }
-        if(this.target) this.setEventListeners(event, listener)
+        if (this.target) this.setEventListeners(event, listener)
     }
 
     setAllListeners() {
-        for(let [event, listeners] of this.listeners) {
+        for (let [event, listeners] of this.listeners) {
             for (let listener of listeners) {
                 this.setEventListeners(event, listener.handler, listener.priority)
             }
@@ -37,7 +37,7 @@ export default abstract class AbstractEventHandlerSet<T> {
     }
 
     resetAllListeners() {
-        for(let [event, listeners] of this.listeners) {
+        for (let [event, listeners] of this.listeners) {
             for (let listener of listeners) {
                 this.resetEventListeners(event, listener.handler)
             }
@@ -46,9 +46,9 @@ export default abstract class AbstractEventHandlerSet<T> {
 
     resetAllEventListeners(event: any) {
         let listeners = this.listeners.get(event);
-        if(!listeners) return
+        if (!listeners) return
 
-        for(let listener of listeners) {
+        for (let listener of listeners) {
             this.resetEventListeners(event, listener.handler)
         }
     }
@@ -72,11 +72,15 @@ export default abstract class AbstractEventHandlerSet<T> {
     }
 
     protected abstract setEventListener(target: T, event: any, listener: (...params: any[]) => any, priority: number): void
+
     protected abstract resetEventListener(target: T, event: any, listener: (...params: any[]) => any): void
 
     setTarget(target: T | T[]) {
-        if(this.target) this.resetAllListeners()
+        if (this.target === target) {
+            return
+        }
+        if (this.target) this.resetAllListeners()
         this.target = target
-        if(this.target) this.setAllListeners()
+        if (this.target) this.setAllListeners()
     }
 }

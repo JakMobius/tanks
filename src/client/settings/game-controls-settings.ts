@@ -1,5 +1,6 @@
 import InputDevice, {AxleConfig, InputDeviceType} from "../controls/input/input-device";
 import {defaultSettingsForDevice} from "./defaults/default-controls-settings";
+import EventEmitter from "src/utils/event-emitter";
 
 export type ControllerControlsConfig<T extends AxleConfig> = {
     [key: string]: T[]
@@ -11,19 +12,18 @@ export interface SerializedGameControlsSettings {
     controllerConfig?: { [key: string] : ControllerControlsConfig<AxleConfig> }
 }
 
-export default class GameControlsSettings {
+export default class GameControlsSettings extends EventEmitter {
 
     controllerConfig: Map<string, ControllerControls<AxleConfig>> = new Map()
 
     constructor(serialized?: SerializedGameControlsSettings) {
-        if (!serialized) {
-            serialized = {}
-        }
+        super()
+        serialized = Object.assign({
+            controllerConfig: {}
+        }, serialized)
 
-        if(serialized.controllerConfig) {
-            for(let [name, controls] of Object.entries(serialized.controllerConfig)) {
-                this.controllerConfig.set(name, new Map(Object.entries(controls)))
-            }
+        for(let [name, controls] of Object.entries(serialized.controllerConfig)) {
+            this.controllerConfig.set(name, new Map(Object.entries(controls)))
         }
     }
 
@@ -43,7 +43,7 @@ export default class GameControlsSettings {
         // Load default settings for controller
         if(!config) {
             config = defaultSettingsForDevice(device)
-            this.controllerConfig.set(name, config)
+            this.controllerConfig.set(deviceSectionName, config)
         }
 
         return config

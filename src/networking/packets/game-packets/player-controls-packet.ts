@@ -1,26 +1,26 @@
-import TankControls from '../../../controls/tank-controls';
+
 import BinaryPacket from '../../binary-packet';
 import {BinarySerializer} from "src/serialization/binary/serializable";
 import WriteBuffer from "src/serialization/binary/write-buffer";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import {Constructor} from "src/utils/constructor";
 
 export default class PlayerControlsPacket extends BinaryPacket {
-	public controls: TankControls;
     static typeName = 6
+    controlsData: Uint8Array
 
-    constructor(controls: TankControls) {
+    constructor(data: Uint8Array) {
         super();
-        this.controls = controls
+        this.controlsData = data;
     }
 
     toBinary(encoder: WriteBuffer): void {
-        this.controls.toBinary(encoder)
+        encoder.writeUint32(this.controlsData.length)
+        encoder.writeBytes(this.controlsData)
     }
 
-    /**
-     * Update specified tank controls
-     */
-    updateControls(controls: TankControls): void {
-        controls.updateState(this.decoder)
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
+        return new PlayerControlsPacket(decoder.readBytes(decoder.readUint32())) as any as T
     }
 }
 

@@ -1,65 +1,28 @@
 import DrawPhase from "./draw-phase";
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
-export default class EntityDrawer implements Component {
-	public entity: Entity;
-    public drawer: WorldDrawerComponent
+export default class EntityDrawer extends EventHandlerComponent {
     public enabled: boolean = true
-    public eventListener = new BasicEventHandlerSet()
+
+    drawCallback = (phase: DrawPhase) => this.draw(phase)
 
     constructor() {
-        this.eventListener.on("world-drawer-attached", (drawer: WorldDrawerComponent) => this.setDrawer(drawer))
-        this.eventListener.on("attached-to-parent", (child, parent) => {
-            if(!this.drawer) this.findDrawer(parent)
+        super()
+        this.eventHandler.on("camera-attach", (camera: Entity) => {
+            camera.getComponent(WorldDrawerComponent).entityDrawPhase.on("draw", this.drawCallback)
         })
-        this.eventListener.on("will-detach-from-parent", (child, parent) => {
-            if(this.drawer) this.findDrawer(this.entity, child)
+
+        this.eventHandler.on("camera-detach", (camera: Entity) => {
+            camera.getComponent(WorldDrawerComponent).entityDrawPhase.off("draw", this.drawCallback)
         })
     }
 
     /**
      * Draws the specified entity.
      */
-    draw(phase: DrawPhase) {}
 
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventListener.setTarget(this.entity)
-        this.findDrawer()
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventListener.setTarget(this.entity)
-        if(this.drawer) {
-            this.drawer.removeDrawer(this)
-        }
-    }
-
-    private findDrawer(startFrom: Entity = this.entity, endWith: Entity = null) {
-        let entity = startFrom
-        let host = null
-
-        while(entity && !host) {
-            host = entity.getComponent(WorldDrawerComponent)
-            if(entity == endWith) break;
-            entity = entity.parent
-        }
-
-        this.setDrawer(host)
-    }
-
-    setDrawer(drawer: WorldDrawerComponent) {
-        if(drawer == this.drawer) return
-        if(this.drawer) {
-            this.drawer.removeDrawer(this)
-        }
-        this.drawer = drawer
-        if(this.drawer) {
-            this.drawer.addDrawer(this)
-        }
+    draw(phase: DrawPhase) {
     }
 }

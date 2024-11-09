@@ -18,10 +18,10 @@
 
 // #if B2_ENABLE_CONTROLLER
 
-import { b2Controller } from "./b2_controller";
-import { b2Vec2 } from "../common/b2_math";
-import { b2TimeStep } from "../dynamics/b2_time_step";
-import { b2Draw } from "../common/b2_draw";
+import {b2Controller} from "./b2_controller";
+import {b2Vec2} from "../common/b2_math";
+import {b2TimeStep} from "../dynamics/b2_time_step";
+import {b2Draw} from "../common/b2_draw";
 
 /**
  * Applies a force every frame

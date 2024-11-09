@@ -1,46 +1,36 @@
-import {Component} from "src/utils/ecs/component";
 import * as Box2D from "src/library/box2d";
 import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
-import PhysicalHostComponent from "src/physiсal-world-component";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import {TransmitterSet} from "./network/transmitting/transmitter-set";
-import PositionTransmitter from "./network/position/position-transmitter";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
-export default class PhysicalComponent implements Component {
-    entity: Entity | null
+export default class PhysicalComponent extends EventHandlerComponent {
     body: Box2D.Body
     host: PhysicalHostComponent
     positionUpdated: boolean = false
     bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body
 
-    private eventListener = new BasicEventHandlerSet()
     private positionComponent?: TransformComponent
 
     constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body) {
+        super()
         this.body = null
         this.host = null
         this.bodyConstructor = bodyConstructor
 
-        this.eventListener.on("will-detach-from-parent", (child, parent) => {
-            if(child !== this.entity) return;
+        this.eventHandler.on("will-detach-from-parent", () => {
             this.setHost(null)
         })
 
-        this.eventListener.on("attached-to-parent", (child, parent) => {
-            if(child !== this.entity) return;
+        this.eventHandler.on("attached-to-parent", (parent) => {
             this.setHost(parent.getComponent(PhysicalHostComponent))
         })
 
-        this.eventListener.on("physical-host-attached", (host) => {
+        this.eventHandler.on("physical-host-attached", (host) => {
             this.setHost(host)
         })
 
-        this.eventListener.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
-            transmitterSet.initializeTransmitter(PositionTransmitter)
-        })
-
-        this.eventListener.on("teleport", () => {
+        this.eventHandler.on("teleport", () => {
             this.host.entity.emit("entity-teleport", this.entity)
         })
     }
@@ -53,12 +43,7 @@ export default class PhysicalComponent implements Component {
     }
 
     onPhysicsTick(dt: number) {
-        const transformComponent = this.getPositionComponent().transform
-        const position = this.body.GetPosition()
-
-        transformComponent.reset()
-        transformComponent.translate(position.x, position.y)
-        transformComponent.rotate(-this.body.GetAngle())
+        this.updateTransform()
 
         if(this.positionUpdated) {
             this.positionUpdated = false
@@ -69,14 +54,15 @@ export default class PhysicalComponent implements Component {
     }
 
     onDetach() {
-        this.entity = null
-        this.eventListener.setTarget(null)
+        super.onDetach()
         this.setHost(null)
     }
 
     onAttach(entity: Entity) {
-        this.entity = entity
-        this.eventListener.setTarget(entity)
+        super.onAttach(entity)
+        if(entity.parent) {
+            this.setHost(entity.parent.getComponent(PhysicalHostComponent))
+        }
     }
 
     getBody() {
@@ -84,7 +70,7 @@ export default class PhysicalComponent implements Component {
     }
 
     setHost(host: PhysicalHostComponent) {
-        if(host == this.host) return;
+        if(host === this.host) return;
 
         if(this.host) {
             this.host.world.DestroyBody(this.body)
@@ -95,7 +81,15 @@ export default class PhysicalComponent implements Component {
 
         if(this.host) {
             this.body = this.bodyConstructor(host)
-            this.body.SetUserData(this.entity)
+
+            // Box2D solvers are stored statically. Resolved contacts
+            // are sometimes cached in memory, as well as corresponding
+            // bodies and their user data. This is not much of a
+            // performance problem, but it makes real memory leaks harder
+            // to detect.
+
+            let ref = new WeakRef(this.entity)
+            this.body.SetUserData(ref)
             this.host.registerComponent(this)
             this.entity.emit("physical-body-created", this)
         }
@@ -103,11 +97,13 @@ export default class PhysicalComponent implements Component {
 
     setPosition(position: Box2D.XY) {
         this.body.SetPosition(position)
+        this.updateTransform()
         this.positionUpdated = true
     }
 
     setAngle(angle: number) {
         this.body.SetAngle(angle)
+        this.updateTransform()
         this.positionUpdated = true
     }
 
@@ -119,5 +115,32 @@ export default class PhysicalComponent implements Component {
     setAngularVelocity(velocity: number) {
         this.body.SetAngularVelocity(velocity)
         this.positionUpdated = true
+    }
+
+    private updateTransform() {
+        const transformComponent = this.getPositionComponent().transform
+        const position = this.body.GetPosition()
+
+        transformComponent.reset()
+        transformComponent.translate(position.x, position.y)
+        transformComponent.rotate(-this.body.GetAngle())
+    }
+
+    static getObjectFromBody(body: Box2D.Body) {
+        let userData = body.GetUserData()
+
+        if(!(userData instanceof WeakRef)) {
+            return null
+        }
+
+        return userData.deref()
+    }
+
+    static getEntityFromBody(body: Box2D.Body) {
+
+        let entity = this.getObjectFromBody(body)
+
+        if(!(entity instanceof Entity)) return null
+        return entity
     }
 }

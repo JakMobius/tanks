@@ -34,7 +34,7 @@ export default class Transmitter {
             throw new Error("Entity is not visible to the receiver")
         }
 
-        this.set.receivingEnd.packNavigationPath(transmitterSet)
+        this.set.receivingEnd.buffer.writeUint32(transmitterSet.entityId)
     }
 
     attachToSet(set: TransmitterSet): void {

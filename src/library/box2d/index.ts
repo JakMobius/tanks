@@ -160,7 +160,9 @@ export { /*class*/ b2Body as Body } from "./dynamics/b2_body";
 export { /*interface*/ b2IBodyDef as IBodyDef } from "./dynamics/b2_body";
 export { /*class*/ b2BodyDef as BodyDef } from "./dynamics/b2_body";
 export { /*enum*/ b2BodyType as BodyType } from "./dynamics/b2_body";
-import { b2BodyType } from "./dynamics/b2_body";
+import {b2BodyType} from "./dynamics/b2_body";
+import {b2BendingModel, b2StretchingModel} from "./rope/b2_rope";
+
 export const staticBody = b2BodyType.b2_staticBody;
 export const kinematicBody = b2BodyType.b2_kinematicBody;
 export const dynamicBody = b2BodyType.b2_dynamicBody;
@@ -253,7 +255,6 @@ export { /*class*/ b2RopeDef as RopeDef } from "./rope/b2_rope";
 export { /*class*/ b2Rope as Rope } from "./rope/b2_rope";
 export { /*class*/ b2RopeTuning as RopeTuning } from "./rope/b2_rope";
 export { /*enum*/ b2BendingModel as BendingModel } from "./rope/b2_rope";
-import { b2BendingModel } from "./rope/b2_rope";
 export const springAngleBendingModel = b2BendingModel.b2_springAngleBendingModel;
 export const pbdAngleBendingModel = b2BendingModel.b2_pbdAngleBendingModel;
 export const xpbdAngleBendingModel = b2BendingModel.b2_xpbdAngleBendingModel;
@@ -261,7 +262,6 @@ export const pbdDistanceBendingModel = b2BendingModel.b2_pbdDistanceBendingModel
 export const pbdHeightBendingModel = b2BendingModel.b2_pbdHeightBendingModel;
 export const pbdTriangleBendingModel = b2BendingModel.b2_pbdTriangleBendingModel;
 export { /*enum*/ b2StretchingModel as StretchingModel } from "./rope/b2_rope";
-import { b2StretchingModel } from "./rope/b2_rope";
 export const pbdStretchingModel = b2StretchingModel.b2_pbdStretchingModel;
 export const xpbdStretchingModel = b2StretchingModel.b2_xpbdStretchingModel;
 

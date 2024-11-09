@@ -4,7 +4,7 @@ import EventEmitter from "./event-emitter";
 export default class BasicEventHandlerSet extends AbstractEventHandlerSet<EventEmitter> {
 
     constructor() {
-        super()
+        super();
     }
 
     protected resetEventListener(target: EventEmitter, event: any, listener: (...params: any[]) => any): void {

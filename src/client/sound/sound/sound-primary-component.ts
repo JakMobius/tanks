@@ -1,114 +1,73 @@
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
 import {SoundStream} from "../stream/sound-stream";
-import {SoundAsset} from "../sounds";
+import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
-export default class SoundPrimaryComponent implements Component {
-    public entity: Entity
-	public source: AudioBufferSourceNode;
-    public asset: SoundAsset
-    public keepalive: boolean
+export default class SoundPrimaryComponent extends EventHandlerComponent {
+    public source: AudioNode;
     public connected: boolean
+    public volume: number = 1.0
 
-    public inputStream: SoundStream
-    public outputStreams: SoundStream[] = []
+    streams = new Map<Entity, SoundStream>()
 
-    private tickHandler: () => void = () => this.entity.emit("tick")
+    constructor() {
+        super()
 
-    constructor(asset: SoundAsset) {
-        this.asset = asset
-        this.source = asset.engine.context.createBufferSource()
-        this.source.buffer = asset.buffer
-        this.source.onended = () => {
-            if(this.source.loop || this.keepalive) return
-            this.entity.emit("ended")
-            this.stopTicking()
-            this.disconnect()
-        }
-        asset.engine.resume()
-        this.createInput()
-        this.createOutputs()
+        this.eventHandler.on("camera-attach", (camera) => this.addCamera(camera))
+        this.eventHandler.on("camera-detach", (camera) => this.removeCamera(camera))
     }
 
-    play() {
-        if(!this.connected) this.connect()
-        this.source.start(this.asset.engine.context.currentTime);
-        this.entity.emit("play")
-        this.startTicking()
+    setVolume(volume: number) {
+        this.volume = volume
+        for (let stream of this.streams.values()) {
+            stream.input.gain.value = this.volume
+        }
         return this
     }
 
-    loop(loop: boolean) {
-        this.source.loop = loop
+    setSource(source: AudioNode) {
+
+        if (this.source) {
+            for (let stream of this.streams.values()) {
+                this.source.disconnect(stream.input)
+            }
+        }
+
+        this.source = source
+
+        if (this.source) {
+            for (let stream of this.streams.values()) {
+                this.source.connect(stream.input)
+            }
+        }
         return this
     }
 
-    playbackRate(rate: number) {
-        this.source.playbackRate.value = rate
-        return this
-    }
+    private addCamera(camera: Entity) {
+        let listener = camera?.getComponent(WorldSoundListenerComponent)
+        if (!listener) return
 
-    stop() {
-        this.source.stop(this.asset.engine.context.currentTime);
-        this.entity.emit("stop")
-        this.stopTicking()
-        return this
-    }
+        listener.sounds.add(this)
+        let stream = new SoundStream(this.source.context)
+        stream.input.gain.value = this.volume
 
-    onAttach(entity: Entity): void {
-        this.entity = entity;
-    }
-
-    onDetach(): void {
-        this.entity = null
-    }
-
-    private createInput() {
-        this.inputStream = new SoundStream(this.asset.engine)
-        this.source.connect(this.inputStream.input)
-    }
-
-    private createOutputs() {
-        for (let output of this.asset.engine.outputs) {
-            let soundOutput = new SoundStream(this.asset.engine)
-            this.inputStream.output.connect(soundOutput.input)
-            soundOutput.output.connect(output.input)
-            this.outputStreams.push(soundOutput)
+        if (this.source) {
+            this.source.connect(stream.input)
         }
+        stream.output.connect(listener.node)
+        this.streams.set(camera, stream)
     }
 
-    disconnect() {
-        if(!this.connected) return
-        this.stop()
-        this.connected = false
+    private removeCamera(camera: Entity) {
+        let listener = camera?.getComponent(WorldSoundListenerComponent)
+        if (!listener) return
 
-        for (let output of this.outputStreams) {
-            output.output.disconnect()
+        listener.sounds.delete(this)
+        let stream = this.streams.get(camera)
+        if (this.source) {
+            this.source.disconnect(stream.input)
         }
-    }
-
-    connect() {
-        if(this.connected) return
-        this.connected = true
-
-        for(let i = 0; i < this.outputStreams.length; i++) {
-            this.outputStreams[i].output.connect(this.asset.engine.outputs[i].input)
-        }
-    }
-
-    private startTicking() {
-        this.tickHandler()
-        this.asset.engine.on("tick", this.tickHandler)
-    }
-
-    private stopTicking() {
-        this.asset.engine.off("tick", this.tickHandler)
-    }
-
-    static createSound(sound: SoundAsset) {
-        let entity = new Entity()
-        let component = new SoundPrimaryComponent(sound)
-        entity.addComponent(component)
-        return entity
+        stream.output.disconnect(listener.node)
+        this.streams.delete(camera)
     }
 }

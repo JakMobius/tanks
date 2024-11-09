@@ -1,7 +1,7 @@
 import GameMap from "src/map/game-map";
 import Loop from "src/utils/loop/loop";
 import Entity from "src/utils/ecs/entity";
-import {serverGameWorldEntityPrefab} from "../server-game-world";
+import {serverGameWorldEntityPrefab} from "src/server/entity/server-game-world";
 import RoomLoopComponent from "./components/room-loop-component";
 import HighPrecisionLoop from "src/utils/loop/high-precision-loop";
 import WorldEventBroadcastComponent from "./components/world-event-broadcast-component";
@@ -9,6 +9,8 @@ import RoomClientComponent from "./components/room-client-component";
 import EmptyServerPauseComponent from "./components/empty-server-pause-component";
 import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
 import MapLoaderComponent from "./components/map-loader-component";
+import GameSocketPortal from "src/server/socket/game-server/game-socket-portal";
+import RoomSocketComponent from "src/server/room/components/room-socket-component";
 
 
 export interface GameConfig {
@@ -16,6 +18,7 @@ export interface GameConfig {
     map: GameMap
     loop?: Loop
     tps?: number
+    gameSocket?: GameSocketPortal
 }
 
 export default function serverGameRoomPrefab(entity: Entity, options: GameConfig) {
@@ -26,7 +29,7 @@ export default function serverGameRoomPrefab(entity: Entity, options: GameConfig
 
     // Vital game components
     serverGameWorldEntityPrefab(entity, {
-        map: entity.getComponent(MapLoaderComponent).getMap(),
+        map: entity.getComponent(MapLoaderComponent).getMap()
     })
 
     let worldStatistics = entity.getComponent(WorldStatisticsComponent)
@@ -44,5 +47,10 @@ export default function serverGameRoomPrefab(entity: Entity, options: GameConfig
     entity.addComponent(new RoomClientComponent({
         name: options.name
     }))
+
+    if(options.gameSocket) {
+        entity.addComponent(new RoomSocketComponent(options.gameSocket))
+    }
+
     entity.addComponent(new EmptyServerPauseComponent())
 }

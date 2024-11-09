@@ -15,9 +15,13 @@ export default class GameModeEventTransmitter extends Transmitter {
         this.controller = controller
 
         this.eventHandler.on("state-broadcast", () => {
-            this.state = this.getState()
             this.updatePrecondition()
             this.sendState()
+        })
+
+        this.eventHandler.on("event-broadcast", (event) => {
+            this.updatePrecondition()
+            this.sendEvent(event)
         })
 
         this.transmitterPrecondition = this.visibilityPrecondition
@@ -29,10 +33,11 @@ export default class GameModeEventTransmitter extends Transmitter {
     }
 
     getState() {
-        return this.controller.activeController.getState()
+        return this.controller.activeGameState.getState()
     }
 
     updatePrecondition() {
+        this.state = this.getState()
         let entityArray: Entity[] = []
         GameObjectWriter.getEntitiesFromObject(this.state, entityArray)
         this.visibilityPrecondition.setEntityArray(entityArray)
@@ -41,6 +46,12 @@ export default class GameModeEventTransmitter extends Transmitter {
     sendState() {
         this.packIfEnabled(Commands.GAME_STATE_COMMAND, (buffer) => {
             this.encodeObject(this.state)
+        })
+    }
+
+    sendEvent(event: any) {
+        this.packIfEnabled(Commands.GAME_EVENT_COMMAND, (buffer) => {
+            this.encodeObject(event)
         })
     }
 }

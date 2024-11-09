@@ -1,0 +1,59 @@
+.tank-select-overlay .tank-select-menu {
+    width: 860px;
+    height: 431px;
+    position: relative;
+}
+.tank-select-overlay .tank-select-menu .tank-title-container {
+    position: absolute;
+    width: 352px;
+    height: 42px;
+    left: 254px;
+    top: 177px;
+    background: #FFFFFF;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+    border-radius: 13px;
+}
+.tank-select-overlay .tank-select-menu .tank-title-container .tank-title {
+    font-weight: bold;
+    font-size: 23px;
+    text-align: center;
+    line-height: 42px;
+    width: 100%;
+    height: 42px;
+}
+.tank-select-overlay .tank-select-menu .tank-description-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    width: 575px;
+    height: 186px;
+    left: 143px;
+    top: 245px;
+    background: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 13px;
+}
+.tank-select-overlay .tank-select-menu .tank-description-menu .tank-description-text {
+    padding: 10px;
+    width: 294px;
+    box-sizing: border-box;
+    font-weight: bold;
+    text-align: center;
+}
+.tank-select-overlay .tank-select-menu .tank-description-menu .tank-description-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 10px;
+    flex-grow: 1;
+}
+.tank-select-overlay {
+    background: rgba(80, 80, 80, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

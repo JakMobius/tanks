@@ -1,0 +1,50 @@
+.tank-carousel-button {
+    width: 40px;
+    height: 100%;
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    animation-duration: 0.2s;
+}
+
+.tank-carousel-button-left {
+    left: 0;
+    background-image: url(../assets/game/carousel-left.png);
+}
+.tank-carousel-button-left.tank-carousel-button-active {
+    animation-name: tank-carousel-button-bounce-left;
+}
+
+.tank-carousel-button-right {
+    right: 0;
+    background-image: url(../assets/game/carousel-right.png);
+}
+.tank-carousel-button-right.tank-carousel-button-active {
+    animation-name: tank-carousel-button-bounce-right;
+}
+
+@keyframes tank-carousel-button-bounce-right {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+@keyframes tank-carousel-button-bounce-left {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(-5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}

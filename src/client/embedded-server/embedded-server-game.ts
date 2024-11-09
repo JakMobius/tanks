@@ -7,7 +7,7 @@ import SocketPortalClient from "src/server/socket/socket-portal-client";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
 import Entity from "src/utils/ecs/entity";
 import RoomClientComponent from "src/server/room/components/room-client-component";
-import {clientGameWorldEntityPrefab} from "../client-game-world-entity-prefab";
+import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 
 export class EmbeddedServerGameConfig {
     map: GameMap
@@ -28,9 +28,10 @@ export default class EmbeddedServerGame {
             map: map,
             name: "Embedded Server Game",
             loop: this.serverLoop,
+            tps: 20
         })
 
-        this.serverLoop.setInterval(50)
+        this.serverLoop.setInterval(1 / 20)
         this.serverLoop.start()
 
         this.clientWorld = new Entity()
@@ -57,7 +58,7 @@ export default class EmbeddedServerGame {
     }
 
     tick(dt: number) {
-        this.clientWorld.propagateEvent("tick", dt)
+        this.clientWorld.emit("tick", dt)
         this.serverLoop.timePassed(dt)
     }
 }

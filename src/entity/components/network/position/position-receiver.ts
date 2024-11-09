@@ -15,6 +15,9 @@ export default class PositionReceiver extends ReceiverComponent {
             const vy = buffer.readFloat32()
             const angularVelocity = buffer.readFloat32()
 
+            const serverTicks = buffer.readUint16()
+            const serverTickTime = buffer.readFloat32()
+
             const serverPosition = this.entity.getComponent(ServerPositionComponent)
 
             serverPosition.serverVelocity.x = vx
@@ -25,6 +28,9 @@ export default class PositionReceiver extends ReceiverComponent {
 
             serverPosition.serverAngle = angle
             serverPosition.serverAngularVelocity = angularVelocity
+
+            serverPosition.serverTick = serverTicks
+            serverPosition.serverTickTime = serverTickTime
 
             serverPosition.serverPositionReceived()
         })

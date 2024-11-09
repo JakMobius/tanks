@@ -1,38 +1,35 @@
 /* @load-resource: './overlay.scss' */
 
-import EventEmitter from '../../../utils/event-emitter';
+import View from "src/client/ui/view";
 
-export interface OverlayConfig {
-    root: JQuery
-}
+export default class Overlay extends View {
+    public shown = false;
+    public root: JQuery;
 
-export default class Overlay extends EventEmitter {
-	public overlay = $("<div>").addClass("overlay");
-	public shown = false;
-	public root: JQuery;
-
-    constructor(options: OverlayConfig) {
+    constructor() {
         super()
-        this.root = options.root
-        this.root.append(this.overlay)
-        this.overlay.hide()
+        this.element.addClass("overlay")
+        this.element.hide()
     }
 
-    show() {
-        if(this.shown) { return }
+    show(): boolean {
+        if (this.shown) return false
 
         this.shown = true
-        this.overlay.show()
-        this.overlay.trigger("focus")
+        this.element.show()
+        this.emit("open")
+
+        return true
     }
 
-    hide(callback?: () => void): void {
-        if(!this.shown) { return }
+    hide(): boolean {
+        if (!this.shown) return false
 
         this.shown = false
-        this.overlay.trigger("blur")
-        this.overlay.hide()
-        if(callback) setTimeout(callback)
+        this.element.hide()
+        this.emit("close")
+
+        return true
     }
 
     static menu() {

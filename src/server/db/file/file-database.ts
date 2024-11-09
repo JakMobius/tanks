@@ -1,5 +1,5 @@
 import ServerDatabase from "../server-database";
-import {UserDataRaw} from "src/client/user-data-raw";
+import {UserDataRaw} from "src/client/utils/user-data-raw";
 import hashToString from "src/utils/hash-to-string";
 import murmurhash3_32_gc from "src/utils/murmurhash";
 import * as fs from "fs";
@@ -36,7 +36,7 @@ export default class FileDatabase implements ServerDatabase {
         return JSON.parse(file)
     }
 
-    createStorageAtPath(storagePath: string, data: any): Promise<any> {
+    writeStorageAtPath(storagePath: string, data: any): Promise<any> {
         return fs.promises.writeFile(path.join(this.path, storagePath), JSON.stringify(data))
     }
 
@@ -63,7 +63,7 @@ export default class FileDatabase implements ServerDatabase {
         if(!hashStorage) hashStorage = {}
         if(hashStorage[login]) return false
         hashStorage[login] = { password: password, data: {} }
-        await this.createStorageAtPath("users/" + hash, hashStorage)
+        await this.writeStorageAtPath("users/" + hash, hashStorage)
         return true
     }
 
@@ -71,6 +71,13 @@ export default class FileDatabase implements ServerDatabase {
     async getUserInfo(login: string): Promise<UserDataRaw> {
         const storage = await this.getUserStorage(login)
         return storage.data
+    }
+
+    async modifyUserInfo(login: string, data: UserDataRaw): Promise<void> {
+        const hash = this.getUsernameHash(login)
+        const hashStorage = await this.getStorageAtPath("users/" + hash)
+        hashStorage[login].data = data
+        await this.writeStorageAtPath("users/" + hash, hashStorage)
     }
 
     getWebserverStore(): session.Store {

@@ -2,9 +2,7 @@ import GameMap from 'src/map/game-map';
 import BlockState from "src/map/block-state/block-state";
 import {TwoDimensionalMap} from "src/utils/two-dimensional-map";
 import TilemapComponent from "src/physics/tilemap-component";
-import {Component} from "src/utils/ecs/component";
-import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -32,7 +30,7 @@ export interface ExplodeEffectPoolConfig {
     damageBlocks?: boolean
 }
 
-export default class ExplodeEffectPool implements Component {
+export default class ExplodeEffectPool extends EventHandlerComponent {
 	public powerDamping = 0.01
 	public stepsPerSecond = 30
 	public stepsWaiting = 0
@@ -73,14 +71,12 @@ export default class ExplodeEffectPool implements Component {
     // Ну это сколько-то.
     // Домножь на damageEnergyFraction, чтобы прикинуть
     // урон блокам от взрыва
-    public blockDamageCoefficient = 20000
-
-    public entity: Entity
-    private eventHandler = new BasicEventHandlerSet()
+    public blockDamageCoefficient = 5000
 
     private damageBlocks = false
 
     constructor(config?: ExplodeEffectPoolConfig) {
+        super()
         config = config || {}
         this.damageBlocks = config.damageBlocks ?? false
 
@@ -357,14 +353,8 @@ export default class ExplodeEffectPool implements Component {
         }
     }
 
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(this.entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(null)
+    onDetach() {
+        super.onDetach()
         this.walkers.clear()
     }
 }

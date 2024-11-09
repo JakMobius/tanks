@@ -1,20 +1,32 @@
-import SceneScreen from '../graphics/scene-screen';
+/* @load-resource: './overlay-container.scss' */
 
-export interface SceneConfig {
-    screen: SceneScreen
-}
+import SceneScreen from 'src/client/graphics/scene-screen';
+import EventEmitter from "src/utils/event-emitter";
+import RootControlsResponder from "src/client/controls/root-controls-responder";
 
-export default class Scene {
+export default class Scene extends EventEmitter {
 
+    private title: string
     screen: SceneScreen = null
     overlayContainer: JQuery = null
 
-    constructor(config: SceneConfig) {
-        this.overlayContainer = $("<div>")
-        this.screen = config.screen
+    constructor() {
+        super()
+        this.overlayContainer = $("<div>").addClass("overlay-container")
     }
 
-    draw(dt: number) {}
+    setTitle(title: string) {
+        this.title = title
+        this.emit("title-set", this.title)
+    }
+
+    getTitle() {
+        return this.title
+    }
+
+    draw(dt: number) {
+        RootControlsResponder.getInstance().refresh()
+    }
 
     layout() {}
     appear() {}

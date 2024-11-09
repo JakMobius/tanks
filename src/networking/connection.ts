@@ -5,11 +5,28 @@ import ReadBuffer from "../serialization/binary/read-buffer";
 
 export default abstract class Connection extends EventEmitter {
 
-    protected queue: ArrayBuffer[] = []
+    protected outgoingQueue: ArrayBuffer[] = []
+    protected incomingQueue: ArrayBuffer[] = []
+    private suspended: boolean = false
 
     abstract isReady(): boolean
+
     abstract close(reason?: string): void
+
     abstract getIpAddress(): string
+
+    isSuspended() {
+        return this.suspended
+    }
+
+    suspend() {
+        this.suspended = true
+    }
+
+    resume() {
+        this.suspended = false
+        if(this.isReady()) this.flushQueues()
+    }
 
     /**
      * Called externally when user wants to send a packet
@@ -21,13 +38,13 @@ export default abstract class Connection extends EventEmitter {
     }
 
     /**
-     * Called externally when user wants to send a binary data
+     * Called externally when user wants to send some binary data
      * @param data
      */
 
     sendOutgoingData(data: ArrayBuffer) {
-        if(this.isReady()) this.handleOutgoingData(data)
-        else this.enqueueOutgoingData(data)
+        if (this.isReady() && !this.suspended) this.handleOutgoingData(data)
+        else this.outgoingQueue.push(data)
     }
 
     /**
@@ -43,17 +60,17 @@ export default abstract class Connection extends EventEmitter {
         this.emit("outgoing-data", data)
     }
 
-    protected enqueueOutgoingData(data: ArrayBuffer) {
-        this.queue.push(data)
-    }
+    protected flushQueues() {
+        for (let data of this.outgoingQueue) this.handleOutgoingData(data)
+        this.outgoingQueue = []
 
-    protected flushQueue() {
-        for(let data of this.queue) this.handleOutgoingData(data)
-        this.queue = []
+        for (let data of this.incomingQueue) this.handleIncomingData(data)
+        this.incomingQueue = []
     }
 
     onReady() {
-        this.flushQueue()
+        this.emit("ready")
+        if(!this.suspended) this.flushQueues()
     }
 
     /**
@@ -61,9 +78,11 @@ export default abstract class Connection extends EventEmitter {
      */
 
     handleIncomingData(data: ArrayBuffer) {
-        let decoder = ReadBuffer.getShared(data)
-        const packet = BinarySerializer.deserialize(decoder, BinaryPacket)
-        this.handleIncomingPacket(packet)
+        if (this.isReady() && !this.suspended) {
+            let decoder = ReadBuffer.getShared(data)
+            const packet = BinarySerializer.deserialize(decoder, BinaryPacket)
+            this.handleIncomingPacket(packet)
+        } else this.incomingQueue.push(data)
     }
 
     /**

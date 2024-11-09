@@ -1,0 +1,12 @@
+.tank-carousel-item {
+    background: #FFFFFF;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 13px;
+    width: 146px;
+    height: 139px;
+    cursor: pointer;
+}
+.tank-carousel-item .tank-preview-canvas {
+    width: 100%;
+    height: 100%;
+}

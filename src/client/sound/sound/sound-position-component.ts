@@ -1,26 +1,22 @@
-import {Component} from "src/utils/ecs/component";
-import Entity from "src/utils/ecs/entity";
-import SoundEffect from "./sound-effect";
+import SoundFilter from "./sound-effect";
 import SoundEngine from "../sound-engine";
 import {SoundStream} from "../stream/sound-stream";
 import SoundPrimaryComponent from "./sound-primary-component";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import * as Box2D from "src/library/box2d"
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import Entity from "src/utils/ecs/entity";
+import CameraComponent from "src/client/graphics/camera";
+import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 
-class StreamPositionFilters extends SoundEffect {
+class SoundPositionFilter extends SoundFilter {
     panFilter: PannerNode
     biquadFilter: BiquadFilterNode
 
-    // TODO: remove
-    engineStream: SoundStream
+    constructor(context: BaseAudioContext) {
+        super(context)
 
-    constructor(engine: SoundEngine, stream: SoundStream, engineStream: SoundStream) {
-        super(stream)
-
-        this.engineStream = engineStream
-
-        this.panFilter = engine.context.createPanner();
-        this.biquadFilter = engine.context.createBiquadFilter();
+        this.panFilter = context.createPanner();
+        this.biquadFilter = context.createBiquadFilter();
         this.biquadFilter.type = "lowpass";
 
         this.panFilter.connect(this.biquadFilter);
@@ -33,80 +29,84 @@ class StreamPositionFilters extends SoundEffect {
     getInput(): AudioNode {
         return this.panFilter;
     }
+
+    setPassthrough() {
+        this.panFilter.positionX.value = 0
+        this.panFilter.positionY.value = 0
+        this.panFilter.positionZ.value = 20
+        this.panFilter.rolloffFactor = 1 / 20
+
+        this.biquadFilter.frequency.value = 24000
+    }
 }
 
-export default class SoundPositionComponent implements Component {
+export default class SoundPositionComponent extends EventHandlerComponent {
 
-    position: Box2D.XY = {x: 0, y: 0}
-    entity: Entity | null;
+    position: Box2D.XY | null = null
+    private filters = new Map<Entity, SoundPositionFilter>()
 
-    private filters: StreamPositionFilters[] = []
-    private eventHandler = new BasicEventHandlerSet()
-
-    constructor(position: Box2D.XY) {
-        this.position = { x: position.x, y: position.y }
-        this.eventHandler.on("tick", () => this.updatePosition())
+    constructor(position: Box2D.XY | null = null) {
+        super()
+        this.position = position
+        this.eventHandler.on("tick", () => this.onTick())
+        this.eventHandler.on("camera-attach", (camera: Entity) => this.onCameraAttach(camera))
+        this.eventHandler.on("camera-detach", (camera: Entity) => this.onCameraDetach(camera))
     }
 
-    setPosition(position: Box2D.XY) {
-        this.position.x = position.x
-        this.position.y = position.y
+    setPosition(position: Box2D.XY | null) {
+        this.position = position
+        return this
     }
 
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(this.entity)
-        this.createFilters()
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(null)
-        this.destroyFilters()
-    }
-
-    updatePosition() {
-
-        for(let filter of this.filters) {
-
-            if(!filter.engineStream || !filter.engineStream.position || !filter.engineStream.position.position) {
-                filter.ensureDisconnected()
-                continue
-            }
-
-            filter.ensureConnected()
-
-            const offsetX = this.position.x - filter.engineStream.position.position.x
-            const offsetY = this.position.y - filter.engineStream.position.position.y
-
-            const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY)
-
-            filter.panFilter.positionX.value = offsetX
-            filter.panFilter.positionY.value = offsetY
-            filter.panFilter.positionZ.value = 20
-            filter.panFilter.rolloffFactor = 1/20
-
-            const freq = 25000 / (distance + 10) * 10;
-
-            filter.biquadFilter.frequency.value = Math.max(0, Math.min(freq, filter.biquadFilter.frequency.maxValue))
+    onTick() {
+        for (let [camera, filter] of this.filters.entries()) {
+            this.updateSoundFilters(camera, filter)
         }
     }
 
-    private createFilters() {
+    updateSoundFilters(camera: Entity, filter: SoundPositionFilter) {
+        if (!this.position) {
+            filter.setPassthrough()
+            return
+        }
+
+        let cameraComponent = camera.getComponent(CameraComponent)
+
+        let centerX = cameraComponent.inverseMatrix.transformX(0, 0)
+        let centerY = cameraComponent.inverseMatrix.transformY(0, 0)
+
+        const offsetX = this.position.x - centerX
+        const offsetY = this.position.y - centerY
+
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY)
+
+        filter.panFilter.positionX.value = offsetX
+        filter.panFilter.positionY.value = offsetY
+        filter.panFilter.positionZ.value = 5
+        filter.panFilter.rolloffFactor = 1 / 5
+
+        const freq = 24000 / (distance + 10) * 10;
+
+        filter.biquadFilter.frequency.value = Math.max(0, Math.min(freq, filter.biquadFilter.frequency.maxValue))
+    }
+
+    private onCameraAttach(camera: Entity) {
         let soundPrimaryComponent = this.entity.getComponent(SoundPrimaryComponent)
-        let engine = soundPrimaryComponent.asset.engine
-        let outputs = soundPrimaryComponent.outputStreams
+        let soundStream = soundPrimaryComponent.streams.get(camera)
+        let context = soundStream.context
+        let filter = new SoundPositionFilter(context)
 
-        // Create filters for each output stream
-        // TODO: It seems wrong to pass an engine output, but it's the only way to get the ear position for now
-        for(let i = 0; i < outputs.length; i++) {
-            this.filters.push(new StreamPositionFilters(engine, outputs[i], engine.outputs[i]))
-        }
+        this.updateSoundFilters(camera, filter)
+
+        this.filters.set(camera, filter)
+        soundStream?.addFilter(filter)
     }
 
-    private destroyFilters() {
-        for(let filter of this.filters) {
-            filter.ensureDisconnected()
-        }
+    private onCameraDetach(camera: Entity) {
+        let soundPrimaryComponent = this.entity.getComponent(SoundPrimaryComponent)
+        let filter = this.filters.get(camera)
+
+        this.filters.delete(camera)
+        soundPrimaryComponent.streams.get(camera)?.removeFilter(filter)
     }
 }

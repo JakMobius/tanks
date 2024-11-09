@@ -1,15 +1,18 @@
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
-import WorldExplodeEffectModel from "src/effects/models/world-explode-effect-model";
-import EffectHostComponent from "src/effects/effect-host-component";
-import ServerEffect from "../effects/server-effect";
 import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
 import TilemapComponent from "src/physics/tilemap-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import DamageReason from "../damage-reason/damage-reason";
-import BulletShootersComponent from "src/entity/components/bullet-shooters-component";
+import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
+import * as Box2D from "src/library/box2d";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import {EntityType} from "src/entity/entity-type";
+import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
+import {World} from "src/library/box2d";
+import {WorldComponent} from "src/entity/game-world-entity-prefab";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -17,128 +20,148 @@ export interface BulletBehaviourConfig {
     wallDamage?: number
     entityDamage?: number
     lifeTime?: number
-    initialVelocity?: number
 }
 
-export default class BulletBehaviour implements Component {
-    entity: Entity
-    eventHandler = new BasicEventHandlerSet()
+export default class BulletBehaviour extends EventHandlerComponent {
     worldEventHandler = new BasicEventHandlerSet()
     config: BulletBehaviourConfig
 
     private lifeTime: number
     private isDead = false;
 
-    constructor(config: BulletBehaviourConfig) {
+    constructor(config?: BulletBehaviourConfig) {
+        super()
         this.config = Object.assign({
-            lifeTime: 5,
-            initialVelocity: 0
+            lifeTime: 5
         }, config)
 
         this.lifeTime = this.config.lifeTime
 
         this.eventHandler.on("tick", (dt: number) => {
-            if(this.isDead) {
+            if (this.isDead) {
+                this.beforeDeath()
                 this.entity.removeFromParent()
             } else {
                 this.lifeTime -= dt
-                if (this.lifeTime <= 0) this.trigger()
+                if (this.lifeTime <= 0) this.die()
             }
         })
 
-        this.eventHandler.on("bullet-launch", () => this.onLaunch())
-
-        this.eventHandler.on("entity-hit", (hitEntity: Entity) => {
-            if(this.isDead) return;
-            this.handleEntityHit(hitEntity)
+        this.eventHandler.on("entity-hit", (hitEntity: Entity, contact: Box2D.Contact) => {
+            this.handleEntityHit(hitEntity, contact)
         })
 
-        this.eventHandler.on("block-hit", (x: number, y: number) => {
-            if(this.isDead) return;
-            this.handleBlockHit(x, y)
+        this.eventHandler.on("block-hit", (x: number, y: number, point: Box2D.XY) => {
+            this.handleBlockHit(x, y, point)
         })
 
         this.eventHandler.on("health-set", (health: number) => {
-            if(health == 0) this.trigger()
+            if (health == 0 && !this.isDead) this.die()
         })
     }
 
-    private handleEntityHit(hitEntity: Entity) {
-        const world = this.entity.parent
+    private handleEntityHit(hitEntity: Entity, contact: Box2D.Contact) {
+        if (this.isDead) return
+        this.die()
 
-        if(this.config.entityDamage) {
-            world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                let healthComponent = hitEntity.getComponent(HealthComponent)
-                let damageReason = new DamageReason()
-                damageReason.damageType = DamageTypes.IMPACT
+        let contactMidpoint = this.getContactMidpoint(contact)
 
-                // TODO: Maybe bullet shooter component should handle this by itself?
-                // i.e shooter component is not even set on the client side, so this
-                // code becomes useless
-                let shooterComponent = this.entity.getComponent(BulletShootersComponent)
-                if(shooterComponent) {
-                    damageReason.players = shooterComponent.shooters
-                }
-
-                if (healthComponent) healthComponent.damage(this.config.entityDamage, damageReason)
-            })
-        }
-
-        this.trigger()
-    }
-
-    private handleBlockHit(x: number, y: number) {
-        const world = this.entity.parent
-
-        if(this.config.wallDamage) {
-            world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                const mapComponent = world.getComponent(TilemapComponent)
-                if (mapComponent) {
-                    mapComponent.map.damageBlock(x, y, this.config.wallDamage)
-                }
-            })
-        }
-
-        if(this.config.diesOnWallHit !== false) {
-            this.trigger()
-        }
-    }
-
-    private trigger() {
-        if(this.config.explodePower) {
-            let position = this.entity.getComponent(PhysicalComponent).getBody().GetPosition()
-            let effect = new WorldExplodeEffectModel({
-                x: position.x,
-                y: position.y,
-                power: this.config.explodePower
-            })
+        this.nextPhysicalTick(() => {
             const world = this.entity.parent
 
-            world.getComponent(EffectHostComponent).addEffect(ServerEffect.fromModel(effect))
+            if (this.config.entityDamage) {
+                world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
+                    let healthComponent = hitEntity.getComponent(HealthComponent)
+                    let damageReason = new DamageReason()
+                    damageReason.damageType = DamageTypes.IMPACT
+
+                    // TODO: Maybe bullet shooter component should handle this by itself?
+                    // i.e shooter component is not even set on the client side, so this
+                    // code becomes useless
+                    let shooterComponent = this.entity.getComponent(BulletShooterComponent)
+                    if (shooterComponent) {
+                        damageReason.player = shooterComponent.shooter
+                    }
+
+                    if (healthComponent) healthComponent.damage(this.config.entityDamage, damageReason)
+                })
+            }
+
+            this.stuckAtPoint(contactMidpoint)
+        })
+    }
+
+    private handleBlockHit(x: number, y: number, point: Box2D.XY) {
+        if (this.isDead) return
+        if (this.config.diesOnWallHit !== false) {
+            this.die()
         }
-        this.die();
+        const world = this.entity.parent
+
+        this.nextPhysicalTick(() => {
+            if (this.config.wallDamage) {
+                world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
+                    const mapComponent = world.getComponent(TilemapComponent)
+                    if (mapComponent) {
+                        mapComponent.map.damageBlock(x, y, this.config.wallDamage)
+                    }
+                })
+            }
+
+            if (this.config.diesOnWallHit !== false) {
+                this.stuckAtPoint(point)
+            }
+        })
+    }
+
+    private nextPhysicalTick(callback: () => void) {
+        this.entity.parent.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(callback)
+    }
+
+    maybeExplode() {
+        if (this.config.explodePower) {
+            let position = this.entity.getComponent(PhysicalComponent).getBody().GetPosition()
+
+            let explodeEntity = new Entity()
+            ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
+            WorldComponent.getWorld(this.entity).appendChild(explodeEntity)
+            explodeEntity.getComponent(ExplodeComponent).explode(position.x, position.y, this.config.explodePower)
+            explodeEntity.removeFromParent()
+        }
     }
 
     die() {
         this.isDead = true
     }
 
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(this.entity)
+    private getContactMidpoint(contact: Box2D.Contact) {
+        const worldManifold = new Box2D.WorldManifold()
+        contact.GetWorldManifold(worldManifold)
+        const points = worldManifold.points.slice(0, contact.GetManifold().pointCount)
+
+        // In case it's a sensor
+        if (points.length === 0) {
+            let position = this.entity.getComponent(PhysicalComponent).getBody().GetPosition()
+            return {
+                x: position.x,
+                y: position.y
+            }
+        }
+
+        const x = points.reduce((sum, point) => sum + point.x, 0) / points.length
+        const y = points.reduce((sum, point) => sum + point.y, 0) / points.length
+        return {x: x, y: y}
     }
 
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(this.entity)
+    private stuckAtPoint(point: Box2D.XY) {
+        let body = this.entity.getComponent(PhysicalComponent)
+        body.setVelocity({x: 0, y: 0})
+        body.setPosition(point)
+        body.getBody().SetFixedRotation(true)
+        body.getBody().SetEnabled(false)
     }
 
-    private onLaunch() {
-        let body = this.entity.getComponent(PhysicalComponent).getBody()
-        let angle = body.GetAngle()
-        body.SetLinearVelocity({
-            x: -Math.sin(angle) * this.config.initialVelocity,
-            y: Math.cos(angle) * this.config.initialVelocity
-        })
+    private beforeDeath() {
+        this.maybeExplode()
     }
 }

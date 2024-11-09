@@ -165,7 +165,6 @@ export default class StatusCommand extends Command {
 
         if(isWebServerActive) {
             this.beginStatusGroup()
-            this.printStatusIsActive("hub page", server.webServer.hubModule.enabled)
             this.printStatusIsActive("game page", server.webServer.gameModule.enabled)
             this.endStatusGroup();
         }

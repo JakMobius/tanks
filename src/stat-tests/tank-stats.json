@@ -1,0 +1,54 @@
+module.exports = {
+    "stats": {
+        "8192": {
+            "speed": 18,
+            "damage": 0,
+            "health": 10
+        },
+        "8193": {
+            "speed": 30,
+            "damage": 4.7,
+            "health": 10
+        },
+        "8194": {
+            "speed": 32,
+            "damage": 43,
+            "health": 10
+        },
+        "8195": {
+            "speed": 25,
+            "damage": 95,
+            "health": 10
+        },
+        "8196": {
+            "speed": 37,
+            "damage": 15,
+            "health": 10
+        },
+        "8197": {
+            "speed": 47,
+            "damage": 0,
+            "health": 10
+        },
+        "8198": {
+            "speed": 30,
+            "damage": 16,
+            "health": 10
+        },
+        "8199": {
+            "speed": 48,
+            "damage": 0,
+            "health": 10
+        },
+        "8200": {
+            "speed": 61,
+            "damage": 43,
+            "health": 6
+        }
+    },
+    "median": {
+        "health": 9.6,
+        "speed": 37,
+        "damage": 24
+    }
+}

@@ -1,4 +1,6 @@
 import ToolManager from "./toolmanager";
+import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import RootControlsResponder from "src/client/controls/root-controls-responder";
 
 
 class Tool {
@@ -6,6 +8,7 @@ class Tool {
 	public cursor: string;
 	public locksDragging: boolean;
 	public settingsView: any;
+    public controlsEventHandler = new BasicEventHandlerSet()
 
     /**
      * Path to tool icon
@@ -45,20 +48,16 @@ class Tool {
 
     }
 
-    mouseUp(): void {
+    mouseUp(x: number, y: number): void {
         this.dragging = false
     }
 
     becomeActive(): void {
-
+        this.controlsEventHandler.setTarget(RootControlsResponder.getInstance())
     }
 
     resignActive(): void {
-
-    }
-
-    drawDecorations() {
-
+        this.controlsEventHandler.setTarget(null)
     }
 
     trace(x1: number, y1: number, x2: number, y2: number, callback: (x: number, y: number) => void) {

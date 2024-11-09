@@ -23,7 +23,9 @@ export default class ObjectReader {
             return array
         } else if (type === ObjectTypeIndices.object) {
             let length = buffer.readUint8()
-            let object: any = {}
+
+            // Use Object.create(null) here to avoid prototype pollution
+            let object: any = Object.create(null)
             for (let i = 0; i < length; i++) {
                 let key = buffer.readString()
                 object[key] = this.read(buffer)

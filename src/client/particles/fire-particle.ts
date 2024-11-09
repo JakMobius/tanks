@@ -6,12 +6,12 @@ export default class FireParticle extends Particle {
 	public times: number[];
 
     createColors(config: ParticleConfig) {
-        let varying = 30
+        let varying = 0.11
         return [
-            [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, 0],
-            [255 - Math.random() * varying, 255 - Math.random() * varying, Math.random() * varying, 0.4],
-            [255 - Math.random() * varying, 128 - Math.random() * varying, Math.random() * varying, 0.6],
-            [255 - Math.random() * varying, 128 - Math.random() * varying, Math.random() * varying, 0]
+            [1 - Math.random() * varying, 1 - Math.random() * varying, Math.random() * varying, 0],
+            [1 - Math.random() * varying, 1 - Math.random() * varying, Math.random() * varying, 0.4],
+            [1 - Math.random() * varying, 0.5 - Math.random() * varying, Math.random() * varying, 0.6],
+            [1 - Math.random() * varying, 0.5 - Math.random() * varying, Math.random() * varying, 0]
         ]
     }
 
@@ -63,12 +63,9 @@ export default class FireParticle extends Particle {
         b = c1[2] * f2 + c2[2] * f1
         a = c1[3] * f2 + c2[3] * f1
 
-        this.color.setRed(Math.round(r))
-        this.color.setGreen(Math.round(g))
-        this.color.setBlue(Math.round(b))
-        this.color.setAlpha(a)
+        this.color.setRGB(r, g, b, a)
 
-        this.width += this.scaling
-        this.height += this.scaling
+        this.width += this.scaling * dt
+        this.height += this.scaling * dt
     }
 }

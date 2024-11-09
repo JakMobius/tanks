@@ -1,25 +1,35 @@
 import SocketPortalClient from "src/server/socket/socket-portal-client";
 import PhysicalComponent from "src/entity/components/physics-component";
-import Player from "src/server/player";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import PlayerConnectionManager from "src/server/player-connection-manager";
 import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
+import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
+import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
+import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
+import PlayerChatEvent from "src/events/player-chat-event";
+import EventEmitter from "src/utils/event-emitter";
+import PlayerRespawnEvent from "src/events/player-respawn-event";
+import HealthComponent from "src/entity/components/health-component";
 
 export default class TutorialWorldController {
     game: Entity;
     private tanks: Entity[] = []
-    private selectedTanks: Map<Player, number> = new Map()
+    private selectedTanks: Map<Entity, number> = new Map()
 
     constructor(serverGame: Entity) {
         this.game = serverGame
 
         this.game.on("client-connect", (client) => this.onClientConnect(client))
-        this.game.on("game-chat", (player, text) => {
+        this.game.on("player-chat", (player, event: PlayerChatEvent) => {
+            let text = event.message
             if(text.startsWith("#")) {
                 this.onPlayerCommand(player, text)
             }
         })
+        this.game.on("tick", () => {
+            this.onTick()
+        })
+        this.game.on("player-respawn", (player, event) => this.onPlayerRespawn(player, event), EventEmitter.PRIORITY_MONITOR)
 
         this.createDummies()
     }
@@ -28,7 +38,6 @@ export default class TutorialWorldController {
         const tank = new Entity()
         ServerEntityPrefabs.types.get(entityType)(tank)
         this.game.appendChild(tank)
-        tank.emit("respawn")
 
         const body = tank.getComponent(PhysicalComponent).getBody()
         body.SetPositionXY(x, y)
@@ -38,47 +47,64 @@ export default class TutorialWorldController {
     }
 
     private createDummies() {
+        // this.createTank(EntityType.TANK_NASTY, 65, 205, 0)
+        // this.createTank(EntityType.TANK_SNIPER, 80, 200, 0)
+        // this.createTank(EntityType.TANK_BOMBER, 95, 205, 0)
+        // this.createTank(EntityType.TANK_MONSTER, 30, 205, 0)
         this.createTank(EntityType.TANK_BIGBOI, 50, 205, 0)
-        this.createTank(EntityType.TANK_NASTY, 65, 205, 0)
-        this.createTank(EntityType.TANK_SNIPER, 80, 200, 0)
-        this.createTank(EntityType.TANK_BOMBER, 95, 205, 0)
-        this.createTank(EntityType.TANK_MONSTER, 30, 205, 0)
+        this.createTank(EntityType.TANK_TINY, 30, 205, 0)
     }
 
     private onClientConnect(client: SocketPortalClient) {
 
-        const player = new Player({
+        const player = new Entity()
+
+        serverPlayerEntityPrefab(player, {
+            client: client,
+            db: null,
             nick: "Вы"
         })
 
-        PlayerConnectionManager.attach(player, client)
-        player.connectToWorld(this.game)
+        player.getComponent(PlayerWorldComponent).connectToWorld(this.game)
 
         const selectedIndex = 0
         const tank = this.tanks[selectedIndex]
 
         this.selectedTanks.set(player, selectedIndex)
-        player.setTank(tank)
+        player.getComponent(PlayerTankComponent).setTank(tank)
         this.respawnPlayer(player)
     }
 
-    private respawnPlayer(player: Player) {
-        const tank = player.tank
+    private respawnPlayer(player: Entity) {
+        const tank = player.getComponent(PlayerTankComponent).tank
         let body = tank.getComponent(PhysicalComponent)
+        let health = tank.getComponent(HealthComponent)
+
         body.setPosition({x: 17.5, y: 212.5})
         body.setVelocity({x: 0, y: 0})
         body.setAngle(4)
         body.setAngularVelocity(0)
+        health.setHealth(health.getMaxHealth())
     }
 
-    private onPlayerCommand(player: Player, text: string) {
+    private onPlayerCommand(player: Entity, text: string) {
         if(text == "#switch-tank") {
             let selectedIndex = this.selectedTanks.get(player)
             selectedIndex++
             if(!this.tanks[selectedIndex]) selectedIndex = 0
             this.selectedTanks.set(player, selectedIndex)
             // This may fail if there is more than one player on the map
-            player.setTank(this.tanks[selectedIndex])
+            player.getComponent(PlayerTankComponent).setTank(this.tanks[selectedIndex])
         }
+    }
+
+    private onTick() {
+        // let tank = this.tanks[0]
+        // let component = tank.getComponent(PhysicalComponent)
+        // console.log(component.getBody().GetPosition(), component.getBody().GetLinearVelocity())
+    }
+
+    private onPlayerRespawn(player: Entity, event: PlayerRespawnEvent) {
+        this.respawnPlayer(player)
     }
 }

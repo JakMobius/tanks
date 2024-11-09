@@ -17,9 +17,9 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_epsilon, b2_epsilon_sq, b2_polygonRadius, b2_linearSlop } from "../common/b2_settings";
-import { b2Max, b2Vec2, b2Rot, b2Transform } from "../common/b2_math";
-import { b2Shape } from "./b2_shape";
+import {b2_epsilon, b2_epsilon_sq, b2_linearSlop, b2_polygonRadius} from "../common/b2_settings";
+import {b2Max, b2Rot, b2Transform, b2Vec2} from "../common/b2_math";
+import {b2Shape} from "./b2_shape";
 
 /// A distance proxy is used by the GJK algorithm.
 /// It encapsulates any shape.

@@ -1,26 +1,24 @@
-
-button.large, button.secondary {
-  padding: 10px;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  font-weight: normal;
-  text-align: center;
-}
-
 button.large {
-  text-align: center;
-  color: white;
-
-  background: #009EE0;
-  border-radius: 5px;
+    text-align: center;
+    color: white;
+    background: #009EE0;
+    border-radius: 5px;
 }
 
 button.large[disabled], button.secondary[disabled] {
-  opacity: 0.5;
+    opacity: 0.5;
+}
+
+button.large, button.secondary {
+    padding: 10px;
+    cursor: pointer;
+    border: none;
+    font-size: 15px;
+    font-weight: normal;
+    text-align: center;
 }
 
 button.secondary {
-  background: none;
-  color: white;
+    background: none;
+    color: white;
 }

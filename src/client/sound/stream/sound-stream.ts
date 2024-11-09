@@ -1,51 +1,57 @@
 import SoundEffect from "../sound/sound-effect";
 import SoundEngine from "../sound-engine";
 import {SoundStreamPosition} from "./sound-stream-position-component";
+import LinkedList from "src/utils/linked-list";
 
 export class SoundStream {
     public input: GainNode
     public output: GainNode
-    public position: SoundStreamPosition | null = null
-    private effects: SoundEffect | null = null
+    public context: BaseAudioContext
+    private effects = new LinkedList<SoundEffect>()
 
-    constructor(engine: SoundEngine) {
-        this.input = new GainNode(engine.context)
-        this.output = new GainNode(engine.context)
+    constructor(context: BaseAudioContext) {
+        this.context = context
+        this.input = new GainNode(context)
+        this.output = new GainNode(context)
 
         this.input.connect(this.output)
     }
 
-    addEffect(effect: SoundEffect) {
-        effect.previousEffect = this.effects
-        effect.nextEffect = null
-        if(this.effects) {
-            this.effects.nextEffect = effect
-            this.effects = effect
-        }
+    addFilter(effect: SoundEffect) {
+        let previous = this.effects.getTail()
+        this.effects.insertTail(effect)
 
-        if(effect.previousEffect) {
-            effect.previousEffect.getOutput().disconnect()
-            effect.previousEffect.getOutput().connect(effect.getInput())
+        if (previous) {
+            previous.getOutput().disconnect()
+            previous.getOutput().connect(effect.getInput())
         } else {
             this.input.disconnect()
             this.input.connect(effect.getInput())
         }
+
         effect.getOutput().connect(this.output)
     }
 
-    removeEffect(effect: SoundEffect) {
+    removeFilter(effect: SoundEffect) {
 
-        if(effect.previousEffect) {
-            effect.previousEffect.getOutput().disconnect()
-            if(effect.nextEffect) {
-                effect.previousEffect.getOutput().connect(effect.nextEffect.getInput())
+        let iterator = this.effects.head
+        while (iterator && iterator.item !== effect) {
+            iterator = iterator.next
+        }
+
+        if (!iterator) return
+
+        if (iterator.prev) {
+            iterator.prev.item.getOutput().disconnect()
+            if (iterator.next) {
+                iterator.prev.item.getOutput().connect(iterator.next.item.getInput())
             } else {
-                effect.previousEffect.getOutput().connect(this.output)
+                iterator.prev.item.getOutput().connect(this.output)
             }
         } else {
             this.input.disconnect()
-            if(effect.nextEffect) {
-                this.input.connect(effect.nextEffect.getInput())
+            if (iterator.next) {
+                this.input.connect(iterator.next.item.getInput())
             } else {
                 this.input.connect(this.output)
             }
@@ -53,15 +59,6 @@ export class SoundStream {
 
         effect.getOutput().disconnect()
 
-        if(effect.previousEffect) {
-            effect.previousEffect.nextEffect = effect.nextEffect
-        }
-
-        if(effect.nextEffect) {
-            effect.nextEffect.previousEffect = effect.previousEffect
-        }
-        if(effect === this.effects) {
-            this.effects = effect.nextEffect
-        }
+        iterator.unlink()
     }
 }

@@ -5,6 +5,7 @@ import GameObjectReader from "./game-object-reader";
 
 export default class ReceiverComponent {
     entity: Entity | null;
+    receiveComponent: EntityDataReceiveComponent | null = null
 
     hook(component: EntityDataReceiveComponent) {
 
@@ -13,17 +14,10 @@ export default class ReceiverComponent {
     onAttach(entity: Entity): void {
         this.entity = entity
         let component = this.entity.getComponent(EntityDataReceiveComponent)
-        if(component) {
+        if (component) {
+            this.receiveComponent = component
             this.hook(component)
         }
-    }
-
-    readEntity(buffer: ReadBuffer): Entity {
-        return EntityDataReceiveComponent.performNavigation(buffer, this.entity)
-    }
-
-    readObject(buffer: ReadBuffer): any {
-        return GameObjectReader.instance.readWithReceiver(buffer, this)
     }
 
     onDetach(): void {

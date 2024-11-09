@@ -1,12 +1,13 @@
 import WebserverModule from './webserver-module';
 import * as path from 'path';
 import * as express from 'express';
+import WebServer from "src/server/webserver/webserver";
 
 export default class BaseModule extends WebserverModule {
-    constructor() {
-        super();
+    setServer(server: WebServer) {
+        super.setServer(server);
 
-        this.resourcesDirectory = path.resolve(__dirname, "resources/web/default")
+        this.resourcesDirectory = this.webServer.server.getResourcePath("web")
         this.priority = WebserverModule.PRIORITY_LOWEST
 
         this.router.use("/assets/", express.static(this.resourcePath("assets")))
@@ -17,7 +18,7 @@ export default class BaseModule extends WebserverModule {
         res.status(404);
 
         if (req.accepts('html')) {
-            res.render('default/views/404.hbs', undefined, (err, html) => {
+            res.render('views/404.hbs', undefined, (err, html) => {
                 if(err) next(err)
                 res.send(html)
             });

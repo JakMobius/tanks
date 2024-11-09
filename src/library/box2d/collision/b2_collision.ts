@@ -17,10 +17,17 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxFloat, b2_epsilon, b2_epsilon_sq, b2_maxManifoldPoints, b2MakeArray, b2MakeNumberArray } from "../common/b2_settings";
-import { b2Abs, b2Min, b2Max, b2Vec2, b2Rot, b2Transform, XY } from "../common/b2_math";
-import { b2Shape } from "./b2_shape";
-import { b2Distance, b2DistanceInput, b2DistanceOutput, b2SimplexCache } from "./b2_distance";
+import {
+    b2_epsilon,
+    b2_epsilon_sq,
+    b2_maxFloat,
+    b2_maxManifoldPoints,
+    b2MakeArray,
+    b2MakeNumberArray
+} from "../common/b2_settings";
+import {b2Abs, b2Max, b2Min, b2Rot, b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2Shape} from "./b2_shape";
+import {b2Distance, b2DistanceInput, b2DistanceOutput, b2SimplexCache} from "./b2_distance";
 
 /// @file
 /// Structures and functions used for computing contact points, distance

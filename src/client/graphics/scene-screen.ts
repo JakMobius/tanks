@@ -1,5 +1,5 @@
-import Scene from "../scenes/scene";
-import Screen, {ScreenConfig} from "./screen";
+import Scene from "src/client/scenes/scene";
+import Screen, {ScreenConfig} from "src/client/graphics/screen";
 import Loop from "src/utils/loop/loop";
 import RenderLoop from "src/utils/loop/render-loop";
 
@@ -54,10 +54,12 @@ export default class SceneScreen extends Screen {
     setScene(scene: Scene): void {
         if(this.scene) {
             this.scene.disappear()
+            this.scene.screen = null
             this.scene.overlayContainer.remove()
         }
 
         this.scene = scene
+        scene.screen = this
         this.scene.appear()
         this.root.append(this.scene.overlayContainer)
     }

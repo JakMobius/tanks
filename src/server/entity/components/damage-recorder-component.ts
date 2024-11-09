@@ -1,23 +1,21 @@
-import {Component} from "src/utils/ecs/component";
-import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import Player from "src/server/player";
 import DamageReason from "src/server/damage-reason/damage-reason";
-import PlayerDisconnectEvent from "src/events/player-disconnect-event";
+import PlayerWillDisconnectEvent from "src/events/player-will-disconnect-event";
 import EntityDamageEvent from "src/events/tank-damage-event";
-import ServerEntityPilotListComponent from "./server-entity-pilot-list-component";
+import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import Entity from "src/utils/ecs/entity";
 
 export class PlayerDamageData {
-    player: Player
-    damagers: Player[] = []
-    rowKills: Map<Player, number> = new Map()
+    player: Entity
+    damagers: Entity[] = []
+    rowKills: Map<Entity, number> = new Map()
     isDead: boolean = false
 
-    constructor(player: Player) {
+    constructor(player: Entity) {
         this.player = player
     }
     
-    addDamager(player: Player) {
+    addDamager(player: Entity) {
         this.resetIfDead()
 
         let index = this.damagers.indexOf(player)
@@ -30,7 +28,7 @@ export class PlayerDamageData {
         }
     }
 
-    addKill(player: Player) {
+    addKill(player: Entity) {
         this.resetIfDead()
 
         let rowKills = this.rowKills.get(player) || 0
@@ -53,21 +51,17 @@ export class PlayerDamageData {
     }
 }
 
-export default class DamageRecorderComponent implements Component {
+export default class DamageRecorderComponent extends EventHandlerComponent {
     static MAX_DAMAGERS = 5
-
-    entity: Entity | null;
-    eventHandler = new BasicEventHandlerSet()
-    damageData: Map<Player, PlayerDamageData> = new Map()
+    damageData: Map<Entity, PlayerDamageData> = new Map()
 
     constructor() {
+        super()
         this.eventHandler.on("entity-damage", (event: EntityDamageEvent) => {
             if(event.cancelled) return
-            let playerListComponent = event.entity.getComponent(ServerEntityPilotListComponent)
-            if(playerListComponent) {
-                for(let player of playerListComponent.players) {
-                    this.onPlayerDamage(player, event.damage, event.damageReason)
-                }
+            let pilotComponent = event.entity.getComponent(ServerEntityPilotComponent)
+            if(pilotComponent && pilotComponent.pilot) {
+                this.onPlayerDamage(pilotComponent.pilot, event.damage, event.damageReason)
             }
         })
 
@@ -75,22 +69,12 @@ export default class DamageRecorderComponent implements Component {
             this.onPlayerDeath(player)
         })
 
-        this.eventHandler.on("player-disconnect", (event: PlayerDisconnectEvent) => {
-            this.damageData.delete(event.player)
+        this.eventHandler.on("player-will-disconnect", (player: Entity, event: PlayerWillDisconnectEvent) => {
+            this.damageData.delete(player)
         })
     }
 
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(null)
-    }
-
-    getDamageData(player: Player) {
+    getDamageData(player: Entity) {
         let data = this.damageData.get(player)
         if (!data) {
             data = new PlayerDamageData(player)
@@ -99,16 +83,14 @@ export default class DamageRecorderComponent implements Component {
         return data
     }
 
-    private onPlayerDeath(player: Player) {
+    private onPlayerDeath(player: Entity) {
         this.handleDeath(this.getDamageData(player))
     }
 
-    private onPlayerDamage(player: Player, damage: number, reason: DamageReason) {
-        if(!reason.players) return
+    private onPlayerDamage(player: Entity, damage: number, reason: DamageReason) {
+        if(!reason.player) return
 
-        for(let damager of reason.players) {
-            this.handleDamage(this.getDamageData(player), this.getDamageData(damager))
-        }
+        this.handleDamage(this.getDamageData(player), this.getDamageData(reason.player))
     }
 
     private handleDamage(playerData: PlayerDamageData, damagerData: PlayerDamageData) {

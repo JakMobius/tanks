@@ -1,17 +1,16 @@
-import Player from "./player";
 import EventEmitter from "../utils/event-emitter";
-import Color from "../utils/color";
+import Entity from "src/utils/ecs/entity";
 
 export default class Team extends EventEmitter {
-    public players: Player[] = []
+    public players: Entity[] = []
     public id: number
 
-    addPlayer(player: Player) {
+    addPlayer(player: Entity) {
         this.players.push(player)
         this.emit("player-added", player)
     }
 
-    removePlayer(player: Player) {
+    removePlayer(player: Entity) {
         let index = this.players.indexOf(player)
         if(index == -1) return;
         this.players.splice(index, 1)

@@ -1,27 +1,13 @@
-import {Component} from "src/utils/ecs/component";
-import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {GameSocketPortalClient} from "src/server/socket/game-server/game-socket-portal";
 import RoomLoopComponent from "./room-loop-component";
 import RoomClientComponent from "./room-client-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
-export default class EmptyServerPauseComponent implements Component {
-    entity: Entity | null;
-
-    roomEventHandler = new BasicEventHandlerSet()
-
+export default class EmptyServerPauseComponent extends EventHandlerComponent {
     constructor() {
-        this.roomEventHandler.on("client-connect",     (client) => this.onClientConnected(client))
-        this.roomEventHandler.on("client-disconnect",  (client) => this.onClientDisconnected(client))
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.roomEventHandler.setTarget(entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
+        super()
+        this.eventHandler.on("client-connect",     (client) => this.onClientConnected(client))
+        this.eventHandler.on("client-disconnect",  (client) => this.onClientDisconnected(client))
     }
 
     private onClientConnected(client: GameSocketPortalClient) {
@@ -34,7 +20,7 @@ export default class EmptyServerPauseComponent implements Component {
     private onClientDisconnected(client: GameSocketPortalClient) {
         let clientComponent = this.entity.getComponent(RoomClientComponent)
 
-        // TODO: check this code. Not sure if portal.clients is updated prior to this event being emitted
+        // TODO: check this code. Not sure if portal.clients is updated prior to this event
         if(clientComponent.portal.clients.size) {
             return
         }

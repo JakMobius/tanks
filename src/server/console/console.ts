@@ -358,7 +358,7 @@ export default class Console {
 
     callHandle(handle: Command, args: string[]) {
         if (handle.requiresRoom() && !this.observingRoom) {
-            this.logger.log("§F00;You should be in a room for executing this command")
+            this.logger.log("§F00;You should enter a room to execute this command")
         } else {
             handle.onPerform(args)
         }
@@ -373,7 +373,7 @@ export default class Console {
     }
 
     runScript(name: string, index: number = 0) {
-        const file = path.resolve(__dirname, "resources/scripts", name + ".script")
+        const file = this.server.getResourcePath("scripts/" + name + ".script")
 
         if(!fs.existsSync(file)) {
             this.logger.log("§F00;Could not find script named '" + name + "'.")

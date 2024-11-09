@@ -1,4 +1,4 @@
-import {Constructor} from "./serializable";
+import {Constructor} from "src/utils/constructor"
 
 export type ByteArray =
     | Uint8Array

@@ -1,19 +1,46 @@
 import Tool from '../tool';
-import Particle from '../../../particles/particle';
-import Color from '../../../../utils/color';
-import SpawnZone from '../../../../map/spawn-zone';
-import GameMap from '../../../../map/game-map';
+import Color from 'src/utils/color';
+import SpawnZone from 'src/map/spawn-zone';
+import GameMap from 'src/map/game-map';
 import ToolManager from "../toolmanager";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "src/physics/tilemap-component";
+import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import Entity from "src/utils/ecs/entity";
+
+export class SpawnZoneDrawer extends EntityDrawer {
+    tool: SpawnZoneTool
+
+    constructor(tool: SpawnZoneTool) {
+        super()
+
+        this.tool = tool
+    }
+
+    draw(phase: DrawPhase) {
+        const program = phase.getProgram(ConvexShapeProgram)
+
+        const map = this.tool.manager.world.getComponent(TilemapComponent).map
+
+        for(let zone of map.spawnZones) {
+            program.drawRectangle(
+                zone.minX * GameMap.BLOCK_SIZE,
+                zone.minY * GameMap.BLOCK_SIZE,
+                zone.maxX * GameMap.BLOCK_SIZE,
+                zone.maxY * GameMap.BLOCK_SIZE,
+                0x7F7F7F7F
+            )
+        }
+    }
+}
 
 export default class SpawnZoneTool extends Tool {
-    public image = "assets/img/spawnzones.png"
+    public image = "assets/map-editor/spawnzones.png"
 	public actionName = "Зона спавна";
 	public selectedTeam: number | null = null;
-	public program: ConvexShapeProgram;
 	public clearZoneButton: JQuery;
-	public decorations = new Map<number, Particle>();
+    public visibleEntity = new Entity()
 
     public readonly colors = new Map<number, Color>([
         [0, new Color().setRGB(1, 0, 0)],
@@ -24,10 +51,9 @@ export default class SpawnZoneTool extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.program = new ConvexShapeProgram(this.manager.screen.ctx)
+        this.visibleEntity.addComponent(new SpawnZoneDrawer(this))
 
         this.setupMenu()
-        this.setupDecorations()
     }
 
     createTeamButton(i: number, color: Color): JQuery {
@@ -68,48 +94,15 @@ export default class SpawnZoneTool extends Tool {
             .css("height", "100%")
     }
 
-    setupDecorations() {
-
-        for(let [index, color] of this.colors) {
-            let decoration = new Particle({
-                x: 0, y: 0,
-                color: color.withAlpha(0.5)
-            })
-
-            this.decorations.set(index, decoration)
-        }
-    }
-
-    drawDecorations() {
-        super.drawDecorations();
-        const map = this.manager.world.getComponent(TilemapComponent).map
-
-        this.program.reset()
-
-        for(let zone of map.spawnZones) {
-            this.program.drawRectangle(
-                zone.minX * GameMap.BLOCK_SIZE,
-                zone.minY * GameMap.BLOCK_SIZE,
-                zone.maxX * GameMap.BLOCK_SIZE,
-                zone.maxY * GameMap.BLOCK_SIZE,
-                0x7F7F7F7F
-            )
-        }
-
-        this.program.bind()
-        this.program.setCamera(this.manager.camera)
-        this.program.draw()
-    }
-
     becomeActive() {
         super.becomeActive();
-
+        this.manager.world.appendChild(this.visibleEntity)
         this.manager.setNeedsRedraw()
     }
 
     resignActive() {
         super.resignActive();
-
+        this.visibleEntity.removeFromParent()
         this.manager.setNeedsRedraw()
     }
 

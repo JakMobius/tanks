@@ -1,0 +1,29 @@
+.pause-menu-view {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    padding: 10px 20px 5px;
+    width: 400px;
+}
+.pause-menu-view > div:not(:last-child) {
+    margin: 0 0 10px 0;
+}
+.pause-menu-view > .bottom-text {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 21px;
+    text-align: center;
+    color: #AAAAAA;
+}
+.pause-menu-view > .subtitle {
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 26px;
+    padding: 5px;
+    color: #AAAAAA;
+}
+.pause-menu-view .pause-menu-button {
+    font-weight: bold;
+    font-size: 24px;
+    height: 40px;
+}

@@ -34,16 +34,28 @@ export default class AdapterLoop extends Loop {
         this.accumulator += dt;
 
         if(!this.running) return;
-        for(let steps = 1; steps < this.maximumSteps && this.accumulator > this.interval; steps++) {
-            this.accumulator -= this.interval
-            this.perform(this.timeCounter + this.interval)
+
+        // The step count is precalculated instead of subtracting the interval from the accumulator
+        // because of floating point errors, which were causing the physics to not be deterministic
+        // over time.
+
+        let stepsRequired = Math.floor(this.accumulator / this.interval)
+
+        for(let steps = 1; steps < this.maximumSteps && steps <= stepsRequired; steps++) {
+            this.perform(this.timeCounter + this.interval * steps)
         }
+
+        let oldAccumulator = this.accumulator
+
+        this.accumulator -= stepsRequired * this.interval;
 
         if(this.accumulator > this.interval) {
             let stepsSkipped = Math.floor(this.accumulator / this.interval)
             this.accumulator -= this.interval * stepsSkipped;
             this.perform(this.timeCounter + this.interval * stepsSkipped)
         }
+
+        this.timeCounter += (oldAccumulator - this.accumulator)
     }
 
     setInterval(interval: number) {

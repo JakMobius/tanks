@@ -5,6 +5,7 @@ import LoginController from "../login/login-controller";
 import WelcomeView from "./welcome-view";
 import BarSeparator from "../bar-separator/bar-separator";
 import Button from "src/client/ui/button/button";
+import PageLocation from "src/client/scenes/page-location";
 
 export default class WelcomeController extends Controller {
 
@@ -25,7 +26,7 @@ export default class WelcomeController extends Controller {
         this.loginButton.element.on("click", () => this.navigateToLoginMenu())
 
         this.howToPlayButton.element.on("click", () => {
-            window.location.href = "../tutorial"
+            PageLocation.navigateToScene("tutorial")
         })
     }
 

@@ -19,9 +19,9 @@
 // #if B2_ENABLE_PARTICLE
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2_maxFloat, b2MakeArray } from "../common/b2_settings";
-import { b2Vec2 } from "../common/b2_math";
-import { b2StackQueue } from "./b2_stack_queue";
+import {b2_maxFloat, b2MakeArray} from "../common/b2_settings";
+import {b2Vec2} from "../common/b2_math";
+import {b2StackQueue} from "./b2_stack_queue";
 
 /**
  * A field representing the nearest generator from each point.

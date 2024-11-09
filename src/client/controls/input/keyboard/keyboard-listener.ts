@@ -1,19 +1,32 @@
-import DocumentEventHandler from "src/client/controls/interact/document-event-handler";
-import {isMacOS} from "src/utils/meta-key-name";
+import DOMEventHandlerSet from "src/utils/dom-event-handler-set";
+import EventEmitter from "src/utils/event-emitter";
 
-export default class KeyboardListener extends DocumentEventHandler {
+export default class KeyboardListener extends EventEmitter {
+
+    handlerSet = new DOMEventHandlerSet()
+    keys = new Set()
 
     constructor() {
         super();
-        this.keys = new Set()
+
+        this.handlerSet.on("keyup", (event) => this.keyup(event))
+        this.handlerSet.on("keydown", (event) => this.keydown(event))
     }
 
     keyup(e: KeyboardEvent) {
+        if(e.target != this.handlerSet.target) {
+            return
+        }
+
         this.emit("keyup", e)
         this.keys.delete(e.code)
     }
 
     keydown(e: KeyboardEvent) {
+        if(e.target != this.handlerSet.target) {
+            return
+        }
+
         if(e.repeat) {
             e.preventDefault()
             return
@@ -22,40 +35,15 @@ export default class KeyboardListener extends DocumentEventHandler {
         this.keys.add(e.code)
     }
 
-    onKeybinding(name: string, handler: (event: KeyboardEvent) => void) {
-        let parts = name.split("-")
-        let cmd = parts.indexOf("Cmd") !== -1
-        let shift = parts.indexOf("Shift") !== -1
-        let alt = parts.indexOf("Alt") !== -1
-        let key = parts.pop()
+    setTarget(target: HTMLElement) {
+        if(this.handlerSet.target === target) {
+            return
+        }
 
-        this.on("keydown", (event: KeyboardEvent) => {
-            let eventCmd = isMacOS ? event.metaKey : event.ctrlKey
-            let eventShift = event.shiftKey
-            let eventAlt = event.altKey
+        this.handlerSet.setTarget(target)
 
-            let eventKey = event.code
-            if (eventKey.startsWith("Key")) eventKey = eventKey.substr(3)
-
-            if (eventCmd !== cmd) return;
-            if (eventShift !== shift) return;
-            if (eventAlt !== alt) return;
-            if (eventKey !== key) return;
-
-            event.preventDefault()
-
-            handler(event)
-        })
-    }
-
-    startListening() {
-        this.bind("keyup", this.keyup)
-        this.bind("keydown", this.keydown)
-    }
-
-    stopListening() {
-        super.stopListening();
-        this.emit("stopped-listening")
+        if(this.handlerSet.target && !target) this.emit("stopped-listening")
+        if(!this.handlerSet.target && target) this.emit("started-listening")
     }
 
     clearAxles() {

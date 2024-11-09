@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { b2Vec2, b2Atan2 } from "../common/b2_math";
-import { b2Draw, b2Color } from "../common/b2_draw";
-import { b2_pi } from "../common/b2_settings";
+import {b2Atan2, b2Vec2} from "../common/b2_math";
+import {b2Color, b2Draw} from "../common/b2_draw";
+import {b2_pi} from "../common/b2_settings";
 
 export enum b2StretchingModel {
   b2_pbdStretchingModel,

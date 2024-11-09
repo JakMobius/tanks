@@ -237,7 +237,12 @@ export class MeshGenerationContext {
             this.addPathPoint(point)
         }
 
-        array.push(this.currentPath)
+        if (this.shapeHasVolume) {
+            // If we add a helper point to the last shape, it will become the same
+            // as the first shape, so we don't need to add it to the array
+            array.push(this.currentPath)
+        }
+
         return array
     }
 

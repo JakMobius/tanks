@@ -1,6 +1,7 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import EntityDataTransmitComponent from "../transmitting/entity-data-transmit-component";
+import PrefabIdComponent from "src/entity/components/prefab-id-component";
 
 export default class EntityStateTransmitter extends Transmitter {
 
@@ -22,12 +23,13 @@ export default class EntityStateTransmitter extends Transmitter {
         const parentTransmitterSet = parentComponent.transmitterSetFor(this.set.receivingEnd)
 
         receivingEnd.packCommand(parentTransmitterSet, Commands.ENTITY_CREATE_COMMAND, (buffer) => {
-            buffer.writeUint32(this.set.transmitComponent.networkIdentifier)
-            buffer.writeUint32(this.set.transmitComponent.configScriptIndex)
+            buffer.writeUint32(this.set.entityId)
+            buffer.writeUint32(this.set.transmitComponent.entity.getComponent(PrefabIdComponent).prefabId)
         })
     }
 
     onDisable() {
+
         if(this.set.receivingEnd.root == this.set.transmitComponent.entity) {
             // We should not synchronise events of the
             // root entity
@@ -38,10 +40,5 @@ export default class EntityStateTransmitter extends Transmitter {
 
         // Disable transmitter after sending the remove command
         super.onDisable()
-
-        // As we're no longer able to navigate from this entity after
-        // it's removed from the tree, the further navigation is
-        // performed from its parent node.
-        this.set.receivingEnd.currentNode = this.set.receivingEnd.currentNode.parent
     }
 }

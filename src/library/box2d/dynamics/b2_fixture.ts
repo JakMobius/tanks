@@ -17,12 +17,12 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2Maybe, b2_lengthUnitsPerMeter } from "../common/b2_settings";
-import { b2Vec2, b2Transform, XY } from "../common/b2_math";
-import { b2AABB, b2RayCastInput, b2RayCastOutput } from "../collision/b2_collision";
-import { b2TreeNode } from "../collision/b2_dynamic_tree";
-import { b2Shape, b2ShapeType, b2MassData } from "../collision/b2_shape";
-import { b2Body } from "./b2_body";
+import {b2_lengthUnitsPerMeter, b2Maybe} from "../common/b2_settings";
+import {b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2AABB, b2RayCastInput, b2RayCastOutput} from "../collision/b2_collision";
+import {b2TreeNode} from "../collision/b2_dynamic_tree";
+import {b2MassData, b2Shape, b2ShapeType} from "../collision/b2_shape";
+import {b2Body} from "./b2_body";
 
 /// This holds contact filtering data.
 export interface b2IFilter {

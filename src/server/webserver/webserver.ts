@@ -1,9 +1,7 @@
 import express from 'express';
 import Logger from '../log/logger';
 import session from 'express-session';
-import * as path from 'path';
 import GameModule from './game/game-module';
-import HubModule from './hub/hub-module';
 import BaseModule from './base-module';
 import WebserverModule from "./webserver-module";
 import * as HTTP from "http";
@@ -23,7 +21,6 @@ export default class WebServer {
 
     modules = new Map<Number, [WebserverModule]>()
 
-    hubModule = new HubModule()
     gameModule = new GameModule()
     baseModule = new BaseModule()
     staticModule = new StaticModule()
@@ -37,7 +34,6 @@ export default class WebServer {
         this.logger = Logger.global
         this.httpServer = null
 
-        this.addModule(this.hubModule)
         this.addModule(this.gameModule)
         this.addModule(this.baseModule)
         this.addModule(this.staticModule)
@@ -83,7 +79,7 @@ export default class WebServer {
 
     setupApp() {
         this.app.set('view engine', 'hbs')
-        this.app.set('views', path.resolve(__dirname, "resources/web"))
+        this.app.set('views', this.server.getResourcePath("web"))
         this.app.disable("x-powered-by")
 
         this.app.use(function(req, res, next) {
@@ -136,7 +132,7 @@ export default class WebServer {
         console.error("An error occurred in the webserver while handling a request: " + req.method + " " + req.url + " with body: ", req.body, err)
 
         if (req.accepts('html')) {
-            res.render('default/views/500.hbs');
+            res.render('views/500.hbs');
         } else if (req.accepts('json')) {
             res.send({ error: 'Internal server error' });
         } else {

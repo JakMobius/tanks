@@ -1,36 +1,32 @@
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import PhysicsChunk from "./physics-chunk";
-import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import GameMap from "../map/game-map";
-import Entity from "../utils/ecs/entity";
-import PhysicalHostComponent from "../physiсal-world-component";
-import {Component} from "../utils/ecs/component";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import TilemapComponent from "./tilemap-component";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export interface PhysicsChunkManagerConfig {
     chunkWidth?: number
     chunkHeight?: number
 }
 
-// According to benchmarks, arrays are the best choice for storing points,
+// According to benchmarks, arrays are the best for storing points,
 // as they're fast to create.
 export type PhysicsPoint = [number, number]
 
-export default class ChunkedMapCollider implements Component {
+export default class ChunkedMapCollider extends EventHandlerComponent {
     public readonly chunkWidth: number;
     public readonly chunkHeight: number
     public time: number = 0
 
     chunkMap = new TwoDimensionalMap<number, number, PhysicsChunk>()
-    private eventHandler = new BasicEventHandlerSet()
     private readonly relevanceRadius: number;
     private readonly relevanceDuration: number;
 
     private mapComponent?: TilemapComponent
 
-    entity?: Entity
-
     constructor(config: PhysicsChunkManagerConfig = {}) {
+        super()
         config = Object.assign({
             chunkWidth: 16,
             chunkHeight: 16
@@ -72,10 +68,6 @@ export default class ChunkedMapCollider implements Component {
         this.chunkMap.delete(chunk.x, chunk.y)
     }
 
-    private updateChunk(chunk: PhysicsChunk) {
-        chunk.updateBody()
-    }
-
     private resetChunks() {
         for(let row of this.chunkMap.rows.values()) {
             for(let chunk of row.values()) {
@@ -100,7 +92,7 @@ export default class ChunkedMapCollider implements Component {
                 if(!this.isChunkRelevant(chunk)) {
                     this.unloadChunk(chunk)
                 } else if(chunk.needsUpdate) {
-                    this.updateChunk(chunk)
+                    chunk.updateBody()
                 }
             }
         }
@@ -123,14 +115,8 @@ export default class ChunkedMapCollider implements Component {
         return chunk.lastRelevanceTime > this.time - this.relevanceDuration
     }
 
-    onAttach(entity: Entity) {
-        this.entity = entity
-        this.eventHandler.setTarget(this.entity)
-    }
-
     onDetach() {
+        super.onDetach()
         this.resetChunks()
-        this.eventHandler.setTarget(null)
-        this.entity = null
     }
 }

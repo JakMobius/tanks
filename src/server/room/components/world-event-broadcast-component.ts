@@ -1,27 +1,24 @@
-import {Component} from "src/utils/ecs/component";
-import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import Player from "src/server/player";
 import RoomClientComponent from "./room-client-component";
 import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
 import HtmlEscape from "src/utils/html-escape";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
-import PlayerConnectEvent from "src/events/player-connect-event";
-import PlayerDisconnectEvent from "src/events/player-disconnect-event";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerChatEvent from "src/events/player-chat-event";
 import TeamColor from "src/utils/team-color";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
+import Entity from "src/utils/ecs/entity";
+import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
+import {chooseRandom} from "src/utils/utils";
 
-export default class WorldEventBroadcastComponent implements Component {
-    entity: Entity | null;
-
-    worldEventHandler = new BasicEventHandlerSet()
+export default class WorldEventBroadcastComponent extends EventHandlerComponent {
 
     constructor() {
-        this.worldEventHandler.on("player-connect", (event) => this.onPlayerConnected(event), EventEmitter.PRIORITY_MONITOR)
-        this.worldEventHandler.on("player-disconnect", (event) => this.onPlayerDisconnected(event), EventEmitter.PRIORITY_MONITOR)
-        this.worldEventHandler.on("player-death", (player) => this.onPlayerDeath(player), EventEmitter.PRIORITY_MONITOR)
-        this.worldEventHandler.on("player-chat", (event) => this.onPlayerChat(event), EventEmitter.PRIORITY_MONITOR)
+        super()
+        this.eventHandler.on("player-connect", (player) => this.onPlayerConnect(player), EventEmitter.PRIORITY_MONITOR)
+        this.eventHandler.on("player-will-disconnect", (player) => this.onPlayerDisconnect(player), EventEmitter.PRIORITY_MONITOR)
+        this.eventHandler.on("player-death", (player) => this.onPlayerDeath(player), EventEmitter.PRIORITY_MONITOR)
+        this.eventHandler.on("player-chat", (player, event) => this.onPlayerChat(event), EventEmitter.PRIORITY_MONITOR)
     }
 
     broadcastMessage(message: string) {
@@ -32,18 +29,27 @@ export default class WorldEventBroadcastComponent implements Component {
         clientComponent.portal.broadcast(new PlayerChatPacket(message))
     }
 
-    protected onPlayerConnected(event: PlayerConnectEvent) {
-        if(event.declined) return
-        let color = event.player.team ? TeamColor.getColor(event.player.team.id).toChatColor(true) : "§!;"
-        this.broadcastMessage(color + event.player.nick + "§; подключился к игре")
+    private getPlayerTeamColor(player: Entity) {
+        const playerTeamComponent = player.getComponent(PlayerTeamComponent)
+        if (!playerTeamComponent.team) return "§!;"
+
+        return TeamColor.getColor(playerTeamComponent.team.id).toChatColor(true)
     }
 
-    protected onPlayerDisconnected(event: PlayerDisconnectEvent) {
-        let color = event.player.team ? TeamColor.getColor(event.player.team.id).toChatColor(true) : "§!;"
-        this.broadcastMessage(color + event.player.nick + "§; отключился от игры")
+    private getPlayerColoredNick(player: Entity) {
+        const playerNick = player.getComponent(PlayerNickComponent).nick
+        return this.getPlayerTeamColor(player) + playerNick + "§;"
     }
 
-    protected onPlayerDeath(player: Player) {
+    protected onPlayerConnect(player: Entity) {
+        this.broadcastMessage(this.getPlayerColoredNick(player) + " подключился к игре")
+    }
+
+    protected onPlayerDisconnect(player: Entity) {
+        this.broadcastMessage(this.getPlayerColoredNick(player) + " отключился от игры")
+    }
+
+    protected onPlayerDeath(player: Entity) {
         this.broadcastMessage(this.getBestDeathMessage(player) || this.defaultDeathMessage(player))
     }
 
@@ -53,8 +59,7 @@ export default class WorldEventBroadcastComponent implements Component {
         text.trim()
         text = HtmlEscape(text)
         if (!text.length) return
-        let color = event.player.team ? TeamColor.getColor(event.player.team.id).toChatColor(true) : "§!;"
-        this.broadcastMessage(color + event.player.nick + "§;: " + text)
+        this.broadcastMessage(this.getPlayerColoredNick(event.player) + ": " + text)
     }
 
     static killMessages = [
@@ -92,44 +97,34 @@ export default class WorldEventBroadcastComponent implements Component {
         }
     ]
 
-    private getPlayerTeamColor(player: Player) {
-        return player.team ? TeamColor.getColor(player.team.id).toChatColor(true) : "§!;"
-    }
+    private getBestDeathMessage(player: Entity) {
+        const playerNick = player.getComponent(PlayerNickComponent).nick
+        const deathRecorderComponent = this.entity.getComponent(DamageRecorderComponent)
+        if (!deathRecorderComponent) return null
 
-    private getBestDeathMessage(player: Player) {
-        let deathRecorder = this.entity.getComponent(DamageRecorderComponent)
-        if (!deathRecorder) return null
-
-        let damageData = deathRecorder.getDamageData(player)
+        let damageData = deathRecorderComponent.getDamageData(player)
         let killer = damageData.damagers[0]
 
-        if (!killer || killer == player) return this.getPlayerTeamColor(player) + player.nick + "§; самоуничтожился"
+        if (!killer || killer == player) return this.getPlayerTeamColor(player) + playerNick + "§; самоуничтожился"
 
-        let killsInRow = deathRecorder.getDamageData(killer).rowKills.get(player) || 0
+        const killerNick = killer.getComponent(PlayerNickComponent).nick
+
+        let killsInRow = deathRecorderComponent.getDamageData(killer).rowKills.get(player) || 0
 
         for (let message of WorldEventBroadcastComponent.killMessages) {
             if (message.minKills > killsInRow) continue;
             if (message.maxKills && message.maxKills < killsInRow) continue;
             let variants = message.messages
 
-            return variants[Math.floor(Math.random() * variants.length)]
-                .replace("@0", this.getPlayerTeamColor(killer) + killer.nick + "§;")
-                .replace("@1", this.getPlayerTeamColor(player) + player.nick + "§;")
+            return chooseRandom(variants)
+                .replace("@0", this.getPlayerTeamColor(killer) + killerNick + "§;")
+                .replace("@1", this.getPlayerTeamColor(player) + playerNick + "§;")
         }
 
         return null
     }
 
-    private defaultDeathMessage(player: Player) {
-        return "§!F00;" + player.nick + "§; уничтожен"
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.worldEventHandler.setTarget(this.entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
+    private defaultDeathMessage(player: Entity) {
+        return this.getPlayerColoredNick(player) + " уничтожен"
     }
 }

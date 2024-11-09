@@ -17,9 +17,9 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2Vec2, b2Transform, XY } from "../common/b2_math";
-import { b2AABB, b2RayCastInput, b2RayCastOutput } from "./b2_collision";
-import { b2DistanceProxy } from "./b2_distance";
+import {b2Transform, b2Vec2, XY} from "../common/b2_math";
+import {b2AABB, b2RayCastInput, b2RayCastOutput} from "./b2_collision";
+import {b2DistanceProxy} from "./b2_distance";
 
 /// This holds the mass data computed for a shape.
 export class b2MassData {

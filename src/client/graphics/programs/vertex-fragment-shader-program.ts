@@ -1,5 +1,5 @@
 import Program from "./program";
-import Shader from "../shader";
+import Shader from "src/client/graphics/shaders/shader";
 
 export default abstract class VertexFragmentShaderProgram extends Program {
 

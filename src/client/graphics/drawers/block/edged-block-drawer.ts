@@ -1,5 +1,5 @@
 import BlockDrawer from './block-drawer';
-import Sprite, {SpriteRect} from '../../../sprite';
+import Sprite, {SpriteRect} from 'src/client/graphics/sprite';
 import GameMap from '../../../../map/game-map';
 import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/block-state/block-state';

@@ -17,14 +17,14 @@
 */
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
-import { b2BroadPhase } from "../collision/b2_broad_phase";
-import { b2TreeNode } from "../collision/b2_dynamic_tree";
-import { b2TestOverlapAABB } from "../collision/b2_collision";
-import { b2Contact, b2ContactEdge } from "./b2_contact";
-import { b2ContactFactory } from "./b2_contact_factory";
-import { b2Body, b2BodyType } from "./b2_body";
-import { b2Fixture, b2FixtureProxy } from "./b2_fixture";
-import { b2ContactFilter, b2ContactListener } from "./b2_world_callbacks";
+import {b2BroadPhase} from "../collision/b2_broad_phase";
+import {b2TreeNode} from "../collision/b2_dynamic_tree";
+import {b2TestOverlapAABB} from "../collision/b2_collision";
+import {b2Contact, b2ContactEdge} from "./b2_contact";
+import {b2ContactFactory} from "./b2_contact_factory";
+import {b2Body, b2BodyType} from "./b2_body";
+import {b2Fixture, b2FixtureProxy} from "./b2_fixture";
+import {b2ContactFilter, b2ContactListener} from "./b2_world_callbacks";
 
 // Delegate of b2World.
 export class b2ContactManager {

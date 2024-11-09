@@ -18,11 +18,11 @@
 
 // DEBUG: import { b2Assert } from "../common/b2_settings";
 // DEBUG: import { b2IsValid } from "../common/b2_math";
-import { b2Maybe } from "../common/b2_settings";
-import { b2Clamp, b2Vec2, b2Mat22, b2Rot, XY } from "../common/b2_math";
-import { b2Body } from "./b2_body";
-import { b2Joint, b2JointDef, b2JointType, b2IJointDef } from "./b2_joint";
-import { b2SolverData } from "./b2_time_step";
+import {b2Maybe} from "../common/b2_settings";
+import {b2Clamp, b2Mat22, b2Rot, b2Vec2, XY} from "../common/b2_math";
+import {b2Body} from "./b2_body";
+import {b2IJointDef, b2Joint, b2JointDef, b2JointType} from "./b2_joint";
+import {b2SolverData} from "./b2_time_step";
 
 // Point-to-point constraint
 // Cdot = v2 - v1

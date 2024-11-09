@@ -43,7 +43,9 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
 
         let schema = ctor.schema
         let requestFields: any = {}
-        let fields: AjaxFields = {}
+
+        // Use Object.create(null) here to avoid prototype pollution
+        let fields: AjaxFields = Object.create(null)
 
         if(req.method == 'GET') requestFields = req.query
         else if(req.method == 'POST') requestFields = req.body

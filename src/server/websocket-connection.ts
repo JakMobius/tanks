@@ -25,7 +25,7 @@ export default class WebsocketConnection extends Connection {
 
     bindToWebsocketConnection(connection?: WebSocket.connection) {
         if(this.websocketConnection) {
-            throw new Error("This WebsocketConnection has already been bound to a socket")
+            throw new Error("This WebsocketConnection is already bound to a socket")
         }
 
         this.websocketConnection = connection

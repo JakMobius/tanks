@@ -1,0 +1,18 @@
+.axis-selector > .mapped-keys {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0;
+    gap: 5px;
+}
+.axis-selector > .mapped-keys .mapped-key {
+    padding: 4px 10px;
+}
+.axis-selector .key-name {
+    font-style: italic;
+    padding: 4px 8px;
+}
+.axis-selector .key-name, .axis-selector .mapped-key {
+    font-size: 20px;
+    line-height: 23px;
+}

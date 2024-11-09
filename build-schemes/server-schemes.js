@@ -26,10 +26,7 @@ module.exports = {
                 ...constants.serverBundlerConfig
             }),
             beelder.copy("src/server/preferences/default.json", `${constants.cacheFolder}/server/resources/default-preferences.json`),
-            beelder.copy("#game",                  `${constants.cacheFolder}/server/resources/web/`),
-            beelder.copy("#hub",                   `${constants.cacheFolder}/server/resources/web/`),
-            beelder.copy("#tutorial",              `${constants.cacheFolder}/server/resources/web/`),
-            beelder.copy("src/client/web/default", `${constants.cacheFolder}/server/resources/web/`),
+            beelder.copy("#web-resources",             `${constants.cacheFolder}/server/resources/`),
             beelder.copy("src/server/maps",        `${constants.cacheFolder}/server/resources/`),
             beelder.copy("src/server/scripts",     `${constants.cacheFolder}/server/resources/`)
         ],

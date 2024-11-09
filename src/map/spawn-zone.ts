@@ -1,9 +1,9 @@
 import Rectangle from '../utils/rectangle';
-import {Constructor} from "../serialization/binary/serializable";
+import {Constructor} from "src/utils/constructor"
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";
 
-class SpawnZone extends Rectangle {
+export default class SpawnZone extends Rectangle {
 	public id: number;
 
     constructor(id: number) {
@@ -32,5 +32,3 @@ class SpawnZone extends Rectangle {
         encoder.writeInt32(this.y2)
     }
 }
-
-export default SpawnZone;

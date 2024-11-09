@@ -1,18 +1,18 @@
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import HealthTransmitter from "./network/health/health-transmitter";
 import DamageReason from "src/server/damage-reason/damage-reason";
 import EntityDamageEvent from "src/events/tank-damage-event";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export type DamageType = number
 export const DamageTypes = {
-    UNKNOWN:    0,
-    EXPLOSION:  1,
-    IMPACT:     2,
-    ELECTRICAL: 3,
-    FIRE:       4
+    UNKNOWN:       0,
+    EXPLOSION:     1,
+    IMPACT:        2,
+    ELECTRICAL:    3,
+    FIRE:          4,
+    SELF_DESTRUCT: 5
 }
 
 export const DamageModifiers = {
@@ -24,38 +24,30 @@ export const DamageModifiers = {
     }
 }
 
-export default class HealthComponent implements Component {
+export default class HealthComponent extends EventHandlerComponent {
     private health: number = 0
     private maxHealth: number = 0
-    entity: Entity | null;
 
     damageModifiers = new Map<DamageType, ((damage: number) => number)[]>();
 
-    private entityHandler = new BasicEventHandlerSet()
-
     constructor() {
-        this.entityHandler.on("transmitter-set-attached", (transmitterSet: TransmitterSet) => {
+        super()
+        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(HealthTransmitter)
         })
 
-        this.entityHandler.on("respawn", () => {
+        this.eventHandler.on("respawn", () => {
             this.setHealth(this.maxHealth)
         })
     }
 
     onAttach(entity: Entity): void {
-        this.entity = entity
+        super.onAttach(entity)
         this.setHealth(this.maxHealth)
-        this.entityHandler.setTarget(this.entity)
     }
 
-    onDetach(): void {
-        this.entity = null
-        this.entityHandler.setTarget(this.entity)
-    }
-
-    // TODO: For now, max health is only set on server side, which can lead to weird smoke effects on first spawn.
-    setMaxHealth(health: number) {
+    setToMaxHealth(health: number) {
+        this.health = health
         this.maxHealth = health
         return this
     }
@@ -91,6 +83,10 @@ export default class HealthComponent implements Component {
         return this.health
     }
 
+    getMaxHealth() {
+        return this.maxHealth
+    }
+
     getModifiedDamage(damage: number, damageReason: DamageReason) {
         let damageType = DamageTypes.UNKNOWN
         if(damageReason) {
@@ -108,6 +104,8 @@ export default class HealthComponent implements Component {
     }
 
     damage(damage: number, damageReason: DamageReason = null) {
+        if(!damageReason) damageReason = new DamageReason()
+
         damage = this.getModifiedDamage(damage, damageReason)
 
         if (damage <= 0) {

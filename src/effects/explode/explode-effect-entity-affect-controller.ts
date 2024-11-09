@@ -3,23 +3,23 @@ import GameMap from "src/map/game-map";
 import * as Box2D from "src/library/box2d";
 import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
 import ExplodeEffectPool from "./explode-effect-pool";
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import SailingComponent from "src/entity/components/sailing-component";
 import DamageReason from "src/server/damage-reason/damage-reason";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export interface ExplodeEffectEntityAffectControllerConfig {
     damageEntities?: boolean
 }
 
-export default class ExplodeEffectEntityAffectController implements Component {
-    entity: Entity | null;
+export default class ExplodeEffectEntityAffectController extends EventHandlerComponent {
 
     damageEntities = false
-    private eventHandler = new BasicEventHandlerSet()
+    entityDamageFactor: number = 5.0
+    entityDamageThreshold: number = 0.5
 
     constructor(config?: ExplodeEffectEntityAffectControllerConfig) {
+        super()
         config = config || {}
         this.damageEntities = config.damageEntities ?? false
         this.eventHandler.on("explode-pool-tick", (dt) => {
@@ -73,7 +73,26 @@ export default class ExplodeEffectEntityAffectController implements Component {
 
             this.getPressureGradient(pool, position, gradient)
             this.handleEntityAirImpulse(entity, gradient)
+            this.handleEntityDamage(pool, entity)
         }
+    }
+
+    private handleEntityDamage(pool: ExplodeEffectPool, entity: Entity) {
+        if(!this.damageEntities) {
+            return
+        }
+
+        let position = entity.getComponent(PhysicalComponent).getBody().GetPosition()
+        let power = pool.poolPressureAt(position.x, position.y)
+        let damage = power * this.entityDamageFactor - this.entityDamageThreshold
+
+        if (damage <= 0) return;
+
+        let healthComponent = entity.getComponent(HealthComponent)
+        let damageReason = new DamageReason()
+        // TODO: Figure out how to get the shooter
+        damageReason.damageType = DamageTypes.EXPLOSION
+        if (healthComponent) healthComponent.damage(power, damageReason)
     }
 
     private handleEntityAirImpulse(entity: Entity, impulse: Box2D.Vec2) {
@@ -90,25 +109,5 @@ export default class ExplodeEffectEntityAffectController implements Component {
                 y: impulse.y * sailingFactor
             })
         }
-
-        if(this.damageEntities) {
-            if (power <= 0) return;
-
-            let healthComponent = entity.getComponent(HealthComponent)
-            let damageReason = new DamageReason()
-            // TODO: Figure out how to get the shooter
-            damageReason.damageType = DamageTypes.EXPLOSION
-            if (healthComponent) healthComponent.damage(power, damageReason)
-        }
-    }
-
-    onAttach(entity: Entity): void {
-        this.entity = entity
-        this.eventHandler.setTarget(entity)
-    }
-
-    onDetach(): void {
-        this.entity = null
-        this.eventHandler.setTarget(null)
     }
 }

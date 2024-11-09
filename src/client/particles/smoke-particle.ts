@@ -1,7 +1,8 @@
 import Particle, {ParticleConfig} from './particle';
 
 export default class SmokeParticle extends Particle {
-	public scaling: any;
+	public scaling: number;
+    public alpha: number
 
     constructor(config: ParticleConfig) {
         super(config)
@@ -9,12 +10,12 @@ export default class SmokeParticle extends Particle {
         this.width = config.width || 1
         this.height = config.height || 1
         this.scaling = config.scaling === undefined ? 0.01 : config.scaling
+        this.alpha = config.color.getAlpha()
     }
 
     tick(dt: number) {
         super.tick(dt)
 
-        this.color.setAlpha(1 - this.lifespan / this.lifetime)
-
+        this.color.setAlpha(this.alpha * (1 - this.lifespan / this.lifetime))
     }
 }

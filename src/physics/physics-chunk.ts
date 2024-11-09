@@ -8,10 +8,11 @@ import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {b2BodyType} from "../library/box2d/dynamics/b2_body";
 import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
-import PhysicalHostComponent from "../physiсal-world-component";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
+import Entity from "src/utils/ecs/entity";
 
 export default class PhysicsChunk {
-    public readonly manager: ChunkedMapCollider;
+    public readonly collider: ChunkedMapCollider;
     public readonly x: number;
     public readonly y: number;
     public readonly width: number;
@@ -26,12 +27,12 @@ export default class PhysicsChunk {
     edgePaths: PhysicsPoint[][];
     edgeMesh: PhysicsPoint[][];
 
-    constructor(manager: ChunkedMapCollider, x: number, y: number) {
-        this.manager = manager
+    constructor(collider: ChunkedMapCollider, x: number, y: number) {
+        this.collider = collider
         this.x = x
         this.y = y
-        this.width = this.manager.chunkWidth
-        this.height = this.manager.chunkHeight
+        this.width = this.collider.chunkWidth
+        this.height = this.collider.chunkHeight
         this.edgeFindingContext = new EdgeFindingContext(this)
         this.meshGenerationContext = new MeshGenerationContext(this)
 
@@ -43,14 +44,14 @@ export default class PhysicsChunk {
         let localX = x - this.x
         let localY = y - this.y
 
-        if(localX >= 0 && localY >= 0 && localX < this.width && localY < this.height) {
-            this.blocks[localX + localY * this.width].updateBlock(this.manager.getMap().getBlock(x, y))
+        if (localX >= 0 && localY >= 0 && localX < this.width && localY < this.height) {
+            this.blocks[localX + localY * this.width].updateBlock(this.collider.getMap().getBlock(x, y))
             this.needsUpdate = true
         }
     }
 
     listen() {
-        this.eventHandlers.setTarget(this.manager.entity)
+        this.eventHandlers.setTarget(this.collider.entity)
         this.needsUpdate = true
     }
 
@@ -60,12 +61,13 @@ export default class PhysicsChunk {
     }
 
     private loadBlocks() {
-        const map = this.manager.getMap();
+        const map = this.collider.getMap();
 
         this.blocks = new Array(this.width * this.height)
-        for(let y = this.y, dy = 0, i = 0; dy < this.height; y++, dy++) {
-            for(let x = this.x, dx = 0; dx < this.width; x++, dx++, i++) {
-                this.blocks[i] = new PhysicsBlock(map.getBlock(x, y))
+
+        for (let y = this.y, dy = 0, i = 0; dy < this.height; y++, dy++) {
+            for (let x = this.x, dx = 0; dx < this.width; x++, dx++, i++) {
+                this.blocks[i] = new PhysicsBlock(map?.getBlock(x, y) ?? null)
             }
         }
     }
@@ -76,26 +78,29 @@ export default class PhysicsChunk {
     }
 
     public updateBody() {
-        if(!this.blocks) this.loadBlocks()
+        if (!this.blocks) this.loadBlocks()
 
-        if(this.body) {
+        if (this.body) {
             this.body.GetWorld().DestroyBody(this.body)
         }
 
-        const body = this.manager.entity.getComponent(PhysicalHostComponent).world.CreateBody({
+        const body = this.collider.entity.getComponent(PhysicalHostComponent).world.CreateBody({
             type: b2BodyType.b2_staticBody,
-            position: { x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE },
+            position: {x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE},
         })
 
         this.generateMesh()
-        for(let shape of this.edgeMesh) {
-            const pointShape = shape.map(point => ({ x: point[0] * GameMap.BLOCK_SIZE, y: point[1] * GameMap.BLOCK_SIZE }))
+        for (let shape of this.edgeMesh) {
+            const pointShape = shape.map(point => ({
+                x: point[0] * GameMap.BLOCK_SIZE,
+                y: point[1] * GameMap.BLOCK_SIZE
+            }))
 
             body.CreateFixture({
                 shape: new Box2D.PolygonShape().Set(pointShape),
                 density: 1.0,
                 friction: 0.1,
-                restitution: 0.5,
+                restitution: 0.1,
                 filter: {
                     categoryBits: physicsCategories.wall,
                     maskBits: physicsMasks.wall
@@ -103,14 +108,20 @@ export default class PhysicsChunk {
             })
         }
 
-        if(this.body) this.body.SetUserData(null)
+        if (this.body) this.body.SetUserData(null)
         this.body = body
-        this.body.SetUserData(this)
+
+        // Box2D solvers are stored statically. Resolved contacts
+        // are sometimes cached in memory, as well as corresponding
+        // bodies and their user data. This is not much of a
+        // performance problem, but it makes real memory leaks harder
+        // to detect.
+        this.body.SetUserData(new WeakRef(this))
         this.needsUpdate = false
     }
 
     getBlock(x: number, y: number) {
-        if(x < 0 || x >= this.width || y < 0 || y >= this.height) {
+        if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
             return PhysicsBlock.nullBlock
         } else {
             return this.blocks[x + y * this.width]
@@ -125,31 +136,47 @@ export default class PhysicsChunk {
     getFacing(fromX: number, fromY: number, toX: number, toY: number, blockX: number, blockY: number) {
         let block = this.getBlock(blockX, blockY)
 
-        for(let edge of block.edges) {
+        for (let edge of block.edges) {
             let surface = signedDoubleTriangleSurface(fromX, fromY, edge.getSourceX() + blockX, edge.getSourceY() + blockY, toX, toY)
-            if(surface > epsilon) return 1
-            if(surface < -epsilon) return -1
+            if (surface > epsilon) return 1
+            if (surface < -epsilon) return -1
 
             surface = signedDoubleTriangleSurface(fromX, fromY, edge.getTargetX() + blockX, edge.getTargetY() + blockY, toX, toY)
-            if(surface > epsilon) return 1
-            if(surface < -epsilon) return -1
+            if (surface > epsilon) return 1
+            if (surface < -epsilon) return -1
         }
 
         return 0
     }
 
     private removeBody() {
-        if(this.body) {
+        if (this.body) {
             this.body.GetWorld().DestroyBody(this.body)
             this.body = null
         }
     }
 
     setRelevant() {
-        this.lastRelevanceTime = this.manager.time
+        this.lastRelevanceTime = this.collider.time
     }
 
     getMap() {
-        return this.manager.getMap()
+        return this.collider.getMap()
+    }
+
+    static getFromBody(body: Box2D.Body) {
+        let userData = body.GetUserData()
+
+        if (!(userData instanceof WeakRef)) {
+            return null
+        }
+
+        let entity = userData.deref()
+
+        if (!(entity instanceof PhysicsChunk)) {
+            return null
+        }
+
+        return entity
     }
 }

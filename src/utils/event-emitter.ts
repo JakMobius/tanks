@@ -1,6 +1,10 @@
 
 export type Handler = (...params: any[]) => any
 
+// TODO: it's probably better to use linked list here.
+// AbstractEventHandlerSet can also be made a lot faster
+// with O(n) for target change instead of O(n^2).
+
 export interface HandlerList {
     handlers: Array<Handler>
     iterationIndex: number
@@ -106,7 +110,7 @@ export default class EventEmitter {
     emit(type: string, ...values: any[]) {
         let args = Array.prototype.slice.call(arguments, 1)
 
-        // Sending the meta-event every time is quite inefficient
+        // Sending the meta-event every time is quite expensive
         // let params = Array.prototype.slice.call(arguments)
         // this.emitArgs('event', params);
 

@@ -19,23 +19,47 @@
 // #if B2_ENABLE_PARTICLE
 
 // DEBUG: import { b2Assert, b2_maxParticleIndex } from "../common/b2_settings";
-import { b2_linearSlop, b2_maxFloat, b2_invalidParticleIndex, b2_minParticleSystemBufferCapacity, b2_maxTriadDistanceSquared, b2_barrierCollisionTime, b2MakeArray, b2Maybe } from "../common/b2_settings";
-import { b2_maxParticlePressure, b2_minParticleWeight, b2_maxParticleForce, b2_particleStride } from "../common/b2_settings";
-import { b2Min, b2Max, b2Abs, b2Clamp, b2Sqrt, b2InvSqrt, b2Vec2, b2TypedVec2, b2Rot, b2Transform, XY } from "../common/b2_math";
-import { b2Color, b2TypedColor } from "../common/b2_draw";
-import { b2AABB, b2RayCastInput, b2RayCastOutput } from "../collision/b2_collision";
-import { b2ShapeType, b2Shape, b2MassData } from "../collision/b2_shape";
-import { b2EdgeShape } from "../collision/b2_edge_shape";
-import { b2ChainShape } from "../collision/b2_chain_shape";
-import { b2TimeStep } from "../dynamics/b2_time_step";
-import { b2Fixture } from "../dynamics/b2_fixture";
-import { b2Body } from "../dynamics/b2_body";
-import { b2World } from "../dynamics/b2_world";
-import { b2ContactFilter, b2ContactListener, b2QueryCallback, b2RayCastCallback } from "../dynamics/b2_world_callbacks";
-import { b2ParticleFlag, b2ParticleDef, b2ParticleHandle, b2IParticleDef } from "./b2_particle";
-import { b2ParticleGroupFlag, b2ParticleGroupDef, b2ParticleGroup, b2IParticleGroupDef } from "./b2_particle_group";
-import { b2VoronoiDiagram } from "./b2_voronoi_diagram";
-import { b2DistanceProxy } from "../collision/b2_distance";
+import {
+    b2_barrierCollisionTime,
+    b2_invalidParticleIndex,
+    b2_linearSlop,
+    b2_maxFloat,
+    b2_maxParticleForce,
+    b2_maxParticlePressure,
+    b2_maxTriadDistanceSquared,
+    b2_minParticleSystemBufferCapacity,
+    b2_minParticleWeight,
+    b2_particleStride,
+    b2MakeArray,
+    b2Maybe
+} from "../common/b2_settings";
+import {
+    b2Abs,
+    b2Clamp,
+    b2InvSqrt,
+    b2Max,
+    b2Min,
+    b2Rot,
+    b2Sqrt,
+    b2Transform,
+    b2TypedVec2,
+    b2Vec2,
+    XY
+} from "../common/b2_math";
+import {b2Color, b2TypedColor} from "../common/b2_draw";
+import {b2AABB, b2RayCastInput, b2RayCastOutput} from "../collision/b2_collision";
+import {b2MassData, b2Shape, b2ShapeType} from "../collision/b2_shape";
+import {b2EdgeShape} from "../collision/b2_edge_shape";
+import {b2ChainShape} from "../collision/b2_chain_shape";
+import {b2TimeStep} from "../dynamics/b2_time_step";
+import {b2Fixture} from "../dynamics/b2_fixture";
+import {b2Body} from "../dynamics/b2_body";
+import {b2World} from "../dynamics/b2_world";
+import {b2ContactFilter, b2ContactListener, b2QueryCallback, b2RayCastCallback} from "../dynamics/b2_world_callbacks";
+import {b2IParticleDef, b2ParticleDef, b2ParticleFlag, b2ParticleHandle} from "./b2_particle";
+import {b2IParticleGroupDef, b2ParticleGroup, b2ParticleGroupDef, b2ParticleGroupFlag} from "./b2_particle_group";
+import {b2VoronoiDiagram} from "./b2_voronoi_diagram";
+import {b2DistanceProxy} from "../collision/b2_distance";
 
 function std_iter_swap<T>(array: T[], a: number, b: number): void {
   const tmp: T = array[a];

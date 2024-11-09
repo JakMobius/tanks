@@ -1,9 +1,9 @@
 /* @load-resource: './hub-page.scss' */
 
 import View from "src/client/ui/view";
-import {UserDataRaw} from "src/client/user-data-raw";
+import {UserDataRaw} from "src/client/utils/user-data-raw";
 import WelcomeController from "./welcome/welcome-controller";
-import EventContainer from "src/client/ui/overlay/events/event-container";
+import EventOverlay from "src/client/ui/overlay/events-overlay/event-overlay";
 import AuthorizedWelcomeController from "./authorised-welcome/authorized-welcome-controller";
 import HubNavigationView from "./hub-navigation-view";
 import {localizeAjaxError} from "../localizations";
@@ -12,7 +12,7 @@ export class HubPage extends View {
     userData: UserDataRaw;
     dimmer: JQuery
     navigationController = new HubNavigationView()
-    eventContainer = new EventContainer()
+    eventContainer: EventOverlay
 
     constructor(userData: UserDataRaw) {
         super();
@@ -22,6 +22,8 @@ export class HubPage extends View {
         this.dimmer = $("<div>").addClass("dimmer")
         this.element.append(this.dimmer)
         this.element.append(this.navigationController.element)
+
+        this.eventContainer = new EventOverlay()
         this.element.append(this.eventContainer.element)
 
         if(this.userData.username) {

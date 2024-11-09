@@ -2,8 +2,6 @@ import Command from '../command';
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
 import path from "path";
 
-const scriptsFolder = path.join(__dirname, "resources/scripts")
-
 export default class RunCommand extends Command {
 
     onPerform(args: string[]): void {
@@ -16,7 +14,8 @@ export default class RunCommand extends Command {
     }
 
     onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {
-        return this.autocompletePath(args[args.length - 1], scriptsFolder, ".script", options)
+        let resourcePath = this.console.server.getResourcePath("scripts")
+        return this.autocompletePath(args[args.length - 1], resourcePath, ".script", options)
     }
 
     getName() {

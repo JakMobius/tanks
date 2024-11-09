@@ -19,7 +19,7 @@ export default class RoomCellStatusLabel extends View {
 
     playerCountStatus(players: number, max: number) {
         this.statusIcon.addClass("turned")
-        this.statusIcon.css("background-image", "url(\"assets/classic-tank.png\")")
+        this.statusIcon.css("background-image", "url(\"assets/hub/classic-tank.png\")")
         this.statusText.text(players + "/" + max)
         return this
     }

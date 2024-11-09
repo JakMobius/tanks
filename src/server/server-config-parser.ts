@@ -30,7 +30,8 @@ export function parseServerConfig(config: PreferencesSection): ServerConfig {
 export function parseGeneralConfig(config: PreferencesSection): GeneralServerConfig {
     return {
         port: config.port("port"),
-        mapsDirectory: path.join(__dirname, config.string("maps-directory"))
+        mapsDirectory: path.join(__dirname, config.string("maps-directory")),
+        resourcesDirectory: path.join(__dirname, config.string("resources-directory"))
     }
 }
 

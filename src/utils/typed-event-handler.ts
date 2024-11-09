@@ -1,4 +1,4 @@
-import {Constructor} from "../serialization/binary/serializable";
+import {Constructor} from "src/utils/constructor"
 import {Class} from "./class";
 
 export default class TypedEventHandler<Args extends Array<any> = []> {

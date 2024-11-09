@@ -2,7 +2,7 @@ import MapBinaryOptions from './map-binary-options';
 import BlockState from './block-state/block-state';
 import AirBlockState from './block-state/types/air-block-state';
 import SpawnZone from "./spawn-zone";
-import {Constructor} from "../serialization/binary/serializable";
+import {Constructor} from "src/utils/constructor"
 import Entity from "../utils/ecs/entity";
 import ReadBuffer from "../serialization/binary/read-buffer";
 import WriteBuffer from "../serialization/binary/write-buffer";

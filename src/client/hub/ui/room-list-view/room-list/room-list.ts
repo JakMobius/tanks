@@ -3,6 +3,7 @@
 import View from "src/client/ui/view";
 import LoadingView from "src/client/hub/ui/loading-view/loading-view";
 import RoomCell from "../room-cell/room-cell";
+import PageLocation from "src/client/scenes/page-location";
 
 export interface RoomConfig {
     name: string
@@ -70,6 +71,8 @@ export class RoomList extends View {
     }
 
     private enterRoom(room: string) {
-        location.href = "/game?room=" + room
+        PageLocation.navigateToScene("game", {
+            room: room
+        })
     }
 }

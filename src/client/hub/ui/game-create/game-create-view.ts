@@ -9,7 +9,6 @@ import Button from "src/client/ui/button/button";
 import {checkRoomName} from "src/data-checkers/room-name-checker";
 import {localizeAjaxError, textFromRoomNameCheckResult} from "src/client/hub/localizations";
 import {TipStyle} from "../input-tip-list/input-tip-list-view";
-import DialogOverlay from "src/client/map-editor/ui/overlay/dialog/dialogoverlay";
 
 export default class GameCreateView extends View {
     private page: HubPage;
@@ -176,24 +175,7 @@ export default class GameCreateView extends View {
     }
 
     private onMapFetchError(data: JQuery.jqXHR, exception: string) {
-        let overlay = new DialogOverlay({
-            root: $(document.body),
-            requiresDecision: true
-        })
-        overlay.dialog
-            .title("Не удалось загрузить доступные карты")
-            .text(localizeAjaxError(data, exception))
-            .withButton({
-                title: "Повторить попытку",
-                onclick: () => this.fetchMaps(),
-                closes: true
-            })
-            .withButton({
-                title: "Выйти",
-                onclick: () => this.emit("close"),
-                closes: true
-            })
-        overlay.show()
+        // TODO: error
     }
 
     private handleRoomNameTaken() {
