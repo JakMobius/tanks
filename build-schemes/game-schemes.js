@@ -47,7 +47,7 @@ module.exports = {
                 ...constants.clientBundlerConfig
             }),
             beelder.bundleJavascript(
-                "src/client/game/index.ts",
+                "src/client/index.ts",
                 `#game-executable = ${constants.cacheFolder}/web/scripts/main.js`, {
                     compilerOptions: {
                         ...constants.clientCompilerConfig,
