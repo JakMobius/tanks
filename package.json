@@ -4,7 +4,7 @@
   "description": "Browser action game project",
   "main": "main.js",
   "dependencies": {
-    "beelder": "^0.0.17",
+    "beelder": "file:Beelder",
     "chalk": "^4.1.0",
     "connect-mongo": "^4.1.0",
     "connect-mongodb-session": "^3.1.1",

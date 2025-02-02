@@ -102,7 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
-<<<<<<< HEAD
 
 # Custom
 .idea
@@ -112,6 +111,3 @@ beelder-cache/*
 dist/*
 temp/*
 package-lock.json
-
-=======
->>>>>>> 29049a358fa30822ec23580ff7098db9e7ef1544
