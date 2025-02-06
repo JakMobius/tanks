@@ -1,10 +1,10 @@
-import {Vec2} from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export default class ServerPositionComponent extends EventHandlerComponent {
-    public serverVelocity: Vec2 = new Vec2();
-    public serverPosition: Vec2 = new Vec2();
+    public serverVelocity: Box2D.b2Vec2 = new Box2D.b2Vec2();
+    public serverPosition: Box2D.b2Vec2 = new Box2D.b2Vec2();
     public serverAngle: number = 0
     public serverAngularVelocity: number = 0
 
@@ -41,9 +41,11 @@ export default class ServerPositionComponent extends EventHandlerComponent {
         serverX += this.serverVelocity.x * timeDifference
         serverY += this.serverVelocity.y * timeDifference
 
-        component.setPosition({x: serverX, y: serverY})
+        component.setPositionAngle(
+            {x: serverX, y: serverY},
+            this.serverAngle + this.serverAngularVelocity * timeDifference
+        )
         component.setVelocity(this.serverVelocity)
-        component.setAngle(this.serverAngle + this.serverAngularVelocity * timeDifference)
         component.setAngularVelocity(this.serverAngularVelocity)
     }
 }

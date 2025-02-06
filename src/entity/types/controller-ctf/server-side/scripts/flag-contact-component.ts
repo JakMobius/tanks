@@ -1,9 +1,8 @@
-import {b2Body} from "src/library/box2d/dynamics/b2_body";
 import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import PhysicsChunk from "src/physics/physics-chunk";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import PhysicalComponent from "src/entity/components/physics-component";
+import { getObjectFromBody } from "src/entity/physical-body-data";
 
 export default class FlagContactComponent extends EventHandlerComponent {
 
@@ -12,26 +11,26 @@ export default class FlagContactComponent extends EventHandlerComponent {
         this.eventHandler.on("physical-contact-begin", (body) => this.onContactBegin(body))
         this.eventHandler.on("physical-contact-end", (body) => this.onContactEnd(body))
 
-        this.eventHandler.on("physical-contact-pre-solve", (body: Box2D.Body, contact: Box2D.Contact) => {
+        this.eventHandler.on("physical-contact-pre-solve", (body: Box2D.b2Body, contact: Box2D.b2Contact) => {
             if(PhysicsChunk.getFromBody(body)) return
             contact.SetEnabled(false)
         })
     }
 
-    private onContactBegin(body: b2Body) {
+    private onContactBegin(body: Box2D.b2Body) {
         const flagState = this.entity.getComponent(FlagDataComponent)
 
-        const entity = PhysicalComponent.getEntityFromBody(body)
+        const entity = getObjectFromBody(body)?.entity.deref()        
         if(!entity) return
         if(flagState.addContact(entity) > 1) return
 
         this.entity.emit("flag-contact", entity)
     }
 
-    private onContactEnd(body: b2Body) {
+    private onContactEnd(body: Box2D.b2Body) {
         const flagState = this.entity.getComponent(FlagDataComponent)
 
-        const entity = PhysicalComponent.getEntityFromBody(body)
+        const entity = getObjectFromBody(body)?.entity.deref()
         if(!entity) return
         flagState.removeContact(entity)
     }

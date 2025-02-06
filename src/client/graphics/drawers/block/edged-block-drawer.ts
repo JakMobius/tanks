@@ -8,15 +8,13 @@ import WorldDrawerComponent from "src/client/entity/components/world-drawer-comp
 
 export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];
-    public spritePath: any;
-    public spriteSize: any;
-    public halfSpriteSize: any;
+    public spriteSize: number;
+    public spritePath: string | string[]
+    public halfSpriteSize: number;
 
     constructor() {
         super();
-
         this.variants = null
-
         this.spritePath = "blocks/concrete"
     }
 

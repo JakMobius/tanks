@@ -12,7 +12,7 @@ const it = mocha.it
 const before = mocha.before
 const after = mocha.after
 
-const serverPath = path.join(__dirname, "../src/server");
+const serverPath = path.join(import.meta.dirname, "../src/server");
 
 describe('Server', function() {
 

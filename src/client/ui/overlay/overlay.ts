@@ -1,4 +1,4 @@
-/* @load-resource: './overlay.scss' */
+import './overlay.scss'
 
 import View from "src/client/ui/view";
 

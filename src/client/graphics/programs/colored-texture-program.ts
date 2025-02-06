@@ -1,13 +1,10 @@
-/* @load-resource: '../shaders/fragment/colored-texture-fragment.glsl' */
-/* @load-resource: '../shaders/vertex/colored-texture-vertex.glsl' */
-
 import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import {Quadrangle} from "src/utils/quadrangle";
 import {ByteArray} from "src/serialization/binary/typed-buffer";
 import TextureProgram, {TextureProgramConfig} from "src/client/graphics/programs/texture-program";
 
-export const vertexShaderPath = "src/client/graphics/shaders/vertex/colored-texture-vertex.glsl"
-export const fragmentShaderPath = "src/client/graphics/shaders/fragment/colored-texture-fragment.glsl"
+import vertexShaderSource from "src/client/graphics/shaders/vertex/colored-texture-vertex.glsl"
+import fragmentShaderSource from "src/client/graphics/shaders/fragment/colored-texture-fragment.glsl"
 
 export default class ColoredTextureProgram extends TextureProgram {
     private colorBuffer: GLBuffer<Uint32Array>;
@@ -17,8 +14,8 @@ export default class ColoredTextureProgram extends TextureProgram {
     constructor(ctx: WebGLRenderingContext, options?: TextureProgramConfig) {
         options = Object.assign({
             largeIndices: false,
-            vertexShaderPath: vertexShaderPath,
-            fragmentShaderPath: fragmentShaderPath
+            vertexShaderSource: vertexShaderSource,
+            fragmentShaderSource: fragmentShaderSource
         }, options)
 
         super(ctx, options)

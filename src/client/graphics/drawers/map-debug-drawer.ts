@@ -4,7 +4,6 @@ import LineDrawer from "./line-drawer";
 import DrawPhase from "./draw-phase";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import B2DebugDraw from "./b2-debug-draw";
-import {b2DrawFlags} from "src/library/box2d/common/b2_draw";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
@@ -12,6 +11,7 @@ import ChunkedMapCollider from "src/physics/chunked-map-collider";
 import TransformComponent from "src/entity/components/transform-component";
 import Entity from "src/utils/ecs/entity";
 import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
+import * as Box2D from "@box2d/core"
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -32,7 +32,7 @@ export default class MapDebugDrawer {
     constructor(drawPhase: DrawPhase) {
         this.drawPhase = drawPhase
         this.b2DebugDraw = new B2DebugDraw(drawPhase)
-        this.b2DebugDraw.SetFlags(b2DrawFlags.e_shapeBit)
+        // this.b2DebugDraw.SetFlags(Box2D.b2DrawFlags.e_shapeBit)
     }
 
     setWorld(world: Entity) {
@@ -114,8 +114,15 @@ export default class MapDebugDrawer {
     }
 
     private drawB2Debug() {
-        this.world.getComponent(PhysicalHostComponent).world.SetDebugDraw(this.b2DebugDraw)
-        this.world.getComponent(PhysicalHostComponent).world.DebugDraw()
+        const physicsComponent = this.world.getComponent(PhysicalHostComponent)
+        const world = physicsComponent.world
+
+        // Draw whatever you want here:
+        Box2D.DrawShapes(this.b2DebugDraw, world /*, aabb */);
+        Box2D.DrawJoints(this.b2DebugDraw, world);
+        Box2D.DrawAABBs(this.b2DebugDraw, world /*, aabb */);
+        Box2D.DrawPairs(this.b2DebugDraw, world);
+        Box2D.DrawCenterOfMasses(this.b2DebugDraw, world);
     }
 
     private drawTankWheelDebug(entity: Entity) {

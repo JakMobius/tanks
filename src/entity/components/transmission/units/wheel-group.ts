@@ -1,4 +1,4 @@
-import {Vec2, XY} from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import TransmissionUnit from "src/entity/components/transmission/units/transmission-unit";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
 import BrakeConstraint from "src/entity/components/transmission/constraints/brake-constraint";
@@ -67,7 +67,7 @@ export class Wheel {
     angle: number = 0
     grip: number
 
-    tensionVector: Vec2 = new Vec2()
+    tensionVector: Box2D.b2Vec2 = new Box2D.b2Vec2()
     groundSpeed: number = 0;
     slideVelocity: number = 0
 

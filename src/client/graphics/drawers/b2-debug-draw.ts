@@ -1,12 +1,10 @@
-import * as Box2D from "src/library/box2d"
-import {RGBA, XY} from "src/library/box2d"
+import * as Box2D from "@box2d/core"
 import DrawPhase from "./draw-phase";
 import Matrix3 from "src/utils/matrix3";
-import {b2Transform} from "src/library/box2d/common/b2_math";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import LineDrawer from "./line-drawer";
 
-export default class B2DebugDraw extends Box2D.Draw {
+export default class B2DebugDraw implements Box2D.b2Draw {
     private drawPhase: DrawPhase;
     private transform = new Matrix3()
 
@@ -15,11 +13,10 @@ export default class B2DebugDraw extends Box2D.Draw {
     public strokeAlpha = 0.8
 
     constructor(drawPhase: DrawPhase) {
-        super()
         this.drawPhase = drawPhase
     }
 
-    private getShape(vertices: XY[]) {
+    private getShape(vertices: Box2D.XY[]) {
         let shape = []
         for(let point of vertices) {
             shape.push(this.transform.transformX(point.x, point.y))
@@ -46,11 +43,11 @@ export default class B2DebugDraw extends Box2D.Draw {
         return shape
     }
 
-    private getColor(color: RGBA, alpha: number) {
+    private getColor(color: Box2D.RGBA, alpha: number) {
         return ConvexShapeProgram.getColor(color.r * 255, color.g * 255, color.b * 255, alpha)
     }
 
-    DrawPolygon(vertices: XY[], vertexCount: number, color: RGBA) {
+    DrawPolygon(vertices: Box2D.XY[], vertexCount: number, color: Box2D.RGBA) {
         if (vertices) {
             const program = this.drawPhase.getProgram(ConvexShapeProgram)
             const shape = this.getShape(vertices)
@@ -58,7 +55,7 @@ export default class B2DebugDraw extends Box2D.Draw {
         }
     }
 
-    DrawSolidPolygon(vertices: XY[], vertexCount: number, color: RGBA) {
+    DrawSolidPolygon(vertices: Box2D.XY[], vertexCount: number, color: Box2D.RGBA) {
         if (vertices) {
             const program = this.drawPhase.getProgram(ConvexShapeProgram)
             const shape = this.getShape(vertices)
@@ -68,12 +65,12 @@ export default class B2DebugDraw extends Box2D.Draw {
         }
     }
 
-    DrawCircle(center: XY, radius: number, color: RGBA) {
+    DrawCircle(center: Box2D.XY, radius: number, color: Box2D.RGBA) {
         const shape = this.getCircleShape(center.x, center.y, radius)
         LineDrawer.strokeShape(this.drawPhase, shape, this.getColor(color, this.strokeAlpha), this.thickness, false)
     }
 
-    DrawSolidCircle(center: XY, radius: number, axis: XY, color: RGBA) {
+    DrawSolidCircle(center: Box2D.XY, radius: number, axis: Box2D.XY, color: Box2D.RGBA) {
         const program = this.drawPhase.getProgram(ConvexShapeProgram)
         const shape = this.getCircleShape(center.x, center.y, radius)
         program.drawConvexShape(shape, this.getColor(color, this.fillAlpha))
@@ -81,7 +78,7 @@ export default class B2DebugDraw extends Box2D.Draw {
         LineDrawer.strokeShape(this.drawPhase, shape, this.getColor(color, this.strokeAlpha), this.thickness, false)
     }
 
-    DrawSegment(p1: XY, p2: XY, color: RGBA) {
+    DrawSegment(p1: Box2D.XY, p2: Box2D.XY, color: Box2D.RGBA) {
         const shape = [
             this.transform.transformX(p1.x, p1.y),
             this.transform.transformY(p1.x, p1.y),
@@ -91,15 +88,15 @@ export default class B2DebugDraw extends Box2D.Draw {
         LineDrawer.strokeShape(this.drawPhase, shape, this.getColor(color, this.strokeAlpha), this.thickness, true)
     }
 
-    DrawTransform(G: b2Transform) {
+    DrawTransform(G: Box2D.b2Transform) {
         // TODO
     }
 
-    DrawParticles(centers: XY[], radius: number, colors: RGBA[] | null, count: number): void {
+    DrawParticles(centers: Box2D.XY[], radius: number, colors: Box2D.RGBA[] | null, count: number): void {
         // TODO
     }
 
-    DrawPoint(p: XY, size: number, color: RGBA): void {
+    DrawPoint(p: Box2D.XY, size: number, color: Box2D.RGBA): void {
         const program = this.drawPhase.getProgram(ConvexShapeProgram)
 
         program.drawConvexShape(this.getShape([
@@ -110,11 +107,11 @@ export default class B2DebugDraw extends Box2D.Draw {
         ]), this.getColor(color, this.strokeAlpha))
     }
 
-    PopTransform(xf: b2Transform): void {
+    PopTransform(xf: Box2D.b2Transform): void {
         this.transform.restore()
     }
 
-    PushTransform(xf: b2Transform): void {
+    PushTransform(xf: Box2D.b2Transform): void {
         this.transform.save()
         let position = xf.GetPosition()
         let rotation = xf.GetAngle()

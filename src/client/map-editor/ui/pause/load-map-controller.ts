@@ -1,4 +1,4 @@
-/* @load-resource: ./load-map-controller.scss */
+import './load-map-controller.scss'
 
 import {PauseMenuView} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";

@@ -1,4 +1,4 @@
-/* @load-resource: './login-password-view.scss' */
+import './login-password-view.scss'
 
 import View from "src/client/ui/view";
 import HugeTextInput from "../huge-text-input/huge-text-input";

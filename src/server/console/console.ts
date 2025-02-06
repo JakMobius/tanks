@@ -1,9 +1,8 @@
 import Logger from '../log/logger';
 import * as fs from 'fs';
-import * as path from 'path';
 
-//@ts-ignore
-import CommandList from "../commands/types/*"
+// @ts-ignore
+import CommandList from "../commands/types/%"
 import Command from "../commands/command";
 import Server from "../server";
 import ConsoleWindow from "./console-window";
@@ -17,6 +16,8 @@ export interface ConsoleAutocompleteOptions {
     /// Indicates whether only one completion unit is required
     single?: boolean
 }
+
+console.log(CommandList)
 
 export default class Console {
     public observingRoom: Entity;

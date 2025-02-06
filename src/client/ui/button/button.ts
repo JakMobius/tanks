@@ -1,4 +1,4 @@
-/* @load-resource: './button.scss' */
+import './button.scss'
 
 import View from "../view";
 

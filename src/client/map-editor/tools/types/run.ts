@@ -1,5 +1,5 @@
 import Tool from '../tool';
-import * as Box2D from '../../../../library/box2d';
+import * as Box2D from "@box2d/core";
 import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import ToolManager from "../toolmanager";
 import PhysicalComponent from "src/entity/components/physics-component";
@@ -16,12 +16,12 @@ export default class RunTool extends Tool {
 	public running: boolean;
 	public runButton: any;
 	public locationButton: any;
-    private spawnPoint = new Box2D.Vec2(10, 10)
+    private spawnPoint = new Box2D.b2Vec2(10, 10)
 
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/map-editor/tank.png"
+        this.image = "static/map-editor/tank.png"
         this.setupMenu()
         this.selectingLocation = false
 
@@ -32,12 +32,12 @@ export default class RunTool extends Tool {
 
         this.runButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/map-editor/start.png)")
+            .css("background-image", "url(static/map-editor/start.png)")
             .on("click",() => this.toggle())
 
         this.locationButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/map-editor/locate.png)")
+            .css("background-image", "url(static/map-editor/locate.png)")
             .on("click",() => this.toggleSelectLocation())
 
         this.settingsView = $("<div>")
@@ -69,7 +69,7 @@ export default class RunTool extends Tool {
         this.manager.world.appendChild(this.tank)
 
         const physicalComponent = this.tank.getComponent(PhysicalComponent)
-        physicalComponent.setPosition(this.spawnPoint)
+        physicalComponent.setPositionAngle(this.spawnPoint, 0)
         RootControlsResponder.getInstance().connectTankControls(this.tank.getComponent(TankControls))
 
         // this.manager.camera.inertial = true

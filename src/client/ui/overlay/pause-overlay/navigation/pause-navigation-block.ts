@@ -1,6 +1,6 @@
-/* @load-resource: ./pause-navigation-block.scss */
+import './pause-navigation-block.scss'
 
-import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
+import Cloud from "src/client/game/ui/cloud/cloud";
 import NavigationBlock from "src/client/ui/navigation/navigation-block";
 import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 

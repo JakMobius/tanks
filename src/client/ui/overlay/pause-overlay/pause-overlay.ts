@@ -1,10 +1,8 @@
-/* @load-resource: ./game-pause-overlay.scss */
+import './game-pause-overlay.scss'
 
 import Overlay from "src/client/ui/overlay/overlay";
 import PauseNavigationBlock from "src/client/ui/overlay/pause-overlay/navigation/pause-navigation-block";
 import PauseNavigationView from "src/client/ui/overlay/pause-overlay/navigation/pause-navigation-view";
-import View from "src/client/ui/view";
-import Controller from "src/client/ui/controller/controller";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 

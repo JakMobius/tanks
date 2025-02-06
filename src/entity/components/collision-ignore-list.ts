@@ -1,17 +1,17 @@
 import Entity from "src/utils/ecs/entity";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import CollisionIgnoreListTransmitter from "./network/collisions/collision-ignore-list-transmitter";
-import * as Box2D from "src/library/box2d"
+import * as Box2D from "@box2d/core"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import PhysicalComponent from "src/entity/components/physics-component";
+import { getObjectFromBody } from "../physical-body-data";
 
 export default class CollisionIgnoreList extends EventHandlerComponent {
     ignoreList = new Set<Entity>()
 
     constructor() {
         super()
-        this.eventHandler.on("should-collide", (body: Box2D.Body) => {
-            let entity = PhysicalComponent.getEntityFromBody(body)
+        this.eventHandler.on("should-collide", (body: Box2D.b2Body) => {
+            let entity = getObjectFromBody(body).entity?.deref()
             return !this.ignoreList.has(entity);
         })
 

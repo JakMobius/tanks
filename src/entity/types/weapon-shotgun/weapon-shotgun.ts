@@ -2,10 +2,10 @@ import FirearmWeaponComponent from "src/entity/components/weapon/firearm-weapon-
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform-component";
-import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
-import DamageReason from "src/server/damage-reason/damage-reason";
+import HealthComponent from "src/entity/components/health-component";
+import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
-import {Vec2} from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
@@ -65,13 +65,14 @@ export default class WeaponShotgun extends FirearmWeaponComponent {
         const tankBody = tank.getComponent(PhysicalComponent).getBody()
         const tankLocation = tankTransform.getPosition()
 
-        const weaponDirection = tankTransform.getDirection().SelfNormalize().SelfRotateCosSin(weaponCos, weaponSin)
+        const weaponDirection = tankTransform.getDirection()
+        weaponDirection.RotateCosSin(weaponCos, weaponSin).Normalize()
         const world = tank.parent
 
-        const impulseVector = weaponDirection.Clone().SelfMul(this.shootImpulse)
+        const impulseVector = weaponDirection.Clone().Scale(this.shootImpulse)
         tankBody.ApplyLinearImpulseToCenter(impulseVector)
 
-        let distanceVector = new Vec2()
+        let distanceVector = new Box2D.b2Vec2()
 
         for (let entity of world.children.values()) {
 
@@ -102,7 +103,7 @@ export default class WeaponShotgun extends FirearmWeaponComponent {
             damageReason.damageType = DamageTypes.IMPACT
             entityHealthComponent.damage(damage, damageReason)
 
-            let forceVector = distanceVector.Clone().SelfMul(this.shootImpulse * impactSeverity)
+            let forceVector = distanceVector.Clone().Scale(this.shootImpulse * impactSeverity)
             entityPhysicalComponent.body.ApplyLinearImpulse(forceVector, tankLocation)
         }
 

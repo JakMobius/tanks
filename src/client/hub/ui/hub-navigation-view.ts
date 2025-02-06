@@ -1,4 +1,4 @@
-/* @load-resource: ./hub-navigation-view.scss */
+import './hub-navigation-view.scss'
 
 import BasicNavigationView from "src/client/ui/navigation/basic-navigation-view";
 import HubNavigationBlock from "./hub-navigation-block";

@@ -1,5 +1,5 @@
 //@ts-ignore
-import Tools from './types/*'
+import Tools from './types/%'
 import {Constructor} from "src/utils/constructor"
 import Tool from "./tool";
 

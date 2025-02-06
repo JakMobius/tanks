@@ -1,4 +1,4 @@
-/* @load-resource: './room-cell-status-label.scss' */
+import './room-cell-status-label.scss'
 
 import View from "src/client/ui/view";
 
@@ -19,7 +19,7 @@ export default class RoomCellStatusLabel extends View {
 
     playerCountStatus(players: number, max: number) {
         this.statusIcon.addClass("turned")
-        this.statusIcon.css("background-image", "url(\"assets/hub/classic-tank.png\")")
+        this.statusIcon.css("background-image", "url(\"static/hub/classic-tank.png\")")
         this.statusText.text(players + "/" + max)
         return this
     }

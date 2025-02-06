@@ -1,3 +1,0 @@
-"source": {
-    "excludePattern": "(node_modules|docs)"
-}

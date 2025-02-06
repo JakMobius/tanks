@@ -1,6 +1,6 @@
-/* @load-resource: ./axis-selector.scss */
+import './axis-selector.scss'
 
-import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
+import Cloud from "src/client/game/ui/cloud/cloud";
 import PauseKeyValueRow from "src/client/ui/overlay/pause-overlay/elements/pause-key-value-row";
 
 export default class AxisSelector extends PauseKeyValueRow {

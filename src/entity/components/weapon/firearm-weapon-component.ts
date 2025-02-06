@@ -165,11 +165,10 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         entity.once("physical-body-created", (component: PhysicalComponent) => {
             let angle = tankBody.GetAngle()
 
-            component.setPosition({
+            component.setPositionAngle({
                 x: worldX,
                 y: worldY
-            })
-            component.setAngle(tankBody.GetAngle())
+            }, tankBody.GetAngle())
 
             component.setVelocity({
                 x: -Math.sin(angle) * this.initialBulletVelocity + tankVelocity.x,
@@ -186,8 +185,8 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
 
         // TODO:
         // tankBody.ApplyLinearImpulse(
-        //     new Box2D.Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
-        //     new Box2D.Vec2(absoluteX, absoluteY)
+        //     new Box2D.b2Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
+        //     new Box2D.b2Vec2(absoluteX, absoluteY)
         // )
 
         return entity

@@ -1,4 +1,4 @@
-/* @load-resource: './block-select.scss' */
+import './block-select.scss'
 
 
 import BlockState from 'src/map/block-state/block-state';
@@ -23,7 +23,7 @@ export default class BlockSelectMenu extends Menu {
 
             this.list.append($("<div>")
                 .addClass("block-button")
-                .css("background-image", "url(assets/map-editor/blocks/" + name + ".png)")
+                .css("background-image", "url(static/map-editor/blocks/" + name + ".png)")
                 .on("click", { id: id, name: name }, (event) => {
                     const Block = BlockState.getBlockStateClass(event.data.id)
                     const block = new Block()

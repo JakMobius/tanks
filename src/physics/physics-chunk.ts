@@ -1,11 +1,10 @@
 import ChunkedMapCollider, {PhysicsPoint} from "./chunked-map-collider";
-import * as Box2D from "../library/box2d"
+import * as Box2D from "@box2d/core"
 import {PhysicsBlock} from "./physics-block";
 import {epsilon, signedDoubleTriangleSurface} from "../utils/utils";
 import EdgeFindingContext from "./edge-finding-context";
 import {MeshGenerationContext} from "./mesh-generation-context";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
-import {b2BodyType} from "../library/box2d/dynamics/b2_body";
 import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
@@ -17,7 +16,7 @@ export default class PhysicsChunk {
     public readonly y: number;
     public readonly width: number;
     public readonly height: number;
-    private body: Box2D.Body | null = null
+    private body: Box2D.b2Body | null = null
     public blocks: PhysicsBlock[] | null = null
     private edgeFindingContext: EdgeFindingContext;
     private meshGenerationContext: MeshGenerationContext;
@@ -85,7 +84,7 @@ export default class PhysicsChunk {
         }
 
         const body = this.collider.entity.getComponent(PhysicalHostComponent).world.CreateBody({
-            type: b2BodyType.b2_staticBody,
+            type: Box2D.b2BodyType.b2_staticBody,
             position: {x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE},
         })
 
@@ -96,8 +95,11 @@ export default class PhysicsChunk {
                 y: point[1] * GameMap.BLOCK_SIZE
             }))
 
+            const polygonShape = new Box2D.b2PolygonShape()
+            polygonShape.Set(pointShape)
+
             body.CreateFixture({
-                shape: new Box2D.PolygonShape().Set(pointShape),
+                shape: polygonShape,
                 density: 1.0,
                 friction: 0.1,
                 restitution: 0.1,
@@ -108,7 +110,9 @@ export default class PhysicsChunk {
             })
         }
 
-        if (this.body) this.body.SetUserData(null)
+        if (this.body) this.body.SetUserData({
+            entity: null
+        })
         this.body = body
 
         // Box2D solvers are stored statically. Resolved contacts
@@ -116,7 +120,9 @@ export default class PhysicsChunk {
         // bodies and their user data. This is not much of a
         // performance problem, but it makes real memory leaks harder
         // to detect.
-        this.body.SetUserData(new WeakRef(this))
+        this.body.SetUserData({
+            physicsChunk: new WeakRef(this)
+        })
         this.needsUpdate = false
     }
 
@@ -164,7 +170,7 @@ export default class PhysicsChunk {
         return this.collider.getMap()
     }
 
-    static getFromBody(body: Box2D.Body) {
+    static getFromBody(body: Box2D.b2Body) {
         let userData = body.GetUserData()
 
         if (!(userData instanceof WeakRef)) {

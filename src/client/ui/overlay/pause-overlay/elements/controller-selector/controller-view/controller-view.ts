@@ -1,4 +1,4 @@
-/* @load-resource: ./controller-view.scss */
+import './controller-view.scss'
 
 import View from "src/client/ui/view";
 import InputDevice, {InputDeviceType} from "src/client/controls/input/input-device";
@@ -66,7 +66,7 @@ export default class ControllerView extends View {
     }
 
     setIcon(icon: string) {
-        this.icon.css("background-image", `url(assets/game/controllers/${icon})`)
+        this.icon.css("background-image", `url(static/game/controllers/${icon})`)
         return this
     }
 

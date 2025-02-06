@@ -1,9 +1,8 @@
-/* @load-resource: ./pause-navigation-transition.scss */
+import './pause-navigation-transition.scss'
 
 import NavigationTransition from "src/client/ui/navigation/navigation-transition";
 import BasicNavigationView from "src/client/ui/navigation/basic-navigation-view";
 import NavigationBlock from "src/client/ui/navigation/navigation-block";
-import PauseNavigationCloud from "src/client/ui/overlay/pause-overlay/elements/pause-navigation-cloud";
 import NavigationCloud from "../../../../game/ui/cloud/navigation-cloud";
 
 export default class PauseNavigationTransition extends NavigationTransition {

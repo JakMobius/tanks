@@ -1,4 +1,4 @@
-/* @load-resource: './welcome.scss' */
+import './welcome.scss'
 
 import View from "src/client/ui/view";
 import InputTipList, {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";

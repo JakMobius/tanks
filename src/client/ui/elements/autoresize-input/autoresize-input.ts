@@ -1,4 +1,4 @@
-/* @load-resource: "./autoresize-input.scss" */
+import "./autoresize-input.scss"
 
 import View from "src/client/ui/view";
 

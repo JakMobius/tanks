@@ -1,4 +1,4 @@
-module.exports = {
+{
     "stats": {
         "8192": {
             "speed": 18,

@@ -1,4 +1,4 @@
-/* @load-resource: './player-nick-overlay.scss' */
+import './player-nick-overlay.scss'
 
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import Entity from "src/utils/ecs/entity";

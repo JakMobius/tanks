@@ -1,7 +1,6 @@
-/* @load-resource: './chat-container.scss' */
+import './chat-container.scss'
 
 import View from 'src/client/ui/view';
-
 import HTMLEscape from 'src/utils/html-escape';
 import Color from 'src/utils/color';
 

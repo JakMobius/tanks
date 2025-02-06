@@ -1,4 +1,4 @@
-import * as Box2D from "../library/box2d"
+import * as Box2D from "@box2d/core"
 import CancellableEvent from "./cancellable-event";
 import Entity from "src/utils/ecs/entity";
 

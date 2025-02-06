@@ -1,4 +1,4 @@
-/* @load-resource: './huge-title.scss' */
+import './huge-title.scss'
 
 import View from "src/client/ui/view";
 

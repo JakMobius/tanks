@@ -1,18 +1,18 @@
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export default class PhysicalComponent extends EventHandlerComponent {
-    body: Box2D.Body
+    body: Box2D.b2Body
     host: PhysicalHostComponent
     positionUpdated: boolean = false
-    bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body
+    bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body
 
     private positionComponent?: TransformComponent
 
-    constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.Body) {
+    constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body) {
         super()
         this.body = null
         this.host = null
@@ -73,6 +73,10 @@ export default class PhysicalComponent extends EventHandlerComponent {
         if(host === this.host) return;
 
         if(this.host) {
+            // @ts-ignore
+            if(global.isWithinTick) {
+                throw new Error("OUCH!!!!!")
+            }
             this.host.world.DestroyBody(this.body)
             this.host.destroyComponent(this)
         }
@@ -88,21 +92,16 @@ export default class PhysicalComponent extends EventHandlerComponent {
             // performance problem, but it makes real memory leaks harder
             // to detect.
 
-            let ref = new WeakRef(this.entity)
-            this.body.SetUserData(ref)
+            this.body.SetUserData({
+                entity: new WeakRef(this.entity)
+            })
             this.host.registerComponent(this)
             this.entity.emit("physical-body-created", this)
         }
     }
 
-    setPosition(position: Box2D.XY) {
-        this.body.SetPosition(position)
-        this.updateTransform()
-        this.positionUpdated = true
-    }
-
-    setAngle(angle: number) {
-        this.body.SetAngle(angle)
+    setPositionAngle(position: Box2D.XY, angle: number) {
+        this.body.SetTransformVec(position, angle)
         this.updateTransform()
         this.positionUpdated = true
     }
@@ -124,23 +123,5 @@ export default class PhysicalComponent extends EventHandlerComponent {
         transformComponent.reset()
         transformComponent.translate(position.x, position.y)
         transformComponent.rotate(-this.body.GetAngle())
-    }
-
-    static getObjectFromBody(body: Box2D.Body) {
-        let userData = body.GetUserData()
-
-        if(!(userData instanceof WeakRef)) {
-            return null
-        }
-
-        return userData.deref()
-    }
-
-    static getEntityFromBody(body: Box2D.Body) {
-
-        let entity = this.getObjectFromBody(body)
-
-        if(!(entity instanceof Entity)) return null
-        return entity
     }
 }

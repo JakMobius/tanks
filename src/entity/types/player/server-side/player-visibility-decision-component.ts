@@ -1,9 +1,8 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
-import {b2Vec2} from "src/library/box2d/common/b2_math";
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
 import TransformComponent from "src/entity/components/transform-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
 import PlayerVisibilityManagerComponent from "src/entity/types/player/server-side/player-visibility-manager-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
@@ -21,7 +20,7 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
         this.worldEventHandler.on("tick", () => this.updateEntitiesVisibility())
     }
 
-    private shouldEntityBeVisible(entity: Entity, position?: b2Vec2) {
+    private shouldEntityBeVisible(entity: Entity, position?: Box2D.b2Readonly<Box2D.XY>) {
         if(entity == this.getPlayerTank()) {
             return true
         }
@@ -36,7 +35,7 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
         }
     }
 
-    private isEntityNear(entity: Entity, position?: b2Vec2) {
+    private isEntityNear(entity: Entity, position?: Box2D.b2Readonly<Box2D.XY>) {
         if(!position) return false
         let transform = entity.getComponent(TransformComponent)
         if (!transform) return false
@@ -49,7 +48,7 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
     }
 
     private updateEntitiesVisibility() {
-        let playerPosition: Box2D.Vec2 | null = null
+        let playerPosition: Box2D.b2Readonly<Box2D.b2Vec2> | null = null
         const tank = this.getPlayerTank()
         const world = this.getWorld()
 

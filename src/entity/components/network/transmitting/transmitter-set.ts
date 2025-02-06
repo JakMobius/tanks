@@ -5,7 +5,6 @@ import {Constructor} from "src/utils/constructor";
 import EventEmitter from "src/utils/event-emitter";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import EntityIdTable from "src/entity/components/network/entity-id-table";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
 
 export class TransmitterSet extends EventEmitter {
     transmitters: Transmitter[] = []

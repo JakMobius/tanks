@@ -1,28 +1,9 @@
 import Entity from "src/utils/ecs/entity";
 import {TransmitterSet} from "./network/transmitting/transmitter-set";
 import HealthTransmitter from "./network/health/health-transmitter";
-import DamageReason from "src/server/damage-reason/damage-reason";
+import DamageReason, { DamageType, DamageTypes } from "src/server/damage-reason/damage-reason";
 import EntityDamageEvent from "src/events/tank-damage-event";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-
-export type DamageType = number
-export const DamageTypes = {
-    UNKNOWN:       0,
-    EXPLOSION:     1,
-    IMPACT:        2,
-    ELECTRICAL:    3,
-    FIRE:          4,
-    SELF_DESTRUCT: 5
-}
-
-export const DamageModifiers = {
-    resistance(strength: number) {
-        return (damage: number) => damage - strength
-    },
-    damageMultiplier(factor: number) {
-        return (damage: number) => damage * factor
-    }
-}
 
 export default class HealthComponent extends EventHandlerComponent {
     private health: number = 0

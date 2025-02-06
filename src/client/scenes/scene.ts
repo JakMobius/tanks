@@ -1,4 +1,4 @@
-/* @load-resource: './overlay-container.scss' */
+import './overlay-container.scss'
 
 import SceneScreen from 'src/client/graphics/scene-screen';
 import EventEmitter from "src/utils/event-emitter";

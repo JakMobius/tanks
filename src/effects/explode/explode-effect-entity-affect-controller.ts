@@ -1,11 +1,11 @@
 import PhysicalComponent from "src/entity/components/physics-component";
 import GameMap from "src/map/game-map";
-import * as Box2D from "src/library/box2d";
-import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
+import * as Box2D from "@box2d/core";
+import HealthComponent from "src/entity/components/health-component";
 import ExplodeEffectPool from "./explode-effect-pool";
 import Entity from "src/utils/ecs/entity";
 import SailingComponent from "src/entity/components/sailing-component";
-import DamageReason from "src/server/damage-reason/damage-reason";
+import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export interface ExplodeEffectEntityAffectControllerConfig {
@@ -63,7 +63,7 @@ export default class ExplodeEffectEntityAffectController extends EventHandlerCom
     private tickEntities(dt: number): void {
         let pool = this.entity.getComponent(ExplodeEffectPool)
 
-        let gradient = new Box2D.Vec2()
+        let gradient = new Box2D.b2Vec2()
 
         for(let entity of this.entity.children) {
             let physicalComponent = entity.getComponent(PhysicalComponent)
@@ -95,7 +95,7 @@ export default class ExplodeEffectEntityAffectController extends EventHandlerCom
         if (healthComponent) healthComponent.damage(power, damageReason)
     }
 
-    private handleEntityAirImpulse(entity: Entity, impulse: Box2D.Vec2) {
+    private handleEntityAirImpulse(entity: Entity, impulse: Box2D.b2Vec2) {
         let power = impulse.Length()
         if(power == 0) return;
 

@@ -1,5 +1,5 @@
 import PhysicsUtils from 'src/utils/physics-utils';
-import * as Box2D from 'src/library/box2d';
+import * as Box2D from '@box2d/core';
 import AirbagTankController from 'src/entity/components/tank-controllers/airbag-tank-controller';
 import {physicsFilters} from "src/physics/categories";
 import PhysicalComponent from "src/entity/components/physics-component";
@@ -7,10 +7,11 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
-import HealthComponent, {DamageModifiers, DamageTypes} from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health-component";
 import {siValueFromHorsepower} from "src/utils/utils";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import { DamageModifiers, DamageTypes } from 'src/server/damage-reason/damage-reason';
 
 const vertices = [
     [-1.00, -1.10],
@@ -21,7 +22,7 @@ const vertices = [
     [0.55, 0.90],
     [-0.55, 0.90],
     [-1.00, -0.25],
-].map(v => new Box2D.Vec2(v[0] * 2.25, v[1] * 2.25))
+].map(v => new Box2D.b2Vec2(v[0] * 2.25, v[1] * 2.25))
 
 EntityPrefabs.Types.set(EntityType.TANK_NASTY, (entity) => {
     entity.addComponent(new PrefabIdComponent(EntityType.TANK_NASTY))

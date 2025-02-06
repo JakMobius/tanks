@@ -7,6 +7,11 @@ import TransformComponent from "src/entity/components/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 
+import bodyBrightSprite from "textures/tanks/bomber/body.texture.png"
+// import bodyDarkSprite from "textures/tanks/bomber/body-dark.texture.png"
+// import bodyLightMask from "textures/tanks/bomber/mask.texture.png"
+import truckSprite from "textures/tanks/bomber/truck.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
     //public bodyDarkSprite: Sprite;
@@ -20,10 +25,10 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodyBrightSprite = Sprite.named("tanks/bomber/body")
-        //this.bodyDarkSprite = Sprite.named("tanks/bomber/body-dark")
-        //this.bodyLightMask = Sprite.named("tanks/bomber/mask")
-        this.truckSprite = Sprite.named("tanks/bomber/truck")
+        this.bodyBrightSprite = Sprite.named(bodyBrightSprite)
+        //this.bodyDarkSprite = Sprite.named(bodyDarkSprite)
+        //this.bodyLightMask = Sprite.named(bodyLightMask)
+        this.truckSprite = Sprite.named(truckSprite)
 
         Sprite.setMipMapLevel(0)
     }

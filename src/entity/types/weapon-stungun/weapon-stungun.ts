@@ -1,9 +1,9 @@
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform-component";
 import Entity from "src/utils/ecs/entity";
-import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
-import DamageReason from "src/server/damage-reason/damage-reason";
+import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
 import ChargeWeaponComponent from "src/entity/components/weapon/charge-weapon-component";
 

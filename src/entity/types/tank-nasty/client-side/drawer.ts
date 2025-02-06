@@ -14,6 +14,12 @@ import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import bodyBrightSprite from "textures/tanks/nasty/body-bright.texture.png"
+import bodyDarkSprite from "textures/tanks/nasty/body-dark.texture.png"
+import bodyLightMask from "textures/tanks/nasty/mask.texture.png"
+import ruderSprite from "textures/tanks/nasty/ruder.texture.png"
+import propellerSprites from "textures/tanks/nasty/propeller%.texture.png"
+
 export class Drawer extends TankDrawer {
     static bodyQuadrangle = squareQuadrangle(-2.16, -2.97, 4.32, 5.94)
     static ruderOffset = -0.4225
@@ -29,15 +35,11 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodyBrightSprite = Sprite.named("tanks/nasty/body-bright")
-        this.bodyDarkSprite = Sprite.named("tanks/nasty/body-dark")
-        this.bodyLightMask = Sprite.named("tanks/nasty/mask")
-
-        this.ruderSprite = Sprite.named("tanks/nasty/ruder")
-        this.propellerSprites = []
-
-        for (let i = 1; i <= Drawer.propellerSpriteCount; i++)
-            this.propellerSprites.push(Sprite.named("tanks/nasty/propeller_" + i))
+        this.bodyBrightSprite = Sprite.named(bodyBrightSprite)
+        this.bodyDarkSprite = Sprite.named(bodyDarkSprite)
+        this.bodyLightMask = Sprite.named(bodyLightMask)
+        this.ruderSprite = Sprite.named(ruderSprite)
+        this.propellerSprites = propellerSprites.map(sprite => Sprite.named(sprite))
     }
 
     draw(phase: DrawPhase) {

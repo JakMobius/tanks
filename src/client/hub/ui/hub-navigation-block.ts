@@ -1,4 +1,4 @@
-/* @load-resource: ./hub-navigation-block.scss */
+import './hub-navigation-block.scss'
 
 import Controller from "src/client/ui/controller/controller";
 import NavigationBlock from "src/client/ui/navigation/navigation-block";

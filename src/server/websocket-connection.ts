@@ -29,7 +29,7 @@ export default class WebsocketConnection extends Connection {
         }
 
         this.websocketConnection = connection
-        connection.on('message', (message: Websocket.IMessage) => {
+        connection.on('message', (message: Websocket.Message) => {
             this.handleMessage(message)
         })
 
@@ -71,7 +71,7 @@ export default class WebsocketConnection extends Connection {
         }
     }
 
-    private handleMessage(message: Websocket.IMessage) {
+    private handleMessage(message: Websocket.Message) {
         try {
             if(message.type !== "binary") return
             this.handleIncomingData(new Uint8Array(message.binaryData).buffer)

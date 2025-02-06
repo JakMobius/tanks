@@ -1,4 +1,4 @@
-/* @load-resource: "./loading-scene.scss" */
+import "./loading-scene.scss"
 
 import Scene from '../scene';
 

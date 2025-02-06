@@ -5,6 +5,7 @@ import ServerDatabase from "./db/server-database";
 import MongoDatabase from "./db/mongo/mongo-database";
 import FileDatabase from "./db/file/file-database";
 import path from "path";
+import { dirname } from "src/utils/dirname";
 
 export function parseServerConfig(config: PreferencesSection): ServerConfig {
 
@@ -30,8 +31,8 @@ export function parseServerConfig(config: PreferencesSection): ServerConfig {
 export function parseGeneralConfig(config: PreferencesSection): GeneralServerConfig {
     return {
         port: config.port("port"),
-        mapsDirectory: path.join(__dirname, config.string("maps-directory")),
-        resourcesDirectory: path.join(__dirname, config.string("resources-directory"))
+        mapsDirectory: path.join(dirname, config.string("maps-directory")),
+        resourcesDirectory: path.join(dirname, config.string("resources-directory"))
     }
 }
 
@@ -97,5 +98,5 @@ function createMongodb(config: PreferencesSection) {
 }
 
 function createFileDb(config: PreferencesSection) {
-    return new FileDatabase(path.resolve(__dirname, "database"))
+    return new FileDatabase(path.resolve(dirname, "database"))
 }

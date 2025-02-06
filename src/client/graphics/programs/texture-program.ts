@@ -1,6 +1,3 @@
-/* @load-resource: '../shaders/fragment/texture-fragment.glsl' */
-/* @load-resource: '../shaders/vertex/texture-vertex.glsl' */
-
 import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from "src/client/graphics/sprite";
 import Uniform from "src/client/graphics/gl/uniform";
@@ -9,14 +6,14 @@ import Matrix3 from "src/utils/matrix3";
 import {Quadrangle} from "src/utils/quadrangle";
 import {ByteArray} from "src/serialization/binary/typed-buffer";
 
+import vertexShaderSource from "src/client/graphics/shaders/vertex/texture-vertex.glsl"
+import fragmentShaderSource from "src/client/graphics/shaders/fragment/texture-fragment.glsl"
+
 export interface TextureProgramConfig {
     largeIndices: boolean
-    vertexShaderPath?: string
-    fragmentShaderPath?: string
+    vertexShaderSource?: string
+    fragmentShaderSource?: string
 }
-
-export const vertexShaderPath = "src/client/graphics/shaders/vertex/texture-vertex.glsl"
-export const fragmentShaderPath = "src/client/graphics/shaders/fragment/texture-fragment.glsl"
 
 export default class TextureProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
@@ -30,11 +27,11 @@ export default class TextureProgram extends CameraProgram {
         options = Object.assign({
             // largeIndices: false,
             largeIndices: true,
-            vertexShaderPath: vertexShaderPath,
-            fragmentShaderPath: fragmentShaderPath
+            vertexShaderSource: vertexShaderSource,
+            fragmentShaderSource: fragmentShaderSource
         }, options)
 
-        super(options.vertexShaderPath, options.fragmentShaderPath, ctx)
+        super(options.vertexShaderSource, options.fragmentShaderSource, ctx)
 
         if(options.largeIndices) this.getExtensionOrThrow("OES_element_index_uint")
 

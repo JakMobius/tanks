@@ -1,7 +1,7 @@
-import * as Box2D from '../library/box2d';
+import * as Box2D from "@box2d/core";
 
 export default class PhysicsUtils {
-    static createFixture(shape: Box2D.Shape, fixture?: Partial<Box2D.IFixtureDef>): Box2D.IFixtureDef {
+    static createFixture(shape: Box2D.b2Shape, fixture?: Partial<Box2D.b2FixtureDef>): Box2D.b2FixtureDef {
         if(!fixture) fixture = {}
 
         fixture.friction = fixture.friction || 0.3
@@ -9,34 +9,34 @@ export default class PhysicsUtils {
         fixture.restitution = fixture.restitution || 0;
         fixture.shape = shape
 
-        return fixture as Box2D.IFixtureDef
+        return fixture as Box2D.b2FixtureDef
     }
 
-    static dynamicBody(world: Box2D.World, options?: Partial<Box2D.IBodyDef>) {
+    static dynamicBody(world: Box2D.b2World, options?: Partial<Box2D.b2BodyDef>) {
         options = options || {}
-        options.type = options.type || Box2D.dynamicBody;
+        options.type = options.type || Box2D.b2BodyType.b2_dynamicBody;
 
         return world.CreateBody(options);
     }
 
-    static squareFixture(width: number, height: number, offset?: Box2D.XY, options?: Partial<Box2D.IFixtureDef>): Box2D.IFixtureDef {
+    static squareFixture(width: number, height: number, offset?: Box2D.XY, options?: Partial<Box2D.b2FixtureDef>): Box2D.b2FixtureDef {
         if(!offset) offset = { x: 0, y: 0 }
 
-        const shape = new Box2D.PolygonShape()
+        const shape = new Box2D.b2PolygonShape()
         shape.SetAsBox(width, height, offset, 0)
 
         return this.createFixture(shape, options)
     }
 
-    static horizontalSquareFixtures(width: number, height: number, offset: Box2D.XY, options?: Partial<Box2D.IFixtureDef>) {
+    static horizontalSquareFixtures(width: number, height: number, offset: Box2D.XY, options?: Partial<Box2D.b2FixtureDef>) {
         return [
-            this.squareFixture(width, height, new Box2D.Vec2(-offset.x, offset.y), Object.assign({}, options)),
-            this.squareFixture(width, height, new Box2D.Vec2(offset.x, offset.y), Object.assign({}, options))
+            this.squareFixture(width, height, new Box2D.b2Vec2(-offset.x, offset.y), Object.assign({}, options)),
+            this.squareFixture(width, height, new Box2D.b2Vec2(offset.x, offset.y), Object.assign({}, options))
         ]
     }
 
-    static vertexFixture(vertexArray: Box2D.XY[], options?: Partial<Box2D.IFixtureDef>) {
-        const shape = new Box2D.PolygonShape();
+    static vertexFixture(vertexArray: Box2D.XY[], options?: Partial<Box2D.b2FixtureDef>) {
+        const shape = new Box2D.b2PolygonShape();
         shape.Set(vertexArray)
 
         return this.createFixture(shape, options)

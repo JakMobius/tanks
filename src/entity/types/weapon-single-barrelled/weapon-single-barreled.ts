@@ -1,5 +1,5 @@
 import FirearmWeaponComponent from "src/entity/components/weapon/firearm-weapon-component";
-import * as Box2D from 'src/library/box2d'
+import * as Box2D from '@box2d/core'
 
 export default class WeaponSingleBarreled extends FirearmWeaponComponent {
 

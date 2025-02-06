@@ -1,4 +1,4 @@
-/* @load-resource: './huge-input.scss' */
+import './huge-input.scss'
 
 import View from "src/client/ui/view";
 import InputTipList from "../input-tip-list/input-tip-list-view";

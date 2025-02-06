@@ -1,4 +1,4 @@
-/* @load-resource: './tank-carousel-button.scss' */
+import './tank-carousel-button.scss'
 
 import View from "src/client/ui/view";
 

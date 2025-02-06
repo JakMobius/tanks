@@ -5,12 +5,13 @@ import GameModule from './game/game-module';
 import BaseModule from './base-module';
 import WebserverModule from "./webserver-module";
 import * as HTTP from "http";
-import * as http from "http";
 import StaticModule from "./static/static-module";
 import Server from "../server";
 import {WebserverSession} from "./webserver-session";
 
-const init = require('express/lib/middleware/init').init
+// const init = require('express/lib/middleware/init').init
+import { init } from 'express/lib/middleware/init.js';
+
 
 export default class WebServer {
 	public app: express.Application;
@@ -25,7 +26,7 @@ export default class WebServer {
     baseModule = new BaseModule()
     staticModule = new StaticModule()
 
-    private requestInit: (req: http.IncomingMessage, res: any, next: () => void) => void
+    private requestInit: (req: HTTP.IncomingMessage, res: any, next: () => void) => void
 
     constructor(server: Server) {
         this.server = server
@@ -149,7 +150,7 @@ export default class WebServer {
         this.httpServer.off("request", this.app)
     }
 
-    getSessionFor(httpRequest: http.IncomingMessage, callback: (session: WebserverSession) => void) {
+    getSessionFor(httpRequest: HTTP.IncomingMessage, callback: (session: WebserverSession) => void) {
         // Hacky way to get the session from the express session middleware
         let httpResult = {}
         this.requestInit(httpRequest, httpResult, () => {

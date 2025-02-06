@@ -1,4 +1,4 @@
-/* @load-resource: './tank-change-event-view.scss' */
+import './tank-change-event-view.scss'
 
 import LargeIconEventView from "src/client/ui/overlay/events-overlay/types/large-icon-event-view";
 import {getTankDescription} from "src/client/ui/overlay/tank-select-overlay/tank-descriptions";

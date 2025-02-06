@@ -10,7 +10,7 @@ export default class BaseModule extends WebserverModule {
         this.resourcesDirectory = this.webServer.server.getResourcePath("web")
         this.priority = WebserverModule.PRIORITY_LOWEST
 
-        this.router.use("/assets/", express.static(this.resourcePath("assets")))
+        this.router.use("/static/", express.static(this.resourcePath("static")))
         this.router.use((req, res, next) => this.onNotFound.apply(this, [req, res, next]))
     }
 

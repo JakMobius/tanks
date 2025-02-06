@@ -7,8 +7,8 @@ export default abstract class CameraProgram extends VertexFragmentShaderProgram 
     public matrixUniform: Uniform;
     public camera: Camera
 
-    protected constructor(vertexShaderPath: string, fragmentShaderPath: string, ctx: WebGLRenderingContext) {
-        super(vertexShaderPath, fragmentShaderPath, ctx);
+    protected constructor(vertexShaderSource: string, fragmentShaderSource: string, ctx: WebGLRenderingContext) {
+        super(vertexShaderSource, fragmentShaderSource, ctx);
 
         this.matrixUniform = this.getUniform((this.constructor as typeof CameraProgram).cameraMatrixUniformName)
     }

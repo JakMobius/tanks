@@ -1,4 +1,4 @@
-/* @load-resource: './player-list-overlay.scss' */
+import './player-list-overlay.scss'
 
 import Overlay from "src/client/ui/overlay/overlay";
 import Entity from "src/utils/ecs/entity";

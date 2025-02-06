@@ -1,5 +1,5 @@
 // @ts-ignore
-import Models from './types/*'
+import Models from './types/%'
 import MapDrawerComponent from 'src/client/graphics/drawers/map-drawer-component';
 
 for(let Model of Models) {

@@ -1,8 +1,7 @@
 import {Component} from "src/utils/ecs/component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
 import Matrix3 from "src/utils/matrix3";
-import {Vec2} from "src/library/box2d";
 
 export default class TransformComponent implements Component {
     entity: Entity | null
@@ -26,11 +25,11 @@ export default class TransformComponent implements Component {
     }
 
     getPosition() {
-        return new Box2D.Vec2(this.transform.m[6], this.transform.m[7])
+        return new Box2D.b2Vec2(this.transform.m[6], this.transform.m[7])
     }
 
     getDirection() {
-        return new Box2D.Vec2(this.transform.m[0], this.transform.m[1])
+        return new Box2D.b2Vec2(this.transform.m[0], this.transform.m[1])
     }
 
     onAttach(entity: Entity) {

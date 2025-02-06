@@ -1,4 +1,4 @@
-/* @load-resource: './self-destruct-event-view.scss' */
+import './self-destruct-event-view.scss'
 
 import LargeIconEventView from "src/client/ui/overlay/events-overlay/types/large-icon-event-view";
 import Entity from "src/utils/ecs/entity";

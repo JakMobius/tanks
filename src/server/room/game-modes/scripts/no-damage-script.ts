@@ -2,7 +2,7 @@ import ServerGameScript from "src/server/room/game-modes/scripts/server-game-scr
 import BlockDamageEvent from "src/events/block-damage-event";
 import EntityDamageEvent from "src/events/tank-damage-event";
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
-import {DamageTypes} from "src/entity/components/health-component";
+import { DamageTypes } from "src/server/damage-reason/damage-reason";
 
 export default class NoDamageScript extends ServerGameScript {
 

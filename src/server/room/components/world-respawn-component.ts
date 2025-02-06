@@ -54,8 +54,7 @@ export default class WorldRespawnComponent extends EventHandlerComponent {
         this.entity.appendChild(tank);
 
         const body = tank.getComponent(PhysicalComponent)
-        body.setPosition(event.respawnPosition)
-        body.setAngle(event.respawnAngle)
+        body.setPositionAngle(event.respawnPosition, event.respawnAngle)
 
         playerTankComponent.setTank(tank)
     }

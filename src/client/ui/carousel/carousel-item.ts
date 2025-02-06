@@ -1,4 +1,4 @@
-/* @load-resource: './carousel-item.scss' */
+import './carousel-item.scss'
 
 import View from "src/client/ui/view";
 import Carousel from "src/client/ui/carousel/carousel";

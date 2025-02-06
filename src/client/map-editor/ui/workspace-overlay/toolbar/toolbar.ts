@@ -1,4 +1,4 @@
-/* @load-resource: './toolbar.scss' */
+import './toolbar.scss'
 
 import View from 'src/client/ui/view';
 

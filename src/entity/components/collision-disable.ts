@@ -1,5 +1,5 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import {TransmitterSet} from "src/entity/components/network/transmitting/transmitter-set";
 import CollisionDisableTransmitter from "src/entity/components/network/collisions/collision-disable-transmitter";
 import PhysicalComponent from "src/entity/components/physics-component";

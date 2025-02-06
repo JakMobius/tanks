@@ -8,6 +8,11 @@ import TruckProgram from "src/client/graphics/programs/truck-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import bodyBrightSprite from "textures/tanks/bigboi/body-bright.texture.png"
+import bodyDarkSprite from "textures/tanks/bigboi/body-dark.texture.png"
+import bodyLightMask from "textures/tanks/bigboi/mask.texture.png"
+import truckSprite from "textures/tanks/bigboi/truck.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
     public bodyDarkSprite: Sprite;
@@ -21,10 +26,10 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodyBrightSprite = Sprite.named("tanks/bigboi/body-bright")
-        this.bodyDarkSprite = Sprite.named("tanks/bigboi/body-dark")
-        this.bodyLightMask = Sprite.named("tanks/bigboi/mask")
-        this.truckSprite = Sprite.named("tanks/bigboi/truck")
+        this.bodyBrightSprite = Sprite.named(bodyBrightSprite)
+        this.bodyDarkSprite = Sprite.named(bodyDarkSprite)
+        this.bodyLightMask = Sprite.named(bodyLightMask)
+        this.truckSprite = Sprite.named(truckSprite)
     }
 
     draw(phase: DrawPhase) {

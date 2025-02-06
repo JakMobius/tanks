@@ -8,6 +8,11 @@ import TruckProgram from "src/client/graphics/programs/truck-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import bodyBrightSprite from "textures/tanks/sniper/body-bright.texture.png"
+import bodyDarkSprite from "textures/tanks/sniper/body-dark.texture.png"
+import bodyLightMask from "textures/tanks/sniper/mask.texture.png"
+import truckSprite from "textures/tanks/sniper/truck.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
     public bodyDarkSprite: Sprite;
@@ -21,10 +26,10 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodyBrightSprite = Sprite.named("tanks/sniper/body-bright")
-        this.bodyDarkSprite = Sprite.named("tanks/sniper/body-dark")
-        this.bodyLightMask = Sprite.named("tanks/sniper/mask")
-        this.truckSprite = Sprite.named("tanks/sniper/truck")
+        this.bodyBrightSprite = Sprite.named(bodyBrightSprite)
+        this.bodyDarkSprite = Sprite.named(bodyDarkSprite)
+        this.bodyLightMask = Sprite.named(bodyLightMask)
+        this.truckSprite = Sprite.named(truckSprite)
 
         Sprite.setMipMapLevel(0)
     }

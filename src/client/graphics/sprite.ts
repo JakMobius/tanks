@@ -12,11 +12,20 @@ export interface SpriteRect {
     [key: string]: number | null
 }
 
+export interface TextureAtlas {
+    settings: {
+        atlasSize: number
+    },
+    textures: {
+        [key: string]: SpriteRect
+    }
+}
+
 export default class Sprite {
 	public rects: SpriteRect[];
 	public rect: SpriteRect;
     static sprites = new Map()
-    static mipmapatlases: { [key: string]: SpriteRect }[] = []
+    static mipmapatlases: TextureAtlas[] = []
     static mipmapimages: HTMLImageElement[] = []
     static mipmaplevel = 0
 
@@ -36,7 +45,7 @@ export default class Sprite {
         this.rect = null
 
         for(let mipmap of Sprite.mipmapatlases) {
-            let source = mipmap[name]
+            let source = mipmap.textures[name]
             this.rects.push({
                 x: source["x"],
                 y: source["y"],
@@ -99,15 +108,15 @@ export default class Sprite {
     }
 
     static download(): Progress {
-        let textureProgress = Downloader.downloadImage("assets/img/textures/atlas-mipmap-level-0.png", (image) => {
+        let textureProgress = Downloader.downloadImage("static/textures/atlas.png", (image) => {
             Sprite.mipmapimages[0] = image
         })
 
-        let atlasProgress = Downloader.download("assets/img/textures/atlas-mipmap-level-0.json", (response) => {
+        let atlasProgress = Downloader.download("static/textures/atlas.json", (response: TextureAtlas) => {
             Sprite.mipmapatlases[0] = response
 
-            for(let key in response) {
-                if(response.hasOwnProperty(key)) {
+            for(let key in response.textures) {
+                if(response.textures.hasOwnProperty(key)) {
                     Sprite.sprites.set(key, new Sprite(key))
                 }
             }

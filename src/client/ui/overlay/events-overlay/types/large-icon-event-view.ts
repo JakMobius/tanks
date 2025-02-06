@@ -1,4 +1,4 @@
-/* @load-resource: './large-icon-event-view.scss' */
+import './large-icon-event-view.scss'
 
 import EventView from "src/client/ui/overlay/events-overlay/event-view";
 

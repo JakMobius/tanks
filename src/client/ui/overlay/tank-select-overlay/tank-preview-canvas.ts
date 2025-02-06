@@ -54,8 +54,10 @@ export default class TankPreviewCanvas extends View {
 
         gameWorldEntityPrefab(this.world, {
             physicsTick: 1 / 60,
-            velocitySteps: 0,
-            positionSteps: 0,
+            iterations: {
+                positionIterations: 0,
+                velocityIterations: 0
+            }
         })
 
         this.world.getComponent(TilemapComponent).setMap(new GameMap({
@@ -83,7 +85,8 @@ export default class TankPreviewCanvas extends View {
 
     onFrame(dt: number) {
         this.time += dt
-        this.tank.getComponent(PhysicalComponent).setAngle(this.time)
+        let component = this.tank.getComponent(PhysicalComponent)
+        component.setPositionAngle(component.getBody().GetPosition(), this.time)
         this.draw(dt)
     }
 }

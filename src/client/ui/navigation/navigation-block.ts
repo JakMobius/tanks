@@ -1,4 +1,4 @@
-/* @load-resource: ./navigation-block.scss */
+import './navigation-block.scss'
 
 import View from "../view";
 import NavigationBar from "./navigation-bar";

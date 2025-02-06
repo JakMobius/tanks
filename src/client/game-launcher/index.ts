@@ -1,4 +1,4 @@
-/* @load-resource: '../web/base-style.scss' */
+import '../web/base-style.scss'
 
 import BrowserCheckView from '../utils/browsercheck/browser-check-view';
 
@@ -16,7 +16,7 @@ function launchGame() {
 
 function downloadGameScript() {
     var script = document.createElement("script")
-    script.src = "scripts/main.js"
+    script.src = "static/main.js"
     script.onload = launchGame
     document.head.appendChild(script)
 }

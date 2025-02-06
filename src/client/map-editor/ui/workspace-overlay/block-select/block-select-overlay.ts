@@ -1,4 +1,4 @@
-/* @load-resource: './block-select-overlay.scss' */
+import './block-select-overlay.scss'
 
 import BlockSelectMenu from 'src/client/map-editor/ui/workspace-overlay/block-select/block-select-menu';
 import Overlay from "src/client/ui/overlay/overlay";

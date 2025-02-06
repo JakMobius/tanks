@@ -6,9 +6,10 @@ import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
 import TilemapHitEmitter from "src/entity/components/tilemap-hit-emitter";
 import TransformComponent from "src/entity/components/transform-component";
-import HealthComponent, {DamageModifiers, DamageTypes} from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health-component";
 import MortarBallHeightComponent from "src/entity/components/network/mortar-ball-height/mortar-ball-height-component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import { DamageModifiers, DamageTypes } from "src/server/damage-reason/damage-reason";
 
 EntityPrefabs.Types.set(EntityType.BULLET_MORTAR_BALL, (entity) => {
 	entity.addComponent(new PrefabIdComponent(EntityType.BULLET_MORTAR_BALL))

@@ -1,7 +1,7 @@
 import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
 import Team from "src/server/team";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import FlagStateComponent from "src/entity/types/flag/flag-state-component";
 import TransformComponent from "src/entity/components/transform-component";
 

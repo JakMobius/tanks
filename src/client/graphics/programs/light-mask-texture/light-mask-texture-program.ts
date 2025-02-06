@@ -1,14 +1,11 @@
-/* @load-resource: '../../shaders/fragment/light-mask-texture-fragment.glsl' */
-/* @load-resource: '../../shaders/vertex/light-mask-texture-vertex.glsl' */
-
 import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from 'src/client/graphics/sprite';
 import Uniform from "src/client/graphics/gl/uniform";
 import CameraProgram from "../camera-program";
 import {Quadrangle} from "src/utils/quadrangle";
 
-export const vertexShaderPath = "src/client/graphics/shaders/vertex/light-mask-texture-vertex.glsl"
-export const fragmentShaderPath = "src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl"
+import vertexShaderSource from "src/client/graphics/shaders/vertex/light-mask-texture-vertex.glsl"
+import fragmentShaderSource from "src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl"
 
 export default class LightMaskTextureProgram extends CameraProgram {
     public vertexBuffer: GLBuffer<Float32Array>;
@@ -20,7 +17,7 @@ export default class LightMaskTextureProgram extends CameraProgram {
     public lightAngle: number = 0
 
     constructor(ctx: WebGLRenderingContext) {
-        super(vertexShaderPath, fragmentShaderPath, ctx)
+        super(vertexShaderSource, fragmentShaderSource, ctx)
 
         this.vertexBuffer = this.createVertexArrayBuffer({
             clazz: Float32Array,

@@ -1,7 +1,7 @@
 import PhysicalComponent from "src/entity/components/physics-component";
 import TankControls from "src/controls/tank-controls";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import * as Box2D from 'src/library/box2d'
+import * as Box2D from '@box2d/core'
 import Entity from "src/utils/ecs/entity";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
 import {AirbagPropeller, AirbagPropellerConfig} from "src/entity/components/transmission/units/airbag-propeller";
@@ -88,10 +88,10 @@ export default class AirbagTankController extends EventHandlerComponent {
             body.GetWorldVector(propeller.getDirection(), propellerForward)
             body.GetWorldVector(propeller.getRuderDirection(), steerVector)
 
-            Box2D.Vec2.prototype.SelfMul.call(propellerForward, propellerAOA)
-            Box2D.Vec2.prototype.SelfMul.call(steerVector, propellerAOA)
+            Box2D.b2Vec2.prototype.Scale.call(propellerForward, propellerAOA)
+            Box2D.b2Vec2.prototype.Scale.call(steerVector, propellerAOA)
 
-            const forwardAirspeed = Box2D.Vec2.DotVV(body.GetLinearVelocity(), propellerForward)
+            const forwardAirspeed = Box2D.b2Vec2.Dot(body.GetLinearVelocity(), propellerForward)
 
             const propellerSpeed = transmissionComponent.system.qdot[propeller.unitIndex]
             const propellerOutputAirspeed = propellerSpeed * propeller.angleSetting
@@ -106,7 +106,7 @@ export default class AirbagTankController extends EventHandlerComponent {
             totalTorque += propellerTorque
             airspeed = windmillDifference
 
-            Box2D.Vec2.prototype.SelfMul.call(steerVector, propellerForce)
+            Box2D.b2Vec2.prototype.Scale.call(steerVector, propellerForce)
 
             body.GetWorldPoint(propeller.position, propellerCenter)
             body.ApplyForce(steerVector, propellerCenter)

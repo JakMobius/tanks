@@ -8,9 +8,7 @@ export default class StaticModule extends WebserverModule {
         super.setServer(server)
 
         this.resourcesDirectory = this.webServer.server.getResourcePath("web")
-
-        this.router.use("/styles/", express.static(this.resourcePath("styles")))
-        this.router.use("/scripts/", express.static(this.resourcePath("scripts")))
-        this.router.use("/assets/", express.static(this.resourcePath("assets")))
+        
+        this.router.use("/static/", express.static(this.resourcePath("static")))
     }
 }

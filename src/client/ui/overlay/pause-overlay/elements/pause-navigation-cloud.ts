@@ -1,7 +1,8 @@
-import Cloud from 'src/client/ui/overlay/pause-overlay/elements/cloud/cloud'
+
 import {Constructor} from "src/utils/constructor"
 import Controller from "src/client/ui/controller/controller";
 import PauseNavigationTransition from "src/client/ui/overlay/pause-overlay/navigation/pause-navigation-transition";
+import Cloud from "src/client/game/ui/cloud/cloud";
 
 export default class PauseNavigationCloud extends Cloud {
 

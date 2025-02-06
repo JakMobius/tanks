@@ -40,8 +40,7 @@ export default class TutorialWorldController {
         this.game.appendChild(tank)
 
         const body = tank.getComponent(PhysicalComponent).getBody()
-        body.SetPositionXY(x, y)
-        body.SetAngle(angle)
+        body.SetTransformXY(x, y, angle)
 
         this.tanks.push(tank)
     }
@@ -80,9 +79,8 @@ export default class TutorialWorldController {
         let body = tank.getComponent(PhysicalComponent)
         let health = tank.getComponent(HealthComponent)
 
-        body.setPosition({x: 17.5, y: 212.5})
+        body.setPositionAngle({x: 17.5, y: 212.5}, 4)
         body.setVelocity({x: 0, y: 0})
-        body.setAngle(4)
         body.setAngularVelocity(0)
         health.setHealth(health.getMaxHealth())
     }

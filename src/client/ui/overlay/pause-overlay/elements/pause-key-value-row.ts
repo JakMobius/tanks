@@ -1,4 +1,4 @@
-/* @load-resource: ./pause-key-value-row.scss */
+import './pause-key-value-row.scss'
 
 import View from "src/client/ui/view";
 

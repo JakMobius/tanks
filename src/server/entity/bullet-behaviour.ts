@@ -1,17 +1,16 @@
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
-import HealthComponent, {DamageTypes} from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health-component";
 import TilemapComponent from "src/physics/tilemap-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import DamageReason from "../damage-reason/damage-reason";
+import DamageReason, { DamageTypes } from "../damage-reason/damage-reason";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
-import {World} from "src/library/box2d";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
 
 export interface BulletBehaviourConfig {
@@ -47,7 +46,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
             }
         })
 
-        this.eventHandler.on("entity-hit", (hitEntity: Entity, contact: Box2D.Contact) => {
+        this.eventHandler.on("entity-hit", (hitEntity: Entity, contact: Box2D.b2Contact) => {
             this.handleEntityHit(hitEntity, contact)
         })
 
@@ -60,7 +59,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
         })
     }
 
-    private handleEntityHit(hitEntity: Entity, contact: Box2D.Contact) {
+    private handleEntityHit(hitEntity: Entity, contact: Box2D.b2Contact) {
         if (this.isDead) return
         this.die()
 
@@ -134,8 +133,8 @@ export default class BulletBehaviour extends EventHandlerComponent {
         this.isDead = true
     }
 
-    private getContactMidpoint(contact: Box2D.Contact) {
-        const worldManifold = new Box2D.WorldManifold()
+    private getContactMidpoint(contact: Box2D.b2Contact) {
+        const worldManifold = new Box2D.b2WorldManifold()
         contact.GetWorldManifold(worldManifold)
         const points = worldManifold.points.slice(0, contact.GetManifold().pointCount)
 
@@ -156,7 +155,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
     private stuckAtPoint(point: Box2D.XY) {
         let body = this.entity.getComponent(PhysicalComponent)
         body.setVelocity({x: 0, y: 0})
-        body.setPosition(point)
+        body.setPositionAngle(point, body.getBody().GetAngle())
         body.getBody().SetFixedRotation(true)
         body.getBody().SetEnabled(false)
     }

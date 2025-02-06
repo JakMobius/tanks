@@ -1,4 +1,4 @@
-/* @load-resource: './bar-separator.scss' */
+import './bar-separator.scss'
 
 import View from "src/client/ui/view";
 

@@ -1,4 +1,4 @@
-/* @load-resource: './game-state-view.scss' */
+import './game-state-view.scss'
 
 import View from "src/client/ui/view";
 import GameStateOverlay from "src/client/ui/overlay/game-overlay/game-state-overlay";

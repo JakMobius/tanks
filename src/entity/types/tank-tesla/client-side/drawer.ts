@@ -8,6 +8,9 @@ import TruckProgram from "src/client/graphics/programs/truck-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 
+import bodyBrightSprite from "textures/tanks/tesla/body.texture.png"
+import truckSprite from "textures/tanks/tesla/truck.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
     public truckSprite: Sprite;
@@ -19,8 +22,8 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodySprite = Sprite.named("tanks/tesla/body")
-        this.truckSprite = Sprite.named("tanks/tesla/truck")
+        this.bodySprite = Sprite.named(bodyBrightSprite)
+        this.truckSprite = Sprite.named(truckSprite)
 
         Sprite.setMipMapLevel(0)
     }

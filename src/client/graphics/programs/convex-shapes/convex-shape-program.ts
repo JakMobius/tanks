@@ -1,12 +1,9 @@
-/* @load-resource: '../../shaders/fragment/convex-shape-fragment.glsl' */
-/* @load-resource: '../../shaders/vertex/convex-shape-vertex.glsl' */
-
 import CameraProgram from "../camera-program";
 import GLBuffer from "src/client/graphics/gl/glbuffer";
 import {Quadrangle} from "src/utils/quadrangle";
 
-export const vertexShaderPath = "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"
-export const fragmentShaderPath = "src/client/graphics/shaders/fragment/convex-shape-fragment.glsl"
+import vertexShaderSource from "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"
+import fragmentShaderSource from "src/client/graphics/shaders/fragment/convex-shape-fragment.glsl"
 
 export default class ConvexShapeProgram extends CameraProgram {
 
@@ -16,7 +13,7 @@ export default class ConvexShapeProgram extends CameraProgram {
     private vertices: number;
 
     constructor(ctx: WebGLRenderingContext) {
-        super(vertexShaderPath, fragmentShaderPath, ctx)
+        super(vertexShaderSource, fragmentShaderSource, ctx)
 
         this.vertexBuffer = this.createVertexArrayBuffer({
             clazz: Float32Array,

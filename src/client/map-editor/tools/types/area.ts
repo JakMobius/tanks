@@ -61,7 +61,7 @@ export default class AreaTool extends Tool {
         this.visibleEntity.addComponent(new AreaToolDrawer(this))
 
         this.area = new Rectangle()
-        this.image = "assets/map-editor/area.png"
+        this.image = "static/map-editor/area.png"
 
         this.copyBuffer = null
 

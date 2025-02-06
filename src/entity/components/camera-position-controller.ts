@@ -1,5 +1,5 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import CameraComponent from "src/client/graphics/camera";
 import {inverse} from "src/utils/matrix3";
 import Entity from "src/utils/ecs/entity";
@@ -34,7 +34,7 @@ export default class CameraPositionController extends EventHandlerComponent {
     /**
      * Camera shaking velocity
      */
-    shakeVelocity = new Box2D.Vec2()
+    shakeVelocity = new Box2D.b2Vec2()
 
     constructor() {
         super()

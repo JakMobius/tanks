@@ -1,6 +1,6 @@
-/* @load-resource: "./input-cloud.scss" */
+import "./input-cloud.scss"
 
-import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
+import Cloud from "src/client/game/ui/cloud/cloud";
 import AutoresizeInput from "src/client/ui/elements/autoresize-input/autoresize-input";
 
 export default class InputCloud extends Cloud {

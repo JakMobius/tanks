@@ -1,9 +1,10 @@
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import PhysicsChunk from "src/physics/physics-chunk";
 import PhysicalComponent from "./physics-component";
 import GameMap from "src/map/game-map";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { getObjectFromBody } from "../physical-body-data";
 
 export default class TilemapHitEmitter extends EventHandlerComponent {
     constructor() {
@@ -13,25 +14,29 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         })
     }
 
-    onBodyHit(body: Box2D.Body, contact: Box2D.Contact) {
-        const data = PhysicalComponent.getObjectFromBody(body)
-        if(data instanceof Entity) this.entity.emit("entity-hit", data, contact)
-        if(data instanceof PhysicsChunk) {
-            const worldManifold = new Box2D.WorldManifold()
+    onBodyHit(body: Box2D.b2Body, contact: Box2D.b2Contact) {
+        const data = getObjectFromBody(body)
+        
+        if(data.entity?.deref()) {
+            this.entity.emit("entity-hit", data.entity.deref(), contact)
+        }
+
+        if(data.physicsChunk?.deref()) {
+            const worldManifold = new Box2D.b2WorldManifold()
             contact.GetWorldManifold(worldManifold)
             const points = worldManifold.points.slice(0, contact.GetManifold().pointCount)
-            this.emitMultipleBlockHits(points, data.getMap())
+            this.emitMultipleBlockHits(points, data.physicsChunk.deref().getMap())
         }
     }
 
-    private emitMultipleBlockHits(points: Box2D.Vec2[], map: GameMap) {
+    private emitMultipleBlockHits(points: Box2D.b2Vec2[], map: GameMap) {
         if(!this.entity.getComponent(PhysicalComponent).getBody().GetWorld()) return
         for(let point of points) {
             this.emitBlockHit(point, map)
         }
     }
 
-    private emitBlockHit(point: Box2D.Vec2, map: GameMap) {
+    private emitBlockHit(point: Box2D.b2Vec2, map: GameMap) {
         let blockX = point.x / GameMap.BLOCK_SIZE
         let blockY = point.y / GameMap.BLOCK_SIZE
 
@@ -44,7 +49,7 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
             return
         }
 
-        const velocity = new Box2D.Vec2()
+        const velocity = new Box2D.b2Vec2()
         this.entity.getComponent(PhysicalComponent).getBody().GetLinearVelocityFromWorldPoint(point, velocity)
 
         if (velocity.x === 0 && velocity.y === 0) return

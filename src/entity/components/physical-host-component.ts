@@ -1,4 +1,4 @@
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
 import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
@@ -8,8 +8,7 @@ import GameWorldContactFilter from "src/contact-filter";
 export interface PhysicalHostComponentConfig {
     gravity?: Box2D.XY
     physicsTick: number;
-    positionSteps: number;
-    velocitySteps: number;
+    iterations: Box2D.b2StepConfig;
 }
 
 export default class PhysicalHostComponent implements Component {
@@ -17,10 +16,9 @@ export default class PhysicalHostComponent implements Component {
     physicalComponents: PhysicalComponent[] = []
     entity?: Entity | null
 
-    public world: Box2D.World
+    public world: Box2D.b2World
     public physicsTick: number
-    public positionSteps: number
-    public velocitySteps: number
+    public iterations: Box2D.b2StepConfig
     public worldTicks: number = 0
     public worldTicksModulo: number = 65536
 
@@ -29,10 +27,9 @@ export default class PhysicalHostComponent implements Component {
 
     constructor(config: PhysicalHostComponentConfig) {
         this.physicsTick = config.physicsTick
-        this.positionSteps = config.positionSteps
-        this.velocitySteps = config.velocitySteps
+        this.iterations = config.iterations
 
-        this.world = new Box2D.World(config.gravity ?? {x: 0, y: 0})
+        this.world = Box2D.b2World.Create(config.gravity ?? {x: 0, y: 0})
 
         this.setupContactListener()
         this.setupContactFilter()
@@ -46,8 +43,12 @@ export default class PhysicalHostComponent implements Component {
 
         this.worldTicks = (this.worldTicks + 1) % this.worldTicksModulo
 
-        if(this.velocitySteps > 0 && this.positionSteps > 0) {
-            this.world.Step(this.physicsTick, this.velocitySteps, this.positionSteps);
+        if(this.iterations.positionIterations > 0 && this.iterations.velocityIterations > 0 && this.physicsTick > 0) {
+            // @ts-ignore
+            global.isWithinTick = true
+            this.world.Step(this.physicsTick, this.iterations);
+            // @ts-ignore
+            global.isWithinTick = false
         }
     }
 

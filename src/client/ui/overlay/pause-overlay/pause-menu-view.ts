@@ -1,4 +1,4 @@
-/* @load-resource: ./pause-menu-view.scss */
+import './pause-menu-view.scss'
 
 import View from "src/client/ui/view";
 import PauseNavigationCloud from "src/client/ui/overlay/pause-overlay/elements/pause-navigation-cloud";

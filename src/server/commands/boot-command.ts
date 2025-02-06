@@ -142,10 +142,14 @@ export default class BootCommand extends Command {
 
     public runPostInit() {
         let scripts = this.parsedFlags.get("script")
-        if(scripts) {
-            for(let script of scripts) {
-                this.console.runScript(script)
-            }
+        
+        if(!Array.isArray(scripts)) {
+            console.log("Invalid value for script flag")
+            return
+        }
+
+        for(let script of scripts) {
+            this.console.runScript(script)
         }
     }
 

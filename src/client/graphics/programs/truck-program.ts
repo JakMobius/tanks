@@ -1,14 +1,11 @@
-/* @load-resource: '../shaders/fragment/truck-fragment.glsl' */
-/* @load-resource: '../shaders/vertex/truck-vertex.glsl' */
-
 import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from "src/client/graphics/sprite";
 import CameraProgram from "./camera-program";
 import {Quadrangle} from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
-export const vertexShaderPath = "src/client/graphics/shaders/vertex/truck-vertex.glsl"
-export const fragmentShaderPath = "src/client/graphics/shaders/fragment/truck-fragment.glsl"
+import vertexShaderSource from "src/client/graphics/shaders/vertex/truck-vertex.glsl"
+import fragmentShaderSource from "src/client/graphics/shaders/fragment/truck-fragment.glsl"
 
 export default class TruckProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
@@ -17,7 +14,7 @@ export default class TruckProgram extends CameraProgram {
 
     constructor(ctx: WebGLRenderingContext) {
 
-        super(vertexShaderPath, fragmentShaderPath, ctx)
+        super(vertexShaderSource, fragmentShaderSource, ctx)
 
         this.vertexBuffer = this.createVertexArrayBuffer({
             clazz: Float32Array,

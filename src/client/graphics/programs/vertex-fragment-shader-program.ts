@@ -5,9 +5,9 @@ export default abstract class VertexFragmentShaderProgram extends Program {
 
     ctx: WebGLRenderingContext
 
-    protected constructor(vertexShaderPath: string, fragmentShaderPath: string, ctx: WebGLRenderingContext) {
-        let vertexShader = new Shader(vertexShaderPath, Shader.VERTEX).compile(ctx)
-        let fragmentShader = new Shader(fragmentShaderPath, Shader.FRAGMENT).compile(ctx)
+    protected constructor(vertexShaderSource: string, fragmentShaderSource: string, ctx: WebGLRenderingContext) {
+        let vertexShader = new Shader(vertexShaderSource, Shader.VERTEX).compile(ctx)
+        let fragmentShader = new Shader(fragmentShaderSource, Shader.FRAGMENT).compile(ctx)
 
         super(vertexShader, fragmentShader);
 

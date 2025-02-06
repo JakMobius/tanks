@@ -1,4 +1,4 @@
-/* @load-resource: './room-list.scss' */
+import './room-list.scss'
 
 import View from "src/client/ui/view";
 import LoadingView from "src/client/hub/ui/loading-view/loading-view";

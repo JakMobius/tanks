@@ -1,7 +1,7 @@
 
 import PauseKeyValueRow from "src/client/ui/overlay/pause-overlay/elements/pause-key-value-row";
-import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
 import InputCloud from "src/client/ui/elements/input-cloud/input-cloud";
+import Cloud from "src/client/game/ui/cloud/cloud";
 
 export default class PauseInputRow extends PauseKeyValueRow {
     title = new Cloud()

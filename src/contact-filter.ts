@@ -1,24 +1,23 @@
-import * as Box2D from './library/box2d'
-import {b2Fixture} from "./library/box2d/dynamics/b2_fixture";
+import * as Box2D from '@box2d/core'
 import Entity from "./utils/ecs/entity";
-import PhysicalComponent from "src/entity/components/physics-component";
+import { getObjectFromBody } from './entity/physical-body-data';
 
-export default class GameWorldContactFilter extends Box2D.ContactFilter {
+export default class GameWorldContactFilter extends Box2D.b2ContactFilter {
 
-    ShouldCollide(fixtureA: b2Fixture, fixtureB: b2Fixture): boolean {
+    ShouldCollide(fixtureA: Box2D.b2Fixture, fixtureB: Box2D.b2Fixture): boolean {
         if(!super.ShouldCollide(fixtureA, fixtureB)) return false
 
         const bodyA = fixtureA.GetBody()
         const bodyB = fixtureB.GetBody()
-        const dataA = PhysicalComponent.getEntityFromBody(bodyA)
-        const dataB = PhysicalComponent.getEntityFromBody(bodyB)
+        const entityA = getObjectFromBody(bodyA).entity?.deref()
+        const entityB = getObjectFromBody(bodyB).entity?.deref()
 
-        if(dataA instanceof Entity) {
-            if(!dataA.emit("should-collide", bodyB)) return false
+        if(entityA) {
+            if(!entityA.emit("should-collide", bodyB)) return false
         }
 
-        if(dataB instanceof Entity) {
-            if(!dataB.emit("should-collide", bodyA)) return false
+        if(entityB) {
+            if(!entityB.emit("should-collide", bodyA)) return false
         }
 
         return true

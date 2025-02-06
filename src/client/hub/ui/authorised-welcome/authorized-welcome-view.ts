@@ -1,4 +1,4 @@
-/* @load-resource: 'authorized-welcome.scss' */
+import './authorized-welcome.scss'
 
 import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";

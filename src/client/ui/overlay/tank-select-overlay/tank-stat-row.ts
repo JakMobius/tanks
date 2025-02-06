@@ -1,4 +1,4 @@
-/* @load-resource: './tank-stat-row.scss' */
+import './tank-stat-row.scss'
 
 import View from "src/client/ui/view";
 

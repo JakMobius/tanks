@@ -1,11 +1,14 @@
 import BasicEntityDrawer from "src/client/graphics/drawers/basic-entity-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 
+import onSprite from "textures/bullets/mine/on.texture.png"
+import offSprite from "textures/bullets/mine/off.texture.png"
+
 export class Drawer extends BasicEntityDrawer {
     public shift: any;
     static spriteNames = [
-        "bullets/mine/on",
-        "bullets/mine/off"
+        onSprite,
+        offSprite
     ]
 
     constructor() {

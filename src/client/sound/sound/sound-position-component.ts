@@ -2,7 +2,7 @@ import SoundFilter from "./sound-effect";
 import SoundEngine from "../sound-engine";
 import {SoundStream} from "../stream/sound-stream";
 import SoundPrimaryComponent from "./sound-primary-component";
-import * as Box2D from "src/library/box2d"
+import * as Box2D from "@box2d/core"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
 import CameraComponent from "src/client/graphics/camera";

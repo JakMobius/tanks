@@ -14,6 +14,11 @@ import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import bodyBrightSprite from "textures/tanks/monster/body-bright.texture.png"
+import bodyDarkSprite from "textures/tanks/monster/body-dark.texture.png"
+import bodyLightMask from "textures/tanks/monster/mask.texture.png"
+import wheelSprites from "textures/tanks/monster/wheel%.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
     public bodyDarkSprite: Sprite;
@@ -29,15 +34,11 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodyBrightSprite = Sprite.named("tanks/monster/body-bright")
-        this.bodyDarkSprite = Sprite.named("tanks/monster/body-dark")
-        this.bodyLightMask = Sprite.named("tanks/monster/mask")
+        this.bodyBrightSprite = Sprite.named(bodyBrightSprite)
+        this.bodyDarkSprite = Sprite.named(bodyDarkSprite)
+        this.bodyLightMask = Sprite.named(bodyLightMask)
 
-        this.wheelSprites = []
-
-        for (let i = 1; i <= Drawer.wheelSpriteCount; i++) {
-            this.wheelSprites.push(Sprite.named("tanks/monster/wheel_" + i))
-        }
+        this.wheelSprites = wheelSprites.map(sprite => Sprite.named(sprite))
     }
 
     draw(phase: DrawPhase) {

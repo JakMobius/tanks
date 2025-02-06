@@ -1,4 +1,4 @@
-/* @load-resource: './account-bar-button.scss' */
+import './account-bar-button.scss'
 
 import View from "src/client/ui/view";
 

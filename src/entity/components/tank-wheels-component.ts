@@ -1,4 +1,4 @@
-import {Vec2, XY} from 'src/library/box2d'
+import * as Box2D from "@box2d/core"
 import {Wheel, WheelGroup} from "src/entity/components/transmission/units/wheel-group";
 import PhysicalComponent from "src/entity/components/physics-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
@@ -44,16 +44,16 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             body.GetLocalVector(wheelVelocity, wheelTranslation)
 
             // set wheelTranslation to wheel-space velocity of the wheel
-            Vec2.prototype.SelfRotate.call(wheelTranslation, -angle)
+            Box2D.b2Vec2.prototype.Rotate.call(wheelTranslation, -angle)
 
             wheel.groundSpeed = wheelTranslation.y
 
             // set wheelTranslation to wheel-space translation of the wheel on this tick
-            Vec2.prototype.SelfMul.call(wheelTranslation, dt)
+            Box2D.b2Vec2.prototype.Scale.call(wheelTranslation, dt)
 
             let tickMovement = wheelRotationSpeed * dt * wheelGroup.circumference
 
-            wheel.tensionVector.SelfAdd(wheelTranslation)
+            wheel.tensionVector.Add(wheelTranslation)
             wheel.tensionVector.y -= tickMovement
 
             let tickDistance = Math.abs(tickMovement)
@@ -77,7 +77,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
 
             if (slippedDistance > 0) {
                 wheel.slideVelocity = slippedDistance / dt
-                wheel.tensionVector.SelfMul(wheel.tensionLimit / wheelTensionLength)
+                wheel.tensionVector.Scale(wheel.tensionLimit / wheelTensionLength)
             } else {
                 wheel.slideVelocity = 0
             }
@@ -100,16 +100,16 @@ export default class TankWheelsComponent extends EventHandlerComponent {
                 wheelTension.x /= (1 - projection * 10);
             }
 
-            Vec2.prototype.SelfMul.call(wheelTension, wheel.grip / wheel.tensionLimit);
-            Vec2.prototype.SelfRotate.call(wheelTension, angle)
+            Box2D.b2Vec2.prototype.Scale.call(wheelTension, wheel.grip / wheel.tensionLimit);
+            Box2D.b2Vec2.prototype.Rotate.call(wheelTension, angle)
 
             let wheelPosition = {x: 0, y: 0}
             body.GetWorldVector({x: wheel.x, y: wheel.y}, wheelPosition)
 
             let wheelReaction = {x: 0, y: 0}
             body.GetWorldVector(wheelTension, wheelReaction)
-            Vec2.prototype.SelfAdd.call(wheelPosition, body.GetPosition())
-            Vec2.prototype.SelfNeg.call(wheelReaction)
+            Box2D.b2Vec2.prototype.Add.call(wheelPosition, body.GetPosition())
+            Box2D.b2Vec2.prototype.Negate.call(wheelReaction)
 
             body.ApplyForce(wheelReaction, wheelPosition)
         }

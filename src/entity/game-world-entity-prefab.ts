@@ -11,12 +11,12 @@ import ChildTickComponent from "src/entity/components/child-tick-component";
 import {Component} from "src/utils/ecs/component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
 import {EntityType} from "src/entity/entity-type";
+import * as Box2D from "@box2d/core"
 
 export interface GameWorldConfig {
     physicsTick?: number
     maxTicks?: number
-    positionSteps?: number
-    velocitySteps?: number
+    iterations?: Box2D.b2StepConfig
     map?: GameMap
 }
 
@@ -44,8 +44,10 @@ export function gameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig)
     options = Object.assign({
         physicsTick: 0.002,
         maxTicks: 30,
-        positionSteps: 1,
-        velocitySteps: 1
+        iterations: {
+            positionIterations: 1,
+            velocityIterations: 1
+        } as Box2D.b2StepConfig
     }, options)
 
     entity.addComponent(new WorldComponent())
@@ -53,8 +55,7 @@ export function gameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig)
     entity.addComponent(new TilemapComponent());
     entity.addComponent(new PhysicalHostComponent({
         physicsTick: options.physicsTick,
-        positionSteps: options.positionSteps,
-        velocitySteps: options.velocitySteps
+        iterations: options.iterations
     }))
     entity.addComponent(new ChunkedMapCollider());
     entity.getComponent(TilemapComponent).setMap(options.map)

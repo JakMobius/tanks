@@ -2,8 +2,10 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import BulletDrawer from "src/client/graphics/drawers/bullet-drawer";
 import ClientBulletBehaviourComponent from "src/client/entity/components/client-bullet-behaviour-component";
 
+import sprite from "textures/bullets/cannonball/cannonball.texture.png"
+
 export class Drawer extends BulletDrawer {
-    static spriteNames = ["bullets/cannonball/cannonball"]
+    static spriteNames = [sprite]
 
     draw(phase: DrawPhase) {
         if (!this.entity.getComponent(ClientBulletBehaviourComponent).visible) return

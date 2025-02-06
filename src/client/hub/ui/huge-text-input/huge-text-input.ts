@@ -1,4 +1,4 @@
-/* @load-resource: './huge-text-input.scss' */
+import './huge-text-input.scss'
 
 import HugeInput from "../huge-input/huge-input";
 

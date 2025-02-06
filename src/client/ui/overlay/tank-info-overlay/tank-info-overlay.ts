@@ -1,4 +1,4 @@
-/* @load-resource: './tank-info-overlay.scss' */
+import './tank-info-overlay.scss'
 
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import Entity from "src/utils/ecs/entity";
@@ -362,7 +362,7 @@ export class TankInfoWeaponView extends View {
         let info = this.weapon?.getComponent(WeaponComponent)?.info
 
         if (info) {
-            this.weaponIcon.css("background-image", "url(\"assets/game/weapon/" + info.id + "@3x.png\")")
+            this.weaponIcon.css("background-image", "url(\"static/game/weapon/" + info.id + "@3x.png\")")
         } else {
             this.weaponIcon.css("background-image", null)
         }

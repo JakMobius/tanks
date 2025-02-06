@@ -53,7 +53,7 @@ export class PencilDrawer extends EntityDrawer {
 
 export default class Pencil extends Tool {
     public actionName = "Карандаш";
-    public image = "assets/map-editor/pencil.png"
+    public image = "static/map-editor/pencil.png"
 
     public mouseX = 0
     public mouseY = 0
@@ -108,7 +108,7 @@ export default class Pencil extends Tool {
 
         this.roundModeButton = $("<div>")
             .addClass("tool inline selected")
-            .css("background-image", "url(assets/map-editor/round-brush.png)")
+            .css("background-image", "url(static/map-editor/round-brush.png)")
             .on("click", () => {
                 this.roundModeButton.addClass("selected")
                 this.squareModeButton.removeClass("selected")
@@ -117,7 +117,7 @@ export default class Pencil extends Tool {
 
         this.squareModeButton = $("<div>")
             .addClass("tool inline")
-            .css("background-image", "url(assets/map-editor/square-brush.png)")
+            .css("background-image", "url(static/map-editor/square-brush.png)")
             .on("click", () => {
                 this.roundModeButton.removeClass("selected")
                 this.squareModeButton.addClass("selected")
@@ -251,7 +251,7 @@ export default class Pencil extends Tool {
 
     becomeActive() {
         super.becomeActive()
-        this.setCursor("url(assets/map-editor/cursors/pencil.png) 0 32, auto")
+        this.setCursor("url(static/map-editor/cursors/pencil.png) 0 32, auto")
         this.brushPositionKnown = false
         this.manager.world.appendChild(this.visibleEntity)
     }

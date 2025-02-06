@@ -105,9 +105,7 @@ dist
 
 # Custom
 .idea
-out
-*.DS_Store
-beelder-cache/*
-dist/*
-temp/*
+.vscode
+.DS_Store
+dist
 package-lock.json

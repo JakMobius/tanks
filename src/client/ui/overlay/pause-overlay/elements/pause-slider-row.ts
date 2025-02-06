@@ -1,4 +1,4 @@
-/* @load-resource: ./pause-slider-row.scss */
+import './pause-slider-row.scss'
 
 import View from "src/client/ui/view";
 import {clamp} from "src/utils/utils";

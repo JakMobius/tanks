@@ -1,6 +1,6 @@
 import PhysicsUtils from 'src/utils/physics-utils';
 import TankWheelsComponent from 'src/entity/components/tank-wheels-component';
-import {Vec2} from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import {physicsFilters} from "src/physics/categories";
 import WheelPositionGenerator from "src/utils/wheel-axles-generator";
 import PhysicalComponent from "src/entity/components/physics-component";
@@ -8,7 +8,7 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
-import HealthComponent, {DamageModifiers, DamageTypes} from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health-component";
 import WheeledTankController from "src/entity/components/tank-controllers/wheeled-tank-controller";
 import WheeledSteeringAssistant from "src/entity/components/wheeled-steering-assistant";
 import {siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";
@@ -16,6 +16,7 @@ import TransmissionComponent from "src/entity/components/transmission/transmissi
 import DifferentialConstraint from "src/entity/components/transmission/constraints/differential-constraint";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
 import {TankWheelConfig, WheelGroup} from "src/entity/components/transmission/units/wheel-group";
+import { DamageModifiers, DamageTypes } from 'src/server/damage-reason/damage-reason';
 
 EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     entity.addComponent(new PrefabIdComponent(EntityType.TANK_TINY))
@@ -113,7 +114,7 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1, 1.2, new Vec2(0, 0.13), {
+        let bodyFixture = PhysicsUtils.squareFixture(1, 1.2, new Box2D.b2Vec2(0, 0.13), {
             density: 512,
             filter: physicsFilters.tank
         })

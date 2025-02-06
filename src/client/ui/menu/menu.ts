@@ -1,4 +1,4 @@
-/* @load-resource: "./menu.scss" */
+import "./menu.scss"
 
 import View from '../view';
 

@@ -1,9 +1,10 @@
 import JSON5 from 'json5';
 import path from 'path';
 import {promises as fs} from 'fs';
+import { dirname } from 'src/utils/dirname';
 
-const preferencesPath = path.resolve(__dirname, "server-preferences.json")
-const defaultsPath = path.resolve(__dirname, "resources/default-preferences.json")
+const preferencesPath = path.resolve(dirname, "server-preferences.json")
+const defaultsPath = path.resolve(dirname, "resources/default-preferences.json")
 
 export interface PreferenceOverrideEntry {
     key: string[]

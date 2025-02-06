@@ -1,13 +1,13 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import MortarBallHeightComponent from "src/entity/components/network/mortar-ball-height/mortar-ball-height-component";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import BulletBehaviour from "src/server/entity/bullet-behaviour";
 import PhysicalComponent from "src/entity/components/physics-component";
 import Entity from "src/utils/ecs/entity";
 
 export default class MortarBallBulletBehaviour extends EventHandlerComponent {
 
-    contacts = new Set<Box2D.Contact>()
+    contacts = new Set<Box2D.b2Contact>()
     inTheAir = false
 
     constructor() {

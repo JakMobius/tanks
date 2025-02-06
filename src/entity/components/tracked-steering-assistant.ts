@@ -4,7 +4,6 @@ import Entity from "src/utils/ecs/entity";
 import TankControls from "src/controls/tank-controls";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import PhysicalComponent from "src/entity/components/physics-component";
-import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
 
 export interface TrackedSteeringAssistantConfig {
     trackSpeedCorrectionStrength?: number
@@ -101,7 +100,7 @@ export default class TrackedSteeringAssistant extends EventHandlerComponent {
 
         newSteerValue = this.tractionSteerAxle.ownValue * dampingCoefficient + newSteerValue * (1 - dampingCoefficient)
 
-        DebugDrawer.instance.plotData.plot(0xFF00FFFF, newSteerValue, Date.now() / 1000)
+        // DebugDrawer.instance.plotData.plot(0xFF00FFFF, newSteerValue, Date.now() / 1000)
 
         this.tractionSteerAxle.setValue(newSteerValue)
     }

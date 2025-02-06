@@ -4,7 +4,7 @@ import Entity from "src/utils/ecs/entity";
 import TankControls from "src/controls/tank-controls";
 import PhysicalComponent from "src/entity/components/physics-component";
 import {clamp} from "src/utils/utils";
-import * as Box2D from "src/library/box2d"
+import * as Box2D from "@box2d/core"
 import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
 
 export interface WheeledSteeringAssistantConfig {
@@ -44,7 +44,7 @@ export default class WheeledSteeringAssistant extends EventHandlerComponent {
     criticalDriftAngle: number
 
     private angularVelocity = 0
-    private velocityVector = new Box2D.Vec2()
+    private velocityVector = new Box2D.b2Vec2()
     private velocity = 0
     private oldVelocityAngles = Array(8).fill(0)
     private distanceToCriticalAngle = 0

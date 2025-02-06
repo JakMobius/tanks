@@ -1,4 +1,4 @@
-/* @load-resource: './room-list-view.scss' */
+import './room-list-view.scss'
 
 import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";

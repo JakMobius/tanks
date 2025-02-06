@@ -1,4 +1,4 @@
-/* @load-resource: './tank-select-overlay.scss' */
+import './tank-select-overlay.scss'
 
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import RenderLoop from "src/utils/loop/render-loop";

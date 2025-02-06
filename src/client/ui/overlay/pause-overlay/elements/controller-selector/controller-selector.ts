@@ -1,4 +1,4 @@
-/* @load-resource: ./controller-selector.scss */
+import './controller-selector.scss'
 
 import View from "src/client/ui/view";
 import ControllerView from "src/client/ui/overlay/pause-overlay/elements/controller-selector/controller-view/controller-view";

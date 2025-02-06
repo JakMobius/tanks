@@ -1,4 +1,4 @@
-/* @load-resource: './large-play-button.scss' */
+import './large-play-button.scss'
 
 import View from "src/client/ui/view";
 

@@ -1,9 +1,8 @@
 import {Constructor} from "src/utils/constructor"
-import {Class} from "./class";
 
 export default class TypedEventHandler<Args extends Array<any> = []> {
 
-    listeners = new Map<string | Class<any>, Array<Function>>()
+    listeners = new Map<string | Constructor<any>, Array<Function>>()
 
     on<T>(what: Constructor<T>, handler: ((packet: T, ...rest: Args) => void)): void
     on(what: string, handler: ((...args: any[]) => void)): void
@@ -15,9 +14,9 @@ export default class TypedEventHandler<Args extends Array<any> = []> {
         }
     }
 
-    emitArgs(key: Class<any>, args: Args): void
+    emitArgs(key: Constructor<any>, args: Args): void
     emitArgs(key: string, args: any[]): void
-    emitArgs(key: Class<any> | string, args: any) {
+    emitArgs(key: Constructor<any> | string, args: any) {
         let listeners = this.listeners.get(key)
 
         if(listeners) {
@@ -34,7 +33,7 @@ export default class TypedEventHandler<Args extends Array<any> = []> {
             let args = Array.prototype.slice.call(arguments, 1)
             this.emitArgs(event, args)
         } else {
-            const constructor = event.constructor as Class<any>
+            const constructor = event.constructor as Constructor<any>
             this.emitArgs(constructor, Array.prototype.slice.call(arguments))
         }
     }

@@ -1,4 +1,4 @@
-/* @load-resource: './event-view.scss' */
+import './event-view.scss'
 
 import EventOverlay from "src/client/ui/overlay/events-overlay/event-overlay";
 import View from "src/client/ui/view";

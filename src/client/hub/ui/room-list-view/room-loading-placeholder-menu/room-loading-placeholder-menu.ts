@@ -1,4 +1,4 @@
-/* @load-resource: './room-loading-placeholder-menu.scss' */
+import './room-loading-placeholder-menu.scss'
 
 import View from "src/client/ui/view";
 import LoadingView from "src/client/hub/ui/loading-view/loading-view";

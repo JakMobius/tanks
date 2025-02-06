@@ -1,4 +1,4 @@
-/* @load-resource: './browser-check.scss' */
+import './browser-check.scss'
 
 import BrowserCheck from './browser-check';
 
@@ -61,13 +61,13 @@ export default function(callback: () => void){
             browserLink(
                 footer,
                 "Google Chrome",
-                "assets/browser/chrome.png",
+                "static/browser/chrome.png",
                 "https://www.google.com/chrome/browser/desktop/"
             )
             browserLink(
                 footer,
                 "Firefox",
-                "assets/browser/firefox.png",
+                "static/browser/firefox.png",
                 "https://www.mozilla.org/firefox/new"
             )
         }

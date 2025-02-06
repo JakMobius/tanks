@@ -1,5 +1,5 @@
 import Entity from "src/utils/ecs/entity";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import TransformComponent from "src/entity/components/transform-component";
 import PhysicalComponent from "src/entity/components/physics-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
@@ -44,12 +44,12 @@ export default class FlagStateComponent extends EventHandlerComponent {
             carryPointX -= 1.35 // Shift of the flagpole relative to the center of the texture
             carryPointY -= 1.85 // So the bottom of the flag is at the "anchor point"
 
-            this.entity.getComponent(PhysicalComponent).setPosition({
+            this.entity.getComponent(PhysicalComponent).setPositionAngle({
                 x: carryPointX,
                 y: carryPointY
-            })
+            }, 0)
         } else if(this.position) {
-            this.entity.getComponent(PhysicalComponent).setPosition(this.position)
+            this.entity.getComponent(PhysicalComponent).setPositionAngle(this.position, 0)
         }
     }
 }

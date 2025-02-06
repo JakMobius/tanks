@@ -1,4 +1,4 @@
-/* @load-resource: './loading-view.scss' */
+import './loading-view.scss'
 
 import View from "src/client/ui/view";
 

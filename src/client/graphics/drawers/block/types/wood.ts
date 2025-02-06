@@ -1,3 +1,4 @@
+import "textures/blocks/wood/%/%.texture.png"
 import EdgedBlockDrawer from '../edged-block-drawer';
 
 export default class WoodBlockDrawer extends EdgedBlockDrawer {

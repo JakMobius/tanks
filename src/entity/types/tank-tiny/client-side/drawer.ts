@@ -13,6 +13,9 @@ import TransformComponent from "src/entity/components/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import bodyBrightSprite from "textures/tanks/tiny/body.texture.png"
+import wheelSprites from "textures/tanks/tiny/wheel%.texture.png"
+
 export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
     public wheelSprites: Sprite[];
@@ -26,13 +29,8 @@ export class Drawer extends TankDrawer {
     constructor() {
         super();
 
-        this.bodySprite = Sprite.named("tanks/tiny/body")
-
-        this.wheelSprites = []
-
-        for (let i = 1; i <= Drawer.wheelSpriteCount; i++) {
-            this.wheelSprites.push(Sprite.named("tanks/tiny/wheel_" + i))
-        }
+        this.bodySprite = Sprite.named(bodyBrightSprite)
+        this.wheelSprites = wheelSprites.map(sprite => Sprite.named(sprite))
     }
 
     draw(phase: DrawPhase) {

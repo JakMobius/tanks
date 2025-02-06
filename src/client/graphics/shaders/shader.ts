@@ -1,14 +1,13 @@
-import {Shaders} from 'src/client/graphics/shader-loader'
 
 export default class Shader {
-	public name: string;
+	public source: string;
 	public type: GLenum;
 	public raw: WebGLShader;
     static VERTEX = 0
     static FRAGMENT = 1
 
-    constructor(name: string, type: number) {
-        this.name = name
+    constructor(source: string, type: number) {
+        this.source = source
         this.type = type
         this.raw = null
     }
@@ -16,15 +15,11 @@ export default class Shader {
     compile(gl: WebGLRenderingContext) {
         this.raw = gl.createShader(this.type === Shader.VERTEX ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER)
 
-        if(!Shaders[this.name]) {
-            throw new Error("No such shader: " + this.name)
-        }
-
-        gl.shaderSource(this.raw, Shaders[this.name]);
+        gl.shaderSource(this.raw, this.source);
         gl.compileShader(this.raw);
 
         if (!gl.getShaderParameter(this.raw, gl.COMPILE_STATUS)) {
-            throw new Error("Failed to compile shader '" + this.name + "': " + gl.getShaderInfoLog(this.raw));
+            throw new Error("Failed to compile shader: " + gl.getShaderInfoLog(this.raw));
         }
 
         return this

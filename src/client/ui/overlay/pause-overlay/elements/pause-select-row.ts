@@ -1,7 +1,7 @@
-/* @load-resource: ./pause-select-row.scss */
+import './pause-select-row.scss'
 
+import Cloud from "src/client/game/ui/cloud/cloud";
 import View from "src/client/ui/view";
-import Cloud from "src/client/ui/overlay/pause-overlay/elements/cloud/cloud";
 
 export default class PauseSelectRow extends View {
     description = new Cloud().blue()

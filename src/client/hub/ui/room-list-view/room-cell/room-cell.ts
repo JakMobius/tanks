@@ -1,4 +1,4 @@
-/* @load-resource: './room-cell.scss' */
+import './room-cell.scss'
 
 import View from "src/client/ui/view";
 import RoomCellStatusLabel from "./room-cell-status-label/room-cell-status-label";

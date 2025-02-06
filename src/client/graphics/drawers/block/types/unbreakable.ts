@@ -1,3 +1,4 @@
+import "textures/blocks/trophephngold/%.texture.png"
 import EdgedBlockDrawer from '../edged-block-drawer';
 
 export default class TrophephngoldBlockDrawer extends EdgedBlockDrawer {

@@ -1,5 +1,5 @@
 import TransmissionUnit from "src/entity/components/transmission/units/transmission-unit";
-import * as Box2D from "src/library/box2d";
+import * as Box2D from "@box2d/core";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
 
 export interface AirbagPropellerConfig {

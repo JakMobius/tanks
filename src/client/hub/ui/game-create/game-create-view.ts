@@ -1,4 +1,4 @@
-/* @load-resource: './game-create-view.scss' */
+import './game-create-view.scss'
 
 import View from "src/client/ui/view";
 import {HubPage} from "../hub-page";

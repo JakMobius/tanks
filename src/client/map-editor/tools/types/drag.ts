@@ -5,7 +5,7 @@ export default class Drag extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "assets/map-editor/drag.png"
+        this.image = "static/map-editor/drag.png"
         this.locksDragging = false
     }
 

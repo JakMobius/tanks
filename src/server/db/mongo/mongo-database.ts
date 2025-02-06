@@ -25,8 +25,6 @@ export default class MongoDatabase implements ServerDatabase {
         this.db = config.db
 
         this.client = new MongoClient(this.url, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             auth: config.auth
         })
     }
@@ -67,7 +65,7 @@ export default class MongoDatabase implements ServerDatabase {
     }
 
     getUserInfo(login: string): Promise<UserDataRaw> {
-        return this.dbHandle.collection('users').findOne({
+        return this.dbHandle.collection<UserDataRaw>('users').findOne({
             login: login
         })
     }

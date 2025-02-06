@@ -1,4 +1,4 @@
-/* @load-resource: './range.scss' */
+import './range.scss'
 
 import View from '../../view';
 

@@ -1,6 +1,7 @@
+import "textures/blocks/brick/%.texture.png"
 import EdgedBlockDrawer from '../edged-block-drawer';
 
-class BrickBlockDrawer extends EdgedBlockDrawer {
+export default class BrickBlockDrawer extends EdgedBlockDrawer {
 
     id = 1
 
@@ -10,5 +11,3 @@ class BrickBlockDrawer extends EdgedBlockDrawer {
         this.spritePath = "blocks/brick"
     }
 }
-
-export default BrickBlockDrawer;

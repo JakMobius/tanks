@@ -1,4 +1,4 @@
-/* @load-resource: 'input-tip-list-view.scss' */
+import './input-tip-list-view.scss'
 
 import View from "src/client/ui/view";
 

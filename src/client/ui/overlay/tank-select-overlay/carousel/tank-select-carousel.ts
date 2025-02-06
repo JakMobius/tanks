@@ -1,4 +1,4 @@
-/* @load-resource: './tank-select-carousel.scss' */
+import './tank-select-carousel.scss'
 
 import TankCarouselItem from "src/client/ui/overlay/tank-select-overlay/carousel/tank-carousel-item";
 import Carousel from "src/client/ui/carousel/carousel";

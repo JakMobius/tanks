@@ -1,4 +1,4 @@
-/* @load-resource: './hub-page.scss' */
+import './hub-page.scss'
 
 import View from "src/client/ui/view";
 import {UserDataRaw} from "src/client/utils/user-data-raw";
