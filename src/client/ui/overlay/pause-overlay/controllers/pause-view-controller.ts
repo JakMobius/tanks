@@ -1,8 +1,7 @@
 import Controller from "src/client/ui/controller/controller";
-import {PauseMenuView} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
-export default class PauseViewController extends Controller<PauseMenuView> {
+export default class PauseViewController extends Controller {
 
     controlsEventListener = new BasicEventHandlerSet()
 

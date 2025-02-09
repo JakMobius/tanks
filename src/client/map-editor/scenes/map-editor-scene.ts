@@ -18,9 +18,9 @@ import Entity from "src/utils/ecs/entity";
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 import PauseOverlay from "src/client/ui/overlay/pause-overlay/pause-overlay";
-import MapEditorPauseMainController from "src/client/map-editor/ui/pause/map-editor-pause-main-controller";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import TransformComponent from "src/entity/components/transform-component";
+import MapEditorPauseMainController from '../ui/pause/map-editor-pause-main-controller';
 
 export default class MapEditorScene extends Scene {
 
@@ -50,8 +50,6 @@ export default class MapEditorScene extends Scene {
         this.camera.addComponent(new TransformComponent())
         this.camera.addComponent(new CameraComponent())
         this.camera.addComponent(new CameraPositionController())
-        this.camera.addComponent(new WorldDrawerComponent(this.screen))
-        this.camera.addComponent(new WorldSoundListenerComponent(this.screen.soundEngine))
 
         this.backgroundOverlay = new MapEditorBackgroundOverlay()
         this.backgroundOverlay.matrix = this.camera.getComponent(CameraComponent).inverseMatrix
@@ -211,6 +209,8 @@ export default class MapEditorScene extends Scene {
     appear() {
         super.appear();
 
+        this.camera.addComponent(new WorldDrawerComponent(this.screen))
+        this.camera.addComponent(new WorldSoundListenerComponent(this.screen.soundEngine))
         this.world.appendChild(this.camera)
 
         RootControlsResponder.getInstance().setMainResponderDelayed(this.controlsResponder)
@@ -221,6 +221,8 @@ export default class MapEditorScene extends Scene {
     disappear() {
         super.disappear();
 
+        this.camera.removeComponent(WorldDrawerComponent)
+        this.camera.removeComponent(WorldSoundListenerComponent)
         this.camera.removeFromParent()
 
         RootControlsResponder.getInstance().setMainResponderDelayed(null)

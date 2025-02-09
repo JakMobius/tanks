@@ -12,53 +12,52 @@ export default class MapStorage {
 
     static read() {
         let base64 = window.localStorage.getItem("editor-maps")
+        if (!base64) return [] as GameMap[]
 
-        if (base64) {
-            let result = []
-            try {
-                let data = base64ToBytes(base64)
+        let result = []
+        try {
+            let data = base64ToBytes(base64)
 
-                let decoder = new ReadBuffer(data.buffer);
+            let decoder = new ReadBuffer(data.buffer);
 
-                let maps = decoder.readInt16()
+            let maps = decoder.readInt16()
 
-                for (let i = 0; i < maps; i++) {
-                    let length = decoder.readInt32()
-                    let bytes = decoder.readBytes(length)
+            for (let i = 0; i < maps; i++) {
+                let length = decoder.readInt32()
+                let bytes = decoder.readBytes(length)
 
-                    try {
-                        let map = MapSerialization.fromBuffer(pako.inflate(bytes))
+                try {
+                    let map = MapSerialization.fromBuffer(pako.inflate(bytes))
 
-                        let nameComponent = map.getComponent(GameMapNameComponent)
-                        let historyComponent = map.getComponent(GameMapHistoryComponent)
-                        let sizeComponent = new GameMapSizeComponent()
-                        sizeComponent.size = bytes.byteLength
-                        map.addComponent(sizeComponent)
+                    let nameComponent = map.getComponent(GameMapNameComponent)
+                    let historyComponent = map.getComponent(GameMapHistoryComponent)
+                    let sizeComponent = new GameMapSizeComponent()
+                    sizeComponent.size = bytes.byteLength
+                    map.addComponent(sizeComponent)
 
-                        if (!nameComponent) {
-                            nameComponent = new GameMapNameComponent()
-                            nameComponent.name = "Карта"
-                            map.addComponent(nameComponent)
-                        }
-
-                        if (!historyComponent) {
-                            historyComponent = new GameMapHistoryComponent()
-                            map.addComponent(historyComponent)
-                        }
-
-                        result.push(map)
-
-                    } catch (error) {
-                        console.error("Failed to read map #" + i, error)
+                    if (!nameComponent) {
+                        nameComponent = new GameMapNameComponent()
+                        nameComponent.name = "Карта"
+                        map.addComponent(nameComponent)
                     }
+
+                    if (!historyComponent) {
+                        historyComponent = new GameMapHistoryComponent()
+                        map.addComponent(historyComponent)
+                    }
+
+                    result.push(map)
+
+                } catch (error) {
+                    console.error("Failed to read map #" + i, error)
                 }
-            } catch (error) {
-                console.error("Failed to read saved maps", error)
-                return null
             }
-            return result
+        } catch (error) {
+            console.error("Failed to read saved maps", error)
+            return null
         }
-        return [] as GameMap[]
+        
+        return result
     }
 
     static write(maps: GameMap[]) {
