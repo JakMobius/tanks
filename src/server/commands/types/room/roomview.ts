@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import Command from '../../command';
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
 
@@ -13,12 +14,12 @@ export default class RoomViewCommand extends Command {
         let world = this.console.server.gameSocket.games.get(id)
 
         if (!world) {
-            logger.log("No such room: '" + id)
+            logger.log("No such room: '" + id + "'")
             return
         }
 
         this.console.observingRoom = world
-        this.console.window.setPrompt(id)
+        this.console.window.setPrompt("(" + id + ")")
         // this.console.switchToLogger(world.logger)
     }
 

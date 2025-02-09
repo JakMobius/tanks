@@ -5,8 +5,10 @@ import FlagStateComponent from "src/entity/types/flag/flag-state-component";
 import TeamColor from "src/utils/team-color";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
+import flagSprite from "textures/misc/flag.texture.png"
+
 export class Drawer extends BasicEntityDrawer {
-    static spriteNames = ["misc/flag"]
+    static spriteNames = [flagSprite]
 
     draw(phase: DrawPhase) {
         const program = phase.getProgram(ColoredTextureProgram)

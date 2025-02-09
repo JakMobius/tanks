@@ -20,7 +20,7 @@ export default class FlagContactComponent extends EventHandlerComponent {
     private onContactBegin(body: Box2D.b2Body) {
         const flagState = this.entity.getComponent(FlagDataComponent)
 
-        const entity = getObjectFromBody(body)?.entity.deref()        
+        const entity = getObjectFromBody(body)?.entity?.deref()        
         if(!entity) return
         if(flagState.addContact(entity) > 1) return
 
@@ -30,7 +30,7 @@ export default class FlagContactComponent extends EventHandlerComponent {
     private onContactEnd(body: Box2D.b2Body) {
         const flagState = this.entity.getComponent(FlagDataComponent)
 
-        const entity = getObjectFromBody(body)?.entity.deref()
+        const entity = getObjectFromBody(body)?.entity?.deref()
         if(!entity) return
         flagState.removeContact(entity)
     }

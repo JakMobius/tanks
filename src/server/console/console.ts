@@ -17,11 +17,9 @@ export interface ConsoleAutocompleteOptions {
     single?: boolean
 }
 
-console.log(CommandList)
-
 export default class Console {
     public observingRoom: Entity;
-    public prompt: any;
+    public prompt: string | null;
     public tabCompleteIndex: number;
     public tabCompletions?: string[];
     public window: ConsoleWindow;
@@ -333,7 +331,7 @@ export default class Console {
     }
 
     evaluate(line: string): void {
-        console.log("> " + line)
+        console.log(this.window.getFullPrompt() + line)
         line = line.trim()
 
         if(line.length === 0) return

@@ -119,5 +119,9 @@ export default [
 	serverBuild({
 		entry: 'src/server/main.ts',
 		output: 'dist/index.js'
+	}),
+	serverBuild({
+		entry: 'test/test.ts',
+		output: 'test/test.js'
 	})
 ];

@@ -60,7 +60,7 @@ export default class ServerLine extends EventEmitter {
             console.warn("Warning: output is not a terminal. ")
         }
 
-        // this.consoleOverwrite(options.consoleOptions)
+        this.consoleOverwrite(options.consoleOptions)
 
         this.keypressListener = (key: string, keypress: Keypress) => this.onKeypress(key, keypress)
         this.sigintListener = () => this.onExit()
@@ -76,7 +76,10 @@ export default class ServerLine extends EventEmitter {
     }
 
     setPrompt(strPrompt: string) {
-        this.promptString = strPrompt
+        if(strPrompt.length) {
+            strPrompt += " "
+        }
+        this.promptString = strPrompt + '$ '
         this.readline.setPrompt(this.promptString)
     }
 

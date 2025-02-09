@@ -22,7 +22,7 @@ export default class ConsoleWindow extends EventEmitter {
         this.currentHistoryEntry = new HistoryEntry(null, 0)
 
         this.serverline = new ServerLine()
-        this.serverline.setPrompt('> ')
+        this.serverline.setPrompt("")
 
         this.serverline.on("keypress", (key: Keypress) => {
             if(key.name == "return") {
@@ -122,8 +122,16 @@ export default class ConsoleWindow extends EventEmitter {
     }
 
     setPrompt(prompt: string) {
-        this.prompt = prompt + " >"
+        this.prompt = prompt
         this.serverline.setPrompt(this.prompt)
+    }
+
+    getPrompt() {
+        return this.prompt
+    }
+
+    getFullPrompt() {
+        return this.serverline.getPrompt()
     }
 
     setLine(text: string) {
