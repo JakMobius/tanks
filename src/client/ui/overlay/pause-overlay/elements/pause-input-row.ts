@@ -13,7 +13,7 @@ export default class PauseInputRow extends PauseKeyValueRow {
         this.element.append(this.input.element)
 
         this.element.on("click", () => {
-            this.input.input.input.trigger("focus")
+            this.input.focus()
         })
     }
 }

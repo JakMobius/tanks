@@ -1,13 +1,13 @@
 import {PauseMenuView} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 import PauseInputRow from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
-import PauseNavigationCloud from "src/client/ui/overlay/pause-overlay/elements/pause-navigation-cloud";
+import NavigationCloud from "src/client/game/ui/cloud/navigation-cloud";
 
 export class MainView extends PauseMenuView {
     mapNameRow = new PauseInputRow().small()
     widthInputRow = new PauseInputRow().small()
     heightInputRow = new PauseInputRow().small()
-    submitButton: PauseNavigationCloud
+    submitButton: NavigationCloud
 
     mapName: string | null
     mapWidth: number | null

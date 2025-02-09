@@ -1,8 +1,9 @@
 import './pause-menu-view.scss'
 
 import View from "src/client/ui/view";
-import PauseNavigationCloud from "src/client/ui/overlay/pause-overlay/elements/pause-navigation-cloud";
 import Controller from "src/client/ui/controller/controller";
+import NavigationCloud from 'src/client/game/ui/cloud/navigation-cloud';
+import PauseNavigationTransition from './navigation/pause-navigation-transition';
 
 export class PauseMenuView extends View {
 
@@ -15,7 +16,9 @@ export class PauseMenuView extends View {
     }
 
     addButton(text: string) {
-        let button = new PauseNavigationCloud(this.controller).text(text).button()
+        let button = new NavigationCloud(this.controller).text(text).button().transition(() => {
+            return new PauseNavigationTransition()
+        })
         button.element.addClass("pause-menu-button")
         this.element.append(button.element)
         return button

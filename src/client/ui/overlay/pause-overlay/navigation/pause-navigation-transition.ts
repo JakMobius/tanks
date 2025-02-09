@@ -3,16 +3,9 @@ import './pause-navigation-transition.scss'
 import NavigationTransition from "src/client/ui/navigation/navigation-transition";
 import BasicNavigationView from "src/client/ui/navigation/basic-navigation-view";
 import NavigationBlock from "src/client/ui/navigation/navigation-block";
-import NavigationCloud from "../../../../game/ui/cloud/navigation-cloud";
 
 export default class PauseNavigationTransition extends NavigationTransition {
-    protected cloud: NavigationCloud;
     transitionDuration: number = 0.5
-
-    constructor(cloud: NavigationCloud) {
-        super();
-        this.cloud = cloud
-    }
 
     protected performTransition(view: BasicNavigationView, from: NavigationBlock, to: NavigationBlock, reverse: boolean, callback: () => void) {
         if(reverse) view.element.append(from.element)

@@ -9,6 +9,7 @@ import shaders from './rollup/rollup-plugin-shaders.js'
 import textureAtlas from './rollup/rollup-plugin-texture-atlas.js'
 import globImport from './rollup/rollup-plugin-glob-import.js'
 import copy from 'rollup-plugin-copy'
+import replace from '@rollup/plugin-replace';
 
 import path from 'path'
 import { fileURLToPath } from 'url';
@@ -18,7 +19,7 @@ const __dirname = path.dirname(__filename);
 
 // `npm run build` -> `production` is true
 // `npm run dev` -> `production` is false
-const production = !process.env.ROLLUP_WATCH;
+const production = false // !process.env.ROLLUP_WATCH;
 
 const projectRootDir = path.resolve(__dirname);
 
@@ -40,11 +41,15 @@ const sharedPlugins = () => [
 	}),
 	json(),
 	resolve({
-		extensions: ['.ts', '.js', '.json'],
+		extensions: ['.ts', '.tsx', '.js', '.json'],
 	}),
 	typescript(),
 	commonjs(),
-	// production && terser()
+	replace({
+		preventAssignment: false,
+		'process.env.NODE_ENV': production ? '"production"' : '"development"'
+	}),
+	production && terser(),
 ]
 
 const serverBuild = (config) => {
