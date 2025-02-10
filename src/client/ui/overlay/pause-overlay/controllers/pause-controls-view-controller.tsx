@@ -1,7 +1,6 @@
 import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 import AxisSelector from "src/client/ui/overlay/pause-overlay/elements/axis-selector/axis-selector";
 import ControllerSelector from "src/client/ui/overlay/pause-overlay/elements/controller-selector/controller-selector";
-import InputDevice from "src/client/controls/input/input-device";
 import GameSettings from "src/client/settings/game-settings";
 import RootControlsResponder from "src/client/controls/root-controls-responder";
 import ControlsPrinter from "src/client/controls/controls-printer";

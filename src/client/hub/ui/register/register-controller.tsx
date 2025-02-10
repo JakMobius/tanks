@@ -2,15 +2,18 @@ import Controller from "src/client/ui/controller/controller";
 import RegisterView from "../register/register-view";
 import {HubPage} from "../hub-page";
 
+import React from "react";
+import ReactDOM from "react-dom/client";
+import View from "src/client/ui/view";
+
 export default class RegisterController extends Controller {
-    registerView: RegisterView
-    page: HubPage
+    root: ReactDOM.Root
 
     constructor(page: HubPage) {
         super();
-        this.page = page
         this.title = "Регистрация"
-        this.registerView = new RegisterView(this.page)
-        this.view = this.registerView
+        this.view = new View()
+        this.root = ReactDOM.createRoot(this.view.element[0])
+        this.root.render(<RegisterView page={page}/>)
     }
 }

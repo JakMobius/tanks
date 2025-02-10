@@ -7,6 +7,10 @@ import BarSeparator from "../bar-separator/bar-separator";
 import Button from "src/client/ui/button/button";
 import PageLocation from "src/client/scenes/page-location";
 
+import React from "react";
+import ReactDOM from 'react-dom/client';
+import View from "src/client/ui/view";
+
 export default class WelcomeController extends Controller {
 
     loginButton = new Button("Вход").secondaryStyle()
@@ -14,13 +18,18 @@ export default class WelcomeController extends Controller {
     howToPlayButton = new Button("Как играть?").secondaryStyle()
     page: HubPage;
 
+    root: ReactDOM.Root
+
     constructor(page: HubPage) {
         super();
 
         this.page = page
         this.rightBarItems = [this.loginButton, new BarSeparator(), this.registerButton]
         this.bottomBarItems = [this.howToPlayButton]
-        this.view = new WelcomeView(page)
+        
+        this.view = new View()
+        this.root = ReactDOM.createRoot(this.view.element[0])
+        this.root.render(<WelcomeView/>)
 
         this.registerButton.element.on("click", () => this.navigateToRegisterMenu())
         this.loginButton.element.on("click", () => this.navigateToLoginMenu())

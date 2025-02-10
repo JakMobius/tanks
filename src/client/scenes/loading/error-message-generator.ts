@@ -194,9 +194,6 @@ export const serverErrorMessageGenerator = new ErrorMessageGenerator([
         description: "Сервер сейчас занят устранением последствий нападения пиратов. {try-later}.",
         retryText: "Может, он уже отбил атаку? {try-again}"
     }, {
-        description: "Сервер сейчас занят устранением последствий нападения пиратов. {try-later}.",
-        retryText: "Может, он уже отбил атаку? {try-again}"
-    }, {
         description: "Сервер сейчас занят борьбой с гигантским роботом. {try-later}.",
         retryText: "Может, он уже победил его? {try-again}"
     }, {
