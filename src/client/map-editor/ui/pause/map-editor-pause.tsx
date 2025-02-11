@@ -2,9 +2,9 @@
 import {PauseMenuButton, PauseNavigationItem} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 import React from "react";
 import NewMapView from "src/client/map-editor/ui/pause/new-map-controller";
-import SettingsView from "src/client/ui/overlay/pause-overlay/controllers/settings-controller";
+import SettingsView from "src/client/ui/overlay/pause-overlay/controllers/settings-view";
 import LoadMapView from "./load-map-view";
-import { NavigationItem, useNavigation } from "src/client/ui/navigation/basic-navigation-view";
+import { NavigationItem, useNavigation } from "src/client/ui/navigation/navigation-view";
 
 const MapEditorPauseView: React.FC = () => {
 

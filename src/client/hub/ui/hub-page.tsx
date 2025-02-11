@@ -3,7 +3,7 @@ import './hub-page.scss'
 import {UserDataRaw} from "src/client/utils/user-data-raw";
 
 import React from 'react';
-import { NavigationProvider } from 'src/client/ui/navigation/basic-navigation-view';
+import { NavigationProvider } from 'src/client/ui/navigation/navigation-view';
 import MainMenuView from './main-menu/main-menu';
 
 const HubPageNavigationWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => {

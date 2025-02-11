@@ -2,7 +2,6 @@ import "./cloud.scss"
 import React from 'react';
 
 export interface CloudProps {
-    text?: string;
     button?: boolean;
     stretch?: boolean;
     red?: boolean;
@@ -14,8 +13,7 @@ export interface CloudProps {
     onClick?: () => void;
 }
 
-const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
-    text,
+const Cloud: React.FC<CloudProps> = (({
     button,
     stretch,
     red,
@@ -25,7 +23,7 @@ const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
     leftArrowed,
     children,
     onClick
-}, ref) => {
+}) => {
     const classNames = ['cloud'];
     if (button) classNames.push('button');
     if (stretch) classNames.push('stretch');
@@ -36,8 +34,8 @@ const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
     if (customClass) classNames.push(customClass);
 
     return (
-        <div onClick={onClick} className={classNames.join(' ')} role={button ? 'button' : undefined} ref={ref}>
-            {children ?? text}
+        <div onClick={onClick} className={classNames.join(' ')} role={button ? 'button' : undefined}>
+            {children}
         </div>
     );
 });

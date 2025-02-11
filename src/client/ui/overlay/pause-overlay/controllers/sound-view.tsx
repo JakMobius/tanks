@@ -1,6 +1,6 @@
 
 import PauseSliderRow from "src/client/ui/overlay/pause-overlay/elements/pause-slider-row";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import GameSettings from "src/client/settings/game-settings";
 import { PauseNavigationItem } from "../pause-menu-view";
 
@@ -12,6 +12,19 @@ const SoundView: React.FC = () => {
         GameSettings.getInstance().audio.setVolume(value / 100)
         setVolume(value)
     }
+
+    const saveSettings = useCallback(() => {
+        GameSettings.getInstance().saveIfNeeded()
+    }, [])
+
+    useEffect(() => {
+        window.addEventListener("beforeunload", saveSettings)
+
+        return () => {
+            window.removeEventListener("beforeunload", saveSettings)
+            saveSettings()
+        }
+    }, [])
     
     return (
         <PauseNavigationItem title="Звук">

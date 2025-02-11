@@ -2,8 +2,8 @@ import PageLocation from 'src/client/scenes/page-location';
 import './main-menu.scss'
 
 import React from 'react';
-import { NavigationItem, useNavigation } from 'src/client/ui/navigation/basic-navigation-view';
-import SettingsView from 'src/client/ui/overlay/pause-overlay/controllers/settings-controller';
+import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
+import SettingsView from 'src/client/ui/overlay/pause-overlay/controllers/settings-view';
 import RoomListView from '../room-list-view/room-list-view';
 
 interface MenuItemProps {

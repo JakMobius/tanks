@@ -6,7 +6,7 @@ import { getNonsenseErrorHeader } from 'src/client/scenes/loading/error-message-
 import React, { useEffect, useState } from 'react';
 import { GlobalRoomListComponent, RoomConfig, UserRoomListComponent } from './room-list/room-list';
 import { LoadingViewComponent } from '../loading-view/loading-view';
-import { useNavigation } from 'src/client/ui/navigation/basic-navigation-view';
+import { useNavigation } from 'src/client/ui/navigation/navigation-view';
 import GameCreateViewComponent from '../game-create/game-create-view';
 
 interface RoomListErrorProps {

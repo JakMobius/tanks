@@ -7,7 +7,7 @@ import { ButtonComponent } from "src/client/ui/button/button";
 import HugeTitle from "../huge-title/huge-title";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import { localizeAjaxError } from "../../localizations";
-import { NavigationItem } from "src/client/ui/navigation/basic-navigation-view";
+import { NavigationItem } from "src/client/ui/navigation/navigation-view";
 
 const LoginView: React.FC = () => {
 

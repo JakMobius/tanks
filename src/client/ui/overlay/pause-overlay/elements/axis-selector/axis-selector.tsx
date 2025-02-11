@@ -22,7 +22,7 @@ const AxisSelector: React.FC<AxisSelectorProps> = (props) => {
     }
 
     return <PauseKeyValueRow small customClass="axis-selector">
-        <Cloud text={props.text} blue customClass='key-name'/>
+        <Cloud blue customClass='key-name'>{props.text}</Cloud>
         <div className='mapped-keys'>
             {getAxes(props.axes)}
         </div>

@@ -9,7 +9,7 @@ import {passwordScore} from "src/data-checkers/password-checker";
 import React from "react";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import HugeTitle from "../huge-title/huge-title";
-import { NavigationItem } from "src/client/ui/navigation/basic-navigation-view";
+import { NavigationItem } from "src/client/ui/navigation/navigation-view";
 
 const RegisterView: React.FC = () => {
 

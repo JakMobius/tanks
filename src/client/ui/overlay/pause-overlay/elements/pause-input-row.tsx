@@ -22,8 +22,9 @@ const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
         <Cloud 
             blue={props.blue}
             red={props.red}
-            text={props.title}
-            customClass="key-name"/>
+            customClass="key-name">
+                {props.title}
+        </Cloud>
         <InputCloud 
             prefix={props.prefix} 
             suffix={props.suffix} 

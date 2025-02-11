@@ -3,7 +3,7 @@ import Overlay from "src/client/ui/overlay/overlay";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import ReactDOM from "react-dom/client";
 import React from "react";
-import { NavigationProvider } from '../../navigation/basic-navigation-view';
+import { NavigationProvider } from '../../navigation/navigation-view';
 
 export interface PauseOverlayConfig {
     rootComponent: React.ReactNode,
