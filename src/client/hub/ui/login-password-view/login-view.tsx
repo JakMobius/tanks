@@ -3,7 +3,7 @@ import "../login-password-view/login-password-view.scss"
 
 import React from "react";
 import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import { ButtonComponent } from "src/client/ui/button/button";
+import Button from "src/client/ui/button/button";
 import HugeTitle from "../huge-title/huge-title";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import { localizeAjaxError } from "../../localizations";
@@ -76,8 +76,8 @@ const LoginView: React.FC = () => {
                     />
                 </div>
                 <div className="auth-button-container">
-                    <ButtonComponent largeStyle onClick={onLogin}>Вход</ButtonComponent>
-                    <ButtonComponent secondaryStyle>Забыли пароль?</ButtonComponent>
+                    <Button largeStyle onClick={onLogin}>Вход</Button>
+                    <Button secondaryStyle>Забыли пароль?</Button>
                 </div>
             </div>
         </NavigationItem>

@@ -4,7 +4,7 @@ import './game-create-view.scss'
 import HugeTitle from "../huge-title/huge-title";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import HugeSelect, { SelectOption } from "../huge-select/huge-select";
-import { ButtonComponent } from "src/client/ui/button/button";
+import Button from "src/client/ui/button/button";
 import {checkRoomName} from "src/data-checkers/room-name-checker";
 import {localizeAjaxError, textFromRoomNameCheckResult} from "src/client/hub/localizations";
 import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
@@ -165,7 +165,7 @@ const GameCreateViewComponent: React.FC = () => {
             <HugeTextInput placeholder="Название комнаты" onChange={handleNameChange}/>
             <HugeSelect options={state.maps}/>
             <HugeSelect options={modes} defaultValue={defaultMode}/>
-            <ButtonComponent largeStyle onClick={createRoom}>В бой!</ButtonComponent>
+            <Button largeStyle onClick={createRoom}>В бой!</Button>
         </div>
     );
 }
