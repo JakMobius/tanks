@@ -1,13 +1,13 @@
 import './room-list-view.scss'
 
-import {HubPage} from "../hub-page";
-import GameCreateController from "../game-create/game-create-controller";
 import {localizeAjaxError} from "src/client/hub/localizations";
 import HugeTitle from "../huge-title/huge-title";
 import { getNonsenseErrorHeader } from 'src/client/scenes/loading/error-message-generator';
 import React, { useEffect, useState } from 'react';
 import { GlobalRoomListComponent, RoomConfig, UserRoomListComponent } from './room-list/room-list';
 import { LoadingViewComponent } from '../loading-view/loading-view';
+import { useNavigation } from 'src/client/ui/navigation/basic-navigation-view';
+import GameCreateViewComponent from '../game-create/game-create-view';
 
 interface RoomListErrorProps {
     error: string
@@ -31,11 +31,9 @@ export const RoomListErrorComponent: React.FC<RoomListErrorProps> = (props) => {
     );
 }
 
-interface RoomListViewComponentProps {
-    page: HubPage
-}
+const RoomListView: React.FC = (props) => {
 
-export const RoomListViewComponent: React.FC<RoomListViewComponentProps> = (props) => {
+    const navigation = useNavigation()
 
     const [state, setState] = useState({
         loading: true,
@@ -49,7 +47,7 @@ export const RoomListViewComponent: React.FC<RoomListViewComponentProps> = (prop
     }
 
     const navigateToRoomCreation = () => {
-        props.page.navigationController.pushController(new GameCreateController(props.page))
+        navigation.push(<GameCreateViewComponent/>)
     }
 
     const onLoaded = (data: any) => {
@@ -107,3 +105,5 @@ export const RoomListViewComponent: React.FC<RoomListViewComponentProps> = (prop
         </div>
     );
 }
+
+export default RoomListView

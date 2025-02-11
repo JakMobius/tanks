@@ -1,47 +1,32 @@
-import {PauseMenuButton, PauseMenuView} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
-import GraphicsController from "src/client/ui/overlay/pause-overlay/controllers/graphics-controller";
-import PauseControlsViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-controls-view-controller";
-import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
-import SoundController from "src/client/ui/overlay/pause-overlay/controllers/sound-controller";
+import {PauseMenuButton, PauseNavigationItem} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
+import GraphicsView from "src/client/ui/overlay/pause-overlay/controllers/graphics-controller";
+import ControlsView from "src/client/ui/overlay/pause-overlay/controllers/pause-controls-view-controller";
+import SoundView from "src/client/ui/overlay/pause-overlay/controllers/sound-controller";
 import GameSettings from "src/client/settings/game-settings";
-import React from "react";
-import ReactDOM from "react-dom/client"
-import View from "src/client/ui/view";
+import React, { useCallback } from "react";
 
-interface MainViewProps {
-    controller: PauseViewController
-}
+const SettingsView: React.FC = () => {
 
-const MainView: React.FC<MainViewProps> = (props) => {
-    return <PauseMenuView>
-        <PauseMenuButton blue controller={props.controller} target={GraphicsController}>Графика</PauseMenuButton>
-        <PauseMenuButton blue controller={props.controller} target={PauseControlsViewController}>Управление</PauseMenuButton>
-        <PauseMenuButton blue controller={props.controller} target={SoundController}>Звук</PauseMenuButton>
-    </PauseMenuView>
-}
-
-export default class SettingsController extends PauseViewController {
-
-    private onBeforeUnloadHandler = () => GameSettings.getInstance().saveIfNeeded()
-
-    root: ReactDOM.Root
-    
-    constructor() {
-        super();
-        this.title = "Настройки"
-        this.view = new View()
-        this.root = ReactDOM.createRoot(this.view.element[0]);
-        this.root.render(<MainView controller={this}/>)
-    }
-
-    onFocus() {
-        super.onFocus();
-        window.addEventListener("beforeunload", this.onBeforeUnloadHandler)
-    }
-
-    onBlur() {
-        super.onBlur();
-        window.removeEventListener("beforeunload", this.onBeforeUnloadHandler)
+    const saveSettings = useCallback(() => {
         GameSettings.getInstance().saveIfNeeded()
+    }, [])
+
+    const onPush = () => {
+        window.addEventListener("beforeunload", saveSettings)
     }
+
+    const onPop = () => {
+        window.removeEventListener("beforeunload", saveSettings)
+        saveSettings()
+    }
+
+    return (
+        <PauseNavigationItem onPush={onPush} onPop={onPop} title="Настройки">
+            <PauseMenuButton blue target={<GraphicsView/>}>Графика</PauseMenuButton>
+            <PauseMenuButton blue target={<ControlsView/>}>Управление</PauseMenuButton>
+            <PauseMenuButton blue target={<SoundView/>}>Звук</PauseMenuButton>
+        </PauseNavigationItem>
+    )
 }
+
+export default SettingsView;

@@ -1,6 +1,6 @@
 import './game-create-view.scss'
 
-import {HubPage} from "../hub-page";
+
 import HugeTitle from "../huge-title/huge-title";
 import HugeTextInput from "../huge-text-input/huge-text-input";
 import HugeSelect, { SelectOption } from "../huge-select/huge-select";
@@ -11,7 +11,7 @@ import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
 
 import React, { useEffect, useState } from 'react';
 
-const GameCreateViewComponent: React.FC<{page: HubPage}> = (props) => {
+const GameCreateViewComponent: React.FC = () => {
 
     const [state, setState] = useState({
         loading: true,
@@ -103,7 +103,7 @@ const GameCreateViewComponent: React.FC<{page: HubPage}> = (props) => {
     }
 
     const onRoomCreateError = (xhr: JQuery.jqXHR, exception: string) => {
-        props.page.eventContainer.createEvent(localizeAjaxError(xhr, exception))
+        // props.page.eventContainer.createEvent(localizeAjaxError(xhr, exception)) // TODO: Figure out a better way
     }
 
     const onRoomCreateResponse = (result: any) => {
@@ -115,14 +115,17 @@ const GameCreateViewComponent: React.FC<{page: HubPage}> = (props) => {
                 window.location.reload()
                 break;
             case "invalid-map":
-                props.page.eventContainer.createEvent("Сервер запутался в картах. Попробуйте перезагрузить страницу.")
+                 // TODO: Figure out a better way
+                // props.page.eventContainer.createEvent("Сервер запутался в картах. Попробуйте перезагрузить страницу.")
                 break;
             case "invalid-mode":
-                props.page.eventContainer.createEvent("Произошло что-то очень странное. Попробуйте перезагрузить страницу.")
+                 // TODO: Figure out a better way
+                // props.page.eventContainer.createEvent("Произошло что-то очень странное. Попробуйте перезагрузить страницу.")
                 break;
             case "invalid-room-name":
                 updateValidity()
-                props.page.eventContainer.createEvent("Недопустимое название комнаты. Попробуйте другое.")
+                 // TODO: Figure out a better way
+                // props.page.eventContainer.createEvent("Недопустимое название комнаты. Попробуйте другое.")
                 break;
             case "room-name-taken":
                 setState((state) => ({...state, roomNameTips: [{

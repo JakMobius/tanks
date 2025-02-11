@@ -1,15 +1,14 @@
 import './pause-menu-view.scss'
 
-import Controller from "src/client/ui/controller/controller";
 import NavigationCloud from 'src/client/game/ui/cloud/navigation-cloud';
 import PauseNavigationTransition from './navigation/pause-navigation-transition';
 
 import React from 'react';
-import { Constructor } from 'src/utils/constructor';
+import Cloud from 'src/client/game/ui/cloud/cloud';
+import { NavigationItem, NavigationItemProps, useNavigation } from '../../navigation/basic-navigation-view';
 
 interface PauseMenuButtonProps {
-    controller?: Controller
-    target?: Constructor<Controller>;
+    target?: React.ReactNode;
     children?: React.ReactNode,
     blue?: boolean
     red?: boolean
@@ -18,7 +17,6 @@ interface PauseMenuButtonProps {
 
 export const PauseMenuButton: React.FC<PauseMenuButtonProps> = (props) => {
     return <NavigationCloud
-                controller={props.controller}
                 customClass="pause-menu-button"
                 transition={() => new PauseNavigationTransition()}
                 target={props.target}
@@ -37,12 +35,23 @@ export const PauseMenuSubtitle: React.FC<PauseMenuSubtitleProps> = (props) => {
     return <div className="subtitle"> {props.children} </div>
 }
 
-export interface PauseMenuViewProps {
-    children?: React.ReactNode
-}
+export const PauseNavigationItem: React.FC<NavigationItemProps> = (props) => {
+    const navigation = useNavigation()
 
-export const PauseMenuView: React.FC<PauseMenuViewProps> = (props) => {
-    return <div className="pause-menu-view">
-        {props.children}
-    </div>
+    let previousNavigationItemName = navigation.stack[navigation.stack.length - 1]?.context?.title
+
+    return (
+        <NavigationItem {...{...props, children: undefined}}>
+            <div className="pause-menu-view">
+                <div className="pause-menu-header">
+                    <div className="pause-menu-header-item">
+                        <Cloud leftArrowed button onClick={() => navigation.pop()} customClass="pause-menu-header-cloud">
+                            {previousNavigationItemName ?? "Назад"}
+                        </Cloud>
+                    </div>
+                </div>
+                {props.children}
+            </div>
+        </NavigationItem>
+    )
 }

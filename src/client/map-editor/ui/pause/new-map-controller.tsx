@@ -1,10 +1,7 @@
 
-import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 import PauseInputRow from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom/client";
-import { PauseMenuButton, PauseMenuView } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
-import View from "src/client/ui/view";
+import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 
 interface MainViewProps {
     onSubmit?: (map: {
@@ -14,7 +11,7 @@ interface MainViewProps {
     }) => void
 }
 
-const MainView: React.FC<MainViewProps> = (props) => {
+const NewMapView: React.FC<MainViewProps> = (props) => {
 
     const defaultMapName = "Безымянная карта"
     const defaultMapWidth = "50"
@@ -89,50 +86,42 @@ const MainView: React.FC<MainViewProps> = (props) => {
         }
     }
 
-    return <PauseMenuView>
-        <PauseInputRow
-            title="Название"
-            placeholder={defaultMapName}
-            onChange={onNameChange}
-            {...style(formState.mapNameValid)}
-            value={formState.mapName}/>
-        <PauseInputRow
-            title="Ширина"
-            placeholder={defaultMapWidth}
-            suffix=" блоков"
-            onChange={onWidthChange}
-            {...style(formState.mapWidthValid)}
-            value={formState.mapWidth}/>
-        <PauseInputRow
-            title="Высота"
-            placeholder={defaultMapHeight}
-            suffix=" блоков"
-            onChange={onHeightChange}
-            {...style(formState.mapHeightValid)}
-            value={formState.mapHeight}/>
-        <PauseMenuButton
-            blue={formState.formValid}
-            onClick={() => {
-                if (formState.formValid) {
-                    props.onSubmit?.({
-                        mapName: formState.mapName,
-                        mapWidth: parseInt(formState.mapWidth),
-                        mapHeight: parseInt(formState.mapHeight)
-                    })
-                }
-            }}
-        />
-    </PauseMenuView>
+    return (
+        <PauseNavigationItem title="Новая карта">
+            <PauseInputRow
+                title="Название"
+                placeholder={defaultMapName}
+                onChange={onNameChange}
+                {...style(formState.mapNameValid)}
+                value={formState.mapName}/>
+            <PauseInputRow
+                title="Ширина"
+                placeholder={defaultMapWidth}
+                suffix=" блоков"
+                onChange={onWidthChange}
+                {...style(formState.mapWidthValid)}
+                value={formState.mapWidth}/>
+            <PauseInputRow
+                title="Высота"
+                placeholder={defaultMapHeight}
+                suffix=" блоков"
+                onChange={onHeightChange}
+                {...style(formState.mapHeightValid)}
+                value={formState.mapHeight}/>
+            <PauseMenuButton
+                blue={formState.formValid}
+                onClick={() => {
+                    if (formState.formValid) {
+                        props.onSubmit?.({
+                            mapName: formState.mapName,
+                            mapWidth: parseInt(formState.mapWidth),
+                            mapHeight: parseInt(formState.mapHeight)
+                        })
+                    }
+                }}
+            />
+        </PauseNavigationItem>
+    )
 }
 
-export default class NewMapController extends PauseViewController {
-    root: ReactDOM.Root
-
-    constructor() {
-        super();
-        this.title = "Новая карта"
-        this.view = new View()
-        this.root = ReactDOM.createRoot(this.view.element[0]);
-        this.root.render(<MainView/>)
-    }
-}
+export default NewMapView;

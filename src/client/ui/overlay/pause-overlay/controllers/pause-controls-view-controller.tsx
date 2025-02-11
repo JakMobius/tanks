@@ -1,19 +1,12 @@
-import PauseViewController from "src/client/ui/overlay/pause-overlay/controllers/pause-view-controller";
 import AxisSelector from "src/client/ui/overlay/pause-overlay/elements/axis-selector/axis-selector";
 import ControllerSelector from "src/client/ui/overlay/pause-overlay/elements/controller-selector/controller-selector";
 import GameSettings from "src/client/settings/game-settings";
 import RootControlsResponder from "src/client/controls/root-controls-responder";
 import ControlsPrinter from "src/client/controls/controls-printer";
-import { PauseMenuView, PauseMenuButton, PauseMenuSubtitle } from "../pause-menu-view";
+import { PauseNavigationItem, PauseMenuButton, PauseMenuSubtitle } from "../pause-menu-view";
 import React, { useState } from "react";
-import ReactDOM from "react-dom/client";
-import View from "src/client/ui/view";
 
-interface ControlsViewProps {
-
-}
-
-const ControlsView: React.FC<ControlsViewProps> = (props) => {
+const ControlsView: React.FC = () => {
 
     let [selectedDevice, setSelectedDevice] = useState(0)
 
@@ -48,7 +41,7 @@ const ControlsView: React.FC<ControlsViewProps> = (props) => {
     }
 
     return (
-        <PauseMenuView>
+        <PauseNavigationItem title="Управление">
             <PauseMenuSubtitle>Обнаруженные контроллеры</PauseMenuSubtitle>
             <ControllerSelector value={selectedDevice} onChange={setSelectedDevice}/>
             <PauseMenuButton blue>Настройки контроллера</PauseMenuButton>
@@ -57,18 +50,8 @@ const ControlsView: React.FC<ControlsViewProps> = (props) => {
             <PauseMenuSubtitle>Игровой процесс</PauseMenuSubtitle>
             {...generateAxles(gameControlsEntries)}
             <PauseMenuButton red>Настройки по умолчанию</PauseMenuButton>
-        </PauseMenuView>
+        </PauseNavigationItem>
     )
 }
 
-export default class PauseControlsViewController extends PauseViewController {
-    root: ReactDOM.Root
-    
-    constructor() {
-        super();
-        this.title = "Управление"
-        this.view = new View()
-        this.root = ReactDOM.createRoot(this.view.element[0]);
-        this.root.render(<ControlsView/>)
-    }
-}
+export default ControlsView;

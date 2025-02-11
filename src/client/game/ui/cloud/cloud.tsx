@@ -11,6 +11,7 @@ export interface CloudProps {
     customClass?: string;
     leftArrowed?: boolean;
     children?: React.ReactNode;
+    onClick?: () => void;
 }
 
 const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
@@ -22,7 +23,8 @@ const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
     round,
     customClass,
     leftArrowed,
-    children
+    children,
+    onClick
 }, ref) => {
     const classNames = ['cloud'];
     if (button) classNames.push('button');
@@ -34,7 +36,7 @@ const Cloud = React.forwardRef<HTMLDivElement, CloudProps>(({
     if (customClass) classNames.push(customClass);
 
     return (
-        <div className={classNames.join(' ')} role={button ? 'button' : undefined} ref={ref}>
+        <div onClick={onClick} className={classNames.join(' ')} role={button ? 'button' : undefined} ref={ref}>
             {children ?? text}
         </div>
     );
