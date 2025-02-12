@@ -166,6 +166,12 @@ export default class Console {
     }
 
     private autocompleteStringLexeme(lexeme: StringLexeme, line: string) {
+        if(!line.startsWith(lexeme.contents)) {
+            lexeme.contents = ""
+            lexeme.rawContents = ""
+            lexeme.setQuoteType(null)
+        }
+
         let lexemeQuoteType = lexeme.quoteType
         let rawContents = lexeme.rawContents
 

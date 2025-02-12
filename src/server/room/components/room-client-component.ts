@@ -5,16 +5,19 @@ import ServerWorldBridge from "src/server/server-world-bridge";
 
 export interface ServerRoomClientComponentOptions {
     name: string
+    mode?: string
 }
 
 export default class RoomClientComponent implements Component {
 	public maxOnline: number = 10
 	public portal = new RoomPortal()
     name?: string = null
+    mode?: string = null
     entity: Entity | null
 
     constructor(options: ServerRoomClientComponentOptions) {
         this.name = options.name
+        this.mode = options.mode
 
         this.portal.on("client-connect",    (client) => this.entity.emit("client-connect", client))
         this.portal.on("client-disconnect", (client) => this.entity.emit("client-disconnect", client))

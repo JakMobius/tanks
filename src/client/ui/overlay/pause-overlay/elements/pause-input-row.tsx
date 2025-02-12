@@ -1,12 +1,46 @@
+import './pause-input-row.scss';
 
 import PauseKeyValueRow from "src/client/ui/overlay/pause-overlay/elements/pause-key-value-row";
-import InputCloud from "src/client/ui/elements/input-cloud/input-cloud";
-import Cloud from "src/client/game/ui/cloud/cloud";
+import AutoresizeInput from "src/client/ui/elements/autoresize-input/autoresize-input";
+import Cloud, { CloudProps } from "src/client/game/ui/cloud/cloud";
+import React, { useState } from 'react';
 
-import React from 'react';
+interface AutoresizeInputCloudProps extends CloudProps {
+    prefix?: string,
+    suffix?: string,
+    placeholder?: string,
+    value?: string,
+    onChange?: (value: string) => void
+}
 
-interface PauseInputRowProps {
-    title?: string
+const AutoresizeInputCloud: React.FC<AutoresizeInputCloudProps> = (props) => {
+    const [inputValue, setInputValue] = useState(props.value || "");
+
+    const handleInputChange = (value: string) => {
+        setInputValue(value);
+        if (props.onChange) {
+            props.onChange(value);
+        }
+    };
+
+    return (
+        <Cloud
+            className="autoresize-input-cloud"
+            {...props}
+        >
+            <span>{props.prefix}</span>
+            <AutoresizeInput 
+                placeholder={props.placeholder} 
+                value={inputValue}
+                onChange={handleInputChange}
+            ></AutoresizeInput>
+            <span>{props.suffix}</span>
+        </Cloud>
+    )
+}
+
+interface PauseKeyInputRowProps {
+    title: string
     placeholder?: string
     value?: string
     prefix?: string
@@ -17,24 +51,76 @@ interface PauseInputRowProps {
     onChange?: (value: string) => void
 }
 
-const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
-    return <PauseKeyValueRow small={props.small}>
-        <Cloud 
-            blue={props.blue}
-            red={props.red}
-            customClass="key-name">
-                {props.title}
-        </Cloud>
-        <InputCloud 
-            prefix={props.prefix} 
-            suffix={props.suffix} 
-            placeholder={props.placeholder} 
-            value={props.value}
-            blue={props.blue}
-            red={props.red}
-            onChange={props.onChange}
-        />
-    </PauseKeyValueRow>
+export const PauseKeyInputRow: React.FC<PauseKeyInputRowProps> = (props) => {
+    return (
+        <PauseKeyValueRow small={props.small} className="pause-key-input-row">
+            <Cloud 
+                blue={props.blue}
+                red={props.red}>
+                    {props.title}
+            </Cloud>
+            <AutoresizeInputCloud 
+                prefix={props.prefix} 
+                suffix={props.suffix} 
+                placeholder={props.placeholder} 
+                value={props.value}
+                blue={props.blue}
+                red={props.red}
+                onChange={props.onChange}
+            />
+        </PauseKeyValueRow>
+    )
 }
 
-export default PauseInputRow;
+interface PauseInputDetailDisclosureProps {
+    blue?: boolean
+    red?: boolean
+    button?: boolean
+    onClick?: () => void
+}
+
+export const PauseInputDetailDisclosure: React.FC<PauseInputDetailDisclosureProps> = (props) => {
+    return (
+        <Cloud
+            {...props}
+            className="pause-input-row-detail-disclosure"
+        />
+    )
+}
+
+interface PauseInputRowProps {
+    placeholder?: string
+    value?: string
+    blue?: boolean
+    red?: boolean
+    type?: string
+    button?: React.ReactNode
+    className?: string
+    onButtonClick?: () => void
+    onChange?: (value: string) => void
+}
+
+export const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    
+        props.onChange?.(e.target.value);
+    }
+
+    return (
+        <div className={"pause-input-row " + (props.className ?? "")}>
+            <Cloud
+                className="input-container-cloud"
+                blue={props.blue}
+                red={props.red}
+            >
+                <input
+                    type={props.type}
+                    value={props.value}
+                    placeholder={props.placeholder}
+                    onChange={handleChange}
+                />
+            </Cloud>
+            {props.button}
+        </div>
+    )
+}

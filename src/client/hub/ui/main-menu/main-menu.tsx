@@ -5,6 +5,9 @@ import React from 'react';
 import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
 import SettingsView from 'src/client/ui/overlay/pause-overlay/controllers/settings-view';
 import RoomListView from '../room-list-view/room-list-view';
+import { useProfile } from '../hub-page';
+import LoginView from '../login-view/login-view';
+import ProfileView from '../profile-view/profile-view';
 
 interface MenuItemProps {
     title?: string
@@ -34,11 +37,10 @@ const MenuItem: React.FC<MenuItemProps> = (props) => {
 const MainMenuView: React.FC = () => {
 
     const navigation = useNavigation()
+    const profile = useProfile()
 
-    const navigateToProfile = () => {
-        // TODO: profile
-    }
-
+    const navigateToProfile = () => navigation.push(<ProfileView/>)
+    const navigateToLogin = () => navigation.push(<LoginView/>)
     const navigateToTutorial = () => PageLocation.navigateToScene("tutorial", {})
     const navigateToMapEditor = () => PageLocation.navigateToScene("map-editor", {})
     const navigateToSettings = () => navigation.push(<SettingsView/>)
@@ -62,11 +64,19 @@ const MainMenuView: React.FC = () => {
                     </div>
                 </div> 
                 <div className="vstack">
-                    <MenuItem
-                        title="Личная карточка"
-                        subtitle="Кто ты, воин?"
-                        icon="static/hub/profile@3x.png"
-                        onClick={navigateToProfile}/>
+                    {profile.authenticated ? (
+                        <MenuItem
+                            title={profile.username}
+                            subtitle="Личная карточка"
+                            icon="static/hub/profile@3x.png"
+                            onClick={navigateToProfile}/>
+                    ) : (
+                        <MenuItem
+                            title="Личная карточка"
+                            subtitle="Кто ты, воин?"
+                            icon="static/hub/profile@3x.png"
+                            onClick={navigateToLogin}/>
+                    )}
                     <MenuItem
                         title="Как играть?"
                         subtitle="Новобранец? Научим!"

@@ -1,104 +1,4 @@
-.map-preview-row:hover .map-preview-container {
-    width: 98px;
-    height: 98px;
-}
-.map-preview-row .map-preview-container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 10px;
-    gap: 10px;
-    width: 90px;
-    height: 90px;
-    background: #FFFFFF;
-    border-radius: 2px;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-    transition: width 0.3s, height 0.3s;
-}
-.map-preview-row .map-preview-container canvas {
-    width: 85px;
-    height: 85px;
-}
-.map-preview-row:hover .map-description {
-    min-height: 30px;
-}
-.map-preview-row .map-description {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    box-sizing: border-box;
-    gap: 4px;
-    padding: 6px 0;
-    flex: none;
-    flex-grow: 0;
-    transition: min-height 0.3s;
-    min-height: 100%;
-}
-.map-preview-row .map-description .map-description-title {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 20px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #FFFFFF;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-}
-.map-preview-row .map-description .map-description-subtitle {
-    font-style: normal;
-    font-weight: 700;
-    font-size: 12px;
-    color: #E7E7E7;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-}
-.map-preview-row:hover .map-buttons-container {
-    opacity: 1;
-}
-.map-preview-row .map-buttons-container {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: flex-end;
-    padding: 1px 0px;
-    gap: 10px;
-    margin: 0 auto;
-    height: 33px;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-    transition: opacity 0.3s;
-    opacity: 0;
-}
-.map-preview-row .map-buttons-container .open-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    align-self: stretch;
-    padding: 3px 28px 3px 13px;
-    background-color: #009EE0;
-    background-repeat: no-repeat;
-    background-position: calc(100% - 10px) center;
-    background-size: 10px;
-    background-image: url(../static/hub/disclosure.png);
-    border-radius: 4px;
-    flex: none;
-    flex-grow: 0;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 19px;
-    color: #FFFFFF;
-}
+@use "../../../ui/theme.scss" as theme;
 
 .map-preview-row {
     position: relative;
@@ -114,11 +14,123 @@
     flex: none;
     flex-grow: 0;
     align-self: center;
-    transition: width 0.3s, height 0.3s, background 0.3s;
+    transition: width 0.3s, height 0.3s, background-color 0.3s;
     cursor: pointer;
-}
-.map-preview-row:hover {
-    background: rgba(0, 0, 0, 0.35);
-    width: 368px;
-    height: 118px;
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.35);
+        width: 368px;
+        height: 118px;
+
+        .map-preview-container {
+            width: 98px;
+            height: 98px;
+        }
+
+        .map-description {
+            min-height: 30px;
+        }
+
+        .map-buttons-container {
+            opacity: 1;
+        }
+    }
+
+    .map-preview-container {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 10px;
+        gap: 10px;
+        width: 90px;
+        height: 90px;
+        background: #FFFFFF;
+        border-radius: 2px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        transition: width 0.3s, height 0.3s;
+
+        canvas {
+            width: 85px;
+            height: 85px;
+        }
+    }
+
+    .map-description {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        box-sizing: border-box;
+        gap: 4px;
+        padding: 6px 0;
+        flex: none;
+        flex-grow: 0;
+        transition: min-height 0.3s;
+        min-height: 100%;
+
+        .map-description-title {
+            font-style: normal;
+            font-weight: 700;
+            font-size: 20px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #FFFFFF;
+            flex: none;
+            align-self: stretch;
+            flex-grow: 0;
+        }
+
+        .map-description-subtitle {
+            font-style: normal;
+            font-weight: 700;
+            font-size: 12px;
+            color: #E7E7E7;
+            flex: none;
+            align-self: stretch;
+            flex-grow: 0;
+        }
+    }
+
+    .map-buttons-container {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: flex-end;
+        padding: 1px 0px;
+        gap: 10px;
+        margin: 0 auto;
+        height: 33px;
+        flex: none;
+        align-self: stretch;
+        flex-grow: 0;
+        transition: opacity 0.3s;
+        opacity: 0;
+
+        .open-button {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            align-self: stretch;
+            padding: 3px 28px 3px 13px;
+            background-color: theme.$main-blue;
+            background-repeat: no-repeat;
+            background-position: calc(100% - 10px) center;
+            background-size: 10px;
+            background-image: url(../static/hub/disclosure.png);
+            border-radius: 4px;
+            flex: none;
+            flex-grow: 0;
+            font-style: normal;
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 19px;
+            color: #FFFFFF;
+        }
+    }
 }

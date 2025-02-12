@@ -2,15 +2,12 @@
     display: flex;
     flex-direction: column;
     align-content: center;
-}
-
-.room-loading-placeholder-menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 20px;
     box-sizing: border-box;
-    width: 793px;
-    background: #FFFFFF;
-    border-radius: 13px;
+    max-height: 100%;
+    padding: 10px 10px 0 10px;
+
+    .room-list-view-contents {
+        overflow-y: auto;
+        padding-bottom: 10px;
+    }
 }

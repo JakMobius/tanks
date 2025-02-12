@@ -1,5 +1,4 @@
 import WebserverModule from '../webserver-module';
-import * as path from 'path';
 import {redirectToSlash} from "../redirest-to-slash";
 import WebServer from "src/server/webserver/webserver";
 import {WebserverSession} from "src/server/webserver/webserver-session";
@@ -10,11 +9,13 @@ import ProfileImageAjaxHandler from "src/server/webserver/game/ajax/profile-imag
 import MapListAjaxHandler from "src/server/webserver/game/ajax/map-list";
 import RoomCreateAjaxHandler from "src/server/webserver/game/ajax/room-create";
 import RoomListAjaxHandler from "src/server/webserver/game/ajax/room-list";
+import LogoutAjaxHandler from './ajax/logout-handler';
 
 export default class GameModule extends WebserverModule {
 
     private userDataFromSession(session: WebserverSession) {
         return JSON.stringify({
+            authenticated: session.username !== undefined,
             username: session.username
         } as UserDataRaw)
     }
@@ -31,6 +32,7 @@ export default class GameModule extends WebserverModule {
         })
 
         this.addAjaxHandler(new LoginAjaxHandler())
+        this.addAjaxHandler(new LogoutAjaxHandler())
         this.addAjaxHandler(new RegisterAjaxHandler())
         this.addAjaxHandler(new ProfileImageAjaxHandler())
         this.addAjaxHandler(new MapListAjaxHandler())

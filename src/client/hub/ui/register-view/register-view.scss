@@ -1,0 +1,12 @@
+
+.password-strength.red .input-container-cloud {
+    background: rgba(224, 0, 40, 0.6);;
+}
+
+.password-strength.weak .input-container-cloud {
+    background: rgba(236, 126, 64, 0.6);
+}
+
+.password-strength.ok .input-container-cloud {
+    background: rgba(0, 177, 18, 0.6);
+}

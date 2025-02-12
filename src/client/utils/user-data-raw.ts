@@ -1,5 +1,6 @@
 
 export interface UserDataRaw {
-    username: string
-    preferredTank: number
+    authenticated: boolean
+    username?: string
+    preferredTank?: number
 }

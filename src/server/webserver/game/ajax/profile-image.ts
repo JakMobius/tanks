@@ -15,6 +15,6 @@ export default class ProfileImageAjaxHandler extends AjaxHandler<GameModule> {
     ]
 
     handle(req: express.Request, res: express.Response, fields: LoginAjaxFields, next: express.NextFunction) {
-        res.sendFile(this.module.resourcePath('static/hub/no-profile-image.png'))
+        res.sendFile(this.module.resourcePath('static/hub/profile.png'))
     }
 }

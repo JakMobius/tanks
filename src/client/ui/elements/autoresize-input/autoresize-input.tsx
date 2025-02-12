@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
 import "./autoresize-input.scss";
+
+import React, { useEffect, useRef, useState } from "react";
 
 interface AutoresizeInputProps {
     placeholder?: string;

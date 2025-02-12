@@ -12,12 +12,12 @@ interface LoadingViewProps {
 
 export const LoadingViewComponent: React.FC<LoadingViewProps> = (props) => {
     return (
-        <div className="loading-container" style={{ display: props.shown ? "block" : "none" }}>
+        <div className="loading-container" style={{ display: props.shown ? undefined : "none" }}>
             <div className="loading-icon"></div>
-            <div className="loading-title" style={{display: props.title ? "block" : "none"}}>
+            <div className="loading-title" style={{display: props.title ? undefined : "none"}}>
                 {props.title}
             </div>
-            <div className="loading-subtitle" style={{display: props.title ? "block" : "none"}}>
+            <div className="loading-subtitle" style={{display: props.title ? undefined : "none"}}>
                 {props.subtitle}
             </div>
         </div>

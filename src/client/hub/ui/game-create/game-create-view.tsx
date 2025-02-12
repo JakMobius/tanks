@@ -1,25 +1,30 @@
 import './game-create-view.scss'
 
-
-import HugeTitle from "../huge-title/huge-title";
-import HugeTextInput from "../huge-text-input/huge-text-input";
-import HugeSelect, { SelectOption } from "../huge-select/huge-select";
-import Button from "src/client/ui/button/button";
-import {checkRoomName} from "src/data-checkers/room-name-checker";
-import {localizeAjaxError, textFromRoomNameCheckResult} from "src/client/hub/localizations";
-import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
+import { checkRoomName } from "src/data-checkers/room-name-checker";
+import { localizeAjaxError, textFromRoomNameCheckResult } from "src/client/hub/localizations";
 
 import React, { useEffect, useState } from 'react';
+import { PauseMenuButton, PauseNavigationItem } from 'src/client/ui/overlay/pause-overlay/pause-menu-view';
+import { PauseInputRow } from 'src/client/ui/overlay/pause-overlay/elements/pause-input-row';
+import PauseKeySelectRow, { SelectOption } from 'src/client/ui/overlay/pause-overlay/elements/pause-select-row';
+import TipList, { Tip, TipStyle } from '../../tip-list/tip-list';
+import PauseKeyValueRow from 'src/client/ui/overlay/pause-overlay/elements/pause-key-value-row';
+import Cloud from 'src/client/game/ui/cloud/cloud';
+import PageLocation from 'src/client/scenes/page-location';
 
 const GameCreateViewComponent: React.FC = () => {
 
     const [state, setState] = useState({
         loading: true,
-        error: null as string | null,
-        maps: [] as SelectOption[],
+        maps: null as SelectOption[] | null,
+        mapLoadingError: false,
         roomNameTips: [] as Tip[],
         roomName: "",
-        requests: new Set<JQuery.jqXHR>()
+        roomValid: false,
+        requests: new Set<JQuery.jqXHR>(),
+        selectedMap: null as string | null,
+        selectedMode: null as string | null,
+        formValid: false
     })
 
     const addRequest = (request: JQuery.jqXHR) => {
@@ -48,9 +53,7 @@ const GameCreateViewComponent: React.FC = () => {
     }
 
     const onMapFetchError = (data: JQuery.jqXHR, exception: string) => {
-        setState((state) => ({ ...state, loading: false, error: localizeAjaxError(data, exception) }))
-
-        // TODO
+        setState((state) => ({ ...state, loading: false, mapLoadingError: true }))
     }
 
     const fetchMaps = () => {
@@ -58,7 +61,7 @@ const GameCreateViewComponent: React.FC = () => {
             url: "ajax/map-list",
             method: "get"
         })
-        
+
         request.done((data) => {
             removeRequest(request)
             onMapFetchResult(data);
@@ -71,23 +74,16 @@ const GameCreateViewComponent: React.FC = () => {
         setState((state) => ({ ...state, error: null, loading: true }))
     }
 
-    useEffect(() => {
-        fetchMaps()
-        return () => {
-            state.requests.forEach(request => request.abort())
-        }
-    }, [])
-
     const createRoom = () => {
-        if(state.roomNameTips.length !== 0) return
-        
+        if (!state.formValid) return
+
         let request = $.ajax({
             url: "ajax/room-create",
             method: "post",
             data: {
                 name: state.roomName,
-                map: state.maps.find(option => option.selected)?.data,
-                mode: "TDM"
+                map: state.selectedMap,
+                mode: state.selectedMode
             }
         })
 
@@ -103,70 +99,125 @@ const GameCreateViewComponent: React.FC = () => {
     }
 
     const onRoomCreateError = (xhr: JQuery.jqXHR, exception: string) => {
-        // props.page.eventContainer.createEvent(localizeAjaxError(xhr, exception)) // TODO: Figure out a better way
+        showError(localizeAjaxError(xhr, exception))
+    }
+
+    const showError = (text: string) => {
+        setState((state) => ({
+            ...state, roomNameTips: [{
+                text: text,
+                style: TipStyle.ERROR
+            }]
+        }))
     }
 
     const onRoomCreateResponse = (result: any) => {
-        switch(result.result) {
+        switch (result.result) {
             case "ok":
-                window.location.href = result.url
+                PageLocation.navigateToScene("game", {
+                    room: result.name
+                })
                 break;
             case "not-authenticated":
                 window.location.reload()
                 break;
             case "invalid-map":
-                 // TODO: Figure out a better way
-                // props.page.eventContainer.createEvent("Сервер запутался в картах. Попробуйте перезагрузить страницу.")
+                showError("Сервер запутался в картах. Попробуйте перезагрузить страницу.")
                 break;
             case "invalid-mode":
-                 // TODO: Figure out a better way
-                // props.page.eventContainer.createEvent("Произошло что-то очень странное. Попробуйте перезагрузить страницу.")
+                showError("Произошло что-то очень странное. Попробуйте перезагрузить страницу.")
                 break;
             case "invalid-room-name":
-                updateValidity()
-                 // TODO: Figure out a better way
-                // props.page.eventContainer.createEvent("Недопустимое название комнаты. Попробуйте другое.")
+                validateRoomName()
+                setState((state) => {
+                    if(state.roomValid) {
+                        showError("Недопустимое название комнаты. Попробуйте другое.")
+                    }
+                    return {...state, roomValid: false}
+                })
+                
                 break;
-            case "room-name-taken":
-                setState((state) => ({...state, roomNameTips: [{
-                    text: "Имя комнаты занято",
-                    style: TipStyle.ERROR
-                }]}))
+            case "room-name-used":
+                showError("Комната с таким именем уже есть")
+                break;
+            default:
+                showError("Что-то пошло не так, но что - непонятно.")
                 break;
         }
     }
 
-    const updateValidity = () => {
-        let errors = checkRoomName(state.roomName).map(reason => {
-            return {
+    const validateRoomName = () => {
+        setState((state) => {
+            let roomNameTips = checkRoomName(state.roomName).map(reason => ({
                 text: textFromRoomNameCheckResult(reason),
                 style: TipStyle.ERROR
-            }
-        })
+            }))
+            let roomValid = roomNameTips.length === 0
 
-        setState((state) => ({...state, roomNameTips: errors}))
+            return {...state, roomNameTips, roomValid }
+        })
     }
 
     const handleNameChange = (value: string) => {
-        setState((state) => ({...state, roomName: value}))
-        updateValidity()
+        setState((state) => ({ ...state, roomName: value }))
+        validateRoomName()
     }
 
+    const handleMapChange = (value: string) => {
+        setState((state) => ({...state, selectedMap: value }))
+    }
+
+    const handleModeChange = (value: string) => {
+        setState((state) => ({...state, selectedMode: value }))
+    }
+
+    useEffect(() => {
+        fetchMaps()
+        return () => {
+            state.requests.forEach(request => request.abort())
+        }
+    }, [])
+
+    useEffect(() => {
+        setState((state) => ({
+            ...state,
+            formValid: state.roomValid && state.selectedMap !== null && state.selectedMode !== null
+        }))
+    }, [state.roomValid, state.selectedMap, state.selectedMode])
+
     const modes = [
-        { name: "Битва команд (TDM)", data: "TDM" },
-        { name: "Каждый сам за себя (DM)", data: "DM" },
-        { name: "Захват флага (FC)", data: "FC" }
-    ]
-    const defaultMode = modes[0].data
+        { name: "Битва команд (TDM)", data: "TDM", displayName: "TDM" },
+        { name: "Каждый сам за себя (DM)", data: "DM", displayName: "DM" },
+        { name: "Захват флага (CTF)", data: "CTF", displayName: "CTF" },
+        { name: "Гонка (RACE)", data: "RACE", displayName: "RACE" },
+    ] as SelectOption[]
 
     return (
-        <div className="game-create-view">
-            <HugeTitle>Новая комната</HugeTitle>
-            <HugeTextInput placeholder="Название комнаты" onChange={handleNameChange}/>
-            <HugeSelect options={state.maps}/>
-            <HugeSelect options={modes} defaultValue={defaultMode}/>
-            <Button largeStyle onClick={createRoom}>В бой!</Button>
-        </div>
+        <PauseNavigationItem title="Создание комнаты">
+            <PauseInputRow
+                blue={state.roomValid}
+                red={!state.roomValid}
+                placeholder="Название комнаты"
+                onChange={handleNameChange} />
+            { state.maps !== null ? (
+                <PauseKeySelectRow blue title="Карта" options={state.maps} onChange={handleMapChange} />
+            ) : (
+                <PauseKeyValueRow>
+                    <Cloud blue>Карта</Cloud>
+                    { state.mapLoadingError ? (
+                        <Cloud red>Ошибка загрузки</Cloud>
+                    ) : (
+                        <Cloud>Загрузка...</Cloud>
+                    )}
+                </PauseKeyValueRow>
+            )}
+            <PauseKeySelectRow blue title="Режим" options={modes} onChange={handleModeChange} />
+            <PauseMenuButton
+                blue={state.formValid}
+                disabled={!state.formValid}
+                onClick={createRoom}>В бой!</PauseMenuButton>
+            <TipList tips={state.roomNameTips} />
+        </PauseNavigationItem>
     );
 }
 

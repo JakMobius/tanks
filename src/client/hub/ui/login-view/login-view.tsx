@@ -1,15 +1,15 @@
-
-import "../login-password-view/login-password-view.scss"
-
 import React from "react";
-import {Tip, TipStyle} from "../input-tip-list/input-tip-list-view";
-import Button from "src/client/ui/button/button";
-import HugeTitle from "../huge-title/huge-title";
-import HugeTextInput from "../huge-text-input/huge-text-input";
 import { localizeAjaxError } from "../../localizations";
-import { NavigationItem } from "src/client/ui/navigation/navigation-view";
+import { PauseInputDetailDisclosure, PauseInputRow } from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
+import { PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
+import Cloud from "src/client/game/ui/cloud/cloud";
+import { useNavigation } from "src/client/ui/navigation/navigation-view";
+import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
+import RegisterView from "../register-view/register-view";
 
 const LoginView: React.FC = () => {
+
+    const navigation = useNavigation()
 
     const [state, setState] = React.useState({
         login: "",
@@ -59,28 +59,33 @@ const LoginView: React.FC = () => {
     const setLogin = (login: string) => setState((state) => ({...state, login}))
     const setPassword = (password: string) => setState((state) => ({...state, password}))
 
+    const navigateToRegistration = () => {
+        navigation.push(<RegisterView/>)
+    }
+
     return (
-        <NavigationItem title="Вход">
-            <div className="login-password-view">
-                <HugeTitle>Вход</HugeTitle>
-                <div className="field-container">
-                    <HugeTextInput
-                        onChange={setLogin}
-                        placeholder="Позывной"
-                        tips={state.tips}
-                    />
-                    <HugeTextInput
-                        onChange={setPassword}
-                        placeholder="••••••••••"
-                        type="password"
-                    />
-                </div>
-                <div className="auth-button-container">
-                    <Button largeStyle onClick={onLogin}>Вход</Button>
-                    <Button secondaryStyle>Забыли пароль?</Button>
-                </div>
-            </div>
-        </NavigationItem>
+        <PauseNavigationItem title="Вход" rightNavigationItem={
+            <Cloud 
+                className="cloudy-navigation-header-item"
+                rightArrowed
+                button
+                onClick={navigateToRegistration}
+            >Регистрация</Cloud>
+        }>
+            <PauseInputRow
+                blue
+                onChange={setLogin}
+                placeholder="Позывной"
+            />
+            <PauseInputRow
+                blue
+                onChange={setPassword}
+                placeholder="••••••••••"
+                type="password"
+                button={<PauseInputDetailDisclosure blue onClick={onLogin}/>}
+            />
+            <TipList tips={state.tips}/>
+        </PauseNavigationItem>
     );
 }
 

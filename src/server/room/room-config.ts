@@ -11,19 +11,19 @@ export default class RoomConfig implements BinaryCodable<typeof RoomConfig> {
 
     name: string
     map: string
+    mode: string
 
     toBinary(encoder: WriteBuffer) {
         encoder.writeString(this.name)
         encoder.writeString(this.map)
+        encoder.writeString(this.mode)
     }
 
     static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
-        let name = decoder.readString()
-        let map = decoder.readString()
-
         let instance = new RoomConfig()
-        instance.name = name
-        instance.map = map
+        instance.name = decoder.readString()
+        instance.map = decoder.readString()
+        instance.mode = decoder.readString()
 
         return instance as any as T
     }

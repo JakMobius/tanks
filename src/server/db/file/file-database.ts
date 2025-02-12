@@ -59,7 +59,7 @@ export default class FileDatabase implements ServerDatabase {
 
     async createUser(login: string, password: string): Promise<boolean> {
         const hash = this.getUsernameHash(login)
-        let hashStorage = await this.getStorageAtPath(login)
+        let hashStorage = await this.getStorageAtPath("users/" + hash)
         if(!hashStorage) hashStorage = {}
         if(hashStorage[login]) return false
         hashStorage[login] = { password: password, data: {} }

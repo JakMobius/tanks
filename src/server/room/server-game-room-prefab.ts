@@ -15,6 +15,7 @@ import RoomSocketComponent from "src/server/room/components/room-socket-componen
 
 export interface GameConfig {
     name: string
+    mode?: string
     map: GameMap
     loop?: Loop
     tps?: number
@@ -45,7 +46,8 @@ export default function serverGameRoomPrefab(entity: Entity, options: GameConfig
 
     // Expose the room to the network
     entity.addComponent(new RoomClientComponent({
-        name: options.name
+        name: options.name,
+        mode: options.mode
     }))
 
     if(options.gameSocket) {

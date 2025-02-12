@@ -7,8 +7,9 @@ export interface CloudProps {
     red?: boolean;
     blue?: boolean;
     round?: boolean;
-    customClass?: string;
+    className?: string;
     leftArrowed?: boolean;
+    rightArrowed?: boolean;
     children?: React.ReactNode;
     onClick?: () => void;
 }
@@ -19,8 +20,9 @@ const Cloud: React.FC<CloudProps> = (({
     red,
     blue,
     round,
-    customClass,
+    className,
     leftArrowed,
+    rightArrowed,
     children,
     onClick
 }) => {
@@ -31,7 +33,8 @@ const Cloud: React.FC<CloudProps> = (({
     if (blue) classNames.push('blue');
     if (round) classNames.push('round');
     if (leftArrowed) classNames.push('left-arrowed');
-    if (customClass) classNames.push(customClass);
+    if (rightArrowed) classNames.push('right-arrowed');
+    if (className) classNames.push(className);
 
     return (
         <div onClick={onClick} className={classNames.join(' ')} role={button ? 'button' : undefined}>

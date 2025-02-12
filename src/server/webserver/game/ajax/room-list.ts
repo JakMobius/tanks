@@ -20,8 +20,8 @@ export default class RoomListAjaxHandler extends AjaxHandler {
                 name: clientComponent.name,
                 players: clientComponent.getCurrentOnline(),
                 maxPlayers: clientComponent.getMaxOnline(),
+                mode: clientComponent.mode,
                 map: "Какая-то карта",
-                mode: "TDM",
             })
         }
 

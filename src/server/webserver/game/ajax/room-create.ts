@@ -2,7 +2,7 @@ import AjaxHandler, {AjaxFields, AjaxFieldType} from "src/server/webserver/ajax/
 import express from "express";
 import RoomConfig from "src/server/room/room-config";
 import path from "path";
-import {NoSuchMapError, RoomNameUsedError} from "src/server/socket/game-server/game-socket-portal";
+import {InvalidGameModeError, NoSuchMapError, RoomNameUsedError} from "src/server/socket/game-server/game-socket-portal";
 import {MalformedMapFileError} from "src/map/map-serialization";
 import {checkRoomName} from "src/data-checkers/room-name-checker";
 
@@ -37,6 +37,7 @@ export default class RoomCreateAjaxHandler extends AjaxHandler {
 
         roomConfig.name = name
         roomConfig.map = path.join(mapsDirectory, map)
+        roomConfig.mode = mode
 
         let server = this.module.webServer.server
         server.gameSocket.createRoom(roomConfig).then(() => {
@@ -50,7 +51,11 @@ export default class RoomCreateAjaxHandler extends AjaxHandler {
                 res.status(200).send({ result: "invalid-map" })
             } else if(e instanceof RoomNameUsedError) {
                 res.status(200).send({ result: "room-name-used" })
-            } else throw e;
+            } else if(e instanceof InvalidGameModeError) {
+                res.status(200).send({ result: "invalid-mode" })
+            } else {
+                throw e
+            }
         })
     }
 }

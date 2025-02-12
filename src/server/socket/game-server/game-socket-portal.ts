@@ -16,6 +16,8 @@ import Entity from "src/utils/ecs/entity";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import {serverCTFControllerPrefab} from "src/entity/types/controller-ctf/server-side/server-prefab";
+import { serverTDMControllerPrefab } from 'src/entity/types/controller-tdm/server-side/server-prefab';
+import { serverDMControllerPrefab } from 'src/entity/types/controller-dm/server-side/server-prefab';
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -28,6 +30,13 @@ export class RoomNameUsedError extends Error {
     constructor(message?: string) {
         super(message);
         this.name = "RoomNameUsedError";
+    }
+}
+
+export class InvalidGameModeError extends Error {
+    constructor(mode: string) {
+        super("Invalid game mode: " + mode)
+        this.name = "InvalidGameModeError"
     }
 }
 
@@ -177,19 +186,41 @@ export default class GameSocketPortal extends SocketPortal {
         serverGameRoomPrefab(game, {
             name: config.name,
             map: map,
-            gameSocket: this
+            gameSocket: this,
+            mode: config.mode
         })
 
         let gameModeController = new Entity()
-        serverCTFControllerPrefab(gameModeController, {
-            // TODO: world should be determined when controller is attached to it
-            world: game,
-            socket: this,
-            minPlayers: 2,
-            teams: 2
-        })
+
+        if(config.mode == "CTF") {
+            serverCTFControllerPrefab(gameModeController, {
+                // TODO: world should be determined when controller is attached to it
+                world: game,
+                socket: this,
+                minPlayers: 2,
+                teams: 2
+            })
+        } else if(config.mode == "TDM") {
+            serverTDMControllerPrefab(gameModeController, {
+                // TODO: world should be determined when controller is attached to it
+                world: game,
+                socket: this,
+                minPlayers: 2,
+                teams: 2
+            })
+        } else if(config.mode == "DM") {
+            serverDMControllerPrefab(gameModeController, {
+                // TODO: world should be determined when controller is attached to it
+                world: game,
+                socket: this,
+                minPlayers: 2,
+            })
+        } else {
+            throw new InvalidGameModeError(config.mode)
+        }
 
         game.appendChild(gameModeController)
+
         this.games.set(config.name, game)
     }
 

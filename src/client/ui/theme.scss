@@ -1,0 +1,10 @@
+
+$main-blue: #008FCC;
+
+$settings-font-size: 24px;
+
+@mixin settings-main-font {
+    font-weight: 700;
+    font-size: $settings-font-size;
+    color: white;
+}

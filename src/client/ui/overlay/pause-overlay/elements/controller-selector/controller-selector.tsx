@@ -37,7 +37,7 @@ const ControllerSelector: React.FC<ControllerSelectorProps> = (props) => {
     return (
         <div className="controller-selector">
             {devices.map((device, i) => {
-                return <ControllerView device={device} onSelect={handleSelect(i)} selected={selectedIndex === i}/>
+                return <ControllerView key={i} device={device} onSelect={handleSelect(i)} selected={selectedIndex === i}/>
             })}
         </div>
     )

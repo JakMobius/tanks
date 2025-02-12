@@ -1,4 +1,5 @@
 .cloud {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -7,44 +8,68 @@
   border-radius: 5px;
   background: rgba(58, 58, 58, 0.4);
   color: white;
-  align-self: stretch;
   box-sizing: border-box;
-}
-.cloud.round {
-  border-radius: 10px;
-}
-.cloud.button {
-  cursor: pointer;
-}
-.cloud.button:hover {
-  background: rgba(58, 58, 58, 0.8);
-}
-.cloud.blue {
-  background: rgba(0, 158, 224, 0.6);
-}
-.cloud.blue.button:hover {
-  background: rgba(0, 158, 224, 0.8);
-}
-.cloud.red {
-  background: rgba(224, 0, 40, 0.6);
-}
-.cloud.red.button:hover {
-  background: rgba(224, 0, 40, 0.8);
-}
-.cloud.left-arrowed:before {
-  content: " ";
-  background: url(../game/back.png) no-repeat left center;
-  background-size: auto 23px;
-  display: block;
-  position: absolute;
-  left: -22px;
-  top: 0;
-  width: 21px;
-  height: 100%;
-  opacity: 0.4;
-}
-.cloud.left-arrowed:hover:before {
-  opacity: 0.8;
+
+  &.stretch {
+    align-self: stretch;
+  }
+
+  &.round {
+    border-radius: 10px;
+  }
+
+  &.button {
+    cursor: pointer;
+  }
+
+  &.button:hover {
+    background-color: rgba(58, 58, 58, 0.8);
+  }
+
+  &.blue {
+    background-color: rgba(0, 158, 224, 0.6);
+  }
+
+  &.blue.button:hover {
+    background-color: rgba(0, 158, 224, 0.8);
+  }
+
+  &.red {
+    background-color: rgba(224, 0, 40, 0.6);
+  }
+
+  &.red.button:hover {
+    background-color: rgba(224, 0, 40, 0.8);
+  }
+
+  &.left-arrowed:before, &.right-arrowed:before {
+    content: " ";
+    background-repeat: no-repeat;
+    background-size: auto 23px;
+    display: block;
+    position: absolute;
+    
+    top: 0;
+    width: 21px;
+    height: 100%;
+    opacity: 0.4;
+  }
+
+  &.left-arrowed:hover:before, &.right-arrowed:hover:before {
+    opacity: 0.8;
+  }
+
+  &.left-arrowed:before {
+    background-position: left center;
+    background-image: url(../hub/navigate-back@3x.png);
+    left: -22px;
+  }
+
+  &.right-arrowed:before {
+    background-position: right center;
+    background-image: url(../hub/navigate-forward@3x.png);
+    right: -22px;
+  }
 }
 
 .menu {

@@ -6,7 +6,7 @@ export function textFromNickCheckResult(reason: NickCheckResult) {
         case NickCheckResult.INVALID_CHARACTERS: return "Недопустимые символы в позывном"
         case NickCheckResult.NICK_EMPTY: return "Позывной не может быть пустым"
         case NickCheckResult.TOO_SHORT: return "Придумай позывной подлиннее!"
-        case NickCheckResult.TOO_LONG: return "Позывной должен быть коротким!"
+        case NickCheckResult.TOO_LONG: return "Пожалей сослуживцев, им это произносить!"
         case NickCheckResult.NICK_USED: return "Позывной уже используется!"
     }
     return null

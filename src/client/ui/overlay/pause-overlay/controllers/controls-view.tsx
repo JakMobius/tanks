@@ -36,7 +36,7 @@ const ControlsView: React.FC = () => {
                 return ControlsPrinter.getPrintedNameOfAxle(axle, device)
             })
 
-            return <AxisSelector key={i} text={entry.title} axes={keyNames}/>
+            return <AxisSelector key={entry.axle} text={entry.title} axes={keyNames}/>
         })
     }
 

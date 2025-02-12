@@ -4,9 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import RoomConfig from "src/server/room/room-config";
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
-import CLIStyle from "src/server/commands/cli-style";
 
 export default class RoomCreateCommand extends Command {
+
+    static validModes = [
+        "CTF", "TDM", "DM"
+    ]
 
     constructor(options: CommandConfig) {
         super(options);
@@ -16,6 +19,13 @@ export default class RoomCreateCommand extends Command {
             name: "name",
             aliases: ["n"],
             description: "Map name"
+        }))
+
+        this.addFlag(new CommandFlag({
+            type: "key",
+            name: "mode",
+            aliases: ["mode"],
+            description: "Game mode"
         }))
 
         this.addFlag(new CommandFlag({
@@ -31,7 +41,6 @@ export default class RoomCreateCommand extends Command {
 
         if(!this.console.server.gameSocket) {
             logger.log("§F00;This command requires game socket to be running")
-            logger.log(CLIStyle.tip("To manage server modules, use 'service' command"))
             return;
         }
 
@@ -45,14 +54,13 @@ export default class RoomCreateCommand extends Command {
             return
         }
 
+        let mode = (flags.get("mode") as string[])[0]
         let mapName = (flags.get("map") as string[])[0]
         let gameName = mapName
         if(flags.has("name")) gameName = (flags.get("name") as string[])[0]
 
         if (this.console.server.gameSocket.games.get(gameName)) {
-            logger.log( `§F00; Room '${gameName}' already exists\n` +
-                        CLIStyle.tip(`To control existing room, use 'room view' command\n`) +
-                        CLIStyle.tip(`To delete existing room, use 'room delete' command`))
+            logger.log( `§F00;Room '${gameName}' already exist\n`)
             return
         }
 
@@ -68,10 +76,10 @@ export default class RoomCreateCommand extends Command {
 
         roomConfig.name = gameName
         roomConfig.map = mapPath
+        roomConfig.mode = mode
 
         this.console.server.gameSocket.createRoom(roomConfig).then(() => {
-            logger.log( `§0F0; Room '${gameName}' has been sucessfully created\n` +
-                    CLIStyle.tip(`To control this room, use 'room view "${gameName}"' command`))
+            logger.log( `§0F0; Room '${gameName}' sucessfully created\n`)
         })
     }
 
@@ -80,9 +88,11 @@ export default class RoomCreateCommand extends Command {
 
         let currentFlag = found.currentFlag
 
-        if(currentFlag && currentFlag.name === "map") {
+        if(currentFlag?.name === "map") {
             let mapsDirectory = this.console.server.config.general.mapsDirectory
             return this.autocompletePath(args[args.length - 1], mapsDirectory, ".map", options)
+        } else if(currentFlag?.name === "mode") {
+            return RoomCreateCommand.validModes.filter(mode => mode.startsWith(args[args.length - 1].toUpperCase()))
         } else if(found.incompleteFlag) {
             return super.autocompleteFlags(found.incompleteFlag, options)
         } else {

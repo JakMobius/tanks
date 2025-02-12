@@ -6,12 +6,12 @@ import React from 'react';
 interface PauseKeyValueRowProps {
     small?: boolean;
     children: React.ReactNode;
-    customClass?: string;
+    className?: string;
 }
 
-const PauseKeyValueRow: React.FC<PauseKeyValueRowProps> = ({ small, children, customClass }) => {
+const PauseKeyValueRow: React.FC<PauseKeyValueRowProps> = ({ small, children, className }) => {
     return (
-        <div className={['pause-key-value-row', small ? 'small' : '', customClass].join(' ')}>
+        <div className={['pause-key-value-row', small ? 'small' : '', className].join(' ')}>
             {children}
         </div>
     );

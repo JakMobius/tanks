@@ -1,17 +1,10 @@
 
-import PauseInputRow from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
+import { PauseKeyInputRow } from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
 import React, { useEffect, useState } from "react";
 import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
 
-interface MainViewProps {
-    onSubmit?: (map: {
-        mapName: string,
-        mapWidth: number,
-        mapHeight: number
-    }) => void
-}
 
-const NewMapView: React.FC<MainViewProps> = (props) => {
+const NewMapView: React.FC = (props) => {
 
     const defaultMapName = "Безымянная карта"
     const defaultMapWidth = "50"
@@ -86,22 +79,30 @@ const NewMapView: React.FC<MainViewProps> = (props) => {
         }
     }
 
+    const createMap = () => {
+        let name = formState.mapName.length === 0 ? defaultMapName : formState.mapName
+        let width = formState.mapWidth.length === 0 ? defaultMapWidth : formState.mapWidth
+        let height = formState.mapHeight.length === 0 ? defaultMapHeight : formState.mapHeight
+
+
+    }
+
     return (
         <PauseNavigationItem title="Новая карта">
-            <PauseInputRow
+            <PauseKeyInputRow
                 title="Название"
                 placeholder={defaultMapName}
                 onChange={onNameChange}
                 {...style(formState.mapNameValid)}
                 value={formState.mapName}/>
-            <PauseInputRow
+            <PauseKeyInputRow
                 title="Ширина"
                 placeholder={defaultMapWidth}
                 suffix=" блоков"
                 onChange={onWidthChange}
                 {...style(formState.mapWidthValid)}
                 value={formState.mapWidth}/>
-            <PauseInputRow
+            <PauseKeyInputRow
                 title="Высота"
                 placeholder={defaultMapHeight}
                 suffix=" блоков"
@@ -112,14 +113,10 @@ const NewMapView: React.FC<MainViewProps> = (props) => {
                 blue={formState.formValid}
                 onClick={() => {
                     if (formState.formValid) {
-                        props.onSubmit?.({
-                            mapName: formState.mapName,
-                            mapWidth: parseInt(formState.mapWidth),
-                            mapHeight: parseInt(formState.mapHeight)
-                        })
+                        createMap()
                     }
                 }}
-            />
+            >Создать</PauseMenuButton>
         </PauseNavigationItem>
     )
 }

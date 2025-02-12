@@ -10,6 +10,7 @@ export interface NavigationContextProps {
   stack: NavigationStackItem[];
   push: (component: ReactNode) => void;
   pop: () => void;
+  popAll: () => void;
 }
 
 const NavigationContext = createContext<NavigationContextProps | undefined>(undefined);
@@ -77,15 +78,20 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => 
     }
   };
 
+  const popAll = () => {
+    setStack([]);
+    props.onClose?.()
+  }
+
   useEffect(() => {
     push(props.children)
     return () => {
-      props.onClose?.()
+      popAll()
     }
   }, [])
 
   return (
-    <NavigationContext.Provider value={{ stack, push, pop }}>
+    <NavigationContext.Provider value={{ stack, push, pop, popAll }}>
       {stack[stack.length - 1]?.component}
     </NavigationContext.Provider>
   );

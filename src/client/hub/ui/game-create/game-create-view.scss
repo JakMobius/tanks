@@ -1,3 +1,4 @@
+@use "../../../ui/theme.scss" as theme;
 
 .game-create-view {
   text-align: center;
@@ -6,7 +7,7 @@
     width: 181px;
     height: 47px;
     border-radius: 13px;
-    background-color: #009EE0;
+    background-color: theme.$main-blue;
     background-repeat: no-repeat;
     background-position: calc(100% - 13px) center;
     background-size: 13px;

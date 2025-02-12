@@ -1,0 +1,23 @@
+
+
+.tip-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+
+    .tip {
+        font-weight: bold;
+
+        &.error {
+            background: rgba(224, 0, 40);;
+        }
+        &.warning {
+            background: rgb(236, 126, 64);
+        }
+        &.fine {
+            background: rgb(0, 177, 18);
+        }
+    }
+}

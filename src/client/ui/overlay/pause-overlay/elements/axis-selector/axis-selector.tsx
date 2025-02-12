@@ -14,15 +14,15 @@ const AxisSelector: React.FC<AxisSelectorProps> = (props) => {
     const getAxes = (axes: string[]) => {
         if(axes.length > 0) {
             return axes.map((axle, i) => 
-                <Cloud key={i} blue customClass='mapped-key'> {axle} </Cloud>
+                <Cloud key={i} blue className='mapped-key'> {axle} </Cloud>
             )
         } else {
-            return <Cloud customClass='mapped-key'> Не установлено </Cloud>
+            return <Cloud className='mapped-key'> Не установлено </Cloud>
         }
     }
 
-    return <PauseKeyValueRow small customClass="axis-selector">
-        <Cloud blue customClass='key-name'>{props.text}</Cloud>
+    return <PauseKeyValueRow small className="axis-selector">
+        <Cloud blue className='key-name'>{props.text}</Cloud>
         <div className='mapped-keys'>
             {getAxes(props.axes)}
         </div>
