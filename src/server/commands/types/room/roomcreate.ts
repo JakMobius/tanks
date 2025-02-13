@@ -54,7 +54,7 @@ export default class RoomCreateCommand extends Command {
             return
         }
 
-        let mode = (flags.get("mode") as string[])[0]
+        let mode = (flags.get("mode") as string[])?.[0] ?? "DM"
         let mapName = (flags.get("map") as string[])[0]
         let gameName = mapName
         if(flags.has("name")) gameName = (flags.get("name") as string[])[0]
@@ -79,7 +79,7 @@ export default class RoomCreateCommand extends Command {
         roomConfig.mode = mode
 
         this.console.server.gameSocket.createRoom(roomConfig).then(() => {
-            logger.log( `§0F0; Room '${gameName}' sucessfully created\n`)
+            logger.log(`§0F0; Created room '${gameName}'`)
         })
     }
 

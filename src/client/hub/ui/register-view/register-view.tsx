@@ -15,25 +15,33 @@ const RegisterView: React.FC = () => {
         password: "",
         loginTips: [] as Tip[],
         passwordTips: [] as Tip[],
+        errors: [] as Tip[],
         loginCorrect: false,
         passwordCorrect: false,
-        passwordStrengthClass: ""
+        passwordStrengthClass: "",
+        requests: new Set<JQuery.jqXHR>()
     })
 
     const onSuccessfulRegister = () => {
         window.location.reload()
     }
 
-    const onLoginUsed = () => {
-        setState((state) => ({
-            ...state,
-            loginTips: [{
-                text: "Этот позывной уже кем-то занят",
-                style: TipStyle.ERROR
-            }],
-            loginCorrect: false
-        }))
+    const setLoginTips = (tips: Tip[]) => {
+        setState((state) => ({...state, loginTips: tips, loginCorrect: tips.length == 0}))
     }
+
+    const setPasswordTips = (tips: Tip[]) => {
+        setState((state) => ({...state, passwordTips: tips, passwordCorrect: tips.length == 0}))
+    }
+
+    const setError = (error: string | null) => {
+        setState((state) => ({...state, errors: error ? [{text: error, style: TipStyle.ERROR}] : []}))
+    }
+
+    const onLoginUsed = () => setLoginTips([{
+        text: "Этот позывной уже кем-то занят",
+        style: TipStyle.ERROR
+    }])
 
     const handleResult = (result: any) => {
         switch(result.result) {
@@ -46,13 +54,10 @@ const RegisterView: React.FC = () => {
 
     const onRegister = () => {
         if(!state.passwordCorrect) {
-            setState((state) => ({
-                ...state,
-                passwordTips: [{
-                    style: TipStyle.ERROR,
-                    text: "Это разве пароль?"
-                }]
-            }))
+            setPasswordTips([{
+                style: TipStyle.ERROR,
+                text: "Это разве пароль?"
+            }])
             return
         }
 
@@ -70,19 +75,17 @@ const RegisterView: React.FC = () => {
         }).done((result) => {
             handleResult(result)
         }).fail((xhr, exception) => {
-            let msg = localizeAjaxError(xhr, exception)
-             // TODO: Figure out a better way
-            // props.page.eventContainer.createEvent(msg)
+            setError(localizeAjaxError(xhr, exception))
         })
     }
 
     const setLogin = (login: string) => {
-        setState((state) => ({...state, login}))
+        setState((state) => ({...state, login, errors: []}))
         checkLogin()
     }
 
     const setPassword = (password: string) => {
-        setState((state) => ({...state, password}))
+        setState((state) => ({...state, password, errors: []}))
         checkPassword()
     }
 

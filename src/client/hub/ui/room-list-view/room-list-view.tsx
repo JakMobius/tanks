@@ -4,7 +4,7 @@ import { localizeAjaxError } from "src/client/hub/localizations";
 import { getNonsenseErrorHeader } from 'src/client/scenes/loading/error-message-generator';
 import React, { useEffect, useState } from 'react';
 import { GlobalRoomListComponent, RoomConfig, UserRoomListComponent } from './room-list/room-list';
-import { LoadingViewComponent } from '../loading-view/loading-view';
+import LoadingView from '../loading-view/loading-view';
 import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
 import GameCreateViewComponent from '../game-create/game-create-view';
 import { CloudyNavigationHeader } from 'src/client/ui/overlay/pause-overlay/pause-menu-view';
@@ -18,7 +18,7 @@ export const RoomListErrorComponent: React.FC<RoomListErrorProps> = (props) => {
     const [header] = useState(getNonsenseErrorHeader())
 
     return (
-        <LoadingViewComponent
+        <LoadingView
             title={header}
             subtitle={
                 <span>
@@ -95,7 +95,7 @@ const RoomListView: React.FC = (props) => {
                 <div className="room-list-view-contents">
                     {state.loading ? (
                         <div className="room-list">
-                            <LoadingViewComponent
+                            <LoadingView
                                 title="Пожалуйста, подождите..."
                                 subtitle="Я думаю"
                                 shown={state.loading} />

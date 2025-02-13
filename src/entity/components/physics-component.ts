@@ -73,10 +73,6 @@ export default class PhysicalComponent extends EventHandlerComponent {
         if(host === this.host) return;
 
         if(this.host) {
-            // @ts-ignore
-            if(global.isWithinTick) {
-                throw new Error("OUCH!!!!!")
-            }
             this.host.world.DestroyBody(this.body)
             this.host.destroyComponent(this)
         }

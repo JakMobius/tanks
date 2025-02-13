@@ -3,9 +3,8 @@ import "./loading-scene.scss"
 import Scene from '../scene';
 
 import LoadingOverlay from "src/client/scenes/loading/ui/loading-overlay";
-import {LoadingError, LoadingErrorAction, RandomMessageLoadingError} from "src/client/scenes/loading/loading-error";
+import {LoadingError, RandomMessageLoadingError} from "src/client/scenes/loading/loading-error";
 import {
-    internetErrorMessageGenerator,
     unknownErrorMessageGenerator
 } from "src/client/scenes/loading/error-message-generator";
 import {Progress} from "src/client/utils/progress";
@@ -40,7 +39,12 @@ export default class LoadingScene extends Scene {
             return
         }
 
-        this.loadingOverlay.loadingView.setLoadingFraction(this.progress.getFraction())
+        let fraction = this.progress.getFraction()
+        if(fraction !== this.loadingOverlay.props.loadingFraction) {
+            this.loadingOverlay.setState({
+                loadingFraction: fraction
+            })
+        }
     }
 
     convertErrorToLoadingError(error: any): LoadingError {
@@ -55,19 +59,22 @@ export default class LoadingScene extends Scene {
     showError(error: any) {
         this.shownError = error !== null
 
-        this.loadingOverlay.loadingView.setScaleVisible(!this.shownError)
-        this.loadingOverlay.loadingView.setErrorVisible(this.shownError)
-
         if (this.shownError) {
             let loadingError = this.convertErrorToLoadingError(error)
 
-            this.loadingOverlay.loadingView.setHeader(loadingError.getHeader())
-            this.loadingOverlay.loadingView.setErrorDescription(loadingError.getDescription())
-            this.loadingOverlay.loadingView.setErrorActions(loadingError.getActions())
+            this.loadingOverlay.setState({
+                loadingFraction: null,
+                title: loadingError.getHeader(),
+                errorDescription: loadingError.getDescription(),
+                errorActions: loadingError.getActions(),
+            })
         } else {
-            this.loadingOverlay.loadingView.setDefaultHeader()
-            this.loadingOverlay.loadingView.setErrorDescription("")
-            this.loadingOverlay.loadingView.setErrorActions([])
+            this.loadingOverlay.setState({
+                loadingFraction: null,
+                title: "Пожалуйста, подождите...",
+                errorDescription: null,
+                errorActions: null,
+            })
         }
     }
 }

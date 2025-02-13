@@ -15,6 +15,7 @@ export default class RenderLoop extends Loop {
     }
 
     stop() {
+        super.stop()
         if (this.frame !== null) {
             cancelAnimationFrame(this.frame)
         }

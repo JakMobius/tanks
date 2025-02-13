@@ -44,11 +44,7 @@ export default class PhysicalHostComponent implements Component {
         this.worldTicks = (this.worldTicks + 1) % this.worldTicksModulo
 
         if(this.iterations.positionIterations > 0 && this.iterations.velocityIterations > 0 && this.physicsTick > 0) {
-            // @ts-ignore
-            global.isWithinTick = true
             this.world.Step(this.physicsTick, this.iterations);
-            // @ts-ignore
-            global.isWithinTick = false
         }
     }
 

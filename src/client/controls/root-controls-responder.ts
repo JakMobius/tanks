@@ -62,6 +62,10 @@ export class ControlsResponder extends EventEmitter {
         }
     }
 
+    getChildResponders() {
+        return this.childrenResponders
+    }
+
     connectTankControls(controls: TankControls) {
         controls.axles.get("y").addSource(this.getControlAxle("tank-throttle"))
         controls.axles.get("x").addSource(this.getControlAxle("tank-steer"))

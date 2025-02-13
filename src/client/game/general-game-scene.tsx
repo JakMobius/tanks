@@ -111,7 +111,7 @@ export default class GeneralGameScene extends Scene {
 
         this.worldEventListener.on("choose-tank", () => {
             this.tankSelectOverlay.show()
-            this.tankSelectOverlay.requireTankSelection()
+            // this.tankSelectOverlay.requireTankSelection()
         })
     }
 
