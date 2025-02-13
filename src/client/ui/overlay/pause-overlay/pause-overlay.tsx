@@ -2,8 +2,9 @@
 import Overlay from "src/client/ui/overlay/overlay";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import ReactDOM from "react-dom/client";
-import React from "react";
-import { NavigationProvider } from '../../navigation/navigation-view';
+import React, { useEffect } from "react";
+import { NavigationProvider, useNavigation } from '../../navigation/navigation-view';
+import NavigationEscapeHandler from "../../navigation/navigation-escape-handler";
 
 export interface PauseOverlayConfig {
     rootComponent: React.ReactNode,
@@ -37,8 +38,9 @@ export default class PauseOverlay extends Overlay {
             this.reactRoot.render(
                 <NavigationProvider
                     onClose={() => this.hide()}
+                    rootComponent={this.rootComponent}
                 >
-                    {this.rootComponent}
+                    <NavigationEscapeHandler controls={this.pauseControlsResponder}/>
                 </NavigationProvider>
             )
             return true

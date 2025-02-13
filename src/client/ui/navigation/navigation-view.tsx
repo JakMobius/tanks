@@ -46,9 +46,10 @@ export interface NavigationStackItem {
 }
 
 export interface NavigationProviderProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   onClose?: () => void
   wrapper?: React.FC<{ children: React.ReactNode }>
+  rootComponent?: React.ReactNode
 }
 
 export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => {
@@ -84,7 +85,9 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => 
   }
 
   useEffect(() => {
-    push(props.children)
+    if (props.rootComponent) {
+      push(props.rootComponent)
+    }
     return () => {
       popAll()
     }
@@ -92,6 +95,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => 
 
   return (
     <NavigationContext.Provider value={{ stack, push, pop, popAll }}>
+      {props.children}
       {stack[stack.length - 1]?.component}
     </NavigationContext.Provider>
   );

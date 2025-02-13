@@ -4,7 +4,9 @@ import {UserDataRaw} from "src/client/utils/user-data-raw";
 
 import { NavigationProvider } from 'src/client/ui/navigation/navigation-view';
 import MainMenuView from './main-menu/main-menu';
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import NavigationEscapeHandler from 'src/client/ui/navigation/navigation-escape-handler';
+import RootControlsResponder, { ControlsResponder } from 'src/client/controls/root-controls-responder';
 
 const HubPageNavigationWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => {
     return (
@@ -29,13 +31,27 @@ export const useProfile = () => {
 };
 
 const HubPage: React.FC<HubPageProps> = (props) => {
+
+    const [state] = useState({
+        controlsResponder: useMemo(() => new ControlsResponder(), [])
+    })
+
+    useEffect(() => {
+        RootControlsResponder.getInstance().setMainResponderDelayed(state.controlsResponder)
+        return () => {
+            RootControlsResponder.getInstance().setMainResponderDelayed(null)
+        }
+    }, [state.controlsResponder])
+
     return (
         <ProfileContext.Provider value={props.userData}>
             <div className="hub-body">
                 <div className="dimmer"></div>
                 <div className="navigation-view">
-                    <NavigationProvider wrapper={HubPageNavigationWrapper}>
-                        <MainMenuView></MainMenuView>
+                    <NavigationProvider
+                        rootComponent={<MainMenuView/>}
+                        wrapper={HubPageNavigationWrapper}>
+                        <NavigationEscapeHandler controls={state.controlsResponder}/>
                     </NavigationProvider>
                 </div>
             </div>
