@@ -8,15 +8,17 @@ import NavigationEscapeHandler from "../../navigation/navigation-escape-handler"
 
 export interface PauseOverlayConfig {
     rootComponent: React.ReactNode,
+    wrapper?: React.FC<{ children: React.ReactNode }>,
     gameControls: ControlsResponder
 }
 
 export default class PauseOverlay extends Overlay {
 
     rootComponent: React.ReactNode
+    wrapper?: React.FC<{ children: React.ReactNode }>
     pauseControlsResponder = new ControlsResponder()
     gameControlsResponder: ControlsResponder
-    
+
     reactRoot: ReactDOM.Root
 
     constructor(options: PauseOverlayConfig) {
@@ -26,6 +28,7 @@ export default class PauseOverlay extends Overlay {
 
         this.gameControlsResponder = options.gameControls
         this.rootComponent = options.rootComponent
+        this.wrapper = options.wrapper
 
         this.gameControlsResponder.on("game-pause", () => this.show())
     }
@@ -35,13 +38,18 @@ export default class PauseOverlay extends Overlay {
             RootControlsResponder.getInstance().setMainResponderDelayed(this.pauseControlsResponder)
             this.element.addClass("shown")
             this.reactRoot = ReactDOM.createRoot(this.element[0])
+
+            let Wrapper = (this.wrapper || React.Fragment) as React.FC<{ children: React.ReactNode }>
+
             this.reactRoot.render(
-                <NavigationProvider
-                    onClose={() => this.hide()}
-                    rootComponent={this.rootComponent}
-                >
-                    <NavigationEscapeHandler controls={this.pauseControlsResponder}/>
-                </NavigationProvider>
+                <Wrapper>
+                    <NavigationProvider
+                        onClose={() => this.hide()}
+                        rootComponent={this.rootComponent}
+                    >
+                        <NavigationEscapeHandler controls={this.pauseControlsResponder}/>
+                    </NavigationProvider>
+                </Wrapper>
             )
             return true
         }

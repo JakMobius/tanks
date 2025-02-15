@@ -21,8 +21,35 @@ import PauseOverlay from "src/client/ui/overlay/pause-overlay/pause-overlay";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import TransformComponent from "src/entity/components/transform-component";
 
-import React from 'react';
 import MapEditorPauseView from '../ui/pause/map-editor-pause';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
+interface MapEditorSceneContextProps {
+    scene: MapEditorScene | null;
+}
+
+const MapEditorSceneContext = createContext<MapEditorSceneContextProps | undefined>(undefined);
+
+interface MapEditorSceneProviderProps {
+    children: React.ReactNode;
+    scene: MapEditorScene;
+}
+
+export const MapEditorSceneProvider: React.FC<MapEditorSceneProviderProps> = (props) => {
+    return (
+        <MapEditorSceneContext.Provider value={{ scene: props.scene }}>
+            {props.children}
+        </MapEditorSceneContext.Provider>
+    );
+};
+
+export const useMapEditorScene = (): MapEditorSceneContextProps => {
+    const context = useContext(MapEditorSceneContext);
+    if (!context) {
+        throw new Error('useMapEditorScene must be used within a MapEditorSceneProvider');
+    }
+    return context;
+};
 
 export default class MapEditorScene extends Scene {
 
@@ -62,35 +89,20 @@ export default class MapEditorScene extends Scene {
         this.setupWorkspace()
 
         this.menuOverlay = new PauseOverlay({
-            rootComponent: <MapEditorPauseView/>,
+            wrapper: (props) => MapEditorSceneProvider({ ...props, scene: this }),
+            rootComponent: (
+                <MapEditorPauseView/>
+            ),
             gameControls: this.controlsResponder
         })
         this.overlayContainer.append(this.menuOverlay.element)
-
-        this.menuOverlay.on("open", (map) => {
-            this.map = map
-            this.world.getComponent(TilemapComponent).setMap(this.map)
-            this.toolManager.world.getComponent(TilemapComponent).setMap(this.map)
-
-            if (map) {
-                let target = {
-                    x: this.map.width * GameMap.BLOCK_SIZE / 2,
-                    y: this.map.height * GameMap.BLOCK_SIZE / 2
-                }
-                this.camera.getComponent(CameraPositionController).setTarget(target).reset()
-                this.menuOverlay.hide()
-            } else {
-                this.camera.getComponent(CameraPositionController).setTarget(null)
-            }
-
-            this.setNeedsRedraw()
-        })
 
         this.backgroundOverlay.on("drag", (dx, dy) => {
             if (this.map && this.cameraMovementEnabled) {
                 let camera = this.camera.getComponent(CameraPositionController)
                 camera.target.x += dx
                 camera.target.y += dy
+                camera.onTick(0)
                 this.setNeedsRedraw()
             }
         })
@@ -99,6 +111,7 @@ export default class MapEditorScene extends Scene {
             if (this.map && this.cameraZoomEnabled) {
                 let camera = this.camera.getComponent(CameraPositionController)
                 camera.baseScale *= zoom;
+                camera.onTick(0)
                 this.setNeedsRedraw()
             }
         })
@@ -138,6 +151,25 @@ export default class MapEditorScene extends Scene {
         //         this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
         //     }
         // })
+    }
+
+    loadMap(map: GameMap) {
+        this.map = map
+        this.world.getComponent(TilemapComponent).setMap(this.map)
+        this.toolManager.world.getComponent(TilemapComponent).setMap(this.map)
+
+        if (map) {
+            let target = {
+                x: this.map.width * GameMap.BLOCK_SIZE / 2,
+                y: this.map.height * GameMap.BLOCK_SIZE / 2
+            }
+            this.camera.getComponent(CameraPositionController).setTarget(target).reset()
+            this.menuOverlay.hide()
+        } else {
+            this.camera.getComponent(CameraPositionController).setTarget(null)
+        }
+
+        this.setNeedsRedraw()
     }
 
     setupWorkspace() {

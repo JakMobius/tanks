@@ -79,13 +79,17 @@ export default class MapEditorBackgroundOverlay extends Overlay {
     }
 
     private getX(x: number, y: number, z: number) {
-        let normX = this.matrix.transformX(x, y, z)
-        return (normX + 1) * this.element.width() / 2
+        let normalizedX = (x / this.element.width()) * 2 - z
+        let normalizedY = (y / this.element.height()) * 2 - z
+
+        return this.matrix.transformX(normalizedX, -normalizedY, z)
     }
 
     private getY(x: number, y: number, z: number) {
-        let normY = this.matrix.transformY(x, y, z)
-        return (normY + 1) * this.element.height() / 2
+        let normalizedX = (x / this.element.width()) * 2 - z
+        let normalizedY = (y / this.element.height()) * 2 - z
+
+        return this.matrix.transformY(normalizedX, -normalizedY, z)
     }
 
     private emitDrag(dx: number, dy: number) {

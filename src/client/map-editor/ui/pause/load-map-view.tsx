@@ -6,14 +6,22 @@ import GameMap from "src/map/game-map";
 import GameMapNameComponent from "src/client/map-editor/map-name-component";
 import GameMapSizeComponent from "src/client/map-editor/map-size-component";
 import React, { useState } from 'react';
+import { useMapEditorScene } from '../../scenes/map-editor-scene';
 
 interface MapPreviewRowProps {
     map: GameMap
+    onClick?: () => void
 }
 
 const MapPreviewRow: React.FC<MapPreviewRowProps> = (props) => {
     let name = props.map.getComponent(GameMapNameComponent)?.name ?? "Карта"
     let size = props.map.getComponent(GameMapSizeComponent)?.size ?? -1
+
+    const mapEditor = useMapEditorScene()
+
+    const onMapSelect = () => {
+        mapEditor.scene?.loadMap(props.map)
+    }
 
     return (
         <div className="map-preview-row">
@@ -25,7 +33,7 @@ const MapPreviewRow: React.FC<MapPreviewRowProps> = (props) => {
                 <div className="map-description-subtitle">{size} байт • изм. 10.02.2024 14:23</div>
             </div>
             <div className="map-buttons-container">
-                <div className="open-button">Открыть</div>
+                <div className="open-button" onClick={onMapSelect}>Открыть</div>
             </div>
         </div>
     )
@@ -36,8 +44,12 @@ const LoadMapView: React.FC = () => {
     
     return (
         <PauseNavigationItem title="Загрузить карту">
-            <PauseMenuSubtitle>Чтобы загрузить карту из файла, просто перетащите его в окно с редактором.</PauseMenuSubtitle>
-            {maps.map(map => <MapPreviewRow map={map}></MapPreviewRow>)}
+            <PauseMenuSubtitle>
+                Чтобы загрузить карту из файла, просто перетащите его в окно с редактором.
+            </PauseMenuSubtitle>
+            {maps.map((map, index) => (
+                <MapPreviewRow map={map} key={index}/>
+            ))}
         </PauseNavigationItem>
     )
 }

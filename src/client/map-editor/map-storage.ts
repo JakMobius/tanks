@@ -7,10 +7,30 @@ import GameMap from "src/map/game-map";
 import GameMapNameComponent from "./map-name-component";
 import GameMapHistoryComponent from "./history/game-map-history-component";
 import GameMapSizeComponent from "src/client/map-editor/map-size-component";
+import { getTutorialMap } from '../tutorial/tutorial-map';
 
 export default class MapStorage {
 
     static read() {
+        // TODO: temporary
+
+        let map = getTutorialMap()
+
+        let nameComponent = new GameMapNameComponent()
+        nameComponent.name = "Туториал"
+        map.addComponent(nameComponent)
+
+        let historyComponent = new GameMapHistoryComponent()
+        map.addComponent(historyComponent)
+        
+        let sizeComponent = new GameMapSizeComponent()
+        sizeComponent.size = 5000000000
+        map.addComponent(sizeComponent)
+
+        return [
+            map
+        ]
+
         let base64 = window.localStorage.getItem("editor-maps")
         if (!base64) return [] as GameMap[]
 
