@@ -60,9 +60,61 @@ export function parseServerClusterConfig(config: PreferencesSection): ServerClus
     }
 }
 
+function verifyOrigin(origin: any, configPath: string): string | RegExp {
+    if(typeof origin === "string") {
+        return origin
+    } else if(origin instanceof Object) {
+        // TODO: generalize this
+
+        let regex: any = null
+        let flags: any = null
+
+        for(let key in origin) {
+            if(key === "regex") {
+                regex = origin[key]
+            } else if(key === "flags") {
+                flags = origin[key]
+            } else {
+                throw new Error(configPath + "has an invalid key '" + key + "'. Only 'regex' and 'flags' are allowed.")
+            }
+        }
+
+        if(regex === null) {
+            throw new Error(configPath + " is missing the 'regex' key.")
+        }
+
+        if(typeof regex !== "string") {
+            throw new Error(configPath + ".regex must be a string.")
+        }
+
+        if(flags !== null && typeof flags !== "string") {
+            throw new Error(configPath + ".flags must be a string.")
+        }
+
+        return new RegExp(regex, flags)
+    }
+
+    throw new Error(configPath + " must be a string or an object of type { regex: string, flags?: string }.")
+}
+
 export function parseWebserverConfig(config: PreferencesSection): WebServerConfig {
+    const allowedOriginsConfigPath = "allowed-origins"
+    const allowedOriginsConfigItem = config.value(allowedOriginsConfigPath)
+    let allowedOrigins: (string | RegExp)[] | "*" = "*"
+    
+    if(Array.isArray(allowedOriginsConfigItem)) {
+        allowedOrigins = allowedOriginsConfigItem.map((origin, index) => {
+            return verifyOrigin(origin, config.nestedPath(allowedOriginsConfigPath) + "[" + index + "]")
+        })
+    } else if(allowedOriginsConfigItem !== "*") {
+        throw new Error(config.nestedPath(allowedOriginsConfigPath) + " must be '*' or an array of allowed origins.")
+    }
+
     return {
-        sessionKey: config.string("session-key")
+        allowLocalInterfaceOrigins: config.boolean("allow-local-interface-origins"),
+        allowedOrigins: allowedOrigins,
+        sessionKey: config.string("session-key"),
+        allowNoOrigin: config.boolean("allow-no-origin")
     }
 }
 

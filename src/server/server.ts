@@ -22,6 +22,9 @@ export interface ServerClusterConfig {
 
 export interface WebServerConfig {
     sessionKey: string
+    allowedOrigins: (string | RegExp)[] | "*"
+    allowLocalInterfaceOrigins: boolean
+    allowNoOrigin: boolean
 }
 
 export interface GeneralServerConfig {

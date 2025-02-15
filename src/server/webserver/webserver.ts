@@ -9,8 +9,10 @@ import StaticModule from "./static/static-module";
 import Server from "../server";
 import {WebserverSession} from "./webserver-session";
 
-// const init = require('express/lib/middleware/init').init
+// TODO: Figure out another way
+// @ts-ignore
 import { init } from 'express/lib/middleware/init.js';
+import { getLocalIPAddresses } from './network-interfaces';
 
 
 export default class WebServer {
@@ -41,6 +43,63 @@ export default class WebServer {
 
         this.baseModule.enabled = true
         this.staticModule.enabled = true
+    }
+
+    checkAllowedOrigin(req: express.Request, res: express.Response) {
+        const allowedOrigins = this.server.config.webServer.allowedOrigins
+
+        if(allowedOrigins === "*") return true
+
+        const requestOrigin = req.get('origin')
+
+        if(!requestOrigin) {
+            if(this.server.config.webServer.allowNoOrigin) {
+                return true;
+            } else {
+                res.status(403).send({
+                    error: 'forbidden',
+                    description: 'no origin header'
+                });
+                return false;
+            }
+        }
+        
+        let requestOriginHostname
+        try {
+            requestOriginHostname = new URL(requestOrigin).hostname
+        } catch(e) {
+            if(this.server.config.webServer.allowNoOrigin) {
+                return true
+            }
+
+            res.status(403).send({
+                error: 'forbidden',
+                description: 'invalid origin header'
+            });
+            return false;
+        }
+
+        for(let allowedOrigin of allowedOrigins) {
+            if(allowedOrigin instanceof RegExp) {
+                if(allowedOrigin.test(requestOriginHostname)) {
+                    return true;
+                }
+            } else if(allowedOrigin === requestOriginHostname) {
+                return true;
+            }
+        }
+
+        if(this.server.config.webServer.allowLocalInterfaceOrigins) {
+            if(getLocalIPAddresses().indexOf(requestOriginHostname) !== -1) {
+                return true
+            }
+        }
+
+        res.status(403).send({
+            error: 'forbidden',
+            description: 'origin ' + requestOrigin + ' is not allowed'
+        });
+        return false;
     }
 
     addModule(module: WebserverModule) {
@@ -95,7 +154,13 @@ export default class WebServer {
             secret: this.server.config.webServer.sessionKey,
             store: this.server.db.getWebserverStore(),
             resave: true,
-            saveUninitialized: false
+            saveUninitialized: false,
+            cookie: {
+                maxAge: 24 * 60 * 60 * 1000,
+                httpOnly: true, 
+                secure: false,
+                sameSite: 'strict',
+            }
         })
 
         this.app.use(express.urlencoded({ extended: true }));

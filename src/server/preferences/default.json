@@ -37,6 +37,21 @@
 		// option to express.js session constructor. You should probably
 		// change it to something else.
 		"session-key": "please change this line to your unique key",
+
+		// To prevent CSRF attacks, allowed origins are checked on 
+		// non-static requests.
+
+		// "allowed-origins": "*",
+		// "allowed-origins": [{ regexp: ".*\\.local", flags: "i" }],
+		// "allowed-origins": [{ regexp: "192\\.168\\.*" }],
+		"allowed-origins": ["localhost"],
+
+		// Whether to consider all local interfaces as allowed origins.
+		// For development only.
+		"allow-local-interface-origins": true,
+
+		// Whether to allow requests with no origin header.
+		"allow-no-origin": false
 	},
 
 	// Settings for the cluster communication mechanism

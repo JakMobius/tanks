@@ -41,6 +41,9 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
             return
         }
 
+        // Check for allowed origins
+        if(this.module.webServer.checkAllowedOrigin(req, res) === false) return;
+
         let schema = ctor.schema
         let requestFields: any = {}
 
