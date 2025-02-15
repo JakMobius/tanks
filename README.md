@@ -1,25 +1,17 @@
 # tanks
 Browser action game project
 
-#### Please, note that project is under heavy development now
-This repository should not be treated as a real finished game for now. Some features listed in this readme are likely being refactored and doesn't work right now. (For example, you should have an HTTP server to access the map editor. Ugh)
-
-However, you can contribute and help make this game more and more awesome `:)`
+#### Please, note that project is under continious development
+This repository should not be treated as a real finished game for now. The code is constantly being refactored in one place or another, and some features might not work at the moment.
 
 ### Features
 
-- The game uses high-performance WebGL for graphics
-- Client-server architecture allows you to play with your friends
-- Convenient server console
-- Realistic spread and reflection of blast waves
-- Convenient map editor
-- Low traffic consumption
-- Uses TypeScript for both server and client.
-- Custom build system which allows to use the same files both in client and in server build for convinience
+- WebGL graphics
+- Client-server architecture
+- Map editor
+- Realistic explosions
 
 # Installing the game
-
-*Please, note that Node 14 is required*
 
 1. Clone the repo
 ```
@@ -37,12 +29,11 @@ npm install
 # Building & running the server
 - To build server from sources, type the following command:
   ```
-  node ./node_modules/beelder/bin/beelder/cli.js release-server
+  npm run build
   ```
-  This command will rebuild the entire project. This may take time the first time you run it, but subsequent builds will be much faster due to the build cache
 - To start server with default settings, simply type
   ```
-  node dist/server
+  node dist
   ```
 ### Server command line arguments
 - `-script <script name>`
