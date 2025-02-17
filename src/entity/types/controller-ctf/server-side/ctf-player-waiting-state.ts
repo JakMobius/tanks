@@ -5,7 +5,7 @@ import PlayerSpawnPositionScript, {
     RandomSpawnMode
 } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import CTFGameStateController from "src/entity/types/controller-ctf/server-side/ctf-game-state-controller";
-import {CTFGameData, CTFGameStateType} from "src/entity/types/controller-ctf/ctf-game-data";
+import {CTFGameData, CTFGameStateType} from "src/entity/types/controller-ctf/ctf-game-state";
 import ServerCTFControllerComponent from "src/entity/types/controller-ctf/server-side/server-ctf-controller-component";
 import CTFPlayingStateController from "src/entity/types/controller-ctf/server-side/ctf-playing-state-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";

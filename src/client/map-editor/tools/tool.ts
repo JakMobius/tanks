@@ -1,13 +1,13 @@
 import ToolManager from "./toolmanager";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import RootControlsResponder from "src/client/controls/root-controls-responder";
+import EventEmitter from "src/utils/event-emitter";
 
-
-class Tool {
-	public dragging: boolean;
+export default class Tool extends EventEmitter {
+	public dragging: boolean;   
 	public cursor: string;
 	public locksDragging: boolean;
-	public settingsView: any;
+	public settingsView: React.FC | null;
     public controlsEventHandler = new BasicEventHandlerSet()
 
     /**
@@ -26,6 +26,7 @@ class Tool {
     manager: ToolManager = null
 
     constructor(manager: ToolManager) {
+        super()
         this.image = null
         this.manager = manager
         this.name = null
@@ -95,5 +96,3 @@ class Tool {
         }
     }
 }
-
-export default Tool;

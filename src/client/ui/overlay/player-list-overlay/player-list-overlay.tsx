@@ -1,6 +1,5 @@
 import './player-list-overlay.scss'
 
-import Overlay from "src/client/ui/overlay/overlay";
 import Entity from "src/utils/ecs/entity";
 import WorldStatisticsComponent, {
     PlayerStatistics
@@ -13,6 +12,7 @@ import ReactDOM from 'react-dom/client';
 
 import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 import Cloud from 'src/client/game/ui/cloud/cloud';
+import View from '../../view';
 
 export interface PlayerListTableProps {
     players: PlayerStatistics[]
@@ -98,7 +98,7 @@ const PlayerListView: React.FC<PlayerListViewProps> = (props) => {
         updateTable()
         updateMapName()
 
-        if(!world) return () => {}
+        if(!world) return undefined
 
         world.on("player-statistics-updated", updateTable)
         world.on("map-name-updated", updateMapName)
@@ -129,7 +129,7 @@ const PlayerListView: React.FC<PlayerListViewProps> = (props) => {
     }, [props.gameControls])
 
     return (
-        <div className="player-list-overlay" style={{ display: state.shown ? undefined : "none" }}>
+        <div className="player-list-overlay" style={{display: state.shown ? undefined : "none"}}>
             <div className="player-list-menu">
                 <div className="player-list-header">
                     <Cloud className={"map-name-cloud " + state.mapName}>{state.mapName}</Cloud>
@@ -147,7 +147,7 @@ export interface PlayerListOverlayConfig {
     gameControls: ControlsResponder
 }
 
-export default class PlayerListOverlay extends Overlay {
+export default class PlayerListOverlay extends View {
 
     reactRoot: ReactDOM.Root
     props: PlayerListViewProps = {}
@@ -155,12 +155,6 @@ export default class PlayerListOverlay extends Overlay {
     constructor(options: PlayerListOverlayConfig) {
         super();
 
-        this.show()
-        this.element
-            .css("width", "100%")
-            .css("height", "100%")
-            .css("display", "flex")
-            .css("flex-direction", "column")
         this.props.gameControls = options.gameControls
         // TODO: this root is never unmounted.
         this.reactRoot = ReactDOM.createRoot(this.element[0])

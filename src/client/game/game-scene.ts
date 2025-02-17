@@ -57,7 +57,7 @@ export default class GameScene extends GeneralGameScene {
 
     private setupPacketHandling() {
         this.client.on(PlayerChatPacket, (packet) => {
-            this.chatContainer.addMessage(packet.text)
+            // this.chatContainer.addMessage(packet.text)
         })
 
         this.client.on(WorldCommunicationPacket, (packet) => {

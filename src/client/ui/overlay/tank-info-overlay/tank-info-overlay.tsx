@@ -374,15 +374,16 @@ const TankInfoView: React.FC<TankInfoViewProps> = (props) => {
     }
 
     useEffect(() => {
-        let primaryEntity = props.world.getComponent(PrimaryPlayerReceiver)?.primaryEntity
+        let primaryEntity = props.world?.getComponent(PrimaryPlayerReceiver)?.primaryEntity
         setTank(primaryEntity)
+        if(!props.world) return undefined
 
         props.world.on("primary-entity-set", setTank)
         return () => props.world.off("primary-entity-set", setTank)
     }, [props.world])
 
     useEffect(() => {
-        if (!state.tank) return () => {}
+        if (!state.tank) return undefined
         state.tank.on("health-set", updateVisibility)
         return () => state.tank.off("health-set", updateVisibility)
     }, [state.tank])

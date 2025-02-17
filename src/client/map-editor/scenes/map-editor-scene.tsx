@@ -80,11 +80,31 @@ export default class MapEditorScene extends Scene {
         this.camera.addComponent(new CameraComponent())
         this.camera.addComponent(new CameraPositionController())
 
-        this.backgroundOverlay = new MapEditorBackgroundOverlay()
-        this.backgroundOverlay.matrix = this.camera.getComponent(CameraComponent).inverseMatrix
+        this.backgroundOverlay = new MapEditorBackgroundOverlay({
+            matrix: this.camera.getComponent(CameraComponent).inverseMatrix,
+            draggingEnabled: false,
+            onDrag: (dx, dy) => {
+                if (this.map && this.cameraMovementEnabled) {
+                    let camera = this.camera.getComponent(CameraPositionController)
+                    camera.target.x += dx
+                    camera.target.y += dy
+                    camera.onTick(0)
+                    this.setNeedsRedraw()
+                }
+            },
+            onZoom: (zoom) => {
+                if (this.map && this.cameraZoomEnabled) {
+                    let camera = this.camera.getComponent(CameraPositionController)
+                    camera.baseScale *= zoom;
+                    camera.onTick(0)
+                    this.setNeedsRedraw()
+                }
+            },
+            onMouseMove: (x, y) => this.toolManager.mouseMove(x, y),
+            onMouseDown: (x, y) => this.toolManager.mouseDown(x, y),
+            onMouseUp: (x, y) => this.toolManager.mouseUp(x, y)
+        })
         this.overlayContainer.append(this.backgroundOverlay.element)
-        this.backgroundOverlay.draggingEnabled = false
-        this.backgroundOverlay.show()
 
         this.setupWorkspace()
 
@@ -97,51 +117,20 @@ export default class MapEditorScene extends Scene {
         })
         this.overlayContainer.append(this.menuOverlay.element)
 
-        this.backgroundOverlay.on("drag", (dx, dy) => {
-            if (this.map && this.cameraMovementEnabled) {
-                let camera = this.camera.getComponent(CameraPositionController)
-                camera.target.x += dx
-                camera.target.y += dy
-                camera.onTick(0)
-                this.setNeedsRedraw()
-            }
-        })
-
-        this.backgroundOverlay.on("zoom", (zoom) => {
-            if (this.map && this.cameraZoomEnabled) {
-                let camera = this.camera.getComponent(CameraPositionController)
-                camera.baseScale *= zoom;
-                camera.onTick(0)
-                this.setNeedsRedraw()
-            }
-        })
-
-        this.backgroundOverlay.on("mousemove", (x, y) => {
-            this.toolManager.mouseMove(x, y)
-        })
-
-        this.backgroundOverlay.on("mousedown", (x, y) => {
-            this.toolManager.mouseDown(x, y)
-        })
-
-        this.backgroundOverlay.on("mouseup", (x, y) => {
-            this.toolManager.mouseUp(x, y)
-        })
-
         this.controlsResponder.on("editor-undo", (event) => {
             const history = this.map.getComponent(GameMapHistoryComponent)
             let entry = history.goBack()
 
-            if (entry) this.eventContainer.createEvent("Отменено: " + entry.actionName)
-            else this.eventContainer.createEvent("Нечего отменять")
+            if (entry) this.createEvent("Отменено: " + entry.actionName)
+            else this.createEvent("Нечего отменять")
         })
 
         this.controlsResponder.on("editor-redo", (event) => {
             const history = this.map.getComponent(GameMapHistoryComponent)
             let entry = history.goForward()
 
-            if (entry) this.eventContainer.createEvent("Повторено: " + entry.actionName)
-            else this.eventContainer.createEvent("Нечего повторять")
+            if (entry) this.createEvent("Повторено: " + entry.actionName)
+            else this.createEvent("Нечего повторять")
         })
 
         // this.controlsEventHandler.on("editor-save-maps", (event) => {
@@ -151,6 +140,10 @@ export default class MapEditorScene extends Scene {
         //         this.eventContainer.createEvent("Карты не сохранились. Что-то сломалось. Грр. Скачай карту ручками и покажи Артему чем насрало в консоль.")
         //     }
         // })
+    }
+
+    createEvent(event: string) {
+
     }
 
     loadMap(map: GameMap) {
@@ -169,6 +162,7 @@ export default class MapEditorScene extends Scene {
             this.camera.getComponent(CameraPositionController).setTarget(null)
         }
 
+        this.camera.getComponent(CameraPositionController).onTick(0)
         this.setNeedsRedraw()
     }
 
@@ -177,17 +171,18 @@ export default class MapEditorScene extends Scene {
         this.toolManager = new ToolManager(this.world)
         this.toolManager.on("camera-movement", (enabled) => this.setCameraMovementEnabled(enabled))
         this.toolManager.on("world-alive", (alive) => this.setWorldAlive(alive))
-        this.toolManager.on("user-event", (text) => this.eventContainer.createEvent(text))
+        // this.toolManager.on("user-event", (text) => this.eventContainer.createEvent(text))
         this.toolManager.on("redraw", () => {
             this.setNeedsRedraw()
         })
 
         this.toolbar = new ToolbarView({
-            root: this.overlayContainer
+            root: this.overlayContainer,
+            toolList: Tools.map(Tool => new Tool(this.toolManager)),
         })
 
         this.toolbar.on("tool-select", (tool) => {
-            this.backgroundOverlay.draggingEnabled = !tool.locksDragging
+            this.backgroundOverlay.setDraggingEnabled(!tool.locksDragging)
             this.toolSettingsView.setupTool(tool)
             this.toolManager.selectTool(tool)
         })
@@ -195,11 +190,6 @@ export default class MapEditorScene extends Scene {
         this.toolbar.on("block-select", (block) => {
             this.toolManager.selectBlock(block)
         })
-
-        this.toolbar.loadSavedBlock()
-
-        Tools.map(Tool => new Tool(this.toolManager))
-            .forEach((tool) => this.toolbar.addTool(tool))
 
         this.eventContainer = new EventOverlay()
         this.overlayContainer.append(this.toolSettingsView.element)

@@ -9,8 +9,8 @@ import SelfDestructEventView from "src/client/ui/overlay/events-overlay/types/se
 
 export default class UserMessageReceiver extends ReceiverComponent {
 
-    tankChangeMessage: TankChangeEventView | null = null
-    selfDestructMessage: SelfDestructEventView | null = null
+    // tankChangeMessage: TankChangeEventView | null = null
+    // selfDestructMessage: SelfDestructEventView | null = null
 
     hook(component: EntityDataReceiveComponent) {
         component.commandHandlers.set(Commands.USER_MESSAGE_COMMAND, (buffer) => {
@@ -33,35 +33,35 @@ export default class UserMessageReceiver extends ReceiverComponent {
     private handleTankChangeOnRespawnMessage(buffer: ReadBuffer) {
         let tankId = buffer.readInt16()
 
-        if(this.tankChangeMessage) {
-            this.tankChangeMessage.updateTankType(tankId)
-        } else {
-            this.tankChangeMessage = new TankChangeEventView(tankId)
-            this.tankChangeMessage.on("disappear", () => {
-                this.tankChangeMessage = null
-            })
-            this.entity.emit("user-message", this.tankChangeMessage)
-        }
+        // if(this.tankChangeMessage) {
+        //     this.tankChangeMessage.updateTankType(tankId)
+        // } else {
+        //     this.tankChangeMessage = new TankChangeEventView(tankId)
+        //     this.tankChangeMessage.on("disappear", () => {
+        //         this.tankChangeMessage = null
+        //     })
+        //     this.entity.emit("user-message", this.tankChangeMessage)
+        // }
     }
 
     private handleSelfDestructMessage(buffer: ReadBuffer) {
         let isSelfDestruct = buffer.readInt8()
         let timer: Entity | null = isSelfDestruct ? this.receiveComponent.readEntity(buffer) : null
 
-        if(isSelfDestruct) {
-            if(!this.selfDestructMessage) {
-                this.selfDestructMessage = new SelfDestructEventView()
-                this.entity.emit("user-message", this.selfDestructMessage)
-                this.selfDestructMessage.on("disappear", () => {
-                    this.selfDestructMessage = null
-                })
-            }
-            this.selfDestructMessage.setTimer(timer)
-        } else {
-            if(this.selfDestructMessage) {
-                this.selfDestructMessage.disappear()
-            }
-        }
+        // if(isSelfDestruct) {
+        //     if(!this.selfDestructMessage) {
+        //         this.selfDestructMessage = new SelfDestructEventView()
+        //         this.entity.emit("user-message", this.selfDestructMessage)
+        //         this.selfDestructMessage.on("disappear", () => {
+        //             this.selfDestructMessage = null
+        //         })
+        //     }
+        //     this.selfDestructMessage.setTimer(timer)
+        // } else {
+        //     if(this.selfDestructMessage) {
+        //         this.selfDestructMessage.disappear()
+        //     }
+        // }
     }
 
     private handleChooseTankMessage() {

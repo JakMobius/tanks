@@ -6,16 +6,10 @@
     background-position: center;
     background-repeat: no-repeat;
     border: solid rgb(200, 200, 200) 1px;
-    margin: 5px;
     border-radius: 3px;
     transition: border 0.5s;
     box-sizing: border-box;
     cursor: pointer;
-}
-
-.tool.inline {
-    position: relative;
-    display: inline-block;
 }
 
 .tool.selected {

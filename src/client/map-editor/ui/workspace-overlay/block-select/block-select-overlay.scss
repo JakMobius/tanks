@@ -1,3 +1,42 @@
 .block-select-overlay {
     background: rgba(80, 80, 80, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu.editor-block-select-menu {
+    width: 240px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+        padding: 10px;
+        font-size: 20px;
+        text-align: center;
+    }
+    
+    .block-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        box-sizing: border-box;
+        overflow-y: auto;
+        width: 220px;
+    }
+
+    .block-button {
+        width: 55px;
+        height: 55px;
+        background-size: 32px;
+        background-position: center;
+        background-repeat: no-repeat;
+        cursor: pointer;
+        transition: transform 0.5s;
+    }
+
+    .block-button:hover {
+        transform: scale(1.1, 1.1);
+    }
 }

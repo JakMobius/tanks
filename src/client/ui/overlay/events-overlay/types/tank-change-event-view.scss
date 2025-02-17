@@ -1,12 +1,28 @@
-.large-icon-event-view.tank-change-event-view .event-icon {
-    background-image: url(../game/tank-gray.png);
+.tank-change-event-icon {
+    background-image: url(../game/tank-gray@3x.png);
     background-repeat: no-repeat;
     background-position: center;
+    background-size: contain;
+    width: 100%;
+    height: 100%;
 }
-.large-icon-event-view.tank-change-event-view .tank-type {
-    color: #009EE0;
+
+.tank-change-event-title {
     font-weight: bold;
+    font-size: 14px;
+    line-height: 16px;
+
+    .tank-type {
+        color: #009EE0;
+        font-weight: bold;
+    }
 }
-.large-icon-event-view.tank-change-event-view .key {
-    font-weight: bold;
+
+.tank-change-event-subtitle{
+    font-size: 12px;
+    line-height: 14px;
+
+    .key {
+        font-weight: bold;
+    }
 }

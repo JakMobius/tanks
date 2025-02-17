@@ -16,7 +16,6 @@ import Entity from "src/utils/ecs/entity";
 import PlayerNickOverlay from "src/client/ui/overlay/player-nick-overlay/player-nick-overlay";
 import Overlay from "../ui/overlay/overlay";
 import TankSelectOverlay from "src/client/ui/overlay/tank-select-overlay/tank-select-overlay";
-import EventView from "src/client/ui/overlay/events-overlay/event-view";
 import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 import TankInfoOverlay from "src/client/ui/overlay/tank-info-overlay/tank-info-overlay";
 import CameraComponent from "src/client/graphics/camera";
@@ -101,13 +100,9 @@ export default class GeneralGameScene extends Scene {
             this.handleOverlayData(overlayClass, data)
         })
 
-        this.worldEventListener.on("overlay-event", (overlayClass: Constructor<GameOverlay>, event: any) => {
-            this.handleOverlayEvent(overlayClass, event)
-        })
-
-        this.worldEventListener.on("user-message", (message: EventView) => {
-            this.eventContainer.createEvent(message)
-        })
+        // this.worldEventListener.on("user-message", (message: EventView) => {
+        //     this.eventContainer.createEvent(message)
+        // })
 
         this.worldEventListener.on("choose-tank", () => {
             this.tankSelectOverlay.show()
@@ -126,13 +121,13 @@ export default class GeneralGameScene extends Scene {
 
         this.controlsResponder.on("game-chat", () => {
             if (this.displayedWorld) {
-                this.chatContainer.showInput()
+                // this.chatContainer.showInput()
             }
         })
 
-        this.chatContainer.on("chat", (text: string) => {
-            this.onChat(text)
-        })
+        // this.chatContainer.on("chat", (text: string) => {
+        //     this.onChat(text)
+        // })
     }
 
     displayWorld(world: Entity) {
@@ -265,10 +260,6 @@ export default class GeneralGameScene extends Scene {
 
     private handleOverlayData(overlayClass: Constructor<GameOverlay>, data: any) {
         this.getModeSpecificOverlay(overlayClass).setData(data)
-    }
-
-    private handleOverlayEvent(overlayClass: Constructor<GameOverlay>, event: any) {
-        this.getModeSpecificOverlay(overlayClass).handleEvent(event)
     }
 
     appear() {

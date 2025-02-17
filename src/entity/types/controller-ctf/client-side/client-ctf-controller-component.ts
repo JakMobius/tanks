@@ -23,9 +23,7 @@ export class ClientCTFControllerComponent extends EventHandlerComponent {
         })
 
         this.eventHandler.on("game-event", (state: DMGameState) => {
-            if(this.world) {
-                this.world.emit("overlay-event", CTFGameStateOverlay, state)
-            }
+            // TODO
         })
     }
 

@@ -17,7 +17,7 @@ import {
     CTFGameStateType,
     CTFTeamStatistics,
     localizedCTFFlagEventTypes
-} from "src/entity/types/controller-ctf/ctf-game-data";
+} from "src/entity/types/controller-ctf/ctf-game-state";
 import {CTFPlayerWaitingStateController} from "src/entity/types/controller-ctf/server-side/ctf-player-waiting-state";
 import {CTFMatchOverStateController} from "src/entity/types/controller-ctf/server-side/ctf-match-over-state-controller";
 import Team from "src/server/team";
