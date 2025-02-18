@@ -1,4 +1,4 @@
-import Screen from "src/client/graphics/screen";
+import Screen from "src/client/graphics/canvas-handler";
 import GameProgramPool from "src/client/graphics/game-program-pool";
 import Entity from "src/utils/ecs/entity";
 import {gameWorldEntityPrefab} from "src/entity/game-world-entity-prefab";

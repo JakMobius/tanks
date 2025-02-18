@@ -7,8 +7,9 @@ window.addEventListener("load", function() {
 })
 
 function launchGame() {
-    var root = $("<div>").addClass("game-root")
-    $(document.body).append(root)
+    var root = document.createElement("div")
+    root.classList.add("game-root")
+    document.body.appendChild(root)
 
     var SceneController = (window as any)['SceneController']
     SceneController.shared.main(root)

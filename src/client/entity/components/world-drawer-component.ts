@@ -1,4 +1,4 @@
-import Screen from 'src/client/graphics/screen'
+import Screen from 'src/client/graphics/canvas-handler'
 import MapDebugDrawer from "src/client/graphics/drawers/map-debug-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
@@ -7,9 +7,10 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import UIDebugDrawer from "src/client/graphics/drawers/ui-debug-drawer";
 import CameraComponent from "src/client/graphics/camera";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
+import CanvasHandler from 'src/client/graphics/canvas-handler';
 
 export default class WorldDrawerComponent extends EventHandlerComponent {
-    public screen: Screen
+    public canvasHandler: CanvasHandler
     public programPool: GameProgramPool
     public debugDrawer: MapDebugDrawer
     public uiDebugDrawer: UIDebugDrawer
@@ -35,10 +36,10 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
     world: Entity | null = null
     worldEventHandler = new BasicEventHandlerSet()
 
-    constructor(screen: Screen) {
+    constructor(canvasHandler: CanvasHandler) {
         super()
 
-        this.screen = screen
+        this.canvasHandler = canvasHandler
         this.world = null
 
         this.worldEventHandler.on("draw", () => this.draw())
@@ -75,7 +76,7 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
 
         let camera = this.entity.getComponent(CameraComponent)
 
-        this.programPool = new GameProgramPool(camera, this.screen.ctx)
+        this.programPool = new GameProgramPool(camera, this.canvasHandler.ctx)
 
         this.backgroundDrawPhase = new DrawPhase(this.programPool)
         this.mapDrawPhase = new DrawPhase(this.programPool)
@@ -85,7 +86,7 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
         this.debugUIDrawPhase = new DrawPhase(this.programPool)
 
         this.debugDrawer = new MapDebugDrawer(this.debugDrawPhase)
-        this.uiDebugDrawer = new UIDebugDrawer(this.screen, camera, this.debugUIDrawPhase)
+        this.uiDebugDrawer = new UIDebugDrawer(this.canvasHandler, camera, this.debugUIDrawPhase)
 
         this.onWorldChange()
     }

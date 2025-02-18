@@ -1,20 +1,19 @@
 
-import Scene from "src/client/scenes/scene";
 import {ScenePrerequisite} from "src/client/scenes/scene-prerequisite";
 export class SceneDescriptor {
     prerequisites: ScenePrerequisite[] = []
 
     constructor() {}
 
-    createScene(): Scene {
+    createScene(): React.ReactNode {
         throw new Error("Not implemented")
     }
 }
 
 export class BasicSceneDescriptor extends SceneDescriptor {
-    lambda: () => Scene
+    lambda: () => React.ReactNode
 
-    constructor(prerequisites: ScenePrerequisite[], lambda: () => Scene) {
+    constructor(prerequisites: ScenePrerequisite[], lambda: () => React.ReactNode) {
         super()
         this.prerequisites = prerequisites
         this.lambda = lambda

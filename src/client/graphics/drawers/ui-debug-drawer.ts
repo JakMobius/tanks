@@ -1,15 +1,16 @@
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
 import CameraComponent from "src/client/graphics/camera";
-import Screen from "src/client/graphics/screen";
+import Screen from "src/client/graphics/canvas-handler";
+import CanvasHandler from "src/client/graphics/canvas-handler";
 
 export default class UIDebugDrawer {
     private readonly drawPhase: DrawPhase;
     private camera: CameraComponent;
-    private screen: Screen
+    private canvasHandler: CanvasHandler
 
-    constructor(screen: Screen, camera: CameraComponent, drawPhase: DrawPhase) {
-        this.screen = screen
+    constructor(canvasHandler: CanvasHandler, camera: CameraComponent, drawPhase: DrawPhase) {
+        this.canvasHandler = canvasHandler
         this.drawPhase = drawPhase
     }
 
@@ -18,8 +19,8 @@ export default class UIDebugDrawer {
 
         this.camera.matrix.save()
 
-        let width = this.screen.width
-        let height = this.screen.height
+        let width = this.canvasHandler.width
+        let height = this.canvasHandler.height
 
         this.camera.matrix.reset()
         this.camera.matrix.translate(-1, 1)

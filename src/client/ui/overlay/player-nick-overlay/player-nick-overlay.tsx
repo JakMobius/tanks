@@ -2,7 +2,7 @@ import './player-nick-overlay.scss'
 
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
-import Screen from "src/client/graphics/screen"
+import Screen from "src/client/graphics/canvas-handler"
 import EntityPilotReceiver from "src/entity/components/network/entity-player-list/entity-pilot-receiver";
 import TeamColor from "src/utils/team-color";
 import View from "src/client/ui/view";

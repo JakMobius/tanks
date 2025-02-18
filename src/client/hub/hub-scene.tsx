@@ -8,73 +8,70 @@ import GameMap from "src/map/game-map";
 import TransformComponent from "src/entity/components/transform-component";
 import CameraComponent from "src/client/graphics/camera";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
-import Scene from "src/client/scenes/scene";
 import CameraRandomMovement from "src/entity/components/camera-random-movement";
 
-import React from "react";
-import ReactDOM from 'react-dom/client';
+import React, { useEffect } from "react";
+import SceneController, { useScene } from "../scenes/scene-controller";
+import { BasicSceneDescriptor } from "../scenes/scene-descriptor";
+import { texturesResourcePrerequisite } from "../scenes/scene-prerequisite";
 
-export default class HubScene extends Scene {
-    backgroundWorld: Entity
-    map: GameMap
-    camera: Entity
+const HubScene: React.FC = () => {
+    const scene = useScene()
 
-    root: ReactDOM.Root
+    const [state, setState] = React.useState({
+        camera: null as Entity | null,
+        backgroundWorld: null as Entity | null
+    })
+    
+    const onDraw = (dt: number) => {
+        state.backgroundWorld?.emit("tick", dt)
+        state.backgroundWorld?.emit("draw")
+        state.camera?.getComponent(CameraRandomMovement)
+            .setViewport({x: scene.canvas.width, y: scene.canvas.height})
+    }
 
-    constructor() {
-        super();
+    useEffect(() => {
+        scene.setTitle("Танчики - Хаб")
+        scene.loop.start()
 
-        this.setTitle("Танчики - Хаб")
-
-        this.map = getHubMap()
-
-        this.backgroundWorld = new Entity()
-        clientGameWorldEntityPrefab(this.backgroundWorld, {
-            map: this.map
+        const map = getHubMap()
+        const backgroundWorld = new Entity()
+        clientGameWorldEntityPrefab(backgroundWorld, {
+            map: map
         })
 
-        let userData = (window as any).userData as any as UserDataRaw
+        const camera = new Entity()
+        camera.addComponent(new TransformComponent())
+        camera.addComponent(new CameraComponent())
+        camera.addComponent(new CameraRandomMovement()
+            .setViewport({x: scene.canvas.width, y: scene.canvas.height})
+            .setMapSize(map.width * GameMap.BLOCK_SIZE, map.height * GameMap.BLOCK_SIZE))
 
-        const reactRoot = document.createElement("div")
-        reactRoot.style.width = "100%"
-        reactRoot.style.height = "100%"
-        this.overlayContainer.append(reactRoot)
+        camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
-        this.root = ReactDOM.createRoot(reactRoot)
-        this.root.render(<HubPage userData={userData}/>)
-    }
+        backgroundWorld.appendChild(camera)
 
-    private setupCamera() {
-        this.camera = new Entity()
-        this.camera.addComponent(new TransformComponent())
-        this.camera.addComponent(new CameraComponent())
-        this.camera.addComponent(new CameraRandomMovement()
-            .setViewport({x: this.screen.width, y: this.screen.height})
-            .setMapSize(this.map.width * GameMap.BLOCK_SIZE, this.map.height * GameMap.BLOCK_SIZE))
+        setState({
+            camera: camera,
+            backgroundWorld: backgroundWorld
+        })
 
-        this.camera.addComponent(new WorldDrawerComponent(this.screen))
-    }
+        return () => {
+            scene.setTitle(undefined)
+            scene.loop.stop()
+            camera.removeFromParent()
+        }
+    }, [])
 
-    layout() {
-        super.layout();
-        this.camera.getComponent(CameraRandomMovement)
-            .setViewport({x: this.screen.width, y: this.screen.height})
-    }
+    useEffect(() => {
+        scene.loop.run = onDraw
+        return () => scene.loop.run = null
+    }, [onDraw])
 
-    appear() {
-        super.appear();
-        this.setupCamera()
-        this.backgroundWorld.appendChild(this.camera)
-    }
-
-    disappear() {
-        super.disappear();
-        this.camera.removeFromParent()
-    }
-
-    draw(dt: number) {
-        super.draw(dt);
-        this.backgroundWorld.emit("tick", dt)
-        this.backgroundWorld.emit("draw")
-    }
+    let userData = (window as any).userData as any as UserDataRaw
+    return <HubPage userData={userData}/>
 }
+
+SceneController.shared.registerScene("hub", () => new BasicSceneDescriptor([
+    texturesResourcePrerequisite
+], () => <HubScene/>));

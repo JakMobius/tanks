@@ -1,6 +1,7 @@
 import ErrorMessageGenerator, {
     getNonsenseErrorHeader,
-    ErrorMessageVariant
+    ErrorMessageVariant,
+    unknownErrorMessageGenerator
 } from "src/client/scenes/loading/error-message-generator";
 import PageLocation from "src/client/scenes/page-location";
 
@@ -14,6 +15,14 @@ export abstract class LoadingError extends Error {
     abstract getHeader(): string
     abstract getDescription(): string
     abstract getActions(): LoadingErrorAction[]
+}
+
+export function convertErrorToLoadingError(error: any): LoadingError {
+    if (!error) return null
+    if (error instanceof LoadingError) return error
+
+    return new RandomMessageLoadingError(unknownErrorMessageGenerator)
+        .withRetryAction(() => window.location.reload())
 }
 
 export class RandomMessageLoadingError extends LoadingError {
