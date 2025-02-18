@@ -1,8 +1,6 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
 import CameraComponent from "src/client/graphics/camera";
-import {inverse} from "src/utils/matrix3";
-import Entity from "src/utils/ecs/entity";
 
 export default class CameraPositionController extends EventHandlerComponent {
     public baseScale: number = 1

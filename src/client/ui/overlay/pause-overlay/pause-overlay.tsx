@@ -1,69 +1,53 @@
+import "./pause-overlay.scss"
 
-import Overlay from "src/client/ui/overlay/overlay";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
-import ReactDOM from "react-dom/client";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavigationProvider, useNavigation } from '../../navigation/navigation-view';
 import NavigationEscapeHandler from "../../navigation/navigation-escape-handler";
+import { useScene } from "src/client/scenes/scene-controller";
 
 export interface PauseOverlayConfig {
     rootComponent: React.ReactNode,
-    wrapper?: React.FC<{ children: React.ReactNode }>,
     gameControls: ControlsResponder
 }
 
-export default class PauseOverlay extends Overlay {
+const PauseOverlay: React.FC<PauseOverlayConfig> = (props) => {
 
-    rootComponent: React.ReactNode
-    wrapper?: React.FC<{ children: React.ReactNode }>
-    pauseControlsResponder = new ControlsResponder()
-    gameControlsResponder: ControlsResponder
+    const scene = useScene()
 
-    reactRoot: ReactDOM.Root
+    const [state, setState] = useState({
+        pauseControlsResponder: useMemo(() => new ControlsResponder(), []),
+        shown: false
+    })
 
-    constructor(options: PauseOverlayConfig) {
-        super();
-
-        this.element.addClass("pause-overlay")
-
-        this.gameControlsResponder = options.gameControls
-        this.rootComponent = options.rootComponent
-        this.wrapper = options.wrapper
-
-        this.gameControlsResponder.on("game-pause", () => this.show())
+    const show = () => {
+        RootControlsResponder.getInstance().setMainResponderDelayed(state.pauseControlsResponder)
+        setState(state => ({...state, shown: true}))
+        scene.soundEngine.setEnabled(false)
     }
 
-    show(): boolean {
-        if (super.show()) {
-            RootControlsResponder.getInstance().setMainResponderDelayed(this.pauseControlsResponder)
-            this.element.addClass("shown")
-            this.reactRoot = ReactDOM.createRoot(this.element[0])
-
-            let Wrapper = (this.wrapper || React.Fragment) as React.FC<{ children: React.ReactNode }>
-
-            this.reactRoot.render(
-                <Wrapper>
-                    <NavigationProvider
-                        onClose={() => this.hide()}
-                        rootComponent={this.rootComponent}
-                    >
-                        <NavigationEscapeHandler controls={this.pauseControlsResponder}/>
-                    </NavigationProvider>
-                </Wrapper>
-            )
-            return true
-        }
-        return false
+    const hide = () => {
+        RootControlsResponder.getInstance().setMainResponderDelayed(props.gameControls)
+        setState(state => ({...state, shown: false}))
+        scene.soundEngine.setEnabled(true)
     }
 
-    hide(): boolean {
-        if (super.hide()) {
-            RootControlsResponder.getInstance().setMainResponderDelayed(this.gameControlsResponder)
-            this.element.removeClass("shown")
+    useEffect(() => {
+        if(!props.gameControls) return undefined
+        props.gameControls.on("game-pause", show)
+        return () => props.gameControls.off("game-pause", show)
+    }, [props.gameControls])
 
-            this.reactRoot.unmount()
-            return true
-        }
-        return false
-    }
+    return (
+        <div className="pause-overlay" style={{display: state.shown ? undefined : "none"}}>
+            <NavigationProvider
+                onClose={hide}
+                rootComponent={props.rootComponent}
+            >
+                <NavigationEscapeHandler controls={state.pauseControlsResponder}/>
+            </NavigationProvider>
+        </div>
+    )
 }
+
+export default PauseOverlay

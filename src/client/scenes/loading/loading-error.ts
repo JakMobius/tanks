@@ -1,5 +1,4 @@
 import ErrorMessageGenerator, {
-    getNonsenseErrorHeader,
     ErrorMessageVariant,
     unknownErrorMessageGenerator
 } from "src/client/scenes/loading/error-message-generator";

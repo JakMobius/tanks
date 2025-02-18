@@ -106,8 +106,6 @@ const SceneRouter: React.FC = () => {
             return state
         }
 
-        state.currentlyLoading = true
-
         const descriptor = descriptorFactory()
 
         const prerequisites = descriptor.prerequisites.map(resource => {
@@ -151,8 +149,8 @@ const SceneRouter: React.FC = () => {
     useEffect(() => {
         handleWindowLocation()
 
-        document.addEventListener("hashchange", handleWindowLocation)
-        return () => document.removeEventListener("hashchange", handleWindowLocation)
+        addEventListener("hashchange", handleWindowLocation)
+        return () => removeEventListener("hashchange", handleWindowLocation)
     }, [])
 
     return state.scene

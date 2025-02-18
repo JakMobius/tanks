@@ -73,14 +73,15 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => 
   };
 
   const pop = () => {
-    setStack((prevStack) => prevStack.slice(0, -1));
     if (stack.length == 1) {
       props.onClose?.()
+      return
     }
+    setStack((prevStack) => prevStack.slice(0, -1));
   };
 
   const popAll = () => {
-    setStack([]);
+    setStack([stack[0]]);
     props.onClose?.()
   }
 
@@ -88,9 +89,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = (props) => 
     if (props.rootComponent) {
       push(props.rootComponent)
     }
-    return () => {
-      popAll()
-    }
+    return () => popAll()
   }, [])
 
   return (

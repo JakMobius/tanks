@@ -6,11 +6,3 @@
     height: 100%;
     display: flex;
 }
-.overlay.pause-overlay {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    backface-visibility: hidden;
-    background: rgba(0, 0, 0, 0.08);
-    justify-content: center;
-    align-items: center;
-}

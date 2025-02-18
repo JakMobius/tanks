@@ -144,12 +144,4 @@ const ChatView: React.FC = (props) => {
     )
 }
 
-export default class ChatContainer extends View {
-    reactRoot: ReactDOM.Root
-
-    constructor() {
-        super()
-        this.reactRoot = ReactDOM.createRoot(this.element[0])
-        this.reactRoot.render(<ChatView/>)
-    }
-}
+export default ChatView

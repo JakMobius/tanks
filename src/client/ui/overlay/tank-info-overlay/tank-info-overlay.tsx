@@ -1,7 +1,6 @@
 import './tank-info-overlay.scss'
 
 import Entity from "src/utils/ecs/entity";
-import View from "src/client/ui/view";
 import PrimaryPlayerReceiver from "src/entity/components/network/primary-player/primary-player-receiver";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import AirbagTankController from "src/entity/components/tank-controllers/airbag-tank-controller";
@@ -397,25 +396,4 @@ const TankInfoView: React.FC<TankInfoViewProps> = (props) => {
     )
 }
 
-export default class TankInfoOverlay extends View {
-
-    reactRoot: ReactDOM.Root
-    props: TankInfoViewProps = {
-        world: null
-    }
-
-    constructor() {
-        super();
-        this.reactRoot = ReactDOM.createRoot(this.element[0])
-        this.render()
-    }
-
-    render() {
-        this.reactRoot.render(<TankInfoView {...this.props} />)
-    }
-
-    setGameWorld(world: Entity) {
-        this.props.world = world
-        this.render()
-    }
-}
+export default TankInfoView;

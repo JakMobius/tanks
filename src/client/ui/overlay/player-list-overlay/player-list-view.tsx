@@ -1,4 +1,4 @@
-import './player-list-overlay.scss'
+import './player-list-view.scss'
 
 import Entity from "src/utils/ecs/entity";
 import WorldStatisticsComponent, {
@@ -119,6 +119,7 @@ const PlayerListView: React.FC<PlayerListViewProps> = (props) => {
     }, [state.timer])
 
     useEffect(() => {
+        if(!props.gameControls) return undefined
         props.gameControls.on("game-player-list-show", () => onShow())
         props.gameControls.on("game-player-list-hide", () => onHide())
 
@@ -143,29 +144,4 @@ const PlayerListView: React.FC<PlayerListViewProps> = (props) => {
     )
 }
 
-export interface PlayerListOverlayConfig {
-    gameControls: ControlsResponder
-}
-
-export default class PlayerListOverlay extends View {
-
-    reactRoot: ReactDOM.Root
-    props: PlayerListViewProps = {}
-
-    constructor(options: PlayerListOverlayConfig) {
-        super();
-
-        this.props.gameControls = options.gameControls
-        // TODO: this root is never unmounted.
-        this.reactRoot = ReactDOM.createRoot(this.element[0])
-    }
-
-    render() {
-        this.reactRoot.render(<PlayerListView {...this.props} />)
-    }
-
-    setGameWorld(world: Entity) {
-        this.props.world = world
-        this.render()
-    }
-}
+export default PlayerListView

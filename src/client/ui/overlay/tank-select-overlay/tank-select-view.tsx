@@ -1,11 +1,9 @@
-import './tank-select-overlay.scss'
+import './tank-select-view.scss'
 
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import RenderLoop from "src/utils/loop/render-loop";
 import {TankStat, TankStats} from "src/stat-tests/tank-stats";
-import Overlay from "src/client/ui/overlay/overlay";
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import React from 'react';
 import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../../carousel/carousel-controller';
@@ -297,6 +295,7 @@ const TankSelectView: React.FC<TankSelectViewProps> = (props) => {
     }, [])
 
     useEffect(() => {
+        if(!props.gameControls) return undefined
         props.gameControls.on("game-change-tank", toggleVisibility)
         return () => props.gameControls.off("game-change-tank", toggleVisibility)
     }, [props.gameControls])
@@ -361,22 +360,4 @@ const TankSelectView: React.FC<TankSelectViewProps> = (props) => {
     )
 }
 
-export interface TankSelectOverlayConfig {
-    gameControls: ControlsResponder
-}
-
-export default class TankSelectOverlay extends Overlay {
-
-   reactRoot: ReactDOM.Root
-
-    constructor(options: TankSelectOverlayConfig) {
-        super()
-
-        this.reactRoot = ReactDOM.createRoot(this.element[0])
-        this.reactRoot.render(<TankSelectView gameControls={options.gameControls} onTankSelect={(type: number) => {
-            this.emit("confirm", type)
-        }}/>)
-
-        this.show()
-    }
-}
+export default TankSelectView

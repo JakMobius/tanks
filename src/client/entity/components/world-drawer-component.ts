@@ -1,4 +1,4 @@
-import Screen from 'src/client/graphics/canvas-handler'
+
 import MapDebugDrawer from "src/client/graphics/drawers/map-debug-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";

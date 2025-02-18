@@ -13,10 +13,6 @@ export class ControlsResponder extends EventEmitter {
     private childrenResponders: ControlsResponder[] = []
     private parentResponder: ControlsResponder | null = null
 
-    constructor() {
-        super();
-    }
-
     public getControlAxle(name: string): Axle {
         if (!this.controlAxles.has(name)) {
             let axle = new Axle()

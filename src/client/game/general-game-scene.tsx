@@ -9,13 +9,13 @@ import TilemapComponent from "src/physics/tilemap-component";
 import TankControls from "src/controls/tank-controls";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import PlayerListOverlay from "src/client/ui/overlay/player-list-overlay/player-list-overlay";
+import PlayerListOverlay from "src/client/ui/overlay/player-list-overlay/player-list-view";
 import {Constructor} from "src/utils/constructor"
 import GameOverlay from "src/client/ui/overlay/game-overlay/game-overlay";
 import Entity from "src/utils/ecs/entity";
-import PlayerNickOverlay from "src/client/ui/overlay/player-nick-overlay/player-nick-overlay";
+import PlayerNickOverlay from "src/client/ui/overlay/player-nick-overlay/player-nicks-view";
 import Overlay from "../ui/overlay/overlay";
-import TankSelectOverlay from "src/client/ui/overlay/tank-select-overlay/tank-select-overlay";
+import TankSelectOverlay from "src/client/ui/overlay/tank-select-overlay/tank-select-view";
 import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 import TankInfoOverlay from "src/client/ui/overlay/tank-info-overlay/tank-info-overlay";
 import CameraComponent from "src/client/graphics/camera";
@@ -53,14 +53,14 @@ export default class GeneralGameScene extends Scene {
         super()
 
         this.setupControls()
-        this.setupTankInfoOverlay()
+        // this.setupTankInfoOverlay()
         this.setupEventContainer()
-        this.setupPlayerNickOverlay()
-        this.setupPlayerListOverlay()
+        // this.setupPlayerNickOverlay()
+        // this.setupPlayerListOverlay()
         this.setupModeSpecificOverlays()
-        this.setupChat()
-        this.setupTankSelectOverlay()
-        this.setupPauseOverlay()
+        // this.setupChat()
+        // this.setupTankSelectOverlay()
+        // this.setupPauseOverlay()
         this.setupWorldEvents()
     }
 
