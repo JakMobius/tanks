@@ -2,10 +2,8 @@ import "./map-editor-background-overlay.scss"
 
 import {isMacOS} from "src/utils/meta-key-name";
 import Matrix3 from "src/utils/matrix3";
-import Overlay from "src/client/ui/overlay/overlay";
 import { useEffect, useRef } from "react";
 import React from "react";
-import ReactDOM from "react-dom/client";
 
 interface GestureEvent extends UIEvent {
     scale: number
@@ -21,7 +19,7 @@ interface MapEditorBackgroundOverlayProps {
     draggingEnabled?: boolean
 }
 
-const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayProps> = (props) => {
+const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = React.memo((props) => {
 
     const divRef = useRef<HTMLDivElement>(null)
     const ref = useRef({
@@ -30,6 +28,11 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
         oldY: null as number | null,
         dragging: false,
     })
+    const propsRef = useRef<MapEditorBackgroundOverlayProps>(props)
+
+    useEffect(() => {
+        propsRef.current = props
+    }, [props])
 
     const zoomStart = (event: GestureEvent) => {
         event.preventDefault()
@@ -40,7 +43,7 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
         event.preventDefault()
         if (isMacOS) {
             if (event.scale) {
-                props.onZoom?.(event.scale / ref.current.oldScale)
+                propsRef.current.onZoom?.(event.scale / ref.current.oldScale)
                 ref.current.oldScale = event.scale
             }
         }
@@ -48,7 +51,7 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
 
     const mouseDown = (event: MouseEvent) => {
         event.preventDefault()
-        if ((event.button === 0 && props.draggingEnabled) || event.button === 1) {
+        if ((event.button === 0 && propsRef.current.draggingEnabled) || event.button === 1) {
             ref.current.dragging = true
         }
 
@@ -57,7 +60,7 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
 
         let [x, y] = toUV(event.pageX, event.pageY, 1)
 
-        props.onMouseDown?.(x, y)
+        propsRef.current.onMouseDown?.(x, y)
     }
 
     const mouseUp = (event: MouseEvent) => {
@@ -66,7 +69,7 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
 
         let [x, y] = toUV(event.pageX, event.pageY, 1)
 
-        props.onMouseUp?.(x, y)
+        propsRef.current.onMouseUp?.(x, y)
     }
 
     const mouseMove = (event: MouseEvent) => {
@@ -84,28 +87,29 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
 
         let [x, y] = toUV(event.pageX, event.pageY, 1)
 
-        props.onMouseMove?.(x, y)
+        propsRef.current.onMouseMove?.(x, y)
     }
 
     const toUV = (x: number, y: number, z: number) => {
-        if(!props.matrix) return [x, y]
+        let matrix = propsRef.current.matrix
+        if(!matrix) return [x, y]
 
         let normalizedX = (x / divRef.current.clientWidth) * 2 - z
         let normalizedY = (y / divRef.current.clientHeight) * 2 - z
 
         return [
-            props.matrix.transformX(normalizedX, -normalizedY, z),
-            props.matrix.transformY(normalizedX, -normalizedY, z)
+            matrix.transformX(normalizedX, -normalizedY, z),
+            matrix.transformY(normalizedX, -normalizedY, z)
         ]
     }
 
     const emitDrag = (dx: number, dy: number) => {
         let [x, y] = toUV(dx, dy, 0)
-        props.onDrag?.(x, y)
+        propsRef.current.onDrag?.(x, y)
     }
 
     const emitZoom = (movement: number) => {
-        props.onZoom?.(1 - (movement / 200))
+        propsRef.current.onZoom?.(1 - (movement / 200))
     }
 
     const onWheel = (event: WheelEvent) => {
@@ -138,27 +142,6 @@ const MapEditorBackgroundOverlayComponent: React.FC<MapEditorBackgroundOverlayPr
     return (
         <div ref={divRef} className="map-editor-background-overlay"/>
     )
-}
+})
 
-export default class MapEditorBackgroundOverlay extends Overlay {
-
-    reactRoot: ReactDOM.Root
-    props: MapEditorBackgroundOverlayProps
-
-    constructor(props: MapEditorBackgroundOverlayProps) {
-        super()
-        this.props = props
-        this.reactRoot = ReactDOM.createRoot(this.element[0])
-        this.show()
-        this.render()
-    }
-
-    render() {
-        this.reactRoot.render(<MapEditorBackgroundOverlayComponent {...this.props}/>)
-    }
-
-    setDraggingEnabled(enabled: boolean) {
-        this.props.draggingEnabled = enabled
-        this.render()
-    }
-}
+export default MapEditorBackgroundOverlay

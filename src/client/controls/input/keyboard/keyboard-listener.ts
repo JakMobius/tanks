@@ -14,7 +14,7 @@ export default class KeyboardListener extends EventEmitter {
     }
 
     keyup(e: KeyboardEvent) {
-        if(e.target != this.handlerSet.target) {
+        if(e.target !== this.handlerSet.target && !this.keys.has(e.code)) {
             return
         }
 
@@ -23,7 +23,7 @@ export default class KeyboardListener extends EventEmitter {
     }
 
     keydown(e: KeyboardEvent) {
-        if(e.target != this.handlerSet.target) {
+        if(e.target !== this.handlerSet.target) {
             return
         }
 

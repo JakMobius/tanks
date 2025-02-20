@@ -1,0 +1,11 @@
+.events-hud {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.event-view {
+    position: absolute;
+    right: 0;
+    transition: bottom 0.3s ease-out;
+}

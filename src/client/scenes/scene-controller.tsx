@@ -17,7 +17,7 @@ interface SceneControlerProps {
 export interface SceneContextProps {
     canvas: CanvasHandler,
     soundEngine: SoundEngine,
-    loop: Loop,
+    loop: RenderLoop,
     setTitle?: (value: string | undefined) => void
 }
 

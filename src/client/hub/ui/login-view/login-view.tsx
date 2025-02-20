@@ -1,7 +1,7 @@
 import React from "react";
 import { localizeAjaxError } from "../../localizations";
-import { PauseInputDetailDisclosure, PauseInputRow } from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
-import { PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
+import { PauseInputDetailDisclosure, PauseInputRow } from "src/client/ui/pause-overlay/elements/pause-input-row";
+import { PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view";
 import Cloud from "src/client/game/ui/cloud/cloud";
 import { useNavigation } from "src/client/ui/navigation/navigation-view";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";

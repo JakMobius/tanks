@@ -1,7 +1,7 @@
 import Entity from "src/utils/ecs/entity";
 import {DMGameState} from "src/entity/types/controller-dm/dm-game-state";
-import DMGameStateOverlay from "src/client/ui/overlay/game-overlay/dm-game-overlay/dm-game-state-overlay";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { DMGameStateHUD } from "src/client/ui/game-hud/dm-game-hud/dm-game-state-hud";
 
 export class ClientDMControllerComponent extends EventHandlerComponent {
     world: Entity | null
@@ -18,7 +18,10 @@ export class ClientDMControllerComponent extends EventHandlerComponent {
 
         this.eventHandler.on("game-state-update", (state: DMGameState) => {
             if(this.world) {
-                this.world.emit("overlay-data", DMGameStateOverlay, state)
+                this.world.emit("hud-view", DMGameStateHUD, {
+                    state: state,
+                    world: this.world
+                })
             }
         })
     }

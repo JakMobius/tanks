@@ -8,13 +8,18 @@
 }
 
 .unsupported-browser {
+  background-position: center 20px;
+  background-repeat: no-repeat;
+  background-size: 64px 64px;
+  background-image: url("../hub/tank@3x.png");
+
   top: 50px;
   left: 50%;
   position: relative;
   margin: 0 40px 40px -230px;
   text-align: center;
   width: 460px;
-  padding: 30px 30px 40px 30px;
+  padding: 80px 30px 40px 30px;
   border-radius: 10px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;

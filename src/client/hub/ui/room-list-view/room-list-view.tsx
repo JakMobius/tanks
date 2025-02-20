@@ -7,7 +7,7 @@ import { GlobalRoomListComponent, RoomConfig, UserRoomListComponent } from './ro
 import LoadingView from '../loading-view/loading-view';
 import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
 import GameCreateViewComponent from '../game-create/game-create-view';
-import { CloudyNavigationHeader } from 'src/client/ui/overlay/pause-overlay/pause-menu-view';
+import { CloudyNavigationHeader } from 'src/client/ui/pause-overlay/pause-menu-view';
 
 interface RoomListErrorProps {
     error: string

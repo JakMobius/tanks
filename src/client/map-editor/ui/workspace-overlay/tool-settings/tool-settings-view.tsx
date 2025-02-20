@@ -2,18 +2,17 @@ import './tool-settings-view.scss'
 
 import Tool from "src/client/map-editor/tools/tool";
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import View from 'src/client/ui/view';
+import ToolManager from 'src/client/map-editor/tools/toolmanager';
 
 export interface ToolViewProps<T extends Tool = Tool> {
     tool: T
 }
 
 interface ToolSettingsViewProps {
-    tool?: Tool
+    toolManager?: ToolManager
 }
 
-const ToolSettingsViewComponent: React.FC<ToolSettingsViewProps> = (props) => {
+const ToolSettingsView: React.FC<ToolSettingsViewProps> = React.memo((props) => {
 
     const [state, setState] = useState({
         style: {
@@ -21,7 +20,8 @@ const ToolSettingsViewComponent: React.FC<ToolSettingsViewProps> = (props) => {
             opacity: 0
         },
         shown: false,
-        displayedView: null as React.FC<ToolViewProps> | null
+        displayedView: null as React.FC<ToolViewProps> | null,
+        tool: null as Tool | null
     })
 
     const setDisplayOpacity = (display: boolean, opacity: number) => {
@@ -34,13 +34,22 @@ const ToolSettingsViewComponent: React.FC<ToolSettingsViewProps> = (props) => {
         }))
     }
 
-    useEffect(() => {
+    const updateTool = () => {
+        const tool = props.toolManager?.selectedTool
         setState((state) => ({
             ...state,
-            shown: props.tool?.settingsView !== null,
-            displayedView: props.tool?.settingsView ?? state.displayedView
+            shown: tool?.settingsView !== null,
+            displayedView: tool?.settingsView ?? state.displayedView,
+            tool: tool
         }))
-    }, [props.tool])
+    }
+
+    useEffect(() => {
+        updateTool()
+        if(!props.toolManager) return undefined
+        props.toolManager.on("select-tool", updateTool)
+        return () => props.toolManager.off("select-tool", updateTool)
+    }, [props.toolManager])
 
     useEffect(() => {
         if(!state.shown) {
@@ -61,31 +70,9 @@ const ToolSettingsViewComponent: React.FC<ToolSettingsViewProps> = (props) => {
 
     return (
         <div className="menu editor-tool-settings" style={state.style}>
-            {state.displayedView ? <state.displayedView tool={props.tool}/> : null}
+            {state.displayedView ? <state.displayedView tool={state.tool}/> : null}
         </div>
-    );
-}
+    )
+})
 
-export default class ToolSettingsView extends View {
-	
-    props: ToolSettingsViewProps = {};
-    reactRoot: ReactDOM.Root;
-
-    constructor() {
-        super();
-
-        this.reactRoot = ReactDOM.createRoot(this.element[0]);    
-        this.render()    
-    }
-
-    render() {
-        this.reactRoot.render(
-            <ToolSettingsViewComponent tool={this.props.tool} />
-        )
-    }
-
-    setupTool(tool: Tool) {
-        this.props.tool = tool;
-        this.render();
-    }
-}
+export default ToolSettingsView

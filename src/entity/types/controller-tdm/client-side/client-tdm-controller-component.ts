@@ -1,7 +1,7 @@
 import Entity from "src/utils/ecs/entity";
-import {TDMGameState} from "src/entity/types/controller-tdm/tdm-game-state";
-import TDMGameStateOverlay from "src/client/ui/overlay/game-overlay/tdm-game-overlay/tdm-game-state-overlay";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { TDMGameState } from "../tdm-game-state";
+import { TDMGameStateHUD } from "src/client/ui/game-hud/tdm-game-hud/tdm-game-state-hud";
 
 export class ClientTDMControllerComponent extends EventHandlerComponent {
     world: Entity | null
@@ -18,7 +18,10 @@ export class ClientTDMControllerComponent extends EventHandlerComponent {
 
         this.eventHandler.on("game-state-update", (state: TDMGameState) => {
             if(this.world) {
-                this.world.emit("overlay-data", TDMGameStateOverlay, state)
+                this.world.emit("hud-view", TDMGameStateHUD, {
+                    state: state,
+                    world: this.world
+                })
             }
         })
     }

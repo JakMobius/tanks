@@ -1,7 +1,7 @@
 
-import { PauseKeyInputRow } from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
+import { PauseKeyInputRow } from "src/client/ui/pause-overlay/elements/pause-input-row";
 import React, { useEffect, useState } from "react";
-import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
+import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view";
 
 
 const NewMapView: React.FC = (props) => {

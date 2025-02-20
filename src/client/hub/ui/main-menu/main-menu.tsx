@@ -3,7 +3,7 @@ import './main-menu.scss'
 
 import React from 'react';
 import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
-import SettingsView from 'src/client/ui/overlay/pause-overlay/controllers/settings-view';
+import SettingsView from 'src/client/ui/pause-overlay/controllers/settings-view';
 import RoomListView from '../room-list-view/room-list-view';
 import { useProfile } from '../hub-page';
 import LoginView from '../login-view/login-view';

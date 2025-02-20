@@ -18,14 +18,16 @@ import WorldSoundListenerComponent from "../entity/components/sound/world-sound-
 import RootControlsResponder, { ControlsResponder } from "../controls/root-controls-responder";
 import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
 import PlayerTankSelectPacket from "src/networking/packets/game-packets/player-tank-select-packet";
-import ChatView from "../ui/overlay/chat-overlay/chat-container";
-import TankInfoView from "../ui/overlay/tank-info-overlay/tank-info-overlay";
-import PlayerNickOverlay from "../ui/overlay/player-nick-overlay/player-nicks-view";
+import ChatHUD from "../ui/chat-hud/chat-hud";
+import TankInfoHUD from "../ui/tank-info-hud/tank-info-hud";
+import PlayerNicksHUD from "../ui/player-nicks-hud/player-nicks-hud";
 import GamePauseView from "../game/game-pause-view";
-import PauseOverlay from "../ui/overlay/pause-overlay/pause-overlay";
+import PauseOverlay from "../ui/pause-overlay/pause-overlay";
 import CameraPrimaryEntityController from "src/entity/components/camera-primary-entity-watcher";
 import PrimaryEntityControls from "src/entity/components/primary-entity-controls";
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
+import EventsHUD, { EventsContext, EventsProvider } from "../ui/events-hud/events-hud";
+import { KeyedComponentsHandle } from "../utils/keyed-component";
 
 const TutorialScene: React.FC = () => {
     const scene = useScene()
@@ -34,8 +36,24 @@ const TutorialScene: React.FC = () => {
         controlsResponder: null as ControlsResponder | null,
         camera: null as Entity | null,
         remoteControlsManager: null as RemoteControlsManager | null,
-        game: null as EmbeddedServerGame | null
+        game: null as EmbeddedServerGame | null,
+        messageCount: 0
     })
+
+    const eventContextRef = useRef<KeyedComponentsHandle | null>(null)
+    const messagesRef = useRef<string[]>([])
+    
+    const addMessage = (message: string) => {
+        messagesRef.current.push(message)
+        setState((state) => ({
+            ...state,
+            messageCount: messagesRef.current.length,
+        }))
+    }
+
+    const getMessage = useCallback((index: number) => {
+        return messagesRef.current[index]
+    }, [])
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
@@ -62,11 +80,13 @@ const TutorialScene: React.FC = () => {
         const game = new EmbeddedServerGame({ map: getTutorialMap() })
         const worldController = new TutorialWorldController(game.serverGame)
         const remoteControlsManager = new RemoteControlsManager(controlsResponder, game.clientConnection.connection)
-
+        
         game.clientConnection.on(WorldCommunicationPacket, (packet) => {
             let buffer = new ReadBuffer(packet.buffer.buffer)
             game.clientWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
         })
+
+        game.clientConnection.on(PlayerChatPacket, (packet) => addMessage(packet.text))
 
         remoteControlsManager.attach()
 
@@ -108,12 +128,24 @@ const TutorialScene: React.FC = () => {
         return () => scene.loop.run = null
     }, [onDraw])
 
-    return <>
-        <PlayerNickOverlay world={state.game?.clientWorld} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
-        <TankInfoView world={state.game?.clientWorld} />
-        <ChatView />
-        <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
-    </>
+    useEffect(() => {
+        if(!state.game?.clientWorld) return undefined
+        const onUserMessage = (message: React.FC, props: any) => {
+            eventContextRef.current?.addEvent(message, props)
+        }
+        state.game.clientWorld.on("event-view", onUserMessage)
+        return () => state.game.clientWorld.off("event-view", onUserMessage)
+    }, [state.game, eventContextRef.current])
+
+    return (
+        <EventsProvider ref={eventContextRef}>
+            <PlayerNicksHUD world={state.game?.clientWorld} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
+            <TankInfoHUD world={state.game?.clientWorld} />
+            <ChatHUD gameControls={state.controlsResponder} onChat={onChat} messageCount={state.messageCount} getMessage={getMessage}/>
+            <EventsHUD/>
+            <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
+        </EventsProvider>
+    )
 }
 
 SceneController.shared.registerScene("tutorial", () => new BasicSceneDescriptor([

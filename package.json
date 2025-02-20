@@ -22,6 +22,7 @@
     "react-virtuoso": "^4.12.5",
     "readable-stream": "^3.6.0",
     "serverline": "^1.6.0",
+    "simplebar-react": "^3.3.0",
     "through2": "^4.0.2",
     "util": "^0.12.3",
     "websocket": "^1.0.32"

@@ -1,6 +1,6 @@
 import Entity from "src/utils/ecs/entity";
 import {DMGameState} from "src/entity/types/controller-dm/dm-game-state";
-import CTFGameStateOverlay from "src/client/ui/overlay/game-overlay/ctf-game-overlay/ctf-game-state-overlay";
+import { CTFGameStateHUD } from "src/client/ui/game-hud/ctf-game-hud/ctf-game-state-hud";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export class ClientCTFControllerComponent extends EventHandlerComponent {
@@ -18,7 +18,10 @@ export class ClientCTFControllerComponent extends EventHandlerComponent {
 
         this.eventHandler.on("game-state-update", (state: DMGameState) => {
             if(this.world) {
-                this.world.emit("overlay-data", CTFGameStateOverlay, state)
+                this.world.emit("hud-view", CTFGameStateHUD, {
+                    state: state,
+                    world: this.world
+                })
             }
         })
 

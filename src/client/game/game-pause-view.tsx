@@ -1,7 +1,7 @@
-import {PauseMenuButton, PauseNavigationItem} from "src/client/ui/overlay/pause-overlay/pause-menu-view";
+import {PauseMenuButton, PauseNavigationItem} from "src/client/ui/pause-overlay/pause-menu-view";
 import PageLocation from "src/client/scenes/page-location";
 import React from "react";
-import SettingsView from "src/client/ui/overlay/pause-overlay/controllers/settings-view";
+import SettingsView from "src/client/ui/pause-overlay/controllers/settings-view";
 import { useNavigation } from "../ui/navigation/navigation-view";
 
 const GamePauseView: React.FC = () => {

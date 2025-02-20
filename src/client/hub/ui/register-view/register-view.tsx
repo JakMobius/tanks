@@ -3,8 +3,8 @@ import "./register-view.scss"
 import {checkNick} from "src/data-checkers/nick-checker";
 import {localizeAjaxError, textFromNickCheckResult} from "src/client/hub/localizations";
 import {passwordScore} from "src/data-checkers/password-checker";
-import { PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view";
-import { PauseInputRow, PauseInputDetailDisclosure } from "src/client/ui/overlay/pause-overlay/elements/pause-input-row";
+import { PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view";
+import { PauseInputRow, PauseInputDetailDisclosure } from "src/client/ui/pause-overlay/elements/pause-input-row";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
 import React from "react";
 

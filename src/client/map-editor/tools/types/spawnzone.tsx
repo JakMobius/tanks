@@ -1,3 +1,5 @@
+import "./spawnzones.scss"
+
 import Tool from '../tool';
 import Color from 'src/utils/color';
 import SpawnZone from 'src/map/spawn-zone';
@@ -25,8 +27,8 @@ const SpawnZoneTeamView: React.FC<SpawnZoneTeamViewProps> = (props) => {
     }, [props.index])
 
     return (
-        <div className={"tool " + props.selected ? "selected" : ""} onClick={onClick}>
-            <div className="wrapper" style={{ backgroundColor: props.backgroundColor }} />
+        <div className={"tool " + (props.selected ? "selected" : "")} onClick={onClick}>
+            <div className="teal-colorbox" style={{ backgroundColor: props.backgroundColor }} />
         </div>
     )
 }
@@ -34,24 +36,24 @@ const SpawnZoneTeamView: React.FC<SpawnZoneTeamViewProps> = (props) => {
 const SpawnZoneToolView: React.FC<ToolViewProps<SpawnZoneTool>> = (props) => {
 
     const onTeamSelect = useCallback((index: number) => {
-        props.tool.selectTeam(index)
+        props.tool?.selectTeam(index)
     }, [props.tool])
 
     const clearZone = useCallback(() => {
-        props.tool.deleteZone(props.tool.selectedTeam)
+        props.tool?.deleteZone(props.tool?.selectedTeam)
     }, [props.tool])
 
     return (
         <div className="tool-preferences">
-            { Array.from(props.tool.colors.entries()).map(([index, color]) => (
+            { Array.from(props.tool?.colors.entries()).map(([index, color]) => (
                 <SpawnZoneTeamView
                     key={index}
                     index={index}
                     onClick={onTeamSelect}
                     backgroundColor={color.code()}
-                    selected={props.tool.selectedTeam === index}/>
+                    selected={props.tool?.selectedTeam === index}/>
             ))}
-            <button className="large" disabled={props.tool.selectedTeam === null} onClick={clearZone}>Очистить</button>
+            <button className="large" disabled={props.tool?.selectedTeam === null} onClick={clearZone}>Очистить</button>
         </div>
     )
 }

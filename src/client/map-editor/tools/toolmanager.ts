@@ -1,5 +1,4 @@
 
-import Camera from 'src/client/graphics/camera';
 import Tool from '../tools/tool';
 import KeyboardController from "src/client/controls/input/keyboard/keyboard-controller";
 import BlockState from "src/map/block-state/block-state";
@@ -34,10 +33,13 @@ export default class ToolManager extends EventEmitter {
             this.selectedTool.becomeActive()
             this.updateCursor()
         }
+
+        this.emit("select-tool", tool)
     }
 
     selectBlock(block: BlockState) {
         this.selectedBlock = block
+        this.emit("select-block", block)
     }
 
     getCursor() {

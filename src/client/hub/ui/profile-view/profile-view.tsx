@@ -1,7 +1,7 @@
 
 import React from "react"
 import Cloud from "src/client/game/ui/cloud/cloud"
-import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/overlay/pause-overlay/pause-menu-view"
+import { PauseMenuButton, PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view"
 import { useProfile } from "../hub-page"
 
 const ProfileView: React.FC = () => {

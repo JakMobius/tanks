@@ -2,15 +2,22 @@ import './browser-check.scss'
 
 import BrowserCheck from './browser-check';
 
-function browserLink (footer: JQuery, name: string, image: string, href: string): void {
-    footer.append(
-        $("<a>").addClass("supported-browser").append(
-            $("<img>")
-                .attr("src", image)
-                .attr("alt", name),
-            $("<p>").text(name)
-        ).attr("href", href)
-    )
+function browserLink (footer: HTMLElement, name: string, image: string, href: string): void {
+    var link = document.createElement("a")
+    link.classList.add("supported-browser")
+    link.setAttribute("href", href)
+
+    var img = document.createElement("img")
+    img.setAttribute("src", image)
+    img.setAttribute("alt", name)
+
+    var p = document.createElement("p")
+    p.innerText = name
+
+    link.appendChild(img)
+    link.appendChild(p)
+
+    footer.appendChild(link)
 }
 
 export default function(callback: () => void){
@@ -39,24 +46,27 @@ export default function(callback: () => void){
     if(webGl == "available") {
         callback()
     } else {
-        var container = $("<div>").addClass("unsupported-browser")
-        var header = $("<h1>").addClass("header")
-        var text = $("<div>").addClass("text")
-        var footer = $("<div>").addClass("footer")
+        var container = document.createElement("div")
+        container.classList.add("unsupported-browser")
+
+        var header = document.createElement("h1")
+        header.classList.add("header")
+
+        var text = document.createElement("div")
+        text.classList.add("text")
+
+        var footer = document.createElement("div")
+        footer.classList.add("footer")
 
         if(webGl == "disabled") {
-            header.text("В Вашем браузере отключен WebGL")
-            text.append(
-                $("<p>").text("Необходимо разрешить использование WebGL в настройках " +
-                    "вашего браузера, прежде чем страница сможет быть загружена")
-            )
+            header.innerText = "В Вашем браузере отключен WebGL"
+            text.innerHTML = "<p>Необходимо разрешить использование WebGL в настройках " +
+                    "вашего браузера, прежде чем страница сможет быть загружена</p>"
         } else if(webGl == "unavailable") {
-            header.text("Ваш браузер устарел")
-            text.append(
-                $("<p>").text("Страница не может быть загружена, поскольку ваш браузер " +
+            header.innerText = "Ваш браузер устарел"
+            text.innerHTML = "<p>Страница не может быть загружена, поскольку ваш браузер " +
                     "не поддерживает WebGL. Для быстрой и стабильной работы страницы рекомендуем " +
-                    "скачать последнюю версию одного из этих браузеров:")
-            )
+                    "скачать последнюю версию одного из этих браузеров:</p>"
 
             browserLink(
                 footer,
@@ -71,7 +81,9 @@ export default function(callback: () => void){
                 "https://www.mozilla.org/firefox/new"
             )
         }
-        container.append(header, text, footer)
-        $(document.body).append(container)
+        container.appendChild(header)
+        container.appendChild(text)
+        container.appendChild(footer)
+        document.body.appendChild(container)
     }
 };

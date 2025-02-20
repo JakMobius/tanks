@@ -8,7 +8,7 @@ import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-e
 import PlayerTankSelectPacket from "src/networking/packets/game-packets/player-tank-select-packet";
 import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from '../scenes/scene-controller';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import RootControlsResponder, { ControlsResponder } from '../controls/root-controls-responder';
 import TransformComponent from 'src/entity/components/transform-component';
 import CameraComponent from '../graphics/camera';
@@ -16,10 +16,10 @@ import CameraPositionController from 'src/entity/components/camera-position-cont
 import CameraPrimaryEntityController from 'src/entity/components/camera-primary-entity-watcher';
 import WorldSoundListenerComponent from '../entity/components/sound/world-sound-listener-component';
 import WorldDrawerComponent from '../entity/components/world-drawer-component';
-import PlayerNickOverlay from '../ui/overlay/player-nick-overlay/player-nicks-view';
-import TankInfoView from '../ui/overlay/tank-info-overlay/tank-info-overlay';
-import ChatView from '../ui/overlay/chat-overlay/chat-container';
-import PauseOverlay from '../ui/overlay/pause-overlay/pause-overlay';
+import PlayerNicksHUD from '../ui/player-nicks-hud/player-nicks-hud';
+import TankInfoHUD from '../ui/tank-info-hud/tank-info-hud';
+import ChatHUD from '../ui/chat-hud/chat-hud';
+import PauseOverlay from '../ui/pause-overlay/pause-overlay';
 import GamePauseView from './game-pause-view';
 import { SceneDescriptor } from '../scenes/scene-descriptor';
 import { ScenePrerequisite, soundResourcePrerequisite, texturesResourcePrerequisite } from '../scenes/scene-prerequisite';
@@ -29,8 +29,11 @@ import { RandomMessageLoadingError } from '../scenes/loading/loading-error';
 import { internetErrorMessageGenerator, missingRoomNameErrorMessageGenerator } from '../scenes/loading/error-message-generator';
 import WebsocketConnection from '../networking/websocket-connection';
 import PrimaryEntityControls from 'src/entity/components/primary-entity-controls';
-import TankSelectView from '../ui/overlay/tank-select-overlay/tank-select-view';
-import PlayerListView from '../ui/overlay/player-list-overlay/player-list-view';
+import TankSelectOverlay from '../ui/tank-select-overlay/tank-select-overlay';
+import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
+import EventsHUD, { EventsContext, EventsProvider } from '../ui/events-hud/events-hud';
+import GameHUD from '../ui/game-hud/game-hud';
+import { KeyedComponents, KeyedComponentsHandle } from '../utils/keyed-component';
 
 export interface GameSceneConfig {
     client: ConnectionClient
@@ -40,13 +43,30 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
     const controlsUpdateInterval = 0.05
 
     const scene = useScene()
+    const eventContextRef = useRef<KeyedComponentsHandle | null>(null)
+    const gameHudRef = useRef<KeyedComponentsHandle | null>(null)
 
     const [state, setState] = React.useState({
         controlsResponder: null as ControlsResponder | null,
         camera: null as Entity | null,
         world: null as Entity | null,
-        remoteControlsManager: null as RemoteControlsManager | null
+        remoteControlsManager: null as RemoteControlsManager | null,
+        messageCount: 0
     })
+
+    const messagesRef = useRef<string[]>([])
+
+    const addMessage = (message: string) => {
+        messagesRef.current.push(message)
+        setState((state) => ({
+            ...state,
+            messageCount: messagesRef.current.length,
+        }))
+    }
+
+    const getMessage = useCallback((index: number) => {
+        return messagesRef.current[index]
+    }, [])
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
@@ -56,13 +76,13 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
     }
 
-    const onChat = (text: string) => {
+    const onChat = useCallback((text: string) => {
         new PlayerChatPacket(text).sendTo(props.client.connection)
-    }
+    }, [props.client])
 
-    const onTankSelected = (tank: number) => {
+    const onTankSelected = useCallback((tank: number) => {
         new PlayerTankSelectPacket(tank).sendTo(props.client.connection)
-    }
+    }, [props.client])
 
     useEffect(() => {
         scene.setTitle("Танчики")
@@ -82,9 +102,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
             camera.getComponent(WorldDrawerComponent).toggleDebugDraw()
         })
 
-        props.client.on(PlayerChatPacket, (packet) => {
-            // this.chatContainer.addMessage(packet.text)
-        })
+        props.client.on(PlayerChatPacket, (packet) => addMessage(packet.text))
 
         props.client.on(WorldCommunicationPacket, (packet) => {
             let buffer = new ReadBuffer(packet.buffer.buffer)
@@ -139,14 +157,34 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
         return () => scene.loop.clearScheduledTask(updateIntervalIndexRef.current)
     }, [state.remoteControlsManager])
 
-    return <>
-        <PlayerNickOverlay world={state.world} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
-        <TankInfoView world={state.world} />
-        <ChatView />
-        <PlayerListView/>
-        <TankSelectView onTankSelect={onTankSelected} gameControls={state.controlsResponder}/>
-        <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
-    </>
+    useEffect(() => {
+        if(!state.world) return undefined
+        const onEventView = (message: React.FC, props: any) => {
+            eventContextRef.current?.addEvent(message, props)
+        }
+        const onHudView = (message: React.FC, props: any) => {
+            gameHudRef.current?.addEvent(message, props)
+        }
+        state.world.on("event-view", onEventView)
+        state.world.on("hud-view", onHudView)
+        return () => {
+            state.world.off("event-view", onEventView)
+            state.world.on("hud-view", onHudView)
+        }
+    }, [state.world, eventContextRef.current])
+
+    return (
+        <EventsProvider ref={eventContextRef}>
+            <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
+            <TankInfoHUD world={state.world} />
+            <ChatHUD gameControls={state.controlsResponder} onChat={onChat} messageCount={state.messageCount} getMessage={getMessage}/>
+            <EventsHUD/>
+            <PlayerListHUD gameControls={state.controlsResponder} world={state.world}/>
+            <GameHUD keyedComponentsRef={gameHudRef}/>
+            <TankSelectOverlay onTankSelect={onTankSelected} gameControls={state.controlsResponder}/>
+            <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
+        </EventsProvider>
+    )
 }
 
 class SocketConnectionPrerequisite extends ScenePrerequisite {

@@ -4,11 +4,11 @@ import { checkRoomName } from "src/data-checkers/room-name-checker";
 import { localizeAjaxError, textFromRoomNameCheckResult } from "src/client/hub/localizations";
 
 import React, { useEffect, useState } from 'react';
-import { PauseMenuButton, PauseNavigationItem } from 'src/client/ui/overlay/pause-overlay/pause-menu-view';
-import { PauseInputRow } from 'src/client/ui/overlay/pause-overlay/elements/pause-input-row';
-import PauseKeySelectRow, { SelectOption } from 'src/client/ui/overlay/pause-overlay/elements/pause-select-row';
+import { PauseMenuButton, PauseNavigationItem } from 'src/client/ui/pause-overlay/pause-menu-view';
+import { PauseInputRow } from 'src/client/ui/pause-overlay/elements/pause-input-row';
+import PauseKeySelectRow, { SelectOption } from 'src/client/ui/pause-overlay/elements/pause-select-row';
 import TipList, { Tip, TipStyle } from '../../tip-list/tip-list';
-import PauseKeyValueRow from 'src/client/ui/overlay/pause-overlay/elements/pause-key-value-row';
+import PauseKeyValueRow from 'src/client/ui/pause-overlay/elements/pause-key-value-row';
 import Cloud from 'src/client/game/ui/cloud/cloud';
 import PageLocation from 'src/client/scenes/page-location';
 
