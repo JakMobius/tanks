@@ -7,6 +7,8 @@ import { PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view
 import { PauseInputRow, PauseInputDetailDisclosure } from "src/client/ui/pause-overlay/elements/pause-input-row";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
 import React from "react";
+import { api } from "src/client/networking/api";
+import { useAbortControllerCleanup } from "src/client/utils/abort-controller-cleanup";
 
 const RegisterView: React.FC = () => {
 
@@ -19,8 +21,9 @@ const RegisterView: React.FC = () => {
         loginCorrect: false,
         passwordCorrect: false,
         passwordStrengthClass: "",
-        requests: new Set<JQuery.jqXHR>()
     })
+    
+    const { addCleanup, removeCleanup } = useAbortControllerCleanup()
 
     const onSuccessfulRegister = () => {
         window.location.reload()
@@ -65,18 +68,23 @@ const RegisterView: React.FC = () => {
             return
         }
 
-        $.ajax({
-            url: "ajax/register",
-            method: "post",
-            data: {
+        let abortController = new AbortController()
+        api("ajax/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
                 login: state.login,
                 password: state.password
-            }
-        }).done((result) => {
-            handleResult(result)
-        }).fail((xhr, exception) => {
-            setError(localizeAjaxError(xhr, exception))
+            }),
+            signal: abortController.signal
         })
+        .then(result => handleResult(result))
+        .catch(error => setError(localizeAjaxError(error)))
+        .finally(() => removeCleanup(abortController))
+
+        addCleanup(abortController)
     }
 
     const setLogin = (login: string) => {
@@ -91,7 +99,6 @@ const RegisterView: React.FC = () => {
 
     const checkLogin = () => {
         setState((state) => {
-            console.log(state.login)
             let tips: Tip[] = checkNick(state.login).map(a => {
                 return {
                     text: textFromNickCheckResult(a),
@@ -154,7 +161,7 @@ const RegisterView: React.FC = () => {
                     />
                 }
             />
-            <TipList tips={[...state.loginTips, ...state.passwordTips]}/>
+            <TipList tips={[...state.loginTips, ...state.passwordTips, ...state.errors]}/>
         </PauseNavigationItem>
     );
 }

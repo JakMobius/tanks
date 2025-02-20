@@ -88,7 +88,6 @@ export default class SpawnZoneTool extends Tool {
     public image = "static/map-editor/spawnzones.png"
 	public actionName = "Зона спавна";
 	public selectedTeam: number | null = null;
-	public clearZoneButton: JQuery;
     public visibleEntity = new Entity()
 
     public readonly colors = new Map<number, Color>([

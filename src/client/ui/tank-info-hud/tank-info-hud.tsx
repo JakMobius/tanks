@@ -230,7 +230,6 @@ const TankInfoWeaponsView: React.FC<TankInfoWeaponsViewProps> = (props) => {
         let weaponsController = props.tank?.getComponent(TankWeaponsController)
         if (!weaponsController) return
         let weapons = weaponsController.weapons
-        console.log(weapons[0])
         setWeapons([...weapons])
     }
 

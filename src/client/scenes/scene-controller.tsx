@@ -109,10 +109,7 @@ const SceneRouter: React.FC = () => {
         const descriptor = descriptorFactory()
 
         const prerequisites = descriptor.prerequisites.map(resource => {
-            return () => {
-                console.log(resource.getLocalizedDescription())
-                return resource.resolve(scene)
-            }
+            return () => resource.resolve(scene)
         })
 
         const progress = Progress.sequential(prerequisites)

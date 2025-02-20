@@ -23,7 +23,7 @@ export default class BaseModule extends WebserverModule {
                 res.send(html)
             });
         } else if (req.accepts('json')) {
-            res.send({ error: 'Not found' });
+            res.send({ error: 'not-found' });
         } else {
             res.type('txt').send('Not found');
         }

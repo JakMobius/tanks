@@ -1,5 +1,6 @@
 import {NickCheckResult} from "src/data-checkers/nick-checker";
 import {RoomNameCheckResult} from "src/data-checkers/room-name-checker";
+import { APIGenericError, APIGenericErrorType, APIHTTPError, APIServerError } from "../networking/api";
 
 export function textFromNickCheckResult(reason: NickCheckResult) {
     switch (reason) {
@@ -20,21 +21,45 @@ export function textFromRoomNameCheckResult(reason: RoomNameCheckResult) {
     return null
 }
 
-export function localizeAjaxError(xhr: JQuery.jqXHR, exception: string): string | null {
-    if (xhr.status === 0) {
-        return 'Не удалось выполнить подключение к серверу. Убедитесь, что с вашим интернетом все в порядке.';
-    } else if (xhr.status >= 500 && xhr.status <= 599) {
-        return 'Сервер прилёг отдохнуть. Пожалуйста, сообщите об этом разработчикам. Пусть разбудят. (Ошибка ' + xhr.status + ')';
-    } else if (xhr.status >= 400 && xhr.status <= 499) {
-        return 'Не удалось выполнить запрос. Серверу он почему-то не понравился. Обратитесь за помощью к разработчикам. (Ошибка ' + xhr.status + ')'
-    } else if (exception === 'parsererror') {
-        return 'Произошла ошибка разбора при выполнении запроса. Как это вообще могло произойти?...';
-    } else if (exception === 'timeout') {
-        return 'Не удалось выполнить запрос. Истекло время ожидания.';
-    } else if (exception === 'abort') {
-        return 'Не удалось выполнить запрос, так как он был отменен';
-    } else {
-        return 'Не удалось выполнить запрос: ' + xhr.responseText;
+export function localizeAjaxError(error: any): string | null {
+    const badRequestMessage = (error: string) => {
+        return "Не удалось выполнить запрос. Серверу он почему-то не понравился. Обратитесь за помощью к разработчикам. (Ошибка " + error + ")"
     }
-    return null
+
+    if(error instanceof APIHTTPError) {
+        if(error.status >= 500 && error.status <= 599) {
+            return 'Сервер прилёг отдохнуть. Пожалуйста, сообщите об этом разработчикам. Пусть разбудят. (Ошибка ' + error.status + ')';
+        }
+        return badRequestMessage(String(error.status))
+    }
+    if(error instanceof APIGenericError) {
+        switch(error.type) {
+            case APIGenericErrorType.connectionError:
+                return 'Не удалось выполнить подключение к серверу. Убедитесь, что с вашим интернетом все в порядке.';
+            case APIGenericErrorType.abortError:
+                return 'Не удалось выполнить запрос, так как он был отменен';
+            case APIGenericErrorType.timeoutError:
+                return 'Не удалось выполнить запрос. Истекло время ожидания.';
+            case APIGenericErrorType.notAllowedError:
+                return 'Ваш браузер не разрешил нам выполнить наш запрос. Мы сами в шоке.';
+            case APIGenericErrorType.invalidJSON:
+                return 'Произошла ошибка разбора при выполнении запроса. Как это вообще могло произойти?...';
+        }
+    }
+    if(error instanceof APIServerError) {
+        switch(error.type) {
+            case "forbidden":
+                return 'Кажется, у вас недостаточно прав.';
+            case "not-authenticated":
+                return 'Кажется, сюда можно только авторизованным пользователям.';
+            case "malformed-input-data":
+            case "missing-field":
+            case "unsupported-method":
+                return badRequestMessage(error.type);
+            case "not-found":
+                return "Вас занесло в неизведанные дали. Такой страницы не существует.";
+            
+        }
+    }
+    return 'Не удалось выполнить запрос. Что-то сломалось, но мы не знаем, что.'
 }

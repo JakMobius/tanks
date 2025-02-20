@@ -45,7 +45,6 @@ export default class RoomCreateAjaxHandler extends AjaxHandler {
                 result: "ok",
                 name: name
             })
-            console.log("Room " + name + " was successfully created!")
         }).catch(e => {
             if(e instanceof NoSuchMapError || e instanceof MalformedMapFileError) {
                 res.status(200).send({ result: "invalid-map" })

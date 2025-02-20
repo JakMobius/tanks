@@ -8,6 +8,8 @@ import LoadingView from '../loading-view/loading-view';
 import { NavigationItem, useNavigation } from 'src/client/ui/navigation/navigation-view';
 import GameCreateViewComponent from '../game-create/game-create-view';
 import { CloudyNavigationHeader } from 'src/client/ui/pause-overlay/pause-menu-view';
+import { api } from 'src/client/networking/api';
+import { useAbortControllerCleanup } from 'src/client/utils/abort-controller-cleanup';
 
 interface RoomListErrorProps {
     error: string
@@ -44,6 +46,8 @@ const RoomListView: React.FC = (props) => {
         globalRooms: [] as RoomConfig[]
     })
 
+    const { addCleanup, removeCleanup } = useAbortControllerCleanup()
+
     const setLoading = (loading: boolean) => {
         setState((state) => ({ ...state, loading: loading }))
     }
@@ -71,15 +75,17 @@ const RoomListView: React.FC = (props) => {
 
     const onRetry = () => {
         setState((state) => ({ ...state, error: null, loading: true }))
-        
-        $.ajax({
-            url: "ajax/room-list",
-            method: "GET"
-        }).done((data: any) => {
-            onLoaded(data)
-        }).fail((jqXHR: JQuery.jqXHR, exception: string) => {
-            onFailure(localizeAjaxError(jqXHR, exception))
+
+        let abortController = new AbortController()
+        api("ajax/room-list", {
+            method: "GET",
+            signal: abortController.signal
         })
+        .then(data => onLoaded(data))
+        .catch(error => onFailure(localizeAjaxError(error)))
+        .finally(() => removeCleanup(abortController))
+
+        addCleanup(abortController)
     }
 
     useEffect(() => {

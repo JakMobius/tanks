@@ -8,6 +8,7 @@ import * as HTTP from "http";
 import StaticModule from "./static/static-module";
 import Server from "../server";
 import {WebserverSession} from "./webserver-session";
+import bodyParser from "body-parser"
 
 // TODO: Figure out another way
 // @ts-ignore
@@ -164,6 +165,7 @@ export default class WebServer {
         })
 
         this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(bodyParser.json());
         this.app.use(this.session)
 
         this.app.use((req, res, next) => {
@@ -200,7 +202,7 @@ export default class WebServer {
         if (req.accepts('html')) {
             res.render('views/500.hbs');
         } else if (req.accepts('json')) {
-            res.send({ error: 'Internal server error' });
+            res.send({ error: 'internal-server-error' });
         } else {
             res.type('txt').send('Internal server error');
         }

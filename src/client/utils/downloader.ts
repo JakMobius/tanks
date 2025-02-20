@@ -1,3 +1,4 @@
+import { api } from '../networking/api';
 import {ProgressLeaf} from './progress';
 import DOMEventHandlerSet from "src/utils/dom-event-handler-set";
 
@@ -23,36 +24,36 @@ export default class Downloader {
 
     static downloadBinary(url: string, handler: (response: ArrayBuffer) => void | Promise<void>) {
         let progress = new ProgressLeaf()
+        let controller = new AbortController()
 
-        let request = $.ajax({
-            url: url,
-            xhr: this.getXHR("arraybuffer", progress),
-        }).done((msg) => {
-            Promise.resolve(handler(msg)).then(() => progress.complete())
-        }).fail((response, _status, error) => {
-            progress.fail(error)
-        })
+        api(url, { signal: controller.signal, type: "arraybuffer" })
+        .then(handler)
+        .then(() => progress.complete())
+        .catch((error) => {
+            progress.fail(error.message);
+        });
 
-        progress.on("abort", () => request.abort())
+        progress.on("abort", () => controller.abort())
 
         return progress
     }
 
-    static download(url: string, handler: (response: any) => void | Promise<void>, contentType: string) {
+    static download(url: string, handler: (response: any) => void | Promise<void>) {
 
         let progress = new ProgressLeaf()
+        let controller = new AbortController();
 
-        let request = $.ajax({
-            url: url,
-            xhr: this.getXHR(null, progress),
-            contentType: contentType,
-        }).done((msg) => {
-            Promise.resolve(handler(msg)).then(() => progress.complete())
-        }).fail((response, _status, error) => {
-            progress.fail(error)
+        api(url, {
+            method: 'GET',
+            signal: controller.signal
         })
+        .then(handler)
+        .then(() => progress.complete())
+        .catch((error) => {
+            progress.fail(error.message);
+        });
 
-        progress.on("abort", () => request.abort())
+        progress.on("abort", () => controller.abort());
 
         return progress
     }

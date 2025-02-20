@@ -36,7 +36,7 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
         let ctor = (this.constructor as typeof AjaxHandler)
         if(req.method != ctor.method) {
             res.status(405).send({
-                error: 'unsupported method'
+                error: 'unsupported-method'
             })
             return
         }
@@ -86,8 +86,8 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
 
                 if (fieldValue === null) {
                     res.status(400).send({
-                        'error': 'malformed-input-data',
-                        'message': 'value of "' + field.name + '" expected to be ' + AjaxFieldType[type]
+                        error: 'malformed-input-data',
+                        message: 'value of "' + field.name + '" expected to be ' + AjaxFieldType[type]
                     })
                     return
                 }
@@ -95,7 +95,7 @@ export default abstract class AjaxHandler<T extends WebserverModule = WebserverM
         }
 
         if(ctor.requiresAuthentication && !(req.session as WebserverSession).username) {
-            res.status(403).send({ result: "not-authenticated" })
+            res.status(403).send({ error: "not-authenticated" })
             return;
         }
 

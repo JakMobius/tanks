@@ -19,7 +19,6 @@ export default class RegisterAjaxHandler extends AjaxHandler<GameModule> {
     ]
 
     handle(req: express.Request, res: express.Response, fields: RegisterAjaxFields, next: express.NextFunction) {
-
         if((req.session as WebserverSession).username) {
             res.status(200).send({ result: "already-authorised" })
             return;

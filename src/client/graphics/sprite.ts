@@ -120,7 +120,7 @@ export default class Sprite {
                     Sprite.sprites.set(key, new Sprite(key))
                 }
             }
-        }, "json")
+        })
 
         return Progress.parallel([textureProgress, atlasProgress])
     }

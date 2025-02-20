@@ -122,7 +122,6 @@ export default class BootCommand extends Command {
     onPerform(args: string[]) {
         let flags = this.findFlags(args.slice(2))
         if (flags.errors) {
-            console.log(flags.errors.join("\n"))
             return
         }
 

@@ -8,6 +8,7 @@ import RoomListView from '../room-list-view/room-list-view';
 import { useProfile } from '../hub-page';
 import LoginView from '../login-view/login-view';
 import ProfileView from '../profile-view/profile-view';
+import EventsHUD, { EventsProvider } from 'src/client/ui/events-hud/events-hud';
 
 interface MenuItemProps {
     title?: string

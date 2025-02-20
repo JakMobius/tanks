@@ -10,7 +10,8 @@ ServerEntityPrefabs.types.set(EntityType.BULLET_CANNONBALL, (entity) => {
 
     entity.addComponent(new BulletBehaviour({
         explodePower: 0,
-        wallDamage: 1000
+        wallDamage: 1000,
+        entityDamage: 4
     }))
 
     entity.addComponent(new PositionTransmitComponent())

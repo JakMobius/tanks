@@ -135,6 +135,10 @@ const MapEditorScene: React.FC = (props) => {
         RootControlsResponder.getInstance().setMainResponderDelayed(controlsResponder)
 
         return () => {
+            // TODO: This is wrong
+            camera.removeComponent(WorldSoundListenerComponent)
+            camera.removeComponent(WorldDrawerComponent)
+
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()

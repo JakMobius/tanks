@@ -132,6 +132,10 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
         props.client.connection.resume()
 
         return () => {
+            // TODO: This is wrong
+            camera.removeComponent(WorldSoundListenerComponent)
+            camera.removeComponent(WorldDrawerComponent)
+
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()

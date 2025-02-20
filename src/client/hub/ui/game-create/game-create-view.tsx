@@ -3,7 +3,7 @@ import './game-create-view.scss'
 import { checkRoomName } from "src/data-checkers/room-name-checker";
 import { localizeAjaxError, textFromRoomNameCheckResult } from "src/client/hub/localizations";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { PauseMenuButton, PauseNavigationItem } from 'src/client/ui/pause-overlay/pause-menu-view';
 import { PauseInputRow } from 'src/client/ui/pause-overlay/elements/pause-input-row';
 import PauseKeySelectRow, { SelectOption } from 'src/client/ui/pause-overlay/elements/pause-select-row';
@@ -11,6 +11,8 @@ import TipList, { Tip, TipStyle } from '../../tip-list/tip-list';
 import PauseKeyValueRow from 'src/client/ui/pause-overlay/elements/pause-key-value-row';
 import Cloud from 'src/client/game/ui/cloud/cloud';
 import PageLocation from 'src/client/scenes/page-location';
+import { api } from 'src/client/networking/api';
+import { useAbortControllerCleanup } from 'src/client/utils/abort-controller-cleanup';
 
 const GameCreateViewComponent: React.FC = () => {
 
@@ -21,29 +23,26 @@ const GameCreateViewComponent: React.FC = () => {
         roomNameTips: [] as Tip[],
         roomName: "",
         roomValid: false,
-        requests: new Set<JQuery.jqXHR>(),
         selectedMap: null as string | null,
         selectedMode: null as string | null,
         formValid: false
     })
 
-    const addRequest = (request: JQuery.jqXHR) => {
-        setState((state) => ({ ...state, requests: state.requests.add(request) }))
+    const { addCleanup, removeCleanup } = useAbortControllerCleanup()
+
+    const onMapFetchError = (error: any) => {
+        setState((state) => ({ ...state, loading: false, mapLoadingError: true }))
     }
 
-    const removeRequest = (request: JQuery.jqXHR) => {
-        setState((state) => {
-            let requests = new Set(state.requests)
-            requests.delete(request)
-            return { ...state, requests: requests }
-        })
-    }
-
-    const onMapFetchResult = (data: any) => {
+    const onMapFetchResult = (response: any) => {
+        if(response.result !== "ok") {
+            onMapFetchError(response.result)
+            return
+        }
         setState((state) => ({
             ...state,
             loading: false,
-            maps: data.maps.map((map: any) => {
+            maps: response.maps.map((map: any) => {
                 return {
                     name: map.name,
                     data: map.value
@@ -52,54 +51,44 @@ const GameCreateViewComponent: React.FC = () => {
         }))
     }
 
-    const onMapFetchError = (data: JQuery.jqXHR, exception: string) => {
-        setState((state) => ({ ...state, loading: false, mapLoadingError: true }))
-    }
-
     const fetchMaps = () => {
-        let request = $.ajax({
-            url: "ajax/map-list",
-            method: "get"
-        })
+        let controller = new AbortController()
 
-        request.done((data) => {
-            removeRequest(request)
-            onMapFetchResult(data);
-        }).fail((data, exception) => {
-            removeRequest(request)
-            onMapFetchError(data, exception)
+        api('/ajax/map-list', {
+            method: 'GET',
+            signal: controller.signal
         })
+        .then(onMapFetchResult)
+        .catch(onMapFetchError)
+        .finally(() => removeCleanup(controller))
 
-        addRequest(request)
+        addCleanup(controller)
         setState((state) => ({ ...state, error: null, loading: true }))
     }
 
     const createRoom = () => {
         if (!state.formValid) return
 
-        let request = $.ajax({
-            url: "ajax/room-create",
-            method: "post",
-            data: {
+        let controller = new AbortController()
+
+        api("ajax/room-create", {
+            method: "POST",
+            body: JSON.stringify({
                 name: state.roomName,
                 map: state.selectedMap,
                 mode: state.selectedMode
-            }
+            }),
+            signal: controller.signal
         })
+        .then(onRoomCreateResponse)
+        .catch(onRoomCreateError)
+        .finally(() => removeCleanup(controller))
 
-        request.done((data) => {
-            removeRequest(request)
-            onRoomCreateResponse(data)
-        }).fail((data, exception) => {
-            removeRequest(request)
-            onRoomCreateError(data, exception)
-        })
-
-        addRequest(request)
+        addCleanup(controller)
     }
 
-    const onRoomCreateError = (xhr: JQuery.jqXHR, exception: string) => {
-        showError(localizeAjaxError(xhr, exception))
+    const onRoomCreateError = (error: any) => {
+        showError(localizeAjaxError(error))
     }
 
     const showError = (text: string) => {
@@ -173,9 +162,6 @@ const GameCreateViewComponent: React.FC = () => {
 
     useEffect(() => {
         fetchMaps()
-        return () => {
-            state.requests.forEach(request => request.abort())
-        }
     }, [])
 
     useEffect(() => {

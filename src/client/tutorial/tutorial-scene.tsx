@@ -26,7 +26,7 @@ import PauseOverlay from "../ui/pause-overlay/pause-overlay";
 import CameraPrimaryEntityController from "src/entity/components/camera-primary-entity-watcher";
 import PrimaryEntityControls from "src/entity/components/primary-entity-controls";
 import React, { useCallback, useEffect, useRef } from "react"
-import EventsHUD, { EventsContext, EventsProvider } from "../ui/events-hud/events-hud";
+import EventsHUD, {  EventsProvider } from "../ui/events-hud/events-hud";
 import { KeyedComponentsHandle } from "../utils/keyed-component";
 
 const TutorialScene: React.FC = () => {
@@ -116,6 +116,10 @@ const TutorialScene: React.FC = () => {
         RootControlsResponder.getInstance().setMainResponderDelayed(controlsResponder)
 
         return () => {
+            // TODO: This is wrong
+            camera.removeComponent(WorldSoundListenerComponent)
+            camera.removeComponent(WorldDrawerComponent)
+
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()

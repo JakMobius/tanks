@@ -6,10 +6,16 @@ import Cloud from "src/client/game/ui/cloud/cloud";
 import { useNavigation } from "src/client/ui/navigation/navigation-view";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
 import RegisterView from "../register-view/register-view";
+import { useEvents } from "src/client/ui/events-hud/events-hud";
+import { BasicEvent } from "src/client/ui/events-hud/basic-event-view";
+import { api } from "src/client/networking/api";
+import { useAbortControllerCleanup } from "src/client/utils/abort-controller-cleanup";
 
 const LoginView: React.FC = () => {
 
     const navigation = useNavigation()
+    const events = useEvents()
+    const { addCleanup, removeCleanup } = useAbortControllerCleanup()
 
     const [state, setState] = React.useState({
         login: "",
@@ -21,11 +27,11 @@ const LoginView: React.FC = () => {
         window.location.reload()
     }
 
-    const invalidCredentials = () => {
+    const showError = (error: string) => {
         setState((state) => ({
             ...state,
             tips: [{
-                text: "Неверный позывной или пароль",
+                text: error,
                 style: TipStyle.ERROR
             }]
         }))
@@ -34,30 +40,33 @@ const LoginView: React.FC = () => {
     const parseResult = (result: any) => {
         switch (result.result) {
             case 'ok':                  loginSuccessful();    break;
-            case 'invalid-credentials': invalidCredentials(); break;
+            case 'invalid-credentials': showError("Неверный позывной или пароль"); break;
             default: break;
         }
     }
 
     const onLogin = () => {
-        $.ajax({
-            url: "ajax/login",
-            method: "post",
-            data: {
+        let abortController = new AbortController()
+        api("ajax/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
                 login: state.login,
                 password: state.password
-            }
-        }).done((result) => {
-            parseResult(result)
-        }).fail((xhr, exception) => {
-            let msg = localizeAjaxError(xhr, exception)
-             // TODO: Figure out a better way
-            // props.page.eventContainer.createEvent(msg)
+            }),
+            signal: abortController.signal
         })
+        .then(parseResult)
+        .catch(error => showError(localizeAjaxError(error)))
+        .finally(() => removeCleanup(abortController))
+
+        addCleanup(abortController)
     }
 
-    const setLogin = (login: string) => setState((state) => ({...state, login}))
-    const setPassword = (password: string) => setState((state) => ({...state, password}))
+    const setLogin = (login: string) => setState((state) => ({...state, login, tips: []}))
+    const setPassword = (password: string) => setState((state) => ({...state, password, tips: []}))
 
     const navigateToRegistration = () => {
         navigation.push(<RegisterView/>)
@@ -82,7 +91,7 @@ const LoginView: React.FC = () => {
                 onChange={setPassword}
                 placeholder="••••••••••"
                 type="password"
-                button={<PauseInputDetailDisclosure blue onClick={onLogin}/>}
+                button={<PauseInputDetailDisclosure blue button onClick={onLogin}/>}
             />
             <TipList tips={state.tips}/>
         </PauseNavigationItem>

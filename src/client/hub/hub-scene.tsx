@@ -57,6 +57,9 @@ const HubScene: React.FC = () => {
         })
 
         return () => {
+            // TODO: This is wrong
+            camera.removeComponent(WorldDrawerComponent)
+            
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()

@@ -7,6 +7,7 @@ import MainMenuView from './main-menu/main-menu';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import NavigationEscapeHandler from 'src/client/ui/navigation/navigation-escape-handler';
 import RootControlsResponder, { ControlsResponder } from 'src/client/controls/root-controls-responder';
+import EventsHUD, { EventsProvider } from 'src/client/ui/events-hud/events-hud';
 
 const HubPageNavigationWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => {
     return (
@@ -44,18 +45,21 @@ const HubPage: React.FC<HubPageProps> = (props) => {
     }, [state.controlsResponder])
 
     return (
-        <ProfileContext.Provider value={props.userData}>
-            <div className="hub-body">
-                <div className="dimmer"></div>
-                <div className="navigation-view">
-                    <NavigationProvider
-                        rootComponent={<MainMenuView/>}
-                        wrapper={HubPageNavigationWrapper}>
-                        <NavigationEscapeHandler controls={state.controlsResponder}/>
-                    </NavigationProvider>
+        <EventsProvider>
+            <ProfileContext.Provider value={props.userData}>
+                <div className="hub-body">
+                    <div className="dimmer"></div>
+                    <div className="navigation-view">
+                        <NavigationProvider
+                            rootComponent={<MainMenuView/>}
+                            wrapper={HubPageNavigationWrapper}>
+                            <NavigationEscapeHandler controls={state.controlsResponder}/>
+                        </NavigationProvider>
+                    </div>
                 </div>
-            </div>
-        </ProfileContext.Provider>
+            </ProfileContext.Provider>
+            <EventsHUD/>
+        </EventsProvider>
     )
 }
 
