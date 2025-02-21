@@ -26,7 +26,7 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     entity.addComponent(new TransmissionComponent())
     entity.addComponent(new TankWheelsComponent());
 
-    const baseLength = 6 // 1.9
+    const baseLength = 1.9
     const baseOffset = 0.05
 
     const wheelPositionGenerator = new WheelPositionGenerator()
