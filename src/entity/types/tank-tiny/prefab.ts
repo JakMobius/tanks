@@ -107,17 +107,8 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     let wheels = wheelsComponent.getWheelGroups()
     transmission.system.addConstraint(new DifferentialConstraint(gearboxOutput, wheels[2].unitIndex, wheels[3].unitIndex))
 
-    // entity.addComponent(new WheeledSteeringAssistant({
-    //     lateralMovementSteerRate: 1.9,
-    //     angularVelocityCounterSteer: 0.2,
-    //     criticalDriftAngle: 0.75,
-    //     // straightenFactor: 0.1,
-    //     steerLimitSpeed: 30,
-    //     steerLimitFactor: 0.85,
-    // }))
-
     entity.addComponent(new WheeledSteeringAssistant({
-        lateralMovementSteerRate: 1.0,
+        lateralMovementSteerRate: 1.9,
         angularVelocityCounterSteer: 0.2,
         criticalDriftAngle: 0.75,
         // straightenFactor: 0.1,
