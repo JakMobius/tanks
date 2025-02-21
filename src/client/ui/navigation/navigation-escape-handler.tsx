@@ -9,14 +9,17 @@ export interface NavigationEscapeHandlerProps {
 const NavigationEscapeHandler: React.FC<NavigationEscapeHandlerProps> = (props) => {
 
     const navigation = useNavigation()
-    const onNavigateBack = () => navigation.pop()
 
     useEffect(() => {
+        const onNavigateBack = () => {
+            navigation.pop()
+        }
+
         props.controls.on("navigate-back", onNavigateBack)
         return () => {
             props.controls.off("navigate-back", onNavigateBack)
         }
-    }, [props.controls, onNavigateBack])
+    }, [props.controls, navigation.pop])
 
     return <></>
 }

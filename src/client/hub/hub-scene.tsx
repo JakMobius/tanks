@@ -14,6 +14,7 @@ import React, { useEffect } from "react";
 import SceneController, { useScene } from "../scenes/scene-controller";
 import { BasicSceneDescriptor } from "../scenes/scene-descriptor";
 import { texturesResourcePrerequisite } from "../scenes/scene-prerequisite";
+import RootControlsResponder from "../controls/root-controls-responder";
 
 const HubScene: React.FC = () => {
     const scene = useScene()
@@ -24,6 +25,7 @@ const HubScene: React.FC = () => {
     })
     
     const onDraw = (dt: number) => {
+        RootControlsResponder.getInstance().refresh()
         state.backgroundWorld?.emit("tick", dt)
         state.backgroundWorld?.emit("draw")
         state.camera?.getComponent(CameraRandomMovement)
@@ -33,6 +35,7 @@ const HubScene: React.FC = () => {
     useEffect(() => {
         scene.setTitle("Танчики - Хаб")
         scene.loop.start()
+        scene.canvas.clear()
 
         const map = getHubMap()
         const backgroundWorld = new Entity()

@@ -75,6 +75,7 @@ const LoadingScene: React.FC<LoadingSceneProps> = (props: LoadingSceneProps) => 
     useEffect(() => {
         scene.setTitle("Танчики - Загрузка")
         scene.loop.start()
+        scene.canvas.clear()
 
         return () => {
             scene.setTitle(undefined)

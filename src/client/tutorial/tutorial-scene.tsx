@@ -75,6 +75,7 @@ const TutorialScene: React.FC = () => {
     useEffect(() => {
         scene.setTitle("Танчики - Туториал")
         scene.loop.start()
+        scene.canvas.clear()
 
         const controlsResponder = new ControlsResponder()
         const game = new EmbeddedServerGame({ map: getTutorialMap() })

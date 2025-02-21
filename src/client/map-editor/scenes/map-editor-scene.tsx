@@ -74,6 +74,7 @@ const MapEditorScene: React.FC = (props) => {
 
     useEffect(() => {
         scene.setTitle("Танчики - Редактор карт")
+        scene.canvas.clear()
 
         const controlsResponder = new ControlsResponder()
         const world = new Entity()
