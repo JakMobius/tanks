@@ -7,7 +7,6 @@ import EntityPilotReceiver from "src/entity/components/network/entity-player-lis
 import {Drawer} from "src/entity/types/tank-bigboi/client-side/drawer";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import {SoundType} from "src/sound/sounds";
-import {SoundAssets} from "src/client/sound/sounds";
 
 ClientEntityPrefabs.associate(EntityType.TANK_BIGBOI, (entity) => {
     // TODO: bad copypaste
@@ -15,7 +14,7 @@ ClientEntityPrefabs.associate(EntityType.TANK_BIGBOI, (entity) => {
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 
     entity.addComponent(new EngineSoundComponent({
-        sound: SoundAssets[SoundType.ENGINE_1],
+        sound: SoundType.ENGINE_1,
         engine: entity.getComponent(TrackedTankController).engine
     }))
 

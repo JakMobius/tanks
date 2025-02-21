@@ -54,11 +54,11 @@ export default class Entity extends EventEmitter {
         let index = this.parent.children.indexOf(this)
         if(index == -1) return
         let parent = this.parent
-        this.emit("will-detach-from-parent", this)
+        this.emit("will-detach-from-parent", parent)
         parent.emit("will-remove-child", this)
         this.parent.children.splice(index, 1)
         this.parent = null
-        this.emit("detached-from-parent", this)
+        this.emit("detached-from-parent", parent)
         parent.emit("did-remove-child", this)
     }
 

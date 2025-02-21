@@ -4,21 +4,57 @@ import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform-component";
 import FireParticle from "src/client/particles/fire-particle";
 import Entity from "src/utils/ecs/entity";
-import SoundPrimaryComponent from "src/client/sound/sound/sound-primary-component";
+import SoundPrimaryComponent, { SoundSource } from "src/client/sound/sound/sound-primary-component";
 import SoundPositionComponent from "src/client/sound/sound/sound-position-component";
 import {SoundAssets} from "src/client/sound/sounds";
 import {SoundType} from "src/sound/sounds";
+import SoundEngine from "src/client/sound/sound-engine";
+
+class FlameEffectSoundSource extends SoundSource {
+    startSoundSource: AudioBufferSourceNode
+    loopSoundSource: AudioBufferSourceNode
+    startGainNode: GainNode
+    loopGainNode: GainNode
+
+    constructor(engine: SoundEngine) {
+        super(engine)
+
+        this.startSoundSource = engine.context.createBufferSource()
+        this.startSoundSource.buffer = engine.soundBuffers[SoundType.FLAMETHROWER_START]
+
+        this.loopSoundSource = engine.context.createBufferSource()
+        this.loopSoundSource.buffer = engine.soundBuffers[SoundType.FLAMETHROWER_SOUND]
+
+        this.startGainNode = new GainNode(engine.context)
+        this.startGainNode.gain.value = SoundAssets.get(SoundType.FLAMETHROWER_START).volume
+
+        this.loopGainNode = new GainNode(engine.context)
+        this.loopGainNode.gain.value = SoundAssets.get(SoundType.FLAMETHROWER_SOUND).volume
+
+        this.startSoundSource.connect(this.startGainNode)
+        this.loopSoundSource.connect(this.loopGainNode)
+
+        this.startGainNode.connect(this.filterSet.input)
+        this.loopGainNode.connect(this.filterSet.input)
+    }
+
+    override start() {
+        this.startSoundSource.start()
+        this.loopSoundSource.start(this.startSoundSource.context.currentTime + this.startSoundSource.buffer.duration)
+        return this
+    }
+
+    override stop() {
+        this.startSoundSource.stop()
+        this.loopSoundSource.stop()
+        return this
+    }
+}
 
 export default class ClientFlameEffectComponent extends EventHandlerComponent {
     isFiring: boolean = false
 
-    soundEffect: Entity | null = null
-
-    startSoundNode: AudioBufferSourceNode
-    startSoundGain: GainNode
-
-    loopSoundNode: AudioBufferSourceNode
-    loopSoundGain: GainNode
+    soundEntity: Entity | null = null
 
     public particleQueue: number = 0;
     public particleFrequency: number = 20;
@@ -33,43 +69,19 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
     }
 
     setupSound() {
-        this.startSoundGain = SoundAssets[SoundType.FLAMETHROWER_START].createGainNode()
-        this.loopSoundGain = SoundAssets[SoundType.FLAMETHROWER_SOUND].createGainNode()
-
-        if (this.startSoundGain && this.loopSoundGain) {
-            this.soundEffect = new Entity()
-
-            let resultSoundNode = new GainNode(this.startSoundGain?.context)
-
-            this.startSoundGain.connect(resultSoundNode)
-            this.loopSoundGain.connect(resultSoundNode)
-
-            this.soundEffect.addComponent(new SoundPrimaryComponent().setSource(resultSoundNode))
-            this.soundEffect.addComponent(new SoundPositionComponent())
-        }
+        this.soundEntity = new Entity()
+        this.soundEntity.addComponent(new SoundPrimaryComponent((listener) => {
+            return new FlameEffectSoundSource(listener.engine)
+        }))
+        this.soundEntity.addComponent(new SoundPositionComponent())
     }
 
     startSound() {
-        this.startSoundNode?.disconnect()
-        this.loopSoundNode?.disconnect()
-
-        this.startSoundNode = SoundAssets[SoundType.FLAMETHROWER_START].createBufferSource()
-        this.loopSoundNode = SoundAssets[SoundType.FLAMETHROWER_SOUND].createBufferSource()
-
-        if (this.startSoundNode && this.loopSoundNode) {
-            this.startSoundNode.connect(this.startSoundGain)
-            this.loopSoundNode.connect(this.loopSoundGain)
-            this.loopSoundNode.loop = true
-
-            this.startSoundNode.start()
-            this.loopSoundNode.start(this.startSoundNode.context.currentTime + this.loopSoundNode.buffer.duration)
-        }
+        this.soundEntity.getComponent(SoundPrimaryComponent).startAll()
     }
 
     stopSound() {
-        if (!this.startSoundNode) return
-        this.startSoundNode.stop()
-        this.loopSoundNode.stop()
+        this.soundEntity.getComponent(SoundPrimaryComponent).stopAll()
     }
 
     onFiringSet(isFiring: boolean) {
@@ -90,7 +102,7 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
         const transformComponent = tank.getComponent(TransformComponent)
         const transform = transformComponent.transform
 
-        this.soundEffect?.getComponent(SoundPositionComponent).setPosition(transformComponent.getPosition())
+        this.soundEntity?.getComponent(SoundPositionComponent).setPosition(transformComponent.getPosition())
 
         const velocity = body.GetLinearVelocity()
         const angle = body.GetAngle()
@@ -128,14 +140,14 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
     onAttach(entity: Entity) {
         super.onAttach(entity);
 
-        if(this.soundEffect) {
-            this.entity.appendChild(this.soundEffect)
+        if(this.soundEntity) {
+            this.entity.appendChild(this.soundEntity)
         }
     }
 
     onDetach() {
         super.onDetach();
 
-        this.soundEffect?.removeFromParent()
+        this.soundEntity?.removeFromParent()
     }
 }

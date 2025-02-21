@@ -26,8 +26,11 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     entity.addComponent(new TransmissionComponent())
     entity.addComponent(new TankWheelsComponent());
 
+    const baseLength = 6 // 1.9
+    const baseOffset = 0.05
+
     const wheelPositionGenerator = new WheelPositionGenerator()
-        .setAxles(2, 1.9, 0.05)
+        .setAxles(2, baseLength, baseOffset)
         .setAxleWidth(2.2)
 
     const frontWheelConfig: Omit<TankWheelConfig, 'x' | 'y'> = {
@@ -48,7 +51,7 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
 
     entity.addComponent(new WheeledTankController({
         minTurnRadius: 3,
-        steerAnchorOffset: (-1.9 + 0.05) / 2,
+        steerAnchorOffset: (-baseLength + baseOffset) / 2,
         engineConfig: {
             power: siValueFromHorsepower(600),
             maxTorque: 600,
@@ -104,8 +107,17 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     let wheels = wheelsComponent.getWheelGroups()
     transmission.system.addConstraint(new DifferentialConstraint(gearboxOutput, wheels[2].unitIndex, wheels[3].unitIndex))
 
+    // entity.addComponent(new WheeledSteeringAssistant({
+    //     lateralMovementSteerRate: 1.9,
+    //     angularVelocityCounterSteer: 0.2,
+    //     criticalDriftAngle: 0.75,
+    //     // straightenFactor: 0.1,
+    //     steerLimitSpeed: 30,
+    //     steerLimitFactor: 0.85,
+    // }))
+
     entity.addComponent(new WheeledSteeringAssistant({
-        lateralMovementSteerRate: 1.9,
+        lateralMovementSteerRate: 1.0,
         angularVelocityCounterSteer: 0.2,
         criticalDriftAngle: 0.75,
         // straightenFactor: 0.1,

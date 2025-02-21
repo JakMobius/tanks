@@ -4,7 +4,7 @@ import {nextPowerOfTwo} from "src/utils/utils";
 export default class GaussSeidelSolver {
     public maxIterations: number = 500;
     public tolerance: number = 1E-4
-    public eps: number = 1E-2
+    public eps: number = 1E-3
     private buffer = new Float64Array(32)
 
     private solveIteration(

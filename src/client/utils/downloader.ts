@@ -1,5 +1,5 @@
 import { api } from '../networking/api';
-import {ProgressLeaf} from './progress';
+import { ProgressLeaf } from './progress';
 import DOMEventHandlerSet from "src/utils/dom-event-handler-set";
 
 // TODO: copy-paste
@@ -8,13 +8,13 @@ export default class Downloader {
 
     static getXHR(dataType: XMLHttpRequestResponseType, progress: ProgressLeaf) {
         let xhr = new XMLHttpRequest();
-        if(dataType)
+        if (dataType)
             xhr.responseType = dataType;
-        if(progress) {
+        if (progress) {
             xhr.addEventListener("progress", (evt) => {
                 if (evt.lengthComputable) {
                     // Avoid triggering completion event
-                    if(evt.loaded >= evt.total) return;
+                    if (evt.loaded >= evt.total) return;
                     progress.setFraction2(evt.total, evt.loaded)
                 }
             }, false);
@@ -27,11 +27,11 @@ export default class Downloader {
         let controller = new AbortController()
 
         api(url, { signal: controller.signal, type: "arraybuffer" })
-        .then(handler)
-        .then(() => progress.complete())
-        .catch((error) => {
-            progress.fail(error.message);
-        });
+            .then(handler)
+            .then(() => progress.complete())
+            .catch((error) => {
+                progress.fail(error.message);
+            });
 
         progress.on("abort", () => controller.abort())
 
@@ -47,11 +47,11 @@ export default class Downloader {
             method: 'GET',
             signal: controller.signal
         })
-        .then(handler)
-        .then(() => progress.complete())
-        .catch((error) => {
-            progress.fail(error.message);
-        });
+            .then(handler)
+            .then(() => progress.complete())
+            .catch((error) => {
+                progress.fail(error.message);
+            });
 
         progress.on("abort", () => controller.abort());
 

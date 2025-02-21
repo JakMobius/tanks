@@ -1,20 +1,24 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
-import {SoundAssets} from "src/client/sound/sounds";
 import SoundPositionComponent from "src/client/sound/sound/sound-position-component";
-import SoundBufferComponent from "src/client/sound/sound/sound-buffer-component";
+import SoundPrimaryComponent, { BufferSoundSource } from "src/client/sound/sound/sound-primary-component";
+import Entity from "src/utils/ecs/entity";
+import { SoundType } from "src/sound/sounds";
 
 export default class ClientSoundEffectComponent extends EventHandlerComponent {
     constructor() {
         super();
 
-        this.eventHandler.on("play-sound", (x: number, y: number, index: number) => {
+        this.eventHandler.on("play-sound", (x: number, y: number, soundType: SoundType) => {
+            let soundEntity = new Entity()
+            soundEntity.addComponent(new SoundPrimaryComponent((listener) => {
+                return new BufferSoundSource(listener.engine, soundType)
+            }))
+            soundEntity.addComponent(new SoundPositionComponent({x: x, y: y}))
+            WorldComponent.getWorld(this.entity).appendChild(soundEntity)
 
-            let sound = SoundBufferComponent.createSoundFromBuffer(SoundAssets[index])
-            sound.addComponent(new SoundPositionComponent({x: x, y: y}))
-            sound.getComponent(SoundBufferComponent).play();
-            WorldComponent.getWorld(this.entity).appendChild(sound)
-            sound.on("ended", () => sound.removeFromParent())
+            soundEntity.on("ended", () => soundEntity.removeFromParent())
+            soundEntity.getComponent(SoundPrimaryComponent).startAll()
         })
     }
 }

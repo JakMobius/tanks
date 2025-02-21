@@ -12,7 +12,7 @@ export default class BulletLauncher implements Component {
         this.eventHandler.on("physical-body-created", (component: PhysicalComponent) => {
             component.setPositionAngle(position, angle)
             this.entity.emit("bullet-launch")
-            this.entity.removeComponent(BulletLauncher)
+            this.eventHandler.setTarget(null)
         })
     }
 

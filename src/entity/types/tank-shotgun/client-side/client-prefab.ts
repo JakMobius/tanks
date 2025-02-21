@@ -15,7 +15,7 @@ ClientEntityPrefabs.associate(EntityType.TANK_SHOTGUN, (entity) => {
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 
     entity.addComponent(new EngineSoundComponent({
-        sound: SoundAssets[SoundType.ENGINE_2],
+        sound: SoundType.ENGINE_2,
         engine: entity.getComponent(TrackedTankController).engine
     }))
 

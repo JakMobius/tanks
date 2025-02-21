@@ -9,6 +9,7 @@ export default class SoundEngine extends EventEmitter {
     public context: AudioContext
     public input: GainNode
     public enabled = false
+    public soundBuffers: { [key: number]: AudioBuffer } = {}
 
     private audioSettingsListener = new BasicEventHandlerSet()
 

@@ -21,7 +21,7 @@ export default class CameraComponent extends EventHandlerComponent {
 
         this.eventHandler.on("detached-from-parent", (parent) => {
             this.parentEventHandler.setTarget(null)
-            this.childAddHandler(parent)
+            this.childRemoveHandler(parent)
         })
     }
 

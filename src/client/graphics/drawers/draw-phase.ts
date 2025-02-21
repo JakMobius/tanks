@@ -2,7 +2,6 @@ import ProgramController from "../programs/controllers/program-controller";
 import {Constructor} from "src/utils/constructor"
 import Program from "../programs/program";
 import ProgramPool from "src/client/graphics/program-pool";
-import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
 import EventEmitter from "src/utils/event-emitter";
 
 export default class DrawPhase extends EventEmitter {

@@ -97,7 +97,7 @@ const TutorialScene: React.FC = () => {
         camera.addComponent(new CameraPositionController()
             .setBaseScale(12)
             .setViewport({ x: screen.width, y: screen.height }))
-        camera.addComponent(new CameraPrimaryEntityController().setWorld(game.clientWorld))
+        camera.addComponent(new CameraPrimaryEntityController())
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
@@ -116,13 +116,10 @@ const TutorialScene: React.FC = () => {
         RootControlsResponder.getInstance().setMainResponderDelayed(controlsResponder)
 
         return () => {
-            // TODO: This is wrong
-            camera.removeComponent(WorldSoundListenerComponent)
-            camera.removeComponent(WorldDrawerComponent)
-
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()
+
             RootControlsResponder.getInstance().setMainResponderDelayed(null)
         }
     }, [])

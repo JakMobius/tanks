@@ -3,10 +3,10 @@ import SoundPositionComponent from "src/client/sound/sound/sound-position-compon
 import {chooseRandom} from "src/utils/utils";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
 import {SoundType} from "src/sound/sounds";
-import {SoundAssets} from "src/client/sound/sounds";
-import SoundBufferComponent from "src/client/sound/sound/sound-buffer-component";
+import Entity from "src/utils/ecs/entity";
+import SoundPrimaryComponent, { BufferSoundSource } from "src/client/sound/sound/sound-primary-component";
 
-const sounds = [
+const sounds: SoundType[] = [
     SoundType.EXPLODE_1,
     SoundType.EXPLODE_2,
     SoundType.EXPLODE_3,
@@ -18,13 +18,17 @@ export default class ClientExplosionComponent extends EventHandlerComponent {
         super();
 
         this.eventHandler.on("explode", (x: number, y: number, power: number) => {
-            let soundAsset = chooseRandom(sounds)
-            let sound = SoundBufferComponent.createSoundFromBuffer(SoundAssets[soundAsset])
-            sound.addComponent(new SoundPositionComponent({x: x, y: y}))
-            sound.getComponent(SoundBufferComponent).play();
-            // Since explode entity is a short-living one, attach the sound entity to the world
-            WorldComponent.getWorld(this.entity).appendChild(sound)
-            sound.on("ended", () => sound.removeFromParent())
+            let soundType = chooseRandom(sounds)
+            let soundEntity = new Entity()
+
+            soundEntity.addComponent(new SoundPrimaryComponent((listener) => {
+                return new BufferSoundSource(listener.engine, soundType)
+            }))
+            soundEntity.addComponent(new SoundPositionComponent({x: x, y: y}))
+            WorldComponent.getWorld(this.entity).appendChild(soundEntity)
+
+            soundEntity.on("ended", () => soundEntity.removeFromParent())
+            soundEntity.getComponent(SoundPrimaryComponent).startAll()
         })
     }
 }

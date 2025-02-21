@@ -1,24 +1,20 @@
 import {TransmitterSet} from "./transmitter-set";
 import {ReceivingEnd} from "./receiving-end";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 export default class EntityDataTransmitComponent extends EventHandlerComponent {
     transmitterSets = new Map<ReceivingEnd, TransmitterSet>()
     visibleAnywhere: boolean = false
     ends = new Set<ReceivingEnd>()
-    parentEventHandler = new BasicEventHandlerSet()
 
     constructor() {
         super();
 
-        this.eventHandler.on("detached-from-parent", (parent) => {
-            this.parentEventHandler.setTarget(parent)
+        this.eventHandler.on("detached-from-parent", () => {
             this.updateParent()
         })
 
-        this.eventHandler.on("attached-to-parent", (parent) => {
-            this.parentEventHandler.setTarget(null)
+        this.eventHandler.on("attached-to-parent", () => {
             this.updateParent()
         })
     }

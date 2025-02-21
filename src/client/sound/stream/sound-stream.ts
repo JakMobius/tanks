@@ -1,9 +1,7 @@
 import SoundEffect from "../sound/sound-effect";
-import SoundEngine from "../sound-engine";
-import {SoundStreamPosition} from "./sound-stream-position-component";
 import LinkedList from "src/utils/linked-list";
 
-export class SoundStream {
+export class SoundFilterSet {
     public input: GainNode
     public output: GainNode
     public context: BaseAudioContext

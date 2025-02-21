@@ -1,5 +1,4 @@
 import EngineSoundComponent from 'src/client/entity/components/engine-sound-component';
-import {SoundAssets} from 'src/client/sound/sounds';
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import EntityPrefabs from "src/entity/entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
@@ -16,7 +15,7 @@ ClientEntityPrefabs.associate(EntityType.TANK_TINY, (entity) => {
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 
     entity.addComponent(new EngineSoundComponent({
-        sound: SoundAssets[SoundType.ENGINE_3],
+        sound: SoundType.ENGINE_3,
         engine: entity.getComponent(WheeledTankController).engine
     }))
 

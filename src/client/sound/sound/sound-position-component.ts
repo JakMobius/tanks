@@ -1,12 +1,9 @@
 import SoundFilter from "./sound-effect";
-import SoundEngine from "../sound-engine";
-import {SoundStream} from "../stream/sound-stream";
 import SoundPrimaryComponent from "./sound-primary-component";
 import * as Box2D from "@box2d/core"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
 import CameraComponent from "src/client/graphics/camera";
-import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 
 class SoundPositionFilter extends SoundFilter {
     panFilter: PannerNode
@@ -92,14 +89,14 @@ export default class SoundPositionComponent extends EventHandlerComponent {
 
     private onCameraAttach(camera: Entity) {
         let soundPrimaryComponent = this.entity.getComponent(SoundPrimaryComponent)
-        let soundStream = soundPrimaryComponent.streams.get(camera)
-        let context = soundStream.context
+        let soundStream = soundPrimaryComponent.soundSources.get(camera)
+        let context = soundStream.filterSet.context
         let filter = new SoundPositionFilter(context)
 
         this.updateSoundFilters(camera, filter)
 
         this.filters.set(camera, filter)
-        soundStream?.addFilter(filter)
+        soundStream?.filterSet.addFilter(filter)
     }
 
     private onCameraDetach(camera: Entity) {
@@ -107,6 +104,6 @@ export default class SoundPositionComponent extends EventHandlerComponent {
         let filter = this.filters.get(camera)
 
         this.filters.delete(camera)
-        soundPrimaryComponent.streams.get(camera)?.removeFilter(filter)
+        soundPrimaryComponent.soundSources.get(camera)?.filterSet.removeFilter(filter)
     }
 }

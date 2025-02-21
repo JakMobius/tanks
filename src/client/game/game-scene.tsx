@@ -31,9 +31,9 @@ import WebsocketConnection from '../networking/websocket-connection';
 import PrimaryEntityControls from 'src/entity/components/primary-entity-controls';
 import TankSelectOverlay from '../ui/tank-select-overlay/tank-select-overlay';
 import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
-import EventsHUD, { EventsContext, EventsProvider } from '../ui/events-hud/events-hud';
+import EventsHUD, { EventsProvider } from '../ui/events-hud/events-hud';
 import GameHUD from '../ui/game-hud/game-hud';
-import { KeyedComponents, KeyedComponentsHandle } from '../utils/keyed-component';
+import { KeyedComponentsHandle } from '../utils/keyed-component';
 
 export interface GameSceneConfig {
     client: ConnectionClient
@@ -114,7 +114,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
         camera.addComponent(new CameraPositionController()
             .setBaseScale(12)
             .setViewport({ x: screen.width, y: screen.height }))
-        camera.addComponent(new CameraPrimaryEntityController().setWorld(world))
+        camera.addComponent(new CameraPrimaryEntityController())
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
@@ -132,10 +132,6 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
         props.client.connection.resume()
 
         return () => {
-            // TODO: This is wrong
-            camera.removeComponent(WorldSoundListenerComponent)
-            camera.removeComponent(WorldDrawerComponent)
-
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()

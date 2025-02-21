@@ -16,7 +16,7 @@ ClientEntityPrefabs.associate(EntityType.TANK_MONSTER, (entity) => {
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 
     entity.addComponent(new EngineSoundComponent({
-        sound: SoundAssets[SoundType.ENGINE_3],
+        sound: SoundType.ENGINE_3,
         engine: entity.getComponent(WheeledTankController).engine
     }))
 
