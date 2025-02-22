@@ -114,7 +114,8 @@ export function parseWebserverConfig(config: PreferencesSection): WebServerConfi
         allowLocalInterfaceOrigins: config.boolean("allow-local-interface-origins"),
         allowedOrigins: allowedOrigins,
         sessionKey: config.string("session-key"),
-        allowNoOrigin: config.boolean("allow-no-origin")
+        allowNoOrigin: config.boolean("allow-no-origin"),
+        enableRegistration: config.boolean("enable-registration")
     }
 }
 

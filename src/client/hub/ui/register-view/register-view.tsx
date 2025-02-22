@@ -22,7 +22,7 @@ const RegisterView: React.FC = () => {
         passwordCorrect: false,
         passwordStrengthClass: "",
     })
-    
+
     const { addCleanup, removeCleanup } = useAbortControllerCleanup()
 
     const onSuccessfulRegister = () => {
@@ -46,12 +46,17 @@ const RegisterView: React.FC = () => {
         style: TipStyle.ERROR
     }])
 
+    const onRegistrationDisabled = () => {
+        setError("Регистрация отключена на этом сервере")
+    }
+
     const handleResult = (result: any) => {
         switch(result.result) {
             case "ok": onSuccessfulRegister(); break;
             case "login-used": onLoginUsed(); break;
             case "check-login": checkLogin(); break;
             case "check-password": checkPassword(); break;
+            case "registration-disabled": onRegistrationDisabled(); break;
         }
     }
 

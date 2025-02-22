@@ -25,6 +25,7 @@ export interface WebServerConfig {
     allowedOrigins: (string | RegExp)[] | "*"
     allowLocalInterfaceOrigins: boolean
     allowNoOrigin: boolean
+    enableRegistration: boolean
 }
 
 export interface GeneralServerConfig {
