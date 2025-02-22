@@ -3,7 +3,7 @@ import './tank-select-overlay.scss'
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import RenderLoop from "src/utils/loop/render-loop";
 import {TankStat, TankStats} from "src/stat-tests/tank-stats";
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import React from 'react';
 import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
@@ -197,14 +197,20 @@ const TankCarouselButton: React.FC<TankCarouselButtonProps> = (props) => {
     )
 }
 
+export interface TankSelectOverlayHandle {
+    show: () => void
+}
+
 export interface TankSelectOverlayProps {
     gameControls: ControlsResponder
     onTankSelect: (tankType: number) => void
+    ref?: Ref<TankSelectOverlayHandle>
 }
 
 const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) => {
     const [state, setState] = useState({
         shown: false,
+        required: false,
         targetCarouselCenterIndex: 0,
         carouselCenterIndex: 0,
         leftAnimationTrigger: null as {} | null,
@@ -222,8 +228,23 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
         controlsResponder: useMemo(() => new ControlsResponder(), [])
     })
 
+    useImperativeHandle(props.ref, () => {
+        return {
+            show: () => {
+                setState(state => ({ ...state, shown: true, required: true }))
+            }
+        }
+    })
+
     const toggleVisibility = useCallback(() => {
-        setState((state) => ({ ...state, shown: !state.shown }))
+        setState((state) => {
+            if(state.required) return state
+            return {
+                ...state,
+                shown: !state.shown,
+                required: false 
+            }
+        })
     }, [])
     
     const onNavigateLeft = useCallback(() => {
@@ -247,9 +268,12 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
             let nearTankIndex = getNearIndex(state.carouselCenterIndex)
             let nearTank = getTankForIndex(nearTankIndex)
             props.onTankSelect(nearTank.type)
-            return state
+            return {
+                ...state,
+                shown: false,
+                required: false
+            }
         })
-        toggleVisibility()
     }, [])
 
     const onFrame = useCallback((dt: number) => setState((state) => {

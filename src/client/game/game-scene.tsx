@@ -29,7 +29,7 @@ import { RandomMessageLoadingError } from '../scenes/loading/loading-error';
 import { internetErrorMessageGenerator, missingRoomNameErrorMessageGenerator } from '../scenes/loading/error-message-generator';
 import WebsocketConnection from '../networking/websocket-connection';
 import PrimaryEntityControls from 'src/entity/components/primary-entity-controls';
-import TankSelectOverlay from '../ui/tank-select-overlay/tank-select-overlay';
+import TankSelectOverlay, { TankSelectOverlayHandle } from '../ui/tank-select-overlay/tank-select-overlay';
 import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
 import EventsHUD, { EventsProvider } from '../ui/events-hud/events-hud';
 import GameHUD from '../ui/game-hud/game-hud';
@@ -45,6 +45,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
     const scene = useScene()
     const eventContextRef = useRef<KeyedComponentsHandle | null>(null)
     const gameHudRef = useRef<KeyedComponentsHandle | null>(null)
+    const tankSelectRef = useRef<TankSelectOverlayHandle | null>(null)
 
     const [state, setState] = React.useState({
         controlsResponder: null as ControlsResponder | null,
@@ -166,11 +167,16 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
         const onHudView = (message: React.FC, props: any) => {
             gameHudRef.current?.addEvent(message, props)
         }
+        const onChooseTank = () => {
+            tankSelectRef.show()
+        }
+        state.world.on("choose-tank", onChooseTank)
         state.world.on("event-view", onEventView)
         state.world.on("hud-view", onHudView)
         return () => {
+            state.world.off("choose-tank", onChooseTank)
             state.world.off("event-view", onEventView)
-            state.world.on("hud-view", onHudView)
+            state.world.off("hud-view", onHudView)
         }
     }, [state.world, eventContextRef.current])
 
@@ -182,7 +188,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
             <EventsHUD/>
             <PlayerListHUD gameControls={state.controlsResponder} world={state.world}/>
             <GameHUD keyedComponentsRef={gameHudRef}/>
-            <TankSelectOverlay onTankSelect={onTankSelected} gameControls={state.controlsResponder}/>
+            <TankSelectOverlay ref={tankSelectRef} onTankSelect={onTankSelected} gameControls={state.controlsResponder}/>
             <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
         </EventsProvider>
     )
