@@ -1,11 +1,6 @@
-import GameProgramPool from "src/client/graphics/game-program-pool";
 import Entity from "src/utils/ecs/entity";
 import {gameWorldEntityPrefab} from "src/entity/game-world-entity-prefab";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
-import DrawPhase from "src/client/graphics/drawers/draw-phase";
-import Sprite from "src/client/graphics/sprite";
-import TilemapComponent from "src/physics/tilemap-component";
-import GameMap from "src/map/game-map";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import PhysicalComponent from "src/entity/components/physics-component";
 import CameraPositionController from "src/entity/components/camera-position-controller";
@@ -69,11 +64,6 @@ const TankPreviewCanvas: React.FC = (props) => {
             }
         })
 
-        stateRef.current.world.getComponent(TilemapComponent).setMap(new GameMap({
-            width: 0,
-            height: 0,
-            data: []
-        }))
         stateRef.current.world.addComponent(new ParticleHostComponent())
     }, [])
 

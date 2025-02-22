@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Арена",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 1,
+			"y1": 44,
+			"x2": 6,
+			"y2": 47,
+			"id": 2
+		},
+		{
+			"x1": 1,
+			"y1": 2,
+			"x2": 6,
+			"y2": 5,
+			"id": 1
+		},
+		{
+			"x1": 43,
+			"y1": 2,
+			"x2": 48,
+			"y2": 5,
+			"id": 0
+		}
+	],
+	"blocks": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb----bbbbbbbbbbbbbb----------bbbbbbbbbbbbbb----bbb------bbbbbbbbbb-------cc-------bbbbbbbbbb------bb------bbbbbbbb---------cc---------bbbbbbbb------bb------bbbbbb------------------------bbbbbb------bb-------bbbb---------bbbccbbb---------bbbb-------bbb----------------bbbbbbccbbbbbb----------------bbbbbbb-----------bbbbbbbbccbbbbbbbb-----------bbbbbbbbbbb--------bbbbbbbbbbccbbbbbbbbbb--------bbbbbbbbbbbb------bbbbbbbbbbbbccbbbbbbbbbbbb------bbbbbbbbbbbb-------bbbbbbbb--------bbbbbbbb-------bbbbbbbbbbbb--------bbbb--------------bbbb--------bbbbbbbbbbb----b-----bb-----c-cc-c-----bb-----b----bbbbbbbbb-----bb-----b------c--c------b-----bb-----bbbbbbbb----bbbb----------c----c----------bbbb----bbbbbbb-----bbbbb------------------------bbbbb-----bbbbbb----bbbbbbb----bb----------bb----bbbbbbb----bbbbb-----bbbbb-----bbb----------bbb-----bbbbb-----bbbb----bbbbb-----bbb------------bbb-----bbbbb----bbbb----bbbbb-----bb--------------bb-----bbbbb----bbb-----bbbbb----------------------------bbbbb-----bb----bbbbb------------------------------bbbbb----bb----bbbbb--c-c--------------------c-c--bbbbb----bb----bbbbb---c----------------------c---bbbbb----bb-cc-ccccc--c-----------cc-----------c--ccccc-cc-bb-cc-ccccc--c-----------cc-----------c--ccccc-cc-bb----bbbbb---c----------------------c---bbbbb----bb----bbbbb--c-c--------------------c-c--bbbbb----bb----bbbbb------------------------------bbbbb----bb-----bbbbb----------------------------bbbbb-----bbb----bbbbb-----bb---------------bb----bbbbb----bbbb----bbbbb-----bbb-------------bbb----bbbbb----bbbb-----bbbbb-----bbb-----------bbb----bbbbb-----bbbbb----bbbbbbb----bb-----------bb---bbbbbbb----bbbbbb-----bbbbb------------------------bbbbb-----bbbbbbb----bbbb----------c----c----------bbbb----bbbbbbbb-----bb-----b------c--c------b-----bb-----bbbbbbbbb----b-----bb-----c-cc-c-----bb-----b----bbbbbbbbbbb--------bbbb--------------bbbb--------bbbbbbbbbbbb-------bbbbbbbb--------bbbbbbbb-------bbbbbbbbbbbb------bbbbbbbbbbbbccbbbbbbbbbbbb------bbbbbbbbbbbb--------bbbbbbbbbbccbbbbbbbbbb--------bbbbbbbbbbb-----------bbbbbbbbccbbbbbbbb---------c-bbbbbbb----------------bbbbbbccbbbbbb----------c-c---bbb-------bbbb---------bbbccbbb---------bbbb-c-----bb------bbbbbb------------------------bbbbbb------bb------bbbbbbbb---------cc---------bbbbbbbb------bb------bbbbbbbbbb-------cc-------bbbbbbbbbb------bbb----bbbbbbbbbbbbbb----------bbbbbbbbbbbbbb----bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+}

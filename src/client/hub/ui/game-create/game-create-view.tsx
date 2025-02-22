@@ -35,10 +35,6 @@ const GameCreateViewComponent: React.FC = () => {
     }
 
     const onMapFetchResult = (response: any) => {
-        if(response.result !== "ok") {
-            onMapFetchError(response.result)
-            return
-        }
         setState((state) => ({
             ...state,
             loading: false,

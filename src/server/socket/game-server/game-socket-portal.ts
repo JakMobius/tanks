@@ -1,14 +1,9 @@
 import SocketPortalClient from '../socket-portal-client';
 import SocketPortal from '../socket-portal';
-import pako from 'pako';
 import * as Websocket from "websocket";
 import BinaryPacket from "src/networking/binary-packet";
-import * as fs from "fs"
 import RoomConfig from "src/server/room/room-config";
 import WebsocketConnection from "src/server/websocket-connection";
-import MapSerialization, {MalformedMapFileError} from "src/map/map-serialization";
-
-import GameMap from "src/map/game-map";
 import * as url from "url";
 import Server from "src/server/server";
 import {WebserverSession} from "src/server/webserver/webserver-session";
@@ -18,6 +13,10 @@ import RoomClientComponent from "src/server/room/components/room-client-componen
 import {serverCTFControllerPrefab} from "src/entity/types/controller-ctf/server-side/server-prefab";
 import { serverTDMControllerPrefab } from 'src/entity/types/controller-tdm/server-side/server-prefab';
 import { serverDMControllerPrefab } from 'src/entity/types/controller-dm/server-side/server-prefab';
+import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
+import { EntityType } from 'src/entity/entity-type';
+import MapLoaderComponent from 'src/server/room/components/map-loader-component';
+import WorldTilemapComponent from 'src/physics/world-tilemap-component';
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -168,30 +167,23 @@ export default class GameSocketPortal extends SocketPortal {
             throw new RoomNameUsedError("There is already a room with name " + config.name)
         }
 
-        let file: Buffer
-        try {
-            file = await fs.promises.readFile(config.map)
-        } catch(e) {
-            throw new NoSuchMapError("No such map: " + config.map)
-        }
-
-        let map: GameMap
-        try {
-            map = MapSerialization.fromBuffer(pako.inflate(file))
-        } catch(e) {
-            throw new MalformedMapFileError("Could not read map file " + config.map + ": " + e.message)
-        }
-
         let game = new Entity()
         serverGameRoomPrefab(game, {
             name: config.name,
-            map: map,
             gameSocket: this,
             mode: config.mode
         })
 
-        let gameModeController = new Entity()
+        let tilemap = new Entity()
+        ServerEntityPrefabs.types.get(EntityType.TILEMAP)(tilemap)
+        tilemap.addComponent(new MapLoaderComponent(config.map))
+        tilemap.getComponent(MapLoaderComponent).reloadMap()
+        game.appendChild(tilemap)
 
+        game.addComponent(new WorldTilemapComponent())
+        game.getComponent(WorldTilemapComponent).setMap(tilemap)
+
+        let gameModeController = new Entity()
         if(config.mode == "CTF") {
             serverCTFControllerPrefab(gameModeController, {
                 // TODO: world should be determined when controller is attached to it

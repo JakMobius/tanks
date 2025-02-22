@@ -1,8 +1,6 @@
 import * as Box2D from "@box2d/core";
-import PhysicsChunk from "src/physics/physics-chunk";
 import PhysicalComponent from "./physics-component";
-import GameMap from "src/map/game-map";
-import Entity from "src/utils/ecs/entity";
+import TilemapComponent from "src/map/tilemap-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { getObjectFromBody } from "../physical-body-data";
 
@@ -29,16 +27,16 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         }
     }
 
-    private emitMultipleBlockHits(points: Box2D.b2Vec2[], map: GameMap) {
+    private emitMultipleBlockHits(points: Box2D.b2Vec2[], map: TilemapComponent) {
         if(!this.entity.getComponent(PhysicalComponent).getBody().GetWorld()) return
         for(let point of points) {
             this.emitBlockHit(point, map)
         }
     }
 
-    private emitBlockHit(point: Box2D.b2Vec2, map: GameMap) {
-        let blockX = point.x / GameMap.BLOCK_SIZE
-        let blockY = point.y / GameMap.BLOCK_SIZE
+    private emitBlockHit(point: Box2D.b2Vec2, map: TilemapComponent) {
+        let blockX = point.x / TilemapComponent.BLOCK_SIZE
+        let blockY = point.y / TilemapComponent.BLOCK_SIZE
 
         const gridX = Math.floor(blockX)
         const gridY = Math.floor(blockY)

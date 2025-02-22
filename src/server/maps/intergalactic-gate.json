@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Межгалактические врата",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 17,
+			"y1": 43,
+			"x2": 21,
+			"y2": 45,
+			"id": 2
+		},
+		{
+			"x1": 1,
+			"y1": 2,
+			"x2": 5,
+			"y2": 4,
+			"id": 1
+		},
+		{
+			"x1": 43,
+			"y1": 17,
+			"x2": 45,
+			"y2": 21,
+			"id": 0
+		}
+	],
+	"blocks": "bbb--bbb--bbbbbbbbbbbbbbbbbb------bbbbbbbbb-------bb----b----bbbbbbbbbbbbbbbbb------bbbbbbbbb-------b-----------bbbbbb---bbbbbb-----b-bbbbbbbbb-----b-------------bbbb-------bbbb-------cbbbbbbbc--------------------bb----b----bb---c----cc-----cc-------b----bbb-----bb---bbb---bb--c-----cc-----cc-------bb---bbb------b--bbcbb--b---------cbbbbbbbc-------b----bbb----------bbb-----------b-bbbbbbbbb--------------------------b--------------bbbbbbbbb----------------------------------------bbbbbbbbb--------b---------b----c-----------------bbbbbbbbb-b------bb----------------------b--------bbbbbbbbb--------bbbb----------bbb------bbb-------bbbbbbbbb--------bbbbbb-------bbbbb------b--------bbbbbbbbb----b---bbbbbbb-----bbbbbbb--------------bbbbbbbbb---bbb--bbbb------c-bbbcbbb-c-----------bbbbbbbbb-----b---bbb---------bbbbbbb-------------bbbbbbbbb---------bbb---b------bbbbb--------------bbbbbbbbb---------bb---bbb------bbb------c--c-----bbbbbbbbb---------bb--bbcbb---------------bb-----bbbbbbbbb--------b-bb---bbb-------c--------bb--c--bbbbbbbbb----------bbb---b-------------------bb---bbbbbbbbb----------bbb-----------------------bbbbbbbbbbbbb-----------bbbb--------b-----c--------bbbbbbbbbbbb-----b-----bbbbbbb----bbb-----bb-------bbbbbbbbbb-----bbb----bbbbbb------b------bb--------bbbbbbbbb----bbcbb---bbbb--------------c--bb-------bbbbbbb------bbb----bb-------------------bbb-------bbbbbb-------b----------c--------------c-bbb-------bbbb------------------c-----------------bbbb-------bbb-b---c-----c------------------------bbbbb-------bbb-----b---b----------------------bbbbbbbbb-------bb-----bbbbb-----b----b-------bbbbbbbbbbbbbb--------b-----bbbb------------bbbbbbbbbbbbbbbbbbbbb-------------bbb----bbbccccbbbbbbbbbbbbbbbbbbbbbbbb------------bbb----bbbbccbbbbbbbbbbbbbbbbbbbbbbbbbb-----------bbb----bbbb--bbbbbbbbbbbbbbbbbbbbbb--bb------------b-----bbbb--bbbbbbbbbbbbbbbbbbbb---b--b-----------b-----bbbb--bbbbbbbbbbbbbbbbbb--------------------b-----bbbb--bbbbbbbbbbbbbbbb----------------------b-----bbbb--bbbbbbbbbbbbb-------------------------------bbbbccbbbbbbbbb--------------c--------------------bbbccccbb----------------b----bb----------------------------b-------------bbb----bbbbb-------------------------------------bbcbb---bbbbbbbbb------------------------b---------bbb----bbbbb---------------------------bbb---------b----bb--------------------------------b--------------c----------------------b-----------------b-------------------------------------------------------------------------------"
+}

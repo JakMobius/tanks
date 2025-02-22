@@ -1,15 +1,14 @@
 import {Constructor} from "src/utils/constructor"
-import BlockDrawer from "./block/block-drawer";
-import GameMap from "src/map/game-map";
 import BlockState from "src/map/block-state/block-state";
-import TextureProgram from "../programs/texture-program";
-import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
-import TilemapComponent from "src/physics/tilemap-component";
 import Entity from "src/utils/ecs/entity";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import CameraComponent from "src/client/graphics/camera";
+import TextureProgram from "src/client/graphics/programs/texture-program";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
+import TilemapComponent from "src/map/tilemap-component";
+import BlockDrawer from "src/client/graphics/drawers/block/block-drawer";
 
 export interface DrawerBounds {
     x0: number
@@ -44,7 +43,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         })
     }
 
-    private updateBounds(map: GameMap, camera: CameraComponent) {
+    private updateBounds(map: TilemapComponent, camera: CameraComponent) {
         let x0 = Infinity
         let y0 = Infinity
         let x1 = -Infinity
@@ -63,18 +62,18 @@ export default class MapDrawerComponent extends EventHandlerComponent {
             }
         }
 
-        const maxWidth = map.width * GameMap.BLOCK_SIZE;
-        const maxHeight = map.height * GameMap.BLOCK_SIZE;
+        const maxWidth = map.width * TilemapComponent.BLOCK_SIZE;
+        const maxHeight = map.height * TilemapComponent.BLOCK_SIZE;
 
-        this.bounds.x0 = Math.floor(Math.max(0, x0) / GameMap.BLOCK_SIZE)
-        this.bounds.y0 = Math.floor(Math.max(0, y0) / GameMap.BLOCK_SIZE)
-        this.bounds.x1 = Math.ceil(Math.min(maxWidth, x1) / GameMap.BLOCK_SIZE)
-        this.bounds.y1 = Math.ceil(Math.min(maxHeight, y1) / GameMap.BLOCK_SIZE)
+        this.bounds.x0 = Math.floor(Math.max(0, x0) / TilemapComponent.BLOCK_SIZE)
+        this.bounds.y0 = Math.floor(Math.max(0, y0) / TilemapComponent.BLOCK_SIZE)
+        this.bounds.x1 = Math.ceil(Math.min(maxWidth, x1) / TilemapComponent.BLOCK_SIZE)
+        this.bounds.y1 = Math.ceil(Math.min(maxHeight, y1) / TilemapComponent.BLOCK_SIZE)
     }
 
     private drawMap(phase: DrawPhase) {
         let program = phase.getProgram(TextureProgram)
-        let map = this.entity.getComponent(TilemapComponent).map
+        let map = this.entity.getComponent(TilemapComponent)
         if (!map) return
 
         this.updateBounds(map, program.camera)
@@ -88,7 +87,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         }
     }
 
-    private drawBlock(program: TextureProgram, block: BlockState, x: number, y: number, map: GameMap) {
+    private drawBlock(program: TextureProgram, block: BlockState, x: number, y: number, map: TilemapComponent) {
         let id = (block.constructor as typeof BlockState).typeId
 
         if (id === 0) return
@@ -102,13 +101,13 @@ export default class MapDrawerComponent extends EventHandlerComponent {
 
     private drawGrid(phase: DrawPhase) {
         let program = phase.getProgram(ConvexShapeProgram)
-        let map = this.entity.getComponent(TilemapComponent).map
+        let map = this.entity.getComponent(TilemapComponent)
         if (!map) return
         this.updateBounds(map, program.camera)
 
         const gridColor = 0xffe6e6e6
 
-        let gridThickness = 0.2 / GameMap.BLOCK_SIZE
+        let gridThickness = 0.2 / TilemapComponent.BLOCK_SIZE
         let halfGridThickness = gridThickness / 2
 
         for (let x = this.bounds.x0; x <= this.bounds.x1; x++) {
@@ -124,7 +123,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         }
 
         const borderColor = 0xffd4d4d4
-        let borderThickness = 0.3 / GameMap.BLOCK_SIZE
+        let borderThickness = 0.3 / TilemapComponent.BLOCK_SIZE
         let halfBorderThickness = borderThickness / 2
 
         this.drawLine(program, -halfBorderThickness, 0, borderThickness, this.bounds.y1, borderColor)
@@ -134,10 +133,10 @@ export default class MapDrawerComponent extends EventHandlerComponent {
     }
 
     private drawLine(program: ConvexShapeProgram, x0: number, y0: number, width: number, height: number, color: number) {
-        x0 *= GameMap.BLOCK_SIZE
-        y0 *= GameMap.BLOCK_SIZE
-        width *= GameMap.BLOCK_SIZE
-        height *= GameMap.BLOCK_SIZE
+        x0 *= TilemapComponent.BLOCK_SIZE
+        y0 *= TilemapComponent.BLOCK_SIZE
+        width *= TilemapComponent.BLOCK_SIZE
+        height *= TilemapComponent.BLOCK_SIZE
 
         program.drawRectangle(x0, y0, x0 + width, y0 + height, color)
     }

@@ -4,7 +4,6 @@ import {UserDataRaw} from "src/client/utils/user-data-raw";
 import Entity from "src/utils/ecs/entity";
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 import {getHubMap} from "src/client/hub/hub-map";
-import GameMap from "src/map/game-map";
 import TransformComponent from "src/entity/components/transform-component";
 import CameraComponent from "src/client/graphics/camera";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
@@ -15,6 +14,10 @@ import SceneController, { useScene } from "../scenes/scene-controller";
 import { BasicSceneDescriptor } from "../scenes/scene-descriptor";
 import { texturesResourcePrerequisite } from "../scenes/scene-prerequisite";
 import RootControlsResponder from "../controls/root-controls-responder";
+import ClientEntityPrefabs from "../entity/client-entity-prefabs";
+import TilemapComponent from "src/map/tilemap-component";
+import { readMapFile } from "src/map/map-serialization";
+import { EntityType } from "src/entity/entity-type";
 
 const HubScene: React.FC = () => {
     const scene = useScene()
@@ -37,18 +40,22 @@ const HubScene: React.FC = () => {
         scene.loop.start()
         scene.canvas.clear()
 
-        const map = getHubMap()
         const backgroundWorld = new Entity()
-        clientGameWorldEntityPrefab(backgroundWorld, {
-            map: map
-        })
+        clientGameWorldEntityPrefab(backgroundWorld)
+
+        const {width, height, blocks} = readMapFile(getHubMap())
+
+        const tilemap = new Entity()
+        ClientEntityPrefabs.types.get(EntityType.TILEMAP)(tilemap)
+        tilemap.getComponent(TilemapComponent).setMap(width, height, blocks)
+        backgroundWorld.appendChild(tilemap)
 
         const camera = new Entity()
         camera.addComponent(new TransformComponent())
         camera.addComponent(new CameraComponent())
         camera.addComponent(new CameraRandomMovement()
             .setViewport({x: scene.canvas.width, y: scene.canvas.height})
-            .setMapSize(map.width * GameMap.BLOCK_SIZE, map.height * GameMap.BLOCK_SIZE))
+            .setMapSize(width * TilemapComponent.BLOCK_SIZE, height * TilemapComponent.BLOCK_SIZE))
 
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 

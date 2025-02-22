@@ -1,10 +1,10 @@
 import BlockDrawer from './block-drawer';
 import Sprite, {SpriteRect} from 'src/client/graphics/sprite';
-import GameMap from '../../../../map/game-map';
 import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/block-state/block-state';
 import {squareQuadrangle} from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
+import TilemapComponent from 'src/map/tilemap-component';
 
 export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];
@@ -69,18 +69,18 @@ export default class EdgedBlockDrawer extends BlockDrawer {
 
         let variant = this.variants[block.variant || 0]
 
-        x *= GameMap.BLOCK_SIZE
-        y *= GameMap.BLOCK_SIZE
+        x *= TilemapComponent.BLOCK_SIZE
+        y *= TilemapComponent.BLOCK_SIZE
 
-        const half = GameMap.BLOCK_SIZE / 2
+        const half = TilemapComponent.BLOCK_SIZE / 2
 
         if((block.facing & 0b111111111111) === 0b000000000000) {
-            this.drawSlice(program, x, y, variant[0].rect, this.spriteSize, GameMap.BLOCK_SIZE, 0, 0)
+            this.drawSlice(program, x, y, variant[0].rect, this.spriteSize, TilemapComponent.BLOCK_SIZE, 0, 0)
         } else if((block.facing & 0b111111111111) === 0b100100100100) {
-            this.drawSlice(program, x, y, variant[4].rect, this.spriteSize, GameMap.BLOCK_SIZE, 0, 0)
+            this.drawSlice(program, x, y, variant[4].rect, this.spriteSize, TilemapComponent.BLOCK_SIZE, 0, 0)
         } else {
             const s = this.halfSpriteSize
-            const h = GameMap.BLOCK_SIZE / 2
+            const h = TilemapComponent.BLOCK_SIZE / 2
 
             this.drawSlice(program, x, y + half, variant[(block.facing >> 9) & 7].rect, s, h, 0, s)
             this.drawSlice(program, x + half, y + half, variant[(block.facing >> 6) & 7].rect, s, h, s, s)

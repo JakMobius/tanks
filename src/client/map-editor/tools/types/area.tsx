@@ -4,9 +4,7 @@ import MapAreaModification from '../../history/modification/map-area-modificatio
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
-import TilemapComponent from "src/physics/tilemap-component";
 import KeyboardListener from "src/client/controls/input/keyboard/keyboard-listener";
-import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 import {createOverlappingModel} from "src/utils/wfc/overlapping-model";
 import {createSuperposition} from "src/utils/wfc/superposition";
@@ -17,6 +15,8 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import React from 'react';
 import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
+import WorldTilemapComponent from 'src/physics/world-tilemap-component';
+import TilemapComponent from 'src/map/tilemap-component';
 
 export class AreaToolDrawer extends EntityDrawer {
     private tool: AreaTool;
@@ -33,10 +33,10 @@ export class AreaToolDrawer extends EntityDrawer {
         if(this.tool.area.isValid()) {
 
             program.drawRectangle(
-                this.tool.area.minX * GameMap.BLOCK_SIZE,
-                this.tool.area.minY * GameMap.BLOCK_SIZE,
-                this.tool.area.maxX * GameMap.BLOCK_SIZE,
-                this.tool.area.maxY * GameMap.BLOCK_SIZE,
+                this.tool.area.minX * TilemapComponent.BLOCK_SIZE,
+                this.tool.area.minY * TilemapComponent.BLOCK_SIZE,
+                this.tool.area.maxX * TilemapComponent.BLOCK_SIZE,
+                this.tool.area.maxY * TilemapComponent.BLOCK_SIZE,
                 0x7F7F7F7F
             )
         }
@@ -53,10 +53,16 @@ const AreaToolView: React.FC<ToolViewProps<AreaTool>> = (props) => {
     )   
 }
 
+interface CopyBuffer {
+    width: number
+    height: number
+    blocks: BlockState[]
+}
+
 export default class AreaTool extends Tool {
 	public area: Rectangle;
 	public program: ConvexShapeProgram;
-	public copyBuffer: GameMap;
+	public copyBuffer?: CopyBuffer;
 	public keyboard: KeyboardListener;
 	public initialAreaState: boolean;
 	public movingArea: boolean;
@@ -103,7 +109,7 @@ export default class AreaTool extends Tool {
         const image = {
             width: this.copyBuffer.width,
             height: this.copyBuffer.height,
-            data: new Uint8ClampedArray(this.copyBuffer.data.map(block => (block.constructor as typeof BlockState).typeId))
+            data: new Uint8ClampedArray(this.copyBuffer.blocks.map(block => (block.constructor as typeof BlockState).typeId))
         } as ImageData
         const model = createOverlappingModel(image, { periodicInput: false });
         const superpos = createSuperposition(
@@ -113,7 +119,8 @@ export default class AreaTool extends Tool {
 
         const observe = createObservation(model, superpos);
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
         let modification = new MapAreaModification(map, this.area.clone(), [])
         let newData = modification.fetchData()
         modification.newData = newData
@@ -185,10 +192,11 @@ export default class AreaTool extends Tool {
     }
 
     selectAll() {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
 
         this.area.setFrom(0, 0)
-        this.area.setTo(map.width, map.height)
+        this.area.setTo(tilemap.width, tilemap.height)
 
         this.manager.setNeedsRedraw()
     }
@@ -198,7 +206,8 @@ export default class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
         const history = map.getComponent(GameMapHistoryComponent)
 
         let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
@@ -212,37 +221,38 @@ export default class AreaTool extends Tool {
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
 
-        let bound = this.area.bounding(0, 0, map.width, map.height)
+        let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
         if(bound.minX >= bound.maxX || bound.minY >= bound.maxY) return
 
         let width = bound.width()
         let height = bound.height()
 
-        this.copyBuffer = new GameMap({
+        this.copyBuffer = {
             width: width,
             height: height,
-            data: new Array(width * height)
-        })
+            blocks: new Array(width * height)
+        }
 
-        let sourceIndex = bound.minX + bound.minY * map.width
+        let sourceIndex = bound.minX + bound.minY * tilemap.width
         let destinationIndex = 0
 
         for(let y = bound.minY; y < bound.maxY; y++) {
             for(let x = bound.minX; x < bound.maxX; x++) {
-                this.copyBuffer.data[destinationIndex++] = map.data[sourceIndex++]
+                this.copyBuffer.blocks[destinationIndex++] = tilemap.blocks[sourceIndex++]
             }
 
-            sourceIndex += map.width - width;
+            sourceIndex += tilemap.width - width;
         }
 
         if(cut) {
             this.manager.createEvent(width * height + " блок(-ов) вырезано")
             const history = map.getComponent(GameMapHistoryComponent)
 
-            let bound = this.area.bounding(0, 0, map.width, map.height)
+            let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
             let areaModification = new MapAreaModification(map, bound, void 0)
             areaModification.perform()
@@ -289,10 +299,11 @@ export default class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        const map = this.manager.world.getComponent(TilemapComponent).map as GameMap
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
         const history = map.getComponent(GameMapHistoryComponent)
 
-        let modification = new MapAreaModification(map, this.area.clone(), this.copyBuffer.data.map((a: BlockState) => a.clone()))
+        let modification = new MapAreaModification(map, this.area.clone(), this.copyBuffer.blocks.map((a: BlockState) => a.clone()))
 
         modification.perform()
         history.registerModification(modification)
@@ -302,18 +313,22 @@ export default class AreaTool extends Tool {
     }
 
     clampX(x: number) {
-        return Math.max(0, Math.min(this.manager.world.getComponent(TilemapComponent).map.width - 1, x))
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
+        return Math.max(0, Math.min(tilemap.width - 1, x))
     }
 
     clampY(y: number) {
-        return Math.max(0, Math.min(this.manager.world.getComponent(TilemapComponent).map.height - 1, y))
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
+        return Math.max(0, Math.min(tilemap.height - 1, y))
     }
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
-        x = Math.floor(x / GameMap.BLOCK_SIZE)
-        y = Math.floor(y / GameMap.BLOCK_SIZE)
+        x = Math.floor(x / TilemapComponent.BLOCK_SIZE)
+        y = Math.floor(y / TilemapComponent.BLOCK_SIZE)
 
         if(this.area.isValid()) {
             if(this.area.contains(x, y)) {
@@ -357,8 +372,8 @@ export default class AreaTool extends Tool {
     mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
-        x = Math.floor(x / GameMap.BLOCK_SIZE)
-        y = Math.floor(y / GameMap.BLOCK_SIZE)
+        x = Math.floor(x / TilemapComponent.BLOCK_SIZE)
+        y = Math.floor(y / TilemapComponent.BLOCK_SIZE)
 
         x = this.clampX(x)
         y = this.clampY(y)

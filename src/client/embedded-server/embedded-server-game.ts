@@ -1,4 +1,3 @@
-import GameMap from "src/map/game-map";
 import AdapterLoop from "src/utils/loop/adapter-loop";
 import ConnectionClient from "src/networking/connection-client";
 import Connection from "src/networking/connection";
@@ -10,7 +9,7 @@ import RoomClientComponent from "src/server/room/components/room-client-componen
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 
 export class EmbeddedServerGameConfig {
-    map: GameMap
+    
 }
 
 export default class EmbeddedServerGame {
@@ -21,11 +20,8 @@ export default class EmbeddedServerGame {
     serverLoop = new AdapterLoop()
 
     constructor(config: EmbeddedServerGameConfig) {
-        const map = config.map
-
         this.serverGame = new Entity()
         serverGameRoomPrefab(this.serverGame, {
-            map: map,
             name: "Embedded Server Game",
             loop: this.serverLoop,
             tps: 20
@@ -35,9 +31,7 @@ export default class EmbeddedServerGame {
         this.serverLoop.start()
 
         this.clientWorld = new Entity()
-        clientGameWorldEntityPrefab(this.clientWorld, {
-            map: map
-        })
+        clientGameWorldEntityPrefab(this.clientWorld)
 
         const clientConnection = new LocalConnection()
         this.clientConnection = new ConnectionClient(clientConnection)

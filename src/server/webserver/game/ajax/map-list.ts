@@ -1,8 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import MapSerialization from "src/map/map-serialization";
-import pako from "pako";
 import AjaxHandler, {AjaxFields} from "src/server/webserver/ajax/ajax-handler";
 
 export interface AvailableMap {
@@ -22,20 +20,18 @@ export default class MapListAjaxHandler extends AjaxHandler {
 
         let maps: AvailableMap[] = []
         await this.walkMapsRecursively(mapsDirectory, async (fullPath, name) => {
-            if(!name.endsWith(".map")) return
+            if(!name.endsWith(".json")) return
 
             try {
-                const gzip = await fs.promises.readFile(fullPath)
-                const map = MapSerialization.fromBuffer(pako.inflate(gzip))
-
-                // todo: fetch map name from the file
+                let mapData = await fs.promises.readFile(fullPath, "utf-8")
+                let mapFile = JSON.parse(mapData)
 
                 maps.push({
-                    name: path.relative(mapsDirectory, fullPath),
-                    value: name
+                    value: path.relative(mapsDirectory, fullPath),
+                    name: mapFile.name ?? name
                 })
-            } catch (e) {
-                // Bad map file
+            } catch(e) {
+                // Ignored
             }
         })
         return maps

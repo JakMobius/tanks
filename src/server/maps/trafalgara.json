@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Метка Трафальгара",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 5,
+			"y1": 34,
+			"x2": 8,
+			"y2": 37,
+			"id": 2
+		},
+		{
+			"x1": 41,
+			"y1": 34,
+			"x2": 44,
+			"y2": 37,
+			"id": 1
+		},
+		{
+			"x1": 23,
+			"y1": 2,
+			"x2": 26,
+			"y2": 5,
+			"id": 0
+		}
+	],
+	"blocks": "--------------bb--bbb---bb--bbb--bb---------------------------------bbb-------bbb--------------------------------------b---------b-------------------------c-c-c------------------------------c-c-c---------c-bbb-c----------------------------c-bbb-c-------c-bbbbb-c-------c----------c-------c-bbbbb-c-------bbbbbbb-------c-c---bb---c-c-------bbbbbbb-------cbbbbbbbc-----c-c--b-bb-b--c-c-----cbbbbbbbc-------bbbbbbb-------c--bb-bb-bb--c-------bbbbbbb-------c-bbbbb-c--------bbb-bb-bbb--------c-bbbbb-c-------c-bbb-c---bb--bbbbb-bb-bbbbb--bb---c-bbb-c---------c-c-c----bbbbbbbbb-bb-bbbbbbbbb----c-c-c--------------------bbbbbb--------bbbbbb-----------------------------c-bbb------------bbb-c--------------b---------bb-c-c-bb------------bb-c-c-bb---------bb---------bbb-c-c-b---bb--bb---b-c-c-bbb---------b-----------bbb-c------bb--bb------c-bbb------------------c---bbbb-------bb--bb-------bbbb---c-------bb----c-c-bbbbbb-----cbb--bbc-----bbbbbb-c-c----bbbbb--c-c--bbb-------c-bb--bb-c-------bbb--c-c--bbbbb----c--bbbb------c-cbb--bbc-c------bbbb--c----bb--------bbbb------c-c-bb--bb-c-c------bbbb---------------bbbbb---bbbbbbbbb--bbbbbbbbb---bbbbb----------------------bbbbbbbbb--bbbbbbbbb---------------b-----bbbbbb--------------------------bbbbbb-----bb-----bbbbbb--------------------------bbbbbb-----b---------------bbbbbbbbb--bbbbbbbbb----------------------bbbbb---bbbbbbbbb--bbbbbbbbb---bbbbb---------------bbbb------c-c-bb--bb-c-c------bbbb--------bb----c--bbbb------c-cbb--bbc-c------bbbb--c----bbbbb--c-c--bbb-------c-bb--bb-c-------bbb--c-c--bbbbb----c-c-bbbbbb-----cbb--bbc-----bbbbbb-c-c----bb-------c---bbbb-------bb--bb-------bbbb---c------------------bbb-c------bb--bb------c-bbb-----------b---------bbb-c-c-b---bb--bb---b-c-c-bbb---------bb---------bb-c-c-bb------------bb-c-c-bb---------b--------------c-bbb------------bbb-c-----------------------------bbbbbb--------bbbbbb--------------------c-c-c----bbbbbbbbb-bb-bbbbbbbbb----c-c-c---------c-bbb-c---bb--bbbbb-bb-bbbbb--bb---c-bbb-c-------c-bbbbb-c--------bbb-bb-bbb--------c-bbbbb-c-------bbbbbbb-------c--bb-bb-bb--c-------bbbbbbb-------cbbbbbbbc-----c-c--b-bb-b--c-c-----cbbbbbbbc-------bbbbbbb-------c-c---bb---c-c-------bbbbbbb-------c-bbbbb-c-------c----------c-------c-bbbbb-c-------c-bbb-c----------------------------c-bbb-c---------c-c-c------------------------------c-c-c------------------------b----------b-------------------------------------bbb--------bbb-------------------------------bb---bbb---bb---bbb---bb-------------"
+}

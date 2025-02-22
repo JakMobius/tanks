@@ -1,10 +1,8 @@
 import WorldDrawerComponent from '../../entity/components/world-drawer-component';
 import CameraComponent from 'src/client/graphics/camera';
-import GameMap from '../../../map/game-map';
 import MapEditorBackgroundOverlay from 'src/client/controls/interact/map-editor-background-overlay';
 import ToolManager from '../tools/toolmanager';
 import Tools from "../tools/type-loader"
-import TilemapComponent from "src/physics/tilemap-component";
 import GameMapHistoryComponent from "../history/game-map-history-component";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import Entity from "src/utils/ecs/entity";
@@ -13,7 +11,6 @@ import WorldSoundListenerComponent from "src/client/entity/components/sound/worl
 import PauseOverlay from "src/client/ui/pause-overlay/pause-overlay";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import TransformComponent from "src/entity/components/transform-component";
-
 import MapEditorPauseView from '../ui/pause/map-editor-pause';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import SceneController, { useScene } from 'src/client/scenes/scene-controller';
@@ -26,9 +23,16 @@ import ToolSettingsView from '../ui/workspace-overlay/tool-settings/tool-setting
 import EventsHUD, { EventsProvider } from 'src/client/ui/events-hud/events-hud';
 import { BasicEvent } from 'src/client/ui/events-hud/basic-event-view';
 import { KeyedComponentsHandle } from 'src/client/utils/keyed-component';
+import WorldTilemapComponent from 'src/physics/world-tilemap-component';
+import { MapFile, readMapFile } from 'src/map/map-serialization';
+import TilemapComponent from '../../../map/tilemap-component';
+import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
+import { EntityType } from 'src/entity/entity-type';
+import GameMapNameComponent from '../map-name-component';
+import SpawnzonesComponent from 'src/map/spawnzones-component';
 
 interface MapEditorSceneContextProps {
-    loadMap: (map: GameMap) => void   
+    loadMap: (map: MapFile) => void   
 }
 
 const MapEditorSceneContext = createContext<MapEditorSceneContextProps | undefined>(undefined);
@@ -51,7 +55,6 @@ const MapEditorScene: React.FC = (props) => {
         world: null as Entity | null,
         toolManager: null as ToolManager | null,
         toolList: [] as Tool[],
-        map: null as GameMap | null
     })
 
     const stateRef = useRef(state)
@@ -83,7 +86,8 @@ const MapEditorScene: React.FC = (props) => {
 
         const toolList = Tools.map(Tool => new Tool(toolManager))
         
-        clientGameWorldEntityPrefab(world, {})
+        clientGameWorldEntityPrefab(world)
+        world.addComponent(new WorldTilemapComponent())
 
         toolManager.selectBlock(new BrickBlockState())
 
@@ -96,7 +100,8 @@ const MapEditorScene: React.FC = (props) => {
         })
 
         controlsResponder.on("editor-undo", (event) => {
-            const history = stateRef.current.map?.getComponent(GameMapHistoryComponent)
+            const map = world.getComponent(WorldTilemapComponent).map
+            const history = map.getComponent(GameMapHistoryComponent)
             let entry = history?.goBack()
 
             eventRef.current.addEvent?.(() => (
@@ -105,7 +110,8 @@ const MapEditorScene: React.FC = (props) => {
         })
 
         controlsResponder.on("editor-redo", (event) => {
-            const history = stateRef.current.map?.getComponent(GameMapHistoryComponent)
+            const map = world.getComponent(WorldTilemapComponent).map
+            const history = map.getComponent(GameMapHistoryComponent)
             let entry = history?.goForward()
 
             eventRef.current.addEvent?.(() => (
@@ -175,28 +181,30 @@ const MapEditorScene: React.FC = (props) => {
         stateRef.current.toolManager?.mouseMove(x, y)
     }, [])
 
-    const loadMap = useCallback((map: GameMap) => {
+    const loadMap = useCallback((mapFile: MapFile) => {
         const state = stateRef.current
-        state.world.getComponent(TilemapComponent).setMap(map)
-        state.toolManager.world.getComponent(TilemapComponent).setMap(map)
+        const map = state.world.getComponent(WorldTilemapComponent).map
+        map?.removeFromParent()
 
-        if (map) {
-            let target = {
-                x: map.width * GameMap.BLOCK_SIZE / 2,
-                y: map.height * GameMap.BLOCK_SIZE / 2
-            }
-            state.camera.getComponent(CameraPositionController).setTarget(target).reset()
-        } else {
-            state.camera.getComponent(CameraPositionController).setTarget(null)
+        const { width, height, blocks, spawnZones, name } = readMapFile(mapFile)
+
+        const entity = new Entity()
+        ClientEntityPrefabs.types.get(EntityType.TILEMAP)(entity)
+        entity.addComponent(new GameMapHistoryComponent())
+        entity.addComponent(new GameMapNameComponent(name))
+        entity.addComponent(new SpawnzonesComponent(spawnZones))
+        entity.getComponent(TilemapComponent).setMap(width, height, blocks)
+
+        state.world.appendChild(entity)
+        state.world.getComponent(WorldTilemapComponent).map = entity
+
+        let target = {
+            x: width * TilemapComponent.BLOCK_SIZE / 2,
+            y: height * TilemapComponent.BLOCK_SIZE / 2
         }
-
+        state.camera.getComponent(CameraPositionController).setTarget(target).reset()
         state.camera.getComponent(CameraPositionController).onTick(0)
         setNeedsRedraw()
-
-        setState({
-            ...state,
-            map: map
-        })
     }, [])
 
     return (

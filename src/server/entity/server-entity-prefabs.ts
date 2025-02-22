@@ -4,7 +4,6 @@ import EntityDataTransmitComponent from "src/entity/components/network/transmitt
 import {EntityType} from "src/entity/entity-type";
 import WeaponSingleBarreled from "src/entity/types/weapon-single-barrelled/weapon-single-barreled";
 import {WeaponComponent, WeaponRole, WeaponType} from "src/entity/components/weapon/weapon-component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
 
 export default class ServerEntityPrefabs {
     static types = new Map<number, (model: Entity) => void>()

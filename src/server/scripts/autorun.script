@@ -1,4 +1,13 @@
-service game-only
-room create -name 'Сильверстоун' -map silverstone
-room create -name 'Детище Арсения' -map race-150x150
-room create -name 'Пустая карта' -map empty
+service on
+room create -map arena -name "Арена"
+room create -map city-block -name "Городской квартал"
+room create -map escobar -name "Пещеры Эскобара"
+room create -map gladiolus-gorge -name "Ущелье Гладиолуса"
+room create -map intergalactic-gate -name "Межгалактические врата"
+room create -map maze -name "Лабиринт"
+room create -map parliament-building -name "Здание Парламента"
+room create -map trafalgara -name "Метка Трафальгара"
+room create -map zeus-temple -name "Храм Зевса"
+room create -map silverstone -name "Сильверстоун"
+room create -map meteor-shower -name "Вихрь"
+room create -map empty -name "Пустая карта"

@@ -1,7 +1,7 @@
 import BlockState from '../block-state'
 
 export default class WoodBlockState extends BlockState {
-	public variant: any;
+	public variant: number;
     static health = 1500
     static typeName = "wood";
     static typeId = 3;

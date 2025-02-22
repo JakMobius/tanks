@@ -1,48 +1,29 @@
 import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import GameMap from "src/map/game-map";
-import BlockState from "src/map/block-state/block-state";
-import BlockChangeEvent from "src/events/block-change-event";
+import fs from "fs"
+import TilemapComponent from "src/map/tilemap-component";
+import { MapFile, readMapFile } from "src/map/map-serialization";
+import SpawnzonesComponent from "src/map/spawnzones-component";
 
 export default class MapLoaderComponent implements Component {
     entity: Entity | null = null
-    map: GameMap
-    private savedMap: BlockState[] = []
+    path: string
 
-    constructor(map: GameMap) {
-        this.map = map
-        this.savedMap = new Array(this.map.width * this.map.height).fill(null)
-
-        this.map.on("block-change", (event: BlockChangeEvent) => {
-            let index = event.x + event.y * this.map.width
-            if(!this.savedMap[index]) this.savedMap[index] = event.oldBlock
-        })
-    }
-
-    getMap() {
-        return this.map
+    constructor(path: string) {
+        this.path = path
     }
 
     reloadMap() {
-        for(let i = 0; i < this.savedMap.length; i++) {
-            let x = i % this.map.width
-            let y = (i - x) / this.map.width
+        // TODO: async?
+        let file = fs.readFileSync(this.path, "utf-8")
 
-            let savedBlock = this.savedMap[i]
-            if(savedBlock) {
-                savedBlock = savedBlock.clone()
-                savedBlock.damage = 0
-                this.map.setBlock(x, y, savedBlock)
-            } else {
-                let currentBlock = this.map.getBlock(x, y)
-                if(currentBlock.damage > 0) {
-                    let newBlock = currentBlock.clone()
-                    newBlock.damage = 0
-                    this.map.setBlock(x, y, newBlock)
-                }
-            }
-        }
-        this.savedMap = []
+        // TODO: check scheme?
+        let json = JSON.parse(file) as unknown as MapFile
+        
+        let { width, height, blocks, spawnZones } = readMapFile(json)
+
+        this.entity.getComponent(TilemapComponent).setMap(width, height, blocks)
+        this.entity.getComponent(SpawnzonesComponent).spawnZones = spawnZones
     }
 
     onAttach(entity: Entity) {

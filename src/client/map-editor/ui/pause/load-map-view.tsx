@@ -2,21 +2,19 @@ import './load-map-view.scss'
 
 import {PauseMenuSubtitle, PauseNavigationItem} from "src/client/ui/pause-overlay/pause-menu-view";
 import MapStorage from "src/client/map-editor/map-storage";
-import GameMap from "src/map/game-map";
-import GameMapNameComponent from "src/client/map-editor/map-name-component";
-import GameMapSizeComponent from "src/client/map-editor/map-size-component";
 import React, { useState } from 'react';
 import { useMapEditorScene } from '../../scenes/map-editor-scene';
 import { useNavigation } from 'src/client/ui/navigation/navigation-view';
+import { MapFile } from 'src/map/map-serialization';
 
 interface MapPreviewRowProps {
-    map: GameMap
+    map: MapFile
     onClick?: () => void
 }
 
 const MapPreviewRow: React.FC<MapPreviewRowProps> = (props) => {
-    let name = props.map.getComponent(GameMapNameComponent)?.name ?? "Карта"
-    let size = props.map.getComponent(GameMapSizeComponent)?.size ?? -1
+    let name = "Карта" //props.map.getComponent(GameMapNameComponent)?.name ?? "Карта"
+    let size = -1 // props.map.getComponent(GameMapSizeComponent)?.size ?? -1
 
     const mapEditor = useMapEditorScene()
     const navigation = useNavigation()

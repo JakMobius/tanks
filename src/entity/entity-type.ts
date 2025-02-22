@@ -34,7 +34,8 @@ export const EntityType = {
     EFFECT_SOUND_EFFECT:             0x4003,
 
     // Other:
-    FLAG:                            0x5000,
+    TILEMAP:                         0x5000,
+    FLAG:                            0x5001,
 
     // Game mode controllers:
     TDM_GAME_MODE_CONTROLLER_ENTITY: 0x6000,

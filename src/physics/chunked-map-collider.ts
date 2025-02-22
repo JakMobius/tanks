@@ -1,9 +1,9 @@
 import {TwoDimensionalMap} from "../utils/two-dimensional-map";
 import PhysicsChunk from "./physics-chunk";
-import GameMap from "../map/game-map";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
-import TilemapComponent from "./tilemap-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import TilemapComponent from "../map/tilemap-component";
+import { WorldComponent } from "src/entity/game-world-entity-prefab";
 
 export interface PhysicsChunkManagerConfig {
     chunkWidth?: number
@@ -46,7 +46,7 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
         if(!this.mapComponent || this.mapComponent.entity != this.entity) {
             this.mapComponent = this.entity.getComponent(TilemapComponent)
         }
-        return this.mapComponent.map
+        return this.mapComponent
     }
 
     getChunk(x: number, y: number): PhysicsChunk {
@@ -79,12 +79,12 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
 
     private updateChunks(dt: number) {
         this.time += dt
-
-        const physicalComponents = this.entity.getComponent(PhysicalHostComponent).physicalComponents
+        const world = WorldComponent.getWorld(this.entity)
+        const physicalComponents = world.getComponent(PhysicalHostComponent).physicalComponents
 
         for(let component of physicalComponents) {
             let position = component.getBody().GetPosition()
-            this.makeNearbyChunksRelevant(position.x / GameMap.BLOCK_SIZE, position.y / GameMap.BLOCK_SIZE)
+            this.makeNearbyChunksRelevant(position.x / TilemapComponent.BLOCK_SIZE, position.y / TilemapComponent.BLOCK_SIZE)
         }
 
         for(let row of this.chunkMap.rows.values()) {

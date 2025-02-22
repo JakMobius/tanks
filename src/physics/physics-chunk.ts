@@ -5,10 +5,10 @@ import {epsilon, signedDoubleTriangleSurface} from "../utils/utils";
 import EdgeFindingContext from "./edge-finding-context";
 import {MeshGenerationContext} from "./mesh-generation-context";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
-import GameMap from "../map/game-map";
 import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
-import Entity from "src/utils/ecs/entity";
+import { WorldComponent } from "src/entity/game-world-entity-prefab";
+import TilemapComponent from "src/map/tilemap-component";
 
 export default class PhysicsChunk {
     public readonly collider: ChunkedMapCollider;
@@ -83,16 +83,17 @@ export default class PhysicsChunk {
             this.body.GetWorld().DestroyBody(this.body)
         }
 
-        const body = this.collider.entity.getComponent(PhysicalHostComponent).world.CreateBody({
+        const world = WorldComponent.getWorld(this.collider.entity)
+        const body = world.getComponent(PhysicalHostComponent).world.CreateBody({
             type: Box2D.b2BodyType.b2_staticBody,
-            position: {x: this.x * GameMap.BLOCK_SIZE, y: this.y * GameMap.BLOCK_SIZE},
+            position: {x: this.x * TilemapComponent.BLOCK_SIZE, y: this.y * TilemapComponent.BLOCK_SIZE},
         })
 
         this.generateMesh()
         for (let shape of this.edgeMesh) {
             const pointShape = shape.map(point => ({
-                x: point[0] * GameMap.BLOCK_SIZE,
-                y: point[1] * GameMap.BLOCK_SIZE
+                x: point[0] * TilemapComponent.BLOCK_SIZE,
+                y: point[1] * TilemapComponent.BLOCK_SIZE
             }))
 
             const polygonShape = new Box2D.b2PolygonShape()

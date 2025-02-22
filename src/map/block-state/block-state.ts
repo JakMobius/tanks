@@ -1,9 +1,7 @@
-import BlockStateBinaryOptions from './block-state-binary-options';
-import GameMap from "../game-map";
+import TilemapComponent from "../tilemap-component";
 
 interface BlockStateConfig {
-    damage?: number
-    solid?: boolean
+    damage: number
 }
 
 export default class BlockState {
@@ -11,7 +9,6 @@ export default class BlockState {
 	public damage: number;
 	public solid: boolean;
 	public facing: number;
-    static BinaryOptions = BlockStateBinaryOptions.shared
 
     static Types = new Map<number, typeof BlockState>()
 
@@ -21,9 +18,8 @@ export default class BlockState {
     static typeId = 0
 
     constructor(options?: BlockStateConfig) {
-        options = options || {}
-        this.damage = options.damage || 0
-        this.solid = options.solid || (this.constructor as typeof BlockState).isSolid
+        this.damage = options?.damage || 0
+        this.solid = (this.constructor as typeof BlockState).isSolid
         this.facing = 0
     }
 
@@ -31,20 +27,20 @@ export default class BlockState {
         return new (this.constructor as typeof BlockState)(this)
     }
 
-    update(map: GameMap, x: number, y: number) {
+    update(map: TilemapComponent, x: number, y: number) {
         if(this.facing !== -1) {
             this.updateNeighbourFacing(map, x, y)
         }
-        map.emit("block-update", x, y)
+        map.entity.emit("block-update", x, y)
     }
 
-    getNeighbourId(map: GameMap, x: number, y: number): number {
+    getNeighbourId(map: TilemapComponent, x: number, y: number): number {
         let block = map.getBlock(x, y);
         if(block) return (block.constructor as typeof BlockState).typeId
         return 0
     }
 
-    updateNeighbourFacing(map: GameMap, x: number, y: number) {
+    updateNeighbourFacing(map: TilemapComponent, x: number, y: number) {
         const id = (this.constructor as typeof BlockState).typeId
 
         this.facing = 0

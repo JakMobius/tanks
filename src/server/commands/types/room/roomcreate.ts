@@ -65,7 +65,7 @@ export default class RoomCreateCommand extends Command {
         }
 
         let mapsDirectory = this.console.server.config.general.mapsDirectory
-        let mapPath = path.resolve(mapsDirectory, mapName + ".map")
+        let mapPath = path.resolve(mapsDirectory, mapName + ".json")
 
         if (!fs.existsSync(mapPath)) {
             logger.log("§F00;No such map: '" + mapName + "'")
@@ -90,7 +90,7 @@ export default class RoomCreateCommand extends Command {
 
         if(currentFlag?.name === "map") {
             let mapsDirectory = this.console.server.config.general.mapsDirectory
-            return this.autocompletePath(args[args.length - 1], mapsDirectory, ".map", options)
+            return this.autocompletePath(args[args.length - 1], mapsDirectory, ".json", options)
         } else if(currentFlag?.name === "mode") {
             return RoomCreateCommand.validModes.filter(mode => mode.startsWith(args[args.length - 1].toUpperCase()))
         } else if(found.incompleteFlag) {

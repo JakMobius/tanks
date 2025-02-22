@@ -2,16 +2,17 @@ import MapModification from './map-modification';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
 import Rectangle from "src/utils/rectangle";
 import BlockState from "src/map/block-state/block-state";
-import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "../game-map-history-component";
 import BlockChangeEvent from "src/events/block-change-event";
+import TilemapComponent from 'src/map/tilemap-component';
+import Entity from 'src/utils/ecs/entity';
 
 export default class MapAreaModification extends MapModification {
 	public area: Rectangle;
 	public oldData: BlockState[];
 	public newData: BlockState[];
 
-    constructor(map: GameMap, area: Rectangle, newData: BlockState[]) {
+    constructor(map: Entity, area: Rectangle, newData: BlockState[]) {
         super(map);
 
         this.area = area
@@ -20,16 +21,17 @@ export default class MapAreaModification extends MapModification {
     }
 
     fetchData(): BlockState[] {
+        let tilemap = this.map.getComponent(TilemapComponent)
         let result = []
 
         let minX = Math.max(0, this.area.minX)
         let minY = Math.max(0, this.area.minY)
-        let maxX = Math.min(this.map.width, this.area.maxX)
-        let maxY = Math.min(this.map.height, this.area.maxY)
+        let maxX = Math.min(tilemap.width, this.area.maxX)
+        let maxY = Math.min(tilemap.height, this.area.maxY)
 
         for(let y = minY; y < maxY; y++) {
             for(let x = minX; x < maxX; x++) {
-                result.push(this.map.getBlock(x, y))
+                result.push(tilemap.getBlock(x, y))
             }
         }
 
@@ -37,6 +39,7 @@ export default class MapAreaModification extends MapModification {
     }
 
     private setArea(data: BlockState[]) {
+        let tilemap = this.map.getComponent(TilemapComponent)
         let history = this.map.getComponent(GameMapHistoryComponent)
         history.preventNativeModificationRegistering = true
 
@@ -44,10 +47,10 @@ export default class MapAreaModification extends MapModification {
 
         let minX = Math.max(0, this.area.minX)
         let minY = Math.max(0, this.area.minY)
-        let maxX = Math.min(this.map.width, this.area.maxX)
-        let maxY = Math.min(this.map.height, this.area.maxY)
+        let maxX = Math.min(tilemap.width, this.area.maxX)
+        let maxY = Math.min(tilemap.height, this.area.maxY)
         let width = maxX - minX
-        let destinationIndex = minX + minY * this.map.width
+        let destinationIndex = minX + minY * tilemap.width
         let delta = this.area.width() - width
 
         // Updating blocks
@@ -61,12 +64,12 @@ export default class MapAreaModification extends MapModification {
                 blockChangeEvent.x = x
                 blockChangeEvent.y = y
                 blockChangeEvent.newBlock = newBlock
-                blockChangeEvent.oldBlock = this.map.data[destinationIndex]
+                blockChangeEvent.oldBlock = tilemap.blocks[destinationIndex]
 
                 this.map.emit("block-change", blockChangeEvent)
-                this.map.data[destinationIndex++] = newBlock
+                tilemap.blocks[destinationIndex++] = newBlock
             }
-            destinationIndex -= (width - this.map.width)
+            destinationIndex -= (width - tilemap.width)
             sourceIndex += delta
         }
 
@@ -74,17 +77,17 @@ export default class MapAreaModification extends MapModification {
 
         minX = Math.max(0, this.area.minX - 1)
         minY = Math.max(0, this.area.minY - 1)
-        maxX = Math.min(this.map.width, this.area.maxX + 1)
-        maxY = Math.min(this.map.height, this.area.maxY + 1)
+        maxX = Math.min(tilemap.width, this.area.maxX + 1)
+        maxY = Math.min(tilemap.height, this.area.maxY + 1)
 
         width = maxX - minX
-        destinationIndex = minX + minY * this.map.width
+        destinationIndex = minX + minY * tilemap.width
 
         for(let y = minY; y < maxY; y++) {
             for(let x = minX; x < maxX; x++) {
-                this.map.data[destinationIndex++].update(this.map, x, y)
+                tilemap.blocks[destinationIndex++].update(tilemap, x, y)
             }
-            destinationIndex -= (width - this.map.width)
+            destinationIndex -= (width - tilemap.width)
         }
 
         history.preventNativeModificationRegistering = false

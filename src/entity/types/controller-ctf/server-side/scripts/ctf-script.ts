@@ -4,8 +4,7 @@ import Team from "src/server/team";
 import Entity from "src/utils/ecs/entity";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
-import TilemapComponent from "src/physics/tilemap-component";
-import GameMap from "src/map/game-map";
+import TilemapComponent from "src/map/tilemap-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import PlayerDropFlagEvent from "src/events/player-drop-flag-event";
@@ -14,6 +13,8 @@ import PlayerTeamComponent from "src/entity/types/player/server-side/player-team
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import HealthComponent from "src/entity/components/health-component";
 import TimerComponent from "src/entity/components/network/timer/timer-component";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import SpawnzonesComponent from "src/map/spawnzones-component";
 
 export default class CTFScript extends ServerGameScript<ServerCTFControllerComponent> {
 
@@ -39,13 +40,14 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         const flagEntity = new Entity()
         ServerEntityPrefabs.types.get(EntityType.FLAG)(flagEntity)
 
-        const map = this.controller.world.getComponent(TilemapComponent).map
-        const zone = map.spawnZones[team.id]
+        const map = this.controller.world.getComponent(WorldTilemapComponent).map
+        const spawnzones = map.getComponent(SpawnzonesComponent)
+        const zone = spawnzones.spawnZones[team.id]
 
         const flagState = flagEntity.getComponent(FlagDataComponent)
         flagState.basePosition = {
-            x: zone.centerX() * GameMap.BLOCK_SIZE,
-            y: zone.centerY() * GameMap.BLOCK_SIZE
+            x: zone.centerX() * TilemapComponent.BLOCK_SIZE,
+            y: zone.centerY() * TilemapComponent.BLOCK_SIZE
         }
         flagState.setTeam(team)
 

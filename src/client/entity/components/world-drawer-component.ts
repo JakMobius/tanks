@@ -1,5 +1,4 @@
 
-import MapDebugDrawer from "src/client/graphics/drawers/map-debug-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import GameProgramPool from "src/client/graphics/game-program-pool";
@@ -8,6 +7,7 @@ import UIDebugDrawer from "src/client/graphics/drawers/ui-debug-drawer";
 import CameraComponent from "src/client/graphics/camera";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import CanvasHandler from 'src/client/graphics/canvas-handler';
+import MapDebugDrawer from "src/entity/types/tilemap/client-side/map-debug-drawer";
 
 export default class WorldDrawerComponent extends EventHandlerComponent {
     public canvasHandler: CanvasHandler

@@ -1,6 +1,6 @@
 // @ts-ignore
+import MapDrawerComponent from 'src/entity/types/tilemap/client-side/map-drawer-component'
 import Models from './types/%'
-import MapDrawerComponent from 'src/client/graphics/drawers/map-drawer-component';
 
 for(let Model of Models) {
     let drawer = new Model()

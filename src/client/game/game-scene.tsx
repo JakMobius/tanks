@@ -87,6 +87,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
     useEffect(() => {
         scene.setTitle("Танчики")
         scene.loop.start()
+        scene.canvas.clear()
 
         const controlsResponder = new ControlsResponder()
         const world = new Entity()

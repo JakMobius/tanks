@@ -2,7 +2,8 @@ import Pencil from './pencil';
 import AirBlockState from '../../../../map/block-state/types/air-block-state';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
-import TilemapComponent from "src/physics/tilemap-component";
+import WorldTilemapComponent from 'src/physics/world-tilemap-component';
+import TilemapComponent from 'src/map/tilemap-component';
 
 export default class Eraser extends Pencil {
     constructor(manager: ToolManager) {
@@ -13,9 +14,10 @@ export default class Eraser extends Pencil {
     }
 
     fragment(x: number, y: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
-        if((map.getBlock(x, y).constructor as typeof BlockState).typeId) {
-            map.setBlock(x, y, new AirBlockState())
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
+        if((tilemap.getBlock(x, y).constructor as typeof BlockState).typeId) {
+            tilemap.setBlock(x, y, new AirBlockState())
         }
     }
 

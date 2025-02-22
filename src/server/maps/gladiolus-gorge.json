@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Ущелье Гладиолуса",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 38,
+			"y1": 42,
+			"x2": 40,
+			"y2": 44,
+			"id": 2
+		},
+		{
+			"x1": 28,
+			"y1": 16,
+			"x2": 30,
+			"y2": 18,
+			"id": 1
+		},
+		{
+			"x1": 5,
+			"y1": 8,
+			"x2": 7,
+			"y2": 10,
+			"id": 0
+		}
+	],
+	"blocks": "---------cccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb------bbbccccbbccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-----bbbbbcccccccbbbbbbb-bbbbbbbbbbbbbbbbbbbbbbbbbb----bbbbbbcccccccbbbbbbc--------bbbbbbbbbb-bbbbbbb---bbbbbbbcccccccbbbbbccc--------bbbbbbbb-----bbbb---bbbbbbbbcccbbccbbbcccbbbbbb---bbbbbbbb-----bbbb----bbbbbbbbbcbcccbbccccbbbbbbb------bbb---bb-bbbb-------bbbbbbbbbbcccccbbbbbb-------------bbbbbb-bbb------bbbbbbbbbbbccbbbbbbb----bbbb------bbbbbbbbbbb------bbbb---bbbbbbbbbbbbbbbbbbbbbb---bbbbbbbbbbbb---------------bbbbbbbbbbbbbbbbbbbb---bbbbbbbbbbbbb---------------bbbbbbbbbbbbbbbbbbb--bbbbbbbbbbbbbbbb------------bbbbbbbbbbbbbbbbbbb-c-bbbbbbbbbbbbbbbb-----------bbbbbbbbbbbbbbbbbbbbc--bbbbbbbbbbbbbbbbb-----------bb----bbbbbbbbbbbbb-c-bbbbbbb-bbbbbbbbbb----------------------bbbbbbbc--bbbbbb--bbbbbbbbbbbb-------cbc-----------bbbbbbb--bbbbb--bbbbbbbbbbbbbb-----cbbb-----------bbbbbbb---bbbb--bbbbbbbbbbbbbb-----cbbbbc---------bbbbbbb---bbbb---bbbbbbbbbbbbb------bbbc----------bbbbbbb---bbbb---bbbbbbbbbbbb--------cc-------c---bbbbbbb----bbb--bbbbbbbbbbbbb-----------------bb--bbbbbbbb---bbb---bbbbbbbbbbb-----------------cbb---bbbbbbbb---bb---bbbbbbb---------------------cbbc--bbbbbbbb-------bbbbbb------------------------bbb---bbbbbbb------bbbbbb----bbbb------------------bb---bbbbbb----bbbbbbbbb---bbbbb------------------------bbb-----bbbbbbbbbb---bbbbbb------------------------bb--c-cbbbbbbbbbb---bbbbbbb---------bb---------------c-cbbbbbbbbbbb---bbbbbbbb--------bbb--------------cc-bbbbbbbbbbbc--bbbbbbbbbbccbb--bbbbb-----------c-bbbbbbbbbbbbb-c-bbbbbbbbbbccbbbbbbbbb----------cbbbbbbbbbbbbbbbc--bbbbbbbbbbcccbbbbbbbb--bb------bbbbbbbbbbbbbbbb-c-bbbbbbbbbcccccccbbbbb--bb-------bbbbbbbbbbbbbbbc--bbbbbbbbccccccccbbbbb---b--------bbbbbbbbbbbbbb----bbbbbbbbbbbcccccbbbb-------------bbbbbb----bbbb---bbbbbbbbbbbbbcccbbbb-------------bbbbb-----bbbb----bbbbbbbbbbbbbccbbbb-------------bbbbbc----bbb-------cccbbbb-bbbbbbbbb-------------bbbbbcc--bbbb------ccccbbbb-bbbbbbbbbbbb-----------bbbbc-c-bbbb-----c-c--bbbb--bbbbbbbbbbbb-----------bbbcccbbbb---------c-bbb---bbbbbbbbbbbb-----------c-cccbbbb----c------------bbbbbbbbbbbbbb-----------ccccbbbb--bb-c-----------bbbbbbbbbbbbbbb----------c-ccbbbb-bbbc-cc-------bbbbbbbbbbbbbbbbb-----------c-bbbbb-bbbbb-c----------bbbbbbbbbbbbbb-------------cbbbb-bbbbbc-c----------bbbbbbbbbbbbbc-bbbb-----------bbbbbbbbbbbb---bbb------bbbbbbbbbccbbbbbbbbbb-----bbbbbbbbbbbbbbbbbbbb---------bbbc-cbbbbbbbbbbb-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---c-c--bbbbbbbbbbbbbb"
+}

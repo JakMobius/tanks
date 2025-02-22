@@ -1,6 +1,5 @@
 import MapModification from "./modification/map-modification";
 import MapBlockModification from "./modification/map-block-modification";
-import GameMap from "src/map/game-map";
 import BlockChangeEvent from "src/events/block-change-event";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
@@ -74,7 +73,7 @@ export default class GameMapHistoryComponent extends EventHandlerComponent {
     onBlockChange(event: BlockChangeEvent) {
         if(!this.preventNativeModificationRegistering) {
             this.registerModification(
-                new MapBlockModification(this.entity as GameMap, event.x, event.y, event.oldBlock, event.newBlock)
+                new MapBlockModification(this.entity, event.x, event.y, event.oldBlock, event.newBlock)
             )
         }
     }

@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Здание Парламента",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 4,
+			"y1": 30,
+			"x2": 7,
+			"y2": 35,
+			"id": 2
+		},
+		{
+			"x1": 42,
+			"y1": 30,
+			"x2": 45,
+			"y2": 35,
+			"id": 1
+		},
+		{
+			"x1": 22,
+			"y1": 2,
+			"x2": 27,
+			"y2": 5,
+			"id": 0
+		}
+	],
+	"blocks": "---c-c-c-c-c-c-c-c-c-c--cc--c-c-c-c-c-c-c-c-c-c-----c-c-c-c-c-c-c-c-c-c-c----c-c-c-c-c-c-c-c-c-c-c---c-c-c-c-c-c-c-c-c-c-c------c-c-c-c-c-c-c-c-c-c-c-c-c--------------------------------------------c-c-c----------------------------------------------c-c-c---c-c-c-c-c-c-c-c--------c-c-c-c-c-c-c-c---c-c-c---c-c-c-c-c-c-c-c-c------c-c-c-c-c-c-c-c-c---c-c-c---c-c-c-c-c-c-c-c--------c-c-c-c-c-c-c-c---c-c-c-----------------c-c------c-c-----------------c-c-c-----------------c--------c-----------------c-c-c-----------------c-c------c-c-----------------c-------------c-------c--------c-------c-------------bbbcccbb--c-c-----c-c------c-c-----c-c--bbcccbbb--bbb---bbb--c-------c--------c-------c--bbb---bbb--bb-----bb---------c-c------c-c---------bb-----bb--c------bbb---------c--------c---------bbb------c--c----------------------------------------------c--bbc------------------------------------------cbb--bb--b--bbb----------------------------bbb--b--bb--bbc----bb--c---------bbbbbb---------c--bb----cbb--c-------c-c-c-------bbbbbbbb-------c-c-c-------c--c-------c--c-------bbb-cc-bbb-------c--c-------c--bbc----bb-c-c------bb-c--c-bb------c-c-bb----cbb--bb--b--bb--c-------bbc-cc-cbb-------c--bb--b--bb--bbc----bb-c-c------bbc-cc-cbb------c-c-bb----cbb--c-------c--c-------bb-c--c-bb-------c--c-------c--c-------c-c-c------bbb-cc-bbb------c-c-c-------c--bb-----bb--c--------bbbbbbbb--------c--bb-----bb--bbbb--bbb-c-c--------bbbbbb--------c-c-bbb--bbbb--bbbb--bbb--c-c--------------------c-c--bbb--bbbb--bbb----bb---c-c------------------c-c---bb----bbb--bbb----bbb-c-c--------------------c-c-bbb----bbb--cc-----bbb--c-c------------------c-c--bbb-----cc--bbb----bbb---c-c----------------c-c---bbb----bbb--bbb----bbbc---c--bb--bb--bb--bb--c---cbbb----bbb--bbb-----bccc-----bb--bb--bb--bb-----cccb-----bbb--bbb-bb---cccc----------------------cccc---bb-bbb--bbb-bb----ccbbbb----bb----bb----bbbbcc----bb-bbb--cc---------bbbbbbbbbbb----bbbbbbbbbbb---------cc--bbb---------bbbbbbbbbb----bbbbbbbbbb---------bbb--bbbcc---------bbbbbbbb----bbbbbbbb---------ccbbb--bbbcc----bb---bb----bb----bb----bb---bb----ccbbb--bbbcc----bb---cc----------------cc---bb----ccbbb--bbb-----------bb----------------bb-----------bbb--cc--------------------------------------------cc--bbbb---ccc--------c-c------c-c--------ccc---bbbb--bbbbb--ccc----bb-c-c-c----c-c-c-bb----ccc--bbbbb---bbbb-bbbbb-bbbbbbbbbbbbbbbbbbbbbbbb-bbbbb-bbbb-----bbbcbbbbbcbbbbbbbbbbbbbbbbbbbbbbbbcbbbbbcbbb-------bbcbbbbbcbbbbbbbbbbbbbbbbbbbbbbbbcbbbbbcbb----"
+}

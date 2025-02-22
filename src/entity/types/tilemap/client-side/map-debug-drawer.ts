@@ -1,17 +1,16 @@
 import PhysicsChunk from "src/physics/physics-chunk";
-import GameMap from "src/map/game-map";
-import LineDrawer from "./line-drawer";
-import DrawPhase from "./draw-phase";
-import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
-import B2DebugDraw from "./b2-debug-draw";
+import TilemapComponent from "src/map/tilemap-component";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import ChunkedMapCollider from "src/physics/chunked-map-collider";
 import TransformComponent from "src/entity/components/transform-component";
 import Entity from "src/utils/ecs/entity";
-import DebugDrawer from "src/client/graphics/drawers/debug-drawer/debug-drawer";
 import * as Box2D from "@box2d/core"
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import B2DebugDraw from "src/client/graphics/drawers/b2-debug-draw";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
+import LineDrawer from "src/client/graphics/drawers/line-drawer";
 
 export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
@@ -64,8 +63,8 @@ export default class MapDebugDrawer {
         for(let shape of edgeMesh) {
             let worldSpaceShape = []
             for(let point of shape) {
-                worldSpaceShape.push((point[0] + chunk.x) * GameMap.BLOCK_SIZE)
-                worldSpaceShape.push((point[1] + chunk.y) * GameMap.BLOCK_SIZE)
+                worldSpaceShape.push((point[0] + chunk.x) * TilemapComponent.BLOCK_SIZE)
+                worldSpaceShape.push((point[1] + chunk.y) * TilemapComponent.BLOCK_SIZE)
             }
             transformedMesh.push(worldSpaceShape)
         }
@@ -81,18 +80,18 @@ export default class MapDebugDrawer {
         }
 
         LineDrawer.strokeShape(this.drawPhase,[
-            chunk.x * GameMap.BLOCK_SIZE, chunk.y * GameMap.BLOCK_SIZE,
-            (chunk.x + chunk.width) * GameMap.BLOCK_SIZE, chunk.y * GameMap.BLOCK_SIZE,
-            (chunk.x + chunk.width) * GameMap.BLOCK_SIZE, (chunk.y + chunk.height) * GameMap.BLOCK_SIZE,
-            chunk.x * GameMap.BLOCK_SIZE, (chunk.y + chunk.height) * GameMap.BLOCK_SIZE
+            chunk.x * TilemapComponent.BLOCK_SIZE, chunk.y * TilemapComponent.BLOCK_SIZE,
+            (chunk.x + chunk.width) * TilemapComponent.BLOCK_SIZE, chunk.y * TilemapComponent.BLOCK_SIZE,
+            (chunk.x + chunk.width) * TilemapComponent.BLOCK_SIZE, (chunk.y + chunk.height) * TilemapComponent.BLOCK_SIZE,
+            chunk.x * TilemapComponent.BLOCK_SIZE, (chunk.y + chunk.height) * TilemapComponent.BLOCK_SIZE
         ], MapDebugDrawer.chunkBorderColor, MapDebugDrawer.meshStrokeThickness, true)
 
         let dotRadius = MapDebugDrawer.vertexSize / 2
 
         for(let shape of edgeMesh) {
             for(let point of shape) {
-                let x = (point[0] + chunk.x) * GameMap.BLOCK_SIZE
-                let y = (point[1] + chunk.y) * GameMap.BLOCK_SIZE
+                let x = (point[0] + chunk.x) * TilemapComponent.BLOCK_SIZE
+                let y = (point[1] + chunk.y) * TilemapComponent.BLOCK_SIZE
 
                 convexShapeProgram.drawConvexShape([
                     x - dotRadius, y - dotRadius,

@@ -5,8 +5,6 @@ import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
 import Color from "src/utils/color";
 import { squareQuadrangleFromPoints } from "src/utils/quadrangle";
-import TilemapComponent from "src/physics/tilemap-component";
-import GameMap from "src/map/game-map";
 import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
@@ -16,6 +14,8 @@ import { clamp } from "src/utils/utils";
 import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
 import React, { useEffect, useState } from 'react';
 import RangeView from 'src/client/ui/elements/range/range';
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import TilemapComponent from "src/map/tilemap-component";
 
 const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
@@ -80,20 +80,21 @@ export class PencilDrawer extends EntityDrawer {
 
         const program = phase.getProgram(ConvexShapeProgram)
 
-        const map = this.tool.manager.world.getComponent(TilemapComponent).map
+        const map = this.tool.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
 
-        const scale = GameMap.BLOCK_SIZE
+        const scale = TilemapComponent.BLOCK_SIZE
         const x = this.tool.brushX
         const y = this.tool.brushY
 
         let dyStart = Math.max(0, -y)
-        let dyEnd = Math.min(this.tool.thickness, map.height - y)
+        let dyEnd = Math.min(this.tool.thickness, tilemap.height - y)
 
         for (let dy = dyStart; dy < dyEnd; dy++) {
             let bounds = this.tool.brushRowBoundsFor(dy)
 
-            bounds[0] = clamp(bounds[0] + x, 0, map.width) * scale
-            bounds[1] = clamp(bounds[1] + x, 0, map.width) * scale
+            bounds[0] = clamp(bounds[0] + x, 0, tilemap.width) * scale
+            bounds[1] = clamp(bounds[1] + x, 0, tilemap.width) * scale
 
             let quadrangle = squareQuadrangleFromPoints(bounds[0], (y + dy) * scale, bounds[1], (y + dy + 1) * scale)
 
@@ -200,7 +201,7 @@ export default class Pencil extends Tool {
     mouseUp(x: number, y: number) {
         super.mouseUp(x, y);
 
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
         const history = map.getComponent(GameMapHistoryComponent)
 
         history.commitActions(this.actionName)
@@ -230,7 +231,8 @@ export default class Pencil extends Tool {
     }
 
     draw(x: number, y: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
 
         for (let by = 0; by < this.thickness; by++) {
 
@@ -241,7 +243,7 @@ export default class Pencil extends Tool {
                 let px = x + bx
                 let py = y + by
 
-                if (px < 0 || py < 0 || px >= map.width || py >= map.height) continue
+                if (px < 0 || py < 0 || px >= tilemap.width || py >= tilemap.height) continue
 
                 this.fragment(px, py)
             }
@@ -251,15 +253,16 @@ export default class Pencil extends Tool {
     }
 
     fragment(x: number, y: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const tilemap = map.getComponent(TilemapComponent)
 
-        if ((map.getBlock(x, y).constructor as typeof BlockState).typeId ===
+        if ((tilemap.getBlock(x, y).constructor as typeof BlockState).typeId ===
             (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
             return
 
         let block = this.manager.selectedBlock.clone()
 
-        map.setBlock(x, y, block)
+        tilemap.setBlock(x, y, block)
     }
 
     becomeActive() {
@@ -277,8 +280,8 @@ export default class Pencil extends Tool {
     refreshBrush() {
         this.brushPositionKnown = true
 
-        let brushX = (Math.floor(this.mouseX / GameMap.BLOCK_SIZE))
-        let brushY = (Math.floor(this.mouseY / GameMap.BLOCK_SIZE))
+        let brushX = (Math.floor(this.mouseX / TilemapComponent.BLOCK_SIZE))
+        let brushY = (Math.floor(this.mouseY / TilemapComponent.BLOCK_SIZE))
 
         if (this.thickness % 2 !== 0) {
             brushX++

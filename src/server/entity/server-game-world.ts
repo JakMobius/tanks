@@ -16,7 +16,7 @@ import ServerWorldPlayerManagerComponent from "src/server/entity/components/serv
 import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
 import UserMessageTransmitComponent from "src/server/entity/components/user-message-transmit-component";
 
-export function serverGameWorldEntityPrefab(entity: Entity, options: GameWorldConfig) {
+export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
 
     gameWorldEntityPrefab(entity, options)
 

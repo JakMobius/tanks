@@ -2,8 +2,7 @@ import EntityDataReceiveComponent from "../receiving/entity-data-receive-compone
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
 import BlockState from "src/map/block-state/block-state";
-import TilemapComponent from "src/physics/tilemap-component";
-import GameMap from "src/map/game-map";
+import TilemapComponent from "src/map/tilemap-component";
 
 export default class MapReceiver extends ReceiverComponent {
 
@@ -12,18 +11,33 @@ export default class MapReceiver extends ReceiverComponent {
             let x = buffer.readUint16()
             let y = buffer.readUint16()
             let id = buffer.readUint8()
+            let damage = buffer.readFloat32()
 
             let Block = BlockState.getBlockStateClass(id)
-            let block = new Block(Block.BinaryOptions.bufferToObject(buffer))
+            let block = new Block({
+                damage: damage
+            })
 
-            const map = this.entity.getComponent(TilemapComponent).map
-            map.setBlock(x, y, block)
+            this.entity.getComponent(TilemapComponent).setBlock(x, y, block)
         })
 
         receiveComponent.commandHandlers.set(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
-            let map = GameMap.fromBinary(buffer)
-            map.update()
-            this.entity.getComponent(TilemapComponent).setMap(map)
+            let width = buffer.readInt32()
+            let height = buffer.readInt32()
+            let blocks = []
+
+            let blockCount = width * height
+            for(let i = 0; i < blockCount; i++) {
+                let id = buffer.readInt16()
+                let damage = buffer.readFloat32()
+                let Block = BlockState.getBlockStateClass(id)
+                let block = new Block({
+                    damage: damage
+                })
+                blocks.push(block)
+            }
+
+            this.entity.getComponent(TilemapComponent).setMap(width, height, blocks)
         })
     }
 }

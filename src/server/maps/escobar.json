@@ -1,0 +1,31 @@
+{
+	"signature": "TNKS",
+	"version": "0.0.1",
+	"name": "Пещеры Эскобара",
+	"width": 50,
+	"height": 50,
+	"spawnZones": [
+		{
+			"x1": 12,
+			"y1": 45,
+			"x2": 14,
+			"y2": 47,
+			"id": 2
+		},
+		{
+			"x1": 38,
+			"y1": 38,
+			"x2": 40,
+			"y2": 40,
+			"id": 1
+		},
+		{
+			"x1": 21,
+			"y1": 5,
+			"x2": 23,
+			"y2": 7,
+			"id": 0
+		}
+	],
+	"blocks": "bbbbbbbcccc--------ccccccccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccbbbbbb--------bbbbbccccccccccccbbbbbbbbbbbbbbbbccbbbbbbbb---------bbbbbbbbbbbbbbcccccbbbbbbbbbbbccbbbbbbbbbbb------------bbbbbbbbbbbbbcbbbbbbbbbbcccccbbbbbbbbbb-------------bbbbbbbbbbbcbbbbbbbbbbcccccccbbbbbbbbb------------bbbbbbbbbbbcbbbbbbbbbbbccccccbbbbbbbbb-------------bbbbbbbbbbccccbbbbbbbbcccccbbbbbbbbbbb-------bb----bbbbbbbbccccccbbb-bbbcccccbbbbbbbbbbbb-----bbbb----bbbbbbbccccccbbb-bbbbcbcbbbbbbbbbbbbbb----bbbbb----bbbbbbbccccccbb--bbbcbbbbbbbbbbbbbbbbbb---bbbb----bbbbbbbbcccccbb---bccbbbbbbbbbbbbccbbbb---bbbb-----bbbbbbbbbcccbb---bccbbbbbbbbbbbbccbbbc----bb------bbbbbbbbbbbcbb----ccbbbbbbbbbbbccccccc------------bbbbbbbbbbbcbb------bbbbbbbbbbbbcccccb------------bbbbbbbbbbbcbb--------bbbbbbbbbbccbbbb------------bbbbbbbbbbbcbb--------bbbbbbbbbbbbbbb-------------bbbbbbbbbbbcbbb--------bbbbbbbbbbbbbb---bbbbb-----bbbbbbbbbbbcbbb----------bbbbbbbbbbb---bbbbbb-----bbbbbbbbbbbcbbb-----------bbbbbbbb-----bbbb-------bbbbbbbbbbccbbb-----b-------bbbbbb----------------bbbbbbbbbbccbbbb----bbb---------------------------bbbbbbbbbbcccbbb-----bbbbbbb----------------------bbbbbbbbcccccbbb-----bbbbbbbb--------------------bbbbbbbcccccccbbbbbb----bbbbbb----------------c-cbbbbbbbbcccccccbbbbbbb-----bbb-------------c--c-cbbbbbbbbccccccccbbbbbbbb------------bbb----c-cc-ccbbbbbbbbccccccccbbbbbbbb------------bbb---c-cccccccbbbbbbbbcccccccbbbbbbbb------------bb----cc-ccccccbbbbbbbbccccccbbbbbbbbbb-c---------------c-ccccccbbbbbbbbbbcccbbbbbbbbbbbbc-c-c-----------c-cccccccbbbbbbbbbbcccbbbbbbbbbbbbbc-c-cc---------cbbcccccccbbbbbbbbbbccbbbbbbbbbbbbbccccc-c--------bbbbccccccbbbbbbbbbbccbbbbbbbbbbbbbbccccc-c------bbbbbbccccccbbbbbbbbbccbbbbbbbbbbbbbbccccccc-c--bbbbbbbbcccccccb--bbbbb---bbbbbbbbbbbcccccccccccbbbbbbbbbbcccccccc----bb-----bbbbbb-c-cccccccccccbbbbbbbbbbbccccc-c------b-------bbb---cc-ccccccccbbbbbbbbbbbcccc-cc-------b-------b-----c-c-ccccccbbbbbbbbbbbbcc-cc------------------------c-cc-cccbbbbbbbbbbbbcc-c-c----------------------------c-ccbbbbbbbbbbbbc-c-c------------------------------cccbbbbbbbbbbbbcc-------------bbbb-------------------bbbbbbbbbbbbc--------------bbbb--------------------bbbbbbbbbbb--------------bbbbbb-------------------bbbbbbbbbbb-------------bbbbbb--------------------bbbbbbbbbbb--------------bbbb-------------bb------bbbbbbbbbbb----------------bb-----------bbbb------bbbbbbbbbbb------bb--------------------bbbbbb----bbbbbbbbbbbbb----bbbb------------------bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-------------"
+}

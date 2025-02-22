@@ -1,5 +1,4 @@
 import PhysicalComponent from "src/entity/components/physics-component";
-import GameMap from "src/map/game-map";
 import * as Box2D from "@box2d/core";
 import HealthComponent from "src/entity/components/health-component";
 import ExplodeEffectPool from "./explode-effect-pool";
@@ -7,6 +6,7 @@ import Entity from "src/utils/ecs/entity";
 import SailingComponent from "src/entity/components/sailing-component";
 import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import TilemapComponent from "src/map/tilemap-component";
 
 export interface ExplodeEffectEntityAffectControllerConfig {
     damageEntities?: boolean
@@ -40,7 +40,7 @@ export default class ExplodeEffectEntityAffectController extends EventHandlerCom
             let gridX
             let gridY
 
-            for(let distance = pool.gridSize; distance <= pool.pressureDifferentialDistance; distance += GameMap.BLOCK_SIZE) {
+            for(let distance = pool.gridSize; distance <= pool.pressureDifferentialDistance; distance += TilemapComponent.BLOCK_SIZE) {
                 gridX = position.x + dx * distance
                 gridY = position.y + dy * distance
 

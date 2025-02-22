@@ -1,10 +1,11 @@
-import GameMap from "src/map/game-map";
+
+import Entity from "src/utils/ecs/entity";
 
 export default class MapModification {
 
-    map: GameMap = null
+    map: Entity = null
 
-    constructor(map: GameMap) {
+    constructor(map: Entity) {
         this.map = map
     }
 

@@ -1,7 +1,6 @@
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
 import HealthComponent from "src/entity/components/health-component";
-import TilemapComponent from "src/physics/tilemap-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import DamageReason, { DamageTypes } from "../damage-reason/damage-reason";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
@@ -12,6 +11,8 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import TilemapComponent from "src/map/tilemap-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -100,10 +101,10 @@ export default class BulletBehaviour extends EventHandlerComponent {
         this.nextPhysicalTick(() => {
             if (this.config.wallDamage) {
                 world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                    const mapComponent = world.getComponent(TilemapComponent)
-                    if (mapComponent) {
-                        mapComponent.map.damageBlock(x, y, this.config.wallDamage)
-                    }
+                    const map = world.getComponent(WorldTilemapComponent).map
+                    const tilemap = map?.getComponent(TilemapComponent)
+                    
+                    tilemap?.damageBlock(x, y, this.config.wallDamage)
                 })
             }
 

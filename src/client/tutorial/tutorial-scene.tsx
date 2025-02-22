@@ -78,7 +78,7 @@ const TutorialScene: React.FC = () => {
         scene.canvas.clear()
 
         const controlsResponder = new ControlsResponder()
-        const game = new EmbeddedServerGame({ map: getTutorialMap() })
+        const game = new EmbeddedServerGame({})
         const worldController = new TutorialWorldController(game.serverGame)
         const remoteControlsManager = new RemoteControlsManager(controlsResponder, game.clientConnection.connection)
         

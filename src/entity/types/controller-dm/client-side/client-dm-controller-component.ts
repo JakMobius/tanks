@@ -12,7 +12,7 @@ export class ClientDMControllerComponent extends EventHandlerComponent {
             this.setWorld(parent)
         })
 
-        this.eventHandler.on("detached-from-parent", (parent) => {
+        this.eventHandler.on("detached-from-parent", () => {
             this.setWorld(null)
         })
 

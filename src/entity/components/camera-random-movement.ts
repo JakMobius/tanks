@@ -1,7 +1,6 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
 import CameraComponent from "src/client/graphics/camera";
-import GameMap from "src/map/game-map";
 
 export default class CameraRandomMovement extends EventHandlerComponent {
     public viewport: Box2D.XY

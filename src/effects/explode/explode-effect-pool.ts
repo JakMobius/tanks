@@ -1,8 +1,7 @@
-import GameMap from 'src/map/game-map';
 import BlockState from "src/map/block-state/block-state";
 import {TwoDimensionalMap} from "src/utils/two-dimensional-map";
-import TilemapComponent from "src/physics/tilemap-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import TilemapComponent from 'src/map/tilemap-component';
 
 interface ExplodePoolWalker {
     // Walker x position
@@ -35,7 +34,7 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
 	public stepsPerSecond = 30
 	public stepsWaiting = 0
 	public walkers: ExplodePoolWalkerMap = new TwoDimensionalMap<number, number,ExplodePoolWalker>();
-	public gridSize = GameMap.BLOCK_SIZE;
+	public gridSize = TilemapComponent.BLOCK_SIZE;
 	public offsetMap = [
         1, 0,
         1, -1,
@@ -84,8 +83,8 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
     }
 
     isBlock (x: number, y: number): boolean {
-        const map = this.entity.getComponent(TilemapComponent).map
-        let block = map.getBlock(Math.floor(x / GameMap.BLOCK_SIZE), Math.floor(y / GameMap.BLOCK_SIZE))
+        const map = this.entity.getComponent(TilemapComponent)
+        let block = map.getBlock(Math.floor(x / TilemapComponent.BLOCK_SIZE), Math.floor(y / TilemapComponent.BLOCK_SIZE))
         if(!block) return true
         return (block.constructor as typeof BlockState).isSolid
     }
@@ -302,8 +301,8 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
 
     protected damageBlock(x: number, y: number, damage: number): void {
         if(!this.damageBlocks) return
-        const map = this.entity.getComponent(TilemapComponent).map
-        map.damageBlock(x / GameMap.BLOCK_SIZE, y / GameMap.BLOCK_SIZE, damage * this.blockDamageCoefficient)
+        const map = this.entity.getComponent(TilemapComponent)
+        map.damageBlock(x / TilemapComponent.BLOCK_SIZE, y / TilemapComponent.BLOCK_SIZE, damage * this.blockDamageCoefficient)
     }
 
     public normalize(x: number): number {

@@ -2,16 +2,16 @@ import "./spawnzones.scss"
 
 import Tool from '../tool';
 import Color from 'src/utils/color';
-import SpawnZone from 'src/map/spawn-zone';
-import GameMap from 'src/map/game-map';
 import ToolManager from "../toolmanager";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
-import TilemapComponent from "src/physics/tilemap-component";
 import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
 import React, { useCallback } from 'react';
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import SpawnzonesComponent, { SpawnZone } from "src/map/spawnzones-component";
+import TilemapComponent from "src/map/tilemap-component";
 
 interface SpawnZoneTeamViewProps {
     index: number
@@ -70,14 +70,15 @@ export class SpawnZoneDrawer extends EntityDrawer {
     draw(phase: DrawPhase) {
         const program = phase.getProgram(ConvexShapeProgram)
 
-        const map = this.tool.manager.world.getComponent(TilemapComponent).map
+        const map = this.tool.manager.world.getComponent(WorldTilemapComponent).map
+        const spawnzones = map.getComponent(SpawnzonesComponent)
 
-        for(let zone of map.spawnZones) {
+        for(let zone of spawnzones.spawnZones) {
             program.drawRectangle(
-                zone.minX * GameMap.BLOCK_SIZE,
-                zone.minY * GameMap.BLOCK_SIZE,
-                zone.maxX * GameMap.BLOCK_SIZE,
-                zone.maxY * GameMap.BLOCK_SIZE,
+                zone.minX * TilemapComponent.BLOCK_SIZE,
+                zone.minY * TilemapComponent.BLOCK_SIZE,
+                zone.maxX * TilemapComponent.BLOCK_SIZE,
+                zone.maxY * TilemapComponent.BLOCK_SIZE,
                 0x7F7F7F7F
             )
         }
@@ -120,13 +121,14 @@ export default class SpawnZoneTool extends Tool {
     }
 
     deleteZone(id: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const spawnzones = map.getComponent(SpawnzonesComponent)
 
         let i = 0;
-        for(let zone of map.spawnZones) {
+        for(let zone of spawnzones.spawnZones) {
 
             if(zone.id === id) {
-                map.spawnZones.splice(i, 1)
+                spawnzones.spawnZones.splice(i, 1)
                 break
             }
             i++
@@ -136,9 +138,10 @@ export default class SpawnZoneTool extends Tool {
     }
 
     getZone(id: number) {
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const spawnzones = map.getComponent(SpawnzonesComponent)
 
-        for(let zone of map.spawnZones) {
+        for(let zone of spawnzones.spawnZones) {
             if(zone.id === id) {
                 return zone
             }
@@ -149,17 +152,18 @@ export default class SpawnZoneTool extends Tool {
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
-        const map = this.manager.world.getComponent(TilemapComponent).map
+        const map = this.manager.world.getComponent(WorldTilemapComponent).map
+        const spawnzones = map.getComponent(SpawnzonesComponent)
 
         if(this.selectedTeam === null) return
         let zone = this.getZone(this.selectedTeam)
         if(!zone) {
             zone = new SpawnZone(this.selectedTeam)
-            map.spawnZones.push(zone)
+            spawnzones.spawnZones.push(zone)
         }
 
-        zone.x1 = Math.floor(x / GameMap.BLOCK_SIZE)
-        zone.y1 = Math.floor(y / GameMap.BLOCK_SIZE)
+        zone.x1 = Math.floor(x / TilemapComponent.BLOCK_SIZE)
+        zone.y1 = Math.floor(y / TilemapComponent.BLOCK_SIZE)
         zone.x2 = zone.x1
         zone.y2 = zone.y1
     }
@@ -170,8 +174,8 @@ export default class SpawnZoneTool extends Tool {
         if(this.selectedTeam !== null && this.dragging) {
             let zone = this.getZone(this.selectedTeam)
 
-            zone.x2 = Math.floor(x / GameMap.BLOCK_SIZE)
-            zone.y2 = Math.floor(y / GameMap.BLOCK_SIZE)
+            zone.x2 = Math.floor(x / TilemapComponent.BLOCK_SIZE)
+            zone.y2 = Math.floor(y / TilemapComponent.BLOCK_SIZE)
 
             this.manager.setNeedsRedraw()
         }
