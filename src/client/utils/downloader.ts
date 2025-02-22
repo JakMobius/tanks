@@ -26,7 +26,7 @@ export default class Downloader {
         let progress = new ProgressLeaf()
         let controller = new AbortController()
 
-        api(url, { signal: controller.signal, type: "arraybuffer" })
+        api(url, { signal: controller.signal, type: "arraybuffer", timeout: Infinity })
             .then(handler)
             .then(() => progress.complete())
             .catch((error) => {
