@@ -51,7 +51,10 @@
 		"allow-local-interface-origins": true,
 
 		// Whether to allow requests with no origin header.
-		"allow-no-origin": false
+		"allow-no-origin": false,
+
+		// Whether to allow for new users to register
+		"enable-registration": true
 	},
 
 	// Settings for the cluster communication mechanism

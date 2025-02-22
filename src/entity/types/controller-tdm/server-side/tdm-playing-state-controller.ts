@@ -20,6 +20,7 @@ import PlayerTeamComponent from "src/entity/types/player/server-side/player-team
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import {chooseRandomIndex} from "src/utils/utils";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
 
 export class TDMPlayingStateController extends TDMGameStateController {
 
@@ -62,7 +63,8 @@ export class TDMPlayingStateController extends TDMGameStateController {
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
 
         this.setupTeams()
-        this.controller.world.getComponent(MapLoaderComponent).reloadMap()
+        let tilemap = this.controller.world.getComponent(WorldTilemapComponent).map
+        tilemap.getComponent(MapLoaderComponent).reloadMap()
         this.gameRunning = true
     }
 

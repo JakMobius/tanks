@@ -9,7 +9,7 @@ interface LoginAjaxFields extends AjaxFields {
 
 export default class ProfileImageAjaxHandler extends AjaxHandler<GameModule> {
     static url = '/ajax/profile-image/'
-    static method = 'GET'
+    static method = 'POST'
     static schema = [
         { name: 'username', type: AjaxFieldType.string },
     ]

@@ -32,6 +32,7 @@ import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scr
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
 import TeamColor from "src/utils/team-color";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
 
 export default class CTFPlayingStateController extends CTFGameStateController {
     private teamStatistics = new Map<Team, CTFTeamStatistics>();
@@ -71,7 +72,8 @@ export default class CTFPlayingStateController extends CTFGameStateController {
         this.controller.world.getComponent(WorldStatisticsComponent)
             .getMatchLeftTimerComponent().countdownFrom(this.controller.config.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
-        this.controller.world.getComponent(MapLoaderComponent).reloadMap()
+        let tilemap = this.controller.world.getComponent(WorldTilemapComponent).map
+        tilemap.getComponent(MapLoaderComponent).reloadMap()
         this.controller.triggerStateBroadcast()
         this.setupTeams()
     }

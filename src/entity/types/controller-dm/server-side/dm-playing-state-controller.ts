@@ -16,6 +16,7 @@ import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-tim
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
 
 export class DMPlayingStateController extends DMGameStateController {
 
@@ -47,7 +48,8 @@ export class DMPlayingStateController extends DMGameStateController {
         this.controller.world.getComponent(WorldStatisticsComponent)
             .getMatchLeftTimerComponent().countdownFrom(this.controller.config.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
-        this.controller.world.getComponent(MapLoaderComponent).reloadMap()
+        let tilemap = this.controller.world.getComponent(WorldTilemapComponent).map
+        tilemap.getComponent(MapLoaderComponent).reloadMap()
         this.controller.triggerStateBroadcast()
         this.respawnPlayers()
     }
