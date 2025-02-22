@@ -51,7 +51,7 @@ const GameCreateViewComponent: React.FC = () => {
         let controller = new AbortController()
 
         api('/ajax/map-list', {
-            method: 'GET',
+            method: 'POST',
             signal: controller.signal
         })
         .then(onMapFetchResult)

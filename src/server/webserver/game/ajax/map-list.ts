@@ -10,7 +10,7 @@ export interface AvailableMap {
 
 export default class MapListAjaxHandler extends AjaxHandler {
     static url = '/ajax/map-list/'
-    static method = 'GET'
+    static method = 'POST'
     static requiresAuthentication = true
 
     maps: AvailableMap[] | null = null

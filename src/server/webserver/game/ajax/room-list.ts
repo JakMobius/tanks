@@ -4,7 +4,7 @@ import RoomClientComponent from "src/server/room/components/room-client-componen
 
 export default class RoomListAjaxHandler extends AjaxHandler {
     static url = '/ajax/room-list/'
-    static method = 'GET'
+    static method = 'POST'
     static requiresAuthentication = true
 
     handle(req: express.Request, res: express.Response, fields: AjaxFields, next: express.NextFunction) {

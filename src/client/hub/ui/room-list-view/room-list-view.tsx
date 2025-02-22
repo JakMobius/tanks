@@ -78,7 +78,7 @@ const RoomListView: React.FC = (props) => {
 
         let abortController = new AbortController()
         api("ajax/room-list", {
-            method: "GET",
+            method: "POST",
             signal: abortController.signal
         })
         .then(data => onLoaded(data))
