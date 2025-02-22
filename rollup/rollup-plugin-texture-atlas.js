@@ -237,7 +237,7 @@ class RollupPluginTextureAtlas {
       plugin.warn("Updating the texture atlas")
       let context = new AtlasCreationSession(this.pluginOptions.atlasSize ?? 1024)
 
-      context.setTextures(await this.readTextures())
+      await context.setTextures(await this.readTextures())
 
       context.createCanvas()
       if (!context.drawTextures()) {
