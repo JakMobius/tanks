@@ -24,6 +24,11 @@ export default class RegisterAjaxHandler extends AjaxHandler<GameModule> {
             return;
         }
 
+        if(!this.module.webServer.server.config.webServer.enableRegistration) {
+            res.status(200).send({ result: "registration-disabled" })
+            return;
+        }
+
         if(!nickIsValid(fields.login)) {
             res.status(200).send({ result: "check-login" })
             return
