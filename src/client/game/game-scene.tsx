@@ -213,7 +213,12 @@ class SocketConnectionPrerequisite extends ScenePrerequisite {
         }
 
         let progress = new ProgressLeaf()
-        let ip = "ws://" + window.location.host + "/game-socket"
+
+        let protocol = "ws:"
+        if(location.protocol == "https:") {
+            protocol = "wss:"
+        }
+        let ip = protocol + "//" + window.location.host + "/game-socket"
 
         const connection = new WebsocketConnection(ip + "?room=" + room)
         connection.suspend()
