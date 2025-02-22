@@ -2,6 +2,7 @@ import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
 import ExplodeParticle from "src/client/particles/explode-particle";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { WorldComponent } from "src/entity/game-world-entity-prefab";
 
 export default class ExplodePoolParticleComponent extends EventHandlerComponent {
 
@@ -21,7 +22,7 @@ export default class ExplodePoolParticleComponent extends EventHandlerComponent 
         if (steps === 0) return
         this.queue -= this.particleEmitInterval * steps
 
-        let particleComponent = this.entity.getComponent(ParticleHostComponent)
+        let particleComponent = WorldComponent.getWorld(this.entity).getComponent(ParticleHostComponent)
         let explodePool = this.entity.getComponent(ExplodeEffectPool)
 
         for (let row of explodePool.walkers.rows.values()) {

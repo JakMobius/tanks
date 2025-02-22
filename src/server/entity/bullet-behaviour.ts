@@ -124,7 +124,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
 
             let explodeEntity = new Entity()
             ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
-            WorldComponent.getWorld(this.entity).appendChild(explodeEntity)
+            WorldComponent.getWorld(this.entity).getComponent(WorldTilemapComponent).map.appendChild(explodeEntity)
             explodeEntity.getComponent(ExplodeComponent).explode(position.x, position.y, this.config.explodePower)
             explodeEntity.removeFromParent()
         }

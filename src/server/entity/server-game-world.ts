@@ -22,9 +22,6 @@ export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldC
 
     entity.addComponent(new ServerWorldPlayerManagerComponent())
     entity.addComponent(new EntityDataTransmitComponent())
-    entity.addComponent(new ExplodeEffectPool({
-        damageBlocks: true
-    }))
 
     entity.addComponent(new ExplodeEffectEntityAffectController({
         damageEntities: true

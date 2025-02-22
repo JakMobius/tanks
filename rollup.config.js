@@ -17,9 +17,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// `npm run build` -> `production` is true
-// `npm run dev` -> `production` is false
-const production = false // !process.env.ROLLUP_WATCH;
+const production = !!process.env.PRODUCTION;
 
 const projectRootDir = path.resolve(__dirname);
 

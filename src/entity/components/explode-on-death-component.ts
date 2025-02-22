@@ -5,6 +5,7 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
+import WorldTilemapComponent from "src/physics/world-tilemap-component";
 
 export interface ExplodeOnDeathComponentConfig {
     explodePower?: number
@@ -26,7 +27,7 @@ export default class ExplodeOnDeathComponent extends EventHandlerComponent {
 
             let explodeEntity = new Entity()
             ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
-            WorldComponent.getWorld(this.entity).appendChild(explodeEntity)
+            WorldComponent.getWorld(this.entity).getComponent(WorldTilemapComponent).map.appendChild(explodeEntity)
             explodeEntity.getComponent(ExplodeComponent).explode(body.x, body.y, config.explodePower)
             explodeEntity.removeFromParent()
         })

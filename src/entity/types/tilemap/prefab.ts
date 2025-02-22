@@ -9,5 +9,4 @@ EntityPrefabs.Types.set(EntityType.TILEMAP, (entity) => {
     entity.addComponent(new PrefabIdComponent(EntityType.TILEMAP))
     entity.addComponent(new TilemapComponent())
     entity.addComponent(new ChunkedMapCollider())
-    entity.addComponent(new ExplodeEffectPool())
 })
