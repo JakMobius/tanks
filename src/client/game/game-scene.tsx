@@ -168,7 +168,7 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
             gameHudRef.current?.addEvent(message, props)
         }
         const onChooseTank = () => {
-            tankSelectRef.show()
+            tankSelectRef.current?.show()
         }
         state.world.on("choose-tank", onChooseTank)
         state.world.on("event-view", onEventView)
