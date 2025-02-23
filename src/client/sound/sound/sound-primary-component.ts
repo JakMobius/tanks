@@ -43,17 +43,14 @@ export class BufferSoundSource extends SoundSource {
     constructor(engine: SoundEngine, sound: SoundType) {
         super(engine)
 
-        this.bufferSource = engine.context.createBufferSource()
-        this.bufferSource.buffer = engine.soundBuffers[sound]
-        this.bufferSource.onended = () => {
-            if (this.bufferSource.loop) return
-            this.emit("ended")
-        }
+        this.bufferSource = new AudioBufferSourceNode(engine.context, {
+            buffer: engine.soundBuffers[sound]
+        })
 
         this.gainNode = new GainNode(engine.context)
         this.gainNode.gain.value = SoundAssets.get(sound).volume ?? 1.0
-        this.bufferSource.connect(this.gainNode)
 
+        this.bufferSource.connect(this.gainNode)
         this.gainNode.connect(this.filterSet.input)
     }
 
@@ -64,13 +61,19 @@ export class BufferSoundSource extends SoundSource {
 
     override start() {
         super.start()
+        this.bufferSource.onended = () => {
+            if (this.bufferSource.loop) return
+            this.emit("ended")
+        }
         this.bufferSource.start()
+
         return this
     }
 
     override stop() {
         super.stop()
         this.bufferSource.stop()
+        this.bufferSource.onended = null
         return this
     }
 }
@@ -125,9 +128,9 @@ export default class SoundPrimaryComponent extends EventHandlerComponent {
         soundSource.disconnect(listener.node)
         this.soundSources.delete(camera)
 
-        if(!this.soundSources) [
+        if(!this.soundSources.size) {
             this.entity.emit("ended")
-        ]
+        }
     }
 
     startAll() {

@@ -1,27 +1,4 @@
-import SoundEngine from "./sound-engine";
 import { SoundType } from "src/sound/sounds";
-
-export class SoundAsset {
-    engine: SoundEngine
-    config: SoundConfig
-
-    constructor(engine: SoundEngine, config: SoundConfig) {
-        this.engine = engine
-        this.config = config
-    }
-
-    createBufferSource() {
-        let node = new AudioBufferSourceNode(this.engine.context)
-        node.buffer = this.engine.soundBuffers[SoundType.FLAMETHROWER_START]
-        return node
-    }
-
-    createGainNode() {
-        let node = new GainNode(this.engine.context)
-        node.gain.value = this.config.volume
-        return node
-    }
-}
 
 export interface SoundConfig {
     path: string
