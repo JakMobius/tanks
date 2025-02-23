@@ -74,7 +74,11 @@ export default class WorldPlayerStatisticsComponent implements Component {
         if(damageRecorder) {
             let damager = damageRecorder.getDamageData(player).damagers[0]
             if(damager && damager != player) {
-                this.playerStatistics.get(damager).kills++
+                let statistics = this.playerStatistics.get(damager)
+                // The player could have left the game
+                if(statistics) {
+                    statistics.kills++
+                }
             }
         }
 
