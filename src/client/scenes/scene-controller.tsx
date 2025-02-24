@@ -1,12 +1,7 @@
-import LoadingScene from "src/client/scenes/loading/loading-scene";
-import {SceneDescriptor} from "src/client/scenes/scene-descriptor";
 import PageLocation from "src/client/scenes/page-location";
-import {Progress} from "src/client/utils/progress";
-
 import React, { createContext, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom/client"
 import SoundEngine from "../sound/sound-engine";
-import Loop from "src/utils/loop/loop";
 import RenderLoop from "src/utils/loop/render-loop";
 import CanvasHandler from "../graphics/canvas-handler";
 
@@ -80,17 +75,12 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
 }
 
 const SceneRouter: React.FC = () => {
-    const scene = useScene()
-
     const [state, setState] = useState({
-        currentlyLoading: false,
         currentSceneName: null as string | null,
         scene: null as React.ReactNode | null
     })
     
     const handleWindowLocation = () => setState(state => {
-        if(state.currentlyLoading) return state
-
         let sceneName = PageLocation.getHashJson().page ?? "hub"
 
         if(sceneName === state.currentSceneName) {
@@ -99,47 +89,17 @@ const SceneRouter: React.FC = () => {
 
         state.currentSceneName = sceneName
 
-        const descriptorFactory = SceneController.shared.sceneDescriptors.get(sceneName)
+        const Component = SceneController.shared.sceneDescriptors.get(sceneName)
 
-        if(!descriptorFactory) {
+        if(!Component) {
             PageLocation.navigateToScene("hub")
             return state
         }
 
-        const descriptor = descriptorFactory()
-
-        const prerequisites = descriptor.prerequisites.map(resource => {
-            return () => resource.resolve(scene)
-        })
-
-        const progress = Progress.sequential(prerequisites)
-
-        const onLoad = () => {
-            setState(state => ({
-                ...state,
-                currentlyLoading: false,
-                scene: descriptor.createScene()
-            }))
-            handleWindowLocation()
-        }
-    
-        const onLoadingError = (error: any) => {
-            setState(state => ({
-                ...state,
-                currentlyLoading: false,
-                scene: <LoadingScene error={error}/>
-            }))
-            handleWindowLocation()
-        }
-
-        progress.on("completed", onLoad)
-        progress.on("error", onLoadingError)
-
         return {
             ...state,
-            currentlyLoading: true,
             currentSceneName: sceneName,
-            scene: <LoadingScene progress={progress}/>
+            scene: <Component/>
         }
     })
 
@@ -155,7 +115,7 @@ const SceneRouter: React.FC = () => {
 
 export default class SceneController {
     static shared: SceneController = new SceneController()
-    sceneDescriptors: Map<string, () => SceneDescriptor> = new Map()
+    sceneDescriptors: Map<string, React.FC> = new Map()
     root: ReactDOM.Root
 
     main(root: HTMLElement) {
@@ -166,7 +126,7 @@ export default class SceneController {
         />)
     }
 
-    registerScene(name: string, descriptorFactory: () => SceneDescriptor) {
-        this.sceneDescriptors.set(name, descriptorFactory)
+    registerScene(name: string, component: React.FC) {
+        this.sceneDescriptors.set(name, component)
     }
 }

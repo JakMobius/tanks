@@ -8,7 +8,7 @@ import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-e
 import PlayerTankSelectPacket from "src/networking/packets/game-packets/player-tank-select-packet";
 import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from '../scenes/scene-controller';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RootControlsResponder, { ControlsResponder } from '../controls/root-controls-responder';
 import TransformComponent from 'src/entity/components/transform-component';
 import CameraComponent from '../graphics/camera';
@@ -21,11 +21,9 @@ import TankInfoHUD from '../ui/tank-info-hud/tank-info-hud';
 import ChatHUD from '../ui/chat-hud/chat-hud';
 import PauseOverlay from '../ui/pause-overlay/pause-overlay';
 import GamePauseView from './game-pause-view';
-import { SceneDescriptor } from '../scenes/scene-descriptor';
-import { ScenePrerequisite, soundResourcePrerequisite, texturesResourcePrerequisite } from '../scenes/scene-prerequisite';
 import { Progress, ProgressLeaf } from '../utils/progress';
 import PageLocation from '../scenes/page-location';
-import { RandomMessageLoadingError } from '../scenes/loading/loading-error';
+import { convertErrorToLoadingError, LoadingError, BasicMessageLoadingError } from '../scenes/loading/loading-error';
 import { internetErrorMessageGenerator, missingRoomNameErrorMessageGenerator } from '../scenes/loading/error-message-generator';
 import WebsocketConnection from '../networking/websocket-connection';
 import PrimaryEntityControls from 'src/entity/components/primary-entity-controls';
@@ -34,12 +32,16 @@ import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
 import EventsHUD, { EventsProvider } from '../ui/events-hud/events-hud';
 import GameHUD from '../ui/game-hud/game-hud';
 import { KeyedComponentsHandle } from '../utils/keyed-component';
+import LoadingScene from '../scenes/loading/loading-scene';
+import { ScenePrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from '../scenes/scene-prerequisite';
+import Sprite from '../graphics/sprite';
 
-export interface GameSceneConfig {
+export interface GameViewConfig {
     client: ConnectionClient
+    onError: (error: any) => void
 }
 
-const GameScene: React.FC<GameSceneConfig> = (props) => {
+const GameView: React.FC<GameViewConfig> = (props) => {
     const controlsUpdateInterval = 0.05
 
     const scene = useScene()
@@ -143,6 +145,32 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
     }, [])
 
     useEffect(() => {
+        let onError = () => {
+            props.onError(new BasicMessageLoadingError({
+                header: "Соединение потеряно",
+                description: "Что-то не так с интернетом?"
+            }).withGoBackAction().withRetryAction(() => window.location.reload()))
+        }
+        let onClose = () => {
+            props.onError(new BasicMessageLoadingError({
+                header: "Соединение закрыто",
+                description: "Возможно, игровая комната была закрыта или сервер ушел спать."
+            }).withGoBackAction().withRetryAction(() => window.location.reload()))
+        }
+        props.client.connection.on("error", onError)
+        props.client.connection.on("close", onClose)
+        return () => {
+            props.client.connection.off("error", onError)
+            props.client.connection.off("close", onClose)
+        }
+    }, [props.client, props.onError])
+
+    useEffect(() => {
+        let texture = Sprite.applyTexture(scene.canvas.ctx)
+        return () => Sprite.cleanupTexture(scene.canvas.ctx, texture)
+    }, [])
+
+    useEffect(() => {
         scene.loop.run = onDraw
         return () => scene.loop.run = null
     }, [onDraw])
@@ -194,20 +222,35 @@ const GameScene: React.FC<GameSceneConfig> = (props) => {
     )
 }
 
+const GameScene: React.FC = () => {
+    const connectionPrerequisite = useMemo(() => new SocketConnectionPrerequisite(), [])
+    const [gameError, setGameError] = useState<LoadingError | null>(null)
+
+    const prerequisites = usePrerequisites(() => [
+        new TexturesResourcePrerequisite(),
+        new SoundResourcePrerequisite(),
+        connectionPrerequisite,
+    ])
+    
+    const onError = useCallback((error: any) => {
+        setGameError(convertErrorToLoadingError(error))
+    }, [])
+    
+    if(prerequisites.loaded && !gameError) {
+        return <GameView client={connectionPrerequisite.client} onError={onError}/>
+    } else {
+        return <LoadingScene progress={prerequisites.progress} error={prerequisites.error ?? gameError}/>
+    }
+}
+
 class SocketConnectionPrerequisite extends ScenePrerequisite {
     client: ConnectionClient | null
-
-    constructor() {
-        super();
-
-        this.setLocalizedDescription("Подключение к игровой сессии")
-    }
 
     resolve(): Progress {
         let room = PageLocation.getHashJson().room
 
         if (!room) {
-            return Progress.failed(new RandomMessageLoadingError(missingRoomNameErrorMessageGenerator)
+            return Progress.failed(new BasicMessageLoadingError(missingRoomNameErrorMessageGenerator.generateVariant())
                 .withRetryAction(() => window.location.reload())
                 .withGoBackAction())
         }
@@ -223,38 +266,33 @@ class SocketConnectionPrerequisite extends ScenePrerequisite {
         const connection = new WebsocketConnection(ip + "?room=" + room)
         connection.suspend()
 
-        connection.on("ready", () => {
+        let cleanup = () => {
+            connection.off("ready", readyHandler)
+            connection.off("error", errorHandler)
+        }
+
+        let readyHandler = () => {
             this.client = new ConnectionClient(connection)
             progress.complete()
-        })
+            cleanup()
+        }
 
-        connection.on("error", () => {
-            progress.fail(new RandomMessageLoadingError(internetErrorMessageGenerator)
+        let errorHandler = () => {
+            progress.fail(new BasicMessageLoadingError(internetErrorMessageGenerator.generateVariant())
                 .withRetryAction(() => window.location.reload())
                 .withGoBackAction())
-        })
+            cleanup()
+        }
+
+        connection.on("ready", readyHandler)
+        connection.on("error", errorHandler)
 
         return progress
     }
-}
 
-class GameSceneDescriptor extends SceneDescriptor {
-
-    connectionPrerequisiste = new SocketConnectionPrerequisite()
-
-    constructor() {
-        super();
-
-        this.prerequisites = [
-            texturesResourcePrerequisite,
-            soundResourcePrerequisite,
-            this.connectionPrerequisiste
-        ]
-    }
-
-    createScene(): React.ReactNode {
-        return <GameScene client={this.connectionPrerequisiste.client}/>
+    getLocalizedDescription(): string | null {
+        return "Подключение к игровой сессии"
     }
 }
 
-SceneController.shared.registerScene("game", () => new GameSceneDescriptor())
+SceneController.shared.registerScene("game", GameScene)

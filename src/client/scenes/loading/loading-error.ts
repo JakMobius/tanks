@@ -20,22 +20,20 @@ export function convertErrorToLoadingError(error: any): LoadingError {
     if (!error) return null
     if (error instanceof LoadingError) return error
 
-    return new RandomMessageLoadingError(unknownErrorMessageGenerator)
+    return new BasicMessageLoadingError(unknownErrorMessageGenerator.generateVariant())
         .withRetryAction(() => window.location.reload())
 }
 
-export class RandomMessageLoadingError extends LoadingError {
-    private retryCallback: () => void
+export class BasicMessageLoadingError extends LoadingError {
     private actions: LoadingErrorAction[] = []
     private variant: ErrorMessageVariant
 
-    constructor(generator: ErrorMessageGenerator) {
+    constructor(variant: ErrorMessageVariant) {
         super()
-        this.variant = generator.generateVariant()
+        this.variant = variant
     }
 
     withRetryAction(retry: () => void) {
-        this.retryCallback = retry
         this.actions.push({
             title: this.variant.retryText ?? "Повторить попытку",
             style: "blue",

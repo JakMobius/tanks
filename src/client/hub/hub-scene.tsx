@@ -9,17 +9,21 @@ import CameraComponent from "src/client/graphics/camera";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import CameraRandomMovement from "src/entity/components/camera-random-movement";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import SceneController, { useScene } from "../scenes/scene-controller";
 import { BasicSceneDescriptor } from "../scenes/scene-descriptor";
-import { texturesResourcePrerequisite } from "../scenes/scene-prerequisite";
 import RootControlsResponder from "../controls/root-controls-responder";
 import ClientEntityPrefabs from "../entity/client-entity-prefabs";
 import TilemapComponent from "src/map/tilemap-component";
 import { readMapFile } from "src/map/map-serialization";
 import { EntityType } from "src/entity/entity-type";
+import { convertErrorToLoadingError, LoadingError } from "../scenes/loading/loading-error";
+import { Progress } from "../utils/progress";
+import { ScenePrerequisite, TexturesResourcePrerequisite } from "../scenes/scene-prerequisite";
+import LoadingScene from "../scenes/loading/loading-scene";
+import Sprite from "../graphics/sprite";
 
-const HubScene: React.FC = () => {
+const HubView: React.FC = () => {
     const scene = useScene()
 
     const [state, setState] = React.useState({
@@ -74,6 +78,11 @@ const HubScene: React.FC = () => {
     }, [])
 
     useEffect(() => {
+        let texture = Sprite.applyTexture(scene.canvas.ctx)
+        return () => Sprite.cleanupTexture(scene.canvas.ctx, texture)
+    }, [])
+
+    useEffect(() => {
         scene.loop.run = onDraw
         return () => scene.loop.run = null
     }, [onDraw])
@@ -82,6 +91,44 @@ const HubScene: React.FC = () => {
     return <HubPage userData={userData}/>
 }
 
-SceneController.shared.registerScene("hub", () => new BasicSceneDescriptor([
-    texturesResourcePrerequisite
-], () => <HubScene/>));
+const HubScene: React.FC = () => {
+
+    const scene = useScene()
+    const [state, setState] = useState({
+        loaded: false,
+        error: null as LoadingError | null,
+        progress: null as Progress | null
+    })
+
+    const onError = (error: Error) => {
+        setState(state => ({
+            ...state,
+            progress: null,
+            loaded: false,
+            error: convertErrorToLoadingError(error)
+        }))
+    }
+
+    useEffect(() => {
+        let progress = ScenePrerequisite.toProgress([
+            new TexturesResourcePrerequisite(),
+        ], scene)
+        
+        const onCompleted = () => setState(state => ({ ...state, loaded: true }))
+        
+        progress.on("completed", onCompleted)
+        progress.on("error", onError)
+
+        setState(state => ({ ...state, progress }))
+
+        return () => progress.abort()
+    }, [])
+
+    if(state.loaded) {
+        return <HubView/>
+    } else {
+        return <LoadingScene progress={state.progress} error={state.error}/>
+    }
+}
+
+SceneController.shared.registerScene("hub", HubScene);

@@ -1,5 +1,4 @@
 
-import { getTutorialMap } from "src/client/tutorial/tutorial-map";
 import EmbeddedServerGame from "src/client/embedded-server/embedded-server-game";
 import TutorialWorldController from "src/client/tutorial/tutorial-world-controller";
 import WorldCommunicationPacket from "src/networking/packets/game-packets/world-communication-packet";
@@ -7,8 +6,7 @@ import ReadBuffer from "src/serialization/binary/read-buffer";
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
 import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from "../scenes/scene-controller";
-import { BasicSceneDescriptor } from "../scenes/scene-descriptor";
-import { soundResourcePrerequisite, texturesResourcePrerequisite } from "../scenes/scene-prerequisite";
+import { ScenePrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from "../scenes/scene-prerequisite";
 import Entity from "src/utils/ecs/entity";
 import TransformComponent from "src/entity/components/transform-component";
 import CameraComponent from "../graphics/camera";
@@ -25,11 +23,15 @@ import GamePauseView from "../game/game-pause-view";
 import PauseOverlay from "../ui/pause-overlay/pause-overlay";
 import CameraPrimaryEntityController from "src/entity/components/camera-primary-entity-watcher";
 import PrimaryEntityControls from "src/entity/components/primary-entity-controls";
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import EventsHUD, {  EventsProvider } from "../ui/events-hud/events-hud";
 import { KeyedComponentsHandle } from "../utils/keyed-component";
+import { convertErrorToLoadingError, LoadingError } from "../scenes/loading/loading-error";
+import { Progress } from "../utils/progress";
+import LoadingScene from "../scenes/loading/loading-scene";
+import Sprite from "../graphics/sprite";
 
-const TutorialScene: React.FC = () => {
+const TutorialView: React.FC = () => {
     const scene = useScene()
 
     const [state, setState] = React.useState({
@@ -126,6 +128,11 @@ const TutorialScene: React.FC = () => {
     }, [])
 
     useEffect(() => {
+        let texture = Sprite.applyTexture(scene.canvas.ctx)
+        return () => Sprite.cleanupTexture(scene.canvas.ctx, texture)
+    }, [])
+
+    useEffect(() => {
         scene.loop.run = onDraw
         return () => scene.loop.run = null
     }, [onDraw])
@@ -150,7 +157,17 @@ const TutorialScene: React.FC = () => {
     )
 }
 
-SceneController.shared.registerScene("tutorial", () => new BasicSceneDescriptor([
-    soundResourcePrerequisite,
-    texturesResourcePrerequisite
-], () => <TutorialScene />));
+const TutorialScene: React.FC = () => {
+    const prerequisites = usePrerequisites(() => [
+        new TexturesResourcePrerequisite(),
+        new SoundResourcePrerequisite()
+    ])
+
+    if(prerequisites.loaded) {
+        return <TutorialView/>
+    } else {
+        return <LoadingScene progress={prerequisites.progress} error={prerequisites.error}/>
+    }
+}
+
+SceneController.shared.registerScene("tutorial", TutorialScene);

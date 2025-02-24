@@ -1,4 +1,5 @@
 import EventEmitter from "src/utils/event-emitter";
+import { finished } from "stream";
 
 export abstract class Progress extends EventEmitter {
     static empty() {
@@ -66,6 +67,8 @@ export abstract class Progress extends EventEmitter {
         })
     }
 
+    abstract abort(): void
+
     abstract getFraction(): number
 
     abstract getWeight(): number
@@ -118,6 +121,7 @@ export class ProgressLeaf extends Progress {
     }
 
     abort() {
+        if(this.completed) return
         this.failed = true
         this.emit("abort")
     }
@@ -216,5 +220,12 @@ export class ProgressGroup extends Progress {
             this.refreshFraction()
         }
         return this.fraction
+    }
+
+    abort() {
+        for(let progress of this.subtasks) {
+            progress.abort()
+        }
+        this.emit("abort")
     }
 }

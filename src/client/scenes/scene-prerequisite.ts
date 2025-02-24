@@ -1,61 +1,88 @@
 
-import SceneController, { SceneContextProps } from "src/client/scenes/scene-controller";
+import { SceneContextProps, useScene } from "src/client/scenes/scene-controller";
 import Downloader from "src/client/utils/downloader";
 import Sprite from "src/client/graphics/sprite";
 import { Progress } from "src/client/utils/progress";
 import { SoundAssets } from "src/client/sound/sounds";
+import { convertErrorToLoadingError, LoadingError } from "./loading/loading-error";
+import { useEffect, useState } from "react";
 
 export class ScenePrerequisite {
-    localizedDescription: string | null
-
     resolve(scene: SceneContextProps): Progress {
         return Progress.completed()
     }
 
     getLocalizedDescription(): string | null {
-        return this.localizedDescription
+        return "Загрузка"
     }
 
-    setLocalizedDescription(description: string) {
-        this.localizedDescription = description
-        return this
-    }
+    static toProgress(prerequisites: ScenePrerequisite[], scene: SceneContextProps) {
+        return Progress.sequential(prerequisites.map(prerequisite => () => prerequisite.resolve(scene)))
+    } 
 }
 
-export class LambdaResourcePrerequisite extends ScenePrerequisite {
-    downloaded = false
+export function usePrerequisites(prerequisitesFunc: () => ScenePrerequisite[]) {
+    const scene = useScene()
+    
+    const [prereqState, setPrereqState] = useState({
+        loaded: false,
+        error: null as LoadingError | null,
+        progress: null as Progress | null,
+    })
 
-    lambda: (scene: SceneContextProps) => Progress
-
-    constructor(lambda: (scene: SceneContextProps) => Progress) {
-        super()
-        this.lambda = lambda
+    const onError = (error: Error) => {
+        setPrereqState({
+            loaded: false,
+            progress: null,
+            error: convertErrorToLoadingError(error)
+        })
     }
 
-    resolve(scene: SceneContextProps) {
-        if (this.downloaded) {
-            return Progress.empty()
+    useEffect(() => {
+        let progress = ScenePrerequisite.toProgress(prerequisitesFunc(), scene)
+        
+        const onCompleted = () => setPrereqState(state => ({ ...state, loaded: true }))
+        
+        progress.on("completed", onCompleted)
+        progress.on("error", onError)
+
+        setPrereqState(state => ({ ...state, progress }))
+
+        return () => progress.abort()
+    }, [])
+
+    return prereqState
+}
+
+export class SoundResourcePrerequisite extends ScenePrerequisite {
+    override resolve(scene: SceneContextProps) {
+        let soundsToDownload = []
+        for(let id of SoundAssets.keys()) {
+            if(!scene.soundEngine.soundBuffers[id]) soundsToDownload.push(id)
         }
-        let result = this.lambda(scene)
-        result.on("completed", () => this.downloaded = true)
-        return result
+
+        let progress = Progress.parallel(
+            soundsToDownload.map((id) => Downloader.downloadBinary(
+                SoundAssets.get(id).path, async (response) => {
+                    await scene.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
+                        scene.soundEngine.soundBuffers[id] = buffer
+                    });
+                })
+            )
+        )
+        return progress
+    }
+    override getLocalizedDescription(): string | null {
+        return "Загрузка звуков"
     }
 }
 
-export const soundResourcePrerequisite = new LambdaResourcePrerequisite((scene: SceneContextProps) => {
-    return Progress.parallel(
-        Array.from(SoundAssets.entries()).map(([id, config]) => Downloader.downloadBinary(
-            config.path, async (response) => {
-                await scene.soundEngine.context.decodeAudioData(response, (buffer: AudioBuffer) => {
-                    scene.soundEngine.soundBuffers[id] = buffer
-                });
-            })
-        )
-    )
-}).setLocalizedDescription("Загрузка звуков")
+export class TexturesResourcePrerequisite extends ScenePrerequisite {
+    override resolve(scene: SceneContextProps) {
+        return Sprite.download()
+    }
 
-export const texturesResourcePrerequisite = new LambdaResourcePrerequisite((scene: SceneContextProps) => {
-    let assetsProgress = Sprite.download()
-    assetsProgress.toPromise().then(() => Sprite.applyTexture(scene.canvas.ctx))
-    return assetsProgress
-}).setLocalizedDescription("Загрузка текстур")
+    override getLocalizedDescription(): string | null {
+        return "Загрузка текстур"
+    }
+}

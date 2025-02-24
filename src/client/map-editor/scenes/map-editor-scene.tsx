@@ -14,7 +14,6 @@ import TransformComponent from "src/entity/components/transform-component";
 import MapEditorPauseView from '../ui/pause/map-editor-pause';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import SceneController, { useScene } from 'src/client/scenes/scene-controller';
-import { texturesResourcePrerequisite } from 'src/client/scenes/scene-prerequisite';
 import { BasicSceneDescriptor } from 'src/client/scenes/scene-descriptor';
 import ToolBarView from 'src/client/map-editor/ui/workspace-overlay/toolbar/toolbar';
 import Tool from '../tools/tool';
@@ -30,6 +29,11 @@ import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
 import { EntityType } from 'src/entity/entity-type';
 import GameMapNameComponent from '../map-name-component';
 import SpawnzonesComponent from 'src/map/spawnzones-component';
+import { convertErrorToLoadingError, LoadingError } from 'src/client/scenes/loading/loading-error';
+import { Progress } from 'src/client/utils/progress';
+import { ScenePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scenes/scene-prerequisite';
+import LoadingScene from 'src/client/scenes/loading/loading-scene';
+import Sprite from 'src/client/graphics/sprite';
 
 interface MapEditorSceneContextProps {
     loadMap: (map: MapFile) => void   
@@ -45,7 +49,7 @@ export const useMapEditorScene = (): MapEditorSceneContextProps => {
     return context;
 };
 
-const MapEditorScene: React.FC = (props) => {
+const MapEditorView: React.FC = () => {
     const scene = useScene()
     const eventRef = useRef<KeyedComponentsHandle | null>(null)
 
@@ -150,6 +154,11 @@ const MapEditorScene: React.FC = (props) => {
     }, [])
 
     useEffect(() => {
+        let texture = Sprite.applyTexture(scene.canvas.ctx)
+        return () => Sprite.cleanupTexture(scene.canvas.ctx, texture)
+    }, [])
+
+    useEffect(() => {
         scene.loop.run = onDraw
         return () => scene.loop.run = null
     }, [onDraw])
@@ -231,6 +240,16 @@ const MapEditorScene: React.FC = (props) => {
     )
 }
 
-SceneController.shared.registerScene("map-editor", () => new BasicSceneDescriptor(
-    [texturesResourcePrerequisite], () => <MapEditorScene/>
-));
+const MapEditorScene: React.FC = () => {
+    const prerequisites = usePrerequisites(() => [
+        new TexturesResourcePrerequisite()
+    ])
+
+    if(prerequisites.loaded) {
+        return <MapEditorView/>
+    } else {
+        return <LoadingScene progress={prerequisites.progress} error={prerequisites.error}/>
+    }
+}
+
+SceneController.shared.registerScene("map-editor", MapEditorScene);
