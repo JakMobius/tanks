@@ -37,4 +37,8 @@ export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldC
     ServerEntityPrefabs.types.get(EntityType.TIMER_ENTITY)(worldStatisticsTimer)
     entity.appendChild(worldStatisticsTimer)
     entity.getComponent(WorldStatisticsComponent).setMatchLeftTimer(worldStatisticsTimer)
+
+    let chatEntity = new Entity()
+    ServerEntityPrefabs.types.get(EntityType.CHAT_ENTITY)(chatEntity)
+    entity.appendChild(chatEntity)
 }

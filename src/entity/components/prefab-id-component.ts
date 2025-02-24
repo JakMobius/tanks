@@ -18,32 +18,32 @@ export default class PrefabIdComponent implements Component {
     onDetach() {
         this.entity = null
     }
+}
 
-    static getPrefabNameForEntity(entity: Entity) {
-        if (!entity) {
-            return "NULL"
-        }
-        let index = entity.getComponent(PrefabIdComponent)?.prefabId
+export function getPrefabNameForEntity(entity: Entity) {
+    if (!entity) {
+        return "NULL"
+    }
+    let index = entity.getComponent(PrefabIdComponent)?.prefabId
 
-        for (let key in EntityType) {
-            if (index === (EntityType as { [key: string]: number })[key]) return key
-        }
-
-        if (entity.getComponent(ServerWorldPlayerManagerComponent)) {
-            return "WORLD"
-        }
-
-        return "<unknown entity>"
+    for (let key in EntityType) {
+        if (index === (EntityType as { [key: string]: number })[key]) return key
     }
 
-    static getPrefabNamesForParents(entity: Entity): string {
-        if (!entity) {
-            return "NULL"
-        }
-        let name = this.getPrefabNameForEntity(entity)
-        if (entity.parent) {
-            return this.getPrefabNamesForParents(entity.parent) + " - " + name
-        }
-        return name
+    if (entity.getComponent(ServerWorldPlayerManagerComponent)) {
+        return "WORLD"
     }
+
+    return "<unknown entity>"
+}
+
+export function getPrefabNamesForParents(entity: Entity): string {
+    if (!entity) {
+        return "NULL"
+    }
+    let name = this.getPrefabNameForEntity(entity)
+    if (entity.parent) {
+        return this.getPrefabNamesForParents(entity.parent) + " - " + name
+    }
+    return name
 }

@@ -44,4 +44,5 @@ export const EntityType = {
 
     // Utilities:
     TIMER_ENTITY:                    0x7000,
+    CHAT_ENTITY:                     0x7001
 }

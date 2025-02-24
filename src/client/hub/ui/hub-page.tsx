@@ -8,6 +8,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import NavigationEscapeHandler from 'src/client/ui/navigation/navigation-escape-handler';
 import RootControlsResponder, { ControlsResponder } from 'src/client/controls/root-controls-responder';
 import EventsHUD, { EventsProvider } from 'src/client/ui/events-hud/events-hud';
+import { ControlsProvider } from 'src/client/utils/react-controls-responder';
 
 const HubPageNavigationWrapper: React.FC<{children: React.ReactNode}> = ({ children }) => {
     return (
@@ -32,34 +33,24 @@ export const useProfile = () => {
 };
 
 const HubPage: React.FC<HubPageProps> = (props) => {
-
-    const [state] = useState({
-        controlsResponder: useMemo(() => new ControlsResponder(), [])
-    })
-
-    useEffect(() => {
-        RootControlsResponder.getInstance().setMainResponderDelayed(state.controlsResponder)
-        return () => {
-            RootControlsResponder.getInstance().setMainResponderDelayed(null)
-        }
-    }, [state.controlsResponder])
-
     return (
-        <EventsProvider>
-            <ProfileContext.Provider value={props.userData}>
-                <div className="hub-body">
-                    <div className="dimmer"></div>
-                    <div className="navigation-view">
-                        <NavigationProvider
-                            rootComponent={<MainMenuView/>}
-                            wrapper={HubPageNavigationWrapper}>
-                            <NavigationEscapeHandler controls={state.controlsResponder}/>
-                        </NavigationProvider>
+        <ControlsProvider>
+            <EventsProvider>
+                <ProfileContext.Provider value={props.userData}>
+                    <div className="hub-body">
+                        <div className="dimmer"></div>
+                        <div className="navigation-view">
+                            <NavigationProvider
+                                rootComponent={<MainMenuView/>}
+                                wrapper={HubPageNavigationWrapper}>
+                                <NavigationEscapeHandler/>
+                            </NavigationProvider>
+                        </div>
                     </div>
-                </div>
-            </ProfileContext.Provider>
-            <EventsHUD/>
-        </EventsProvider>
+                </ProfileContext.Provider>
+                <EventsHUD/>
+            </EventsProvider>
+        </ControlsProvider>
     )
 }
 

@@ -1,25 +1,22 @@
-import { ControlsResponder } from "src/client/controls/root-controls-responder"
 import { useNavigation } from "./navigation-view"
 import React, { useEffect } from "react"
+import { useControls } from "src/client/utils/react-controls-responder"
 
-export interface NavigationEscapeHandlerProps {
-    controls: ControlsResponder
-}
-
-const NavigationEscapeHandler: React.FC<NavigationEscapeHandlerProps> = (props) => {
+const NavigationEscapeHandler: React.FC = (props) => {
 
     const navigation = useNavigation()
+    const controls = useControls()
 
     useEffect(() => {
         const onNavigateBack = () => {
             navigation.pop()
         }
 
-        props.controls.on("navigate-back", onNavigateBack)
+        controls.on("navigate-back", onNavigateBack)
         return () => {
-            props.controls.off("navigate-back", onNavigateBack)
+            controls.off("navigate-back", onNavigateBack)
         }
-    }, [props.controls, navigation.pop])
+    }, [controls, navigation.pop])
 
     return <></>
 }

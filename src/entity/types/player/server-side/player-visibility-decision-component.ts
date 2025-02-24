@@ -72,6 +72,8 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
     }
 
     private updateWorld() {
-        this.worldEventHandler.setTarget(this.getWorld())
+        let world = this.getWorld()
+        this.worldEventHandler.setTarget(world)
+        if(world) this.updateEntitiesVisibility()
     }
 }

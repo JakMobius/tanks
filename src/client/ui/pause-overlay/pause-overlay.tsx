@@ -1,52 +1,49 @@
 import "./pause-overlay.scss"
 
-import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
-import React, { useEffect, useMemo, useState } from "react";
-import { NavigationProvider, useNavigation } from '../navigation/navigation-view';
+import React, { useEffect, useState } from "react";
+import { NavigationProvider } from '../navigation/navigation-view';
 import NavigationEscapeHandler from "../navigation/navigation-escape-handler";
 import { useScene } from "src/client/scenes/scene-controller";
+import { ControlsProvider, useControls } from "src/client/utils/react-controls-responder";
 
 export interface PauseOverlayConfig {
-    rootComponent: React.ReactNode,
-    gameControls: ControlsResponder
+    rootComponent: React.ReactNode
 }
 
 const PauseOverlay: React.FC<PauseOverlayConfig> = React.memo((props) => {
 
     const scene = useScene()
+    const gameControls = useControls()
 
-    const [state, setState] = useState({
-        pauseControlsResponder: useMemo(() => new ControlsResponder(), []),
-        shown: false
-    })
+    const [shown, setShown] = useState(false)
 
     const show = () => {
-        RootControlsResponder.getInstance().setMainResponderDelayed(state.pauseControlsResponder)
-        setState(state => ({...state, shown: true}))
+        setShown(true)
         scene.soundEngine.setEnabled(false)
     }
 
     const hide = () => {
-        RootControlsResponder.getInstance().setMainResponderDelayed(props.gameControls)
-        setState(state => ({...state, shown: false}))
+        setShown(false)
         scene.soundEngine.setEnabled(true)
     }
 
     useEffect(() => {
-        if(!props.gameControls) return undefined
-        props.gameControls.on("game-pause", show)
-        return () => props.gameControls.off("game-pause", show)
-    }, [props.gameControls])
+        if(!gameControls) return undefined
+        gameControls.on("game-pause", show)
+        return () => gameControls.off("game-pause", show)
+    }, [gameControls])
 
     return (
-        <div className="pause-overlay" style={{display: state.shown ? undefined : "none"}}>
-            <NavigationProvider
-                onClose={hide}
-                rootComponent={props.rootComponent}
-            >
-                <NavigationEscapeHandler controls={state.pauseControlsResponder}/>
-            </NavigationProvider>
-        </div>
+        <ControlsProvider enabled={shown}>
+            <div className="pause-overlay" style={{display: shown ? undefined : "none"}}>
+                <NavigationProvider
+                    onClose={hide}
+                    rootComponent={props.rootComponent}
+                >
+                    <NavigationEscapeHandler/>
+                </NavigationProvider>
+            </div>
+        </ControlsProvider>
     )
 })
 

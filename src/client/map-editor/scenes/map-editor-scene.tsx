@@ -34,6 +34,7 @@ import { Progress } from 'src/client/utils/progress';
 import { ScenePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scenes/scene-prerequisite';
 import LoadingScene from 'src/client/scenes/loading/loading-scene';
 import Sprite from 'src/client/graphics/sprite';
+import { ControlsProvider } from 'src/client/utils/react-controls-responder';
 
 interface MapEditorSceneContextProps {
     loadMap: (map: MapFile) => void   
@@ -63,6 +64,7 @@ const MapEditorView: React.FC = () => {
 
     const stateRef = useRef(state)
     const needsRedrawRef = useRef(true)
+    const controlsResponderRef = useRef<ControlsResponder | null>(null)
 
     useEffect(() => { stateRef.current = state }, [state])
 
@@ -83,7 +85,6 @@ const MapEditorView: React.FC = () => {
         scene.setTitle("Танчики - Редактор карт")
         scene.canvas.clear()
 
-        const controlsResponder = new ControlsResponder()
         const world = new Entity()
         const camera = new Entity()
         const toolManager = new ToolManager(world)
@@ -99,11 +100,11 @@ const MapEditorView: React.FC = () => {
             setNeedsRedraw()
         })
 
-        controlsResponder.on("game-toggle-debug", () => {
+        controlsResponderRef.current.on("game-toggle-debug", () => {
             camera.getComponent(WorldDrawerComponent).toggleDebugDraw()
         })
 
-        controlsResponder.on("editor-undo", (event) => {
+        controlsResponderRef.current.on("editor-undo", (event) => {
             const map = world.getComponent(WorldTilemapComponent).map
             const history = map.getComponent(GameMapHistoryComponent)
             let entry = history?.goBack()
@@ -113,7 +114,7 @@ const MapEditorView: React.FC = () => {
             ))
         })
 
-        controlsResponder.on("editor-redo", (event) => {
+        controlsResponderRef.current.on("editor-redo", (event) => {
             const map = world.getComponent(WorldTilemapComponent).map
             const history = map.getComponent(GameMapHistoryComponent)
             let entry = history?.goForward()
@@ -137,19 +138,16 @@ const MapEditorView: React.FC = () => {
             ...state,
             world: world,
             camera: camera,
-            controlsResponder: controlsResponder,
             toolManager: toolManager,
             toolList: toolList
         }))
 
         scene.loop.start()
-        RootControlsResponder.getInstance().setMainResponderDelayed(controlsResponder)
 
         return () => {
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()
-            RootControlsResponder.getInstance().setMainResponderDelayed(null)
         }
     }, [])
 
@@ -217,26 +215,28 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     return (
-        <MapEditorSceneContext.Provider value={{loadMap}}>
-            <EventsProvider ref={eventRef}>
-                <MapEditorBackgroundOverlay
-                    draggingEnabled={false}
-                    matrix={state.camera?.getComponent(CameraComponent).inverseMatrix}
-                    onDrag={onDrag}
-                    onZoom={onZoom}
-                    onMouseDown={onMouseDown}
-                    onMouseUp={onMouseUp}
-                    onMouseMove={onMouseMove}
-                />
-                <ToolSettingsView toolManager={state.toolManager}/>
-                <ToolBarView
-                    toolList={state.toolList}
-                    toolManager={state.toolManager}
-                />
-                <EventsHUD/>
-                <PauseOverlay rootComponent={<MapEditorPauseView/>} gameControls={state.controlsResponder}/>
-            </EventsProvider>
-        </MapEditorSceneContext.Provider>
+        <ControlsProvider ref={controlsResponderRef}>
+            <MapEditorSceneContext.Provider value={{loadMap}}>
+                <EventsProvider ref={eventRef}>
+                    <MapEditorBackgroundOverlay
+                        draggingEnabled={false}
+                        matrix={state.camera?.getComponent(CameraComponent).inverseMatrix}
+                        onDrag={onDrag}
+                        onZoom={onZoom}
+                        onMouseDown={onMouseDown}
+                        onMouseUp={onMouseUp}
+                        onMouseMove={onMouseMove}
+                    />
+                    <ToolSettingsView toolManager={state.toolManager}/>
+                    <ToolBarView
+                        toolList={state.toolList}
+                        toolManager={state.toolManager}
+                    />
+                    <EventsHUD/>
+                    <PauseOverlay rootComponent={<MapEditorPauseView/>} gameControls={state.controlsResponder}/>
+                </EventsProvider>
+            </MapEditorSceneContext.Provider>
+        </ControlsProvider>
     )
 }
 

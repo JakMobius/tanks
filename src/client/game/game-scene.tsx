@@ -1,6 +1,5 @@
-import PlayerChatPacket from 'src/networking/packets/game-packets/player-chat-packet';
 import ConnectionClient from "src/networking/connection-client";
-import WorldCommunicationPacket from "src/networking/packets/game-packets/world-communication-packet";
+import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
 import ReadBuffer from "src/serialization/binary/read-buffer";
 import Entity from "src/utils/ecs/entity";
@@ -18,7 +17,6 @@ import WorldSoundListenerComponent from '../entity/components/sound/world-sound-
 import WorldDrawerComponent from '../entity/components/world-drawer-component';
 import PlayerNicksHUD from '../ui/player-nicks-hud/player-nicks-hud';
 import TankInfoHUD from '../ui/tank-info-hud/tank-info-hud';
-import ChatHUD from '../ui/chat-hud/chat-hud';
 import PauseOverlay from '../ui/pause-overlay/pause-overlay';
 import GamePauseView from './game-pause-view';
 import { Progress, ProgressLeaf } from '../utils/progress';
@@ -35,6 +33,8 @@ import { KeyedComponentsHandle } from '../utils/keyed-component';
 import LoadingScene from '../scenes/loading/loading-scene';
 import { ScenePrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from '../scenes/scene-prerequisite';
 import Sprite from '../graphics/sprite';
+import WriteBuffer from 'src/serialization/binary/write-buffer';
+import { ControlsProvider } from "../utils/react-controls-responder";
 
 export interface GameViewConfig {
     client: ConnectionClient
@@ -48,28 +48,13 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     const eventContextRef = useRef<KeyedComponentsHandle | null>(null)
     const gameHudRef = useRef<KeyedComponentsHandle | null>(null)
     const tankSelectRef = useRef<TankSelectOverlayHandle | null>(null)
+    const controlsResponderRef = useRef<ControlsResponder | null>(null)
 
     const [state, setState] = React.useState({
-        controlsResponder: null as ControlsResponder | null,
         camera: null as Entity | null,
         world: null as Entity | null,
-        remoteControlsManager: null as RemoteControlsManager | null,
-        messageCount: 0
+        remoteControlsManager: null as RemoteControlsManager | null
     })
-
-    const messagesRef = useRef<string[]>([])
-
-    const addMessage = (message: string) => {
-        messagesRef.current.push(message)
-        setState((state) => ({
-            ...state,
-            messageCount: messagesRef.current.length,
-        }))
-    }
-
-    const getMessage = useCallback((index: number) => {
-        return messagesRef.current[index]
-    }, [])
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
@@ -78,10 +63,6 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         state.camera?.getComponent(CameraPositionController)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
     }
-
-    const onChat = useCallback((text: string) => {
-        new PlayerChatPacket(text).sendTo(props.client.connection)
-    }, [props.client])
 
     const onTankSelected = useCallback((tank: number) => {
         new PlayerTankSelectPacket(tank).sendTo(props.client.connection)
@@ -92,25 +73,26 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         scene.loop.start()
         scene.canvas.clear()
 
-        const controlsResponder = new ControlsResponder()
         const world = new Entity()
         const camera = new Entity()
-        const remoteControlsManager = new RemoteControlsManager(controlsResponder, props.client.connection)
+        const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, props.client.connection)
         
         clientGameWorldEntityPrefab(world, {})
-        world.addComponent(new PrimaryEntityControls(controlsResponder))
+        world.addComponent(new PrimaryEntityControls(controlsResponderRef.current))
 
         remoteControlsManager.attach()
 
-        controlsResponder.on("game-toggle-debug", () => {
+        controlsResponderRef.current.on("game-toggle-debug", () => {
             camera.getComponent(WorldDrawerComponent).toggleDebugDraw()
         })
 
-        props.client.on(PlayerChatPacket, (packet) => addMessage(packet.text))
-
-        props.client.on(WorldCommunicationPacket, (packet) => {
+        props.client.on(WorldDataPacket, (packet) => {
             let buffer = new ReadBuffer(packet.buffer.buffer)
             world.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+        })
+
+        world.on("response", (buffer: WriteBuffer) => {
+            new WorldDataPacket(buffer.spitBuffer()).sendTo(props.client.connection)
         })
 
         camera.addComponent(new TransformComponent())
@@ -128,18 +110,15 @@ const GameView: React.FC<GameViewConfig> = (props) => {
             ...state,
             world: world,
             camera: camera,
-            controlsResponder: controlsResponder,
             remoteControlsManager: remoteControlsManager
         }))
 
-        RootControlsResponder.getInstance().setMainResponderDelayed(controlsResponder)
         props.client.connection.resume()
 
         return () => {
             scene.setTitle(undefined)
             scene.loop.stop()
             camera.removeFromParent()
-            RootControlsResponder.getInstance().setMainResponderDelayed(null)
             props.client.connection.close()
         }
     }, [])
@@ -209,16 +188,17 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     }, [state.world, eventContextRef.current])
 
     return (
-        <EventsProvider ref={eventContextRef}>
-            <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
-            <TankInfoHUD world={state.world} />
-            <ChatHUD gameControls={state.controlsResponder} onChat={onChat} messageCount={state.messageCount} getMessage={getMessage}/>
-            <EventsHUD/>
-            <PlayerListHUD gameControls={state.controlsResponder} world={state.world}/>
-            <GameHUD keyedComponentsRef={gameHudRef}/>
-            <TankSelectOverlay ref={tankSelectRef} onTankSelect={onTankSelected} gameControls={state.controlsResponder}/>
-            <PauseOverlay rootComponent={<GamePauseView/>} gameControls={state.controlsResponder}/>
-        </EventsProvider>
+        <ControlsProvider ref={controlsResponderRef}>
+            <EventsProvider ref={eventContextRef}>
+                <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
+                <TankInfoHUD world={state.world} />
+                <EventsHUD/>
+                <PlayerListHUD world={state.world}/>
+                <GameHUD keyedComponentsRef={gameHudRef}/>
+                <TankSelectOverlay ref={tankSelectRef} onTankSelect={onTankSelected}/>
+                <PauseOverlay rootComponent={<GamePauseView/>}/>
+            </EventsProvider>
+        </ControlsProvider>
     )
 }
 

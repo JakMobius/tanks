@@ -9,6 +9,7 @@ import TeamColor from "src/utils/team-color"
 import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 import Cloud from 'src/client/game/ui/cloud/cloud';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useControls } from 'src/client/utils/react-controls-responder';
 
 export interface PlayerListTableProps {
     players: PlayerStatistics[]
@@ -45,7 +46,6 @@ const PlayerListTable: React.FC<PlayerListTableProps> = React.memo((props) => {
 })
 
 interface PlayerListHUDProps {
-    gameControls?: ControlsResponder
     world?: Entity
 }
 
@@ -59,6 +59,8 @@ const PlayerListHUD: React.FC<PlayerListHUDProps> = React.memo((props) => {
         world: null as Entity | null,
         timer: null as Entity | null
     })
+
+    const gameControls = useControls()
 
     const updateTimerText = useCallback(() => {
         let timerComponent = state.timer?.getComponent(TimerComponent)
@@ -118,15 +120,15 @@ const PlayerListHUD: React.FC<PlayerListHUDProps> = React.memo((props) => {
     }, [state.timer])
 
     useEffect(() => {
-        if(!props.gameControls) return undefined
-        props.gameControls.on("game-player-list-show", () => onShow())
-        props.gameControls.on("game-player-list-hide", () => onHide())
+        if(!gameControls) return undefined
+        gameControls.on("game-player-list-show", () => onShow())
+        gameControls.on("game-player-list-hide", () => onHide())
 
         return () => {
-            props.gameControls.off("game-player-list-show", () => onShow())
-            props.gameControls.off("game-player-list-hide", () => onHide())
+            gameControls.off("game-player-list-show", () => onShow())
+            gameControls.off("game-player-list-hide", () => onHide())
         }
-    }, [props.gameControls])
+    }, [gameControls])
 
     return (
         <div className="player-list-overlay" style={{display: state.shown ? undefined : "none"}}>

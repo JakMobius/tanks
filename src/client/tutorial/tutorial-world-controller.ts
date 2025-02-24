@@ -6,7 +6,6 @@ import Entity from "src/utils/ecs/entity";
 import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
-import PlayerChatEvent from "src/events/player-chat-event";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerRespawnEvent from "src/events/player-respawn-event";
 import HealthComponent from "src/entity/components/health-component";
@@ -20,12 +19,6 @@ export default class TutorialWorldController {
         this.game = serverGame
 
         this.game.on("client-connect", (client) => this.onClientConnect(client))
-        this.game.on("player-chat", (player, event: PlayerChatEvent) => {
-            let text = event.message
-            if(text.startsWith("#")) {
-                this.onPlayerCommand(player, text)
-            }
-        })
         this.game.on("tick", () => {
             this.onTick()
         })

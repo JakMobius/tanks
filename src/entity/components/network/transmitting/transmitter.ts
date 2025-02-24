@@ -5,12 +5,22 @@ import Entity from "src/utils/ecs/entity";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import GameObjectWriter from "../receiving/game-object-writer";
 import TransmitterPrecondition from "./precondition/transmitter-precondition";
+import ReadBuffer from "src/serialization/binary/read-buffer";
 
 export default class Transmitter {
     set: TransmitterSet | null = null
     eventHandler = new BasicEventHandlerSet()
     protected transmitterPrecondition: TransmitterPrecondition | null = null
     enabled = false
+
+    addResponseHandler(command: number, callback: (player: Entity, buffer: ReadBuffer, size: number) => void) {
+        let currentHandlers = this.set.messageHandlers.get(command)
+        if(!currentHandlers) {
+            currentHandlers = []
+            this.set.messageHandlers.set(command, currentHandlers)
+        }
+        currentHandlers.push(callback)
+    }
 
     packIfEnabled(command: number, callback: (buffer: WriteBuffer) => void) {
         if(!this.enabled) return
@@ -42,13 +52,6 @@ export default class Transmitter {
         if(set.isAttachedToRoot()) {
             this.attachedToRoot()
         }
-    }
-
-    detachFromSet() {
-        if(this.set.isAttachedToRoot()) {
-            this.detachedFromRoot()
-        }
-        this.set = null
     }
 
     getEntity() {

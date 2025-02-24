@@ -30,7 +30,6 @@ import {chooseRandomIndex} from "src/utils/utils";
 import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
 import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
 import RoomClientComponent from "src/server/room/components/room-client-component";
-import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
 import TeamColor from "src/utils/team-color";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
 
@@ -175,13 +174,13 @@ export default class CTFPlayingStateController extends CTFGameStateController {
                 `${playerColor}${playerNick} ` +
                 `§!; ${localizedEvent} ` +
                 `${flagColor}флаг ${TeamColor.teamNames[flagTeam]}`
-
-            clientComponent.portal.broadcast(new PlayerChatPacket(message))
+            
+            this.controller.world.emit("chat", message)
         } else if (event == CTFFlagEventType.flagReturn) {
             let message =
                 `${flagColor}флаг ${TeamColor.teamNames[flagTeam]} возвращён на базу`
 
-            clientComponent.portal.broadcast(new PlayerChatPacket(message))
+            this.controller.world.emit("chat", message)
         }
     }
 

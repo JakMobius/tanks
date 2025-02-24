@@ -4,9 +4,6 @@ import {TransmitterSet} from "./transmitter-set";
 import EntityDataTransmitComponent from "./entity-data-transmit-component";
 import BinaryBlockCoder from "src/serialization/binary/parsers/binary-block-coder";
 import EventEmitter from "src/utils/event-emitter";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
-import {commandName} from "src/entity/components/network/commands";
 
 export class ReceivingEnd extends EventEmitter {
     buffer = new WriteBuffer()

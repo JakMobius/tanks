@@ -4,7 +4,7 @@ import ReadBuffer from "src/serialization/binary/read-buffer";
 import WriteBuffer from "src/serialization/binary/write-buffer";
 import {Constructor} from "src/utils/constructor";
 
-export default class WorldCommunicationPacket extends BinaryPacket {
+export default class WorldDataPacket extends BinaryPacket {
     static typeName = 22
 
     buffer: Uint8Array
@@ -20,8 +20,8 @@ export default class WorldCommunicationPacket extends BinaryPacket {
     }
 
     static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
-        return new WorldCommunicationPacket(decoder.readBytes(decoder.readUint32())) as any as T
+        return new WorldDataPacket(decoder.readBytes(decoder.readUint32())) as any as T
     }
 }
 
-BinarySerializer.register(WorldCommunicationPacket)
+BinarySerializer.register(WorldDataPacket)

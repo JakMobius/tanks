@@ -3,10 +3,11 @@ import './tank-select-overlay.scss'
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import RenderLoop from "src/utils/loop/render-loop";
 import {TankStat, TankStats} from "src/stat-tests/tank-stats";
-import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import React from 'react';
 import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
+import { ControlsProvider, useControls } from 'src/client/utils/react-controls-responder';
 
 const getTankForIndex = (item: number) => {
     let tankIndex = item % tankDescriptions.length
@@ -202,7 +203,6 @@ export interface TankSelectOverlayHandle {
 }
 
 export interface TankSelectOverlayProps {
-    gameControls: ControlsResponder
     onTankSelect: (tankType: number) => void
     ref?: Ref<TankSelectOverlayHandle>
 }
@@ -225,8 +225,10 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
             timeMultiplier: 0.001,
             maximumTimestep: 0.1
         }), []),
-        controlsResponder: useMemo(() => new ControlsResponder(), [])
     })
+
+    const gameControls = useControls()
+    const controlsResponderRef = useRef<ControlsResponder | null>(null)
 
     useImperativeHandle(props.ref, () => {
         return {
@@ -311,29 +313,23 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     useEffect(() => {
         state.animationLoop.run = onFrame
 
-        state.controlsResponder.on("game-change-tank", toggleVisibility)
-        state.controlsResponder.on("navigate-left", onNavigateLeft)
-        state.controlsResponder.on("navigate-right", onNavigateRight)
-        state.controlsResponder.on("confirm", onConfirm)
-        state.controlsResponder.on("navigate-back", toggleVisibility)
+        controlsResponderRef.current.on("game-change-tank", toggleVisibility)
+        controlsResponderRef.current.on("navigate-left", onNavigateLeft)
+        controlsResponderRef.current.on("navigate-right", onNavigateRight)
+        controlsResponderRef.current.on("confirm", onConfirm)
+        controlsResponderRef.current.on("navigate-back", toggleVisibility)
     }, [])
 
     useEffect(() => {
-        if(!props.gameControls) return undefined
-        props.gameControls.on("game-change-tank", toggleVisibility)
-        return () => props.gameControls.off("game-change-tank", toggleVisibility)
-    }, [props.gameControls])
+        if(!gameControls) return undefined
+        gameControls.on("game-change-tank", toggleVisibility)
+        return () => gameControls.off("game-change-tank", toggleVisibility)
+    }, [gameControls])
 
     useEffect(() => {   
-        if(!state.shown) return () => {}
-
-        RootControlsResponder.getInstance().setMainResponderDelayed(state.controlsResponder)
+        if(!state.shown) return undefined
         state.animationLoop.start()
-
-        return () => {
-            RootControlsResponder.getInstance().setMainResponderDelayed(props.gameControls)
-            state.animationLoop.stop()
-        }
+        return () => state.animationLoop.stop()
     }, [state.shown])
 
     useEffect(() => {
@@ -359,28 +355,30 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     }, [state.carouselCenterIndex])
 
     return  (
-        <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
-            <div className="tank-select-menu">
-                <TankSelectCarousel centerIndex={state.carouselCenterIndex} onClick={onCarouselClick}/>
-                <div className="tank-title-container">
-                    <div className="tank-title">{state.tankDescription?.name}</div>
-                    <TankCarouselButton left
-                        animationTrigger={state.leftAnimationTrigger}
-                        onClick={onNavigateLeft}/>
-                    <TankCarouselButton right
-                        animationTrigger={state.rightAnimationTrigger}
-                        onClick={onNavigateRight}/>
-                </div>
-                <div className="tank-description-menu">
-                    <div className="tank-description-text">{state.tankDescription?.description}</div>
-                    <div className="tank-description-stats">
-                        <TankStatRow label="СКР" value={state.tankStats.speed} medianStatValue={TankStats.median.speed}/>
-                        <TankStatRow label="АТК" value={state.tankStats.damage} medianStatValue={TankStats.median.damage}/>
-                        <TankStatRow label="ЗАЩ" value={state.tankStats.health} medianStatValue={TankStats.median.health}/>
+        <ControlsProvider ref={controlsResponderRef} enabled={state.shown}>
+            <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
+                <div className="tank-select-menu">
+                    <TankSelectCarousel centerIndex={state.carouselCenterIndex} onClick={onCarouselClick}/>
+                    <div className="tank-title-container">
+                        <div className="tank-title">{state.tankDescription?.name}</div>
+                        <TankCarouselButton left
+                            animationTrigger={state.leftAnimationTrigger}
+                            onClick={onNavigateLeft}/>
+                        <TankCarouselButton right
+                            animationTrigger={state.rightAnimationTrigger}
+                            onClick={onNavigateRight}/>
+                    </div>
+                    <div className="tank-description-menu">
+                        <div className="tank-description-text">{state.tankDescription?.description}</div>
+                        <div className="tank-description-stats">
+                            <TankStatRow label="СКР" value={state.tankStats.speed} medianStatValue={TankStats.median.speed}/>
+                            <TankStatRow label="АТК" value={state.tankStats.damage} medianStatValue={TankStats.median.damage}/>
+                            <TankStatRow label="ЗАЩ" value={state.tankStats.health} medianStatValue={TankStats.median.health}/>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ControlsProvider>
     )
 })
 

@@ -1,15 +1,10 @@
-import RoomClientComponent from "./room-client-component";
-import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
-import HtmlEscape from "src/utils/html-escape";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
 import EventEmitter from "src/utils/event-emitter";
-import PlayerChatEvent from "src/events/player-chat-event";
-import TeamColor from "src/utils/team-color";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import Entity from "src/utils/ecs/entity";
 import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
 import {chooseRandom} from "src/utils/utils";
+import ServerChatComponent from "src/entity/types/chat/server-side/server-chat-component";
 
 export default class WorldEventBroadcastComponent extends EventHandlerComponent {
 
@@ -18,48 +13,22 @@ export default class WorldEventBroadcastComponent extends EventHandlerComponent 
         this.eventHandler.on("player-connect", (player) => this.onPlayerConnect(player), EventEmitter.PRIORITY_MONITOR)
         this.eventHandler.on("player-will-disconnect", (player) => this.onPlayerDisconnect(player), EventEmitter.PRIORITY_MONITOR)
         this.eventHandler.on("player-death", (player) => this.onPlayerDeath(player), EventEmitter.PRIORITY_MONITOR)
-        this.eventHandler.on("player-chat", (player, event) => this.onPlayerChat(event), EventEmitter.PRIORITY_MONITOR)
     }
 
     broadcastMessage(message: string) {
-        if (!this.entity) return
-        let clientComponent = this.entity.getComponent(RoomClientComponent)
-
-        if (!clientComponent) return
-        clientComponent.portal.broadcast(new PlayerChatPacket(message))
-    }
-
-    private getPlayerTeamColor(player: Entity) {
-        const playerTeamComponent = player.getComponent(PlayerTeamComponent)
-        if (!playerTeamComponent.team) return "§!;"
-
-        return TeamColor.getColor(playerTeamComponent.team.id).toChatColor(true)
-    }
-
-    private getPlayerColoredNick(player: Entity) {
-        const playerNick = player.getComponent(PlayerNickComponent).nick
-        return this.getPlayerTeamColor(player) + playerNick + "§;"
+        this.entity?.emit("chat", message)
     }
 
     protected onPlayerConnect(player: Entity) {
-        this.broadcastMessage(this.getPlayerColoredNick(player) + " подключился к игре")
+        this.broadcastMessage(ServerChatComponent.getPlayerColoredNick(player) + " подключился к игре")
     }
 
     protected onPlayerDisconnect(player: Entity) {
-        this.broadcastMessage(this.getPlayerColoredNick(player) + " отключился от игры")
+        this.broadcastMessage(ServerChatComponent.getPlayerColoredNick(player) + " отключился от игры")
     }
 
     protected onPlayerDeath(player: Entity) {
         this.broadcastMessage(this.getBestDeathMessage(player) || this.defaultDeathMessage(player))
-    }
-
-    protected onPlayerChat(event: PlayerChatEvent) {
-        if(event.cancelled) return
-        let text = event.message
-        text.trim()
-        text = HtmlEscape(text)
-        if (!text.length) return
-        this.broadcastMessage(this.getPlayerColoredNick(event.player) + ": " + text)
     }
 
     static killMessages = [
@@ -105,7 +74,7 @@ export default class WorldEventBroadcastComponent extends EventHandlerComponent 
         let damageData = deathRecorderComponent.getDamageData(player)
         let killer = damageData.damagers[0]
 
-        if (!killer || killer == player) return this.getPlayerTeamColor(player) + playerNick + "§; самоуничтожился"
+        if (!killer || killer == player) return ServerChatComponent.getPlayerTeamColor(player) + playerNick + "§; самоуничтожился"
 
         const killerNick = killer.getComponent(PlayerNickComponent).nick
 
@@ -117,14 +86,14 @@ export default class WorldEventBroadcastComponent extends EventHandlerComponent 
             let variants = message.messages
 
             return chooseRandom(variants)
-                .replace("@0", this.getPlayerTeamColor(killer) + killerNick + "§;")
-                .replace("@1", this.getPlayerTeamColor(player) + playerNick + "§;")
+                .replace("@0", ServerChatComponent.getPlayerTeamColor(killer) + killerNick + "§;")
+                .replace("@1", ServerChatComponent.getPlayerTeamColor(player) + playerNick + "§;")
         }
 
         return null
     }
 
     private defaultDeathMessage(player: Entity) {
-        return this.getPlayerColoredNick(player) + " уничтожен"
+        return ServerChatComponent.getPlayerColoredNick(player) + " уничтожен"
     }
 }

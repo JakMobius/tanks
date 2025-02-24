@@ -4,8 +4,9 @@ import HTMLEscape from 'src/utils/html-escape';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import Color from 'src/utils/color';
 
-import React, { Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ControlsResponder } from 'src/client/controls/root-controls-responder';
+import { useControls } from 'src/client/utils/react-controls-responder';
 
 function parseColor(text: string) {
     return Color.replace(text, function (color: string, bold: boolean, text: string) {
@@ -113,13 +114,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = (props: ChatMessagesProps) => 
 
 interface ChatInputProps {
     onChat?: (value: string) => void
-    gameControls?: ControlsResponder
 }
 
 const ChatInput: React.FC<ChatInputProps> = (props) => {
     const [shown, setShown] = useState(false)
 
     const inputRef = useRef<HTMLInputElement | null>(null)
+    const gameControls = useControls()
 
     const onInputKeydown = (event: KeyboardEvent) => {
         let input = inputRef.current as HTMLInputElement
@@ -148,13 +149,13 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     }
 
     useEffect(() => {
-        if (!props.gameControls) return undefined
+        if (!gameControls) return undefined
         const openChat = () => {
             setShown(true)
         }
-        props.gameControls.on("game-chat", openChat)
-        return () => props.gameControls.off("game-chat", openChat)
-    }, [props.gameControls])
+        gameControls.on("game-chat", openChat)
+        return () => gameControls.off("game-chat", openChat)
+    }, [gameControls])
 
     useEffect(() => {
         if (shown) inputRef.current?.focus()
@@ -178,8 +179,7 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     )
 }
 
-interface ChatHUDProps {
-    gameControls?: ControlsResponder
+export interface ChatHUDProps {
     onChat?: (value: string) => void
     messageCount: number
     getMessage: (index: number) => string
@@ -189,7 +189,7 @@ const ChatHUD: React.FC<ChatHUDProps> = React.memo((props) => {
     return (
         <div className="chat-container">
             <ChatMessages messageCount={props.messageCount} getMessage={props.getMessage} />
-            <ChatInput gameControls={props.gameControls} onChat={props.onChat} />
+            <ChatInput onChat={props.onChat} />
         </div>
     )
 })

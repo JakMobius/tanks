@@ -7,6 +7,7 @@ import 'src/entity/types/bullet-mine/prefab'
 import 'src/entity/types/bullet-mortar-ball/prefab'
 
 import 'src/entity/types/timer/prefab'
+import 'src/entity/types/chat/prefab'
 import 'src/entity/types/flag/prefab'
 
 import 'src/entity/types/controller-ctf/prefab'

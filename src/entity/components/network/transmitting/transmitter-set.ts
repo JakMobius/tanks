@@ -5,11 +5,14 @@ import {Constructor} from "src/utils/constructor";
 import EventEmitter from "src/utils/event-emitter";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import EntityIdTable from "src/entity/components/network/entity-id-table";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import Entity from "src/utils/ecs/entity";
 
 export class TransmitterSet extends EventEmitter {
     transmitters: Transmitter[] = []
     // TODO: Get rid
     transmitterMap = new Map<Constructor<Transmitter>, Transmitter>
+    messageHandlers = new Map<number, Array<(entity: Entity, buffer: ReadBuffer, size: number) => void>>
     transmitComponent: EntityDataTransmitComponent | null = null
     receivingEnd: ReceivingEnd
     entityId: number | null = null
@@ -38,6 +41,16 @@ export class TransmitterSet extends EventEmitter {
         return this.transmitterMap.get(TransmitterClass) as TransmitterType | null
     }
 
+    handleResponse(command: number, player: Entity, buffer: ReadBuffer, size: number) {
+        let handlers = this.messageHandlers.get(command)
+        if(!handlers) return
+        let index = buffer.offset
+        for(let handler of handlers) {
+            buffer.offset = index
+            handler(player, buffer, size)
+        }
+    }
+
     updateParent() {
         if (this.transmitComponent?.ends?.has(this.receivingEnd)) {
             if (!this.idTable) {
@@ -61,21 +74,24 @@ export class TransmitterSet extends EventEmitter {
         if (idTable === this.idTable) return
 
         if (this.idTable) {
+            if (this.entityId !== null) {
+                this.idTable.removeId(this.entityId)
+                this.entityId = null
+            }
+            this.idTable = null
             this.detachedFromRoot()
         }
 
-        this.idTable = idTable
-
         if (idTable) {
+            this.idTable = idTable
+            if (this.entityId === null) {
+                this.entityId = this.idTable.getNewId(this.transmitComponent.entity)
+            }
             this.attachedToRoot()
         }
     }
 
     attachedToRoot() {
-        if (this.entityId === null) {
-            this.entityId = this.idTable.getNewId(this.transmitComponent.entity)
-        }
-
         for (let transmitter of this.transmitters) {
             transmitter.attachedToRoot()
         }
@@ -94,11 +110,6 @@ export class TransmitterSet extends EventEmitter {
 
         for (let transmitter of this.transmitters) {
             transmitter.detachedFromRoot()
-        }
-
-        if (this.entityId !== null) {
-            this.idTable.removeId(this.entityId)
-            this.entityId = null
         }
 
         this.receivingEnd.emit("transmitter-set-detached", this)

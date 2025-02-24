@@ -7,6 +7,7 @@ import 'src/entity/types/bullet-mortar-ball/server-prefab'
 
 import 'src/entity/types/timer/server-prefab'
 import 'src/entity/types/flag/server-side/server-prefab'
+import 'src/entity/types/chat/server-side/server-prefab'
 
 import 'src/entity/types/controller-ctf/server-side/server-prefab'
 import 'src/entity/types/controller-dm/server-side/server-prefab'

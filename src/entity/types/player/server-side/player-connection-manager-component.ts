@@ -3,16 +3,18 @@ import Entity from "src/utils/ecs/entity";
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
 import SocketPortalClient from "src/server/socket/socket-portal-client";
 import {ReceivingEnd} from "src/entity/components/network/transmitting/receiving-end";
-import WorldCommunicationPacket from "src/networking/packets/game-packets/world-communication-packet";
+import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
 import PlayerControlsPacket from "src/networking/packets/game-packets/player-controls-packet";
 import PlayerActionPacket, {PlayerActionType} from "src/networking/packets/game-packets/player-action-packet";
-import PlayerChatPacket from "src/networking/packets/game-packets/player-chat-packet";
-import PlayerChatEvent from "src/events/player-chat-event";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerTankSelectPacket from "src/networking/packets/game-packets/player-tank-select-packet";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import PlayerPreferredTankComponent from "src/entity/types/player/server-side/player-preferred-tank-component";
+import ReadBuffer from "src/serialization/binary/read-buffer";
+import BinaryBlockCoder from "src/serialization/binary/parsers/binary-block-coder";
+import { commandName } from "src/entity/components/network/commands";
+import { getPrefabNameForEntity } from "src/entity/components/prefab-id-component";
 
 export default class PlayerConnectionManagerComponent extends EventHandlerComponent {
     client: SocketPortalClient
@@ -30,15 +32,16 @@ export default class PlayerConnectionManagerComponent extends EventHandlerCompon
         this.eventHandler.on("world-set", (world: Entity) => this.setWorld(world))
         this.eventHandler.on("tank-set", (tank: Entity) => this.setTank(tank))
 
+        client.on(WorldDataPacket, (packet) => {
+            let buffer = new ReadBuffer(packet.buffer.buffer)
+            this.onClientWorldData(buffer)
+        })
+
         client.on(PlayerControlsPacket, (packet) => {
             this.entity.emit("player-controls", packet)
         })
 
         client.on(PlayerActionPacket, (packet) => this.handlePlayerAction(packet.action))
-
-        client.on(PlayerChatPacket, (packet) => {
-            if(this.world) this.world.emit("player-chat", this.entity, new PlayerChatEvent(this.entity, packet.text))
-        })
 
         client.on(PlayerTankSelectPacket, (packet) => {
             this.entity.getComponent(PlayerPreferredTankComponent).selectPreferredTank(packet.tank)
@@ -55,12 +58,43 @@ export default class PlayerConnectionManagerComponent extends EventHandlerCompon
         if(!world) return null
 
         let worldTransmitComponent = world.getComponent(EntityDataTransmitComponent)
-        return worldTransmitComponent.transmitterSets.get(this.end)
+        return worldTransmitComponent.transmitterSetFor(this.end)
+    }
+
+    private onClientWorldData(buffer: ReadBuffer) {
+        BinaryBlockCoder.decodeBlock(buffer, (buffer, size) => {
+            let end = buffer.offset + size
+            while (buffer.offset < end) {
+                let entityId = buffer.readUint32()
+                BinaryBlockCoder.decodeBlock(buffer, (buffer, size) => {
+                    let command = buffer.readUint16()
+                    let entity = this.getEntityById(entityId)
+                    if (!entity) {
+                        console.error("Command " + commandName(command) + " is received for an unknown entity id " + entityId)
+                        return
+                    }
+
+                    let receiveComponent = entity.getComponent(EntityDataTransmitComponent)
+                    if(!receiveComponent) {
+                        console.error("Command " + commandName(command) + " is received for unsupported entity " + getPrefabNameForEntity(entity))
+                    }
+                    
+                    let set = receiveComponent.transmitterSetFor(this.end)
+                    set.handleResponse(command, this.entity, buffer, size)
+                });
+            }
+        })
+    }
+
+    private getEntityById(id: number) {
+        let transmitterSet = this.world.getComponent(EntityDataTransmitComponent).transmitterSetFor(this.end)
+        let table = transmitterSet.getIdTable()
+        return table.getEntityFor(id)
     }
 
     private updateClient() {
         if (!this.end.hasData()) return;
-        new WorldCommunicationPacket(this.end.spitBuffer()).sendTo(this.client.connection)
+        new WorldDataPacket(this.end.spitBuffer()).sendTo(this.client.connection)
     }
 
     private setWorld(world: Entity) {
