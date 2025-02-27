@@ -67,13 +67,16 @@ export default class Transmitter {
         this.eventHandler.setTarget(this.set.transmitComponent.entity)
     }
 
-    detachedFromRoot() {
+    willDetachFromRoot() {
         this.eventHandler.setTarget(null)
-        if(this.transmitterPrecondition) {
-            this.transmitterPrecondition.transmitterDetachedFromRoot()
-        }
         if(this.enabled) {
             this.onDisable()
+        }
+    }
+
+    detachedFromRoot() {
+        if(this.transmitterPrecondition) {
+            this.transmitterPrecondition.transmitterDetachedFromRoot()
         }
     }
 

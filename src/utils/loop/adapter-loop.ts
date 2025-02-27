@@ -25,7 +25,7 @@ export default class AdapterLoop extends Loop {
         this.timeCounter = 0
 
         if(config.parentLoop) {
-            config.parentLoop.run = (dt) => this.timePassed(dt)
+            config.parentLoop.on("tick", (dt) => this.timePassed(dt))
         }
     }
 

@@ -14,7 +14,6 @@ import TransformComponent from "src/entity/components/transform-component";
 import MapEditorPauseView from '../ui/pause/map-editor-pause';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import SceneController, { useScene } from 'src/client/scenes/scene-controller';
-import { BasicSceneDescriptor } from 'src/client/scenes/scene-descriptor';
 import ToolBarView from 'src/client/map-editor/ui/workspace-overlay/toolbar/toolbar';
 import Tool from '../tools/tool';
 import BrickBlockState from 'src/map/block-state/types/brick-block-state';
@@ -29,9 +28,7 @@ import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
 import { EntityType } from 'src/entity/entity-type';
 import GameMapNameComponent from '../map-name-component';
 import SpawnzonesComponent from 'src/map/spawnzones-component';
-import { convertErrorToLoadingError, LoadingError } from 'src/client/scenes/loading/loading-error';
-import { Progress } from 'src/client/utils/progress';
-import { ScenePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scenes/scene-prerequisite';
+import { TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scenes/scene-prerequisite';
 import LoadingScene from 'src/client/scenes/loading/loading-scene';
 import Sprite from 'src/client/graphics/sprite';
 import { ControlsProvider } from 'src/client/utils/react-controls-responder';
@@ -157,8 +154,8 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        scene.loop.run = onDraw
-        return () => scene.loop.run = null
+        scene.loop.on("tick", onDraw)
+        return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
 
     const onDrag = useCallback((dx: number, dy: number) => {
@@ -233,7 +230,7 @@ const MapEditorView: React.FC = () => {
                         toolManager={state.toolManager}
                     />
                     <EventsHUD/>
-                    <PauseOverlay rootComponent={<MapEditorPauseView/>} gameControls={state.controlsResponder}/>
+                    <PauseOverlay rootComponent={<MapEditorPauseView/>}/>
                 </EventsProvider>
             </MapEditorSceneContext.Provider>
         </ControlsProvider>

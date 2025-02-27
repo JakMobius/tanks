@@ -3,7 +3,6 @@ import ChatHUD, { ChatHUDProps } from "src/client/ui/chat-hud/chat-hud";
 import { Commands } from "../commands";
 import EntityDataReceiveComponent from "../receiving/entity-data-receive-component";
 import ReceiverComponent from "../receiving/receiver-component";
-import WriteBuffer from "src/serialization/binary/write-buffer";
 
 export default class ClientChatComponent extends ReceiverComponent {
 

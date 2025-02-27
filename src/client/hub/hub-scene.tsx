@@ -80,8 +80,8 @@ const HubView: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        scene.loop.run = onDraw
-        return () => scene.loop.run = null
+        scene.loop.on("tick", onDraw)
+        return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
 
     let userData = (window as any).userData as any as UserDataRaw

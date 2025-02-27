@@ -74,6 +74,7 @@ export class TransmitterSet extends EventEmitter {
         if (idTable === this.idTable) return
 
         if (this.idTable) {
+            this.willDetachFromRoot()
             if (this.entityId !== null) {
                 this.idTable.removeId(this.entityId)
                 this.entityId = null
@@ -101,6 +102,16 @@ export class TransmitterSet extends EventEmitter {
         }
 
         this.receivingEnd.emit("transmitter-set-attached", this)
+    }
+
+    willDetachFromRoot() {
+        for (let child of this.transmitComponent.entity.children) {
+            child.getComponent(EntityDataTransmitComponent)?.transmitterSetFor(this.receivingEnd)?.willDetachFromRoot()
+        }
+
+        for (let transmitter of this.transmitters) {
+            transmitter.willDetachFromRoot()
+        }
     }
 
     detachedFromRoot() {

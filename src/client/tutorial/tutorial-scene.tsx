@@ -112,8 +112,8 @@ const TutorialView: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        scene.loop.run = onDraw
-        return () => scene.loop.run = null
+        scene.loop.on("tick", onDraw)
+        return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
 
     useEffect(() => {
@@ -139,7 +139,7 @@ const TutorialView: React.FC = () => {
                 <TankInfoHUD world={state.game?.clientWorld} />
                 <EventsHUD />
                 <GameHUD keyedComponentsRef={gameHudRef} />
-                <PauseOverlay rootComponent={<GamePauseView />} gameControls={state.controlsResponder} />
+                <PauseOverlay rootComponent={<GamePauseView />}/>
             </EventsProvider>
         </ControlsProvider>
     )

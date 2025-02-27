@@ -34,6 +34,8 @@ export default class HighPrecisionLoop extends Loop {
         if(this.totalTime < -this.maximumTimestep) {
             this.totalTime = -this.maximumTimestep
         }
-        setTimeout(() => this.perform(), this.totalTime + this.interval)
+        let interval = this.totalTime + this.interval
+        if(interval < 0) setImmediate(() => this.perform())
+        else setTimeout(() => this.perform(), interval)
     }
 }

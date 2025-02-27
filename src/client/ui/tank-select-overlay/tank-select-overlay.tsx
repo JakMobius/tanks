@@ -3,11 +3,18 @@ import './tank-select-overlay.scss'
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import RenderLoop from "src/utils/loop/render-loop";
 import {TankStat, TankStats} from "src/stat-tests/tank-stats";
-import { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { createContext, Ref, RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import React from 'react';
 import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
 import { ControlsProvider, useControls } from 'src/client/utils/react-controls-responder';
+import TankPreviewCanvas from './tank-preview-canvas';
+import CanvasHandler from 'src/client/graphics/canvas-handler';
+import Sprite from 'src/client/graphics/sprite';
+import { useScene } from 'src/client/scenes/scene-controller';
+import AdapterLoop from 'src/utils/loop/adapter-loop';
+import EventEmitter from 'src/utils/event-emitter';
+import { availableFeatures } from 'src/client/utils/browsercheck/browser-check';
 
 const getTankForIndex = (item: number) => {
     let tankIndex = item % tankDescriptions.length
@@ -38,14 +45,21 @@ interface TankCarouselConfig extends CarouselConfig {
     width: number
 }
 
+interface TankSelectCarouselItemHandle {
+    updatePosition: (items: CarouselItem[]) => void
+}
+
 interface TankSelectCarouselItemProps {
-    item: CarouselItem
     carouselConfig: TankCarouselConfig
-    onClick: (index: number) => void
+    onClick: (index: number) => void,
+    ref: Ref<TankSelectCarouselItemHandle>,
+    index: number
 }
 
 const TankSelectCarouselItem: React.FC<TankSelectCarouselItemProps> = (props) => {
     const ref = React.useRef<HTMLDivElement>(null)
+
+    const [tankType, setTankType] = useState<number | null>(null)
 
     const selfWidth = 146 // TODO: hardcode?
 
@@ -57,116 +71,224 @@ const TankSelectCarouselItem: React.FC<TankSelectCarouselItemProps> = (props) =>
         return 1 - (1 - opacityFunction(distance)) * 0.5
     }
 
-    useEffect(() => {
-        if (!ref.current) return
+    useImperativeHandle(props.ref, () => ({
+        updatePosition: (items: CarouselItem[]) => {
+            let item = items[props.index]
+            const carouselRadius = props.carouselConfig.radius
+            const carouselWidth = props.carouselConfig.width
+            const carouselAngle = props.carouselConfig.angle
+            const carouselVisibleItems = props.carouselConfig.visibleItems
 
-        let item = ref.current
+            let angle = item.position * carouselAngle
+            let angleLimit = carouselVisibleItems * carouselAngle * 0.5
 
-        const carouselRadius = props.carouselConfig.radius
-        const carouselWidth = props.carouselConfig.width
-        const carouselAngle = props.carouselConfig.angle
-        const carouselVisibleItems = props.carouselConfig.visibleItems
+            let offsetX = Math.sin(angle) * carouselRadius;
+            let offsetY = -Math.cos(angle) * carouselRadius + carouselRadius;
 
-        let angle = props.item.position * carouselAngle
-        let angleLimit = carouselVisibleItems * carouselAngle * 0.5
+            let left = offsetX + carouselWidth / 2 - selfWidth / 2;
+            let top = offsetY
 
-        let offsetX = Math.sin(angle) * carouselRadius;
-        let offsetY = -Math.cos(angle) * carouselRadius + carouselRadius;
+            let distance = Math.min(Math.abs(angle) / angleLimit, 1)
 
-        let left = offsetX + carouselWidth / 2 - selfWidth / 2;
-        let top = offsetY
+            let opacity = opacityFunction(distance)
+            let scale = scaleFunction(distance)
 
-        let distance = Math.min(Math.abs(angle) / angleLimit, 1)
+            let div = ref.current
+            div.style.left = left + "px"
+            div.style.top = top + "px"
+            div.style.transform = "scale(" + scale + ", " + scale + ") rotate(" + angle + "rad)"
+            div.style.opacity = (opacity * 100).toFixed(2) + "%"
 
-        let opacity = opacityFunction(distance)
-        let scale = scaleFunction(distance)
-
-        item.style.left = left + "px"
-        item.style.top = top + "px"
-        item.style.transform = "scale(" + scale + ", " + scale + ") rotate(" + angle + "rad)"
-        item.style.opacity = (opacity * 100).toFixed(2) + "%"
-    }, [props.item, props.carouselConfig])
+            let tankIndex = item.index % tankDescriptions.length
+            if (tankIndex < 0) tankIndex += tankDescriptions.length
+            setTankType(tankDescriptions[tankIndex].type)
+        }
+    }), [props.index])
 
     const onClick = useCallback(() => {
-        props.onClick(props.item.index)
-    }, [props.onClick, props.item])
+        props.onClick(props.index)
+    }, [props.onClick, props.index])
 
     return (
         <div ref={ref} onClick={onClick} className="tank-select-carousel-item">
-            { 
-                /* TODO: add canvas and stuff */
-            }
+            <TankPreviewCanvas tankType={tankType}/>
         </div>
     )
 }
 
-interface TankSelectCarouselProps {
-    onClick: (index: number) => void
-    centerIndex: number
+interface TankSelectCarouselContextProps {
+    canvas: CanvasHandler
+    ticker: EventEmitter
 }
 
-const TankSelectCarousel: React.FC<TankSelectCarouselProps> = (props) => {
+export const TankSelectCarouselContext = createContext<TankSelectCarouselContextProps | null>(null)
 
-    const carouselConfig: TankCarouselConfig = {
+interface TankSelectCarouselDrawerProps {
+    children: React.ReactNode,
+    enabled: boolean
+}
+
+const TankSelectCarouselDrawer: React.FC<TankSelectCarouselDrawerProps> = (props) => {
+
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const useOffscreenCanvas = availableFeatures.OffscreenCanvas === true
+    const scene = useScene()
+    
+    const [context, setContext] = useState<TankSelectCarouselContextProps>({
+        canvas: null,
+        ticker: null
+    })
+
+    const onFrame = useCallback((dt: number) => {
+        context.ticker?.emit("tick", dt)
+    }, [context.ticker])
+
+    useEffect(() => {
+        let canvas: HTMLCanvasElement | OffscreenCanvas
+        let scale = window.devicePixelRatio ?? 1
+        let width = 146, height = 139
+        if(useOffscreenCanvas) {
+            canvas = new OffscreenCanvas(width * scale, height * scale)
+        } else {
+            canvas = canvasRef.current
+            canvas.width = width * scale
+            canvas.height = height * scale
+        }
+
+        let handler = new CanvasHandler(canvas)
+        let texture = Sprite.applyTexture(handler.ctx)
+        setContext({ canvas: handler, ticker: new EventEmitter() })
+        handler.setSize(width, height)
+
+        return () => Sprite.cleanupTexture(handler.ctx, texture)
+    }, [])
+
+    useEffect(() => {
+        if(!props.enabled) return undefined
+        scene.loop.on("tick", onFrame)
+        return () => scene.loop.off("tick", onFrame)
+    }, [props.enabled, onFrame])
+
+    return (<>
+        {
+            useOffscreenCanvas ? null : <canvas style={{visibility: "hidden"}} ref={canvasRef}></canvas>
+        }
+        {
+            context.canvas ? <TankSelectCarouselContext.Provider value={context} children={props.children}/> : null
+        }
+    </>)
+}
+
+interface TankSelectCarouselHandle {
+    setPosition: (position: number) => void
+    getPosition: () => number
+}
+
+interface TankSelectCarouselProps {
+    onClick: (index: number) => void
+    initialPosition: number,
+    shown: boolean,
+    ref: Ref<TankSelectCarouselHandle>
+}
+
+const TankSelectCarousel: React.FC<TankSelectCarouselProps> = React.memo((props) => {
+
+    const carouselConfig: TankCarouselConfig = useMemo(() => ({
         radius: 800,
         angle: 15 / 180 * Math.PI,
         width: 860,
         visibleItems: 5,
-        centerIndex: props.centerIndex
-    }
+        initialPosition: props.initialPosition
+    }), [])
 
-    const [state, setState] = React.useState({
+    const [state, setState] = useState({
         carouselController: React.useMemo(() => new CarouselController(carouselConfig), [])
     })
 
-    useEffect(() => {
-        state.carouselController.setCenterIndex(props.centerIndex)
-    }, [props.centerIndex])
+    const refs = (() => {
+        let result: RefObject<TankSelectCarouselItemHandle | null>[] = []
+        for (let i = 0; i < tankDescriptions.length; i++) {
+            result.push(useRef(null))
+        }
+        return result
+    })()
+
+    useImperativeHandle(props.ref, () => ({
+        setPosition: (position: number) => {
+            state.carouselController.setCenterIndex(position)
+            refs.forEach((ref) => ref.current?.updatePosition(state.carouselController.getItems()))
+        },
+        getPosition: () => {
+            return state.carouselController.centerIndex
+        }
+    }), [state.carouselController])
 
     return (
-        <div className="tank-select-carousel">
-            {state.carouselController.getItems().map((item, index) => (
-                <TankSelectCarouselItem
-                    onClick={props.onClick}
-                    key={index}
-                    carouselConfig={carouselConfig}
-                    item={{ ...item }} />
-            ))}
-        </div>
+        <TankSelectCarouselDrawer enabled={props.shown}>
+            <div className="tank-select-carousel">
+                {state.carouselController.getItems().map((item, index) => (
+                    <TankSelectCarouselItem
+                        ref={refs[index]}
+                        onClick={props.onClick}
+                        key={index}
+                        index={index}
+                        carouselConfig={carouselConfig}
+                        />
+                ))}
+            </div>
+        </TankSelectCarouselDrawer>
     );
+})
+
+interface TankStatRowHandle {
+    setValue: (value: number) => void
 }
 
 interface TankStatRowProps {
     label: string
-    value: number
-    medianStatValue: number
+    medianStatValue: number,
+    ref: Ref<TankStatRowHandle>
 }
 
 const TankStatRow: React.FC<TankStatRowProps> = (props) => {
 
-    const formatNumber= (number: number) => {
-        if(number < 0.01) return 0
+    const barRef = useRef<HTMLDivElement>(null)
+    const valueRef = useRef<HTMLDivElement>(null)
+
+    const formatNumber = (number: number) => {
+        if(number < 0.01) return "0"
         if(number < 0.1) return number.toFixed(2)
         if(number < 100) return number.toPrecision(2)
         return Math.round(number).toString()
     }
 
+    useImperativeHandle(props.ref, () => ({
+        setValue: (value: number) => {
+            barRef.current.style.width = (value / (value + props.medianStatValue)) * 100 + "%"
+            valueRef.current.innerText = formatNumber(value)
+        }
+    }), [])
+
     return (
         <div className="tank-stat-row">
             <div className="tank-stat-label">{props.label}</div>
             <div className="tank-stat-scale">
-                <div className="tank-stat-scale-bar" style={{width: (props.value / (props.value + props.medianStatValue)) * 100 + "%"}}></div>
+                <div className="tank-stat-scale-bar" ref={barRef}></div>
             </div>
-            <div className="tank-stat-value">{formatNumber(props.value)}</div>
+            <div className="tank-stat-value" ref={valueRef}></div>
         </div>
     )
+}
+
+interface TankCarouselButtonHandle {
+    triggerAnimation: () => void
 }
 
 interface TankCarouselButtonProps {
     left?: boolean
     right?: boolean
-    animationTrigger?: {} | null
-    onClick?: () => void
+    onClick?: () => void,
+    ref: Ref<TankCarouselButtonHandle>
 }
 
 const TankCarouselButton: React.FC<TankCarouselButtonProps> = (props) => {
@@ -175,21 +297,20 @@ const TankCarouselButton: React.FC<TankCarouselButtonProps> = (props) => {
     if (props.left) classNames.push("tank-carousel-button-left")
     if (props.right) classNames.push("tank-carousel-button-right")
 
-    let [triggered, setTriggered] = useState<boolean>(false)
+    const [triggered, setTriggered] = useState(false)
+    const intervalHandle = useRef<number | null>(null)
 
-    useEffect(() => {
-        if(!props.animationTrigger || triggered) return () => {}
+    useImperativeHandle(props.ref, () => ({
+        triggerAnimation: () => {
+            if(intervalHandle.current) return
 
-        setTriggered(true)
-        let timeout = window.setTimeout(() => {
-            setTriggered(false)
-        }, 200)
-
-        return () => {
-            clearTimeout(timeout)
-            setTriggered(false)
+            setTriggered(true)
+            intervalHandle.current = window.setTimeout(() => {
+                intervalHandle.current = null
+                setTriggered(false)
+            }, 200)
         }
-    }, [props.animationTrigger])
+    }), [])
     
     if (triggered) classNames.push("tank-carousel-button-active")
 
@@ -208,27 +329,24 @@ export interface TankSelectOverlayProps {
 }
 
 const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) => {
+    const initialPosition = 0
+
     const [state, setState] = useState({
         shown: false,
         required: false,
-        targetCarouselCenterIndex: 0,
-        carouselCenterIndex: 0,
-        leftAnimationTrigger: null as {} | null,
-        rightAnimationTrigger: null as {} | null,
         tankDescription: null as TankDescription | null,
-        tankStats: {
-            speed: 0,
-            damage: 0,
-            health: 0
-        } as TankStat,
-        animationLoop: useMemo(() => new RenderLoop({
-            timeMultiplier: 0.001,
-            maximumTimestep: 0.1
-        }), []),
     })
 
+    const scene = useScene()
     const gameControls = useControls()
     const controlsResponderRef = useRef<ControlsResponder | null>(null)
+    const carouselRef = useRef<TankSelectCarouselHandle | null>(null)
+    const leftButtonRef = useRef<TankCarouselButtonHandle | null>(null)
+    const rightButtonRef = useRef<TankCarouselButtonHandle | null>(null)
+    const targetPositionRef = useRef<number>(initialPosition)
+    const speedRowRef = useRef<TankStatRowHandle | null>(null)
+    const damageRowRef = useRef<TankStatRowHandle | null>(null)
+    const healthRowRef = useRef<TankStatRowHandle | null>(null)
 
     useImperativeHandle(props.ref, () => {
         return {
@@ -250,24 +368,18 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     }, [])
     
     const onNavigateLeft = useCallback(() => {
-        setState((state) => ({
-            ...state,
-            leftAnimationTrigger: {},
-            targetCarouselCenterIndex: state.targetCarouselCenterIndex - 1
-        }))
+        targetPositionRef.current--
+        leftButtonRef.current?.triggerAnimation()
     }, [])
 
     const onNavigateRight = useCallback(() => {
-        setState((state) => ({
-            ...state,
-            rightAnimationTrigger: {},
-            targetCarouselCenterIndex: state.targetCarouselCenterIndex + 1
-        }))
+        targetPositionRef.current++
+        rightButtonRef.current?.triggerAnimation()
     }, [])
 
     const onConfirm = useCallback(() => {
         setState((state) => {
-            let nearTankIndex = getNearIndex(state.carouselCenterIndex)
+            let nearTankIndex = getNearIndex(carouselRef.current.getPosition())
             let nearTank = getTankForIndex(nearTankIndex)
             props.onTankSelect(nearTank.type)
             return {
@@ -278,46 +390,54 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
         })
     }, [])
 
-    const onFrame = useCallback((dt: number) => setState((state) => {
-        let delta = state.targetCarouselCenterIndex - state.carouselCenterIndex
-
-        if(delta === 0) {
-            return state
-        }
+    const onFrame = useCallback((dt: number) => {
+        let currentPosition = carouselRef.current.getPosition()
+        let delta = targetPositionRef.current - currentPosition
 
         let newPosition
         if (Math.abs(delta) < 0.001) {
-            newPosition = state.targetCarouselCenterIndex
+            newPosition = targetPositionRef.current
         } else {
             let animationStep = delta - delta * Math.exp(-dt * 15)
-            newPosition = state.carouselCenterIndex + animationStep
+            newPosition = currentPosition + animationStep
         }
 
-        return { ...state, carouselCenterIndex: newPosition }
-    }), [])
+        carouselRef.current.setPosition(newPosition)
 
-    const onCarouselClick = useCallback((index: number) => {
-        setState((state) => {
-            if(state.targetCarouselCenterIndex === index) {
-                props.onTankSelect(index)
-                return state
-            }
+        let nearTankIndex = getNearIndex(newPosition)
+        let farTankIndex = getFarIndex(newPosition)
+        let farWeight = getFarWeight(newPosition)
+        let nearWeight = 1 - farWeight
+        let nearTank = getTankForIndex(nearTankIndex)
+        let farTank = getTankForIndex(farTankIndex)
+        
+        let nearStat = TankStats.stats[nearTank.type]
+        let farStat = TankStats.stats[farTank.type]
 
-            return {
-                ...state,
-                targetCarouselCenterIndex: index
-            }
+        speedRowRef.current.setValue(nearStat.speed * nearWeight + farStat.speed * farWeight)
+        damageRowRef.current.setValue(nearStat.damage * nearWeight + farStat.damage * farWeight)
+        healthRowRef.current.setValue(nearStat.health * nearWeight + farStat.health * farWeight)
+
+        setState(state => {
+            if(state.tankDescription === nearTank) return state
+            return { ...state, tankDescription: nearTank }
         })
     }, [])
 
-    useEffect(() => {
-        state.animationLoop.run = onFrame
+    const onCarouselClick = useCallback((index: number) => {
+        if(targetPositionRef.current === index) {
+            props.onTankSelect(index)
+        } else {
+            targetPositionRef.current = index
+        }
+    }, [])
 
+    useEffect(() => {
         controlsResponderRef.current.on("game-change-tank", toggleVisibility)
         controlsResponderRef.current.on("navigate-left", onNavigateLeft)
         controlsResponderRef.current.on("navigate-right", onNavigateRight)
         controlsResponderRef.current.on("confirm", onConfirm)
-        controlsResponderRef.current.on("navigate-back", toggleVisibility)
+        controlsResponderRef.current.on("navigate-back", toggleVisibility)        
     }, [])
 
     useEffect(() => {
@@ -328,52 +448,30 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
 
     useEffect(() => {   
         if(!state.shown) return undefined
-        state.animationLoop.start()
-        return () => state.animationLoop.stop()
+        scene.loop.on("tick", onFrame)
+        return () => scene.loop.off("tick", onFrame)
     }, [state.shown])
-
-    useEffect(() => {
-        let nearTankIndex = getNearIndex(state.carouselCenterIndex)
-        let farTankIndex = getFarIndex(state.carouselCenterIndex)
-        let farWeight = getFarWeight(state.carouselCenterIndex)
-        let nearWeight = 1 - farWeight
-        let nearTank = getTankForIndex(nearTankIndex)
-        let farTank = getTankForIndex(farTankIndex)
-        
-        let nearStat = TankStats.stats[nearTank.type]
-        let farStat = TankStats.stats[farTank.type]
-        
-        setState((state) => ({
-            ...state,
-            tankDescription: nearTank,
-            tankStats: {
-                speed: nearStat.speed * nearWeight + farStat.speed * farWeight,
-                damage: nearStat.damage * nearWeight + farStat.damage * farWeight,
-                health: nearStat.health * nearWeight + farStat.health * farWeight
-            }
-        }))
-    }, [state.carouselCenterIndex])
 
     return  (
         <ControlsProvider ref={controlsResponderRef} enabled={state.shown}>
             <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
                 <div className="tank-select-menu">
-                    <TankSelectCarousel centerIndex={state.carouselCenterIndex} onClick={onCarouselClick}/>
+                    <TankSelectCarousel ref={carouselRef} shown={state.shown} initialPosition={initialPosition} onClick={onCarouselClick}/>
                     <div className="tank-title-container">
                         <div className="tank-title">{state.tankDescription?.name}</div>
                         <TankCarouselButton left
-                            animationTrigger={state.leftAnimationTrigger}
+                            ref={leftButtonRef}
                             onClick={onNavigateLeft}/>
                         <TankCarouselButton right
-                            animationTrigger={state.rightAnimationTrigger}
+                            ref={rightButtonRef}
                             onClick={onNavigateRight}/>
                     </div>
                     <div className="tank-description-menu">
                         <div className="tank-description-text">{state.tankDescription?.description}</div>
                         <div className="tank-description-stats">
-                            <TankStatRow label="СКР" value={state.tankStats.speed} medianStatValue={TankStats.median.speed}/>
-                            <TankStatRow label="АТК" value={state.tankStats.damage} medianStatValue={TankStats.median.damage}/>
-                            <TankStatRow label="ЗАЩ" value={state.tankStats.health} medianStatValue={TankStats.median.health}/>
+                            <TankStatRow label="СКР" ref={speedRowRef} medianStatValue={TankStats.median.speed}/>
+                            <TankStatRow label="АТК" ref={damageRowRef} medianStatValue={TankStats.median.damage}/>
+                            <TankStatRow label="ЗАЩ" ref={healthRowRef} medianStatValue={TankStats.median.health}/>
                         </div>
                     </div>
                 </div>

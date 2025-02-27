@@ -84,8 +84,8 @@ const LoadingScene: React.FC<LoadingSceneProps> = (props: LoadingSceneProps) => 
     }, [])
 
     useEffect(() => {
-        scene.loop.run = onDraw
-        return () => scene.loop.run = null
+        scene.loop.on("tick", onDraw)
+        return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
 
     useEffect(() => {

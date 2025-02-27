@@ -1,3 +1,4 @@
+import EventEmitter from '../event-emitter';
 import ScheduledTask from './scheduled-task';
 
 export interface LoopConfig {
@@ -12,17 +13,17 @@ export interface LoopConfig {
     timeMultiplier?: number
 }
 
-export default class Loop {
+export default class Loop extends EventEmitter {
 	public schedule = new Map<number, ScheduledTask>();
 	public schedules = 0;
 	public ticks = 0;
 	public loopTimestamp = 0;
 	public maximumTimestep: number
 	public timeMultiplier: number;
-	public run: (dt: number) => void = null;
 	public running: boolean = false;
 
 	constructor(config: LoopConfig) {
+        super()
 	    config = Object.assign({
             maximumTimestep: 100,
             timeMultiplier: 1
@@ -73,9 +74,7 @@ export default class Loop {
 
             this.runScheduledTasks(dt)
 
-            if(this.run) {
-                this.run(dt)
-            }
+            this.emit("tick", dt)
         } else {
             this.loopTimestamp = undefined
         }

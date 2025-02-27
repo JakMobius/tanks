@@ -10,11 +10,42 @@
     <link rel="stylesheet" href="static/styles/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,400;0,700;1,900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cousine:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="apple-touch-icon-iphone-60x60.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="apple-touch-icon-ipad-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="apple-touch-icon-iphone-retina-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="apple-touch-icon-ipad-retina-152x152.png">
 
     <script>window.userData = {{{ userData }}};</script>
     <script src="static/index.js" defer></script>
 </head>
 <body>
-
+    <noscript>
+        <div class="loading-overlay">
+            <div class="loading-view">
+                <div class="tank-image"></div>
+                <div class="loading-header">JavaScript отключен</div>
+                <div class="loading-error-description">Танчики не смогут работать без него. Разрешите JavaScript в настройках браузера и перезагрузите страницу.</div>
+            </div>
+        </div>
+    </noscript>
+    <div class="loading-overlay" style="display: none">
+        <div class="loading-view">
+            <div class="tank-image"></div>
+            <div class="loading-header">Пожалуйста, подождите</div>
+            <div class="loading-error-description" style="display: none;"></div>
+            <div class="loading-error-button-container" style="display: none;">
+                <div class="loading-error-button" onclick="window.location.reload();">
+                    Попробовать еще раз
+                </div>
+            </div>
+        </div>
+        <script>
+            let noscript = document.querySelector("noscript")
+            noscript.parentNode.removeChild(noscript)
+            document.querySelector(".loading-overlay").style.display = null
+        </script>
+    </div>
 </body>
 </html>

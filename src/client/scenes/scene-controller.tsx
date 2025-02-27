@@ -44,9 +44,13 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
             maximumTimestep: 0.1
         })
 
-        const observer = new ResizeObserver((value) => canvasHandler.updateSize())
+        const updateSize = () => {
+            canvasHandler.setSize(canvas.clientWidth, canvas.clientHeight)
+        }
+
+        const observer = new ResizeObserver(updateSize)
         observer.observe(canvas)
-        canvasHandler.updateSize()
+        updateSize()
 
         setState(state => ({
             ...state,

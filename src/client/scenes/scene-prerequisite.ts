@@ -2,10 +2,14 @@
 import { SceneContextProps, useScene } from "src/client/scenes/scene-controller";
 import Downloader from "src/client/utils/downloader";
 import Sprite from "src/client/graphics/sprite";
-import { Progress } from "src/client/utils/progress";
+import { Progress, ProgressLeaf } from "src/client/utils/progress";
 import { SoundAssets } from "src/client/sound/sounds";
-import { convertErrorToLoadingError, LoadingError } from "./loading/loading-error";
+import { BasicMessageLoadingError, convertErrorToLoadingError, LoadingError } from "./loading/loading-error";
 import { useEffect, useState } from "react";
+import ConnectionClient from "src/networking/connection-client";
+import PageLocation from "./page-location";
+import { internetErrorMessageGenerator, missingRoomNameErrorMessageGenerator } from "./loading/error-message-generator";
+import WebsocketConnection from "../networking/websocket-connection";
 
 export class ScenePrerequisite {
     resolve(scene: SceneContextProps): Progress {
@@ -84,5 +88,57 @@ export class TexturesResourcePrerequisite extends ScenePrerequisite {
 
     override getLocalizedDescription(): string | null {
         return "Загрузка текстур"
+    }
+}
+
+export class SocketConnectionPrerequisite extends ScenePrerequisite {
+    client: ConnectionClient | null
+
+    resolve(): Progress {
+        let room = PageLocation.getHashJson().room
+
+        if (!room) {
+            return Progress.failed(new BasicMessageLoadingError(missingRoomNameErrorMessageGenerator.generateVariant())
+                .withRetryAction(() => window.location.reload())
+                .withGoBackAction())
+        }
+
+        let progress = new ProgressLeaf()
+
+        let protocol = "ws:"
+        if(location.protocol == "https:") {
+            protocol = "wss:"
+        }
+        let ip = protocol + "//" + window.location.host + "/game-socket"
+
+        const connection = new WebsocketConnection(ip + "?room=" + room)
+        connection.suspend()
+
+        let cleanup = () => {
+            connection.off("ready", readyHandler)
+            connection.off("error", errorHandler)
+        }
+
+        let readyHandler = () => {
+            this.client = new ConnectionClient(connection)
+            progress.complete()
+            cleanup()
+        }
+
+        let errorHandler = () => {
+            progress.fail(new BasicMessageLoadingError(internetErrorMessageGenerator.generateVariant())
+                .withRetryAction(() => window.location.reload())
+                .withGoBackAction())
+            cleanup()
+        }
+
+        connection.on("ready", readyHandler)
+        connection.on("error", errorHandler)
+
+        return progress
+    }
+
+    getLocalizedDescription(): string | null {
+        return "Подключение к игровой сессии"
     }
 }

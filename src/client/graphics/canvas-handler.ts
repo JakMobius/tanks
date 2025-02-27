@@ -9,11 +9,11 @@ export default class CanvasHandler {
     public inactiveFramebufferIndex: number;
 
     public ctx: WebGLRenderingContext = null
-    public canvas: HTMLCanvasElement = null
+    public canvas: HTMLCanvasElement | OffscreenCanvas = null
 
     public scale: number
     
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement | OffscreenCanvas) {
         this.canvas = canvas
         this.initCanvas()
         this.ctx = this.getContext()
@@ -25,9 +25,11 @@ export default class CanvasHandler {
         try {
             ctx = this.canvas.getContext("webgl")
         } catch(ignored) {}
-        try {
-            ctx = this.canvas.getContext("experimental-webgl") as WebGLRenderingContext
-        } catch(ignored) {}
+        if(this.canvas instanceof HTMLCanvasElement) {
+            try {
+                ctx = this.canvas.getContext("experimental-webgl") as WebGLRenderingContext
+            } catch(ignored) {}
+        }
 
         if(!ctx) throw new Error("WebGL not supported")
 
@@ -35,10 +37,6 @@ export default class CanvasHandler {
         ctx.blendFuncSeparate(ctx.SRC_ALPHA, ctx.ONE_MINUS_SRC_ALPHA, ctx.ONE, ctx.ONE_MINUS_SRC_ALPHA);
         ctx.depthFunc(ctx.LEQUAL)
         return ctx
-    }
-
-    updateSize() {
-        this.setSize(this.canvas.clientWidth, this.canvas.clientHeight)
     }
 
     setSize(width: number, height: number) {

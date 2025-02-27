@@ -180,7 +180,8 @@ const GameCreateViewComponent: React.FC = () => {
                 blue={state.roomValid}
                 red={!state.roomValid}
                 placeholder="Название комнаты"
-                onChange={handleNameChange} />
+                onChange={handleNameChange}
+                onEnter={createRoom}/>
             { state.maps !== null ? (
                 <PauseKeySelectRow blue title="Карта" options={state.maps} onChange={handleMapChange} />
             ) : (

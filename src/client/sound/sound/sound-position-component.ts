@@ -90,6 +90,8 @@ export default class SoundPositionComponent extends EventHandlerComponent {
     private onCameraAttach(camera: Entity) {
         let soundPrimaryComponent = this.entity.getComponent(SoundPrimaryComponent)
         let soundStream = soundPrimaryComponent.soundSources.get(camera)
+        if(!soundStream) return
+        
         let context = soundStream.filterSet.context
         let filter = new SoundPositionFilter(context)
 

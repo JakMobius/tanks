@@ -19,11 +19,7 @@ import PlayerNicksHUD from '../ui/player-nicks-hud/player-nicks-hud';
 import TankInfoHUD from '../ui/tank-info-hud/tank-info-hud';
 import PauseOverlay from '../ui/pause-overlay/pause-overlay';
 import GamePauseView from './game-pause-view';
-import { Progress, ProgressLeaf } from '../utils/progress';
-import PageLocation from '../scenes/page-location';
 import { convertErrorToLoadingError, LoadingError, BasicMessageLoadingError } from '../scenes/loading/loading-error';
-import { internetErrorMessageGenerator, missingRoomNameErrorMessageGenerator } from '../scenes/loading/error-message-generator';
-import WebsocketConnection from '../networking/websocket-connection';
 import PrimaryEntityControls from 'src/entity/components/primary-entity-controls';
 import TankSelectOverlay, { TankSelectOverlayHandle } from '../ui/tank-select-overlay/tank-select-overlay';
 import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
@@ -31,7 +27,7 @@ import EventsHUD, { EventsProvider } from '../ui/events-hud/events-hud';
 import GameHUD from '../ui/game-hud/game-hud';
 import { KeyedComponentsHandle } from '../utils/keyed-component';
 import LoadingScene from '../scenes/loading/loading-scene';
-import { ScenePrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from '../scenes/scene-prerequisite';
+import { SocketConnectionPrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from '../scenes/scene-prerequisite';
 import Sprite from '../graphics/sprite';
 import WriteBuffer from 'src/serialization/binary/write-buffer';
 import { ControlsProvider } from "../utils/react-controls-responder";
@@ -113,8 +109,6 @@ const GameView: React.FC<GameViewConfig> = (props) => {
             remoteControlsManager: remoteControlsManager
         }))
 
-        props.client.connection.resume()
-
         return () => {
             scene.setTitle(undefined)
             scene.loop.stop()
@@ -150,8 +144,8 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     }, [])
 
     useEffect(() => {
-        scene.loop.run = onDraw
-        return () => scene.loop.run = null
+        scene.loop.on("tick", onDraw)
+        return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
 
     const updateIntervalIndexRef = useRef<number | null>(null)
@@ -180,6 +174,11 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         state.world.on("choose-tank", onChooseTank)
         state.world.on("event-view", onEventView)
         state.world.on("hud-view", onHudView)
+
+        if(props.client.connection.isSuspended()) {
+            props.client.connection.resume()
+        }
+
         return () => {
             state.world.off("choose-tank", onChooseTank)
             state.world.off("event-view", onEventView)
@@ -220,58 +219,6 @@ const GameScene: React.FC = () => {
         return <GameView client={connectionPrerequisite.client} onError={onError}/>
     } else {
         return <LoadingScene progress={prerequisites.progress} error={prerequisites.error ?? gameError}/>
-    }
-}
-
-class SocketConnectionPrerequisite extends ScenePrerequisite {
-    client: ConnectionClient | null
-
-    resolve(): Progress {
-        let room = PageLocation.getHashJson().room
-
-        if (!room) {
-            return Progress.failed(new BasicMessageLoadingError(missingRoomNameErrorMessageGenerator.generateVariant())
-                .withRetryAction(() => window.location.reload())
-                .withGoBackAction())
-        }
-
-        let progress = new ProgressLeaf()
-
-        let protocol = "ws:"
-        if(location.protocol == "https:") {
-            protocol = "wss:"
-        }
-        let ip = protocol + "//" + window.location.host + "/game-socket"
-
-        const connection = new WebsocketConnection(ip + "?room=" + room)
-        connection.suspend()
-
-        let cleanup = () => {
-            connection.off("ready", readyHandler)
-            connection.off("error", errorHandler)
-        }
-
-        let readyHandler = () => {
-            this.client = new ConnectionClient(connection)
-            progress.complete()
-            cleanup()
-        }
-
-        let errorHandler = () => {
-            progress.fail(new BasicMessageLoadingError(internetErrorMessageGenerator.generateVariant())
-                .withRetryAction(() => window.location.reload())
-                .withGoBackAction())
-            cleanup()
-        }
-
-        connection.on("ready", readyHandler)
-        connection.on("error", errorHandler)
-
-        return progress
-    }
-
-    getLocalizedDescription(): string | null {
-        return "Подключение к игровой сессии"
     }
 }
 

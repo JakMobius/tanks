@@ -27,7 +27,7 @@ export default class WorldPhysicalLoopComponent extends EventHandlerComponent {
             }
         })
 
-        loop.run = () => this.entity.getComponent(PhysicalHostComponent).tickPhysics()
+        loop.on("tick", () => this.entity.getComponent(PhysicalHostComponent).tickPhysics())
         loop.start()
     }
 }

@@ -64,24 +64,20 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
 
         this.eventHandler.on("set-firing", (isFiring: boolean) => this.onFiringSet(isFiring))
         this.eventHandler.on("tick", (dt: number) => this.onTick(dt))
-
-        this.setupSound()
     }
 
-    setupSound() {
+    startSound() {
         this.soundEntity = new Entity()
         this.soundEntity.addComponent(new SoundPrimaryComponent((listener) => {
             return new FlameEffectSoundSource(listener.engine)
         }))
         this.soundEntity.addComponent(new SoundPositionComponent())
-    }
-
-    startSound() {
+        this.entity.appendChild(this.soundEntity)
         this.soundEntity.getComponent(SoundPrimaryComponent).startAll()
     }
 
     stopSound() {
-        this.soundEntity.getComponent(SoundPrimaryComponent).stopAll()
+        this.soundEntity.removeFromParent()
     }
 
     onFiringSet(isFiring: boolean) {

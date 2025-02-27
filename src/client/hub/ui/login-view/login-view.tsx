@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { localizeAjaxError } from "../../localizations";
 import { PauseInputDetailDisclosure, PauseInputRow } from "src/client/ui/pause-overlay/elements/pause-input-row";
 import { PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view";
@@ -6,16 +6,14 @@ import Cloud from "src/client/game/ui/cloud/cloud";
 import { useNavigation } from "src/client/ui/navigation/navigation-view";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
 import RegisterView from "../register-view/register-view";
-import { useEvents } from "src/client/ui/events-hud/events-hud";
-import { BasicEvent } from "src/client/ui/events-hud/basic-event-view";
 import { api } from "src/client/networking/api";
 import { useAbortControllerCleanup } from "src/client/utils/abort-controller-cleanup";
 
 const LoginView: React.FC = () => {
 
     const navigation = useNavigation()
-    const events = useEvents()
     const { addCleanup, removeCleanup } = useAbortControllerCleanup()
+    const passwordField = React.useRef<HTMLInputElement>(null)
 
     const [state, setState] = React.useState({
         login: "",
@@ -72,6 +70,10 @@ const LoginView: React.FC = () => {
         navigation.push(<RegisterView/>)
     }
 
+    const onLoginEnter = useCallback(() => {
+        passwordField.current?.focus()
+    }, [passwordField.current])
+
     return (
         <PauseNavigationItem title="Вход" rightNavigationItem={
             <Cloud 
@@ -84,11 +86,14 @@ const LoginView: React.FC = () => {
             <PauseInputRow
                 blue
                 onChange={setLogin}
+                onEnter={onLoginEnter}
                 placeholder="Позывной"
             />
             <PauseInputRow
                 blue
+                ref={passwordField}
                 onChange={setPassword}
+                onEnter={onLogin}
                 placeholder="••••••••••"
                 type="password"
                 button={<PauseInputDetailDisclosure blue button onClick={onLogin}/>}

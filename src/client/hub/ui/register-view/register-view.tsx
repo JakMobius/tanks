@@ -6,7 +6,7 @@ import {passwordScore} from "src/data-checkers/password-checker";
 import { PauseNavigationItem } from "src/client/ui/pause-overlay/pause-menu-view";
 import { PauseInputRow, PauseInputDetailDisclosure } from "src/client/ui/pause-overlay/elements/pause-input-row";
 import TipList, { Tip, TipStyle } from "../../tip-list/tip-list";
-import React from "react";
+import React, { useCallback } from "react";
 import { api } from "src/client/networking/api";
 import { useAbortControllerCleanup } from "src/client/utils/abort-controller-cleanup";
 
@@ -22,6 +22,8 @@ const RegisterView: React.FC = () => {
         passwordCorrect: false,
         passwordStrengthClass: "",
     })
+
+    const passwordInput = React.useRef<HTMLInputElement>(null)
 
     const { addCleanup, removeCleanup } = useAbortControllerCleanup()
 
@@ -143,18 +145,25 @@ const RegisterView: React.FC = () => {
         })
     }
 
+    const onLoginEnter = useCallback(() => {
+        passwordInput.current?.focus()
+    }, [passwordInput.current])
+
     return (
         <PauseNavigationItem title="Регистрация" rightNavigationItem>
             <PauseInputRow
                 blue={state.loginCorrect}
                 red={!state.loginCorrect}
                 onChange={setLogin}
+                onEnter={onLoginEnter}
                 placeholder="Позывной"
             />
             <PauseInputRow
+                ref={passwordInput}
                 blue={state.passwordCorrect}
                 red={!state.passwordCorrect}
                 onChange={setPassword}
+                onEnter={onRegister}
                 placeholder="••••••••••"
                 type="password"
                 className={state.passwordStrengthClass}

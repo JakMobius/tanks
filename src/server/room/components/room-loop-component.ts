@@ -9,9 +9,9 @@ export default class RoomLoopComponent implements Component {
 
     constructor(loop: Loop) {
         this.loop = loop
-        loop.run = (dt) => {
+        loop.on("tick", (dt) => {
             this.entity.emit("tick", dt)
-        }
+        })
     }
 
     onAttach(entity: Entity): void {

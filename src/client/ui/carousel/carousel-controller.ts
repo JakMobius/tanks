@@ -1,7 +1,7 @@
 
 export interface CarouselConfig {
     visibleItems: number
-    centerIndex: number
+    initialPosition: number
 }
 
 export interface CarouselItem {
@@ -24,7 +24,7 @@ export default class CarouselController {
             this.items.push({ index: i, position: 0 })
         }
 
-        this.setCenterIndex(this.centerIndex)
+        this.setCenterIndex(config.initialPosition)
     }
 
     private updateItemIndexIfNeeded(item: CarouselItem) {

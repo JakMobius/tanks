@@ -1,0 +1,21 @@
+div.browser-link-container {
+  width: 350px;
+  text-align: center;
+}
+
+a.browser-link {
+  display: inline-block;
+  margin: 4px 10px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+
+  &:hover {
+    background: #f1f1f5;
+  }
+
+  p {
+    color: #11E;
+  }
+}

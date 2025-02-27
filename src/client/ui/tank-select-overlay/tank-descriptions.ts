@@ -1,5 +1,4 @@
 import {EntityType} from "src/entity/entity-type";
-import Entity from "src/utils/ecs/entity";
 
 export interface TankDescription {
     type: number,

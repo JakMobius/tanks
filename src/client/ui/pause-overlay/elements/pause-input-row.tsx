@@ -3,7 +3,7 @@ import './pause-input-row.scss';
 import PauseKeyValueRow from "src/client/ui/pause-overlay/elements/pause-key-value-row";
 import AutoresizeInput from "src/client/ui/elements/autoresize-input/autoresize-input";
 import Cloud, { CloudProps } from "src/client/game/ui/cloud/cloud";
-import React, { useState } from 'react';
+import React, { useState, useCallback, useImperativeHandle } from 'react';
 
 interface AutoresizeInputCloudProps extends CloudProps {
     prefix?: string,
@@ -98,6 +98,8 @@ interface PauseInputRowProps {
     className?: string
     onButtonClick?: () => void
     onChange?: (value: string) => void
+    onEnter?: () => void
+    ref?: React.RefObject<HTMLInputElement>
 }
 
 export const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
@@ -105,6 +107,10 @@ export const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {    
         props.onChange?.(e.target.value);
     }
+
+    const handleKeydown = useCallback((e: React.KeyboardEvent) => {
+        if(e.key === "Enter") props.onEnter?.();
+    }, [props.onEnter])
 
     return (
         <div className={"pause-input-row " + (props.className ?? "")}>
@@ -114,10 +120,12 @@ export const PauseInputRow: React.FC<PauseInputRowProps> = (props) => {
                 red={props.red}
             >
                 <input
+                    ref={props.ref}
                     type={props.type}
                     value={props.value}
                     placeholder={props.placeholder}
                     onChange={handleChange}
+                    onKeyDown={handleKeydown}
                 />
             </Cloud>
             {props.button}

@@ -23,8 +23,8 @@ export default class RenderLoop extends Loop {
 
     cycle(dt: number) {
         this.frame = requestAnimationFrame((time) => {
-            this.perform(time)
             this.frame = null
-        });
+            this.perform(time)
+        })
     }
 }
