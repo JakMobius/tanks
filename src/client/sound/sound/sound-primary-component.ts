@@ -128,9 +128,9 @@ export default class SoundPrimaryComponent extends EventHandlerComponent {
         soundSource.disconnect(listener.node)
         this.soundSources.delete(camera)
 
-        if(!this.soundSources) [
+        if(!this.soundSources.size) {
             this.entity.emit("ended")
-        ]
+        }
     }
 
     startAll() {

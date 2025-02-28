@@ -1,10 +1,8 @@
 import './tank-select-overlay.scss'
 
-import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
-import RenderLoop from "src/utils/loop/render-loop";
-import {TankStat, TankStats} from "src/stat-tests/tank-stats";
-import { createContext, Ref, RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import React from 'react';
+import {ControlsResponder} from "src/client/controls/root-controls-responder";
+import {TankStats} from "src/stat-tests/tank-stats";
+import React, { createContext, Ref, RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
 import { ControlsProvider, useControls } from 'src/client/utils/react-controls-responder';
