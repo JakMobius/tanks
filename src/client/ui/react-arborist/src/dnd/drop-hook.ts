@@ -1,11 +1,10 @@
-import { RefObject } from "react";
+import { RefObject, useEffect } from "react";
 import { ConnectDropTarget, useDrop } from "react-dnd";
 import { useTreeApi } from "../context";
 import { NodeApi } from "../interfaces/node-api";
 import { DragItem } from "../types/dnd";
 import { computeDrop } from "./compute-drop";
 import { actions as dnd } from "../state/dnd-slice";
-import { safeRun } from "../utils";
 import { ROOT_ID } from "../data/create-root";
 
 export type DropResult = {
@@ -18,13 +17,17 @@ export function useDropHook(
   node: NodeApi<any>,
 ): ConnectDropTarget {
   const tree = useTreeApi();
-  const [_, dropRef] = useDrop<DragItem, DropResult | null, void>(
+  const [{ isOver }, dropRef] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
     () => ({
       accept: "NODE",
       canDrop: () => tree.canDrop(),
       hover: (_item, m) => {
         const offset = m.getClientOffset();
-        if (!el.current || !offset) return;
+        if (!m.isOver({ shallow: true })) return;
+        if (!el.current || !offset) {
+          tree.hideCursor()
+          return
+        }
         const { cursor, drop } = computeDrop({
           element: el.current,
           offset: offset,
@@ -41,21 +44,30 @@ export function useDropHook(
           tree.hideCursor();
         }
       },
-      drop: (_, m) => {
+      drop: (item, m) => {
         if (!m.canDrop()) return null;
         let { parentId, index, dragIds } = tree.state.dnd;
-        safeRun(tree.props.onMove, {
-          dragIds,
+        tree.props.onDrop?.({
+          item,
+          index: index === null ? 0 : index,
           parentId: parentId === ROOT_ID ? null : parentId,
-          index: index === null ? 0 : index, // When it's null it was dropped over a folder
-          dragNodes: tree.dragNodes,
           parentNode: tree.get(parentId),
-        });
+        })
         tree.open(parentId);
       },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+      }),
     }),
     [node, el.current, tree.props],
   );
+
+  useEffect(() => {
+    if (!isOver) {
+      tree.hideCursor()
+      tree.dispatch(dnd.hovering(null, null));
+    }
+  }, [isOver]);
 
   return dropRef;
 }

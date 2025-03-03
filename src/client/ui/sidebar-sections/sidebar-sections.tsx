@@ -8,10 +8,11 @@ export  interface SidebarSectionHeight {
     collapsed: boolean
 }
 
-export  interface SidebarSectionContextProps {
+export interface SidebarSectionContextProps {
+    savedHeight: number
     height: number
-    collapse: (height: number) => void
-    expand: (height: number, minHeight: number) => void
+    collapse: () => void
+    expand: () => void
     dragEdge: (dy: number) => void
 }
 
@@ -20,6 +21,8 @@ export const SidebarSectionContext = createContext<SidebarSectionContextProps | 
 export interface SidebarSectionsProps {
     sections: number
     sectionContent: (index: number) => React.ReactNode
+    minSectionHeight: number
+    collapsedSectionHeight: number
 }
 
 export const SidebarSections: React.FC<SidebarSectionsProps> = (props) => {
@@ -160,7 +163,7 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = (props) => {
             if(state.sectionHeights === null) {
                 let sectionHeight = newHeight / props.sections
                 newHeights = Array.from({length: props.sections}).map((_, i) => ({
-                    min: 0,
+                    min: props.minSectionHeight,
                     current: sectionHeight,
                     collapsed: false
                 }))
@@ -178,12 +181,22 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = (props) => {
 
     const getContextFor = (section: number) => {
         return {
+            ...state.sectionContexts?.[section],
             height: state.sectionHeights[section].current,
-            collapse(height) {
-                setSectionHeight(section, height, height, true)
+            collapse() {
+                let heights = stateRef.current.sectionHeights
+                let contexts = stateRef.current.sectionContexts
+                if(heights[section].collapsed) return
+                let height = heights[section].current
+                contexts[section].savedHeight = height
+                setSectionHeight(section, props.collapsedSectionHeight, props.collapsedSectionHeight, true)
             },
-            expand(height, minHeight) {
-                setSectionHeight(section, height, minHeight, false)
+            expand() {
+                let heights = stateRef.current.sectionHeights
+                let contexts = stateRef.current.sectionContexts
+                if(!heights[section].collapsed) return
+                let height = contexts[section].savedHeight ?? props.minSectionHeight
+                setSectionHeight(section, height, props.minSectionHeight, false)
             },
             dragEdge(dy) {
                 dragSectionEdge(section, dy)

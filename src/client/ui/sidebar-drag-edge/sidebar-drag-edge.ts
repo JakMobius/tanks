@@ -51,8 +51,9 @@ const Dragger: React.FC<DraggerProps> = (props) => {
 
     useEffect(() => {
         if(!draggerRef.current) return undefined
-        draggerRef.current.addEventListener("mousedown", onDragEdgeMouseDown)
-        return () => draggerRef.current.removeEventListener("mousedown", onDragEdgeMouseDown)
+        let dragger = draggerRef.current
+        dragger.addEventListener("mousedown", onDragEdgeMouseDown)
+        return () => dragger.removeEventListener("mousedown", onDragEdgeMouseDown)
     }, [draggerRef.current])
 
     return props.contents(draggerRef)

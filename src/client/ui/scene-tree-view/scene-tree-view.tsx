@@ -1,58 +1,18 @@
 import "./scene-tree-view.scss"
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CreateHandler, DeleteHandler, DragPreviewProps, MoveHandler, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
+import { CreateHandler, DeleteHandler, DragPreviewProps, DropHandler, MoveHandler, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
 import Entity from 'src/utils/ecs/entity';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityEditorTreeNodeComponent, EntityEditorTreeRootComponent, EntityTreeNode } from "./components";
+import { SceneEntityLibraryDropItem } from "../scene-entity-library/scene-entity-library";
 
 const SceneTreeView: React.FC = () => {
 
     const rootEntity = useMemo(() => {
         let rootEntity = new Entity()
-        rootEntity.addComponent(new EntityEditorTreeNodeComponent("Мир"))
+        rootEntity.addComponent(new EntityEditorTreeNodeComponent())
         rootEntity.addComponent(new EntityEditorTreeRootComponent())
-
-        let e1 = new Entity()
-        e1.addComponent(new EntityEditorTreeNodeComponent("Карта"))
-        rootEntity.appendChild(e1)
-
-        let ctf = new Entity()
-        ctf.addComponent(new EntityEditorTreeNodeComponent("Режим CTF"))
-        rootEntity.appendChild(ctf)
-
-        let dm = new Entity()
-        dm.addComponent(new EntityEditorTreeNodeComponent("Режим DM"))
-        rootEntity.appendChild(dm)
-
-        let tdm = new Entity()
-        tdm.addComponent(new EntityEditorTreeNodeComponent("Режим TDM"))
-        rootEntity.appendChild(tdm)
-
-        let race = new Entity()
-        race.addComponent(new EntityEditorTreeNodeComponent("Режим RACE"))
-        rootEntity.appendChild(race)
-
-        let spawnZones = new Entity()
-        spawnZones.addComponent(new EntityEditorTreeNodeComponent("Зоны спавна"))
-        rootEntity.appendChild(spawnZones)
-
-        let zone1 = new Entity()
-        zone1.addComponent(new EntityEditorTreeNodeComponent("Спавн синих"))
-        spawnZones.appendChild(zone1)
-
-        let zone2 = new Entity()
-        zone2.addComponent(new EntityEditorTreeNodeComponent("Спавн красных"))
-        spawnZones.appendChild(zone2)
-
-        let zone3 = new Entity()
-        zone3.addComponent(new EntityEditorTreeNodeComponent("Спавн зеленых"))
-        spawnZones.appendChild(zone3)
-
-        let zone4 = new Entity()
-        zone4.addComponent(new EntityEditorTreeNodeComponent("Спавн желтых"))
-        spawnZones.appendChild(zone4)
-
         return rootEntity
     }, [])
 
@@ -84,20 +44,33 @@ const SceneTreeView: React.FC = () => {
         getNodeById(id).setName(name)
         updateRoot()
     };
-    const onMove: MoveHandler<EntityTreeNode> = ({ dragIds, parentId, index }) => {
-        let parent = getNodeById(parentId).entity
-        let after = index === 0 ? null : parent.children[index - 1]
-        for (let id of dragIds) {
-            let node = getNodeById(id)
-            let entity = node.entity
-            if (after !== entity) {
-                entity.removeFromParent()
-                parent.insertChildAfter(entity, after)
+
+    const onDrop: DropHandler<EntityTreeNode> = ({ item, parentId, index }) => {
+        if(item.tree === treeRef.current) {
+            let dragIds = treeRef.current.state.dnd.dragIds
+            let parent = getNodeById(parentId).entity
+            let after = index === 0  ? null : parent.children[index - 1]
+            for (let id of dragIds) {
+                let node = getNodeById(id)
+                let entity = node.entity
+                if (after !== entity) {
+                    entity.removeFromParent()
+                    parent.insertChildAfter(entity, after)
+                }
+                after = entity
             }
-            after = entity
+            updateRoot()
+        } else if(item.userData instanceof SceneEntityLibraryDropItem) {
+            let dropItem = item.userData as SceneEntityLibraryDropItem
+            let entity = new Entity()
+            dropItem.prefab(entity)
+            let parent = getNodeById(parentId).entity
+            let after = index === 0  ? null : parent.children[index - 1]
+            parent.insertChildAfter(entity, after)
+            updateRoot()
         }
-        updateRoot()
-    };
+    }
+
     const onDelete: DeleteHandler<EntityTreeNode> = ({ ids }) => {
         for (let id of ids) {
             getNodeById(id).entity.removeFromParent()
@@ -121,7 +94,7 @@ const SceneTreeView: React.FC = () => {
                 data={treeRoot.children}
                 onCreate={onCreate}
                 onRename={onRename}
-                onMove={onMove}
+                onDrop={onDrop}
                 onDelete={onDelete}
                 selectionFollowsFocus={true}
                 ref={treeRef}

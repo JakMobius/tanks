@@ -30,18 +30,12 @@ const SidebarSection: React.FC<SidebarSectionProps> = (props) => {
 
     const [open, setOpen] = useState(true)
     const section = useContext(SidebarSectionContext)
-    const savedHeight = useRef<number | null>(null)
 
-    const onToggle = useCallback(() => {
-        setOpen(!open)
-    }, [open])
+    const onToggle = useCallback(() => setOpen(!open), [open])
 
     useEffect(() => {
-        if(open) {
-            section.expand(savedHeight.current ?? 150, 150)
-        } else {
-            section.collapse(40)
-        }
+        if(open) section.expand()
+        else section.collapse()
     }, [open])
 
     
@@ -68,7 +62,11 @@ const MapEditorSidebar: React.FC<MapEditorSidebarProps> = (props) => {
 
     return (
         <div className="map-editor-sidebar">
-            <SidebarSections sections={3} sectionContent={(index) => {
+            <SidebarSections
+                sections={3}
+                minSectionHeight={150}
+                collapsedSectionHeight={40}
+                sectionContent={(index) => {
                 switch(index) {
                     case 0: return (
                         <SidebarSection key={index} header="Слои">
@@ -76,13 +74,13 @@ const MapEditorSidebar: React.FC<MapEditorSidebarProps> = (props) => {
                         </SidebarSection>
                     )
                     case 1: return (
-                        <SidebarSection key={index} header="Компоненты">
-                            
+                        <SidebarSection key={index} header="Библиотека слоёв">
+                            <SceneEntityLibrary/>
                         </SidebarSection>
                     )
                     case 2: return (
-                        <SidebarSection key={index} header="Библиотека слоёв">
-                            <SceneEntityLibrary/>
+                        <SidebarSection key={index} header="Компоненты">
+                            
                         </SidebarSection>
                     )
                     default: return <></>

@@ -660,4 +660,8 @@ export class TreeApi<T> {
   get renderCursor() {
     return this.props.renderCursor;
   }
+
+  get dragItemUserData() {
+    return this.props.dragItemUserData;
+  }
 }

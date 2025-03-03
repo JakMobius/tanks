@@ -2,6 +2,7 @@ import { Component } from "src/utils/ecs/component"
 import Entity from "src/utils/ecs/entity"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component"
 import { TreeNodeBase } from "../tree-view/tree-view"
+import PrefabIdComponent, { getPrefabNameForId } from "src/entity/components/prefab-id-component"
 
 export interface EntityTreeNode extends TreeNodeBase {
     id: string,
@@ -12,7 +13,7 @@ export interface EntityTreeNode extends TreeNodeBase {
 
 export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
     static counter = 0
-    name: string = "Unnamed"
+    name?: string
     id: string
     descriptor: EntityTreeNode | null = null
     root: EntityEditorTreeRootComponent
@@ -22,8 +23,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
         this.eventHandler.on("child-added", (child) => this.onChildAdded(child))
         this.eventHandler.on("did-remove-child", (child) => this.onChildRemoved(child))
         this.id = (EntityEditorTreeNodeComponent.counter++).toString(36)
-        if (name) this.name = name
-        else this.name = "Entity " + this.id
+        this.name = name
     }
 
     markDirty() {
@@ -48,6 +48,10 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
 
     onAttach(entity: Entity): void {
         super.onAttach(entity)
+        if(!this.name) {
+            let prefabId = entity.getComponent(PrefabIdComponent)?.prefabId
+            this.name = (prefabId ? getPrefabNameForId(prefabId) : null) ?? "Entity " + this.id
+        }
         for (let child of entity.children) {
             this.onChildAdded(child)
         }

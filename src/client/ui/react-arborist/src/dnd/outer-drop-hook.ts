@@ -4,14 +4,14 @@ import { DragItem } from "../types/dnd";
 import { computeDrop } from "./compute-drop";
 import { DropResult } from "./drop-hook";
 import { actions as dnd } from "../state/dnd-slice";
-import { safeRun } from "../utils";
 import { ROOT_ID } from "../data/create-root";
+import { useEffect } from "react";
 
 export function useOuterDrop() {
   const tree = useTreeApi();
 
   // In case we drop an item at the bottom of the list
-  const [, drop] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
+  const [{ isOver }, drop] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
     () => ({
       accept: "NODE",
       canDrop: (_item, m) => {
@@ -38,21 +38,30 @@ export function useOuterDrop() {
           tree.hideCursor();
         }
       },
-      drop: (_, m) => {
+      drop: (item, m) => {
         if (!m.canDrop()) return null;
-        let { parentId, index, dragIds } = tree.state.dnd;
-        safeRun(tree.props.onMove, {
-          dragIds,
+        let { parentId, index } = tree.state.dnd;
+        tree.props.onDrop?.({
+          item,
+          index,
           parentId: parentId === ROOT_ID ? null : parentId,
-          index: index === null ? 0 : index, // When it's null it was dropped over a folder
-          dragNodes: tree.dragNodes,
           parentNode: tree.get(parentId),
         });
         tree.open(parentId);
       },
+      collect: (monitor) => ({
+        isOver: monitor.isOver({ shallow: true }),
+      }),
     }),
-    [tree]
+    [tree, tree.listEl.current]
   );
+
+  useEffect(() => {
+    if (!isOver) {
+      tree.hideCursor()
+      tree.dispatch(dnd.hovering(null, null));
+    }
+  }, [isOver]);
 
   drop(tree.listEl);
 }

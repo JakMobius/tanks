@@ -14,7 +14,7 @@ export interface TreeProps<T> {
 
   /* Data Handlers */
   onCreate?: handlers.CreateHandler<T>;
-  onMove?: handlers.MoveHandler<T>;
+  onDrop?: handlers.DropHandler<T>
   onRename?: handlers.RenameHandler<T>;
   onDelete?: handlers.DeleteHandler<T>;
 
@@ -24,6 +24,7 @@ export interface TreeProps<T> {
   renderCursor: ElementType<renderers.CursorProps>;
   renderDragPreview: ElementType<renderers.DragPreviewProps<T>>;
   renderContainer: ElementType<{}>;
+  dragItemUserData?: (id: T) => any;
 
   /* Sizes */
   rowHeight?: number;

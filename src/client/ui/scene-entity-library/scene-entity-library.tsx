@@ -3,70 +3,62 @@ import "./scene-entity-library.scss"
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tree, TreeApi } from '../react-arborist/src/index';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeBase, TreeViewDragPreview } from "../tree-view/tree-view";
+import Entity from "src/utils/ecs/entity";
+import { EntityType } from "src/entity/entity-type";
+import { getPrefabNameForId } from "src/entity/components/prefab-id-component";
+import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 
 interface LibraryTreeNode extends TreeNodeBase {
+    prefab?: (entity: Entity) => void,
+    children?: LibraryTreeNode[]
+}
 
+interface LibraryTreeNodeConfig {
+    name?: string
+    prefab?: number,
+    children?: LibraryTreeNodeConfig[]
+}
+
+export class SceneEntityLibraryDropItem {
+    prefab: (entity: Entity) => void
+    constructor(prefab: (entity: Entity) => void) {
+        this.prefab = prefab
+    }
+}
+
+function createLibraryTree(config: LibraryTreeNodeConfig, id: string = "root"): LibraryTreeNode {
+    let name = config.name ?? getPrefabNameForId(config.prefab)
+    let children = config.children?.map((childConfig, index) => {
+        return createLibraryTree(childConfig, id + "/" + String(index))   
+    }) ?? []
+    let prefab = config.prefab ? (entity: Entity) => {
+        return ClientEntityPrefabs.types.get(config.prefab)(entity)
+    } : null
+
+    return { id, name, children, prefab }
 }
 
 const SceneEntityLibrary: React.FC = () => {
 
     const rootNode = useMemo(() => {
-        let rootNode: LibraryTreeNode = {
-            id: "root",
+        let rootNode: LibraryTreeNodeConfig = {
             name: "",
-            children: []
+            prefab: null,
+            children: [{
+                prefab: EntityType.TILEMAP,
+            }, {
+                name: "Режимы",
+                children: [
+                    { prefab: EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY },
+                    { prefab: EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY },
+                    { prefab: EntityType.DM_GAME_MODE_CONTROLLER_ENTITY }
+                ],
+            }, {
+                name: "Зона спавна"
+            }]
         }
 
-        let mapNode: LibraryTreeNode = {
-            id: "maps",
-            name: "Карта",
-            children: []
-        }
-        rootNode.children.push(mapNode)
-
-        let modesNode: LibraryTreeNode = {
-            id: "modes",
-            name: "Режимы",
-            children: []
-        }
-        rootNode.children.push(modesNode)
-
-        let ctf: LibraryTreeNode = {
-            id: "maps/ctf",
-            name: "CTF",
-            children: []
-        }
-        modesNode.children.push(ctf)
-
-        let dm: LibraryTreeNode = {
-            id: "maps/dm",
-            name: "DM",
-            children: []
-        }
-        modesNode.children.push(dm)
-
-        let tdm: LibraryTreeNode = {
-            id: "maps/tdm",
-            name: "TDM",
-            children: []
-        }
-        modesNode.children.push(tdm)
-
-        let race: LibraryTreeNode = {
-            id: "maps/race",
-            name: "RACE",
-            children: []
-        }
-        modesNode.children.push(race)
-
-        let spawnZonesNode: LibraryTreeNode = {
-            id: "spawnZones",
-            name: "Зона спавна",
-            children: []
-        }
-        rootNode.children.push(spawnZonesNode)
-
-        return rootNode
+        return createLibraryTree(rootNode)
     }, [])
 
     const treeRef = useRef<TreeApi<LibraryTreeNode> | null>(null)
@@ -84,6 +76,14 @@ const SceneEntityLibrary: React.FC = () => {
         return () => observer.disconnect()
     }, [divRef.current])
 
+    const disableDrag = (node: LibraryTreeNode) => {
+        return node.prefab === null
+    }
+
+    const dragItemUserData = (node: LibraryTreeNode) => {
+        return new SceneEntityLibraryDropItem(node.prefab)
+    }
+
     return (
         <div className="tree-view" ref={divRef}>
             {height !== null ? <Tree
@@ -98,6 +98,8 @@ const SceneEntityLibrary: React.FC = () => {
                 height={height}
                 disableDrop={true}
                 disableEdit={true}
+                disableDrag={disableDrag}
+                dragItemUserData={dragItemUserData}
             >
                 {TreeViewNode}
             </Tree> : null}

@@ -16,6 +16,13 @@ export type MoveHandler<T> = (args: {
   index: number;
 }) => void | Promise<void>;
 
+export type DropHandler<T> = (args: {
+  item: any
+  parentId: string | null;
+  parentNode: NodeApi<T> | null;
+  index: number;
+}) => void | Promise<void>;
+
 export type RenameHandler<T> = (args: {
   id: string;
   name: string;
