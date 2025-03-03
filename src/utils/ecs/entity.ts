@@ -49,6 +49,24 @@ export default class Entity extends EventEmitter {
         this.emit("child-added", child)
     }
 
+    public insertChildAfter(child: Entity, after: Entity | null) {
+        if(after === null) {
+            this.insertChild(child, 0)
+            return
+        }
+        let index = this.children.indexOf(after)
+        if(index === -1) throw new Error("No such child")
+        this.insertChild(child, index + 1)
+    } 
+
+    public insertChild(child: Entity, index: number) {
+        this.children.splice(index, 0, child)
+        child.parent = this
+
+        child.emit("attached-to-parent", this)
+        this.emit("child-added", child)
+    }
+
     public removeFromParent() {
         if(!this.parent) return
         let index = this.parent.children.indexOf(this)

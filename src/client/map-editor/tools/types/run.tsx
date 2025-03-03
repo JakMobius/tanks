@@ -9,7 +9,7 @@ import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
 import React, { useEffect, useState } from 'react';
-import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
+import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 
 const RunToolView: React.FC<ToolViewProps<RunTool>> = (props) => {
     

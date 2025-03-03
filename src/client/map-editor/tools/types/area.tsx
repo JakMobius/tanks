@@ -14,7 +14,7 @@ import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import React from 'react';
-import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
+import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import WorldTilemapComponent from 'src/physics/world-tilemap-component';
 import TilemapComponent from 'src/map/tilemap-component';
 

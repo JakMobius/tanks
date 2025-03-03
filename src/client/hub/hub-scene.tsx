@@ -1,5 +1,5 @@
 
-import HubPage from "src/client/hub/ui/hub-page";
+import HubPage from "src/client/ui/hub-page/hub-page";
 import {UserDataRaw} from "src/client/utils/user-data-raw";
 import Entity from "src/utils/ecs/entity";
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";

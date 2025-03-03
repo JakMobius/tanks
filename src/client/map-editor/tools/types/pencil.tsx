@@ -11,7 +11,7 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import { clamp } from "src/utils/utils";
-import { ToolViewProps } from '../../ui/workspace-overlay/tool-settings/tool-settings-view';
+import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import React, { useEffect, useState } from 'react';
 import RangeView from 'src/client/ui/elements/range/range';
 import WorldTilemapComponent from "src/physics/world-tilemap-component";

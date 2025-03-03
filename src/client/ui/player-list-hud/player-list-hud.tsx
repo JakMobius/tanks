@@ -7,7 +7,7 @@ import WorldStatisticsComponent, {
 import TimerComponent from "src/entity/components/network/timer/timer-component";
 import TeamColor from "src/utils/team-color"
 import { ControlsResponder } from 'src/client/controls/root-controls-responder';
-import Cloud from 'src/client/game/ui/cloud/cloud';
+import Cloud from 'src/client/ui/cloud/cloud';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useControls } from 'src/client/utils/react-controls-responder';
 

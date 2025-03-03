@@ -1,6 +1,6 @@
 import './axis-selector.scss'
 
-import Cloud from "src/client/game/ui/cloud/cloud";
+import Cloud from "src/client/ui/cloud/cloud";
 import PauseKeyValueRow from "src/client/ui/pause-overlay/elements/pause-key-value-row";
 import React from 'react';
 

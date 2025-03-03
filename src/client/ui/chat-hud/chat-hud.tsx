@@ -5,7 +5,6 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import Color from 'src/utils/color';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 import { useControls } from 'src/client/utils/react-controls-responder';
 
 function parseColor(text: string) {

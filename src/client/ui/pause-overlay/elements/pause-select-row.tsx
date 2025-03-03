@@ -1,6 +1,6 @@
 import './pause-select-row.scss'
 import React, { useEffect } from 'react';
-import Cloud from "src/client/game/ui/cloud/cloud";
+import Cloud from "src/client/ui/cloud/cloud";
 
 export interface SelectOption {
     name: string

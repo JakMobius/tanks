@@ -1,9 +1,9 @@
 import './pause-menu-view.scss'
 
-import NavigationCloud from 'src/client/game/ui/cloud/navigation-cloud';
+import NavigationCloud from 'src/client/ui/cloud/navigation-cloud';
 
 import React from 'react';
-import Cloud from 'src/client/game/ui/cloud/cloud';
+import Cloud from 'src/client/ui/cloud/cloud';
 import { NavigationItem, NavigationItemProps, useNavigation, useNavigationItem } from '../navigation/navigation-view';
 
 interface PauseMenuButtonProps {

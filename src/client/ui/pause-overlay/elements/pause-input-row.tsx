@@ -2,7 +2,7 @@ import './pause-input-row.scss';
 
 import PauseKeyValueRow from "src/client/ui/pause-overlay/elements/pause-key-value-row";
 import AutoresizeInput from "src/client/ui/elements/autoresize-input/autoresize-input";
-import Cloud, { CloudProps } from "src/client/game/ui/cloud/cloud";
+import Cloud, { CloudProps } from "src/client/ui/cloud/cloud";
 import React, { useState, useCallback, useImperativeHandle } from 'react';
 
 interface AutoresizeInputCloudProps extends CloudProps {
