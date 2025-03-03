@@ -3,7 +3,6 @@ import { TreeProvider } from "./provider";
 import { TreeApi } from "../interfaces/tree-api";
 import { OuterDrop } from "./outer-drop";
 import { TreeContainer } from "./tree-container";
-import { DragPreviewContainer } from "./drag-preview-container";
 import { TreeProps } from "../types/tree-props";
 import React from "react";
 
@@ -16,7 +15,6 @@ function TreeComponent<T>(
       <OuterDrop>
         <TreeContainer />
       </OuterDrop>
-      <DragPreviewContainer />
     </TreeProvider>
   );
 }

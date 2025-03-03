@@ -3,7 +3,7 @@ import "./scene-tree-view.scss"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CreateHandler, DeleteHandler, DragPreviewProps, MoveHandler, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
 import Entity from 'src/utils/ecs/entity';
-import { TreeViewContainer, TreeViewRow, SceneTreeViewDragPreview, TreeViewNode, TreeViewCursor } from "../tree-view/tree-view";
+import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityEditorTreeNodeComponent, EntityEditorTreeRootComponent, EntityTreeNode } from "./components";
 
 const SceneTreeView: React.FC = () => {
@@ -105,10 +105,6 @@ const SceneTreeView: React.FC = () => {
         updateRoot()
     };
 
-    const renderDragPreview = useCallback((props: DragPreviewProps) => {
-        return SceneTreeViewDragPreview({ tree: treeRef.current, ...props })
-    }, [treeRef])
-
     useEffect(() => {
         if(!divRef.current) return undefined
         let observer = new ResizeObserver(() => {
@@ -129,9 +125,9 @@ const SceneTreeView: React.FC = () => {
                 onDelete={onDelete}
                 selectionFollowsFocus={true}
                 ref={treeRef}
-                renderDragPreview={renderDragPreview}
                 renderCursor={TreeViewCursor}
                 renderContainer={TreeViewContainer}
+                renderDragPreview={TreeViewDragPreview}
                 renderRow={TreeViewRow}
                 rowHeight={27}
                 height={height}

@@ -1,8 +1,8 @@
 import "./scene-entity-library.scss"
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DragPreviewProps, Tree, TreeApi } from '../react-arborist/src/index';
-import { TreeViewContainer, TreeViewRow, SceneTreeViewDragPreview, TreeViewNode, TreeViewCursor, TreeNodeBase } from "../tree-view/tree-view";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Tree, TreeApi } from '../react-arborist/src/index';
+import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeBase, TreeViewDragPreview } from "../tree-view/tree-view";
 
 interface LibraryTreeNode extends TreeNodeBase {
 
@@ -73,10 +73,6 @@ const SceneEntityLibrary: React.FC = () => {
     const divRef = useRef<HTMLDivElement | null>(null)
     const [height, setHeight] = useState<number | null>(null)
     const [treeRoot, setTreeRoot] = useState(rootNode)
-    
-    const renderDragPreview = useCallback((props: DragPreviewProps) => {
-        return SceneTreeViewDragPreview({ tree: treeRef.current, ...props })
-    }, [treeRef])
 
     useEffect(() => {
         if(!divRef.current) return undefined
@@ -94,13 +90,14 @@ const SceneEntityLibrary: React.FC = () => {
                 data={treeRoot.children}
                 selectionFollowsFocus={true}
                 ref={treeRef}
-                renderDragPreview={renderDragPreview}
                 renderCursor={TreeViewCursor}
                 renderContainer={TreeViewContainer}
+                renderDragPreview={TreeViewDragPreview}
                 renderRow={TreeViewRow}
                 rowHeight={27}
                 height={height}
-                disableDrag={true}
+                disableDrop={true}
+                disableEdit={true}
             >
                 {TreeViewNode}
             </Tree> : null}

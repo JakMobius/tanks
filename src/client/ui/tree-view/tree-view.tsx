@@ -45,9 +45,10 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
     );
 }
 
-export function SceneTreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewProps & { tree: TreeApi<T> }) {
+export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewProps<T>) {
+    let item = props.item
 
-    let isDragging = props.mouse && props.isDragging
+    let isDragging = !!props.mouse
     if (!isDragging) return <></>
 
     let style: React.CSSProperties = {
@@ -56,10 +57,10 @@ export function SceneTreeViewDragPreview<T extends TreeNodeBase>(props: DragPrev
 
     let previewText
 
-    if (props.tree.dragNodes.length === 1) {
-        previewText = props.tree.dragNodes[0].data.name
+    if (item.tree.dragNodes.length === 1) {
+        previewText = item.tree.dragNodes[0].data.name
     } else {
-        previewText = "x" + props.tree.dragNodes.length
+        previewText = "x" + item.tree.dragNodes.length
     }
 
     return (

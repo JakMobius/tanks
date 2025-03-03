@@ -19,12 +19,14 @@ export type RowRendererProps<T> = {
   children: ReactElement;
 };
 
-export type DragPreviewProps = {
+export type DragPreviewProps<T> = {
   offset: XYCoord | null;
   mouse: XYCoord | null;
-  id: string | null;
-  dragIds: string[];
-  isDragging: boolean;
+  item: {
+    id: string,
+    item: T,
+    tree: TreeApi<T>
+  }
 };
 
 export type CursorProps = {

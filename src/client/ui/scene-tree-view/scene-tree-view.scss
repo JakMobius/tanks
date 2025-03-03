@@ -7,21 +7,6 @@
     flex-grow: 1;
     min-height: 0;
 
-    .tree-drag-container {
-        position: absolute;
-        left: 0px;
-        top: 0px;
-    }
-
-    .tree-preview .inner {
-        display: inline-block;
-        padding: 5px;
-        background-color: white;
-        font-size: 12px;
-        border-radius: 5px;
-        box-shadow: rgba(0, 0, 0, .3) 0 0 15px;
-    }
-
     [role="treeitem"] {
         outline: none;
     }
@@ -97,5 +82,21 @@
 .tree-view:hover {
     .expand-arrow:not(.hidden) {
         visibility: visible;
+    }
+}
+
+.tree-drag-container {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    pointer-events: none;
+
+    .tree-preview .inner {
+        display: inline-block;
+        padding: 5px;
+        background-color: white;
+        font-size: 12px;
+        border-radius: 5px;
+        box-shadow: rgba(0, 0, 0, .3) 0 0 15px;
     }
 }

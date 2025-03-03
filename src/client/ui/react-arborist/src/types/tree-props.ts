@@ -21,8 +21,8 @@ export interface TreeProps<T> {
   /* Renderers*/
   children?: ElementType<renderers.NodeRendererProps<T>>;
   renderRow: ElementType<renderers.RowRendererProps<T>>;
-  renderDragPreview: ElementType<renderers.DragPreviewProps>;
   renderCursor: ElementType<renderers.CursorProps>;
+  renderDragPreview: ElementType<renderers.DragPreviewProps<T>>;
   renderContainer: ElementType<{}>;
 
   /* Sizes */

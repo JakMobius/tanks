@@ -645,16 +645,16 @@ export class TreeApi<T> {
     return this.props.renderContainer;
   }
 
+  get renderDragPreview() {
+    return this.props.renderDragPreview;
+  }
+
   get renderRow() {
     return this.props.renderRow;
   }
 
   get renderNode() {
     return this.props.children;
-  }
-
-  get renderDragPreview() {
-    return this.props.renderDragPreview;
   }
 
   get renderCursor() {

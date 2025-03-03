@@ -32,8 +32,9 @@ import { TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scene
 import LoadingScene from 'src/client/scenes/loading/loading-scene';
 import Sprite from 'src/client/graphics/sprite';
 import { ControlsProvider } from 'src/client/utils/react-controls-responder';
-import SceneTreeView from '../ui/scene-tree-view/scene-tree-view';
 import MapEditorSidebar from '../ui/map-editor-sidebar/map-editor-sidebar';
+import { DndProvider, useDragLayer } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface MapEditorSceneContextProps {
     loadMap: (map: MapFile) => void   
@@ -48,6 +49,28 @@ export const useMapEditorScene = (): MapEditorSceneContextProps => {
     }
     return context;
 };
+
+const DragPreviewContainer = () => {
+    const { offset, mouse, item } = useDragLayer((m) => {
+      return {
+        offset: m.getSourceClientOffset(),
+        mouse: m.getClientOffset(),
+        item: m.getItem(),
+        isDragging: m.isDragging(),
+      };
+    });
+
+    let Preview = item?.preview
+    if(!Preview) return <></>
+    
+    return (
+      <Preview
+        offset={offset}
+        mouse={mouse}
+        item={item}
+      />
+    );
+  }
 
 const MapEditorView: React.FC = () => {
     const scene = useScene()
@@ -215,27 +238,33 @@ const MapEditorView: React.FC = () => {
 
     return (
         <ControlsProvider ref={controlsResponderRef}>
-            <MapEditorSceneContext.Provider value={{loadMap}}>
-                <EventsProvider ref={eventRef}>
-                    <MapEditorBackgroundOverlay
-                        draggingEnabled={false}
-                        matrix={state.camera?.getComponent(CameraComponent).inverseMatrix}
-                        onDrag={onDrag}
-                        onZoom={onZoom}
-                        onMouseDown={onMouseDown}
-                        onMouseUp={onMouseUp}
-                        onMouseMove={onMouseMove}
-                    />
-                    <ToolSettingsView toolManager={state.toolManager}/>
-                    <ToolBarView
-                        toolList={state.toolList}
-                        toolManager={state.toolManager}
-                    />
-                    <MapEditorSidebar/>
-                    <EventsHUD/>
-                    <PauseOverlay rootComponent={<MapEditorPauseView/>}/>
-                </EventsProvider>
-            </MapEditorSceneContext.Provider>
+            <DndProvider
+                backend={HTML5Backend}
+                options={{ rootElement: document.body || undefined }}
+                >
+                <MapEditorSceneContext.Provider value={{loadMap}}>
+                    <EventsProvider ref={eventRef}>
+                        <MapEditorBackgroundOverlay
+                            draggingEnabled={false}
+                            matrix={state.camera?.getComponent(CameraComponent).inverseMatrix}
+                            onDrag={onDrag}
+                            onZoom={onZoom}
+                            onMouseDown={onMouseDown}
+                            onMouseUp={onMouseUp}
+                            onMouseMove={onMouseMove}
+                        />
+                        <ToolSettingsView toolManager={state.toolManager}/>
+                        <ToolBarView
+                            toolList={state.toolList}
+                            toolManager={state.toolManager}
+                        />
+                        <MapEditorSidebar/>
+                        <EventsHUD/>
+                        <PauseOverlay rootComponent={<MapEditorPauseView/>}/>
+                    </EventsProvider>
+                    <DragPreviewContainer/>
+                </MapEditorSceneContext.Provider>
+            </DndProvider>
         </ControlsProvider>
     )
 }

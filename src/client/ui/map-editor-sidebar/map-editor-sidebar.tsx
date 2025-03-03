@@ -82,7 +82,7 @@ const MapEditorSidebar: React.FC<MapEditorSidebarProps> = (props) => {
                     )
                     case 2: return (
                         <SidebarSection key={index} header="Библиотека слоёв">
-                            {/* <SceneEntityLibrary/> */}
+                            <SceneEntityLibrary/>
                         </SidebarSection>
                     )
                     default: return <></>
