@@ -285,7 +285,7 @@ export function TreeViewContainer() {
 
 export const TreeViewCursor: React.FC<CursorProps> = (props) => {
     return (
-        <div className="tree-view" style={{
+        <div className="tree-view-cursor" style={{
             left: props.left + 15,
             top: props.top - 3
         }}></div>
