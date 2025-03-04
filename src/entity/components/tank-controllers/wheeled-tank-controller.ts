@@ -122,6 +122,8 @@ export default class WheeledTankController extends EventHandlerComponent {
         let applyThrottle = Math.abs(driveSpeed) < 2 || Math.sign(inputThrottle) == Math.sign(driveSpeed)
         let applyBrake = Math.sign(inputThrottle) * Math.sign(driveSpeed) === -1
 
+        if(applyThrottle) applyBrake = false
+
         if (applyThrottle) {
             this.engine.setThrottle(Math.abs(inputThrottle))
         } else {

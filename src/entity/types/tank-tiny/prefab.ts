@@ -106,6 +106,8 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     let gearboxOutput = controller.gearbox.outputUnitIndex
     let wheels = wheelsComponent.getWheelGroups()
     transmission.system.addConstraint(new DifferentialConstraint(gearboxOutput, wheels[2].unitIndex, wheels[3].unitIndex))
+    // Uncomment to add AWD
+    transmission.system.addConstraint(new DifferentialConstraint(gearboxOutput, wheels[0].unitIndex, wheels[1].unitIndex))
 
     entity.addComponent(new WheeledSteeringAssistant({
         lateralMovementSteerRate: 1.9,

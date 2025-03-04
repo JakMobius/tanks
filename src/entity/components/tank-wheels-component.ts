@@ -113,7 +113,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
 
             body.ApplyForce(wheelReaction, wheelPosition)
         }
-
+        
         wheelGroup.transmission.system.Q[wheelGroup.unitIndex] += torque
     }
 

@@ -1,5 +1,5 @@
 import { useDrop } from "react-dnd";
-import { useTreeApi } from "../context";
+import { useDataUpdates, useTreeApi } from "../context";
 import { DragItem } from "../types/dnd";
 import { computeDrop } from "./compute-drop";
 import { DropResult } from "./drop-hook";
@@ -9,6 +9,7 @@ import { useEffect } from "react";
 
 export function useOuterDrop() {
   const tree = useTreeApi();
+  useDataUpdates()
 
   // In case we drop an item at the bottom of the list
   const [{ isOver }, drop] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(

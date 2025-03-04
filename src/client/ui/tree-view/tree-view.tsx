@@ -49,7 +49,9 @@ export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewPr
     let item = props.item
 
     let isDragging = !!props.mouse
-    if (!isDragging) return <></>
+    if (!isDragging) return (
+        <div className="drag-container"/>
+    )
 
     let style: React.CSSProperties = {
         transform: "translate(" + props.mouse.x + "px, " + props.mouse.y + "px)"
@@ -64,8 +66,8 @@ export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewPr
     }
 
     return (
-        <div className="tree-drag-container">
-            <div className="tree-preview" style={style}>
+        <div className="drag-container">
+            <div className="drag-preview" style={style}>
                 <div className="inner">
                     {previewText}
                 </div>

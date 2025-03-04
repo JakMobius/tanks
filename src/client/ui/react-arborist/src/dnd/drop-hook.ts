@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from "react";
 import { ConnectDropTarget, useDrop } from "react-dnd";
-import { useTreeApi } from "../context";
+import { useDataUpdates, useTreeApi } from "../context";
 import { NodeApi } from "../interfaces/node-api";
 import { DragItem } from "../types/dnd";
 import { computeDrop } from "./compute-drop";
@@ -17,6 +17,8 @@ export function useDropHook(
   node: NodeApi<any>,
 ): ConnectDropTarget {
   const tree = useTreeApi();
+  useDataUpdates()
+  
   const [{ isOver }, dropRef] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
     () => ({
       accept: "NODE",
