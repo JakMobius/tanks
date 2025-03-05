@@ -136,9 +136,8 @@ export function inverse(m: Float32Array) {
     ]);
 }
 
-export default class Matrix3 {
-    public m: Float32Array;
-    public stack: Float32Array[];
+export class ReadonlyMatrix3 {
+    protected m: Float32Array;
 
     constructor(data?: Float32Array) {
         if(!data) {
@@ -150,9 +149,53 @@ export default class Matrix3 {
         } else {
             this.m = data
         }
-        this.stack = []
     }
 
+    inverted() {
+        return new Matrix3(inverse(this.m))
+    }
+
+    transformX(x: number, y: number, z: number = 1) {
+        return this.m[0] * x + this.m[3] * y + this.m[6] * z
+    }
+
+    transformY(x: number, y: number, z: number = 1) {
+        return this.m[1] * x + this.m[4] * y + this.m[7] * z
+    }
+
+    multiplied(other: ReadonlyMatrix3) {
+        return new Matrix3(multiply(this.m, other.m))
+    }
+
+    equals(currentTransform: ReadonlyMatrix3) {
+        for(let i = 0; i < 9; i++) {
+            if(this.m[i] !== currentTransform.m[i]) return false
+        }
+        return true
+    }
+
+    multiplyLeft(left: Matrix3) {
+        return multiply(left.m, this.m)
+    }
+
+    clone() {
+        return new Matrix3(this.m.slice())
+    }
+
+    get(i: number) {
+        return this.m[i]
+    }
+}
+
+export class Matrix3 extends ReadonlyMatrix3 {
+
+    public stack: Float32Array[];
+
+    constructor(data?: Float32Array) {
+        super(data)
+        this.stack = []
+    }
+    
     save() {
         this.stack.push(this.m.slice())
     }
@@ -163,10 +206,6 @@ export default class Matrix3 {
 
     inverse() {
         this.m = inverse(this.m)
-    }
-
-    inverted() {
-        return new Matrix3(inverse(this.m))
     }
 
     rotate(angle: number) {
@@ -189,16 +228,8 @@ export default class Matrix3 {
         this.m = scale(this.m, x, y)
     }
 
-    transformX(x: number, y: number, z: number = 1) {
-        return this.m[0] * x + this.m[3] * y + this.m[6] * z
-    }
-
-    transformY(x: number, y: number, z: number = 1) {
-        return this.m[1] * x + this.m[4] * y + this.m[7] * z
-    }
-
-    multiply(other: Matrix3) {
-        this.m = multiply(this.m, other.m)
+    multiply(left: ReadonlyMatrix3): void {
+        this.m = left.multiplyLeft(this)
     }
 
     reset() {
@@ -208,4 +239,5 @@ export default class Matrix3 {
             0, 0, 1,
         ])
     }
+
 }

@@ -10,6 +10,7 @@ import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
 import React, { useEffect, useState } from 'react';
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
+import TransformComponent from 'src/entity/components/transform-component';
 
 const RunToolView: React.FC<ToolViewProps<RunTool>> = (props) => {
     
@@ -90,9 +91,8 @@ export default class RunTool extends Tool {
         this.tank = new Entity()
         ClientEntityPrefabs.types.get(EntityType.TANK_SNIPER)(this.tank)
         this.manager.world.appendChild(this.tank)
-
-        const physicalComponent = this.tank.getComponent(PhysicalComponent)
-        physicalComponent.setPositionAngle(this.spawnPoint, 0)
+        
+        this.tank.getComponent(TransformComponent).setGlobalPositionAngle(this.spawnPoint, 0)
         RootControlsResponder.getInstance().connectTankControls(this.tank.getComponent(TankControls))
 
         // this.manager.camera.inertial = true

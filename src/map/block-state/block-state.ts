@@ -31,7 +31,7 @@ export default class BlockState {
         if(this.facing !== -1) {
             this.updateNeighbourFacing(map, x, y)
         }
-        map.entity.emit("block-update", x, y)
+        map.entity?.emit("block-update", x, y)
     }
 
     getNeighbourId(map: TilemapComponent, x: number, y: number): number {

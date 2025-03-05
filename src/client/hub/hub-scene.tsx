@@ -30,10 +30,10 @@ const HubView: React.FC = () => {
     
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        state.backgroundWorld?.emit("tick", dt)
-        state.backgroundWorld?.emit("draw")
         state.camera?.getComponent(CameraRandomMovement)
             .setViewport({x: scene.canvas.width, y: scene.canvas.height})
+        state.backgroundWorld?.emit("tick", dt)
+        state.backgroundWorld?.emit("draw")
     }
 
     useEffect(() => {

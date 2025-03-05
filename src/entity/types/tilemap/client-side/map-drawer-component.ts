@@ -9,6 +9,8 @@ import TextureProgram from "src/client/graphics/programs/texture-program";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "src/map/tilemap-component";
 import BlockDrawer from "src/client/graphics/drawers/block/block-drawer";
+import { Transform } from "stream";
+import TransformComponent from "src/entity/components/transform-component";
 
 export interface DrawerBounds {
     x0: number
@@ -76,6 +78,9 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         let map = this.entity.getComponent(TilemapComponent)
         if (!map) return
 
+        program.transform.save()
+        program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
+
         this.updateBounds(map, program.camera)
 
         for (let x = this.bounds.x0; x <= this.bounds.x1; x++) {
@@ -85,6 +90,8 @@ export default class MapDrawerComponent extends EventHandlerComponent {
                 if (block) this.drawBlock(program, block, x, y, map)
             }
         }
+
+        program.transform.restore()
     }
 
     private drawBlock(program: TextureProgram, block: BlockState, x: number, y: number, map: TilemapComponent) {
@@ -103,6 +110,10 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         let program = phase.getProgram(ConvexShapeProgram)
         let map = this.entity.getComponent(TilemapComponent)
         if (!map) return
+
+        program.transform.save()
+        program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
+
         this.updateBounds(map, program.camera)
 
         const gridColor = 0xffe6e6e6
@@ -130,6 +141,8 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         this.drawLine(program, 0, -halfBorderThickness, this.bounds.x1, borderThickness, borderColor)
         this.drawLine(program, map.width - halfBorderThickness, 0, borderThickness, this.bounds.y1, borderColor)
         this.drawLine(program, 0, map.height - halfBorderThickness, this.bounds.x1, borderThickness, borderColor)
+
+        program.transform.restore()
     }
 
     private drawLine(program: ConvexShapeProgram, x0: number, y0: number, width: number, height: number, color: number) {

@@ -45,7 +45,7 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
         })
 
         const updateSize = () => {
-            canvasHandler.setSize(canvas.clientWidth, canvas.clientHeight)
+            canvasHandler.setSizeNextFrame(canvas.clientWidth, canvas.clientHeight)
         }
 
         const observer = new ResizeObserver(updateSize)

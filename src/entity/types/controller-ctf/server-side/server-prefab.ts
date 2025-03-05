@@ -5,13 +5,12 @@ import EntityDataTransmitComponent from "src/entity/components/network/transmitt
 import ServerCTFControllerComponent, {
     ServerCTFControllerConfig
 } from "src/entity/types/controller-ctf/server-side/server-ctf-controller-component";
-import Entity from "src/utils/ecs/entity";
 
-export function serverCTFControllerPrefab(entity: Entity, config: ServerCTFControllerConfig) {
+ServerEntityPrefabs.types.set(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)
     EntityPrefabs.Types.get(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY)(entity)
 
-    entity.addComponent(new ServerCTFControllerComponent(config))
+    entity.addComponent(new ServerCTFControllerComponent())
     let transmitComponent = entity.getComponent(EntityDataTransmitComponent)
     transmitComponent.visibleAnywhere = true
-}
+})

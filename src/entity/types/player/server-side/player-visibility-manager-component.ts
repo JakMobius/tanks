@@ -5,7 +5,6 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export default class PlayerVisibilityManagerComponent extends EventHandlerComponent {
     entity: Entity | null;
-    visibleEntities = new Set<Entity>()
 
     private makeEntityVisible(entity: Entity) {
         const connectionManager = this.entity.getComponent(PlayerConnectionManagerComponent)
@@ -26,13 +25,10 @@ export default class PlayerVisibilityManagerComponent extends EventHandlerCompon
     }
 
     public setEntityVisible(entity: Entity, visible: boolean) {
-        if(visible === this.visibleEntities.has(entity)) return false
 
         if(visible) {
-            this.visibleEntities.add(entity)
             this.makeEntityVisible(entity)
         } else {
-            this.visibleEntities.delete(entity)
             this.makeEntityInvisible(entity)
         }
 

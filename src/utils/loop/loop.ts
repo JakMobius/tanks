@@ -44,13 +44,18 @@ export default class Loop extends EventEmitter {
     cycle(dt: number) {}
 
     runScheduledTasks(dt: number) {
-        ScheduledTask.lockInitialTimers = true
-        for(let [key, task] of this.schedule.entries()) {
-            if(task.tick(dt)) {
-                this.schedule.delete(key)
+        let result = false
+        if(!this.schedule.size) return result
+        let schedule = this.schedule
+        this.schedule = new Map()
+        for(let [key, task] of schedule.entries()) {
+            if(!task.tick(dt)) {
+                this.schedule.set(key, task)
+            } else {
+                result = true
             }
         }
-        ScheduledTask.lockInitialTimers = false
+        return result
     }
 
     perform(timestamp?: number) {

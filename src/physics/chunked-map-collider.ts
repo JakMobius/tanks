@@ -10,8 +10,8 @@ export interface PhysicsChunkManagerConfig {
     chunkHeight?: number
 }
 
-// According to benchmarks, arrays are the best for storing points,
-// as they're fast to create.
+// According to benchmarks, arrays are fastest to create,
+// so we use them to represent points.
 export type PhysicsPoint = [number, number]
 
 export default class ChunkedMapCollider extends EventHandlerComponent {

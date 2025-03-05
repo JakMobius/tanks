@@ -1,5 +1,6 @@
 import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
+import TransformComponent from "src/entity/components/transform-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export default class ServerPositionComponent extends EventHandlerComponent {
@@ -19,33 +20,39 @@ export default class ServerPositionComponent extends EventHandlerComponent {
     }
 
     serverPositionReceived() {
-        let physicalComponent = this.entity.getComponent(PhysicalComponent)
         this.entity.emit("server-position-received")
-        this.serverPositionUpdateTick = physicalComponent.host.worldTicks
-
-        const component = this.entity.getComponent(PhysicalComponent)
-        const host = component.host
 
         let serverX = this.serverPosition.x
         let serverY = this.serverPosition.y
+        let serverAngle = this.serverAngle
 
-        let tickDifference = this.unsignedModulo(this.serverPositionUpdateTick - this.serverTick + this.serverSyncTime, host.worldTicksModulo)
+        let transformComponent = this.entity.getComponent(TransformComponent)
+        let physicalComponent = this.entity.getComponent(PhysicalComponent)
 
-        if (tickDifference > 100) {
-            this.serverSyncTime = this.unsignedModulo(this.serverSyncTime - tickDifference, host.worldTicksModulo)
-            tickDifference = 0
+        if(physicalComponent) {
+            this.serverPositionUpdateTick = physicalComponent.host.worldTicks
+            const host = physicalComponent.host
+
+            let tickDifference = this.unsignedModulo(this.serverPositionUpdateTick - this.serverTick + this.serverSyncTime, host.worldTicksModulo)
+
+            if (tickDifference > 100) {
+                this.serverSyncTime = this.unsignedModulo(this.serverSyncTime - tickDifference, host.worldTicksModulo)
+                tickDifference = 0
+            }
+
+            let timeDifference = tickDifference * host.physicsTick
+
+            serverX += this.serverVelocity.x * timeDifference
+            serverY += this.serverVelocity.y * timeDifference
+            serverAngle += this.serverAngularVelocity * timeDifference
+
+            physicalComponent.setVelocity(this.serverVelocity)
+            physicalComponent.setAngularVelocity(this.serverAngularVelocity)
         }
 
-        let timeDifference = tickDifference * host.physicsTick
-
-        serverX += this.serverVelocity.x * timeDifference
-        serverY += this.serverVelocity.y * timeDifference
-
-        component.setPositionAngle(
+        transformComponent.setGlobalPositionAngle(
             {x: serverX, y: serverY},
-            this.serverAngle + this.serverAngularVelocity * timeDifference
+            serverAngle
         )
-        component.setVelocity(this.serverVelocity)
-        component.setAngularVelocity(this.serverAngularVelocity)
     }
 }

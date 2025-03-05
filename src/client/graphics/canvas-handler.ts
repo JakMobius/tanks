@@ -1,7 +1,10 @@
+import EventEmitter from "src/utils/event-emitter";
 
-export default class CanvasHandler {
+export default class CanvasHandler extends EventEmitter {
+    
     public width: number;
     public height: number;
+    public needsResize: boolean = true;
     
     public framebufferTextures: WebGLTexture[];
     public framebuffers: WebGLFramebuffer[];
@@ -14,6 +17,7 @@ export default class CanvasHandler {
     public scale: number
     
     constructor(canvas: HTMLCanvasElement | OffscreenCanvas) {
+        super()
         this.canvas = canvas
         this.initCanvas()
         this.ctx = this.getContext()
@@ -37,27 +41,6 @@ export default class CanvasHandler {
         ctx.blendFuncSeparate(ctx.SRC_ALPHA, ctx.ONE_MINUS_SRC_ALPHA, ctx.ONE, ctx.ONE_MINUS_SRC_ALPHA);
         ctx.depthFunc(ctx.LEQUAL)
         return ctx
-    }
-
-    setSize(width: number, height: number) {
-        if(width === this.width && height === this.height) return
-
-        this.width = width
-        this.height = height
-
-        this.canvas.width = this.width * this.scale
-        this.canvas.height = this.height * this.scale
-
-        this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
-
-        for (let texture of this.framebufferTextures) {
-            this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
-            this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
-
-            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
-            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
-            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
-        }
     }
 
     initialize(): void {
@@ -109,6 +92,31 @@ export default class CanvasHandler {
         this.inactiveFramebufferIndex = this.activeFramebufferIndex
         this.activeFramebufferIndex = null
         this.ctx.bindFramebuffer(this.ctx.FRAMEBUFFER, null)
+    }
+
+    setSizeNextFrame(width: number, height: number) {
+        if(width === this.width && height === this.height) return
+        this.width = width;
+        this.height = height;
+        this.needsResize = true
+    }
+
+    updateSize() {
+        this.canvas.width = this.width * this.scale
+        this.canvas.height = this.height * this.scale
+
+        this.ctx.viewport(0, 0, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight);
+
+        for (let texture of this.framebufferTextures) {
+            this.ctx.bindTexture(this.ctx.TEXTURE_2D, texture)
+            this.ctx.texImage2D(this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.drawingBufferWidth, this.ctx.drawingBufferHeight, 0, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE, null);
+
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
+            this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
+        }
+
+        this.needsResize = false
     }
 
     clear(): void {

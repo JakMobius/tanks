@@ -31,8 +31,10 @@ export default class VisibilityInheritanceComponent extends EventHandlerComponen
 
     private inheritTransmitterSets() {
         let parent = this.entity.parent
-        let parentTransmitComponent = parent.getComponent(EntityDataTransmitComponent)
+        let parentTransmitComponent = parent?.getComponent(EntityDataTransmitComponent)
         let transmitComponent = this.entity.getComponent(EntityDataTransmitComponent)
+
+        if(!parentTransmitComponent || !transmitComponent) return
 
         for (let end of parentTransmitComponent.transmitterSets.keys()) {
             transmitComponent.createTransmitterSetFor(end)

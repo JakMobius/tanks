@@ -1,7 +1,7 @@
-import ServerGameController, {ServerGameControllerConfig} from "src/server/room/game-modes/server-game-controller";
+import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import Team from "src/server/team";
 
-export interface ServerTeamedGameControllerConfig extends ServerGameControllerConfig {
+export interface ServerTeamedGameControllerConfig {
     teams?: number
 }
 
@@ -9,7 +9,7 @@ export default abstract class ServerTeamedGameController extends ServerGameContr
     teams: Team[] = []
 
     protected constructor(config: ServerTeamedGameControllerConfig) {
-        super(config);
+        super();
         this.createTeams(config.teams)
     }
 

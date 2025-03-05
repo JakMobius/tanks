@@ -23,7 +23,7 @@ export function useDragHook<T>(node: NodeApi<T>): ConnectDragSource {
           id: node.id,
           tree: tree,
           preview: tree.renderDragPreview,
-          userData: tree.dragItemUserData?.(node.data)
+          userData: tree.dragItemUserData?.(dragIds.map(id => tree.get(id).data))
         };
       },
       end: () => {

@@ -156,7 +156,7 @@ const TankSelectCarouselDrawer: React.FC<TankSelectCarouselDrawerProps> = (props
         let handler = new CanvasHandler(canvas)
         let texture = Sprite.applyTexture(handler.ctx)
         setContext({ canvas: handler, ticker: new EventEmitter() })
-        handler.setSize(width, height)
+        handler.setSizeNextFrame(width, height)
 
         return () => Sprite.cleanupTexture(handler.ctx, texture)
     }, [])

@@ -6,7 +6,7 @@ import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeB
 import Entity from "src/utils/ecs/entity";
 import { EntityType } from "src/entity/entity-type";
 import { getPrefabNameForId } from "src/entity/components/prefab-id-component";
-import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 
 interface LibraryTreeNode extends TreeNodeBase {
     prefab?: (entity: Entity) => void,
@@ -20,9 +20,9 @@ interface LibraryTreeNodeConfig {
 }
 
 export class SceneEntityLibraryDropItem {
-    prefab: (entity: Entity) => void
-    constructor(prefab: (entity: Entity) => void) {
-        this.prefab = prefab
+    prefabs: Array<(entity: Entity) => void>
+    constructor(prefabs: Array<(entity: Entity) => void>) {
+        this.prefabs = prefabs
     }
 }
 
@@ -32,7 +32,7 @@ function createLibraryTree(config: LibraryTreeNodeConfig, id: string = "root"): 
         return createLibraryTree(childConfig, id + "/" + String(index))   
     }) ?? []
     let prefab = config.prefab ? (entity: Entity) => {
-        return ClientEntityPrefabs.types.get(config.prefab)(entity)
+        return ServerEntityPrefabs.types.get(config.prefab)(entity)
     } : null
 
     return { id, name, children, prefab }
@@ -80,8 +80,8 @@ const SceneEntityLibrary: React.FC = () => {
         return node.prefab === null
     }
 
-    const dragItemUserData = (node: LibraryTreeNode) => {
-        return new SceneEntityLibraryDropItem(node.prefab)
+    const dragItemUserData = (nodes: LibraryTreeNode[]) => {
+        return new SceneEntityLibraryDropItem(nodes.map(node => node.prefab))
     }
 
     return (

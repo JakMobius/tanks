@@ -3,7 +3,6 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import ExplodeOnDeathComponent from "src/entity/components/explode-on-death-component";
 import {EntityType} from "src/entity/entity-type";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
-import PositionTransmitComponent from "src/server/entity/components/position-transmit-component";
 import Entity from "src/utils/ecs/entity";
 import FirearmWeaponComponent from "src/entity/types/weapon-single-barrelled/weapon-single-barreled";
 import {WeaponComponent, WeaponRole, WeaponType} from "src/entity/components/weapon/weapon-component";
@@ -13,7 +12,6 @@ ServerEntityPrefabs.types.set(EntityType.TANK_BOMBER, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)
     EntityPrefabs.Types.get(EntityType.TANK_BOMBER)(entity)
 
-    entity.addComponent(new PositionTransmitComponent())
     entity.addComponent(new ServerEntityPilotComponent())
     entity.addComponent(new ExplodeOnDeathComponent())
 

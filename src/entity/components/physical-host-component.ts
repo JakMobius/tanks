@@ -35,6 +35,12 @@ export default class PhysicalHostComponent implements Component {
         this.setupContactFilter()
     }
 
+    beforePhysics() {
+        for(let component of this.physicalComponents) {
+            component.beforePhysics();
+        }
+    }
+
     tickPhysics() {
         this.world.ClearForces()
         for(let component of this.physicalComponents) {

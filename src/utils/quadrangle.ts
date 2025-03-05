@@ -1,4 +1,4 @@
-import Matrix3 from "./matrix3";
+import { Matrix3, ReadonlyMatrix3 } from "./matrix3";
 
 export interface Quadrangle {
     x1: number
@@ -55,7 +55,7 @@ export function turnQuadrangle(quadrangle: Quadrangle, sin: number, cos: number)
     setQuadrangle(quadrangle, x1, y1, x2, y2, x3, y3, x4, y4)
 }
 
-export function transformQuadrangle(quadrangle: Quadrangle, matrix: Matrix3) {
+export function transformQuadrangle(quadrangle: Quadrangle, matrix: ReadonlyMatrix3) {
     const x1 = matrix.transformX(quadrangle.x1, quadrangle.y1)
     const y1 = matrix.transformY(quadrangle.x1, quadrangle.y1)
     const x2 = matrix.transformX(quadrangle.x2, quadrangle.y2)

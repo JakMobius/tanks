@@ -8,29 +8,30 @@ export default class PositionReceiver extends ReceiverComponent {
     hook(receiveComponent: EntityDataReceiveComponent): void {
 
         receiveComponent.commandHandlers.set(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-            const x = buffer.readFloat32()
-            const y = buffer.readFloat32()
-            const angle = buffer.readFloat32()
-            const vx = buffer.readFloat32()
-            const vy = buffer.readFloat32()
-            const angularVelocity = buffer.readFloat32()
-
-            const serverTicks = buffer.readUint16()
-            const serverTickTime = buffer.readFloat32()
 
             const serverPosition = this.entity.getComponent(ServerPositionComponent)
 
-            serverPosition.serverVelocity.x = vx
-            serverPosition.serverVelocity.y = vy
+            serverPosition.serverPosition.x = buffer.readFloat32()
+            serverPosition.serverPosition.y = buffer.readFloat32()
+            serverPosition.serverAngle =  buffer.readFloat32()
 
-            serverPosition.serverPosition.x = x
-            serverPosition.serverPosition.y = y
+            let hasVelocity = buffer.readInt8() === 1
+            
+            if(hasVelocity) {
+                serverPosition.serverVelocity.x = buffer.readFloat32()
+                serverPosition.serverVelocity.y = buffer.readFloat32()
+                serverPosition.serverAngularVelocity = buffer.readFloat32()
 
-            serverPosition.serverAngle = angle
-            serverPosition.serverAngularVelocity = angularVelocity
+                serverPosition.serverTick = buffer.readUint16()
+                serverPosition.serverTickTime = buffer.readFloat32()
+            } else {
+                serverPosition.serverVelocity.x = 0
+                serverPosition.serverVelocity.y = 0
+                serverPosition.serverAngularVelocity = 0
 
-            serverPosition.serverTick = serverTicks
-            serverPosition.serverTickTime = serverTickTime
+                serverPosition.serverTick = 0
+                serverPosition.serverTickTime = 0
+            }
 
             serverPosition.serverPositionReceived()
         })

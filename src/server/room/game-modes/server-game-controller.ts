@@ -9,28 +9,25 @@ import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/serv
 import EventEmitter from "src/utils/event-emitter";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 
-export interface ServerGameControllerConfig {
-    socket: GameSocketPortal
-    world: Entity
-}
 
 export default abstract class ServerGameController extends EventHandlerComponent {
 
     worldEventHandler = new BasicEventHandlerSet()
     world: Entity
-    socket: GameSocketPortal
+    private socket: GameSocketPortal
     activeGameState: ServerGameStateController
 
     private needsBroadcast = false
 
-    protected constructor(config: ServerGameControllerConfig) {
+    protected constructor() {
         super()
-        this.socket = config.socket
-        this.world = config.world
 
         this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
             transmitterSet.initializeTransmitter(GameModeEventTransmitter, this)
         })
+        
+        this.eventHandler.on("attached-to-parent", () => this.updateWorld())
+        this.eventHandler.on("detached-from-parent", () => this.updateWorld())
 
         this.worldEventHandler.on("tick", () => {
             if (this.needsBroadcast) {
@@ -40,8 +37,15 @@ export default abstract class ServerGameController extends EventHandlerComponent
         })
 
         this.worldEventHandler.on("client-connect", (client) => this.onClientConnected(client), EventEmitter.PRIORITY_MONITOR)
+    }
 
-        this.worldEventHandler.setTarget(this.world)
+    updateWorld() {
+        this.setWorld(this.entity.parent)
+    }
+
+    setWorld(world: Entity) {
+        this.world = world
+        this.worldEventHandler.setTarget(world)
     }
 
     triggerStateBroadcast() {
@@ -63,6 +67,8 @@ export default abstract class ServerGameController extends EventHandlerComponent
     }
 
     protected onClientConnected(client: GameSocketPortalClient) {
+        if(!this.socket || !this.world) return
+
         let player = new Entity()
 
         serverPlayerEntityPrefab(player, {

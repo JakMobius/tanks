@@ -57,9 +57,22 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        padding: 0px 5px;
+        padding: 0 0 0 5px;
         gap: 6px;
         height: 100%;
+    }
+
+    .tree-row input {
+        background: white;
+        box-shadow: none;
+        flex-grow: 1;
+        align-self: stretch;
+        font-size: 14px;
+        font-family: 'Roboto';
+        border: 2px solid rgb(200, 200, 200);
+        border-radius: 5px;
+        padding: 2px 5px;
+        outline: none;
     }
 
     .expand-arrow {

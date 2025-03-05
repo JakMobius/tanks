@@ -13,6 +13,8 @@ import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-co
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
 import TilemapComponent from "src/map/tilemap-component";
+import { Transform } from "stream";
+import TransformComponent from "src/entity/components/transform-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -156,9 +158,10 @@ export default class BulletBehaviour extends EventHandlerComponent {
     private stuckAtPoint(point: Box2D.XY) {
         let body = this.entity.getComponent(PhysicalComponent)
         body.setVelocity({x: 0, y: 0})
-        body.setPositionAngle(point, body.getBody().GetAngle())
         body.getBody().SetFixedRotation(true)
         body.getBody().SetEnabled(false)
+
+        this.entity.getComponent(TransformComponent).setGlobalPositionAngle(point, body.getBody().GetAngle())
     }
 
     private beforeDeath() {

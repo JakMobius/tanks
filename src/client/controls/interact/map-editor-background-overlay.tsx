@@ -1,7 +1,7 @@
 import "./map-editor-background-overlay.scss"
 
 import {isMacOS} from "src/utils/meta-key-name";
-import Matrix3 from "src/utils/matrix3";
+import { Matrix3 } from "src/utils/matrix3";
 import { useEffect, useRef } from "react";
 import React from "react";
 

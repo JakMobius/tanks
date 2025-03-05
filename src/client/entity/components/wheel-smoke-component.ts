@@ -2,7 +2,7 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import Color from "src/utils/color";
-import {Wheel, WheelGroup} from "src/entity/components/transmission/units/wheel-group";
+import {Wheel} from "src/entity/components/transmission/units/wheel-group";
 import TransformComponent from "src/entity/components/transform-component";
 import WheelSmokeParticle from "src/client/particles/wheel-smoke-particle";
 
@@ -64,11 +64,13 @@ export default class WheelSmokeComponent extends EventHandlerComponent {
         const transformComponent = this.entity.getComponent(TransformComponent)
         const particleComponent = this.entity.parent.getComponent(ParticleHostComponent)
 
+        let transform = transformComponent.getTransform()
+
         const color = new Color().setRGB(0.9, 0.9, 0.9, intensity)
 
         const smoke = new WheelSmokeParticle({
-            x: transformComponent.transform.transformX(wheel.x, wheel.y) + Math.random() - 0.5,
-            y: transformComponent.transform.transformY(wheel.x, wheel.y) + Math.random() - 0.5,
+            x: transform.transformX(wheel.x, wheel.y) + Math.random() - 0.5,
+            y: transform.transformY(wheel.x, wheel.y) + Math.random() - 0.5,
             dx: 0,
             dy: 0,
             width: 0.5,

@@ -7,8 +7,8 @@ import PrefabIdComponent, { getPrefabNameForId } from "src/entity/components/pre
 export interface EntityTreeNode extends TreeNodeBase {
     id: string,
     name: string,
-    parent?: string,
     children?: EntityTreeNode[]
+    entity: Entity
 }
 
 export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
@@ -41,7 +41,8 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
         this.descriptor = {
             id: this.id,
             name: this.name,
-            children: children
+            children: children,
+            entity: this.entity
         }
         return this.descriptor
     }
@@ -74,6 +75,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
 
     setName(name: string) {
         this.name = name
+        this.markDirty()
     }
 
     updateRoot() {

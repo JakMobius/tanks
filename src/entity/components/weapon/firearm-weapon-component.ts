@@ -2,7 +2,6 @@ import ServerWeaponComponent from "src/entity/components/weapon/server-weapon-co
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform-component";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import BulletLauncher from "src/server/entity/bullet-launcher";
 import CollisionIgnoreList from "src/entity/components/collision-ignore-list";
 import Entity from "src/utils/ecs/entity";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
@@ -152,7 +151,7 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         const tankPhysicalComponent = tank.getComponent(PhysicalComponent)
         const tankBody = tankPhysicalComponent.getBody()
         const tankVelocity = tankPhysicalComponent.getBody().GetLinearVelocity()
-        const transform = tank.getComponent(TransformComponent).transform
+        const transform = tank.getComponent(TransformComponent).getGlobalTransform()
 
         const world = tank.parent
 
@@ -165,15 +164,15 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         entity.once("physical-body-created", (component: PhysicalComponent) => {
             let angle = tankBody.GetAngle()
 
-            component.setPositionAngle({
-                x: worldX,
-                y: worldY
-            }, tankBody.GetAngle())
+            let vx = -Math.sin(angle) * this.initialBulletVelocity + tankVelocity.x
+            let vy = Math.cos(angle) * this.initialBulletVelocity + tankVelocity.y
 
-            component.setVelocity({
-                x: -Math.sin(angle) * this.initialBulletVelocity + tankVelocity.x,
-                y: Math.cos(angle) * this.initialBulletVelocity + tankVelocity.y
-            })
+            component.setVelocity({ x: vx, y: vy })
+
+            tankBody.ApplyLinearImpulse(
+                {x: -vx * component.body.GetMass(), y: -vy * component.body.GetMass()},
+                {x: worldX, y: worldY}
+            )
         })
 
         let shooter = tank.getComponent(ServerEntityPilotComponent).pilot
@@ -183,11 +182,10 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
 
         world.appendChild(entity)
 
-        // TODO:
-        // tankBody.ApplyLinearImpulse(
-        //     new Box2D.b2Vec2(-vx * bulletBody.GetMass(), -vy * bulletBody.GetMass()),
-        //     new Box2D.b2Vec2(absoluteX, absoluteY)
-        // )
+        entity.getComponent(TransformComponent).setGlobalPositionAngle({
+            x: worldX,
+            y: worldY
+        }, tankBody.GetAngle())
 
         return entity
     }

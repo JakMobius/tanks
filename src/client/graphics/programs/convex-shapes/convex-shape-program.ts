@@ -4,12 +4,14 @@ import {Quadrangle} from "src/utils/quadrangle";
 
 import vertexShaderSource from "src/client/graphics/shaders/vertex/convex-shape-vertex.glsl"
 import fragmentShaderSource from "src/client/graphics/shaders/fragment/convex-shape-fragment.glsl"
+import { Matrix3 } from "src/utils/matrix3";
 
 export default class ConvexShapeProgram extends CameraProgram {
 
     public vertexBuffer: GLBuffer<Float32Array>
     public colorBuffer: GLBuffer<Uint32Array>
     public indexBuffer: GLBuffer<Uint16Array>
+    public transform = new Matrix3()
     private vertices: number;
 
     constructor(ctx: WebGLRenderingContext) {
@@ -48,7 +50,13 @@ export default class ConvexShapeProgram extends CameraProgram {
         for(let i = 0; i < points; i++) this.colorBuffer.push(color)
 
         const baseIndex = this.vertices
-        this.vertexBuffer.appendArray(vertices)
+        for(let i = 0; i < vertices.length; i += 2) {
+            let x = vertices[i]
+            let y = vertices[i + 1]
+
+            this.vertexBuffer.push(this.transform.transformX(x, y))
+            this.vertexBuffer.push(this.transform.transformY(x, y))
+        }
 
         for(let i = 2; i < points; i++) {
             this.indexBuffer.push(baseIndex)

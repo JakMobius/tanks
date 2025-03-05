@@ -98,13 +98,7 @@ export default class PlayerConnectionManagerComponent extends EventHandlerCompon
     }
 
     private setWorld(world: Entity) {
-        // Detach all transmitters from old world, because otherwise they will
-        // be mixed with new world transmitters. It might also lead to issues
-        // when new world is null, when player leaves the game. Transmitters
-        // will keep sending events to the disconnected player and server will crash.
-
         this.end.setRoot(world)
-
         this.world = world
         this.worldEventHandler.setTarget(world)
 

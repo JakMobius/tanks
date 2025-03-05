@@ -1,55 +1,25 @@
-import SceneEntityLibrary from "../scene-entity-library/scene-entity-library"
-import SceneTreeView from "../scene-tree-view/scene-tree-view"
-import Dragger from "../sidebar-drag-edge/sidebar-drag-edge"
-import { SidebarSectionContext, SidebarSections } from "../sidebar-sections/sidebar-sections"
 import "./map-editor-sidebar.scss"
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
+import SceneEntityLibrary from "../scene-entity-library/scene-entity-library"
+import SceneTreeView from "../scene-tree-view/scene-tree-view"
+import { SidebarSections } from "../sidebar-sections/sidebar-sections"
 
-interface SidebarSectionHeaderProps {
-    text: string
-    open: boolean
-    onToggle?: () => void
-}
+import React from "react"
+import { SidebarSection } from "../sidebar-section/sidebar-section"
+import { SceneComponentsSection } from "../scene-components-view/scene-components-view"
 
-const SidebarSectionHeader: React.FC<SidebarSectionHeaderProps> = (props) => {
+const MapEditorSidebarHeader: React.FC = (props) => {
     return (
-        <div className="map-editor-sidebar-section-header">
-            <div className={"expand-arrow " + (props.open ? "open" : "")} onClick={props.onToggle}/>
-            <div className="map-editor-sidebar-section-header">{props.text}</div>
-        </div>
-    )
-}
-
-interface SidebarSectionProps {
-    header: string
-    children?: React.ReactNode
-}
-
-const SidebarSection: React.FC<SidebarSectionProps> = (props) => {
-
-    const [open, setOpen] = useState(true)
-    const section = useContext(SidebarSectionContext)
-
-    const onToggle = useCallback(() => setOpen(!open), [open])
-
-    useEffect(() => {
-        if(open) section.expand()
-        else section.collapse()
-    }, [open])
-
-    
-    const onDrag = useCallback((dx: number, dy: number) => {
-        section.dragEdge(dy)
-    }, [])
-
-    return (
-        <div className="map-editor-sidebar-section" style={{height: section.height}}>
-            <SidebarSectionHeader text={props.header} onToggle={onToggle} open={open}/>
-            {open && props.children}
-            <Dragger onDrag={onDrag} contents={(ref) => (
-                <div className="drag-edge" ref={(elt) => { ref.current = elt }}></div>
-            )}/>
+        <div className="map-editor-sidebar-header">
+            <div className="map-editor-sidebar-header-side">
+                <div className="map-editor-sidebar-header-icon"/>
+                <div className="map-editor-sidebar-header-text">
+                    Редактор карт
+                </div>
+            </div>
+            <div className="map-editor-sidebar-header-side">
+                <div className="map-editor-sidebar-close-button"/>
+            </div>
         </div>
     )
 }
@@ -62,6 +32,7 @@ const MapEditorSidebar: React.FC<MapEditorSidebarProps> = (props) => {
 
     return (
         <div className="map-editor-sidebar">
+            <MapEditorSidebarHeader/>
             <SidebarSections
                 sections={3}
                 minSectionHeight={150}
@@ -78,11 +49,7 @@ const MapEditorSidebar: React.FC<MapEditorSidebarProps> = (props) => {
                             <SceneEntityLibrary/>
                         </SidebarSection>
                     )
-                    case 2: return (
-                        <SidebarSection key={index} header="Компоненты">
-                            
-                        </SidebarSection>
-                    )
+                    case 2: return <SceneComponentsSection key={index}/>
                     default: return <></>
                 }
             }}>

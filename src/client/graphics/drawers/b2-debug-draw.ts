@@ -1,6 +1,6 @@
 import * as Box2D from "@box2d/core"
 import DrawPhase from "./draw-phase";
-import Matrix3 from "src/utils/matrix3";
+import { Matrix3 } from "src/utils/matrix3";
 import ConvexShapeProgram from "../programs/convex-shapes/convex-shape-program";
 import LineDrawer from "./line-drawer";
 

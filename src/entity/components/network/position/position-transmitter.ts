@@ -1,16 +1,13 @@
 import PhysicalComponent from "src/entity/components/physics-component";
 import {Commands} from "../commands";
 import Transmitter from "../transmitting/transmitter";
+import TransformComponent from "../../transform-component";
 
 export default class PositionTransmitter extends Transmitter {
     constructor() {
         super()
 
-        this.eventHandler.on("teleport", () => {
-            this.sendPositionUpdate()
-        })
-
-        this.eventHandler.on("tick", () => {
+        this.eventHandler.on("position-update", () => {
             this.sendPositionUpdate()
         })
     }
@@ -18,29 +15,35 @@ export default class PositionTransmitter extends Transmitter {
     onEnable() {
         super.onEnable();
         this.sendPositionUpdate()
-        // console.log("enable")
     }
 
     sendPositionUpdate() {
-        let component = this.getEntity().getComponent(PhysicalComponent)
-        let body = component.getBody()
-        if(!body) return;
+        let transform = this.getEntity().getComponent(TransformComponent)
 
         this.packIfEnabled(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-            let position = body.GetPosition()
+            let position = transform.getGlobalPosition()
+            let angle = transform.getGlobalAngle()
             buffer.writeFloat32(position.x)
             buffer.writeFloat32(position.y)
-            buffer.writeFloat32(body.GetAngle())
+            buffer.writeFloat32(angle)
 
-            let velocity = body.GetLinearVelocity()
-            let angular = body.GetAngularVelocity()
+            let physicsComponent = this.getEntity().getComponent(PhysicalComponent)
+            let body = physicsComponent?.getBody()
 
-            buffer.writeFloat32(velocity.x)
-            buffer.writeFloat32(velocity.y)
-            buffer.writeFloat32(angular)
+            if(body) {
+                buffer.writeInt8(1)
+                let velocity = body.GetLinearVelocity()
+                let angular = body.GetAngularVelocity()
 
-            buffer.writeUint16(component.host.worldTicks)
-            buffer.writeFloat32(component.host.physicsTick)
+                buffer.writeFloat32(velocity.x)
+                buffer.writeFloat32(velocity.y)
+                buffer.writeFloat32(angular)
+
+                buffer.writeUint16(physicsComponent.host.worldTicks)
+                buffer.writeFloat32(physicsComponent.host.physicsTick)
+            } else {
+                buffer.writeInt8(0)
+            }
         })
     }
 }

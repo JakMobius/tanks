@@ -5,13 +5,12 @@ import EntityDataTransmitComponent from "src/entity/components/network/transmitt
 import ServerTDMControllerComponent, {
     ServerTDMControllerConfig
 } from "src/entity/types/controller-tdm/server-side/server-tdm-controller-component";
-import Entity from "src/utils/ecs/entity";
 
-export function serverTDMControllerPrefab(entity: Entity, config: ServerTDMControllerConfig) {
+ServerEntityPrefabs.types.set(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)
     EntityPrefabs.Types.get(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY)(entity)
 
-    entity.addComponent(new ServerTDMControllerComponent(config))
+    entity.addComponent(new ServerTDMControllerComponent())
     let transmitComponent = entity.getComponent(EntityDataTransmitComponent)
     transmitComponent.visibleAnywhere = true
-}
+})

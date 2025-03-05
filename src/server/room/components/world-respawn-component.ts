@@ -1,7 +1,6 @@
 import Entity from "src/utils/ecs/entity";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerRespawnEvent from "src/events/player-respawn-event";
-import PhysicalComponent from "src/entity/components/physics-component";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import PlayerPreferredTankComponent from "src/entity/types/player/server-side/player-preferred-tank-component";
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
@@ -9,6 +8,7 @@ import {UserTankChangeOnRespawnMessageTransmitter} from "src/entity/components/n
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
+import TransformComponent from "src/entity/components/transform-component";
 
 export default class WorldRespawnComponent extends EventHandlerComponent {
 
@@ -53,8 +53,7 @@ export default class WorldRespawnComponent extends EventHandlerComponent {
         ServerEntityPrefabs.types.get(preferredTank)(tank)
         this.entity.appendChild(tank);
 
-        const body = tank.getComponent(PhysicalComponent)
-        body.setPositionAngle(event.respawnPosition, event.respawnAngle)
+        tank.getComponent(TransformComponent).setGlobalPositionAngle(event.respawnPosition, event.respawnAngle)
 
         playerTankComponent.setTank(tank)
     }

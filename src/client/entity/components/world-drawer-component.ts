@@ -54,6 +54,11 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
     }
 
     draw() {
+        if(this.canvasHandler.needsResize) {
+            this.canvasHandler.updateSize()
+        }
+        this.canvasHandler.clear()
+
         this.backgroundDrawPhase.draw()
         this.mapDrawPhase.draw()
         this.entityDrawPhase.draw()

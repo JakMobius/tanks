@@ -7,8 +7,9 @@ import {MeshGenerationContext} from "./mesh-generation-context";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
-import { WorldComponent } from "src/entity/game-world-entity-prefab";
 import TilemapComponent from "src/map/tilemap-component";
+import Entity from "src/utils/ecs/entity";
+import PhysicalComponent from "src/entity/components/physics-component";
 
 export default class PhysicsChunk {
     public readonly collider: ChunkedMapCollider;
@@ -16,7 +17,7 @@ export default class PhysicsChunk {
     public readonly y: number;
     public readonly width: number;
     public readonly height: number;
-    private body: Box2D.b2Body | null = null
+    private entity: Entity | null = null
     public blocks: PhysicsBlock[] | null = null
     private edgeFindingContext: EdgeFindingContext;
     private meshGenerationContext: MeshGenerationContext;
@@ -79,52 +80,52 @@ export default class PhysicsChunk {
     public updateBody() {
         if (!this.blocks) this.loadBlocks()
 
-        if (this.body) {
-            this.body.GetWorld().DestroyBody(this.body)
-        }
-
-        const world = WorldComponent.getWorld(this.collider.entity)
-        const body = world.getComponent(PhysicalHostComponent).world.CreateBody({
-            type: Box2D.b2BodyType.b2_staticBody,
-            position: {x: this.x * TilemapComponent.BLOCK_SIZE, y: this.y * TilemapComponent.BLOCK_SIZE},
-        })
-
+        this.removeBody()
         this.generateMesh()
-        for (let shape of this.edgeMesh) {
-            const pointShape = shape.map(point => ({
-                x: point[0] * TilemapComponent.BLOCK_SIZE,
-                y: point[1] * TilemapComponent.BLOCK_SIZE
-            }))
 
-            const polygonShape = new Box2D.b2PolygonShape()
-            polygonShape.Set(pointShape)
-
-            body.CreateFixture({
-                shape: polygonShape,
-                density: 1.0,
-                friction: 0.1,
-                restitution: 0.1,
-                filter: {
-                    categoryBits: physicsCategories.wall,
-                    maskBits: physicsMasks.wall
-                }
+        const entity = new Entity()
+        entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
+            let body = host.world.CreateBody({
+                type: Box2D.b2BodyType.b2_staticBody,
+                position: {x: this.x * TilemapComponent.BLOCK_SIZE, y: this.y * TilemapComponent.BLOCK_SIZE},
             })
-        }
 
-        if (this.body) this.body.SetUserData({
-            entity: null
-        })
-        this.body = body
+            for (let shape of this.edgeMesh) {
+                const pointShape = shape.map(point => ({
+                    x: point[0] * TilemapComponent.BLOCK_SIZE,
+                    y: point[1] * TilemapComponent.BLOCK_SIZE
+                }))
+    
+                const polygonShape = new Box2D.b2PolygonShape()
+                polygonShape.Set(pointShape)
+    
+                body.CreateFixture({
+                    shape: polygonShape,
+                    density: 1.0,
+                    friction: 0.1,
+                    restitution: 0.1,
+                    filter: {
+                        categoryBits: physicsCategories.wall,
+                        maskBits: physicsMasks.wall
+                    }
+                })
+            }
+    
+            // Box2D solvers are stored statically. Resolved contacts
+            // are sometimes cached in memory, as well as corresponding
+            // bodies and their user data. This is not much of a
+            // performance problem, but it makes real memory leaks harder
+            // to detect.
+            body.SetUserData({
+                physicsChunk: new WeakRef(this)
+            })
 
-        // Box2D solvers are stored statically. Resolved contacts
-        // are sometimes cached in memory, as well as corresponding
-        // bodies and their user data. This is not much of a
-        // performance problem, but it makes real memory leaks harder
-        // to detect.
-        this.body.SetUserData({
-            physicsChunk: new WeakRef(this)
-        })
+            return body
+        }))
+
         this.needsUpdate = false
+
+        this.entity.appendChild(entity)
     }
 
     getBlock(x: number, y: number) {
@@ -157,9 +158,8 @@ export default class PhysicsChunk {
     }
 
     private removeBody() {
-        if (this.body) {
-            this.body.GetWorld().DestroyBody(this.body)
-            this.body = null
+        if (this.entity) {
+            this.entity.removeFromParent()
         }
     }
 

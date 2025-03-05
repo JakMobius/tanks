@@ -23,6 +23,9 @@ export default class EntityDataTransmitComponent extends EventHandlerComponent {
         for (let transmitterSet of this.transmitterSets.values()) {
             transmitterSet.updateParent()
         }
+        if(!this.entity.parent) {
+            this.clearTransmitterSets()
+        }
     }
 
     hasTransmitterSetForEnd(receivingEnd: ReceivingEnd) {

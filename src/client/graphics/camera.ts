@@ -1,4 +1,4 @@
-import Matrix3, {inverse} from "src/utils/matrix3";
+import { Matrix3, inverse } from "src/utils/matrix3";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
@@ -46,6 +46,6 @@ export default class CameraComponent extends EventHandlerComponent {
     }
 
     updateInverseMatrix() {
-        this.inverseMatrix.m = inverse(this.matrix.m)
+        this.inverseMatrix = this.matrix.inverted()
     }
 }

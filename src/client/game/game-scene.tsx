@@ -54,10 +54,10 @@ const GameView: React.FC<GameViewConfig> = (props) => {
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        state.world?.emit("tick", dt)
-        state.world?.emit("draw")
         state.camera?.getComponent(CameraPositionController)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
+        state.world?.emit("tick", dt)
+        state.world?.emit("draw")
     }
 
     const onTankSelected = useCallback((tank: number) => {

@@ -4,6 +4,9 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
 import SpawnzonesComponent from "src/map/spawnzones-component";
 import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
+import VisibilityInheritanceComponent from "src/entity/components/network/transmitting/visibility-inheritance-component";
+
+
 
 ServerEntityPrefabs.types.set(EntityType.TILEMAP, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)
@@ -15,4 +18,7 @@ ServerEntityPrefabs.types.set(EntityType.TILEMAP, (entity) => {
 
     let transmitComponent = entity.getComponent(EntityDataTransmitComponent)
     transmitComponent.visibleAnywhere = true
+
+    // TODO: temporary, until map editor is implemented properly
+    entity.addComponent(new VisibilityInheritanceComponent())
 })

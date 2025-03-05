@@ -1,70 +1,3 @@
-
-.map-editor-sidebar-section-header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0px 10px 0px 5px;
-    height: 40px;
-    gap: 5px;
-
-    flex: none;
-    align-self: stretch;
-    font-weight: 700;
-    color: #000000;
-    box-sizing: border-box;
-
-    .expand-arrow {
-        background-position: center;
-        background-size: 100% auto;
-        background-repeat: no-repeat;
-        background-image: url(../map-editor/expand@3x.png);
-        width: 12px;
-        height: 12px;
-        transform: rotate(270deg);
-        cursor: pointer;
-
-        &.open {
-            transform: none;
-        }
-    }
-}
-
-.map-editor-sidebar-section {
-    position: relative;
-    box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0px;
-    width: 100%;
- 
-    align-self: stretch;
-
-    .drag-edge {
-        position: absolute;
-        bottom: 0px;
-        left: 0px;
-        width: 100%;
-        height: 2px;
-        background-color: rgb(200, 200, 200);
-        cursor: ns-resize
-    }
-
-    .drag-edge:hover {
-        height: 4px;
-        background-color: rgb(200, 200, 200);
-    }
-
-    &:last-child {
-        padding-bottom: 0;
-    }
-
-    &:last-child .drag-edge {
-        display: none;
-    }
-}
-
 .map-editor-sidebar {
     box-sizing: border-box;
 
@@ -81,4 +14,49 @@
 
     background: #FFFFFF;
     border-right: 1px solid #7F7F7F;
+
+    .map-editor-sidebar-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0px 10px;
+        gap: 10px;
+        height: 40px;
+        border-bottom: 2px solid #C8C8C8;
+        align-self: stretch;
+    }
+
+    .map-editor-sidebar-header-side {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0px;
+        gap: 10px;
+        align-self: stretch;
+    }
+
+    .map-editor-sidebar-header-icon {
+        width: 40px;
+        height: 40px;
+        background-image: url("../game/tank-gray@3x.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+    }
+
+    .map-editor-sidebar-header-text {
+        font-weight: 700;
+        font-size: 14px;
+        color: #000000;
+    }
+
+    .map-editor-sidebar-close-button {
+        width: 40px;
+        height: 40px;
+        background-image: url("../map-editor/sidebar@3x.png");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 28px 22px;
+    }
 }

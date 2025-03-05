@@ -9,6 +9,7 @@ import PlayerTankComponent from "src/entity/types/player/server-side/player-tank
 import EventEmitter from "src/utils/event-emitter";
 import PlayerRespawnEvent from "src/events/player-respawn-event";
 import HealthComponent from "src/entity/components/health-component";
+import TransformComponent from "src/entity/components/transform-component";
 
 export default class TutorialWorldController {
     game: Entity;
@@ -72,10 +73,11 @@ export default class TutorialWorldController {
         let body = tank.getComponent(PhysicalComponent)
         let health = tank.getComponent(HealthComponent)
 
-        body.setPositionAngle({x: 17.5, y: 212.5}, 4)
         body.setVelocity({x: 0, y: 0})
         body.setAngularVelocity(0)
         health.setHealth(health.getMaxHealth())
+
+        tank.getComponent(TransformComponent).setGlobalPositionAngle({x: 17.5, y: 212.5}, 4)
     }
 
     private onPlayerCommand(player: Entity, text: string) {

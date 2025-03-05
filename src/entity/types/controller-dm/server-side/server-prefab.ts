@@ -7,11 +7,11 @@ import ServerDMControllerComponent, {
 } from "src/entity/types/controller-dm/server-side/server-dm-controller-component";
 import Entity from "src/utils/ecs/entity";
 
-export function serverDMControllerPrefab(entity: Entity, config: ServerDMControllerConfig) {
+ServerEntityPrefabs.types.set(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY, (entity) => {
     ServerEntityPrefabs.setupEntity(entity)
     EntityPrefabs.Types.get(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY)(entity)
 
-    entity.addComponent(new ServerDMControllerComponent(config))
+    entity.addComponent(new ServerDMControllerComponent())
     let transmitComponent = entity.getComponent(EntityDataTransmitComponent)
     transmitComponent.visibleAnywhere = true
-}
+})

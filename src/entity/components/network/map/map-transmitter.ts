@@ -11,15 +11,22 @@ export default class MapTransmitter extends Transmitter {
 
         this.eventHandler.on("map-block-damage", (event: BlockDamageEvent) => {
             if(event.cancelled) return
-            this.queueBlockUpdate(event.x, event.y)
+            this.sendBlockUpdate(event.x, event.y)
         })
         this.eventHandler.on("map-block-change", (event: BlockChangeEvent) => {
-            this.queueBlockUpdate(event.x, event.y)
+            this.sendBlockUpdate(event.x, event.y)
+        })
+        this.eventHandler.on("update", (event: BlockChangeEvent) => {
+            this.sendMap()
         })
     }
 
     onEnable() {
         super.onEnable()
+        this.sendMap()
+    }
+
+    sendMap() {
         const map = this.getEntity().getComponent(TilemapComponent)
 
         this.packIfEnabled(Commands.GAME_MAP_CONTENT_COMMAND, (buffer) => {
@@ -35,7 +42,7 @@ export default class MapTransmitter extends Transmitter {
         })
     }
 
-    queueBlockUpdate(x: number, y: number) {
+    sendBlockUpdate(x: number, y: number) {
         const map = this.getEntity().getComponent(TilemapComponent)
 
         this.packIfEnabled(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {

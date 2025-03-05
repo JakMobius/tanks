@@ -37,19 +37,19 @@ export default class FlagStateComponent extends EventHandlerComponent {
 
     private updatePosition() {
         if(this.carrier) {
-            let carrierTransform = this.carrier.getComponent(TransformComponent)
-            let carryPointX = carrierTransform.transform.transformX(0, -1.3)
-            let carryPointY = carrierTransform.transform.transformY(0, -1.3)
+            let carrierTransform = this.carrier.getComponent(TransformComponent).getGlobalTransform()
+            let carryPointX = carrierTransform.transformX(0, -1.3)
+            let carryPointY = carrierTransform.transformY(0, -1.3)
 
             carryPointX -= 1.35 // Shift of the flagpole relative to the center of the texture
             carryPointY -= 1.85 // So the bottom of the flag is at the "anchor point"
 
-            this.entity.getComponent(PhysicalComponent).setPositionAngle({
+            this.entity.getComponent(TransformComponent).setGlobalPositionAngle({
                 x: carryPointX,
                 y: carryPointY
             }, 0)
         } else if(this.position) {
-            this.entity.getComponent(PhysicalComponent).setPositionAngle(this.position, 0)
+            this.entity.getComponent(TransformComponent).setGlobalPositionAngle(this.position, 0)
         }
     }
 }

@@ -7,6 +7,6 @@ export default class AirBlockState extends BlockState {
     static typeId = 0;
 
     update(map: TilemapComponent, x: number, y: number) {
-        map.entity.emit("block-update", x, y)
+        map.entity?.emit("block-update", x, y)
     }
 }

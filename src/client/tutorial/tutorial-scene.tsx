@@ -46,10 +46,10 @@ const TutorialView: React.FC = () => {
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
         state.remoteControlsManager?.updateIfNeeded()
-        state.game?.tick(dt)
-        state.game?.clientWorld.emit("draw")
         state.camera?.getComponent(CameraPositionController)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
+        state.game?.tick(dt)
+        state.game?.clientWorld.emit("draw")
     }
 
     const onTankSelected = (tank: number) => {
@@ -61,7 +61,7 @@ const TutorialView: React.FC = () => {
         scene.loop.start()
         scene.canvas.clear()
 
-        const game = new EmbeddedServerGame({})
+        const game = new EmbeddedServerGame()
         const worldController = new TutorialWorldController(game.serverGame)
         const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, game.clientConnection.connection)
 

@@ -10,13 +10,12 @@ import {WebserverSession} from "src/server/webserver/webserver-session";
 import Entity from "src/utils/ecs/entity";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
 import RoomClientComponent from "src/server/room/components/room-client-component";
-import {serverCTFControllerPrefab} from "src/entity/types/controller-ctf/server-side/server-prefab";
-import { serverTDMControllerPrefab } from 'src/entity/types/controller-tdm/server-side/server-prefab';
-import { serverDMControllerPrefab } from 'src/entity/types/controller-dm/server-side/server-prefab';
 import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
 import { EntityType } from 'src/entity/entity-type';
 import MapLoaderComponent from 'src/server/room/components/map-loader-component';
 import WorldTilemapComponent from 'src/physics/world-tilemap-component';
+import fs from 'fs'
+import { MapFile } from 'src/map/map-serialization';
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -174,9 +173,11 @@ export default class GameSocketPortal extends SocketPortal {
             mode: config.mode
         })
 
+        let json = JSON.parse(fs.readFileSync(config.map, "utf-8")) as unknown as MapFile
+
         let tilemap = new Entity()
         ServerEntityPrefabs.types.get(EntityType.TILEMAP)(tilemap)
-        tilemap.addComponent(new MapLoaderComponent(config.map))
+        tilemap.addComponent(new MapLoaderComponent(json))
         tilemap.getComponent(MapLoaderComponent).reloadMap()
         game.appendChild(tilemap)
 
@@ -185,28 +186,11 @@ export default class GameSocketPortal extends SocketPortal {
 
         let gameModeController = new Entity()
         if(config.mode == "CTF") {
-            serverCTFControllerPrefab(gameModeController, {
-                // TODO: world should be determined when controller is attached to it
-                world: game,
-                socket: this,
-                minPlayers: 2,
-                teams: 2
-            })
+            ServerEntityPrefabs.types.get(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
         } else if(config.mode == "TDM") {
-            serverTDMControllerPrefab(gameModeController, {
-                // TODO: world should be determined when controller is attached to it
-                world: game,
-                socket: this,
-                minPlayers: 2,
-                teams: 2
-            })
+            ServerEntityPrefabs.types.get(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
         } else if(config.mode == "DM") {
-            serverDMControllerPrefab(gameModeController, {
-                // TODO: world should be determined when controller is attached to it
-                world: game,
-                socket: this,
-                minPlayers: 2,
-            })
+            ServerEntityPrefabs.types.get(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
         } else {
             throw new InvalidGameModeError(config.mode)
         }

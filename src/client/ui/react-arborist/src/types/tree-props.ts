@@ -24,7 +24,7 @@ export interface TreeProps<T> {
   renderCursor: ElementType<renderers.CursorProps>;
   renderDragPreview: ElementType<renderers.DragPreviewProps<T>>;
   renderContainer: ElementType<{}>;
-  dragItemUserData?: (id: T) => any;
+  dragItemUserData?: (ids: T[]) => any;
 
   /* Sizes */
   rowHeight?: number;

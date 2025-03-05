@@ -9,7 +9,7 @@ export default class WorldPhysicalLoopComponent extends EventHandlerComponent {
         super()
         this.loop = loop
         this.eventHandler.on("tick", (dt: number) => {
-            // console.log("physics")
+            this.entity.getComponent(PhysicalHostComponent).beforePhysics()
             this.loop.timePassed(dt)
 
             // It's convenient to use physical loop schedule

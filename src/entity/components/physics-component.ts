@@ -3,12 +3,14 @@ import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { Matrix3, ReadonlyMatrix3 } from "src/utils/matrix3";
 
 export default class PhysicalComponent extends EventHandlerComponent {
     body: Box2D.b2Body
     host: PhysicalHostComponent
     positionUpdated: boolean = false
     bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body
+    oldTransform: ReadonlyMatrix3
 
     private positionComponent?: TransformComponent
 
@@ -18,21 +20,13 @@ export default class PhysicalComponent extends EventHandlerComponent {
         this.host = null
         this.bodyConstructor = bodyConstructor
 
-        this.eventHandler.on("will-detach-from-parent", () => {
-            this.setHost(null)
-        })
+        this.eventHandler.on("will-detach-from-parent", () => this.detachFromPhysicsHost())
 
         this.eventHandler.on("attached-to-parent", (parent) => {
             this.setHost(parent.getComponent(PhysicalHostComponent))
         })
 
-        this.eventHandler.on("physical-host-attached", (host) => {
-            this.setHost(host)
-        })
-
-        this.eventHandler.on("teleport", () => {
-            this.host.entity.emit("entity-teleport", this.entity)
-        })
+        this.eventHandler.on("physical-host-attached", (host) => this.setHost(host))
     }
 
     getPositionComponent() {
@@ -42,20 +36,35 @@ export default class PhysicalComponent extends EventHandlerComponent {
         return this.positionComponent;
     }
 
-    onPhysicsTick(dt: number) {
-        this.updateTransform()
-
-        if(this.positionUpdated) {
-            this.positionUpdated = false
-            this.entity.emit("teleport")
+    beforePhysics() {
+        let updatePos = false
+        let currentTransform = this.getPositionComponent()
+        if(this.oldTransform) {
+            let currentTransform = this.getPositionComponent().getGlobalTransform()
+            if(!this.oldTransform.equals(currentTransform)) {
+                this.oldTransform = currentTransform.clone()
+                updatePos = true
+            }
+        } else {
+            updatePos = true
         }
 
+        if(updatePos) {
+            let position = currentTransform.getGlobalPosition()
+            let angle = currentTransform.getGlobalAngle()
+            
+            this.body.SetTransformVec(position, angle)
+        }
+    }
+
+    onPhysicsTick(dt: number) {
         this.entity.emit("physics-tick", dt)
+        this.updateTransform()
     }
 
     onDetach() {
         super.onDetach()
-        this.setHost(null)
+        this.detachFromPhysicsHost()
     }
 
     onAttach(entity: Entity) {
@@ -96,28 +105,22 @@ export default class PhysicalComponent extends EventHandlerComponent {
         }
     }
 
-    setPositionAngle(position: Box2D.XY, angle: number) {
-        this.body.SetTransformVec(position, angle)
-        this.updateTransform()
-        this.positionUpdated = true
-    }
-
     setVelocity(velocity: Box2D.XY) {
         this.body.SetLinearVelocity(velocity)
-        this.positionUpdated = true
     }
 
     setAngularVelocity(velocity: number) {
         this.body.SetAngularVelocity(velocity)
-        this.positionUpdated = true
     }
 
     private updateTransform() {
-        const transformComponent = this.getPositionComponent().transform
         const position = this.body.GetPosition()
 
-        transformComponent.reset()
-        transformComponent.translate(position.x, position.y)
-        transformComponent.rotate(-this.body.GetAngle())
+        this.getPositionComponent().setGlobalPositionAngle(position, this.body.GetAngle())
+    }
+
+    detachFromPhysicsHost(): void {
+        this.setHost(null)
+        this.oldTransform = null
     }
 }

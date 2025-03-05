@@ -1,6 +1,6 @@
 import "./tree-view.scss"
 
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import { CursorProps, DragPreviewProps, NodeRendererProps, RowRendererProps, TreeApi } from "../react-arborist/src"
 import { useDataUpdates, useTreeApi } from "../react-arborist/src/context"
 import { focusNextElement, focusPrevElement } from "../react-arborist/src/utils"
@@ -22,11 +22,43 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
     if (props.node.isSelectedStart) classNames.push("selected-start")
     if (props.node.isSelectedEnd) classNames.push("selected-end")
 
+    const inputRef = React.createRef<HTMLInputElement>()
+
     let onExpand = useCallback(() => {
         if (props.node.isOpen) {
             props.node.close()
         } else {
             props.node.open()
+        }
+    }, [props.node])
+
+    useEffect(() => {
+        if(props.node.isEditing) {
+            inputRef.current.focus()
+            inputRef.current.value = props.node.data.name
+            inputRef.current.setSelectionRange(0, inputRef.current.value.length)
+        }
+    }, [props.node.isEditing, props.node.data.name])
+
+    const onInputKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault()
+            let input = e.target as HTMLInputElement
+            props.node.submit(input.value)
+        }
+        if (e.key === "Escape") {
+            e.preventDefault()
+            props.node.reset()
+        }
+    }, [props.node])
+
+    const onInputBlur = useCallback((e: React.FocusEvent) => {
+        props.node.reset()
+    }, [props.node])
+
+    const onClick = useCallback((e: React.MouseEvent) => {
+        if (e.detail === 2 && props.node.isEditable) {
+            props.node.edit()
         }
     }, [props.node])
 
@@ -36,10 +68,21 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
     if (!props.node.data.children?.length) expandNodeClassnames.push("hidden")
 
     return (
-        <div className={classNames.join(" ")} style={props.style} ref={props.dragHandle}>
+        <div
+            className={classNames.join(" ")}
+            style={props.style}
+            ref={props.dragHandle}
+            onClick={onClick}
+        >
             <div className="inner">
                 <div className={expandNodeClassnames.join(" ")} onClick={onExpand}></div>
-                {props.node.data.name}
+                {props.node.isEditing ?
+                    <input 
+                        ref={inputRef}
+                        onKeyDown={onInputKeyDown}
+                        onBlur={onInputBlur}
+                    ></input>
+                : props.node.data.name }
             </div>
         </div>
     );

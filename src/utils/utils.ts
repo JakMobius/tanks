@@ -139,6 +139,14 @@ export function horsepowerFromSiValue(hp: number): number {
     return hp / 735.5;
 }
 
+export function radToDeg(rad: number) {
+    return rad * 180 / Math.PI
+}
+
+export function degToRad(deg: number) {
+    return deg * Math.PI / 180
+}
+
 export function nextPowerOfTwo(x: number) {
     x |= (x >> 1) & 0x7FFFFFFF;
     x |= (x >> 2) & 0x3FFFFFFF;

@@ -2,8 +2,8 @@ import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from "src/client/graphics/sprite";
 import Uniform from "src/client/graphics/gl/uniform";
 import CameraProgram from "./camera-program";
-import Matrix3 from "src/utils/matrix3";
-import {Quadrangle} from "src/utils/quadrangle";
+import { Matrix3 } from "src/utils/matrix3";
+import {copyQuadrangle, Quadrangle, transformQuadrangle} from "src/utils/quadrangle";
 import {ByteArray} from "src/serialization/binary/typed-buffer";
 
 import vertexShaderSource from "src/client/graphics/shaders/vertex/texture-vertex.glsl"
@@ -19,7 +19,7 @@ export default class TextureProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
 	public indexBuffer: GLBuffer<ByteArray>;
 	public textureUniform: Uniform;
-	public transform: Matrix3;
+	public transform = new Matrix3();
 	private vertices: number
     private updated: boolean;
 
@@ -51,11 +51,15 @@ export default class TextureProgram extends CameraProgram {
     }
 
     drawTexture(quadrangle: Quadrangle, sx: number, sy: number, sw: number, sh: number, z: number) {
+
+        let copy = copyQuadrangle(quadrangle)
+        transformQuadrangle(copy, this.transform)
+        
         this.vertexBuffer.appendArray([
-            quadrangle.x1, quadrangle.y1, z, sx + sw, sy + sh,
-            quadrangle.x2, quadrangle.y2, z, sx + sw, sy,
-            quadrangle.x3, quadrangle.y3, z, sx, sy + sh,
-            quadrangle.x4, quadrangle.y4, z, sx, sy
+            copy.x1, copy.y1, z, sx + sw, sy + sh,
+            copy.x2, copy.y2, z, sx + sw, sy,
+            copy.x3, copy.y3, z, sx, sy + sh,
+            copy.x4, copy.y4, z, sx, sy
         ])
 
         const baseIndex = this.vertices

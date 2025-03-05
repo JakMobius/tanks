@@ -3,10 +3,8 @@ import CameraComponent from 'src/client/graphics/camera';
 import MapEditorBackgroundOverlay from 'src/client/controls/interact/map-editor-background-overlay';
 import ToolManager from './tools/toolmanager';
 import Tools from "./tools/type-loader"
-import GameMapHistoryComponent from "./history/game-map-history-component";
 import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import Entity from "src/utils/ecs/entity";
-import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 import PauseOverlay from "src/client/ui/pause-overlay/pause-overlay";
 import CameraPositionController from "src/entity/components/camera-position-controller";
@@ -19,15 +17,8 @@ import Tool from './tools/tool';
 import BrickBlockState from 'src/map/block-state/types/brick-block-state';
 import ToolSettingsView from '../ui/tool-settings/tool-settings-view';
 import EventsHUD, { EventsProvider } from 'src/client/ui/events-hud/events-hud';
-import { BasicEvent } from 'src/client/ui/events-hud/basic-event-view';
 import { KeyedComponentsHandle } from 'src/client/utils/keyed-component';
-import WorldTilemapComponent from 'src/physics/world-tilemap-component';
-import { MapFile, readMapFile } from 'src/map/map-serialization';
-import TilemapComponent from '../../map/tilemap-component';
-import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
-import { EntityType } from 'src/entity/entity-type';
-import GameMapNameComponent from './map-name-component';
-import SpawnzonesComponent from 'src/map/spawnzones-component';
+import { MapFile } from 'src/map/map-serialization';
 import { TexturesResourcePrerequisite, usePrerequisites } from 'src/client/scenes/scene-prerequisite';
 import LoadingScene from 'src/client/scenes/loading/loading-scene';
 import Sprite from 'src/client/graphics/sprite';
@@ -35,9 +26,44 @@ import { ControlsProvider } from 'src/client/utils/react-controls-responder';
 import MapEditorSidebar from '../ui/map-editor-sidebar/map-editor-sidebar';
 import { DndProvider, useDragLayer } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import EmbeddedServerGame from '../embedded-server/embedded-server-game';
+import WorldDataPacket from 'src/networking/packets/game-packets/world-data-packet';
+import ReadBuffer from 'src/serialization/binary/read-buffer';
+import EntityDataReceiveComponent from 'src/entity/components/network/receiving/entity-data-receive-component';
+import WriteBuffer from 'src/serialization/binary/write-buffer';
+import { serverPlayerEntityPrefab } from 'src/entity/types/player/server-side/server-prefab';
+import SocketPortalClient from 'src/server/socket/socket-portal-client';
+import PlayerWorldComponent from 'src/entity/types/player/server-side/player-world-component';
+
+export default class MapEditorWorldController {
+    game: Entity;
+
+    constructor(serverGame: Entity) {
+        this.game = serverGame
+
+        this.game.on("client-connect", (client) => this.onClientConnect(client))
+    }
+
+    private onClientConnect(client: SocketPortalClient) {
+
+        const player = new Entity()
+
+        serverPlayerEntityPrefab(player, {
+            client: client,
+            db: null,
+            nick: "Вы"
+        })
+
+        player.getComponent(PlayerWorldComponent).connectToWorld(this.game)
+    }
+}
 
 interface MapEditorSceneContextProps {
-    loadMap: (map: MapFile) => void   
+    loadMap: (map: MapFile) => void  
+    currentSelectedEntity: Entity | null 
+    game: EmbeddedServerGame,
+    selectEntity: (entity: Entity) => void
+    update: () => void
 }
 
 const MapEditorSceneContext = createContext<MapEditorSceneContextProps | undefined>(undefined);
@@ -79,9 +105,9 @@ const MapEditorView: React.FC = () => {
     const [state, setState] = React.useState({
         controlsResponder: null as ControlsResponder | null,
         camera: null as Entity | null,
-        world: null as Entity | null,
         toolManager: null as ToolManager | null,
         toolList: [] as Tool[],
+        game: null as EmbeddedServerGame | null
     })
 
     const stateRef = useRef(state)
@@ -92,11 +118,16 @@ const MapEditorView: React.FC = () => {
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        if(!needsRedrawRef.current) return
-        state.world?.emit("tick", dt)
-        state.world?.emit("draw")
+        let needsRedraw = state.game?.serverLoop.runScheduledTasks(dt)
+
+        if(!needsRedrawRef.current && !needsRedraw && !scene.canvas.needsResize) return
+        needsRedrawRef.current = false
+        
         state.camera?.getComponent(CameraPositionController)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
+        state.game?.serverLoop.emit("tick", dt)
+        state.game?.clientWorld.emit("tick", dt)
+        state.game?.clientWorld.emit("draw")
     }
 
     const setNeedsRedraw = () => {
@@ -107,14 +138,24 @@ const MapEditorView: React.FC = () => {
         scene.setTitle("Танчики - Редактор карт")
         scene.canvas.clear()
 
-        const world = new Entity()
+        const game = new EmbeddedServerGame()
+
+        game.clientConnection.on(WorldDataPacket, (packet) => {
+            let buffer = new ReadBuffer(packet.buffer.buffer)
+            game.clientWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+        })
+
+        game.clientWorld.on("response", (buffer: WriteBuffer) => {
+            new WorldDataPacket(buffer.buffer).sendTo(game.clientConnection.connection)
+        })
+
+        new MapEditorWorldController(game.serverGame)
+
+        const world = game.clientWorld
         const camera = new Entity()
         const toolManager = new ToolManager(world)
 
         const toolList = Tools.map(Tool => new Tool(toolManager))
-        
-        clientGameWorldEntityPrefab(world)
-        world.addComponent(new WorldTilemapComponent())
 
         toolManager.selectBlock(new BrickBlockState())
 
@@ -122,35 +163,12 @@ const MapEditorView: React.FC = () => {
             setNeedsRedraw()
         })
 
-        controlsResponderRef.current.on("game-toggle-debug", () => {
-            camera.getComponent(WorldDrawerComponent).toggleDebugDraw()
-        })
-
-        controlsResponderRef.current.on("editor-undo", (event) => {
-            const map = world.getComponent(WorldTilemapComponent).map
-            const history = map.getComponent(GameMapHistoryComponent)
-            let entry = history?.goBack()
-
-            eventRef.current.addEvent?.(() => (
-                <BasicEvent text={entry ? "Отменено: " + entry.actionName : "Нечего отменять"}/>
-            ))
-        })
-
-        controlsResponderRef.current.on("editor-redo", (event) => {
-            const map = world.getComponent(WorldTilemapComponent).map
-            const history = map.getComponent(GameMapHistoryComponent)
-            let entry = history?.goForward()
-
-            eventRef.current.addEvent?.(() => (
-                <BasicEvent text={entry ? "Повторено: " + entry.actionName : "Нечего повторять"}/>
-            ))
-        })
-
         camera.addComponent(new TransformComponent())
         camera.addComponent(new CameraComponent())
         camera.addComponent(new CameraPositionController()
             .setBaseScale(12)
-            .setViewport({ x: screen.width, y: screen.height }))
+            .setViewport({ x: screen.width, y: screen.height })
+            .setTarget({ x: 0, y: 0 }))
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
@@ -158,12 +176,18 @@ const MapEditorView: React.FC = () => {
 
         setState((state) => ({
             ...state,
-            world: world,
+            game: game,
             camera: camera,
             toolManager: toolManager,
             toolList: toolList
         }))
 
+        setSceneContext((context) => ({
+            ...context,
+            game: game
+        }))
+
+        game.connectClientToServer()
         scene.loop.start()
 
         return () => {
@@ -179,6 +203,7 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     useEffect(() => {
+        scene.canvas
         scene.loop.on("tick", onDraw)
         return () => scene.loop.off("tick", onDraw)
     }, [onDraw])
@@ -211,30 +236,21 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     const loadMap = useCallback((mapFile: MapFile) => {
-        const state = stateRef.current
-        const map = state.world.getComponent(WorldTilemapComponent).map
-        map?.removeFromParent()
-
-        const { width, height, blocks, spawnZones, name } = readMapFile(mapFile)
-
-        const entity = new Entity()
-        ClientEntityPrefabs.types.get(EntityType.TILEMAP)(entity)
-        entity.addComponent(new GameMapHistoryComponent())
-        entity.addComponent(new GameMapNameComponent(name))
-        entity.addComponent(new SpawnzonesComponent(spawnZones))
-        entity.getComponent(TilemapComponent).setMap(width, height, blocks)
-
-        state.world.appendChild(entity)
-        state.world.getComponent(WorldTilemapComponent).map = entity
-
-        let target = {
-            x: width * TilemapComponent.BLOCK_SIZE / 2,
-            y: height * TilemapComponent.BLOCK_SIZE / 2
-        }
-        state.camera.getComponent(CameraPositionController).setTarget(target).reset()
-        state.camera.getComponent(CameraPositionController).onTick(0)
-        setNeedsRedraw()
+        // TODO
     }, [])
+
+    const [sceneContext, setSceneContext] = useState<MapEditorSceneContextProps>({
+        loadMap: loadMap,
+        currentSelectedEntity: null,
+        game: null,
+        update: setNeedsRedraw,
+        selectEntity: (entity) => {
+            setSceneContext((context) => ({
+                ...context,
+                currentSelectedEntity: entity
+            }))
+        }
+    })
 
     return (
         <ControlsProvider ref={controlsResponderRef}>
@@ -242,7 +258,7 @@ const MapEditorView: React.FC = () => {
                 backend={HTML5Backend}
                 options={{ rootElement: document.body || undefined }}
                 >
-                <MapEditorSceneContext.Provider value={{loadMap}}>
+                <MapEditorSceneContext.Provider value={sceneContext}>
                     <EventsProvider ref={eventRef}>
                         <MapEditorBackgroundOverlay
                             draggingEnabled={false}

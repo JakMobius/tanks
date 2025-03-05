@@ -15,7 +15,7 @@ export default class PlayerCountCallbackScript extends ServerGameScript {
     }
 
     private getPlayerCount() {
-        return this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length
+        return this.controller.world.getComponent(ServerWorldPlayerManagerComponent)?.players.length ?? 0
     }
 
     private triggerCallback() {

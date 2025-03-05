@@ -8,6 +8,7 @@ import CameraComponent from "src/client/graphics/camera";
 import React, { useContext, useEffect, useRef } from "react";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import { TankSelectCarouselContext } from "./tank-select-overlay";
+import TransformComponent from "src/entity/components/transform-component";
 
 interface TankPreviewCanvasProps {
     tankType: number | null
@@ -27,8 +28,8 @@ const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
 
     const onFrame = (dt: number) => {
         stateRef.current.time += dt
-        let component = stateRef.current.tank?.getComponent(PhysicalComponent)
-        component?.setPositionAngle(component.getBody().GetPosition(), stateRef.current.time)
+        let component = stateRef.current.tank?.getComponent(TransformComponent)
+        component?.setGlobalPositionAngle(component.getGlobalPosition(), stateRef.current.time)
 
         drawContext.canvas.clear()
         stateRef.current.world.emit("tick", dt)

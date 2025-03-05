@@ -8,10 +8,6 @@ import Entity from "src/utils/ecs/entity";
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 
-export class EmbeddedServerGameConfig {
-    
-}
-
 export default class EmbeddedServerGame {
     clientConnection: ConnectionClient<Connection>
     clientWorld: Entity
@@ -19,7 +15,7 @@ export default class EmbeddedServerGame {
 
     serverLoop = new AdapterLoop()
 
-    constructor(config: EmbeddedServerGameConfig) {
+    constructor() {
         this.serverGame = new Entity()
         serverGameRoomPrefab(this.serverGame, {
             name: "Embedded Server Game",
@@ -28,7 +24,6 @@ export default class EmbeddedServerGame {
         })
 
         this.serverLoop.setInterval(1 / 20)
-        this.serverLoop.start()
 
         this.clientWorld = new Entity()
         clientGameWorldEntityPrefab(this.clientWorld)
