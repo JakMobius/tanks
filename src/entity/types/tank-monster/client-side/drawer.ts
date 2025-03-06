@@ -49,6 +49,12 @@ export class Drawer extends TankDrawer {
         const wheelProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
 
+        wheelProgram.transform.save()
+        bodyProgram.transform.save()
+    
+        wheelProgram.transform.set(transform.getGlobalTransform())
+        bodyProgram.transform.set(transform.getGlobalTransform())
+
         for (let wheelGroup of behaviour.getWheelGroups()) {
             for(let wheel of wheelGroup.wheels) {
                 let spriteIndex = Math.floor(-wheelGroup.getDistance() * Drawer.spritesPerMeter % Drawer.wheelSpriteCount);
@@ -58,21 +64,21 @@ export class Drawer extends TankDrawer {
                 const wheelQuadrangle = copyQuadrangle(Drawer.wheelQuadrangle)
                 if (angle) turnQuadrangle(wheelQuadrangle, Math.sin(angle), Math.cos(angle))
                 translateQuadrangle(wheelQuadrangle, wheel.x, wheel.y)
-                transformQuadrangle(wheelQuadrangle, transform.transform)
 
                 wheelProgram.drawSprite(this.wheelSprites[spriteIndex], wheelQuadrangle)
             }
         }
 
-        const quadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
-        transformQuadrangle(quadrangle, transform.transform)
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,
             this.bodyLightMask,
-            quadrangle,
-            transform.getAngle(),
+            Drawer.bodyQuadrangle,
+            transform.getGlobalAngle(),
             WorldDrawerComponent.depths.tankBody
         )
+
+        wheelProgram.transform.restore()
+        bodyProgram.transform.restore()
     }
 }

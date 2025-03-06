@@ -41,23 +41,30 @@ export class Drawer extends TankDrawer {
         const wheelProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(TextureProgram)
 
+        wheelProgram.transform.save()
+        bodyProgram.transform.save()
+
+        wheelProgram.transform.set(transform.getGlobalTransform())
+        bodyProgram.transform.set(transform.getGlobalTransform())
+
         for (let wheelGroup of behaviour.getWheelGroups()) {
             for(let wheel of wheelGroup.wheels) {
                 let spriteIndex = Math.floor(-wheelGroup.getDistance() * Drawer.spritesPerMeter % Drawer.wheelSpriteCount);
                 if (spriteIndex < 0) spriteIndex = Drawer.wheelSpriteCount + spriteIndex;
                 const angle = wheel.angle
 
-                const wheelQuadrangle = copyQuadrangle(Drawer.wheelQuadrangle)
-                if (angle) turnQuadrangle(wheelQuadrangle, Math.sin(angle), Math.cos(angle))
-                translateQuadrangle(wheelQuadrangle, wheel.x, wheel.y)
-                transformQuadrangle(wheelQuadrangle, transform.transform)
+                wheelProgram.transform.save()
+                wheelProgram.transform.rotate(angle)
+                wheelProgram.transform.translate(wheel.x, wheel.y)
 
-                wheelProgram.drawSprite(this.wheelSprites[spriteIndex], wheelQuadrangle)
+                wheelProgram.drawSprite(this.wheelSprites[spriteIndex], Drawer.wheelQuadrangle)
+                wheelProgram.transform.restore()
             }
         }
 
-        const quadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
-        transformQuadrangle(quadrangle, transform.transform)
-        bodyProgram.drawSprite(this.bodySprite, quadrangle, WorldDrawerComponent.depths.tankBody)
+        bodyProgram.drawSprite(this.bodySprite, Drawer.bodyQuadrangle, WorldDrawerComponent.depths.tankBody)
+
+        wheelProgram.transform.restore()
+        bodyProgram.transform.restore
     }
 }

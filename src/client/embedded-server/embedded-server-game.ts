@@ -24,6 +24,7 @@ export default class EmbeddedServerGame {
         })
 
         this.serverLoop.setInterval(1 / 20)
+        this.serverLoop.start()
 
         this.clientWorld = new Entity()
         clientGameWorldEntityPrefab(this.clientWorld)

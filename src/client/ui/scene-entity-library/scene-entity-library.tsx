@@ -55,6 +55,8 @@ const SceneEntityLibrary: React.FC = () => {
                 ],
             }, {
                 name: "Зона спавна"
+            }, {
+                prefab: EntityType.GROUP,
             }]
         }
 

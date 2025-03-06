@@ -65,6 +65,7 @@ const prefabNames = new Map<number, string>([
     [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY,  "Контроллер режима DM"],
 
     // Utilities:
+    [EntityType.GROUP,                           "Группа"],
     [EntityType.TIMER_ENTITY,                    "Таймер"],
     [EntityType.CHAT_ENTITY,                     "Чат"]
 ])

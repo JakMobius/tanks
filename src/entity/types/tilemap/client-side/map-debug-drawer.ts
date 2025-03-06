@@ -126,7 +126,7 @@ export default class MapDebugDrawer {
 
     private drawTankWheelDebug(entity: Entity) {
         const behaviour = entity.getComponent(TankWheelsComponent)
-        const transform = entity.getComponent(TransformComponent).transform
+        const transform = entity.getComponent(TransformComponent).getTransform()
 
         if(!behaviour) return
 

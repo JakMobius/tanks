@@ -1,8 +1,6 @@
 import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import TilemapComponent from "src/map/tilemap-component";
-import { MapFile, readMapFile } from "src/map/map-serialization";
-import SpawnzonesComponent from "src/map/spawnzones-component";
+import { MapFile, readEntityFile } from "src/map/map-serialization";
 
 export default class MapLoaderComponent implements Component {
     entity: Entity | null = null
@@ -14,10 +12,10 @@ export default class MapLoaderComponent implements Component {
     }
 
     reloadMap() {
-        let { width, height, blocks, spawnZones } = readMapFile(this.json)
+        // let { width, height, blocks, spawnZones } = readEntityFile(this.json)
 
-        this.entity.getComponent(TilemapComponent).setMap(width, height, blocks)
-        this.entity.getComponent(SpawnzonesComponent).spawnZones = spawnZones
+        // this.entity.getComponent(TilemapComponent).setMap(width, height, blocks)
+        // this.entity.getComponent(SpawnzonesComponent).spawnZones = spawnZones
     }
 
     onAttach(entity: Entity) {

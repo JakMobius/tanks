@@ -34,4 +34,5 @@ import 'src/entity/types/effect-pellets/server-side/server-prefab'
 import 'src/entity/types/effect-world-explosion/server-side/server-prefab'
 import 'src/entity/types/effect-sound/server-side/server-prefab'
 
+import 'src/entity/types/group/server-prefab'
 import 'src/entity/types/tilemap/server-prefab'

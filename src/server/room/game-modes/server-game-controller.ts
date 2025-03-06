@@ -8,6 +8,7 @@ import GameSocketPortal, {GameSocketPortalClient} from "src/server/socket/game-s
 import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
+import { WorldComponent } from "src/entity/game-world-entity-prefab";
 
 
 export default abstract class ServerGameController extends EventHandlerComponent {
@@ -40,7 +41,8 @@ export default abstract class ServerGameController extends EventHandlerComponent
     }
 
     updateWorld() {
-        this.setWorld(this.entity.parent)
+        let world = WorldComponent.getWorld(this.entity)
+        this.setWorld(world)
     }
 
     setWorld(world: Entity) {

@@ -31,7 +31,7 @@ export default class WeaponStungun extends ChargeWeaponComponent {
         let weaponComponent = this.entity.getComponent(WeaponComponent)
         let tank = weaponComponent.tank
 
-        const transform = tank.getComponent(TransformComponent).transform
+        const transform = tank.getComponent(TransformComponent).getTransform()
 
         let world = tank.parent
 

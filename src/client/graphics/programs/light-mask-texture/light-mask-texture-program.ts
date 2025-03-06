@@ -2,10 +2,11 @@ import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from 'src/client/graphics/sprite';
 import Uniform from "src/client/graphics/gl/uniform";
 import CameraProgram from "../camera-program";
-import {Quadrangle} from "src/utils/quadrangle";
+import {copyQuadrangle, Quadrangle, transformQuadrangle} from "src/utils/quadrangle";
 
 import vertexShaderSource from "src/client/graphics/shaders/vertex/light-mask-texture-vertex.glsl"
 import fragmentShaderSource from "src/client/graphics/shaders/fragment/light-mask-texture-fragment.glsl"
+import { Matrix3 } from 'src/utils/matrix3';
 
 export default class LightMaskTextureProgram extends CameraProgram {
     public vertexBuffer: GLBuffer<Float32Array>;
@@ -13,6 +14,7 @@ export default class LightMaskTextureProgram extends CameraProgram {
     public textureSizeUniform: Uniform;
     public angleUniform: Uniform;
     public vertices: number
+    public transform = new Matrix3()
 
     public lightAngle: number = 0
 
@@ -62,13 +64,16 @@ export default class LightMaskTextureProgram extends CameraProgram {
         // vertex:
         // position, depth, angle, bright texture position, dark texture position, mask texture position
 
+        const copy = copyQuadrangle(pos)
+        transformQuadrangle(copy, this.transform)
+
         this.vertexBuffer.appendArray([
-            pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x2, pos.y2, z, angle, b.x + b.w, b.y, d.x + d.w, d.y, m.x + m.w, m.y,
-            pos.x4, pos.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y,
-            pos.x1, pos.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
-            pos.x3, pos.y3, z, angle, b.x, b.y + b.h, d.x, d.y + d.h, m.x, m.y + m.h,
-            pos.x4, pos.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y
+            copy.x1, copy.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
+            copy.x2, copy.y2, z, angle, b.x + b.w, b.y, d.x + d.w, d.y, m.x + m.w, m.y,
+            copy.x4, copy.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y,
+            copy.x1, copy.y1, z, angle, b.x + b.w, b.y + b.h, d.x + d.w, d.y + m.h, m.x + m.w, m.y + m.h,
+            copy.x3, copy.y3, z, angle, b.x, b.y + b.h, d.x, d.y + d.h, m.x, m.y + m.h,
+            copy.x4, copy.y4, z, angle, b.x, b.y, d.x, d.y, m.x, m.y
         ])
 
         this.vertices += 6

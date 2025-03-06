@@ -97,12 +97,8 @@ window.addEventListener("load", function() {
 function onLoaded() {
     removeLoadingDiv()
 
-    var root = document.createElement("div")
-    root.classList.add("game-root")
-    document.body.appendChild(root)
-
     var SceneController = (window as any)['SceneController']
-    SceneController.shared.main(root)
+    SceneController.shared.main(document.body)
 }
 
 function downloadGameScript() {

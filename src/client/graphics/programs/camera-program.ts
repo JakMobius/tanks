@@ -20,6 +20,6 @@ export default abstract class CameraProgram extends VertexFragmentShaderProgram 
     bind() {
         super.bind();
 
-        this.matrixUniform.setMatrix(this.camera.matrix.m)
+        this.matrixUniform.setMatrix(this.camera.matrix.getArray())
     }
 }

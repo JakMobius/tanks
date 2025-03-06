@@ -4,11 +4,9 @@ import {DMGameState, DMGameStateType} from "src/entity/types/controller-dm/dm-ga
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
-import PlayerSpawnPositionScript, {
-    RandomSpawnMode
-} from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import {DMPlayingStateController} from "src/entity/types/controller-dm/server-side/dm-playing-state-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
+import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export class DMPlayerWaitingStateController extends DMGameStateController {
 
@@ -26,10 +24,7 @@ export class DMPlayerWaitingStateController extends DMGameStateController {
             this.controller.triggerStateBroadcast()
         }))
 
-        this.addScript(new PlayerSpawnPositionScript(this.controller, {
-            usePlayerTeam: false,
-            randomSpawnMode: RandomSpawnMode.randomTeamSpawn
-        }))
+        this.addScript(new RandomRespawnScript(this.controller, controller.config.spawnZones))
     }
 
     getState(): DMGameState {

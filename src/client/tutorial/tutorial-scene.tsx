@@ -66,8 +66,7 @@ const TutorialView: React.FC = () => {
         const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, game.clientConnection.connection)
 
         game.clientConnection.on(WorldDataPacket, (packet) => {
-            let buffer = new ReadBuffer(packet.buffer.buffer)
-            game.clientWorld.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+            game.clientWorld.getComponent(EntityDataReceiveComponent).receivePacket(packet)
         })
 
         game.clientWorld.on("response", (buffer: WriteBuffer) => {

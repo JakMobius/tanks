@@ -36,25 +36,26 @@ export class Drawer extends TankDrawer {
     draw(phase: DrawPhase) {
         const model = this.entity
         const behaviour = this.entity.getComponent(TrackedTankController)
-        const transform = model.getComponent(TransformComponent).transform
+        const transform = model.getComponent(TransformComponent)
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(TextureProgram)
 
-        const quadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
-        const leftTrack = copyQuadrangle(Drawer.leftTrack)
-        const rightTrack = copyQuadrangle(Drawer.rightTrack)
+        truckProgram.transform.save()
+        bodyProgram.transform.save()
+
+        truckProgram.transform.set(transform.getGlobalTransform())
+        bodyProgram.transform.set(transform.getGlobalTransform())
 
         const leftTrackDist = behaviour.getLeftTrackDistance()
         const rightTrackDist = behaviour.getRightTrackDistance()
 
-        transformQuadrangle(quadrangle, transform)
-        transformQuadrangle(leftTrack, transform)
-        transformQuadrangle(rightTrack, transform)
-
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
-        bodyProgram.drawSprite(this.bodyBrightSprite, quadrangle)
+        truckProgram.drawTruck(Drawer.leftTrack, leftTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
+        truckProgram.drawTruck(Drawer.rightTrack, rightTrackDist, 0.25, this.truckSprite, 3.0, 0.85)
+        bodyProgram.drawSprite(this.bodyBrightSprite, Drawer.bodyQuadrangle)
         //bodyProgram.drawMaskedSprite(this.bodyBrightSprite, this.bodyDarkSprite, this.bodyLightMask, quadrangle, body.GetAngle())
+
+        truckProgram.transform.restore()
+        bodyProgram.transform.restore
     }
 }

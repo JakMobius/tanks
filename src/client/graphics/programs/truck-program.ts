@@ -1,16 +1,18 @@
 import GLBuffer from 'src/client/graphics/gl/glbuffer';
 import Sprite from "src/client/graphics/sprite";
 import CameraProgram from "./camera-program";
-import {Quadrangle} from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import vertexShaderSource from "src/client/graphics/shaders/vertex/truck-vertex.glsl"
 import fragmentShaderSource from "src/client/graphics/shaders/fragment/truck-fragment.glsl"
+import { Matrix3 } from 'src/utils/matrix3';
+import { copyQuadrangle, Quadrangle, transformQuadrangle } from 'src/utils/quadrangle';
 
 export default class TruckProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
 	public indexBuffer: GLBuffer<Uint16Array>;
 	public vertices: number;
+    public transform = new Matrix3()
 
     constructor(ctx: WebGLRenderingContext) {
 
@@ -40,11 +42,14 @@ export default class TruckProgram extends CameraProgram {
 
         const r = texture.rect
 
+        const copy = copyQuadrangle(quadrangle)
+        transformQuadrangle(copy, this.transform)
+
         this.vertexBuffer.appendArray([
-            quadrangle.x1, quadrangle.y1, z, 1, 1, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
-            quadrangle.x2, quadrangle.y2, z, 1, 0, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
-            quadrangle.x3, quadrangle.y3, z, 0, 1, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
-            quadrangle.x4, quadrangle.y4, z, 0, 0, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
+            copy.x1, copy.y1, z, 1, 1, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
+            copy.x2, copy.y2, z, 1, 0, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
+            copy.x3, copy.y3, z, 0, 1, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
+            copy.x4, copy.y4, z, 0, 0, distance, radius, r.x, r.y, r.w, r.h, lengthInTextures,
         ])
 
         const baseIndex = this.vertices

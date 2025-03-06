@@ -5,7 +5,7 @@ import BlockChangeEvent from "../events/block-change-event";
 import EventHandlerComponent from 'src/utils/ecs/event-handler-component';
 import MapTransmitter from 'src/entity/components/network/map/map-transmitter';
 import { TransmitterSet } from 'src/entity/components/network/transmitting/transmitter-set';
-import { ParameterInspector, VectorParameter } from 'src/entity/components/inspector/entity-inspector';
+import { PropertyInspector, VectorProperty } from 'src/entity/components/inspector/property-inspector';
 
 
 export default class TilemapComponent extends EventHandlerComponent {
@@ -24,8 +24,8 @@ export default class TilemapComponent extends EventHandlerComponent {
             transmitterSet.initializeTransmitter(MapTransmitter)
         })
 
-		this.eventHandler.on("inspector-added", (inspector: ParameterInspector) => {
-			let sizeParameter = new VectorParameter(2)
+		this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
+			let sizeParameter = new VectorProperty("mapSize", 2)
 				.withName("Размер карты")
 				.withPrefixes(["W", "H"])
 				.withGetter(() => [this.width, this.height])
@@ -36,7 +36,7 @@ export default class TilemapComponent extends EventHandlerComponent {
 				.replaceNaN()
 				.setBounds(0, 250)
 
-			inspector.addParameter(sizeParameter)
+			inspector.addProperty(sizeParameter)
 		})
 
 		this.setSize(50, 50)

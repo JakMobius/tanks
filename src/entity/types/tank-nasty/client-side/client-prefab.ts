@@ -10,7 +10,6 @@ import AirbagTankController from "src/entity/components/tank-controllers/airbag-
 import {SoundType} from "src/sound/sounds";
 
 ClientEntityPrefabs.associate(EntityType.TANK_NASTY, (entity) => {
-    // TODO: bad
     EntityPrefabs.Types.get(EntityType.TANK_NASTY)(entity)
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 

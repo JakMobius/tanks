@@ -19,7 +19,7 @@ export default class ClientPelletsEffectComponent extends EventHandlerComponent 
 
         const world = tank.parent
         const body = tank.getComponent(PhysicalComponent).getBody()
-        const transform = tank.getComponent(TransformComponent).transform
+        const transform = tank.getComponent(TransformComponent).getGlobalTransform()
 
         const weaponAngle = -Math.PI / 2
         const weaponSpread = Math.PI / 4

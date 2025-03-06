@@ -12,15 +12,13 @@ import MapLoaderComponent from "src/server/room/components/map-loader-component"
 import NoFriendlyFireScript from "src/server/room/game-modes/scripts/no-friendly-fire-script";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
-import PlayerSpawnPositionScript, {
-    RandomSpawnMode
-} from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import {chooseRandomIndex} from "src/utils/utils";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export class TDMPlayingStateController extends TDMGameStateController {
 
@@ -45,9 +43,9 @@ export class TDMPlayingStateController extends TDMGameStateController {
             }
         }))
 
-        this.addScript(new PlayerSpawnPositionScript(this.controller, {
-            randomSpawnMode: RandomSpawnMode.randomTeamSpawn,
-            usePlayerTeam: true
+        this.addScript(new TeamedRespawnScript(this.controller, {
+            usePlayerTeam: true,
+            spawnZones: this.controller.spawnZones
         }))
 
         this.addScript(new MatchTimerExpireScript(this.controller, () => {

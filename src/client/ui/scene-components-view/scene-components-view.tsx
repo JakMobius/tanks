@@ -2,21 +2,21 @@ import "./scene-components-view.scss"
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
-import { Parameter, ParameterInspector, VectorParameter } from "src/entity/components/inspector/entity-inspector";
+import { Property, PropertyInspector, VectorProperty } from "src/entity/components/inspector/property-inspector";
 import { SidebarSection } from "../sidebar-section/sidebar-section";
 import { EntityEditorTreeNodeComponent } from "../scene-tree-view/components";
 
-const useParameterValue = (parameter: Parameter) => {
-    const [value, setValue] = useState(parameter?.getValue())
+const useParameterValue = (property: Property) => {
+    const [value, setValue] = useState(property?.getValue())
 
     useEffect(() => {
-        if(!parameter) return undefined
-        let handler = () => setValue(parameter.getValue())
+        if(!property) return undefined
+        let handler = () => setValue(property.getValue())
         handler()
 
-        parameter.on("change", handler)
-        return () => parameter.off("change", handler)
-    }, [parameter])
+        property.on("change", handler)
+        return () => property.off("change", handler)
+    }, [property])
 
     return value
 }
@@ -29,8 +29,8 @@ interface ParameterInputProps extends React.InputHTMLAttributes<HTMLInputElement
 
 const ParameterInput = React.forwardRef<HTMLInputElement, ParameterInputProps>((props, ref) => {
     return (
-        <div className="parameter-input">
-            { props.prefix ? <span className="parameter-input-prefix">{props.prefix}</span> : null }
+        <div className="property-input">
+            { props.prefix ? <span className="property-input-prefix">{props.prefix}</span> : null }
             <div className="input-wrapper">
                 <input ref={ref} {...props}/>
             </div>
@@ -38,22 +38,22 @@ const ParameterInput = React.forwardRef<HTMLInputElement, ParameterInputProps>((
     )
 })
 
-const VectorParameterView: React.FC<{parameter: VectorParameter}> = (props) => {
-    let value = useParameterValue(props.parameter)
+const VectorParameterView: React.FC<{property: VectorProperty}> = (props) => {
+    let value = useParameterValue(props.property)
 
     let refs = useRef<HTMLInputElement[]>([])
 
     const commitChanges = useCallback(() => {
-        props.parameter.setValue(refs.current.map(input => parseFloat(input.value)))
+        props.property.setValue(refs.current.map(input => parseFloat(input.value)))
         resetValues()
-    }, [props.parameter])
+    }, [props.property])
 
     const resetValues = useCallback(() => {
-        let value = props.parameter.getValue()
-        for(let i = 0; i < props.parameter.dim; i++) {
+        let value = props.property.getValue()
+        for(let i = 0; i < props.property.dim; i++) {
             refs.current[i].value = String(value[i])
         }
-    }, [props.parameter])
+    }, [props.property])
 
     const onKeydown = useCallback((e: React.KeyboardEvent) => {
         if(e.key === "Enter") commitChanges()
@@ -61,17 +61,23 @@ const VectorParameterView: React.FC<{parameter: VectorParameter}> = (props) => {
         e.preventDefault()
         let target = e.target as HTMLInputElement
         target.blur()
-    }, [props.parameter])
+    }, [props.property])
 
     useEffect(resetValues, [value])
 
     let callbacks = useMemo(() => {
+        refs.current = Array(props.property.dim).fill(null)
         let result = []
-        for(let i = 0; i < props.parameter.dim; i++) {
-            result.push((e: HTMLInputElement) => { refs.current[i] = e })
+        for(let i = 0; i < props.property.dim; i++) {
+            result.push((e: HTMLInputElement) => {
+                // When paramerer.dim is decreased, old removed inputs
+                // reset the ref to null using old indices, which expands
+                // the array
+                if(i < refs.current.length) refs.current[i] = e
+            })
         }
         return result
-    }, [props.parameter.dim])
+    }, [props.property.dim])
 
     const onFocus = useCallback((e: React.FocusEvent) => {
         let target = e.target as HTMLInputElement
@@ -83,13 +89,13 @@ const VectorParameterView: React.FC<{parameter: VectorParameter}> = (props) => {
 
     return (
         <>
-            <div className="parameter-header">{props.parameter.name}</div>
-            <div className="parameter-inputs-container">
+            <div className="property-header">{props.property.name}</div>
+            <div className="property-inputs-container">
                 {
-                    props.parameter.value.map((_, i) => {
+                    props.property.value.map((_, i) => {
                         return <ParameterInput
                             key={i}
-                            prefix={props.parameter.prefixes[i]}
+                            prefix={props.property.prefixes[i]}
                             type="number"
                             ref={callbacks[i]}
                             onFocus={onFocus}
@@ -102,32 +108,31 @@ const VectorParameterView: React.FC<{parameter: VectorParameter}> = (props) => {
     )
 }
 
-interface ComponentParameterViewProps {
-    parameter: Parameter
+interface ComponentPropertyViewProps {
+    property: Property
 }
 
-export const ComponentParameterView: React.FC<ComponentParameterViewProps> = (props) => {
+export const ComponentPropertyView: React.FC<ComponentPropertyViewProps> = (props) => {
 
-    if(props.parameter instanceof VectorParameter)
-        return <VectorParameterView parameter={props.parameter}/>
+    if(props.property instanceof VectorProperty)
+        return <VectorParameterView property={props.property}/>
 
     return (
-        <div>Неизвестный параметр "{props.parameter?.name}"</div>
+        <div>Неизвестный параметр "{props.property?.name}"</div>
     )
 }
 
 export const SceneComponentsView: React.FC = (props) => {
     let mapEditor = useMapEditorScene()
 
-    let [inspector, setInspector] = useState<ParameterInspector | null>(null)
+    let [inspector, setInspector] = useState<PropertyInspector | null>(null)
 
     useEffect(() => {
         if(!mapEditor.currentSelectedEntity) return undefined
         let onSet = () => mapEditor.update()
 
-        let inspector = new ParameterInspector(mapEditor.currentSelectedEntity)
+        let inspector = new PropertyInspector(mapEditor.currentSelectedEntity)
         inspector.on("set", onSet)
-        mapEditor.currentSelectedEntity.emit("inspector-added", inspector)
         setInspector(inspector)
 
         return () => {
@@ -137,17 +142,17 @@ export const SceneComponentsView: React.FC = (props) => {
         }
     }, [mapEditor.currentSelectedEntity])
 
-    if(inspector && inspector.parameters.length) return (
-        <div className="parameters-container">
-            {inspector.parameters.map((parameter, index) => {
-                return <ComponentParameterView key={index} parameter={parameter}/>   
+    if(inspector && inspector.properties.length) return (
+        <div className="properties-container">
+            {inspector.properties.map((property, index) => {
+                return <ComponentPropertyView key={index} property={property}/>   
             })}
         </div>
     )
 
     return (
-        <div className="parameters-container">
-            <div className="parameter-header">
+        <div className="properties-container">
+            <div className="no-properties-text">
                 Нет настраиваемых параметров
             </div>
         </div>

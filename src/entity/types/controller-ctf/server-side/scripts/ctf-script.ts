@@ -14,7 +14,7 @@ import PlayerTankComponent from "src/entity/types/player/server-side/player-tank
 import HealthComponent from "src/entity/components/health-component";
 import TimerComponent from "src/entity/components/network/timer/timer-component";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
-import SpawnzonesComponent from "src/map/spawnzones-component";
+import { chooseRandom } from "src/utils/utils";
 
 export default class CTFScript extends ServerGameScript<ServerCTFControllerComponent> {
 
@@ -41,8 +41,8 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         ServerEntityPrefabs.types.get(EntityType.FLAG)(flagEntity)
 
         const map = this.controller.world.getComponent(WorldTilemapComponent).map
-        const spawnzones = map.getComponent(SpawnzonesComponent)
-        const zone = spawnzones.spawnZones[team.id]
+        const zones = this.controller.spawnZones.filter((zone) => zone.team === team.id)
+        const zone = chooseRandom(zones).zone
 
         const flagState = flagEntity.getComponent(FlagDataComponent)
         flagState.basePosition = {

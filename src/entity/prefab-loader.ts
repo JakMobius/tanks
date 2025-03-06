@@ -35,4 +35,5 @@ import 'src/entity/types/effect-pellets/prefab'
 import 'src/entity/types/effect-world-explosion/prefab'
 import 'src/entity/types/effect-sound/prefab'
 
+import 'src/entity/types/group/prefab'
 import 'src/entity/types/tilemap/prefab'

@@ -79,7 +79,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
 
                     // TODO: Maybe bullet shooter component should handle this by itself?
                     // i.e shooter component is not even set on the client side, so this
-                    // code becomes useless
+                    // code become useless
                     let shooterComponent = this.entity.getComponent(BulletShooterComponent)
                     if (shooterComponent) {
                         damageReason.player = shooterComponent.shooter

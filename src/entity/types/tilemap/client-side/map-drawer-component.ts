@@ -46,16 +46,22 @@ export default class MapDrawerComponent extends EventHandlerComponent {
     }
 
     private updateBounds(map: TilemapComponent, camera: CameraComponent) {
+        const transform = this.entity.getComponent(TransformComponent).getGlobalTransform()
+        const inverseTransform = transform.inverted()
+
         let x0 = Infinity
         let y0 = Infinity
         let x1 = -Infinity
         let y1 = -Infinity
 
         // Calculate visible AABB
-        for (let dx = -1; dx <= 1; dx += 2) {
-            for (let dy = -1; dy <= 1; dy += 2) {
-                let x = camera.inverseMatrix.transformX(dx, dy)
-                let y = camera.inverseMatrix.transformY(dx, dy)
+        for (let sx = -1; sx <= 1; sx += 2) {
+            for (let sy = -1; sy <= 1; sy += 2) {
+                let gx = camera.inverseMatrix.transformX(sx, sy)
+                let gy = camera.inverseMatrix.transformY(sx, sy)
+
+                let x = inverseTransform.transformX(gx, gy)
+                let y = inverseTransform.transformY(gx, gy)
 
                 x0 = Math.min(x0, x)
                 y0 = Math.min(y0, y)

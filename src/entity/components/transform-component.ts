@@ -2,7 +2,7 @@ import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
 import { Matrix3, ReadonlyMatrix3 } from "src/utils/matrix3";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import { ParameterInspector, VectorParameter } from "./inspector/entity-inspector";
+import { PropertyInspector, VectorProperty } from "./inspector/property-inspector";
 import { TransmitterSet } from "./network/transmitting/transmitter-set";
 import PositionTransmitter from "./network/position/position-transmitter";
 import { degToRad, radToDeg } from "src/utils/utils";
@@ -20,8 +20,8 @@ export default class TransformComponent extends EventHandlerComponent {
             this.transform = new Matrix3();
         }
 
-        this.eventHandler.on("inspector-added", (inspector: ParameterInspector) => {
-            let positionParameter = new VectorParameter(2)
+        this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
+            let positionProperty = new VectorProperty("position", 2)
                 .withName("Расположение")
                 .withPrefixes(["X", "Y"])
                 .withGetter(() => {
@@ -34,7 +34,7 @@ export default class TransformComponent extends EventHandlerComponent {
                 .updateOn("position-update")
                 .replaceNaN()
 
-            let angleParameter = new VectorParameter(1)
+            let angleProperty = new VectorProperty("angle", 1)
                 .withName("Угол")
                 .withGetter(() => [radToDeg(this.getAngle())])
                 .withSetter(([angle]) => {
@@ -44,8 +44,8 @@ export default class TransformComponent extends EventHandlerComponent {
                 .updateOn("position-update")
                 .replaceNaN()
 
-            inspector.addParameter(positionParameter)
-            inspector.addParameter(angleParameter)
+            inspector.addProperty(positionProperty)
+            inspector.addProperty(angleProperty)
         })
 
         this.eventHandler.on("attached-to-parent", () => this.markDirty())
@@ -62,7 +62,10 @@ export default class TransformComponent extends EventHandlerComponent {
 
     setPosition(position: Box2D.XY) {
         const currentPosition = this.getPosition()
-        this.transform.translate(position.x - currentPosition.x, position.y - currentPosition.y)
+        let newMatrix = new Matrix3()
+        newMatrix.translate(position.x - currentPosition.x, position.y - currentPosition.y)
+        newMatrix.multiply(this.transform)
+        this.transform = newMatrix
         this.markDirty()
     }
 

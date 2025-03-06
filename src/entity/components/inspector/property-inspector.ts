@@ -1,10 +1,13 @@
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set"
 import Entity from "src/utils/ecs/entity"
 import EventEmitter from "src/utils/event-emitter"
+import PrefabIdComponent from "../prefab-id-component"
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs"
 
-export abstract class Parameter<T = any> extends EventEmitter {
+export abstract class Property<T = any> extends EventEmitter {
     eventHandler = new BasicEventHandlerSet()
     value: T
+    id: string
     name: string | null = null
     getter: () => T = () => this.value
     setter: (value: T) => void = (value) => this.value = value
@@ -51,13 +54,14 @@ export abstract class Parameter<T = any> extends EventEmitter {
     }
 }
 
-export class VectorParameter extends Parameter<number[]> {
+export class VectorProperty extends Property<number[]> {
     value: number[] = []
     dim: number
     prefixes: string[] = []
 
-    constructor(dim: number) {
+    constructor(id: string, dim: number) {
         super()
+        this.id = id
         this.dim = dim
         this.value = new Array(dim).fill(0)
     }
@@ -96,24 +100,60 @@ export class VectorParameter extends Parameter<number[]> {
     }
 }
 
-export class ParameterInspector extends EventEmitter {
-    parameters: Parameter[] = []
+export interface SerializedEntityProperties {
+    prefab: number | null
+    properties: Record<string, any>
+}
+
+export class PropertyInspector extends EventEmitter {
+    properties: Property[] = []
     entity: Entity
 
     constructor(entity: Entity) {
         super()
         this.entity = entity
+        this.entity.emit("inspector-added", this)
     }
 
-    addParameter<T>(parameter: Parameter<T>) {
-        this.parameters.push(parameter)
-        parameter.eventHandler.setTarget(this.entity)
-        parameter.on("set", () => this.emit("set"))
+    addProperty<T>(property: Property<T>) {
+        this.properties.push(property)
+        property.eventHandler.setTarget(this.entity)
+        property.on("set", () => this.emit("set"))
     }
 
     cleanup() {
-        for(let parameter of this.parameters) {
-            parameter.eventHandler.setTarget(null)
+        for(let property of this.properties) {
+            property.eventHandler.setTarget(null)
+        }
+    }
+
+    private restoreProperties(properties: Record<string, any>) {
+        for(let property of this.properties) {
+            if(properties.hasOwnProperty(property.id)) {
+                property.setValue(properties[property.id])
+            }
+        }
+    }
+
+    static deserialize(serialized: SerializedEntityProperties): Entity {
+        let entity = new Entity()
+        let prefab = ServerEntityPrefabs.types.get(serialized.prefab)
+        if(!prefab) return entity
+        prefab(entity)
+        let inspector = new PropertyInspector(entity)
+        inspector.restoreProperties(serialized.properties)
+        return entity
+    }
+
+    serialize(): SerializedEntityProperties {
+        let properties = new Object(null) as Record<string, any>
+        for(let property of this.properties) {
+            properties[property.id] = property.getValue()
+        }
+        let prefab = this.entity.getComponent(PrefabIdComponent)?.prefabId
+
+        return {
+            prefab, properties
         }
     }
 }

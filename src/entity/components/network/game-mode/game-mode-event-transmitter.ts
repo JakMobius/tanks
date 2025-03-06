@@ -33,7 +33,7 @@ export default class GameModeEventTransmitter extends Transmitter {
     }
 
     getState() {
-        return this.controller.activeGameState.getState()
+        return this.controller.activeGameState?.getState() ?? {}
     }
 
     updatePrecondition() {

@@ -28,6 +28,8 @@ export default class BasicEntityDrawer extends EntityDrawer {
     }
 
     drawSpriteWithProgram(sprite: Sprite, width: number, height: number, program: TextureProgram, z: number = 1) {
+        // TODO: use program transform?
+
         const transform = this.entity.getComponent(TransformComponent)
 
         const quadrangle = squareQuadrangle(-width / 2, -height / 2, width, height)

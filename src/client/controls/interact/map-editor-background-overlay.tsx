@@ -4,6 +4,8 @@ import {isMacOS} from "src/utils/meta-key-name";
 import { Matrix3 } from "src/utils/matrix3";
 import { useEffect, useRef } from "react";
 import React from "react";
+import CameraPositionController from "src/entity/components/camera-position-controller";
+import CameraComponent from "src/client/graphics/camera";
 
 interface GestureEvent extends UIEvent {
     scale: number
@@ -15,7 +17,7 @@ interface MapEditorBackgroundOverlayProps {
     onMouseDown?: (x: number, y: number) => void
     onMouseUp?: (x: number, y: number) => void
     onMouseMove?: (x: number, y: number) => void
-    matrix?: Matrix3,
+    camera?: CameraComponent,
     draggingEnabled?: boolean
 }
 
@@ -91,7 +93,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
     }
 
     const toUV = (x: number, y: number, z: number) => {
-        let matrix = propsRef.current.matrix
+        let matrix = propsRef.current.camera?.inverseMatrix
         if(!matrix) return [x, y]
 
         let normalizedX = (x / divRef.current.clientWidth) * 2 - z
@@ -109,7 +111,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
     }
 
     const emitZoom = (movement: number) => {
-        propsRef.current.onZoom?.(1 - (movement / 200))
+        propsRef.current.onZoom?.(1 - (movement / 150))
     }
 
     const onWheel = (event: WheelEvent) => {

@@ -13,6 +13,7 @@ import { useScene } from 'src/client/scenes/scene-controller';
 import AdapterLoop from 'src/utils/loop/adapter-loop';
 import EventEmitter from 'src/utils/event-emitter';
 import { availableFeatures } from 'src/client/utils/browsercheck/browser-check';
+import { degToRad } from 'src/utils/utils';
 
 const getTankForIndex = (item: number) => {
     let tankIndex = item % tankDescriptions.length
@@ -193,7 +194,7 @@ const TankSelectCarousel: React.FC<TankSelectCarouselProps> = React.memo((props)
 
     const carouselConfig: TankCarouselConfig = useMemo(() => ({
         radius: 800,
-        angle: 15 / 180 * Math.PI,
+        angle: degToRad(15),
         width: 860,
         visibleItems: 5,
         initialPosition: props.initialPosition

@@ -83,8 +83,7 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         })
 
         props.client.on(WorldDataPacket, (packet) => {
-            let buffer = new ReadBuffer(packet.buffer.buffer)
-            world.getComponent(EntityDataReceiveComponent).receiveBuffer(buffer)
+            world.getComponent(EntityDataReceiveComponent).receivePacket(packet)
         })
 
         world.on("response", (buffer: WriteBuffer) => {

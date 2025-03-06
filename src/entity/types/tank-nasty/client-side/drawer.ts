@@ -50,16 +50,18 @@ export class Drawer extends TankDrawer {
         const propellerProgram = phase.getProgram(TextureProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
 
-        const bodyQuadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
+        propellerProgram.transform.save()
+        bodyProgram.transform.save()
 
-        transformQuadrangle(bodyQuadrangle, transform.transform)
+        propellerProgram.transform.set(transform.getGlobalTransform())
+        bodyProgram.transform.set(transform.getGlobalTransform())
 
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,
             this.bodyLightMask,
-            bodyQuadrangle,
-            transform.getAngle(),
+            Drawer.bodyQuadrangle,
+            transform.getGlobalAngle(),
             WorldDrawerComponent.depths.tankBody
         )
 
@@ -81,11 +83,11 @@ export class Drawer extends TankDrawer {
                 propeller.position.x + propellerDirection.x * Drawer.ruderOffset,
                 propeller.position.y + propellerDirection.y * Drawer.ruderOffset)
 
-            transformQuadrangle(propellerQuadrangle, transform.transform)
-            transformQuadrangle(ruderQuadrangle, transform.transform)
-
             propellerProgram.drawSprite(this.ruderSprite, ruderQuadrangle, WorldDrawerComponent.depths.tankTop)
             propellerProgram.drawSprite(propellerSprite, propellerQuadrangle, WorldDrawerComponent.depths.tankTop)
         }
+
+        propellerProgram.transform.restore()
+        bodyProgram.transform.restore()
     }
 }

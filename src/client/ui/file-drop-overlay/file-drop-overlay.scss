@@ -1,0 +1,28 @@
+
+.drop-release-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255 255 255 / 50%);
+    backdrop-filter: blur(5px);
+    color: gray;
+    font-weight: 700;
+    font-variant: all-small-caps;
+    font-size: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.drop-release-overlay::after {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    bottom: 20px;
+    right: 20px;
+    border: 5px dashed rgb(200, 200, 200);
+    border-radius: 30px;
+}

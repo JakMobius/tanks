@@ -83,7 +83,7 @@ export default class TankControls extends EventHandlerComponent {
         let y = this.axles.get("y").getValue()
 
         if (this.directional) {
-            const transform = this.entity.getComponent(TransformComponent).transform
+            const transform = this.entity.getComponent(TransformComponent).getGlobalTransform()
 
             this.steer = transform.transformX(x, y, 0)
             this.throttle = transform.transformY(x, y, 0)

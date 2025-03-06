@@ -2,9 +2,6 @@ import WorldStatisticsComponent from "src/entity/components/network/world-statis
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
 import MapLoaderComponent from "src/server/room/components/map-loader-component";
-import PlayerSpawnPositionScript, {
-    RandomSpawnMode
-} from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
@@ -32,6 +29,7 @@ import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scr
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import TeamColor from "src/utils/team-color";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export default class CTFPlayingStateController extends CTFGameStateController {
     private teamStatistics = new Map<Team, CTFTeamStatistics>();
@@ -54,9 +52,9 @@ export default class CTFPlayingStateController extends CTFGameStateController {
 
         this.addScript(new QuickMatchEndScript(this.controller, this.controller.config.singlePlayerMatchTime))
 
-        this.addScript(new PlayerSpawnPositionScript(this.controller, {
-            randomSpawnMode: RandomSpawnMode.randomTeamSpawn,
-            usePlayerTeam: true
+        this.addScript(new TeamedRespawnScript(this.controller, {
+            usePlayerTeam: true,
+            spawnZones: this.controller.spawnZones
         }))
 
         this.addScript(new MatchTimerExpireScript(this.controller, () => {

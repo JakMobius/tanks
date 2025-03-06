@@ -96,7 +96,7 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
         const tank = this.entity.parent
         const body = tank.getComponent(PhysicalComponent).getBody()
         const transformComponent = tank.getComponent(TransformComponent)
-        const transform = transformComponent.transform
+        const transform = transformComponent.getGlobalTransform()
 
         this.soundEntity?.getComponent(SoundPositionComponent).setPosition(transformComponent.getPosition())
 

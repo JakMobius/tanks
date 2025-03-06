@@ -7,9 +7,6 @@ import {DMPlayerWaitingStateController} from "src/entity/types/controller-dm/ser
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
 import MapLoaderComponent from "src/server/room/components/map-loader-component";
 import {DMGameState, DMGameStateType} from "src/entity/types/controller-dm/dm-game-state";
-import PlayerSpawnPositionScript, {
-    RandomSpawnMode
-} from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
@@ -17,6 +14,7 @@ import ServerWorldPlayerManagerComponent from "src/server/entity/components/serv
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import WorldTilemapComponent from "src/physics/world-tilemap-component";
+import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export class DMPlayingStateController extends DMGameStateController {
 
@@ -33,10 +31,7 @@ export class DMPlayingStateController extends DMGameStateController {
 
         this.addScript(new QuickMatchEndScript(this.controller, this.controller.config.singlePlayerMatchTime))
 
-        this.addScript(new PlayerSpawnPositionScript(this.controller, {
-            randomSpawnMode: RandomSpawnMode.randomTeamSpawn,
-            usePlayerTeam: true
-        }))
+        this.addScript(new RandomRespawnScript(this.controller, this.controller.config.spawnZones))
 
         this.addScript(new MatchTimerExpireScript(this.controller, () => {
             this.endMatch()

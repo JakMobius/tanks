@@ -1,7 +1,7 @@
 import "./scene-tree-view.scss"
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CreateHandler, DeleteHandler, DropHandler, NodeApi, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { DeleteHandler, DropHandler, NodeApi, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
 import Entity from 'src/utils/ecs/entity';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityEditorTreeNodeComponent, EntityEditorTreeRootComponent, EntityTreeNode } from "./components";
@@ -13,19 +13,25 @@ const SceneTreeView: React.FC = () => {
     const editorScene = useMapEditorScene()
 
     const rootEntity = useMemo(() => {
-        if(!editorScene.game) return null
-        let rootEntity = editorScene.game.serverGame
-        if(!rootEntity.getComponent(EntityEditorTreeNodeComponent)) {
-            rootEntity.addComponent(new EntityEditorTreeNodeComponent())
-        }
+        if(!editorScene.rootEntity) return null
+        let rootEntity = editorScene.rootEntity
         if(!rootEntity.getComponent(EntityEditorTreeRootComponent)) {
             rootEntity.addComponent(new EntityEditorTreeRootComponent())
         }
+        if(!rootEntity.getComponent(EntityEditorTreeNodeComponent)) {
+            rootEntity.addComponent(new EntityEditorTreeNodeComponent())
+        }
         return rootEntity
-    }, [editorScene.game?.serverGame])
+    }, [editorScene.rootEntity])
 
     const treeRef = useRef<TreeApi<EntityTreeNode> | null>(null)
     const divRef = useRef<HTMLDivElement | null>(null)
+    // TODO: come up with a better solution
+    // Virtuoso updates its internal state in useLayoutEffect. Since effects are called
+    // for children first, Virtuoso will update its state before the root node is updated.
+    // While the internal Virtuoso state is misaligned with the root node, the react-arborist
+    // might be asked to render a note that is out of bounds in case the row count is decreased.
+    const [_, rerender] = useState({})
     const [height, setHeight] = useState<number | null>(null)
 
     const getNodeById = (id: string) => {
@@ -38,16 +44,9 @@ const SceneTreeView: React.FC = () => {
         return rootEntity?.getComponent(EntityEditorTreeNodeComponent).getDescriptor()
     }
 
-    const [treeRoot, setTreeRoot] = useState(getRoot())
-
-    const updateRoot = () => setTreeRoot(getRoot())
-
-    useEffect(() => updateRoot(), [rootEntity])
-
     const onRename: RenameHandler<EntityTreeNode> = ({ id, name }) => {
         getNodeById(id)?.setName(name)
         editorScene.update()
-        updateRoot()
     };
 
     const onDrop: DropHandler<EntityTreeNode> = ({ item, parentId, index }) => {
@@ -66,7 +65,7 @@ const SceneTreeView: React.FC = () => {
                 after = entity
             }
             editorScene.update()
-            updateRoot()
+            rerender({})
         } else if(item.userData instanceof SceneEntityLibraryDropItem) {
             let dropItem = item.userData as SceneEntityLibraryDropItem
             if(dropItem.prefabs.length === 0) return
@@ -87,7 +86,7 @@ const SceneTreeView: React.FC = () => {
                 after = entity
             }
             editorScene.update()
-            updateRoot()
+            rerender({})
             treeRef.current?.focus(ids[0])
             treeRef.current?.setSelection({ ids: ids, anchor: null, mostRecent: null })
 
@@ -102,7 +101,7 @@ const SceneTreeView: React.FC = () => {
         }
         editorScene.selectEntity(null)
         editorScene.update()
-        updateRoot()
+        rerender({})
     };
 
     const onFocus = useCallback((node: NodeApi<EntityTreeNode>) => {
@@ -122,7 +121,7 @@ const SceneTreeView: React.FC = () => {
     return (
         <div className="tree-view" ref={divRef}>
             {height !== null ? <Tree
-                data={treeRoot?.children}
+                data={getRoot()?.children}
                 onRename={onRename}
                 onDrop={onDrop}
                 onDelete={onDelete}

@@ -39,27 +39,28 @@ export class Drawer extends TankDrawer {
 
         const truckProgram = phase.getProgram(TruckProgram)
         const bodyProgram = phase.getProgram(LightMaskTextureProgram)
+        
+        truckProgram.transform.save()
+        bodyProgram.transform.save()
+
+        truckProgram.transform.set(transform.getGlobalTransform())
+        bodyProgram.transform.set(transform.getGlobalTransform())
 
         const leftTrackDist = behaviour.getLeftTrackDistance()
         const rightTrackDist = behaviour.getRightTrackDistance()
 
-        const bodyQuadrangle = copyQuadrangle(Drawer.bodyQuadrangle)
-        const leftTrack = copyQuadrangle(Drawer.leftTrack)
-        const rightTrack = copyQuadrangle(Drawer.rightTrack)
-
-        transformQuadrangle(leftTrack, transform.transform)
-        transformQuadrangle(rightTrack, transform.transform)
-        transformQuadrangle(bodyQuadrangle, transform.transform)
-
-        truckProgram.drawTruck(leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.85)
-        truckProgram.drawTruck(rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.85)
+        truckProgram.drawTruck(Drawer.leftTrack, leftTrackDist, 0.25, this.truckSprite, 4, 0.85)
+        truckProgram.drawTruck(Drawer.rightTrack, rightTrackDist, 0.25, this.truckSprite, 4, 0.85)
         bodyProgram.drawMaskedSprite(
             this.bodyBrightSprite,
             this.bodyDarkSprite,
             this.bodyLightMask,
-            bodyQuadrangle,
-            transform.getAngle(),
+            Drawer.bodyQuadrangle,
+            transform.getGlobalAngle(),
             WorldDrawerComponent.depths.tankBody
         )
+
+        truckProgram.transform.restore()
+        bodyProgram.transform.restore()
     }
 }

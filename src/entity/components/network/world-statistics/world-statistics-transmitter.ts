@@ -20,8 +20,11 @@ export default class WorldStatisticsTransmitter extends Transmitter {
     }
 
     private sendMapName() {
+        let name = this.getWorldStatistics().mapName
+        if(!name) return
+        
         this.packIfEnabled(Commands.WORLD_MAP_NAME_COMMAND, (buffer) => {
-            buffer.writeString(this.getWorldStatistics().mapName)
+            buffer.writeString(name)
         })
     }
 

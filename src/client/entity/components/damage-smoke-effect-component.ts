@@ -21,7 +21,7 @@ export default class DamageSmokeEffectComponent extends EventHandlerComponent {
 
     onTick(dt: number) {
         const tank = this.entity
-        const transform = tank.getComponent(TransformComponent).transform
+        const transform = tank.getComponent(TransformComponent).getGlobalTransform()
         const healthComponent = tank.getComponent(HealthComponent)
         const health = healthComponent.getHealth()
         const maxHealth = healthComponent.getMaxHealth()

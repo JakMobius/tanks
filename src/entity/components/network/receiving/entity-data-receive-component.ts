@@ -7,6 +7,7 @@ import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import GameObjectReader from "src/entity/components/network/receiving/game-object-reader";
 import {commandName} from "src/entity/components/network/commands";
 import WriteBuffer from "src/serialization/binary/write-buffer";
+import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
 
 export default class EntityDataReceiveComponent extends EventHandlerComponent {
 
@@ -28,6 +29,10 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
         this.parentEventHandler.on("root-update", () => {
             this.updateRoot()
         })
+    }
+
+    receivePacket(packet: WorldDataPacket) {
+        this.receiveBuffer(new ReadBuffer(packet.buffer.buffer))
     }
 
     receiveBuffer(buffer: ReadBuffer) {

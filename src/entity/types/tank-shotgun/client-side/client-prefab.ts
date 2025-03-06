@@ -10,7 +10,6 @@ import TrackedTankController from "src/entity/components/tank-controllers/tracke
 import {SoundType} from "src/sound/sounds";
 
 ClientEntityPrefabs.associate(EntityType.TANK_SHOTGUN, (entity) => {
-    // TODO: bad
     EntityPrefabs.Types.get(EntityType.TANK_SHOTGUN)(entity)
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 

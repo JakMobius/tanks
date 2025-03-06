@@ -13,11 +13,37 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
 
     private visibilityDistanceThreshold = 60
     private worldEventHandler = new BasicEventHandlerSet()
+    private oldWorld: Entity = null
+
+    childAddHandler = (child: Entity) => this.onChildAdded(child)
+    childRemoveHandler = (child: Entity) => this.onChildRemoved(child)
 
     constructor() {
         super();
         this.eventHandler.on("world-set", () => this.updateWorld())
         this.worldEventHandler.on("tick", () => this.updateEntitiesVisibility())
+    }
+
+    onChildAdded(child: Entity) {
+        const visibilityManager = this.entity.getComponent(PlayerVisibilityManagerComponent)
+        visibilityManager.setEntityVisible(child, true)
+        child.on("child-added", this.childAddHandler)
+        child.on("did-remove-child", this.childRemoveHandler)
+
+        for (let nestedChild of child.children) {
+            this.onChildAdded(nestedChild)
+        }
+    }
+
+    onChildRemoved(child: Entity) {
+        const visibilityManager = this.entity.getComponent(PlayerVisibilityManagerComponent)
+        visibilityManager.setEntityVisible(child, false)
+        child.off("child-added", this.childAddHandler)
+        child.off("did-remove-child", this.childRemoveHandler)
+
+        for (let nestedChild of child.children) {
+            this.onChildRemoved(nestedChild)
+        }
     }
 
     private shouldEntityBeVisible(entity: Entity, position?: Box2D.b2Readonly<Box2D.XY>) {
@@ -48,6 +74,8 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
     }
 
     private updateEntitiesVisibility() {
+        // Everything is visible now. TODO
+        return
         let playerPosition: Box2D.b2Readonly<Box2D.b2Vec2> | null = null
         const tank = this.getPlayerTank()
         const world = this.getWorld()
@@ -72,7 +100,14 @@ export default class PlayerVisibilityDecisionComponent extends EventHandlerCompo
     }
 
     private updateWorld() {
+        if(this.oldWorld) {
+            this.onChildRemoved(this.oldWorld)
+        }
         let world = this.getWorld()
+        this.oldWorld = world
+        if(world) {
+            this.onChildAdded(world)
+        }
         this.worldEventHandler.setTarget(world)
         if(world) this.updateEntitiesVisibility()
     }

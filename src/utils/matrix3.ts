@@ -178,6 +178,10 @@ export class ReadonlyMatrix3 {
         return multiply(left.m, this.m)
     }
 
+    copyTo(matrix: Matrix3) {
+        matrix.m.set(this.m)
+    }
+
     clone() {
         return new Matrix3(this.m.slice())
     }
@@ -188,12 +192,15 @@ export class ReadonlyMatrix3 {
 }
 
 export class Matrix3 extends ReadonlyMatrix3 {
-
     public stack: Float32Array[];
 
     constructor(data?: Float32Array) {
         super(data)
         this.stack = []
+    }
+
+    set(another: ReadonlyMatrix3) {
+        another.copyTo(this)
     }
     
     save() {
@@ -230,6 +237,10 @@ export class Matrix3 extends ReadonlyMatrix3 {
 
     multiply(left: ReadonlyMatrix3): void {
         this.m = left.multiplyLeft(this)
+    }
+
+    getArray(): Float32Array {
+        return this.m
     }
 
     reset() {

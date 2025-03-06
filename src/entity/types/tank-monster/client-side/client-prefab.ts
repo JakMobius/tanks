@@ -11,7 +11,6 @@ import WheeledTankController from "src/entity/components/tank-controllers/wheele
 import {SoundType} from "src/sound/sounds";
 
 ClientEntityPrefabs.associate(EntityType.TANK_MONSTER, (entity) => {
-    // TODO: bad
     EntityPrefabs.Types.get(EntityType.TANK_MONSTER)(entity)
     ClientEntityPrefabs.configureGameWorldEntity(entity)
 

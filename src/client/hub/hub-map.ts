@@ -1,6 +1,6 @@
-import { MapFile } from "src/map/map-serialization";
+import { MapFileV0_0_1 } from "src/map/map-serialization";
 
-export function getHubMap(): MapFile {
+export function getHubMap(): MapFileV0_0_1 {
     // TODO: Fetch it from the server
     return {
         "signature": "TNKS",

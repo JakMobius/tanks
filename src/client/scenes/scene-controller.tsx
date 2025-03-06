@@ -4,6 +4,8 @@ import ReactDOM from "react-dom/client"
 import SoundEngine from "../sound/sound-engine";
 import RenderLoop from "src/utils/loop/render-loop";
 import CanvasHandler from "../graphics/canvas-handler";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface SceneControlerProps {
     setTitle?: (value: string | undefined) => void
@@ -13,6 +15,7 @@ export interface SceneContextProps {
     canvas: CanvasHandler,
     soundEngine: SoundEngine,
     loop: RenderLoop,
+    root: HTMLDivElement,
     setTitle?: (value: string | undefined) => void
 }
 
@@ -29,6 +32,7 @@ export function useScene() {
 const SceneContainer: React.FC<SceneControlerProps> = (props) => {
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const rootRef = useRef<HTMLDivElement | null>(null)
     const [state, setState] = useState<SceneContextProps | null>(null)
 
     useEffect(() => {
@@ -56,6 +60,7 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
             ...state,
             canvas: canvasHandler,
             soundEngine: soundEngine,
+            root: rootRef.current,
             loop: loop
         }))
 
@@ -67,14 +72,24 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
 
     useEffect(() => setState(state => ({
         ...state,
-        setTitle: props.setTitle
-    })), [props.setTitle])
+        setTitle: props.setTitle,
+        root: rootRef.current,
+    })), [props.setTitle, rootRef.current])
 
     return (
-        <SceneContext.Provider value={state}>
-            <canvas className="game-canvas" ref={canvasRef}/>
-            {state && <SceneRouter/>}
-        </SceneContext.Provider>
+        // Map editor uses DnD, so we need to wrap the whole thing in a DnDProvider
+        <DndProvider
+                backend={HTML5Backend}
+                options={{ rootElement: document.body || undefined }}
+                >
+            <SceneContext.Provider value={state}>
+                <div ref={rootRef} className="game-root">
+                    <canvas className="game-canvas" ref={canvasRef}/>
+                    {state && <SceneRouter/>}
+                </div>
+            </SceneContext.Provider>
+        </DndProvider>
+            
     )
 }
 
@@ -126,7 +141,9 @@ export default class SceneController {
         // This is the game entrypoint, effectively.
         this.root = ReactDOM.createRoot(root)
         this.root.render(<SceneContainer
-            setTitle={(title) => document.title = title}
+            setTitle={(title) => {
+                document.title = title ?? "Танчики"
+            }}
         />)
     }
 
