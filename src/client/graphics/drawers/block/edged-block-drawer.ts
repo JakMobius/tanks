@@ -69,23 +69,17 @@ export default class EdgedBlockDrawer extends BlockDrawer {
 
         let variant = this.variants[block.variant || 0]
 
-        x *= TilemapComponent.BLOCK_SIZE
-        y *= TilemapComponent.BLOCK_SIZE
-
-        const half = TilemapComponent.BLOCK_SIZE / 2
-
         if((block.facing & 0b111111111111) === 0b000000000000) {
-            this.drawSlice(program, x, y, variant[0].rect, this.spriteSize, TilemapComponent.BLOCK_SIZE, 0, 0)
+            this.drawSlice(program, x, y, variant[0].rect, this.spriteSize, 1, 0, 0)
         } else if((block.facing & 0b111111111111) === 0b100100100100) {
-            this.drawSlice(program, x, y, variant[4].rect, this.spriteSize, TilemapComponent.BLOCK_SIZE, 0, 0)
+            this.drawSlice(program, x, y, variant[4].rect, this.spriteSize, 1, 0, 0)
         } else {
             const s = this.halfSpriteSize
-            const h = TilemapComponent.BLOCK_SIZE / 2
 
-            this.drawSlice(program, x, y + half, variant[(block.facing >> 9) & 7].rect, s, h, 0, s)
-            this.drawSlice(program, x + half, y + half, variant[(block.facing >> 6) & 7].rect, s, h, s, s)
-            this.drawSlice(program, x + half, y, variant[(block.facing >> 3) & 7].rect, s, h, s, 0)
-            this.drawSlice(program, x, y, variant[block.facing & 7].rect, s, h, 0, 0)
+            this.drawSlice(program, x, y + 0.5, variant[(block.facing >> 9) & 7].rect, s, 0.5, 0, s)
+            this.drawSlice(program, x + 0.5, y + 0.5, variant[(block.facing >> 6) & 7].rect, s, 0.5, s, s)
+            this.drawSlice(program, x + 0.5, y, variant[(block.facing >> 3) & 7].rect, s, 0.5, s, 0)
+            this.drawSlice(program, x, y, variant[block.facing & 7].rect, s, 0.5, 0, 0)
         }
 
         super.draw(program, x, y, block)

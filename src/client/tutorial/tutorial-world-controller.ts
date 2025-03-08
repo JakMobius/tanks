@@ -77,7 +77,10 @@ export default class TutorialWorldController {
         body.setAngularVelocity(0)
         health.setHealth(health.getMaxHealth())
 
-        tank.getComponent(TransformComponent).setGlobalPositionAngle({x: 17.5, y: 212.5}, 4)
+        tank.getComponent(TransformComponent).setGlobal({
+            position: {x: 17.5, y: 212.5},
+            angle: 0
+        })
     }
 
     private onPlayerCommand(player: Entity, text: string) {

@@ -34,9 +34,9 @@ export const EntityType = {
     EFFECT_SOUND_EFFECT:             0x4003,
 
     // Other:
-    GROUP:                           0x5000, 
-    TILEMAP:                         0x5001,
-    FLAG:                            0x5002,
+    TILEMAP:                         0x5000,
+    FLAG:                            0x5001,
+    SPAWNZONE:                       0x5002,
 
     // Game mode controllers:
     TDM_GAME_MODE_CONTROLLER_ENTITY: 0x6000,
@@ -45,5 +45,6 @@ export const EntityType = {
 
     // Utilities:
     TIMER_ENTITY:                    0x7000,
-    CHAT_ENTITY:                     0x7001
+    CHAT_ENTITY:                     0x7001,
+    GROUP:                           0x7002 
 }

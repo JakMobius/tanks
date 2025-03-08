@@ -7,10 +7,10 @@ import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-tex
 import MaskTextureProgramController
     from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program-controller";
 import ProgramPool from "src/client/graphics/program-pool";
-import Camera from "src/client/graphics/camera";
+import Entity from "src/utils/ecs/entity";
 
 export default class GameProgramPool extends ProgramPool {
-    constructor(camera: Camera, ctx: WebGLRenderingContext) {
+    constructor(camera: Entity, ctx: WebGLRenderingContext) {
         super();
 
         this.registerFactory(TruckProgram, () => {

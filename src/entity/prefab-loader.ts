@@ -37,3 +37,4 @@ import 'src/entity/types/effect-sound/prefab'
 
 import 'src/entity/types/group/prefab'
 import 'src/entity/types/tilemap/prefab'
+import 'src/entity/types/spawn-zone/prefab'

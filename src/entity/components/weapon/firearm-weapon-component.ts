@@ -182,10 +182,13 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
 
         world.appendChild(entity)
 
-        entity.getComponent(TransformComponent).setGlobalPositionAngle({
-            x: worldX,
-            y: worldY
-        }, tankBody.GetAngle())
+        entity.getComponent(TransformComponent).setGlobal({
+            position: {
+                x: worldX,
+                y: worldY
+            },
+            angle: tankBody.GetAngle()
+        })
 
         return entity
     }

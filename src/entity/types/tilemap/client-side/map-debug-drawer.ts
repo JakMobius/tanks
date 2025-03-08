@@ -16,7 +16,7 @@ export default class MapDebugDrawer {
     private readonly drawPhase: DrawPhase;
     private world: Entity;
 
-    // ARGB
+    // ABGR
     static chunkBorderColor = 0xFFDD22DD
     static meshFillColor = 0x800000FF
     static meshStrokeColor = 0xFF0000FF
@@ -63,8 +63,8 @@ export default class MapDebugDrawer {
         for(let shape of edgeMesh) {
             let worldSpaceShape = []
             for(let point of shape) {
-                worldSpaceShape.push((point[0] + chunk.x) * TilemapComponent.BLOCK_SIZE)
-                worldSpaceShape.push((point[1] + chunk.y) * TilemapComponent.BLOCK_SIZE)
+                worldSpaceShape.push((point[0] + chunk.x))
+                worldSpaceShape.push((point[1] + chunk.y))
             }
             transformedMesh.push(worldSpaceShape)
         }
@@ -80,18 +80,18 @@ export default class MapDebugDrawer {
         }
 
         LineDrawer.strokeShape(this.drawPhase,[
-            chunk.x * TilemapComponent.BLOCK_SIZE, chunk.y * TilemapComponent.BLOCK_SIZE,
-            (chunk.x + chunk.width) * TilemapComponent.BLOCK_SIZE, chunk.y * TilemapComponent.BLOCK_SIZE,
-            (chunk.x + chunk.width) * TilemapComponent.BLOCK_SIZE, (chunk.y + chunk.height) * TilemapComponent.BLOCK_SIZE,
-            chunk.x * TilemapComponent.BLOCK_SIZE, (chunk.y + chunk.height) * TilemapComponent.BLOCK_SIZE
+            chunk.x, chunk.y,
+            (chunk.x + chunk.width), chunk.y,
+            (chunk.x + chunk.width), (chunk.y + chunk.height),
+            chunk.x, (chunk.y + chunk.height)
         ], MapDebugDrawer.chunkBorderColor, MapDebugDrawer.meshStrokeThickness, true)
 
         let dotRadius = MapDebugDrawer.vertexSize / 2
 
         for(let shape of edgeMesh) {
             for(let point of shape) {
-                let x = (point[0] + chunk.x) * TilemapComponent.BLOCK_SIZE
-                let y = (point[1] + chunk.y) * TilemapComponent.BLOCK_SIZE
+                let x = (point[0] + chunk.x)
+                let y = (point[1] + chunk.y)
 
                 convexShapeProgram.drawConvexShape([
                     x - dotRadius, y - dotRadius,

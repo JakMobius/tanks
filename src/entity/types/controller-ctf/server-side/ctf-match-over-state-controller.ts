@@ -14,7 +14,7 @@ export class CTFMatchOverStateController extends CTFGameStateController {
         this.statistics = statistics
 
         this.addScript(new NoDamageScript(this.controller))
-        this.addScript(new DelayedActionScript(this.controller, controller.config.matchEndDelay, () => {
+        this.addScript(new DelayedActionScript(this.controller, controller.matchEndDelay, () => {
             this.controller.activateGameState(new CTFPlayerWaitingStateController(this.controller))
         }))
     }

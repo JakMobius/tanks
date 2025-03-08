@@ -4,7 +4,6 @@ import Team from "src/server/team";
 import Entity from "src/utils/ecs/entity";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
-import TilemapComponent from "src/map/tilemap-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import PlayerDropFlagEvent from "src/events/player-drop-flag-event";
@@ -13,8 +12,9 @@ import PlayerTeamComponent from "src/entity/types/player/server-side/player-team
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import HealthComponent from "src/entity/components/health-component";
 import TimerComponent from "src/entity/components/network/timer/timer-component";
-import WorldTilemapComponent from "src/physics/world-tilemap-component";
 import { chooseRandom } from "src/utils/utils";
+import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component";
+import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 
 export default class CTFScript extends ServerGameScript<ServerCTFControllerComponent> {
 
@@ -40,15 +40,15 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         const flagEntity = new Entity()
         ServerEntityPrefabs.types.get(EntityType.FLAG)(flagEntity)
 
-        const map = this.controller.world.getComponent(WorldTilemapComponent).map
-        const zones = this.controller.spawnZones.filter((zone) => zone.team === team.id)
-        const zone = chooseRandom(zones).zone
+        const spawnzonesComponent = this.controller.entity.getComponent(GameSpawnzonesComponent)
+        const spawnzones = spawnzonesComponent.spawnzones.filter((zone) => {
+            let spawnzone = zone.getComponent(SpawnzoneComponent)
+            return spawnzone.team === team.id
+        })
+        const spawnzone = chooseRandom(spawnzones)?.getComponent(SpawnzoneComponent).center() ?? { x: 0, y: 0}
 
         const flagState = flagEntity.getComponent(FlagDataComponent)
-        flagState.basePosition = {
-            x: zone.centerX() * TilemapComponent.BLOCK_SIZE,
-            y: zone.centerY() * TilemapComponent.BLOCK_SIZE
-        }
+        flagState.basePosition = spawnzone
         flagState.setTeam(team)
 
         flagEntity.on("flag-contact", (entity) => this.onFlagContact(flagState, entity))

@@ -2,8 +2,6 @@ import Tool from '../tool';
 import ToolManager from '../toolmanager';
 import BlockState from "src/map/block-state/block-state";
 import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
-import WorldTilemapComponent from 'src/physics/world-tilemap-component';
-import TilemapComponent from 'src/map/tilemap-component';
 
 export default class Fill extends Tool {
     public actionName: any;
@@ -18,8 +16,8 @@ export default class Fill extends Tool {
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
-        x = Math.floor(x / TilemapComponent.BLOCK_SIZE)
-        y = Math.floor(y / TilemapComponent.BLOCK_SIZE)
+        x = Math.floor(x / 1)
+        y = Math.floor(y / 1)
 
         this.fill(x, y)
     }
@@ -38,8 +36,7 @@ export default class Fill extends Tool {
     }
 
     fill(x: number, y: number) {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
         let baseBlock = tilemap.getBlock(x, y)
 
         if(!baseBlock) return
@@ -81,7 +78,7 @@ export default class Fill extends Tool {
 
         this.manager.setNeedsRedraw()
 
-        const history = map.getComponent(GameMapHistoryComponent)
+        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
         history.commitActions(this.actionName)
     }
 }

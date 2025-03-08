@@ -5,7 +5,7 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import * as Box2D from "@box2d/core";
 
 export default class BulletDrawer extends BasicEntityDrawer {
-    oldPosition: Box2D.b2Vec2 | null = null
+    oldPosition: Box2D.XY | null = null
 
     drawTrace(phase: DrawPhase, thickness: number) {
         let position = this.entity.getComponent(TransformComponent).getPosition()

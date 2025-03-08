@@ -1,14 +1,12 @@
 import Version from "src/utils/version"
 import BlockState from "./block-state/block-state"
-import { SpawnZone } from "./spawnzones-component"
-import { serverGameWorldEntityPrefab } from "src/server/entity/server-game-world"
 import Entity from "src/utils/ecs/entity"
 import { EntityType } from "src/entity/entity-type"
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs"
-import TilemapComponent from "./tilemap-component"
-import ServerDMControllerComponent from "src/entity/types/controller-dm/server-side/server-dm-controller-component"
-import { PropertyInspector, SerializedEntityProperties } from "src/entity/components/inspector/property-inspector"
-import e from "express"
+import TilemapComponent, { charToId } from "./tilemap-component"
+import { EntityDeserializer, EntityFactory, EntitySerializer, manufactureEntity, SerializedEntity } from "src/entity/components/inspector/property-inspector"
+import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component"
+import TransformComponent from "src/entity/components/transform-component"
+import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component"
 
 export interface SpawnZoneConfig {
     id: number
@@ -33,10 +31,7 @@ export interface MapFileV0_0_1 extends MapFile {
 
 export interface MapFileV0_1_0 extends MapFile {
     root: SerializedEntity
-}
-
-export interface SerializedEntity extends SerializedEntityProperties {
-    children: SerializedEntity[]
+    danglingEntities: SerializedEntity[]
 }
 
 export class MalformedMapFileError extends Error {
@@ -44,17 +39,6 @@ export class MalformedMapFileError extends Error {
         super(message);
         this.name = "MalformedMapFileError";
     }
-}
-
-export function idToChar(id: number) {
-    if(id > 26) throw new Error("ID is too large!")
-    if(id === 0) return '-'
-    return String.fromCharCode('a'.charCodeAt(0) + id - 1)
-}
-
-export function charToId(char: string) {
-    if(char === '-') return 0
-    return char.charCodeAt(0) - 'a'.charCodeAt(0) + 1
 }
 
 export function readEntityFile(file: MapFile) {
@@ -69,9 +53,9 @@ export function readEntityFile(file: MapFile) {
 
         let name = config.name ?? null
 
-        const createEntity = () => {
-            let entity = new Entity()
-            ServerEntityPrefabs.types.get(EntityType.GROUP)(entity)
+        const createEntity = (factory?: EntityFactory) => {
+            let entity = manufactureEntity(EntityType.GROUP, factory?.root)
+            if(!entity) return null
 
             let width = config.width
             let height = config.height
@@ -84,23 +68,47 @@ export function readEntityFile(file: MapFile) {
                 blocks.push(new Block())
             }
 
-            let spawnZones: SpawnZone[] = []
+            const tilemap = manufactureEntity(EntityType.TILEMAP, factory?.leaf)
+            tilemap?.getComponent(TilemapComponent).setMap(width, height, blocks)
+            if(tilemap) entity.appendChild(tilemap)
+
+            let spawnzones: Entity[] = []
             for(let spawnZone of config.spawnZones) {
-                let zone = new SpawnZone(spawnZone.id)
-                zone.setFrom(spawnZone.x1, spawnZone.y1)
-                zone.setTo(spawnZone.x2, spawnZone.y2)
-                spawnZones.push(zone)
+                let zone = manufactureEntity(EntityType.SPAWNZONE, factory?.leaf)
+                if(!zone) continue
+
+                let centerX = (spawnZone.x1 + spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let centerY = (spawnZone.y1 + spawnZone.y2) / 2 * TilemapComponent.DEFAULT_SCALE
+
+                let scaleX = Math.abs(spawnZone.x1 - spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let scaleY = Math.abs(spawnZone.y1 - spawnZone.y2) / 2 * TilemapComponent.DEFAULT_SCALE
+
+                zone.getComponent(TransformComponent).set({
+                    position: { x: centerX, y: centerY },
+                    scale: { x: scaleX, y: scaleY }
+                })
+                zone.getComponent(SpawnzoneComponent).setTeam(spawnZone.id)
+                entity.appendChild(zone)
+                spawnzones.push(zone)
             }
 
-            const tilemap = new Entity()
-            ServerEntityPrefabs.types.get(EntityType.TILEMAP)(tilemap)
-            tilemap.getComponent(TilemapComponent).setMap(width, height, blocks)
-            entity.appendChild(tilemap)
+            const dmController = manufactureEntity(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
+            if(dmController) {
+                dmController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
+                entity.appendChild(dmController)
+            }
 
-            const dmController = new Entity()
-            ServerEntityPrefabs.types.get(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY)(dmController)
-            dmController.getComponent(ServerDMControllerComponent).config.spawnZones = spawnZones
-            entity.appendChild(dmController)
+            const tdmController = manufactureEntity(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
+            if(tdmController) {
+                tdmController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
+                entity.appendChild(tdmController)
+            }
+
+            const ctfController = manufactureEntity(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
+            if(ctfController) {
+                ctfController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
+                entity.appendChild(ctfController)
+            }
 
             return entity
         }
@@ -112,39 +120,32 @@ export function readEntityFile(file: MapFile) {
         let config = file as MapFileV0_1_0
         let name = config.name ?? null
     
-        return { name, createEntity: () => deserializeEntity(config.root) }
+        return { name, createEntity: (factory: EntityFactory) => {
+            let ctx = new EntityDeserializer(factory)
+
+            if(config.danglingEntities) {
+                for(let entity of config.danglingEntities) {
+                    ctx.createTreeFor(entity, false)
+                }
+            }
+
+            let entity = ctx.createTreeFor(config.root)
+            ctx.restoreProperties()
+
+            return entity
+        }}
     }
 
     throw new MalformedMapFileError("Unsupported map file version: " + file.version)
 }
 
 export function writeEntityFile(entity: Entity, name: string): MapFileV0_1_0 {
+    let serializer = new EntitySerializer()
+    let root = serializer.serializeTree(entity)
+    let danglingEntities = serializer.getSerializedDanglingEntities()
     return {
         signature: "TNKS",
         version: "0.1.0",
-        name,
-        root: serializeEntity(entity)
-    }
-}
-
-export function deserializeEntity(serialized: SerializedEntity): Entity {
-    let entity = PropertyInspector.deserialize(serialized)
-    
-    for(let child of serialized.children) {
-        entity.appendChild(deserializeEntity(child))
-    }
-
-    return entity
-}
-
-export function serializeEntity(entity: Entity): SerializedEntity {
-    let inspector = new PropertyInspector(entity)
-    let serialized = inspector.serialize()
-    inspector.cleanup()
-    let children = entity.children.map(entity => serializeEntity(entity))
-
-    return  {
-        ...serialized,
-        children
+        name, root, danglingEntities
     }
 }

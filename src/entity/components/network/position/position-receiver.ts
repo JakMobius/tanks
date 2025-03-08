@@ -2,18 +2,21 @@ import EntityDataReceiveComponent from "../receiving/entity-data-receive-compone
 import {Commands} from "../commands";
 import ReceiverComponent from "../receiving/receiver-component";
 import ServerPositionComponent from "src/client/entity/components/server-position-component";
+import { Matrix3 } from "src/utils/matrix3";
 
 export default class PositionReceiver extends ReceiverComponent {
 
     hook(receiveComponent: EntityDataReceiveComponent): void {
 
         receiveComponent.commandHandlers.set(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-
             const serverPosition = this.entity.getComponent(ServerPositionComponent)
 
-            serverPosition.serverPosition.x = buffer.readFloat32()
-            serverPosition.serverPosition.y = buffer.readFloat32()
-            serverPosition.serverAngle =  buffer.readFloat32()
+            let transform = new Matrix3()
+            for(let i = 0; i < 9; i++) {
+                transform.getArray()[i] = buffer.readFloat32()
+            }
+
+            serverPosition.serverTransform = transform
 
             let hasVelocity = buffer.readInt8() === 1
             

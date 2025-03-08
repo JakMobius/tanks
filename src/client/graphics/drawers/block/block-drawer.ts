@@ -19,7 +19,7 @@ export default class BlockDrawer {
         if (!(block.constructor as typeof BlockState).typeId) return
         let crack = Math.floor(block.damage * 6)
         if(crack) {
-            program.drawSprite(this.crackSprites[crack - 1], squareQuadrangle(x, y, TilemapComponent.BLOCK_SIZE, TilemapComponent.BLOCK_SIZE),
+            program.drawSprite(this.crackSprites[crack - 1], squareQuadrangle(x, y, 1, 1),
                 WorldDrawerComponent.depths.blockCrack
             )
         }

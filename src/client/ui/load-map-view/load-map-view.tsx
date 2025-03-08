@@ -20,7 +20,7 @@ const MapPreviewRow: React.FC<MapPreviewRowProps> = (props) => {
     const navigation = useNavigation()
 
     const onMapSelect = () => {
-        mapEditor.loadMap(props.map)
+        // mapEditor.loadMap(props.map)
         navigation.popAll()
     }
 

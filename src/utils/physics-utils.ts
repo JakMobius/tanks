@@ -1,4 +1,5 @@
 import * as Box2D from "@box2d/core";
+import { b2ScaledPolygonShape } from "src/physics/b2-scale-shape";
 
 export default class PhysicsUtils {
     static createFixture(shape: Box2D.b2Shape, fixture?: Partial<Box2D.b2FixtureDef>): Box2D.b2FixtureDef {
@@ -22,7 +23,7 @@ export default class PhysicsUtils {
     static squareFixture(width: number, height: number, offset?: Box2D.XY, options?: Partial<Box2D.b2FixtureDef>): Box2D.b2FixtureDef {
         if(!offset) offset = { x: 0, y: 0 }
 
-        const shape = new Box2D.b2PolygonShape()
+        const shape = new b2ScaledPolygonShape()
         shape.SetAsBox(width, height, offset, 0)
 
         return this.createFixture(shape, options)
@@ -36,7 +37,7 @@ export default class PhysicsUtils {
     }
 
     static vertexFixture(vertexArray: Box2D.XY[], options?: Partial<Box2D.b2FixtureDef>) {
-        const shape = new Box2D.b2PolygonShape();
+        const shape = new b2ScaledPolygonShape();
         shape.Set(vertexArray)
 
         return this.createFixture(shape, options)

@@ -1,9 +1,9 @@
 import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
-import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
 import GameWorldContactListener from "src/contact-listener";
 import GameWorldContactFilter from "src/contact-filter";
+import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export interface PhysicalHostComponentConfig {
     gravity?: Box2D.XY
@@ -11,10 +11,9 @@ export interface PhysicalHostComponentConfig {
     iterations: Box2D.b2StepConfig;
 }
 
-export default class PhysicalHostComponent implements Component {
+export default class PhysicalHostComponent extends EventHandlerComponent {
 
-    physicalComponents: PhysicalComponent[] = []
-    entity?: Entity | null
+    physicalComponents = new Set<PhysicalComponent>()
 
     public world: Box2D.b2World
     public physicsTick: number
@@ -26,6 +25,7 @@ export default class PhysicalHostComponent implements Component {
     contactFilter: GameWorldContactFilter
 
     constructor(config: PhysicalHostComponentConfig) {
+        super()
         this.physicsTick = config.physicsTick
         this.iterations = config.iterations
 
@@ -33,6 +33,37 @@ export default class PhysicalHostComponent implements Component {
 
         this.setupContactListener()
         this.setupContactFilter()
+
+        this.eventHandler.on("attached-to-parent", (parent: Entity) => {
+            this.childAddHandler(parent)
+        })
+
+        this.eventHandler.on("detached-from-parent", (parent) => {
+            this.childRemoveHandler(parent)
+        })
+    }
+
+    childAddHandler = (child: Entity) => this.onChildAdded(child)
+    childRemoveHandler = (child: Entity) => this.onChildRemoved(child)
+
+    onChildAdded(child: Entity) {
+        child.emit("physical-host-attached", this)
+        child.on("child-added", this.childAddHandler)
+        child.on("did-remove-child", this.childRemoveHandler)
+
+        for (let nestedChild of child.children) {
+            this.onChildAdded(nestedChild)
+        }
+    }
+
+    onChildRemoved(child: Entity) {
+        child.emit("physical-host-detached", this)
+        child.off("child-added", this.childAddHandler)
+        child.off("did-remove-child", this.childRemoveHandler)
+
+        for (let nestedChild of child.children) {
+            this.onChildRemoved(nestedChild)
+        }
     }
 
     beforePhysics() {
@@ -55,26 +86,23 @@ export default class PhysicalHostComponent implements Component {
     }
 
     onAttach(entity: Entity) {
+        super.onAttach(entity)
         this.entity = entity;
-        this.entity.emit("physical-host-attached", this)
+        this.onChildAdded(this.entity)
     }
 
     onDetach() {
+        this.onChildRemoved(this.entity)
+        super.onDetach()
         this.entity = null
-        for(let component of this.physicalComponents) {
-            component.setHost(null)
-        }
-        this.physicalComponents = []
     }
 
     registerComponent(component: PhysicalComponent) {
-        this.physicalComponents.push(component)
+        this.physicalComponents.add(component)
     }
 
-    destroyComponent(component: PhysicalComponent) {
-        let index = this.physicalComponents.indexOf(component)
-        if(index < 0) return;
-        this.physicalComponents.splice(index, 1)
+    unregisterComponent(component: PhysicalComponent) {
+        this.physicalComponents.delete(component)
     }
 
     protected setupContactListener() {

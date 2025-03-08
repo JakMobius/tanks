@@ -21,11 +21,10 @@ export default class PositionTransmitter extends Transmitter {
         let transform = this.getEntity().getComponent(TransformComponent)
 
         this.packIfEnabled(Commands.POSITION_UPDATE_COMMAND, (buffer) => {
-            let position = transform.getGlobalPosition()
-            let angle = transform.getGlobalAngle()
-            buffer.writeFloat32(position.x)
-            buffer.writeFloat32(position.y)
-            buffer.writeFloat32(angle)
+            let matrix = transform.getTransform()
+            for(let i = 0; i < 9; i++) {
+                buffer.writeFloat32(matrix.get(i))
+            }
 
             let physicsComponent = this.getEntity().getComponent(PhysicalComponent)
             let body = physicsComponent?.getBody()

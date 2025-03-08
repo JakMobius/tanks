@@ -15,22 +15,22 @@ export class DMPlayerWaitingStateController extends DMGameStateController {
 
         this.addScript(new NoDamageScript(this.controller))
 
-        this.addScript(new GameStartTimerScript(this.controller, this.controller.config.matchStartDelay, () => {
+        this.addScript(new GameStartTimerScript(this.controller, this.controller.matchStartDelay, () => {
             this.controller.activateGameState(new DMPlayingStateController(this.controller))
         }))
 
         this.addScript(new PlayerCountCallbackScript(this.controller, (playerCount) => {
-            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= this.controller.config.minPlayers)
+            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= this.controller.minPlayers)
             this.controller.triggerStateBroadcast()
         }))
 
-        this.addScript(new RandomRespawnScript(this.controller, controller.config.spawnZones))
+        this.addScript(new RandomRespawnScript(this.controller))
     }
 
     getState(): DMGameState {
         return {
             state: DMGameStateType.waitingForPlayers,
-            minPlayers: this.controller.config.minPlayers,
+            minPlayers: this.controller.minPlayers,
             currentPlayers: this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length,
             timer: this.getScript(GameStartTimerScript).gameStartTimer
         }

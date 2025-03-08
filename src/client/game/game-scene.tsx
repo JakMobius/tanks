@@ -188,7 +188,7 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     return (
         <ControlsProvider ref={controlsResponderRef}>
             <EventsProvider ref={eventContextRef}>
-                <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
+                <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera} />
                 <TankInfoHUD world={state.world} />
                 <EventsHUD/>
                 <PlayerListHUD world={state.world}/>

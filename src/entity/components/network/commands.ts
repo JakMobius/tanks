@@ -30,7 +30,8 @@ export const Commands = {
     MORTAR_BALL_HEIGHT_SET:          0x0F21,
     WEAPON_STATE:                    0x0F22,
     WEAPON_INFO:                     0x0F23,
-    CHAT_MESSAGE_COMMAND:            0x0F24
+    CHAT_MESSAGE_COMMAND:            0x0F24,
+    SPAWNZONE_TEAM_SET_COMMAND:      0x0F25
 }
 
 export function commandName(command: number) {

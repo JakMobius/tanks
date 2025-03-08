@@ -38,6 +38,34 @@
         align-self: stretch;
         box-sizing: border-box;
 
+        .property-entity {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            flex-grow: 1;
+            min-height: 0;
+            align-self: stretch;
+            border: 1px solid #C8C8C8;
+            border-radius: 5px;
+            padding: 0px 5px;
+            height: 23px;
+
+            &.over {
+                background-color:rgb(220, 220, 220)
+            }
+
+            .remove-button {
+                width: 20px;
+                height: 100%;
+                background-position: center;
+                background-size: 10px 10px;
+                background-repeat: no-repeat;
+                background-image: url(../map-editor/clear@3x.png);
+                cursor: pointer;
+            }
+        }
+
         .property-input {
             box-sizing: border-box;
             display: flex;
@@ -63,7 +91,7 @@
                 align-self: stretch;
                 flex-grow: 1;
 
-                input {
+                input, select {
                     position: absolute;
                     left: 0;
                     top: 0;
@@ -75,6 +103,9 @@
                     outline: none;
                     box-shadow: none;
                     font-family: "Roboto";
+                    font-size: 14px;
+                    appearance: none;
+                    -webkit-appearance: none;
                 }
             }
         }

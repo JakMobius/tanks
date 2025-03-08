@@ -1,13 +1,7 @@
-import { Matrix3 } from "src/utils/matrix3";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 export default class CameraComponent extends EventHandlerComponent {
-    matrix = new Matrix3()
-    inverseMatrix = new Matrix3()
-    parentEventHandler = new BasicEventHandlerSet()
-
     childAddHandler = (child: Entity) => this.onChildAdded(child)
     childRemoveHandler = (child: Entity) => this.onChildRemoved(child)
 
@@ -15,12 +9,10 @@ export default class CameraComponent extends EventHandlerComponent {
         super();
 
         this.eventHandler.on("attached-to-parent", (parent: Entity) => {
-            this.parentEventHandler.setTarget(parent)
             this.childAddHandler(parent)
         })
 
         this.eventHandler.on("detached-from-parent", (parent) => {
-            this.parentEventHandler.setTarget(null)
             this.childRemoveHandler(parent)
         })
     }
@@ -43,9 +35,5 @@ export default class CameraComponent extends EventHandlerComponent {
         for (let nestedChild of child.children) {
             this.onChildRemoved(nestedChild)
         }
-    }
-
-    updateInverseMatrix() {
-        this.inverseMatrix = this.matrix.inverted()
     }
 }

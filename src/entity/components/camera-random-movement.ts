@@ -1,6 +1,6 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
-import CameraComponent from "src/client/graphics/camera";
+import TransformComponent from "./transform-component";
 
 export default class CameraRandomMovement extends EventHandlerComponent {
     public viewport: Box2D.XY
@@ -36,11 +36,7 @@ export default class CameraRandomMovement extends EventHandlerComponent {
      * Moves the camera to follow the target.
      */
     onTick(dt: number) {
-        let cameraComponent = this.entity.getComponent(CameraComponent)
-        let matrix = cameraComponent.matrix
-
-        matrix.reset()
-        matrix.scale(1 / this.viewport.x * 2, -1 / this.viewport.y * 2)
+        let cameraComponent = this.entity.getComponent(TransformComponent)
 
         this.timing += dt * this.timingVelocity
 
@@ -82,10 +78,16 @@ export default class CameraRandomMovement extends EventHandlerComponent {
         this.currentPosition.y += this.currentVelocity.y * dt
         this.currentScale += this.currentScaleVelocity * dt
 
-        matrix.scale(this.currentScale, this.currentScale)
-        matrix.translate(-this.currentPosition.x, -this.currentPosition.y)
-
-        cameraComponent.updateInverseMatrix()
+        cameraComponent.set({
+            position: {
+                x: this.currentPosition.x,
+                y: this.currentPosition.y
+            },
+            scale: {
+                x: this.viewport.x / this.currentScale / 2,
+                y: -this.viewport.y / this.currentScale / 2
+            }
+        })
     }
 
     updateTarget() {

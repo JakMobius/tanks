@@ -242,7 +242,7 @@ const MapEditorView: React.FC = () => {
                 <EventsProvider ref={eventRef}>
                     <MapEditorBackgroundOverlay
                         draggingEnabled={false}
-                        camera={state.camera?.getComponent(CameraComponent)}
+                        camera={state.camera}
                         onDrag={onDrag}
                         onZoom={onZoom}
                         // onMouseDown={onMouseDown}

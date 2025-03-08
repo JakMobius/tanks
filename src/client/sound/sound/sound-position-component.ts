@@ -4,6 +4,7 @@ import * as Box2D from "@box2d/core"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
 import CameraComponent from "src/client/graphics/camera";
+import TransformComponent from "src/entity/components/transform-component";
 
 class SoundPositionFilter extends SoundFilter {
     panFilter: PannerNode
@@ -67,10 +68,10 @@ export default class SoundPositionComponent extends EventHandlerComponent {
             return
         }
 
-        let cameraComponent = camera.getComponent(CameraComponent)
+        let cameraTransform = camera.getComponent(TransformComponent).getTransform()
 
-        let centerX = cameraComponent.inverseMatrix.transformX(0, 0)
-        let centerY = cameraComponent.inverseMatrix.transformY(0, 0)
+        let centerX = cameraTransform.transformX(0, 0)
+        let centerY = cameraTransform.transformY(0, 0)
 
         const offsetX = this.position.x - centerX
         const offsetY = this.position.y - centerY

@@ -35,8 +35,8 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
     }
 
     private emitBlockHit(point: Box2D.b2Vec2, map: TilemapComponent) {
-        let blockX = point.x / TilemapComponent.BLOCK_SIZE
-        let blockY = point.y / TilemapComponent.BLOCK_SIZE
+        let blockX = point.x / 1
+        let blockY = point.y / 1
 
         const gridX = Math.floor(blockX)
         const gridY = Math.floor(blockY)

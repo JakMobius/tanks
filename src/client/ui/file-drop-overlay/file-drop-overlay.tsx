@@ -5,10 +5,26 @@ import { DropTargetMonitor, useDrop } from "react-dnd"
 import { NativeTypes } from "react-dnd-html5-backend"
 import { useScene } from "../../scenes/scene-controller"
 import { useEvents } from "../events-hud/events-hud"
-import { deserializeEntity, readEntityFile } from "src/map/map-serialization"
+import { readEntityFile } from "src/map/map-serialization"
 import { BasicEvent } from "../events-hud/basic-event-view"
 import { useMapEditorScene } from "src/client/map-editor/map-editor-scene"
+import { EntityEditorTreeNodeComponent, EntityEditorTreeRootComponent } from "../scene-tree-view/components"
+import Entity from "src/utils/ecs/entity"
+import { EntityFactory } from "src/entity/components/inspector/property-inspector"
 
+const mapEditorEntityFactory: EntityFactory = {
+    root: (prefab) => {
+        let entity = new Entity()
+        entity.addComponent(new EntityEditorTreeRootComponent())
+        entity.addComponent(new EntityEditorTreeNodeComponent())
+        return entity
+    },
+    leaf: (prefab) => {
+        let entity = new Entity()
+        entity.addComponent(new EntityEditorTreeNodeComponent())
+        return entity
+    }
+}
 
 export const FileDropOverlay: React.FC = () => {
     const scene = useScene()
@@ -27,7 +43,8 @@ export const FileDropOverlay: React.FC = () => {
             try {
                 let json = JSON.parse(reader.result as string)
                 let { name, createEntity } = readEntityFile(json)
-                mapEditorScene.loadMap(name, createEntity())
+                let entity = createEntity(mapEditorEntityFactory)
+                mapEditorScene.loadMap(name, entity)
             } catch(e) {
                 console.error(e)
                 handleError()

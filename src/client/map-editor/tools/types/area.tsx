@@ -15,8 +15,6 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import React from 'react';
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
-import WorldTilemapComponent from 'src/physics/world-tilemap-component';
-import TilemapComponent from 'src/map/tilemap-component';
 
 export class AreaToolDrawer extends EntityDrawer {
     private tool: AreaTool;
@@ -33,10 +31,10 @@ export class AreaToolDrawer extends EntityDrawer {
         if(this.tool.area.isValid()) {
 
             program.drawRectangle(
-                this.tool.area.minX * TilemapComponent.BLOCK_SIZE,
-                this.tool.area.minY * TilemapComponent.BLOCK_SIZE,
-                this.tool.area.maxX * TilemapComponent.BLOCK_SIZE,
-                this.tool.area.maxY * TilemapComponent.BLOCK_SIZE,
+                this.tool.area.minX,
+                this.tool.area.minY,
+                this.tool.area.maxX,
+                this.tool.area.maxY,
                 0x7F7F7F7F
             )
         }
@@ -119,12 +117,11 @@ export default class AreaTool extends Tool {
 
         const observe = createObservation(model, superpos);
 
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
-        let modification = new MapAreaModification(map, this.area.clone(), [])
+        const tilemap = this.manager.tilemap
+        let modification = new MapAreaModification(tilemap.entity, this.area.clone(), [])
         let newData = modification.fetchData()
         modification.newData = newData
-        const history = map.getComponent(GameMapHistoryComponent)
+        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
         history.registerModification(modification)
         history.commitActions("Автозаполнение")
@@ -192,12 +189,9 @@ export default class AreaTool extends Tool {
     }
 
     selectAll() {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
-
+        const tilemap =this.manager.tilemap
         this.area.setFrom(0, 0)
         this.area.setTo(tilemap.width, tilemap.height)
-
         this.manager.setNeedsRedraw()
     }
 
@@ -206,8 +200,7 @@ export default class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const map = this.manager.tilemap.entity
         const history = map.getComponent(GameMapHistoryComponent)
 
         let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
@@ -221,8 +214,7 @@ export default class AreaTool extends Tool {
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
 
         let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
@@ -250,11 +242,11 @@ export default class AreaTool extends Tool {
 
         if(cut) {
             this.manager.createEvent(width * height + " блок(-ов) вырезано")
-            const history = map.getComponent(GameMapHistoryComponent)
+            const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
             let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
-            let areaModification = new MapAreaModification(map, bound, void 0)
+            let areaModification = new MapAreaModification(tilemap.entity, bound, void 0)
             areaModification.perform()
             history.registerModification(areaModification)
             history.commitActions("Вырезание")
@@ -299,11 +291,10 @@ export default class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
-        const history = map.getComponent(GameMapHistoryComponent)
+        const tilemap = this.manager.tilemap
+        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
-        let modification = new MapAreaModification(map, this.area.clone(), this.copyBuffer.blocks.map((a: BlockState) => a.clone()))
+        let modification = new MapAreaModification(tilemap.entity, this.area.clone(), this.copyBuffer.blocks.map((a: BlockState) => a.clone()))
 
         modification.perform()
         history.registerModification(modification)
@@ -313,22 +304,20 @@ export default class AreaTool extends Tool {
     }
 
     clampX(x: number) {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
         return Math.max(0, Math.min(tilemap.width - 1, x))
     }
 
     clampY(y: number) {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
         return Math.max(0, Math.min(tilemap.height - 1, y))
     }
 
     mouseDown(x: number, y: number) {
         super.mouseDown(x, y);
 
-        x = Math.floor(x / TilemapComponent.BLOCK_SIZE)
-        y = Math.floor(y / TilemapComponent.BLOCK_SIZE)
+        x = Math.floor(x / 1)
+        y = Math.floor(y / 1)
 
         if(this.area.isValid()) {
             if(this.area.contains(x, y)) {
@@ -372,8 +361,8 @@ export default class AreaTool extends Tool {
     mouseMove(x: number, y: number) {
         super.mouseMove(x, y);
 
-        x = Math.floor(x / TilemapComponent.BLOCK_SIZE)
-        y = Math.floor(y / TilemapComponent.BLOCK_SIZE)
+        x = Math.floor(x / 1)
+        y = Math.floor(y / 1)
 
         x = this.clampX(x)
         y = this.clampY(y)

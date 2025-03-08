@@ -11,6 +11,8 @@ import WorldStatisticsReceiver from "src/entity/components/network/world-statist
 import UserMessageReceiver from "src/entity/components/network/event/user-message-receiver";
 import CollisionDisableReceiver from "src/entity/components/network/collisions/collision-disable-receiver";
 import ExplodeShakingComponent from "src/client/entity/components/explode-pool-shaking-component";
+import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
+import ExplodePoolParticleComponent from "./components/explode-pool-particle-component";
 
 export function clientGameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
     gameWorldEntityPrefab(entity, options)
@@ -26,4 +28,8 @@ export function clientGameWorldEntityPrefab(entity: Entity, options?: GameWorldC
     entity.addComponent(new ExplodeShakingComponent())
     entity.addComponent(new ExplodeEntityAffectController())
     entity.addComponent(new ParticleHostComponent())
+    entity.addComponent(new ExplodeEffectPool({
+        damageBlocks: false
+    }))
+    entity.addComponent(new ExplodePoolParticleComponent())
 }

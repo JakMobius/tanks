@@ -3,7 +3,6 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import Entity from "src/utils/ecs/entity";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
-import WorldTilemapComponent from 'src/physics/world-tilemap-component';
 
 export default class ExplodeCommand extends Command {
     public defaultPower: number;
@@ -45,7 +44,7 @@ export default class ExplodeCommand extends Command {
 
         let explodeEntity = new Entity()
         ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
-        world.getComponent(WorldTilemapComponent).map.appendChild(explodeEntity)
+        world.appendChild(explodeEntity)
         explodeEntity.getComponent(ExplodeComponent).explode(x, y, power)
         explodeEntity.removeFromParent()
     }

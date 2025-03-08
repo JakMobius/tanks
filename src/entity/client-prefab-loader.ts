@@ -36,3 +36,4 @@ import 'src/entity/types/effect-sound/client-side/client-prefab'
 
 import 'src/entity/types/group/client-prefab'
 import 'src/entity/types/tilemap/client-side/client-prefab'
+import 'src/entity/types/spawn-zone/client-side/client-prefab'

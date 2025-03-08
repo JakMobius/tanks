@@ -2,6 +2,7 @@
 import Tool from '../tools/tool';
 import KeyboardController from "src/client/controls/input/keyboard/keyboard-controller";
 import BlockState from "src/map/block-state/block-state";
+import TilemapComponent from 'src/map/tilemap-component';
 import Entity from "src/utils/ecs/entity";
 import EventEmitter from "src/utils/event-emitter";
 
@@ -9,6 +10,7 @@ export default class ToolManager extends EventEmitter {
     keyboard: KeyboardController = null
     selectedTool: Tool = null
     world: Entity = null
+    tilemap: TilemapComponent
     selectedBlock: BlockState = null
 
     constructor(world: Entity) {

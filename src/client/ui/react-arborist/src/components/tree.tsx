@@ -12,7 +12,7 @@ function TreeComponent<T>(
 ) {
   return (
     <TreeProvider treeProps={props} imperativeHandle={ref}>
-      <OuterDrop>
+      <OuterDrop<T>>
         <TreeContainer />
       </OuterDrop>
     </TreeProvider>

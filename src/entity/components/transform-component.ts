@@ -6,19 +6,65 @@ import { PropertyInspector, VectorProperty } from "./inspector/property-inspecto
 import { TransmitterSet } from "./network/transmitting/transmitter-set";
 import PositionTransmitter from "./network/position/position-transmitter";
 import { degToRad, radToDeg } from "src/utils/utils";
+import { getPrefabNameForEntity } from "./prefab-id-component";
+
+function getScale(transform: ReadonlyMatrix3) {
+    let x = Math.sqrt(transform.get(0) ** 2 + transform.get(1) ** 2)
+    let y = Math.sqrt(transform.get(3) ** 2 + transform.get(4) ** 2)
+
+    let basis1X = transform.get(0) / x
+    let basis1Y = transform.get(1) / x
+
+    let basis2X = transform.get(3) / y
+    let basis2Y = transform.get(4) / y
+
+    if(basis1X * basis2Y - basis1Y * basis2X < 0) {
+        y = -y
+    }
+
+    return { x, y }
+}
+
+function getPosition(transform: ReadonlyMatrix3) {
+    return { x: transform.get(6), y: transform.get(7) }
+}
+
+function getDirection(transform: ReadonlyMatrix3) {
+    return { x: transform.get(0), y: transform.get(1) }
+}
+
+function getAngle(transform: ReadonlyMatrix3) {
+    let direction = getDirection(transform)
+    return Math.atan2(-direction.y, direction.x);
+}
+
+interface TransformParameters {
+    position?: Box2D.XY
+    angle?: number
+    scale?: Box2D.XY 
+}
+
+function alterTransform(transform: Matrix3, params: TransformParameters) {
+    let position = params.position ?? getPosition(transform)
+    let angle = params.angle ?? getAngle(transform)
+    let scale = params.scale ?? getScale(transform)
+
+    transform.reset()
+    transform.translate(position.x, position.y)
+    transform.rotate(angle)
+    transform.scale(scale.x, scale.y)
+
+    return transform
+}
 
 export default class TransformComponent extends EventHandlerComponent {
     entity: Entity | null
-    private transform: Matrix3 | null = null
-    globalTransform: Matrix3 | null = null
+    private transform = new Matrix3()
+    private globalTransform: Matrix3 | null = null
+    private invertedGlobalTransform: Matrix3 | null = null
 
-    constructor(transform?: Matrix3) {
+    constructor() {
         super()
-        if (transform) {
-            this.transform = transform;
-        } else {
-            this.transform = new Matrix3();
-        }
 
         this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
             let positionProperty = new VectorProperty("position", 2)
@@ -29,7 +75,7 @@ export default class TransformComponent extends EventHandlerComponent {
                     return [position.x, position.y]
                 })
                 .withSetter(([x, y]) => {
-                    this.setPosition(new Box2D.b2Vec2(x, y))
+                    this.set({ position: { x, y } })
                 })
                 .updateOn("position-update")
                 .replaceNaN()
@@ -38,14 +84,27 @@ export default class TransformComponent extends EventHandlerComponent {
                 .withName("Угол")
                 .withGetter(() => [radToDeg(this.getAngle())])
                 .withSetter(([angle]) => {
-                    let position = this.getPosition()
-                    this.setPositionAngle(position, degToRad(angle))
+                    this.set({ angle: degToRad(angle) })
+                })
+                .updateOn("position-update")
+                .replaceNaN()
+            
+            let scaleProperty = new VectorProperty("scale", 2)
+                .withName("Масштаб")
+                .withPrefixes(["X", "Y"])
+                .withGetter(() => {
+                    let scale = this.getScale()
+                    return [scale.x, scale.y]
+                })
+                .withSetter(([x, y]) => {
+                    this.set({ scale: { x, y } })
                 })
                 .updateOn("position-update")
                 .replaceNaN()
 
             inspector.addProperty(positionProperty)
             inspector.addProperty(angleProperty)
+            inspector.addProperty(scaleProperty)
         })
 
         this.eventHandler.on("attached-to-parent", () => this.markDirty())
@@ -60,59 +119,31 @@ export default class TransformComponent extends EventHandlerComponent {
         return this.transform as ReadonlyMatrix3
     }
 
-    setPosition(position: Box2D.XY) {
-        const currentPosition = this.getPosition()
-        let newMatrix = new Matrix3()
-        newMatrix.translate(position.x - currentPosition.x, position.y - currentPosition.y)
-        newMatrix.multiply(this.transform)
-        this.transform = newMatrix
+    getAngle() { return getAngle(this.transform)}
+    getScale() { return getScale(this.transform) }
+    getPosition() { return getPosition(this.transform) }
+    getDirection() { return getDirection(this.transform) }
+
+    set(parameters: TransformParameters) {
+        this.setTransform(alterTransform(this.transform, parameters))
+        return this
+    }
+
+    setTransform(transform: Matrix3) {
+        this.transform = transform
         this.markDirty()
+        return this
     }
 
-    setPositionAngle(position: Box2D.XY, angle: number) {
-        this.transform.reset()
-        this.transform.translate(position.x, position.y)
-        this.transform.rotate(-angle)
-        this.markDirty()
-    }
+    getGlobalAngle(): number { return getAngle(this.getGlobalTransform()) }
+    getGlobalScale() { return getScale(this.getGlobalTransform()) }
+    getGlobalPosition() { return getPosition(this.getGlobalTransform()) }
+    getGlobalDirection() { return getDirection(this.getGlobalTransform()) }
 
-    updateTransform(body: (matrix: Matrix3) => void) {
-        body(this.transform)
-        this.markDirty()
-    }
-
-    getAngle(): number {
-        return Math.atan2(this.transform.get(1), this.transform.get(0));
-    }
-
-    getPosition() {
-        return new Box2D.b2Vec2(this.transform.get(6), this.transform.get(7))
-    }
-
-    getDirection() {
-        return new Box2D.b2Vec2(this.transform.get(0), this.transform.get(1))
-    }
-
-    getGlobalAngle() {
-        let direction = this.getGlobalTransform()
-        return Math.atan2(direction.get(1), direction.get(0))
-    }
-
-    getGlobalDirection() {
-        let direction = this.getGlobalTransform()
-        return new Box2D.b2Vec2(direction.get(0), direction.get(1))
-    }
-
-    getGlobalPosition() {
-        let position = this.getGlobalTransform()
-        return new Box2D.b2Vec2(position.get(6), position.get(7))
-    }
-
-    setGlobalPositionAngle(position: Box2D.XY, angle: number) {
-        let matrix = new Matrix3()
-        matrix.translate(position.x, position.y)
-        matrix.rotate(-angle)
-        this.setGlobalTransform(matrix)
+    setGlobal(parameters: TransformParameters) {
+        let transform = this.getGlobalTransform().clone()
+        this.setGlobalTransform(alterTransform(transform, parameters))
+        return this
     }
 
     setGlobalTransform(transform: ReadonlyMatrix3) {
@@ -126,10 +157,11 @@ export default class TransformComponent extends EventHandlerComponent {
             this.transform.multiply(transform)
         }
         this.markDirty()
+        return this
     }
 
     getGlobalTransform() {
-        if(this.globalTransform) {
+        if (this.globalTransform) {
             return this.globalTransform as ReadonlyMatrix3
         }
 
@@ -143,21 +175,31 @@ export default class TransformComponent extends EventHandlerComponent {
         return this.globalTransform as ReadonlyMatrix3
     }
 
+    getInvertedGlobalTransform() {
+        if (this.invertedGlobalTransform) {
+            return this.invertedGlobalTransform as ReadonlyMatrix3
+        }
+
+        this.invertedGlobalTransform = this.getGlobalTransform().inverted()
+        return this.invertedGlobalTransform as ReadonlyMatrix3
+    }
+
     emitGlobalPositionUpdate() {
-        this.entity.emit("position-update")
+        this.entity?.emit("position-update")
     }
 
     markDirty() {
         this.emitGlobalPositionUpdate()
-        if(this.globalTransform !== null) {
+        if (this.globalTransform !== null || !this.invertedGlobalTransform) {
             this.globalTransform = null
+            this.invertedGlobalTransform = null
             this.markChildrenDirty()
         }
     }
 
     markChildrenDirty() {
         let children = this.entity?.children
-        if(!children) return
+        if (!children) return
         for (let child of children) {
             child.getComponent(TransformComponent)?.markDirty()
         }

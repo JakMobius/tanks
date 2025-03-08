@@ -75,7 +75,7 @@ const HubView: React.FC = () => {
         camera.addComponent(new CameraComponent())
         camera.addComponent(new CameraRandomMovement()
             .setViewport({x: scene.canvas.width, y: scene.canvas.height})
-            .setMapSize(150 * TilemapComponent.BLOCK_SIZE, 150 * TilemapComponent.BLOCK_SIZE))
+            .setMapSize(150 * TilemapComponent.DEFAULT_SCALE, 150 * TilemapComponent.DEFAULT_SCALE))
 
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 

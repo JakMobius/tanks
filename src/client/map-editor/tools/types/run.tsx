@@ -92,7 +92,10 @@ export default class RunTool extends Tool {
         ClientEntityPrefabs.types.get(EntityType.TANK_SNIPER)(this.tank)
         this.manager.world.appendChild(this.tank)
         
-        this.tank.getComponent(TransformComponent).setGlobalPositionAngle(this.spawnPoint, 0)
+        this.tank.getComponent(TransformComponent).setGlobal({
+            position: this.spawnPoint,
+            angle: 0
+        })
         RootControlsResponder.getInstance().connectTankControls(this.tank.getComponent(TankControls))
 
         // this.manager.camera.inertial = true

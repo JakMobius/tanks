@@ -5,7 +5,6 @@ import WorldStatisticsComponent from "src/entity/components/network/world-statis
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import {DMPlayerWaitingStateController} from "src/entity/types/controller-dm/server-side/dm-player-waiting-state";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
-import MapLoaderComponent from "src/server/room/components/map-loader-component";
 import {DMGameState, DMGameStateType} from "src/entity/types/controller-dm/dm-game-state";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
@@ -13,7 +12,6 @@ import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-tim
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
-import WorldTilemapComponent from "src/physics/world-tilemap-component";
 import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export class DMPlayingStateController extends DMGameStateController {
@@ -29,9 +27,9 @@ export class DMPlayingStateController extends DMGameStateController {
             this.controller.triggerStateBroadcast()
         }))
 
-        this.addScript(new QuickMatchEndScript(this.controller, this.controller.config.singlePlayerMatchTime))
+        this.addScript(new QuickMatchEndScript(this.controller, this.controller.singlePlayerMatchTime))
 
-        this.addScript(new RandomRespawnScript(this.controller, this.controller.config.spawnZones))
+        this.addScript(new RandomRespawnScript(this.controller))
 
         this.addScript(new MatchTimerExpireScript(this.controller, () => {
             this.endMatch()
@@ -41,10 +39,9 @@ export class DMPlayingStateController extends DMGameStateController {
     activate() {
         super.activate()
         this.controller.world.getComponent(WorldStatisticsComponent)
-            .getMatchLeftTimerComponent().countdownFrom(this.controller.config.matchTime)
+            .getMatchLeftTimerComponent().countdownFrom(this.controller.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
-        let tilemap = this.controller.world.getComponent(WorldTilemapComponent).map
-        tilemap.getComponent(MapLoaderComponent).reloadMap()
+        // TODO: reload map
         this.controller.triggerStateBroadcast()
         this.respawnPlayers()
     }

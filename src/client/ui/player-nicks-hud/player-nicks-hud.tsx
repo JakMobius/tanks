@@ -8,11 +8,12 @@ import TeamColor from "src/utils/team-color";
 import CameraComponent from "src/client/graphics/camera";
 import Color from 'src/utils/color';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import TransformComponent from 'src/entity/components/transform-component';
 
 interface PlayerNickViewProps {
     entity?: Entity
     world?: Entity
-    camera?: CameraComponent
+    camera?: Entity
     screen?: Screen
 }
 
@@ -31,14 +32,15 @@ const PlayerNickView: React.FC<PlayerNickViewProps> = (props) => {
     const onTick = () => {
         if (!state.bounds || !ref.current) return
 
+        let cameraTransform = props.camera.getComponent(TransformComponent).getGlobalTransform()
         let physicalComponent = props.entity.getComponent(PhysicalComponent)
         let position = physicalComponent.getBody().GetPosition()
 
         let gameX = position.x
         let gameY = position.y + nickVerticalOffset
 
-        let x = (props.camera.matrix.transformX(gameX, gameY) + 1) / 2 * props.screen.width
-        let y = (-props.camera.matrix.transformY(gameX, gameY) + 1) / 2 * props.screen.height
+        let x = (cameraTransform.transformX(gameX, gameY) + 1) / 2 * props.screen.width
+        let y = (-cameraTransform.transformY(gameX, gameY) + 1) / 2 * props.screen.height
 
         x -= state.bounds.width / 2
         y -= state.bounds.height
@@ -91,7 +93,7 @@ const PlayerNickView: React.FC<PlayerNickViewProps> = (props) => {
 interface PlayerNicksHUDProps {
     world?: Entity
     screen?: Screen
-    camera?: CameraComponent
+    camera?: Entity
 }
 
 const PlayerNicksHUD: React.FC<PlayerNicksHUDProps> = React.memo((props) => {

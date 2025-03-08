@@ -34,7 +34,7 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
 	public stepsPerSecond = 30
 	public stepsWaiting = 0
 	public walkers: ExplodePoolWalkerMap = new TwoDimensionalMap<number, number,ExplodePoolWalker>();
-	public gridSize = TilemapComponent.BLOCK_SIZE;
+	public gridSize = 1;
 	public offsetMap = [
         1, 0,
         1, -1,
@@ -83,10 +83,11 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
     }
 
     isBlock (x: number, y: number): boolean {
-        const map = this.entity.getComponent(TilemapComponent)
-        let block = map.getBlock(Math.floor(x / TilemapComponent.BLOCK_SIZE), Math.floor(y / TilemapComponent.BLOCK_SIZE))
-        if(!block) return true
-        return (block.constructor as typeof BlockState).isSolid
+        return false
+        // const map = this.entity.getComponent(TilemapComponent)
+        // let block = map.getBlock(Math.floor(x / 1), Math.floor(y / 1))
+        // if(!block) return true
+        // return (block.constructor as typeof BlockState).isSolid
     }
 
     /**
@@ -300,9 +301,10 @@ export default class ExplodeEffectPool extends EventHandlerComponent {
     }
 
     protected damageBlock(x: number, y: number, damage: number): void {
-        if(!this.damageBlocks) return
-        const map = this.entity.getComponent(TilemapComponent)
-        map.damageBlock(x / TilemapComponent.BLOCK_SIZE, y / TilemapComponent.BLOCK_SIZE, damage * this.blockDamageCoefficient)
+        return
+        // if(!this.damageBlocks) return
+        // const map = this.entity.getComponent(TilemapComponent)
+        // map.damageBlock(x / 1, y / 1, damage * this.blockDamageCoefficient)
     }
 
     public normalize(x: number): number {

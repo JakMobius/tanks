@@ -12,6 +12,8 @@ EntityPrefabs.Types.set(EntityType.TILEMAP, (entity) => {
     entity.addComponent(new TransformComponent())
     entity.addComponent(new ChunkedMapCollider())
 
+    entity.getComponent(TransformComponent).set({ scale: { x: TilemapComponent.DEFAULT_SCALE, y: TilemapComponent.DEFAULT_SCALE } })
+
     // TODO: temporary, until map editor is implemented properly
     entity.addComponent(new ChildTickComponent())
 })

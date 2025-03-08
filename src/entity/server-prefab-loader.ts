@@ -36,3 +36,4 @@ import 'src/entity/types/effect-sound/server-side/server-prefab'
 
 import 'src/entity/types/group/server-prefab'
 import 'src/entity/types/tilemap/server-prefab'
+import 'src/entity/types/spawn-zone/server-side/server-prefab'

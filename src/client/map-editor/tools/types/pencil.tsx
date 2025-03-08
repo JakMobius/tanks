@@ -14,8 +14,6 @@ import { clamp } from "src/utils/utils";
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import React, { useEffect, useState } from 'react';
 import RangeView from 'src/client/ui/elements/range/range';
-import WorldTilemapComponent from "src/physics/world-tilemap-component";
-import TilemapComponent from "src/map/tilemap-component";
 
 const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
@@ -80,10 +78,9 @@ export class PencilDrawer extends EntityDrawer {
 
         const program = phase.getProgram(ConvexShapeProgram)
 
-        const map = this.tool.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.tool.manager.tilemap
 
-        const scale = TilemapComponent.BLOCK_SIZE
+        const scale = 1
         const x = this.tool.brushX
         const y = this.tool.brushY
 
@@ -201,8 +198,8 @@ export default class Pencil extends Tool {
     mouseUp(x: number, y: number) {
         super.mouseUp(x, y);
 
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const history = map.getComponent(GameMapHistoryComponent)
+        const tilemap = this.manager.tilemap
+        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
         history.commitActions(this.actionName)
 
@@ -231,8 +228,7 @@ export default class Pencil extends Tool {
     }
 
     draw(x: number, y: number) {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
 
         for (let by = 0; by < this.thickness; by++) {
 
@@ -253,8 +249,7 @@ export default class Pencil extends Tool {
     }
 
     fragment(x: number, y: number) {
-        const map = this.manager.world.getComponent(WorldTilemapComponent).map
-        const tilemap = map.getComponent(TilemapComponent)
+        const tilemap = this.manager.tilemap
 
         if ((tilemap.getBlock(x, y).constructor as typeof BlockState).typeId ===
             (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
@@ -280,8 +275,8 @@ export default class Pencil extends Tool {
     refreshBrush() {
         this.brushPositionKnown = true
 
-        let brushX = (Math.floor(this.mouseX / TilemapComponent.BLOCK_SIZE))
-        let brushY = (Math.floor(this.mouseY / TilemapComponent.BLOCK_SIZE))
+        let brushX = (Math.floor(this.mouseX / 1))
+        let brushY = (Math.floor(this.mouseY / 1))
 
         if (this.thickness % 2 !== 0) {
             brushX++

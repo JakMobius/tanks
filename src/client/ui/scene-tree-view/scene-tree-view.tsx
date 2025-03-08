@@ -1,12 +1,19 @@
 import "./scene-tree-view.scss"
 
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DeleteHandler, DropHandler, NodeApi, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
 import Entity from 'src/utils/ecs/entity';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityEditorTreeNodeComponent, EntityEditorTreeRootComponent, EntityTreeNode } from "./components";
 import { SceneEntityLibraryDropItem } from "../scene-entity-library/scene-entity-library";
 import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
+
+export class SceneTreeViewDropItem {
+    entities: Entity[]
+    constructor(entities: Entity[]) {
+        this.entities = entities
+    }
+}
 
 const SceneTreeView: React.FC = () => {
 
@@ -47,6 +54,7 @@ const SceneTreeView: React.FC = () => {
     const onRename: RenameHandler<EntityTreeNode> = ({ id, name }) => {
         getNodeById(id)?.setName(name)
         editorScene.update()
+        rerender({})
     };
 
     const onDrop: DropHandler<EntityTreeNode> = ({ item, parentId, index }) => {
@@ -118,6 +126,10 @@ const SceneTreeView: React.FC = () => {
         return () => observer.disconnect()
     }, [divRef.current])
 
+    const dragItemUserData = (nodes: EntityTreeNode[]) => {
+        return new SceneTreeViewDropItem(nodes.map(node => node.entity))
+    }
+
     return (
         <div className="tree-view" ref={divRef}>
             {height !== null ? <Tree
@@ -134,6 +146,7 @@ const SceneTreeView: React.FC = () => {
                 rowHeight={27}
                 height={height}
                 selectionFollowsFocus={true}
+                dragItemUserData={dragItemUserData}
             >
                 {TreeViewNode}
             </Tree> : null}

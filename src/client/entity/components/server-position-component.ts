@@ -2,11 +2,11 @@ import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { Matrix3 } from "src/utils/matrix3";
 
 export default class ServerPositionComponent extends EventHandlerComponent {
     public serverVelocity: Box2D.b2Vec2 = new Box2D.b2Vec2();
-    public serverPosition: Box2D.b2Vec2 = new Box2D.b2Vec2();
-    public serverAngle: number = 0
+    public serverTransform: Matrix3
     public serverAngularVelocity: number = 0
 
     public serverTick: number = 0
@@ -22,12 +22,12 @@ export default class ServerPositionComponent extends EventHandlerComponent {
     serverPositionReceived() {
         this.entity.emit("server-position-received")
 
-        let serverX = this.serverPosition.x
-        let serverY = this.serverPosition.y
-        let serverAngle = this.serverAngle
-
         let transformComponent = this.entity.getComponent(TransformComponent)
         let physicalComponent = this.entity.getComponent(PhysicalComponent)
+
+        let transform = this.serverTransform.clone()
+        
+        transformComponent.setTransform(transform)
 
         if(physicalComponent) {
             this.serverPositionUpdateTick = physicalComponent.host.worldTicks
@@ -42,17 +42,17 @@ export default class ServerPositionComponent extends EventHandlerComponent {
 
             let timeDifference = tickDifference * host.physicsTick
 
-            serverX += this.serverVelocity.x * timeDifference
-            serverY += this.serverVelocity.y * timeDifference
-            serverAngle += this.serverAngularVelocity * timeDifference
+            let position = transformComponent.getGlobalPosition()
+            let angle = transformComponent.getGlobalAngle()
+
+            position.x += this.serverVelocity.x * timeDifference
+            position.y += this.serverVelocity.y * timeDifference
+            angle += this.serverAngularVelocity * timeDifference
+
+            transformComponent.setGlobal({ position, angle })
 
             physicalComponent.setVelocity(this.serverVelocity)
             physicalComponent.setAngularVelocity(this.serverAngularVelocity)
         }
-
-        transformComponent.setGlobalPositionAngle(
-            {x: serverX, y: serverY},
-            serverAngle
-        )
     }
 }

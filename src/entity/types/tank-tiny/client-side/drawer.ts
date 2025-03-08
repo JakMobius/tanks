@@ -54,8 +54,8 @@ export class Drawer extends TankDrawer {
                 const angle = wheel.angle
 
                 wheelProgram.transform.save()
-                wheelProgram.transform.rotate(angle)
                 wheelProgram.transform.translate(wheel.x, wheel.y)
+                wheelProgram.transform.rotate(-angle)
 
                 wheelProgram.drawSprite(this.wheelSprites[spriteIndex], Drawer.wheelQuadrangle)
                 wheelProgram.transform.restore()

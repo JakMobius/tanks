@@ -11,9 +11,6 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
-import WorldTilemapComponent from "src/physics/world-tilemap-component";
-import TilemapComponent from "src/map/tilemap-component";
-import { Transform } from "stream";
 import TransformComponent from "src/entity/components/transform-component";
 
 export interface BulletBehaviourConfig {
@@ -103,10 +100,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
         this.nextPhysicalTick(() => {
             if (this.config.wallDamage) {
                 world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                    const map = world.getComponent(WorldTilemapComponent).map
-                    const tilemap = map?.getComponent(TilemapComponent)
-                    
-                    tilemap?.damageBlock(x, y, this.config.wallDamage)
+                    // tilemap?.damageBlock(x, y, this.config.wallDamage)
                 })
             }
 
@@ -126,7 +120,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
 
             let explodeEntity = new Entity()
             ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
-            WorldComponent.getWorld(this.entity).getComponent(WorldTilemapComponent).map.appendChild(explodeEntity)
+            WorldComponent.getWorld(this.entity).appendChild(explodeEntity)
             explodeEntity.getComponent(ExplodeComponent).explode(position.x, position.y, this.config.explodePower)
             explodeEntity.removeFromParent()
         }
@@ -161,7 +155,10 @@ export default class BulletBehaviour extends EventHandlerComponent {
         body.getBody().SetFixedRotation(true)
         body.getBody().SetEnabled(false)
 
-        this.entity.getComponent(TransformComponent).setGlobalPositionAngle(point, body.getBody().GetAngle())
+        this.entity.getComponent(TransformComponent).setGlobal({
+            position: point,
+            angle: body.getBody().GetAngle()
+        })
     }
 
     private beforeDeath() {

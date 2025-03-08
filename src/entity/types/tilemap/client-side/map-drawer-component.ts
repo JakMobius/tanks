@@ -9,7 +9,6 @@ import TextureProgram from "src/client/graphics/programs/texture-program";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "src/map/tilemap-component";
 import BlockDrawer from "src/client/graphics/drawers/block/block-drawer";
-import { Transform } from "stream";
 import TransformComponent from "src/entity/components/transform-component";
 
 export interface DrawerBounds {
@@ -45,9 +44,10 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         })
     }
 
-    private updateBounds(map: TilemapComponent, camera: CameraComponent) {
-        const transform = this.entity.getComponent(TransformComponent).getGlobalTransform()
-        const inverseTransform = transform.inverted()
+    private updateBounds(map: TilemapComponent, camera: Entity) {
+        const cameraTransform = camera.getComponent(TransformComponent)
+        const inverseTransform = this.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
+        const cameraMatrix = cameraTransform.getGlobalTransform()
 
         let x0 = Infinity
         let y0 = Infinity
@@ -57,8 +57,8 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         // Calculate visible AABB
         for (let sx = -1; sx <= 1; sx += 2) {
             for (let sy = -1; sy <= 1; sy += 2) {
-                let gx = camera.inverseMatrix.transformX(sx, sy)
-                let gy = camera.inverseMatrix.transformY(sx, sy)
+                let gx = cameraMatrix.transformX(sx, sy)
+                let gy = cameraMatrix.transformY(sx, sy)
 
                 let x = inverseTransform.transformX(gx, gy)
                 let y = inverseTransform.transformY(gx, gy)
@@ -70,13 +70,13 @@ export default class MapDrawerComponent extends EventHandlerComponent {
             }
         }
 
-        const maxWidth = map.width * TilemapComponent.BLOCK_SIZE;
-        const maxHeight = map.height * TilemapComponent.BLOCK_SIZE;
+        const maxWidth = map.width;
+        const maxHeight = map.height;
 
-        this.bounds.x0 = Math.floor(Math.max(0, x0) / TilemapComponent.BLOCK_SIZE)
-        this.bounds.y0 = Math.floor(Math.max(0, y0) / TilemapComponent.BLOCK_SIZE)
-        this.bounds.x1 = Math.ceil(Math.min(maxWidth, x1) / TilemapComponent.BLOCK_SIZE)
-        this.bounds.y1 = Math.ceil(Math.min(maxHeight, y1) / TilemapComponent.BLOCK_SIZE)
+        this.bounds.x0 = Math.floor(Math.max(0, x0) / 1)
+        this.bounds.y0 = Math.floor(Math.max(0, y0) / 1)
+        this.bounds.x1 = Math.ceil(Math.min(maxWidth, x1) / 1)
+        this.bounds.y1 = Math.ceil(Math.min(maxHeight, y1) / 1)
     }
 
     private drawMap(phase: DrawPhase) {
@@ -124,7 +124,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
 
         const gridColor = 0xffe6e6e6
 
-        let gridThickness = 0.2 / TilemapComponent.BLOCK_SIZE
+        let gridThickness = 0.04
         let halfGridThickness = gridThickness / 2
 
         for (let x = this.bounds.x0; x <= this.bounds.x1; x++) {
@@ -140,7 +140,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         }
 
         const borderColor = 0xffd4d4d4
-        let borderThickness = 0.3 / TilemapComponent.BLOCK_SIZE
+        let borderThickness = 0.06
         let halfBorderThickness = borderThickness / 2
 
         this.drawLine(program, -halfBorderThickness, 0, borderThickness, this.bounds.y1, borderColor)
@@ -152,11 +152,6 @@ export default class MapDrawerComponent extends EventHandlerComponent {
     }
 
     private drawLine(program: ConvexShapeProgram, x0: number, y0: number, width: number, height: number, color: number) {
-        x0 *= TilemapComponent.BLOCK_SIZE
-        y0 *= TilemapComponent.BLOCK_SIZE
-        width *= TilemapComponent.BLOCK_SIZE
-        height *= TilemapComponent.BLOCK_SIZE
-
         program.drawRectangle(x0, y0, x0 + width, y0 + height, color)
     }
 

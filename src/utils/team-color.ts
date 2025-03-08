@@ -28,10 +28,14 @@ export default class TeamColor {
         "фиолетовых",
     ]
 
-
-    static getColor(id: number) {
-        if(id === -1) return new Color().setRGB(0.5, 0.5, 0.5)
-        let hue = TeamColor.teamHues[id]
+    static teamColors = TeamColor.teamHues.map((hue) => {
         return new Color().setHSL(hue, TeamColor.teamColorSaturation, TeamColor.teamColorLuminance)
+    })
+
+    static noTeamColor = new Color().setRGB(0.5, 0.5, 0.5)
+    
+    static getColor(id: number) {
+        if(id in this.teamColors) return this.teamColors[id]
+        return this.noTeamColor    
     }
 }

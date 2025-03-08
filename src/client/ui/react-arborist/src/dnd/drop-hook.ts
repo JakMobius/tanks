@@ -12,14 +12,14 @@ export type DropResult = {
   index: number | null;
 };
 
-export function useDropHook(
+export function useDropHook<T>(
   el: RefObject<HTMLElement | null>,
-  node: NodeApi<any>,
+  node: NodeApi<T>,
 ): ConnectDropTarget {
-  const tree = useTreeApi();
+  const tree = useTreeApi<T>();
   useDataUpdates()
   
-  const [{ isOver }, dropRef] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
+  const [{ isOver }, dropRef] = useDrop<DragItem<T>, DropResult | null, { isOver: boolean }>(
     () => ({
       accept: "NODE",
       canDrop: () => tree.canDrop(),

@@ -40,7 +40,7 @@ export default class ExplodeEffectEntityAffectController extends EventHandlerCom
             let gridX
             let gridY
 
-            for(let distance = pool.gridSize; distance <= pool.pressureDifferentialDistance; distance += TilemapComponent.BLOCK_SIZE) {
+            for(let distance = pool.gridSize; distance <= pool.pressureDifferentialDistance; distance += 1) {
                 gridX = position.x + dx * distance
                 gridY = position.y + dy * distance
 

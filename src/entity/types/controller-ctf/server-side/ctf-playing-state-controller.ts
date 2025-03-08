@@ -28,7 +28,6 @@ import PlayerNickComponent from "src/entity/types/player/server-side/player-nick
 import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import TeamColor from "src/utils/team-color";
-import WorldTilemapComponent from "src/physics/world-tilemap-component";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 
 export default class CTFPlayingStateController extends CTFGameStateController {
@@ -50,12 +49,9 @@ export default class CTFPlayingStateController extends CTFGameStateController {
             this.controller.triggerStateBroadcast()
         }))
 
-        this.addScript(new QuickMatchEndScript(this.controller, this.controller.config.singlePlayerMatchTime))
+        this.addScript(new QuickMatchEndScript(this.controller, this.controller.singleTeamMatchTime))
 
-        this.addScript(new TeamedRespawnScript(this.controller, {
-            usePlayerTeam: true,
-            spawnZones: this.controller.spawnZones
-        }))
+        this.addScript(new TeamedRespawnScript(this.controller, { usePlayerTeam: true }))
 
         this.addScript(new MatchTimerExpireScript(this.controller, () => {
             this.endMatch()
@@ -67,10 +63,9 @@ export default class CTFPlayingStateController extends CTFGameStateController {
     activate() {
         super.activate()
         this.controller.world.getComponent(WorldStatisticsComponent)
-            .getMatchLeftTimerComponent().countdownFrom(this.controller.config.matchTime)
+            .getMatchLeftTimerComponent().countdownFrom(this.controller.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
-        let tilemap = this.controller.world.getComponent(WorldTilemapComponent).map
-        tilemap.getComponent(MapLoaderComponent).reloadMap()
+        // TODO: reload map
         this.controller.triggerStateBroadcast()
         this.setupTeams()
     }

@@ -3,7 +3,8 @@ import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import { Matrix3, ReadonlyMatrix3 } from "src/utils/matrix3";
+import { ReadonlyMatrix3 } from "src/utils/matrix3";
+import { b2ScaledCircleShape, b2ScaledPolygonShape } from "src/physics/b2-scale-shape";
 
 export default class PhysicalComponent extends EventHandlerComponent {
     body: Box2D.b2Body
@@ -12,35 +13,21 @@ export default class PhysicalComponent extends EventHandlerComponent {
     bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body
     oldTransform: ReadonlyMatrix3
 
-    private positionComponent?: TransformComponent
-
     constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body) {
         super()
         this.body = null
         this.host = null
         this.bodyConstructor = bodyConstructor
 
-        this.eventHandler.on("will-detach-from-parent", () => this.detachFromPhysicsHost())
-
-        this.eventHandler.on("attached-to-parent", (parent) => {
-            this.setHost(parent.getComponent(PhysicalHostComponent))
-        })
-
         this.eventHandler.on("physical-host-attached", (host) => this.setHost(host))
-    }
-
-    getPositionComponent() {
-        if(!this.positionComponent || this.positionComponent.entity != this.entity) {
-            this.positionComponent = this.entity.getComponent(TransformComponent)
-        }
-        return this.positionComponent;
+        this.eventHandler.on("physical-host-detached", (host) => this.setHost(null))
     }
 
     beforePhysics() {
         let updatePos = false
-        let currentTransform = this.getPositionComponent()
+        let transformComponent = this.entity.getComponent(TransformComponent)
         if(this.oldTransform) {
-            let currentTransform = this.getPositionComponent().getGlobalTransform()
+            let currentTransform = transformComponent.getGlobalTransform()
             if(!this.oldTransform.equals(currentTransform)) {
                 this.oldTransform = currentTransform.clone()
                 updatePos = true
@@ -50,10 +37,23 @@ export default class PhysicalComponent extends EventHandlerComponent {
         }
 
         if(updatePos) {
-            let position = currentTransform.getGlobalPosition()
-            let angle = currentTransform.getGlobalAngle()
+            let position = transformComponent.getGlobalPosition()
+            let angle = transformComponent.getGlobalAngle()
             
-            this.body.SetTransformVec(position, angle)
+            let fixtures = this.body.GetFixtureList()
+            while(fixtures) {
+                let shape = fixtures.GetShape()
+                if(shape instanceof b2ScaledPolygonShape) {
+                    shape.SetScale(transformComponent.getGlobalScale())
+                }
+                if(shape instanceof b2ScaledCircleShape) {
+                    shape.SetScale(transformComponent.getGlobalScale())
+                }
+
+                fixtures = fixtures.GetNext()
+            }
+
+            this.body.SetTransformVec(position, -angle)
         }
     }
 
@@ -64,7 +64,6 @@ export default class PhysicalComponent extends EventHandlerComponent {
 
     onDetach() {
         super.onDetach()
-        this.detachFromPhysicsHost()
     }
 
     onAttach(entity: Entity) {
@@ -83,7 +82,7 @@ export default class PhysicalComponent extends EventHandlerComponent {
 
         if(this.host) {
             this.host.world.DestroyBody(this.body)
-            this.host.destroyComponent(this)
+            this.host.unregisterComponent(this)
         }
 
         this.host = host
@@ -114,13 +113,9 @@ export default class PhysicalComponent extends EventHandlerComponent {
     }
 
     private updateTransform() {
-        const position = this.body.GetPosition()
-
-        this.getPositionComponent().setGlobalPositionAngle(position, this.body.GetAngle())
-    }
-
-    detachFromPhysicsHost(): void {
-        this.setHost(null)
-        this.oldTransform = null
+        this.entity.getComponent(TransformComponent).setGlobal({
+            position: this.body.GetPosition(),
+            angle: -this.body.GetAngle()
+        })
     }
 }

@@ -4,11 +4,12 @@ import PlayerRespawnEvent from "src/events/player-respawn-event";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import Entity from "src/utils/ecs/entity";
 import { chooseRandom } from "src/utils/utils";
-import { SpawnZone } from "src/map/spawnzones-component";
+import { Spawnzone } from "src/map/spawnzone";
+import GameSpawnzonesComponent from "../game-spawnzones-component";
+import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 
 export interface PlayerSpawnPositionScriptOptions {
     usePlayerTeam: boolean
-    spawnZones: { team: number, zone: SpawnZone }[]
 }
 
 export class TeamedRespawnScript extends ServerGameScript {
@@ -22,11 +23,20 @@ export class TeamedRespawnScript extends ServerGameScript {
     }
 
     spawnPointForTeam(id: number) {
+        const spawnzonesComponent = this.controller.entity.getComponent(GameSpawnzonesComponent)
         
-        const zones = this.config.spawnZones.filter(zone => zone.team === id);
-        const zone = chooseRandom(zones)?.zone
+        let zones = []
 
-        return zone?.sample() ?? { x: 0, y: 0 }
+        if(id === -1) {
+            zones = spawnzonesComponent.spawnzones
+        } else {
+            zones = spawnzonesComponent.spawnzones.filter(entity => {
+                let spawnzone = entity.getComponent(SpawnzoneComponent)
+                return spawnzone.team === id
+            });
+        }
+
+        return chooseRandom(zones)?.getComponent(SpawnzoneComponent).sample() ?? { x: 0, y: 0 }
     }
 
     private getSpawnPosition(player: Entity) {
@@ -35,7 +45,7 @@ export class TeamedRespawnScript extends ServerGameScript {
             if(team) return this.spawnPointForTeam(team.id)
         }
         
-        return chooseRandom(this.config.spawnZones)?.zone.sample() ?? { x: 0, y: 0 }
+        return this.spawnPointForTeam(-1)
     }
 
     private onPlayerRespawn(event: PlayerRespawnEvent) {
@@ -44,16 +54,14 @@ export class TeamedRespawnScript extends ServerGameScript {
 }
 
 export class RandomRespawnScript extends ServerGameScript {
-    private spawnZones: SpawnZone[];
-
-    constructor(controller: ServerGameController, spawnZones: SpawnZone[]) {
+    constructor(controller: ServerGameController) {
         super(controller)
-        this.spawnZones = spawnZones
-
         this.worldEventHandler.on("player-respawn", (player, event) => this.onPlayerRespawn(event))
     }
 
     private onPlayerRespawn(event: PlayerRespawnEvent) {
-        event.respawnPosition = chooseRandom(this.spawnZones)?.sample() ?? { x: 0, y: 0 }
+        let spawnzonesComponent = this.controller.entity.getComponent(GameSpawnzonesComponent).spawnzones
+        let position = chooseRandom(spawnzonesComponent)?.getComponent(SpawnzoneComponent).sample()
+        event.respawnPosition = position ?? { x: 0, y: 0 }
     }
 }

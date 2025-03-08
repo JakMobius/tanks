@@ -79,9 +79,7 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
     onAttach(entity: Entity): void {
         super.onAttach(entity)
 
-        let camera = this.entity.getComponent(CameraComponent)
-
-        this.programPool = new GameProgramPool(camera, this.canvasHandler.ctx)
+        this.programPool = new GameProgramPool(this.entity, this.canvasHandler.ctx)
 
         this.backgroundDrawPhase = new DrawPhase(this.programPool)
         this.mapDrawPhase = new DrawPhase(this.programPool)
@@ -91,7 +89,7 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
         this.debugUIDrawPhase = new DrawPhase(this.programPool)
 
         this.debugDrawer = new MapDebugDrawer(this.debugDrawPhase)
-        this.uiDebugDrawer = new UIDebugDrawer(this.canvasHandler, camera, this.debugUIDrawPhase)
+        this.uiDebugDrawer = new UIDebugDrawer(this.canvasHandler, this.entity, this.debugUIDrawPhase)
 
         this.onWorldChange()
     }

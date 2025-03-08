@@ -1,12 +1,12 @@
 import ProgramController from "./program-controller";
 import CameraProgram from "../camera-program";
-import Camera from "src/client/graphics/camera";
+import Entity from "src/utils/ecs/entity";
 
 export default class BasicCameraProgramController<ProgramClass extends CameraProgram = CameraProgram> extends ProgramController<ProgramClass> {
 
-    public camera: Camera
+    public camera: Entity
 
-    constructor(program: ProgramClass, camera: Camera) {
+    constructor(program: ProgramClass, camera: Entity) {
         super(program)
         this.camera = camera
     }

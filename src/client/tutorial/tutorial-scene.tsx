@@ -134,7 +134,7 @@ const TutorialView: React.FC = () => {
     return (
         <ControlsProvider ref={controlsResponderRef}>
             <EventsProvider ref={eventContextRef}>
-                <PlayerNicksHUD world={state.game?.clientWorld} screen={scene.canvas} camera={state.camera?.getComponent(CameraComponent)} />
+                <PlayerNicksHUD world={state.game?.clientWorld} screen={scene.canvas} camera={state.camera} />
                 <TankInfoHUD world={state.game?.clientWorld} />
                 <EventsHUD />
                 <GameHUD keyedComponentsRef={gameHudRef} />

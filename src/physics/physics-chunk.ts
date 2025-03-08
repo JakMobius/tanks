@@ -7,9 +7,10 @@ import {MeshGenerationContext} from "./mesh-generation-context";
 import BasicEventHandlerSet from "../utils/basic-event-handler-set";
 import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
-import TilemapComponent from "src/map/tilemap-component";
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
+import TransformComponent from "src/entity/components/transform-component";
+import { b2ScaledPolygonShape } from "./b2-scale-shape";
 
 export default class PhysicsChunk {
     public readonly collider: ChunkedMapCollider;
@@ -84,19 +85,17 @@ export default class PhysicsChunk {
         this.generateMesh()
 
         const entity = new Entity()
+        entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
         entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
-            let body = host.world.CreateBody({
-                type: Box2D.b2BodyType.b2_staticBody,
-                position: {x: this.x * TilemapComponent.BLOCK_SIZE, y: this.y * TilemapComponent.BLOCK_SIZE},
-            })
+            let body = host.world.CreateBody({ type: Box2D.b2BodyType.b2_staticBody })
 
             for (let shape of this.edgeMesh) {
                 const pointShape = shape.map(point => ({
-                    x: point[0] * TilemapComponent.BLOCK_SIZE,
-                    y: point[1] * TilemapComponent.BLOCK_SIZE
+                    x: point[0],
+                    y: point[1]
                 }))
     
-                const polygonShape = new Box2D.b2PolygonShape()
+                const polygonShape = new b2ScaledPolygonShape()
                 polygonShape.Set(pointShape)
     
                 body.CreateFixture({
@@ -125,7 +124,7 @@ export default class PhysicsChunk {
 
         this.needsUpdate = false
 
-        this.entity.appendChild(entity)
+        this.collider.entity.appendChild(entity)
     }
 
     getBlock(x: number, y: number) {

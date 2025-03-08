@@ -1,6 +1,6 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
-import CameraComponent from "src/client/graphics/camera";
+import TransformComponent from "./transform-component";
 
 export default class CameraPositionController extends EventHandlerComponent {
     public baseScale: number = 1
@@ -60,11 +60,6 @@ export default class CameraPositionController extends EventHandlerComponent {
      * Moves the camera to follow the target.
      */
     onTick(dt: number) {
-        let cameraComponent = this.entity.getComponent(CameraComponent)
-        let matrix = cameraComponent.matrix
-
-        matrix.reset()
-
         let target = this.target || this.defaultPosition
         this.scale = this.baseScale
 
@@ -76,8 +71,6 @@ export default class CameraPositionController extends EventHandlerComponent {
                 this.scale = Math.max(this.scale, this.viewport.y / this.viewportLimit.y * this.baseScale)
             }
         }
-
-        matrix.scale(1 / this.viewport.x * 2, -1 / this.viewport.y * 2)
 
         if (this.position) {
             if (this.inertial) {
@@ -107,10 +100,17 @@ export default class CameraPositionController extends EventHandlerComponent {
             }
         }
 
-        matrix.scale(this.scale, this.scale)
-        matrix.translate(-this.position.x - this.shaking.x, -this.position.y - this.shaking.y)
-
-        cameraComponent.updateInverseMatrix()
+        this.entity.getComponent(TransformComponent).set({
+            position: {
+                x: this.position.x + this.shaking.x,
+                y: this.position.y + this.shaking.y
+            },
+            scale: {
+                x: this.viewport.x / this.scale / 2,
+                y: -this.viewport.y / this.scale / 2
+            },
+            angle: this.inertial ? -Math.atan2(this.velocity.y, this.velocity.x) - Math.PI / 2 : 0
+        })
     }
 
     update() {

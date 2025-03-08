@@ -1,20 +1,23 @@
-import { SpawnZone } from "src/map/spawnzones-component";
+import { PropertyInspector, VectorProperty } from "src/entity/components/inspector/property-inspector";
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import Team from "src/server/team";
 
-export interface ServerTeamedGameControllerConfig {
-    teams?: number
-    spawnZones?: { team: number, zone: SpawnZone }[]
-}
-
 export default abstract class ServerTeamedGameController extends ServerGameController {
     teams: Team[] = []
-    spawnZones: { team: number, zone: SpawnZone }[] = []
+    singleTeamMatchTime = 15
 
-    protected constructor(config: ServerTeamedGameControllerConfig) {
+    protected constructor() {
         super();
-        this.createTeams(config.teams)
-        this.spawnZones = config.spawnZones
+
+        this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
+            inspector.addProperty(new VectorProperty("singleTeamMatchTime", 1)
+                .withName("Задержка победы без соперников")
+                .withGetter(() => [this.singleTeamMatchTime])
+                .withSetter((time) => this.singleTeamMatchTime = time[0])
+                .replaceNaN()
+                .requirePositive()
+            )
+        })
     }
 
     public leastPopulatedTeam() {

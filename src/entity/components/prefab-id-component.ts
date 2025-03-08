@@ -58,6 +58,7 @@ const prefabNames = new Map<number, string>([
     // Other:
     [EntityType.TILEMAP,                         "Карта"],
     [EntityType.FLAG,                            "Флаг"],
+    [EntityType.SPAWNZONE,                       "Зона спавна"],
 
     // Game mode controllers:
     [EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, "Контроллер режима TDM"],
@@ -65,9 +66,9 @@ const prefabNames = new Map<number, string>([
     [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY,  "Контроллер режима DM"],
 
     // Utilities:
-    [EntityType.GROUP,                           "Группа"],
     [EntityType.TIMER_ENTITY,                    "Таймер"],
-    [EntityType.CHAT_ENTITY,                     "Чат"]
+    [EntityType.CHAT_ENTITY,                     "Чат"],
+    [EntityType.GROUP,                           "Группа"],
 ])
 
 export function getPrefabNameForId(id: number) {

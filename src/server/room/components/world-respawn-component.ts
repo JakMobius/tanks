@@ -53,7 +53,10 @@ export default class WorldRespawnComponent extends EventHandlerComponent {
         ServerEntityPrefabs.types.get(preferredTank)(tank)
         this.entity.appendChild(tank);
 
-        tank.getComponent(TransformComponent).setGlobalPositionAngle(event.respawnPosition, event.respawnAngle)
+        tank.getComponent(TransformComponent).setGlobal({
+            position: event.respawnPosition,
+            angle: event.respawnAngle
+        })
 
         playerTankComponent.setTank(tank)
     }

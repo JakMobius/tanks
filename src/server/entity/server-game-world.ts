@@ -32,6 +32,10 @@ export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldC
     entity.addComponent(new WorldRespawnComponent())
     entity.addComponent(new UserMessageTransmitComponent())
 
+    entity.addComponent(new ExplodeEffectPool({
+        damageBlocks: false
+    }))
+
     // TODO: Maybe move this somewhere from world prefab
     let worldStatisticsTimer = new Entity()
     ServerEntityPrefabs.types.get(EntityType.TIMER_ENTITY)(worldStatisticsTimer)

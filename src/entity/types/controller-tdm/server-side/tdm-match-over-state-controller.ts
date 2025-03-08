@@ -14,7 +14,7 @@ export class TDMMatchOverStateController extends TDMGameStateController {
         this.statistics = statistics
 
         this.addScript(new NoDamageScript(this.controller))
-        this.addScript(new DelayedActionScript(this.controller, controller.config.matchEndDelay, () => {
+        this.addScript(new DelayedActionScript(this.controller, controller.matchEndDelay, () => {
             this.controller.activateGameState(new TDMPlayerWaitingStateController(this.controller))
         }))
     }

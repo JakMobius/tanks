@@ -66,10 +66,11 @@ export default class WeaponShotgun extends FirearmWeaponComponent {
         const tankLocation = tankTransform.getPosition()
 
         const weaponDirection = tankTransform.getDirection()
-        weaponDirection.RotateCosSin(weaponCos, weaponSin).Normalize()
+        Box2D.b2Vec2.prototype.RotateCosSin.call(weaponDirection, weaponCos, weaponSin)
+        Box2D.b2Vec2.prototype.Normalize.call(weaponDirection)
         const world = tank.parent
 
-        const impulseVector = weaponDirection.Clone().Scale(this.shootImpulse)
+        const impulseVector = { x: weaponDirection.x * this.shootImpulse, y: weaponDirection.y * this.shootImpulse }
         tankBody.ApplyLinearImpulseToCenter(impulseVector)
 
         let distanceVector = new Box2D.b2Vec2()

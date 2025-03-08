@@ -1,11 +1,11 @@
 import "./map-editor-background-overlay.scss"
 
 import {isMacOS} from "src/utils/meta-key-name";
-import { Matrix3 } from "src/utils/matrix3";
 import { useEffect, useRef } from "react";
 import React from "react";
-import CameraPositionController from "src/entity/components/camera-position-controller";
 import CameraComponent from "src/client/graphics/camera";
+import Entity from "src/utils/ecs/entity";
+import TransformComponent from "src/entity/components/transform-component";
 
 interface GestureEvent extends UIEvent {
     scale: number
@@ -17,7 +17,7 @@ interface MapEditorBackgroundOverlayProps {
     onMouseDown?: (x: number, y: number) => void
     onMouseUp?: (x: number, y: number) => void
     onMouseMove?: (x: number, y: number) => void
-    camera?: CameraComponent,
+    camera?: Entity,
     draggingEnabled?: boolean
 }
 
@@ -60,7 +60,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
         ref.current.oldX = event.pageX
         ref.current.oldY = event.pageY
 
-        let [x, y] = toUV(event.pageX, event.pageY, 1)
+        let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseDown?.(x, y)
     }
@@ -69,7 +69,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
         event.preventDefault()
         ref.current.dragging = false
 
-        let [x, y] = toUV(event.pageX, event.pageY, 1)
+        let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseUp?.(x, y)
     }
@@ -87,26 +87,28 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
         ref.current.oldX = event.pageX
         ref.current.oldY = event.pageY
 
-        let [x, y] = toUV(event.pageX, event.pageY, 1)
+        let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseMove?.(x, y)
     }
 
-    const toUV = (x: number, y: number, z: number) => {
-        let matrix = propsRef.current.camera?.inverseMatrix
-        if(!matrix) return [x, y]
+    const toWorld = (x: number, y: number, z: number) => {
+        const cameraTransform = propsRef.current.camera?.getComponent(TransformComponent)
+        const cameraMatrix = cameraTransform?.getGlobalTransform()
+        
+        if(!cameraMatrix) return [x, y]
 
         let normalizedX = (x / divRef.current.clientWidth) * 2 - z
         let normalizedY = (y / divRef.current.clientHeight) * 2 - z
 
         return [
-            matrix.transformX(normalizedX, -normalizedY, z),
-            matrix.transformY(normalizedX, -normalizedY, z)
+            cameraMatrix.transformX(normalizedX, -normalizedY, z),
+            cameraMatrix.transformY(normalizedX, -normalizedY, z)
         ]
     }
 
     const emitDrag = (dx: number, dy: number) => {
-        let [x, y] = toUV(dx, dy, 0)
+        let [x, y] = toWorld(dx, dy, 0)
         propsRef.current.onDrag?.(x, y)
     }
 

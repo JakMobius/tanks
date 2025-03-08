@@ -3,6 +3,7 @@ import Entity from "src/utils/ecs/entity"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component"
 import { TreeNodeBase } from "../tree-view/tree-view"
 import PrefabIdComponent, { getPrefabNameForId } from "src/entity/components/prefab-id-component"
+import { PropertyInspector, StringProperty } from "src/entity/components/inspector/property-inspector"
 
 export interface EntityTreeNode extends TreeNodeBase {
     id: string,
@@ -18,17 +19,33 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
     descriptor: EntityTreeNode | null = null
     root: EntityEditorTreeRootComponent
 
-    constructor(name?: string) {
+    constructor() {
         super()
         this.eventHandler.on("child-added", (child) => this.onChildAdded(child))
         this.eventHandler.on("did-remove-child", (child) => this.onChildRemoved(child))
         this.id = (EntityEditorTreeNodeComponent.counter++).toString(36)
-        this.name = name
+
+        this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
+            let property = new StringProperty("name")
+                .withHidden(true)
+                .withGetter(() => this.getName())
+                .withSetter((name) => this.setName(name))
+            inspector.addProperty(property)
+        })
     }
 
     markDirty() {
         this.descriptor = null
         this.entity.parent?.getComponent(EntityEditorTreeNodeComponent)?.markDirty()
+    }
+
+    getName() {
+        if(!this.entity) return null
+        if(!this.name) {
+            let prefabId = this.entity.getComponent(PrefabIdComponent)?.prefabId
+            this.name = (prefabId ? getPrefabNameForId(prefabId) : null) ?? "Entity " + this.id
+        }
+        return this.name
     }
 
     getDescriptor() {
@@ -40,7 +57,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
 
         this.descriptor = {
             id: this.id,
-            name: this.name,
+            name: this.getName(),
             children: children,
             entity: this.entity
         }
@@ -48,11 +65,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
     }
 
     onAttach(entity: Entity): void {
-        super.onAttach(entity)
-        if(!this.name) {
-            let prefabId = entity.getComponent(PrefabIdComponent)?.prefabId
-            this.name = (prefabId ? getPrefabNameForId(prefabId) : null) ?? "Entity " + this.id
-        }
+        super.onAttach(entity)        
         for (let child of entity.children) {
             this.onChildAdded(child)
         }
@@ -75,6 +88,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
 
     setName(name: string) {
         this.name = name
+        this.entity.emit("name-set", name)
         this.markDirty()
     }
 

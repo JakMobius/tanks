@@ -10,12 +10,10 @@ import {WebserverSession} from "src/server/webserver/webserver-session";
 import Entity from "src/utils/ecs/entity";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
 import RoomClientComponent from "src/server/room/components/room-client-component";
-import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
 import { EntityType } from 'src/entity/entity-type';
-import MapLoaderComponent from 'src/server/room/components/map-loader-component';
-import WorldTilemapComponent from 'src/physics/world-tilemap-component';
 import fs from 'fs'
-import { MapFile } from 'src/map/map-serialization';
+import { MapFile, readEntityFile } from 'src/map/map-serialization';
+import { manufactureEntity } from 'src/entity/components/inspector/property-inspector';
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -35,6 +33,13 @@ export class InvalidGameModeError extends Error {
     constructor(mode: string) {
         super("Invalid game mode: " + mode)
         this.name = "InvalidGameModeError"
+    }
+}
+
+export class BadMapError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = "BadMapError"
     }
 }
 
@@ -175,27 +180,45 @@ export default class GameSocketPortal extends SocketPortal {
 
         let json = JSON.parse(fs.readFileSync(config.map, "utf-8")) as unknown as MapFile
 
-        let tilemap = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.TILEMAP)(tilemap)
-        tilemap.addComponent(new MapLoaderComponent(json))
-        tilemap.getComponent(MapLoaderComponent).reloadMap()
-        game.appendChild(tilemap)
-
-        game.addComponent(new WorldTilemapComponent())
-        game.getComponent(WorldTilemapComponent).setMap(tilemap)
-
-        let gameModeController = new Entity()
-        if(config.mode == "CTF") {
-            ServerEntityPrefabs.types.get(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
-        } else if(config.mode == "TDM") {
-            ServerEntityPrefabs.types.get(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
-        } else if(config.mode == "DM") {
-            ServerEntityPrefabs.types.get(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY)(gameModeController)
-        } else {
-            throw new InvalidGameModeError(config.mode)
+        const controllers = {
+            [EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY]: "CTF",
+            [EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY]: "TDM",
+            [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY]: "DM"
         }
 
-        game.appendChild(gameModeController)
+        let gameController: Entity | null = null
+
+        let factory = (prefab: number) => {
+            let isController = controllers.hasOwnProperty(prefab)
+            let requiredMode = isController ? controllers[prefab] : null
+            if(requiredMode && requiredMode !== config.mode) {
+                return null
+            }
+            if(requiredMode && gameController) {
+                throw new BadMapError("Map has multiple " + requiredMode + " game controllers")
+            }
+            let entity = new Entity()
+            
+            if(requiredMode) {
+                gameController = entity
+            }
+
+            return entity
+        }
+
+        let { name, createEntity } = readEntityFile(json)
+        let entity = createEntity({
+            root: factory, leaf: factory
+        })
+
+        if(!gameController) {
+            throw new InvalidGameModeError(config.mode + " game mode is not supported by this map")
+        }
+
+        game.appendChild(entity)
+
+        gameController.emit("set-db", this.server.db)
+        gameController.emit("set-world", game)
 
         this.games.set(config.name, game)
     }

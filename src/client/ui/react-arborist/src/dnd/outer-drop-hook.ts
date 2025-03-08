@@ -7,12 +7,12 @@ import { actions as dnd } from "../state/dnd-slice";
 import { ROOT_ID } from "../data/create-root";
 import { useEffect } from "react";
 
-export function useOuterDrop() {
-  const tree = useTreeApi();
+export function useOuterDrop<T>() {
+  const tree = useTreeApi<T>();
   useDataUpdates()
 
   // In case we drop an item at the bottom of the list
-  const [{ isOver }, drop] = useDrop<DragItem, DropResult | null, { isOver: boolean }>(
+  const [{ isOver }, drop] = useDrop<DragItem<T>, DropResult | null, { isOver: boolean }>(
     () => ({
       accept: "NODE",
       canDrop: (_item, m) => {

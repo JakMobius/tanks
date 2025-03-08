@@ -45,7 +45,11 @@ const SceneEntityLibrary: React.FC = () => {
             name: "",
             prefab: null,
             children: [{
-                prefab: EntityType.TILEMAP,
+                name: "Игровые элементы",
+                children: [
+                    { prefab: EntityType.TILEMAP },
+                    { prefab: EntityType.SPAWNZONE }
+                ]
             }, {
                 name: "Режимы",
                 children: [
@@ -54,9 +58,10 @@ const SceneEntityLibrary: React.FC = () => {
                     { prefab: EntityType.DM_GAME_MODE_CONTROLLER_ENTITY }
                 ],
             }, {
-                name: "Зона спавна"
-            }, {
-                prefab: EntityType.GROUP,
+                name: "Утилиты",
+                children: [
+                    { prefab: EntityType.GROUP }
+                ]
             }]
         }
 

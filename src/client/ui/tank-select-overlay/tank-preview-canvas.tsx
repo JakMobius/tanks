@@ -29,7 +29,10 @@ const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
     const onFrame = (dt: number) => {
         stateRef.current.time += dt
         let component = stateRef.current.tank?.getComponent(TransformComponent)
-        component?.setGlobalPositionAngle(component.getGlobalPosition(), stateRef.current.time)
+        component?.setGlobal({
+            position: component.getGlobalPosition(),
+            angle: stateRef.current.time
+        })
 
         drawContext.canvas.clear()
         stateRef.current.world.emit("tick", dt)
@@ -46,6 +49,7 @@ const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
 
         stateRef.current.world = new Entity()
         let camera = new Entity()
+        camera.addComponent(new TransformComponent())
         camera.addComponent(new CameraComponent())
         camera.addComponent(new CameraPositionController()
             .setViewport({x: drawContext.canvas.width, y: drawContext.canvas.height})

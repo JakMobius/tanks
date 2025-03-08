@@ -7,6 +7,7 @@ import ServerCTFControllerComponent from "src/entity/types/controller-ctf/server
 import CTFPlayingStateController from "src/entity/types/controller-ctf/server-side/ctf-playing-state-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component";
 
 export class CTFPlayerWaitingStateController extends CTFGameStateController {
 
@@ -15,25 +16,22 @@ export class CTFPlayerWaitingStateController extends CTFGameStateController {
 
         this.addScript(new NoDamageScript(this.controller))
 
-        this.addScript(new GameStartTimerScript(this.controller, this.controller.config.matchStartDelay, () => {
+        this.addScript(new GameStartTimerScript(this.controller, this.controller.matchStartDelay, () => {
             this.controller.activateGameState(new CTFPlayingStateController(this.controller))
         }))
 
         this.addScript(new PlayerCountCallbackScript(this.controller, (playerCount) => {
-            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= this.controller.config.minPlayers)
+            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= this.controller.minPlayers)
             this.controller.triggerStateBroadcast()
         }))
 
-        this.addScript(new TeamedRespawnScript(this.controller, {
-            usePlayerTeam: false,
-            spawnZones: controller.config.spawnZones
-        }))
+        this.addScript(new TeamedRespawnScript(this.controller, { usePlayerTeam: false }))
     }
 
     getState(): CTFGameData {
         return {
             state: CTFGameStateType.waitingForPlayers,
-            minPlayers: this.controller.config.minPlayers,
+            minPlayers: this.controller.minPlayers,
             currentPlayers: this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length,
             timer: this.getScript(GameStartTimerScript).gameStartTimer
         }

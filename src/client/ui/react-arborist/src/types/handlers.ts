@@ -1,4 +1,5 @@
 import { NodeApi } from "../interfaces/node-api";
+import { DragItem } from "./dnd";
 import { IdObj } from "./utils";
 
 export type CreateHandler<T> = (args: {
@@ -17,7 +18,7 @@ export type MoveHandler<T> = (args: {
 }) => void | Promise<void>;
 
 export type DropHandler<T> = (args: {
-  item: any
+  item: DragItem<T>
   parentId: string | null;
   parentNode: NodeApi<T> | null;
   index: number;

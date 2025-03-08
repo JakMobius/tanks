@@ -5,12 +5,24 @@ import BlockChangeEvent from "../events/block-change-event";
 import EventHandlerComponent from 'src/utils/ecs/event-handler-component';
 import MapTransmitter from 'src/entity/components/network/map/map-transmitter';
 import { TransmitterSet } from 'src/entity/components/network/transmitting/transmitter-set';
-import { PropertyInspector, VectorProperty } from 'src/entity/components/inspector/property-inspector';
+import { PropertyInspector, StringProperty, VectorProperty } from 'src/entity/components/inspector/property-inspector';
 
+export function idToChar(id: number) {
+	if(id > 26 || id < 0) throw new Error("ID out of bounds")
+	if(id === 0) return '-'
+	return String.fromCharCode('a'.charCodeAt(0) + id - 1)
+}
+
+export function charToId(char: string) {
+	if(char === '-') return 0
+	let code = char.charCodeAt(0) - 'a'.charCodeAt(0) + 1
+	if(code < 1 || code > 26) throw new Error("Invalid character")
+	return code
+}
 
 export default class TilemapComponent extends EventHandlerComponent {
 	public needsUpdate: boolean;
-	static BLOCK_SIZE = 5;
+	static DEFAULT_SCALE = 5;
 
 	width: number = 0
 	height: number = 0
@@ -25,7 +37,7 @@ export default class TilemapComponent extends EventHandlerComponent {
         })
 
 		this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
-			let sizeParameter = new VectorProperty("mapSize", 2)
+			let sizeProperty = new VectorProperty("mapSize", 2)
 				.withName("Размер карты")
 				.withPrefixes(["W", "H"])
 				.withGetter(() => [this.width, this.height])
@@ -36,9 +48,15 @@ export default class TilemapComponent extends EventHandlerComponent {
 				.replaceNaN()
 				.setBounds(0, 250)
 
-			inspector.addProperty(sizeParameter)
-		})
+			let blocksProperty = new StringProperty("blocks")
+				.withHidden(true)
+				.withGetter(() => this.getBlocksString())
+				.withSetter((value: string) => this.setBlocksString(value))
 
+			inspector.addProperty(sizeProperty)
+			inspector.addProperty(blocksProperty)
+		})
+		
 		this.setSize(50, 50)
 	}
 
@@ -119,6 +137,32 @@ export default class TilemapComponent extends EventHandlerComponent {
 		this.update()
 		this.entity.emit("update")
     }
+
+	getBlocksString() {
+		let blocks = this.width * this.height
+		let string = ""
+		for(let i = 0; i < blocks; i++) {
+			string += idToChar((this.blocks[i].constructor as typeof BlockState).typeId)
+		}
+		return string
+	}
+
+	setBlocksString(blocksString: string) {
+		let blocks = this.width * this.height
+		if(blocks !== blocksString.length) throw new Error("Invalid string length")
+		for(let i = 0; i < blocks; i++) {
+			let id = (this.blocks[i].constructor as typeof BlockState).typeId
+			let newId = charToId(blocksString[i])
+			
+			if(id === newId) {
+				let maxHealth = (this.blocks[i].constructor as typeof BlockState).health
+				this.blocks[i].setHealth(maxHealth)
+			} else {
+				const Block = BlockState.getBlockStateClass(newId)
+				this.blocks[i] = new Block()
+			}
+		}
+	}
 
 	update() {
 		this.needsUpdate = false

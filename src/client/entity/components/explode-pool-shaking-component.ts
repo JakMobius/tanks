@@ -4,6 +4,7 @@ import Entity from "src/utils/ecs/entity";
 import {ExplodeEffectEntityAffectControllerConfig} from "src/effects/explode/explode-effect-entity-affect-controller";
 import CameraComponent from "src/client/graphics/camera";
 import CameraPositionController from "src/entity/components/camera-position-controller";
+import TransformComponent from "src/entity/components/transform-component";
 
 export default class ExplodePoolShakingComponent extends EventHandlerComponent {
 
@@ -31,11 +32,12 @@ export default class ExplodePoolShakingComponent extends EventHandlerComponent {
         let pool = this.entity.getComponent(ExplodeEffectPool)
 
         for (let camera of this.cameras) {
-            let cameraComponent = camera.getComponent(CameraComponent)
-            if (!cameraComponent) continue
+            const cameraTransform = camera.getComponent(TransformComponent)
+            const cameraMatrix = cameraTransform?.getTransform()
+            if (!cameraMatrix) continue
 
-            let cameraX = cameraComponent.inverseMatrix.transformX(0, 0)
-            let cameraY = cameraComponent.inverseMatrix.transformY(0, 0)
+            let cameraX = cameraMatrix.transformX(0, 0)
+            let cameraY = cameraMatrix.transformY(0, 0)
 
             let pressure = pool.poolPressureAt(cameraX, cameraY)
 
