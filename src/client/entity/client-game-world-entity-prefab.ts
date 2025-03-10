@@ -13,6 +13,7 @@ import CollisionDisableReceiver from "src/entity/components/network/collisions/c
 import ExplodeShakingComponent from "src/client/entity/components/explode-pool-shaking-component";
 import ExplodeEffectPool from "src/effects/explode/explode-effect-pool";
 import ExplodePoolParticleComponent from "./components/explode-pool-particle-component";
+import { GameHudListenerComponent } from "../ui/game-hud/game-hud";
 
 export function clientGameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
     gameWorldEntityPrefab(entity, options)
@@ -32,4 +33,5 @@ export function clientGameWorldEntityPrefab(entity: Entity, options?: GameWorldC
         damageBlocks: false
     }))
     entity.addComponent(new ExplodePoolParticleComponent())
+    entity.addComponent(new GameHudListenerComponent())
 }

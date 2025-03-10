@@ -1,6 +1,7 @@
 
 import {
-    CTFGameData,
+    CTFEventData,
+    CTFGameState,
     CTFGameStateType
 } from "src/entity/types/controller-ctf/ctf-game-state";
 import CTFWaitingStateView from "src/client/ui/game-hud/ctf-game-hud/ctf-waiting-state-view";
@@ -10,7 +11,8 @@ import CTFMatchOverStateView from "./ctf-match-over-state-view";
 import Entity from "src/utils/ecs/entity";
 
 interface CTFGameStateHUDProps {
-    state: CTFGameData
+    state?: CTFGameState
+    event?: CTFEventData
     world: Entity
 }
 
@@ -21,7 +23,7 @@ export const CTFGameStateHUD: React.FC<CTFGameStateHUDProps> = (props) => {
         case CTFGameStateType.matchOver:
             return <CTFMatchOverStateView state={props.state}/>
         case CTFGameStateType.playing:
-            return <CTFPlayingStateView state={props.state} world={props.world} />
+            return <CTFPlayingStateView state={props.state} event={props.event} world={props.world} />
         default:
             return <></>
     }

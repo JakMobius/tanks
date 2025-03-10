@@ -84,9 +84,9 @@ export default class PhysicsChunk {
         this.removeBody()
         this.generateMesh()
 
-        const entity = new Entity()
-        entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
-        entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
+        this.entity = new Entity()
+        this.entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
+        this.entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
             let body = host.world.CreateBody({ type: Box2D.b2BodyType.b2_staticBody })
 
             for (let shape of this.edgeMesh) {
@@ -124,7 +124,7 @@ export default class PhysicsChunk {
 
         this.needsUpdate = false
 
-        this.collider.entity.appendChild(entity)
+        this.collider.entity.appendChild(this.entity)
     }
 
     getBlock(x: number, y: number) {
@@ -159,6 +159,7 @@ export default class PhysicsChunk {
     private removeBody() {
         if (this.entity) {
             this.entity.removeFromParent()
+            this.entity = null
         }
     }
 

@@ -24,7 +24,7 @@ import PrimaryEntityControls from 'src/entity/components/primary-entity-controls
 import TankSelectOverlay, { TankSelectOverlayHandle } from '../ui/tank-select-overlay/tank-select-overlay';
 import PlayerListHUD from '../ui/player-list-hud/player-list-hud';
 import EventsHUD, { EventsProvider } from '../ui/events-hud/events-hud';
-import GameHUD from '../ui/game-hud/game-hud';
+import GameHUD, { GameHudListenerComponent } from '../ui/game-hud/game-hud';
 import { KeyedComponentsHandle } from '../utils/keyed-component';
 import LoadingScene from '../scenes/loading/loading-scene';
 import { SocketConnectionPrerequisite, SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from '../scenes/scene-prerequisite';
@@ -164,26 +164,28 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         const onEventView = (message: React.FC, props: any) => {
             eventContextRef.current?.addEvent(message, props)
         }
-        const onHudView = (message: React.FC, props: any) => {
-            gameHudRef.current?.addEvent(message, props)
-        }
         const onChooseTank = () => {
             tankSelectRef.current?.show()
         }
         state.world.on("choose-tank", onChooseTank)
         state.world.on("event-view", onEventView)
-        state.world.on("hud-view", onHudView)
-
-        if(props.client.connection.isSuspended()) {
-            props.client.connection.resume()
-        }
 
         return () => {
             state.world.off("choose-tank", onChooseTank)
             state.world.off("event-view", onEventView)
-            state.world.off("hud-view", onHudView)
         }
     }, [state.world, eventContextRef.current])
+
+    useEffect(() => {
+        state.world?.getComponent(GameHudListenerComponent).setHud(gameHudRef.current)
+        return () => state.world?.getComponent(GameHudListenerComponent).setHud(null)
+    }, [gameHudRef.current])
+
+    useEffect(() => {
+        if(props.client.connection.isSuspended()) {
+            props.client.connection.resume()
+        }
+    }, [])
 
     return (
         <ControlsProvider ref={controlsResponderRef}>

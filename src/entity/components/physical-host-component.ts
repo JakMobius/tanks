@@ -4,6 +4,7 @@ import Entity from "src/utils/ecs/entity";
 import GameWorldContactListener from "src/contact-listener";
 import GameWorldContactFilter from "src/contact-filter";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import EntityContextProvider from "src/utils/ecs/entity-context-provider";
 
 export interface PhysicalHostComponentConfig {
     gravity?: Box2D.XY
@@ -23,6 +24,9 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
 
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
+    contextProvider = new EntityContextProvider()
+        .setAddHandler(entity => entity.emit("physical-host-attached", this))
+        .setRemoveHandler(entity => entity.emit("physical-host-detached", this))
 
     constructor(config: PhysicalHostComponentConfig) {
         super()
@@ -33,37 +37,6 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
 
         this.setupContactListener()
         this.setupContactFilter()
-
-        this.eventHandler.on("attached-to-parent", (parent: Entity) => {
-            this.childAddHandler(parent)
-        })
-
-        this.eventHandler.on("detached-from-parent", (parent) => {
-            this.childRemoveHandler(parent)
-        })
-    }
-
-    childAddHandler = (child: Entity) => this.onChildAdded(child)
-    childRemoveHandler = (child: Entity) => this.onChildRemoved(child)
-
-    onChildAdded(child: Entity) {
-        child.emit("physical-host-attached", this)
-        child.on("child-added", this.childAddHandler)
-        child.on("did-remove-child", this.childRemoveHandler)
-
-        for (let nestedChild of child.children) {
-            this.onChildAdded(nestedChild)
-        }
-    }
-
-    onChildRemoved(child: Entity) {
-        child.emit("physical-host-detached", this)
-        child.off("child-added", this.childAddHandler)
-        child.off("did-remove-child", this.childRemoveHandler)
-
-        for (let nestedChild of child.children) {
-            this.onChildRemoved(nestedChild)
-        }
     }
 
     beforePhysics() {
@@ -88,12 +61,12 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
     onAttach(entity: Entity) {
         super.onAttach(entity)
         this.entity = entity;
-        this.onChildAdded(this.entity)
+        this.contextProvider.setEntity(this.entity)
     }
 
     onDetach() {
-        this.onChildRemoved(this.entity)
         super.onDetach()
+        this.contextProvider.setEntity(null)
         this.entity = null
     }
 

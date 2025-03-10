@@ -27,7 +27,7 @@ import { KeyedComponentsHandle } from "../utils/keyed-component";
 import LoadingScene from "../scenes/loading/loading-scene";
 import Sprite from "../graphics/sprite";
 import WriteBuffer from "src/serialization/binary/write-buffer";
-import GameHUD from "../ui/game-hud/game-hud";
+import GameHUD, { GameHudListenerComponent } from "../ui/game-hud/game-hud";
 import { ControlsProvider } from "../utils/react-controls-responder";
 
 const TutorialView: React.FC = () => {
@@ -120,16 +120,15 @@ const TutorialView: React.FC = () => {
         const onEventView = (message: React.FC, props: any) => {
             eventContextRef.current?.addEvent(message, props)
         }
-        const onHudView = (message: React.FC, props: any) => {
-            gameHudRef.current?.addEvent(message, props)
-        }
         state.game.clientWorld.on("event-view", onEventView)
-        state.game.clientWorld.on("hud-view", onHudView)
-        return () => {
-            state.game.clientWorld.off("event-view", onEventView)
-            state.game.clientWorld.off("hud-view", onHudView)
-        }
+        return () => state.game.clientWorld.off("event-view", onEventView)
     }, [eventContextRef.current])
+
+    useEffect(() => {
+        let world = state.game.clientWorld
+        world?.getComponent(GameHudListenerComponent).setHud(gameHudRef.current)
+        return () => world?.getComponent(GameHudListenerComponent).setHud(null)
+    }, [gameHudRef.current])
 
     return (
         <ControlsProvider ref={controlsResponderRef}>

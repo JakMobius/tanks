@@ -39,7 +39,7 @@ export type CTFGameStateWaitingForPlayers = {
     timer: Entity
 }
 
-export type CTFGameData = CTFGameMatchOverState | CTFGamePlayingState | CTFGameStateWaitingForPlayers
+export type CTFGameState = CTFGameMatchOverState | CTFGamePlayingState | CTFGameStateWaitingForPlayers
 
 export type CTFEventData = {
     event: CTFFlagEventType

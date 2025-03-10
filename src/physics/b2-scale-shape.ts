@@ -3,10 +3,8 @@ import * as Box2D from "@box2d/core";
 
 export class b2ScaledPolygonShape extends Box2D.b2PolygonShape {
     scale = new Box2D.b2Vec2(1, 1)
-    originalVertices: Box2D.XY[]
+    originalVertices: Box2D.b2Vec2[]
     originalCount: number
-    originalCentroid = new Box2D.b2Vec2()
-    originalNormals: Box2D.XY[]
 
     /*
     Set(vertices: Box2D.XY[], count: number): Box2D.b2PolygonShape {
@@ -23,7 +21,7 @@ export class b2ScaledPolygonShape extends Box2D.b2PolygonShape {
     Copy(other: b2ScaledPolygonShape): b2ScaledPolygonShape {
         let result = super.Copy(other)
         if(!result) return null
-        this.scale
+        this.scale.Copy(other.scale)
         this.updateOriginal()
         return this
     }
@@ -45,24 +43,18 @@ export class b2ScaledPolygonShape extends Box2D.b2PolygonShape {
     private updateOriginal() {
         this.originalVertices = this.m_vertices.map(v => v.Clone())
         this.originalCount = this.m_count
-        this.originalCentroid.Copy(this.m_centroid)
-        this.originalNormals = this.m_normals.map(v => v.Clone())
         this.SetScale(this.scale)
     }
 
     SetScale(scale: Box2D.XY) {
         this.scale.Set(scale.x, scale.y)
-        
-        for(let i = 0; i < this.originalCount; i++) {
-            this.m_vertices[i].Set(this.originalVertices[i].x * scale.x, this.originalVertices[i].y * scale.y)
-        }
 
-        for(let i = 0; i < this.originalCount; i++) {
-            this.m_normals[i].Set(this.originalNormals[i].x * scale.x, this.originalNormals[i].y * scale.y)
-            this.m_normals[i].Normalize()
-        }
-
-        this.m_centroid.Set(this.originalCentroid.x * scale.x, this.originalCentroid.y * scale.y)
+        let scaled = this.originalVertices.map(v => {
+            let result = v.Clone()
+            result.Set(result.x * scale.x, result.y * scale.y)
+            return result
+        })
+        super.SetHull(scaled, this.originalCount)
     }
 }
 

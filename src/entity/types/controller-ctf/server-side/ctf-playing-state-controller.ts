@@ -10,7 +10,7 @@ import CTFGameStateController from "src/entity/types/controller-ctf/server-side/
 import ServerCTFControllerComponent from "src/entity/types/controller-ctf/server-side/server-ctf-controller-component";
 import {
     CTFFlagEventType,
-    CTFGameData,
+    CTFGameState,
     CTFGameStateType,
     CTFTeamStatistics,
     localizedCTFFlagEventTypes
@@ -122,7 +122,7 @@ export default class CTFPlayingStateController extends CTFGameStateController {
         }
     }
 
-    getState(): CTFGameData {
+    getState(): CTFGameState {
         return {
             state: CTFGameStateType.playing,
             quickMatchEnd: this.getScript(QuickMatchEndScript).quickMatchEnd

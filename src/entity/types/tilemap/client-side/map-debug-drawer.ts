@@ -119,8 +119,8 @@ export default class MapDebugDrawer {
         // Draw whatever you want here:
         Box2D.DrawShapes(this.b2DebugDraw, world /*, aabb */);
         Box2D.DrawJoints(this.b2DebugDraw, world);
-        Box2D.DrawAABBs(this.b2DebugDraw, world /*, aabb */);
-        Box2D.DrawPairs(this.b2DebugDraw, world);
+        // Box2D.DrawAABBs(this.b2DebugDraw, world /*, aabb */);
+        // Box2D.DrawPairs(this.b2DebugDraw, world);
         Box2D.DrawCenterOfMasses(this.b2DebugDraw, world);
     }
 

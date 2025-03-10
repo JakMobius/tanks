@@ -52,7 +52,7 @@ class KeyedComponentStorage {
 }
 
 export interface KeyedComponentsHandle {
-    addEvent: (fc: React.FC, props?: any) => number
+    addEvent: <T,>(fc: React.FC<T>, props?: T) => number
     removeEvent: (key: number) => void
     components: KeyedComponentState[]
 }

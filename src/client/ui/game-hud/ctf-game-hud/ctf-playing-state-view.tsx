@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 interface CTFPlayingStateViewProps {
     world: Entity
     state: CTFGamePlayingState
+    event: CTFEventData | null
 }
 
 const CTFPlayingStateView: React.FC<CTFPlayingStateViewProps> = (props) => {
@@ -19,7 +20,6 @@ const CTFPlayingStateView: React.FC<CTFPlayingStateViewProps> = (props) => {
     const [state, setState] = useState({
         oldTimerValue: 0,
         timeLeftMessage: null as string | null,
-        flagEvent: null as CTFEventData | null,
         visibility: null as {} | null
     })
 
@@ -52,20 +52,18 @@ const CTFPlayingStateView: React.FC<CTFPlayingStateViewProps> = (props) => {
                 ...state,
                 oldTimerValue: timer.currentTime,
                 timeLeftMessage,
-                flagEvent: null,
+                event: null,
                 visibility: {}
             }
         })
     }
 
-    const onFlagEvent = (event: CTFEventData) => {
+    useEffect(() => {
         setState(state => ({
             ...state,
-            flagEvent: event,
-            timeLeftMessage: null,
             visibility: {}
         }))
-    }
+    }, [props.event])
 
     useEffect(() => {
         const matchTimer = getTimer()?.entity
@@ -76,27 +74,25 @@ const CTFPlayingStateView: React.FC<CTFPlayingStateViewProps> = (props) => {
         return () => matchTimer.off("timer-transmit", onTimerTransmit)
     }, [props.world])
 
-    if(state.flagEvent) {
-        let flagEvent = state.flagEvent
-
-        if(flagEvent.player) return (
+    if(props.event) {
+        if(props.event.player) return (
             <GameStateView visibility={state.visibility} header={<>
-                <span style={{color: TeamColor.getColor(flagEvent.playerTeam).code()}}>
-                    {flagEvent.player}
+                <span style={{color: TeamColor.getColor(props.event.playerTeam).code()}}>
+                    {props.event.player}
                 </span>
                 <span>
-                    {localizedCTFFlagEventTypes[flagEvent.event]}
+                    {localizedCTFFlagEventTypes[props.event.event]}
                 </span>
-                <span style={{color: TeamColor.getColor(flagEvent.flagTeam).code()}}>
-                    флаг {TeamColor.teamNames[flagEvent.flagTeam]}
+                <span style={{color: TeamColor.getColor(props.event.flagTeam).code()}}>
+                    флаг {TeamColor.teamNames[props.event.flagTeam]}
                 </span>
             </>}/>
         )
 
         return (
             <GameStateView visibility={state.visibility} header={<>
-                <span style={{color: TeamColor.getColor(flagEvent.flagTeam).code()}}>
-                    флаг {TeamColor.teamNames[flagEvent.flagTeam]}
+                <span style={{color: TeamColor.getColor(props.event.flagTeam).code()}}>
+                    флаг {TeamColor.teamNames[props.event.flagTeam]}
                 </span>
                 <span>
                     возвращён на базу
