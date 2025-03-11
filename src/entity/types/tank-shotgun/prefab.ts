@@ -10,7 +10,7 @@ import {EntityType} from "src/entity/entity-type";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import TrackedSteeringAssistant from "src/entity/components/tracked-steering-assistant";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
 

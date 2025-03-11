@@ -1,6 +1,6 @@
 import Axle from './axle';
-import TransformComponent from "../entity/components/transform-component";
-import HealthComponent from "../entity/components/health-component";
+import TransformComponent from "../entity/components/transform/transform-component";
+import HealthComponent from "../entity/components/health/health-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import {clamp} from "src/utils/utils";
 

@@ -3,7 +3,7 @@ import {EntityType} from "src/entity/entity-type";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
 import TilemapComponent from "src/map/tilemap-component";
 import ChunkedMapCollider from "src/physics/chunked-map-collider";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import ChildTickComponent from "src/entity/components/child-tick-component";
 
 EntityPrefabs.Types.set(EntityType.TILEMAP, (entity) => {

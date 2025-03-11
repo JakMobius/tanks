@@ -3,7 +3,7 @@ import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import Color from "src/utils/color";
 import {Wheel} from "src/entity/components/transmission/units/wheel-group";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import WheelSmokeParticle from "src/client/particles/wheel-smoke-particle";
 
 export default class WheelSmokeComponent extends EventHandlerComponent {

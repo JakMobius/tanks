@@ -4,7 +4,7 @@ import PhysicalComponent from "src/entity/components/physics-component";
 import EntityPrefabs from "src/entity/entity-prefabs";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
 import * as Box2D from "@box2d/core"
 

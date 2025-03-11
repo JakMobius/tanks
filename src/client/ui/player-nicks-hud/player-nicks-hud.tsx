@@ -3,12 +3,11 @@ import './player-nicks-hud.scss'
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
 import Screen from "src/client/graphics/canvas-handler"
-import EntityPilotReceiver from "src/entity/components/network/entity-player-list/entity-pilot-receiver";
 import TeamColor from "src/utils/team-color";
-import CameraComponent from "src/client/graphics/camera";
 import Color from 'src/utils/color';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import TransformComponent from 'src/entity/components/transform-component';
+import TransformComponent from 'src/entity/components/transform/transform-component';
+import EntityPilotReceiver from 'src/entity/components/entity-player-list/entity-pilot-receiver';
 
 interface PlayerNickViewProps {
     entity?: Entity

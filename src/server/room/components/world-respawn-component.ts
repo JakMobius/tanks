@@ -8,7 +8,7 @@ import {UserTankChangeOnRespawnMessageTransmitter} from "src/entity/components/n
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class WorldRespawnComponent extends EventHandlerComponent {
 

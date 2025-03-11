@@ -1,6 +1,6 @@
 import Color from 'src/utils/color';
 import PhysicalComponent from "src/entity/components/physics-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Particle from "src/client/particles/particle";

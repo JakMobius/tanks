@@ -6,7 +6,7 @@ import Entity from "src/utils/ecs/entity";
 import WorldSoundListenerComponent from "src/client/entity/components/sound/world-sound-listener-component";
 import PauseOverlay from "src/client/ui/pause-overlay/pause-overlay";
 import CameraPositionController from "src/entity/components/camera-position-controller";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import MapEditorPauseView from './map-editor-pause';
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import SceneController, { useScene } from 'src/client/scenes/scene-controller';

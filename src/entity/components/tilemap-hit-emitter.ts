@@ -3,7 +3,7 @@ import PhysicalComponent from "./physics-component";
 import TilemapComponent from "src/map/tilemap-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { getObjectFromBody } from "../physical-body-data";
-import TransformComponent from "./transform-component";
+import TransformComponent from "./transform/transform-component";
 
 export default class TilemapHitEmitter extends EventHandlerComponent {
     constructor() {

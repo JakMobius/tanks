@@ -1,6 +1,6 @@
 import PhysicalComponent from "src/entity/components/physics-component";
 import * as Box2D from "@box2d/core";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import ExplodeEffectPool from "./explode-effect-pool";
 import Entity from "src/utils/ecs/entity";
 import SailingComponent from "src/entity/components/sailing-component";

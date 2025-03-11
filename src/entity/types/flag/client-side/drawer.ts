@@ -6,7 +6,7 @@ import TeamColor from "src/utils/team-color";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import flagSprite from "textures/misc/flag.texture.png"
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import { squareQuadrangle, transformQuadrangle, translateQuadrangle } from "src/utils/quadrangle";
 
 export class Drawer extends BasicEntityDrawer {

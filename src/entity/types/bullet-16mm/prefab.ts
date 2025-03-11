@@ -5,9 +5,9 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
 import TilemapHitEmitter from "src/entity/components/tilemap-hit-emitter";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import { DamageModifiers, DamageTypes } from "src/server/damage-reason/damage-reason";
 
 EntityPrefabs.Types.set(EntityType.BULLET_16MM, (entity) => {

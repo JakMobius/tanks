@@ -8,7 +8,7 @@ import CameraComponent from "src/client/graphics/camera";
 import React, { useContext, useEffect, useRef } from "react";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import { TankSelectCarouselContext } from "./tank-select-overlay";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 interface TankPreviewCanvasProps {
     tankType: number | null

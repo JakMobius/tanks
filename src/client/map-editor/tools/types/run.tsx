@@ -10,7 +10,7 @@ import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
 import React, { useEffect, useState } from 'react';
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
-import TransformComponent from 'src/entity/components/transform-component';
+import TransformComponent from 'src/entity/components/transform/transform-component';
 
 const RunToolView: React.FC<ToolViewProps<RunTool>> = (props) => {
     

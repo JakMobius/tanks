@@ -8,7 +8,7 @@ import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from "../scenes/scene-controller";
 import { SoundResourcePrerequisite, TexturesResourcePrerequisite, usePrerequisites } from "../scenes/scene-prerequisite";
 import Entity from "src/utils/ecs/entity";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import CameraComponent from "../graphics/camera";
 import WorldDrawerComponent from "../entity/components/world-drawer-component";
 import CameraPositionController from "src/entity/components/camera-position-controller";

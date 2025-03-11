@@ -1,4 +1,4 @@
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TankControls from "src/controls/tank-controls";

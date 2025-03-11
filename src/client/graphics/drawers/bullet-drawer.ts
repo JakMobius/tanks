@@ -1,5 +1,5 @@
 import BasicEntityDrawer from "src/client/graphics/drawers/basic-entity-drawer";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import LineDrawer from "src/client/graphics/drawers/line-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import * as Box2D from "@box2d/core";

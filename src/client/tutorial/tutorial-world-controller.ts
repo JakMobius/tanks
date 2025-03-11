@@ -8,8 +8,8 @@ import PlayerWorldComponent from "src/entity/types/player/server-side/player-wor
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerRespawnEvent from "src/events/player-respawn-event";
-import HealthComponent from "src/entity/components/health-component";
-import TransformComponent from "src/entity/components/transform-component";
+import HealthComponent from "src/entity/components/health/health-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class TutorialWorldController {
     game: Entity;

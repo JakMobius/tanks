@@ -1,6 +1,6 @@
 import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { Matrix3 } from "src/utils/matrix3";
 

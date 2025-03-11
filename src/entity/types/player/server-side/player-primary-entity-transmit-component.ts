@@ -1,7 +1,7 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import PrimaryEntityTransmitter from "src/entity/components/network/primary-player/primary-entity-transmitter";
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
+import PrimaryEntityTransmitter from "src/entity/components/primary-player/primary-entity-transmitter";
 
 export default class PlayerPrimaryEntityTransmitComponent extends EventHandlerComponent {
 

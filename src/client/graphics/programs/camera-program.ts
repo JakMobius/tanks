@@ -1,6 +1,6 @@
 import Uniform from "src/client/graphics/gl/uniform";
 import VertexFragmentShaderProgram from "./vertex-fragment-shader-program";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import Entity from "src/utils/ecs/entity";
 import { Matrix3 } from "src/utils/matrix3";
 

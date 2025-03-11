@@ -4,7 +4,7 @@ import * as Box2D from "@box2d/core"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
 import CameraComponent from "src/client/graphics/camera";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 class SoundPositionFilter extends SoundFilter {
     panFilter: PannerNode

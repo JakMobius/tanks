@@ -4,7 +4,7 @@ import Entity from "src/utils/ecs/entity";
 import {ExplodeEffectEntityAffectControllerConfig} from "src/effects/explode/explode-effect-entity-affect-controller";
 import CameraComponent from "src/client/graphics/camera";
 import CameraPositionController from "src/entity/components/camera-position-controller";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class ExplodePoolShakingComponent extends EventHandlerComponent {
 

@@ -3,7 +3,7 @@ import { TransmitterSet } from "src/entity/components/network/transmitting/trans
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TeamColor from "src/utils/team-color";
 import SpawnzoneTransmitter from "./spawnzone-transmitter";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class SpawnzoneComponent extends EventHandlerComponent {
     team = 0

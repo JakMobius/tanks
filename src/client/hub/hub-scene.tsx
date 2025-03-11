@@ -3,7 +3,7 @@ import HubPage from "src/client/ui/hub-page/hub-page";
 import {UserDataRaw} from "src/client/utils/user-data-raw";
 import Entity from "src/utils/ecs/entity";
 import {getHubMap} from "src/client/hub/hub-map";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import CameraComponent from "src/client/graphics/camera";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import CameraRandomMovement from "src/entity/components/camera-random-movement";

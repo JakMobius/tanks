@@ -3,9 +3,9 @@ import AirBlockState from './block-state/types/air-block-state';
 import BlockDamageEvent from "../events/block-damage-event";
 import BlockChangeEvent from "../events/block-change-event";
 import EventHandlerComponent from 'src/utils/ecs/event-handler-component';
-import MapTransmitter from 'src/entity/components/network/map/map-transmitter';
 import { TransmitterSet } from 'src/entity/components/network/transmitting/transmitter-set';
 import { PropertyInspector, StringProperty, VectorProperty } from 'src/entity/components/inspector/property-inspector';
+import MapTransmitter from 'src/entity/components/map/map-transmitter';
 
 export function idToChar(id: number) {
 	if(id > 26 || id < 0) throw new Error("ID out of bounds")

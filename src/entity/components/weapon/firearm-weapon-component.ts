@@ -1,15 +1,15 @@
 import ServerWeaponComponent from "src/entity/components/weapon/server-weapon-component";
 import PhysicalComponent from "src/entity/components/physics-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import CollisionIgnoreList from "src/entity/components/collision-ignore-list";
+import CollisionIgnoreList from "src/entity/components/collisions/collision-ignore-list";
 import Entity from "src/utils/ecs/entity";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
 import {EntityType} from "src/entity/entity-type";
 import SoundEffectComponent from "src/entity/types/effect-sound/sound-effect-component";
+import TimerComponent from "src/entity/types/timer/timer-component";
 
 export default class FirearmWeaponComponent extends ServerWeaponComponent {
     public maxAmmo: number = Infinity

@@ -3,7 +3,7 @@ import Sprite from "src/client/graphics/sprite";
 import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 

@@ -1,6 +1,6 @@
 import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
-import TransformComponent from "./transform-component";
+import TransformComponent from "./transform/transform-component";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { b2ScaledCircleShape, b2ScaledPolygonShape } from "src/physics/b2-scale-shape";

@@ -9,7 +9,7 @@ import {physicsCategories, physicsMasks} from "./categories";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import { b2ScaledPolygonShape } from "./b2-scale-shape";
 
 export default class PhysicsChunk {

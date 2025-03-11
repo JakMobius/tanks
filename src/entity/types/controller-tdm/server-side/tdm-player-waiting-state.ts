@@ -1,5 +1,5 @@
-import TDMGameStateController from "src/entity/types/controller-tdm/server-side/tdm-game-state-controller";
-import ServerTDMControllerComponent from "src/entity/types/controller-tdm/server-side/server-tdm-controller-component";
+
+import ServerTDMController, { TDMGameStateController } from "src/entity/types/controller-tdm/server-side/tdm-controller";
 import {TDMPlayingStateController} from "src/entity/types/controller-tdm/server-side/tdm-playing-state-controller";
 import {TDMGameState, TDMGameStateType} from "src/entity/types/controller-tdm/tdm-game-state";
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
@@ -11,7 +11,7 @@ import { GameTimeComponent } from "src/server/room/game-modes/game-time-componen
 
 export class TDMPlayerWaitingStateController extends TDMGameStateController {
 
-    constructor(controller: ServerTDMControllerComponent) {
+    constructor(controller: ServerTDMController) {
         super(controller)
 
         const timeComponent = controller.entity.getComponent(GameTimeComponent)   

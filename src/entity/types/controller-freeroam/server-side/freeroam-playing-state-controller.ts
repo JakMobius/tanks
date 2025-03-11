@@ -3,7 +3,7 @@ import ServerWorldPlayerManagerComponent from "src/server/entity/components/serv
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
-import ServerFreeroamControllerComponent from "./server-freeroam-controller-component";
+import ServerFreeroamControllerComponent from "./freeroam-controller";
 
 export class FreeroamPlayingStateController extends ServerGameStateController<ServerFreeroamControllerComponent, {}> {
 

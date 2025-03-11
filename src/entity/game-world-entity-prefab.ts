@@ -3,7 +3,7 @@ import Entity from "src/utils/ecs/entity";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import EntityStateTransmitComponent from "src/server/entity/components/entity-state-transmit-component";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import ChildTickComponent from "src/entity/components/child-tick-component";
 import {Component} from "src/utils/ecs/component";
 import PrefabIdComponent from "src/entity/components/prefab-id-component";

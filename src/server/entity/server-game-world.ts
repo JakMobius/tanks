@@ -13,7 +13,7 @@ import "src/entity/prefab-loader"
 import "src/map/block-state/type-loader"
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import UserMessageTransmitComponent from "src/server/entity/components/user-message-transmit-component";
 
 export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {

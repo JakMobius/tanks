@@ -1,6 +1,6 @@
 import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import DamageReason, { DamageTypes } from "../damage-reason/damage-reason";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
@@ -11,7 +11,7 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import TilemapComponent from "src/map/tilemap-component";
 
 export interface BulletBehaviourConfig {

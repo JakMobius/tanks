@@ -1,6 +1,6 @@
 import ServerGameScript from "src/server/room/game-modes/scripts/server-game-script";
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 
 export default class MatchTimerExpireScript extends ServerGameScript {

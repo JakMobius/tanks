@@ -1,5 +1,4 @@
-import DMGameStateController from "src/entity/types/controller-dm/server-side/dm-game-state-controller";
-import ServerDMControllerComponent from "src/entity/types/controller-dm/server-side/server-dm-controller-component";
+import DMController, { DMGameStateController } from "src/entity/types/controller-dm/server-side/dm-controller";
 import {DMGameState, DMGameStateType} from "src/entity/types/controller-dm/dm-game-state";
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
@@ -11,7 +10,7 @@ import { GameTimeComponent } from "src/server/room/game-modes/game-time-componen
 
 export class DMPlayerWaitingStateController extends DMGameStateController {
 
-    constructor(controller: ServerDMControllerComponent) {
+    constructor(controller: DMController) {
         super(controller)
 
         const timeComponent = controller.entity.getComponent(GameTimeComponent)

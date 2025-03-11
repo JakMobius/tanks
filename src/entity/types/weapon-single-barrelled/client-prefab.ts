@@ -1,10 +1,10 @@
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import {EntityType} from "src/entity/entity-type"
 import EntityPrefabs from "src/entity/entity-prefabs"
-import TimerReceiverComponent from "src/entity/components/network/timer/timer-receiver";
 import WeaponReceiverComponent from "src/entity/components/weapon/weapon-receiver-component";
 import ClientWeaponComponent from "src/entity/components/weapon/client-weapon-component";
 import WeaponSoundComponent from "src/client/entity/components/sound/weapon-sound-component";
+import TimerReceiverComponent from "../timer/client-side/timer-receiver";
 
 ClientEntityPrefabs.types.set(EntityType.WEAPON_SINGLE_BARRELLED, (entity) => {
     EntityPrefabs.Types.get(EntityType.WEAPON_SINGLE_BARRELLED)(entity)

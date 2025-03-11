@@ -1,8 +1,7 @@
-import TDMGameStateController from "src/entity/types/controller-tdm/server-side/tdm-game-state-controller";
-import ServerTDMControllerComponent from "src/entity/types/controller-tdm/server-side/server-tdm-controller-component";
+import ServerTDMController, { TDMGameStateController } from "src/entity/types/controller-tdm/server-side/tdm-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import {TDMMatchOverStateController} from "src/entity/types/controller-tdm/server-side/tdm-match-over-state-controller";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import {TDMGameState, TDMGameStateType, TDMTeamStatistics} from "src/entity/types/controller-tdm/tdm-game-state";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import {TDMPlayerWaitingStateController} from "src/entity/types/controller-tdm/server-side/tdm-player-waiting-state";
@@ -24,7 +23,7 @@ export class TDMPlayingStateController extends TDMGameStateController {
     private teamStatistics = new Map<Team, TDMTeamStatistics>()
     private gameRunning = false;
 
-    constructor(controller: ServerTDMControllerComponent) {
+    constructor(controller: ServerTDMController) {
         super(controller)
 
         this.worldEventHandler.on("player-connect", (player) => this.onPlayerConnect(player))

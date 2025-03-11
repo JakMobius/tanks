@@ -1,13 +1,12 @@
 import './tank-info-hud.scss'
 
 import Entity from "src/utils/ecs/entity";
-import PrimaryPlayerReceiver from "src/entity/components/network/primary-player/primary-player-receiver";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import AirbagTankController from "src/entity/components/tank-controllers/airbag-tank-controller";
 import WheeledTankController from "src/entity/components/tank-controllers/wheeled-tank-controller";
 import TankEngineUnit from "src/entity/components/transmission/units/tank-engine-unit";
 import GearboxUnit from "src/entity/components/transmission/units/gearbox-unit";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TankWeaponsController from "src/entity/components/weapon/tank-weapons-controller";
 import {
@@ -16,9 +15,10 @@ import {
     WeaponComponent,
     WeaponType
 } from "src/entity/components/weapon/weapon-component";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
 
 import React, { useCallback, useEffect } from 'react';
+import TimerComponent from 'src/entity/types/timer/timer-component';
+import PrimaryPlayerReceiver from 'src/entity/components/primary-player/primary-player-receiver';
 
 interface TankInfoSpeedViewProps {
     world: Entity

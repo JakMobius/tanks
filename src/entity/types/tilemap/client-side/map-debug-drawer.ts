@@ -4,7 +4,7 @@ import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {squareQuadrangle, transformQuadrangle, translateQuadrangle, turnQuadrangle} from "src/utils/quadrangle";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import ChunkedMapCollider from "src/physics/chunked-map-collider";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import Entity from "src/utils/ecs/entity";
 import * as Box2D from "@box2d/core"
 import DrawPhase from "src/client/graphics/drawers/draw-phase";

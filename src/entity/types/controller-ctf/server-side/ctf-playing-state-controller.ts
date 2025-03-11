@@ -1,12 +1,11 @@
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
-import CTFGameStateController from "src/entity/types/controller-ctf/server-side/ctf-game-state-controller";
-import ServerCTFControllerComponent from "src/entity/types/controller-ctf/server-side/server-ctf-controller-component";
+import CTFController, { CTFGameStateController } from "src/entity/types/controller-ctf/server-side/ctf-controller";
 import {
     CTFFlagEventType,
     CTFGameState,
@@ -17,23 +16,23 @@ import {
 import {CTFPlayerWaitingStateController} from "src/entity/types/controller-ctf/server-side/ctf-player-waiting-state";
 import {CTFMatchOverStateController} from "src/entity/types/controller-ctf/server-side/ctf-match-over-state-controller";
 import Team from "src/server/team";
-import CTFScript from "src/entity/types/controller-ctf/server-side/scripts/ctf-script";
+import CTFScript from "src/entity/types/controller-ctf/server-side/ctf-script";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import {chooseRandomIndex} from "src/utils/utils";
 import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
-import {FlagStateComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-state-component";
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import TeamColor from "src/utils/team-color";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import { FlagStateComponent } from "../../flag/server-side/flag-state-component";
 
 export default class CTFPlayingStateController extends CTFGameStateController {
     private teamStatistics = new Map<Team, CTFTeamStatistics>();
 
-    constructor(controller: ServerCTFControllerComponent) {
+    constructor(controller: CTFController) {
         super(controller)
 
         this.worldEventHandler.on("player-connect", (player) => this.onPlayerConnect(player))

@@ -7,7 +7,7 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import {siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";

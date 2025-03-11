@@ -1,9 +1,9 @@
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import GameStateView from "src/client/ui/game-hud/game-state-view";
 import React, { useEffect, useState } from "react";
 import Entity from "src/utils/ecs/entity";
 import { TDMGameStateWaitingForPlayers } from "src/entity/types/controller-tdm/tdm-game-state";
+import TimerComponent from "src/entity/types/timer/timer-component";
 
 interface TDMWaitingStateViewProps {
     world: Entity

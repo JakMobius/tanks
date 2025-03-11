@@ -9,7 +9,7 @@ import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from '../scenes/scene-controller';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import RootControlsResponder, { ControlsResponder } from '../controls/root-controls-responder';
-import TransformComponent from 'src/entity/components/transform-component';
+import TransformComponent from 'src/entity/components/transform/transform-component';
 import CameraComponent from '../graphics/camera';
 import CameraPositionController from 'src/entity/components/camera-position-controller';
 import CameraPrimaryEntityController from 'src/entity/components/camera-primary-entity-watcher';

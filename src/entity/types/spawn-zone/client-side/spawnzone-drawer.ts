@@ -3,7 +3,7 @@ import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import SpawnzoneComponent from "../spawnzone-component";
 import TeamColor from "src/utils/team-color";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import LineDrawer from "src/client/graphics/drawers/line-drawer";
 
 export default class SpawnzoneDrawer extends EntityDrawer {

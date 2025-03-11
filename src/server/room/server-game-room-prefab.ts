@@ -6,7 +6,7 @@ import HighPrecisionLoop from "src/utils/loop/high-precision-loop";
 import WorldEventBroadcastComponent from "./components/world-event-broadcast-component";
 import RoomClientComponent from "./components/room-client-component";
 import EmptyServerPauseComponent from "./components/empty-server-pause-component";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import GameSocketPortal from "src/server/socket/game-server/game-socket-portal";
 import RoomSocketComponent from "src/server/room/components/room-socket-component";
 

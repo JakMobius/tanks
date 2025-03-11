@@ -1,4 +1,4 @@
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import GameStateView from "src/client/ui/game-hud/game-state-view";
 import Entity from "src/utils/ecs/entity";
 import React, { useEffect, useState } from "react";

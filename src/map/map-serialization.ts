@@ -5,7 +5,7 @@ import { EntityType } from "src/entity/entity-type"
 import TilemapComponent, { charToId } from "./tilemap-component"
 import { EntityDeserializer, EntityFactory, EntitySerializer, manufactureEntity, SerializedEntity } from "src/entity/components/inspector/property-inspector"
 import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component"
-import TransformComponent from "src/entity/components/transform-component"
+import TransformComponent from "src/entity/components/transform/transform-component"
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component"
 
 export interface SpawnZoneConfig {

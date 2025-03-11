@@ -1,11 +1,11 @@
 import ServerPositionComponent from "./components/server-position-component";
-import PositionReceiver from "src/entity/components/network/position/position-receiver";
-import HealthReceiver from "src/entity/components/network/health/health-receiver";
+import TransformReceiver from "src/entity/components/transform/transform-receiver";
 import EntityStateReceiver from "src/entity/components/network/entity/entity-state-receiver";
 import Entity from "src/utils/ecs/entity";
-import CollisionIgnoreListReceiver from "src/entity/components/network/collisions/collision-ignore-list-receiver";
-import CollisionDisableReceiver from "src/entity/components/network/collisions/collision-disable-receiver";
-import CollisionDisableComponent from "src/entity/components/collision-disable";
+import CollisionDisableComponent from "src/entity/components/collisions/collision-disable";
+import CollisionDisableReceiver from "src/entity/components/collisions/collision-disable-receiver";
+import HealthReceiver from "src/entity/components/health/health-receiver";
+import CollisionIgnoreListReceiver from "src/entity/components/collisions/collision-ignore-list-receiver";
 
 export default class ClientEntityPrefabs {
 
@@ -18,14 +18,10 @@ export default class ClientEntityPrefabs {
     static configureGameWorldEntity(entity: Entity) {
         this.configureClientEntity(entity)
         entity.addComponent(new ServerPositionComponent())
-        entity.addComponent(new PositionReceiver())
+        entity.addComponent(new TransformReceiver())
         entity.addComponent(new CollisionDisableComponent())
         entity.addComponent(new CollisionDisableReceiver())
         entity.addComponent(new HealthReceiver())
         entity.addComponent(new CollisionIgnoreListReceiver())
-    }
-
-    static associate(type: number, configureFunction: (model: Entity) => void) {
-        this.types.set(type, configureFunction)
     }
 }

@@ -2,7 +2,7 @@
 import GameStateView from "src/client/ui/game-hud/game-state-view";
 import React from "react";
 import { DMGameStateMatchOver } from "src/entity/types/controller-dm/dm-game-state";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import Entity from "src/utils/ecs/entity";
 
 interface DMMatchOverStateViewProps {

@@ -2,9 +2,9 @@ import './self-destruct-event-view.scss'
 
 import LargeIconEventView from "src/client/ui/events-hud/types/large-icon-event-view";
 import Entity from "src/utils/ecs/entity";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
 import React, { useEffect, useRef } from 'react';
 import { useEvent } from '../events-hud';
+import TimerComponent from 'src/entity/types/timer/timer-component';
 
 interface SelfDestructEventViewProps {
     timer: Entity

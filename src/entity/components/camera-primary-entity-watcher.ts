@@ -1,9 +1,9 @@
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import PrimaryPlayerReceiver from "./network/primary-player/primary-player-receiver";
 import PhysicalComponent from "./physics-component";
 import CameraPositionController from "./camera-position-controller";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import PrimaryPlayerReceiver from "./primary-player/primary-player-receiver";
 
 export default class CameraPrimaryEntityController extends EventHandlerComponent {
     

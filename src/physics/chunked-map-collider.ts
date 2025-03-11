@@ -4,7 +4,7 @@ import PhysicalHostComponent from "src/entity/components/physical-host-component
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TilemapComponent from "../map/tilemap-component";
 import { WorldComponent } from "src/entity/game-world-entity-prefab";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import { b2BodyType } from "@box2d/core";
 
 export interface PhysicsChunkManagerConfig {

@@ -1,7 +1,7 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import Entity from "src/utils/ecs/entity";
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import * as Box2D from "@box2d/core";
 import PhysicalComponent from "src/entity/components/physics-component";
 import PlayerVisibilityManagerComponent from "src/entity/types/player/server-side/player-visibility-manager-component";

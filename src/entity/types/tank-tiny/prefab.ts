@@ -8,7 +8,7 @@ import EntityPrefabs from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
 import SailingComponent from "src/entity/components/sailing-component";
 import {EntityType} from "src/entity/entity-type";
-import HealthComponent from "src/entity/components/health-component";
+import HealthComponent from "src/entity/components/health/health-component";
 import WheeledTankController from "src/entity/components/tank-controllers/wheeled-tank-controller";
 import WheeledSteeringAssistant from "src/entity/components/wheeled-steering-assistant";
 import {siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";

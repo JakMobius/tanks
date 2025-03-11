@@ -1,5 +1,5 @@
 import Transmitter from "src/entity/components/network/transmitting/transmitter"
-import { FlagStateComponent } from "../../controller-ctf/server-side/scripts/flag-state-component"
+import { FlagStateComponent } from "./flag-state-component"
 import { Commands } from "src/entity/components/network/commands"
 
 

@@ -3,7 +3,7 @@ import Entity from "src/utils/ecs/entity";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import WorldStatisticsComponent, {
     PlayerStatistics
-} from "src/entity/components/network/world-statistics/world-statistics-component";
+} from "src/entity/components/world-statistics/world-statistics-component";
 import DamageRecorderComponent from "./damage-recorder-component";
 import EventEmitter from "src/utils/event-emitter";
 import ServerWorldPlayerManagerComponent from "./server-world-player-manager-component";

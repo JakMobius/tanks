@@ -2,13 +2,13 @@ import ServerGameStateController from "./server-game-state-controller";
 import Entity from "src/utils/ecs/entity";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "src/entity/components/network/transmitting/transmitter-set";
-import GameModeEventTransmitter from "src/entity/components/network/game-mode/game-mode-event-transmitter";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import {GameSocketPortalClient} from "src/server/socket/game-server/game-socket-portal";
 import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import ServerDatabase from "src/server/db/server-database";
+import GameModeEventTransmitter from "src/entity/components/game-mode/game-mode-event-transmitter";
 
 
 export default abstract class ServerGameController extends EventHandlerComponent {

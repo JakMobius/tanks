@@ -3,7 +3,7 @@ import ServerGameScript from "src/server/room/game-modes/scripts/server-game-scr
 import Entity from "src/utils/ecs/entity";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import {EntityType} from "src/entity/entity-type";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
+import TimerComponent from "src/entity/types/timer/timer-component";
 
 export default class GameStartTimerScript extends ServerGameScript {
     gameStartTimer: Entity;

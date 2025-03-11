@@ -8,7 +8,7 @@ import {
 } from "src/utils/quadrangle";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";

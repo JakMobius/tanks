@@ -3,13 +3,12 @@ import './player-list-hud.scss'
 import Entity from "src/utils/ecs/entity";
 import WorldStatisticsComponent, {
     PlayerStatistics
-} from "src/entity/components/network/world-statistics/world-statistics-component";
-import TimerComponent from "src/entity/components/network/timer/timer-component";
+} from "src/entity/components/world-statistics/world-statistics-component";
 import TeamColor from "src/utils/team-color"
-import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 import Cloud from 'src/client/ui/cloud/cloud';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useControls } from 'src/client/utils/react-controls-responder';
+import TimerComponent from 'src/entity/types/timer/timer-component';
 
 export interface PlayerListTableProps {
     players: PlayerStatistics[]

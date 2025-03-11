@@ -1,7 +1,6 @@
-import DMGameStateController from "src/entity/types/controller-dm/server-side/dm-game-state-controller";
-import ServerDMControllerComponent from "src/entity/types/controller-dm/server-side/server-dm-controller-component";
+import DMController, { DMGameStateController } from "src/entity/types/controller-dm/server-side/dm-controller";
 import {DMMatchOverStateController} from "src/entity/types/controller-dm/server-side/dm-match-over-state-controller";
-import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
+import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import {DMPlayerWaitingStateController} from "src/entity/types/controller-dm/server-side/dm-player-waiting-state";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
@@ -17,7 +16,7 @@ import { GameTimeComponent } from "src/server/room/game-modes/game-time-componen
 
 export class DMPlayingStateController extends DMGameStateController {
 
-    constructor(controller: ServerDMControllerComponent) {
+    constructor(controller: DMController) {
         super(controller)
 
         this.worldEventHandler.on("player-death", (player) => this.onPlayerDeath(player))

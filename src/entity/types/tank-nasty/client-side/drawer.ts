@@ -9,7 +9,7 @@ import {
 import Sprite from "src/client/graphics/sprite";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import AirbagTankController from "src/entity/components/tank-controllers/airbag-tank-controller";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";

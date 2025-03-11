@@ -1,8 +1,8 @@
 import { ControlsResponder } from "src/client/controls/root-controls-responder";
 import Entity from "src/utils/ecs/entity";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import PrimaryPlayerReceiver from "./network/primary-player/primary-player-receiver";
 import TankControls from "src/controls/tank-controls";
+import PrimaryPlayerReceiver from "./primary-player/primary-player-receiver";
 
 export default class PrimaryEntityControls extends EventHandlerComponent {
 

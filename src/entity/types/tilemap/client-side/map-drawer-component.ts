@@ -9,7 +9,7 @@ import TextureProgram from "src/client/graphics/programs/texture-program";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "src/map/tilemap-component";
 import BlockDrawer from "src/client/graphics/drawers/block/block-drawer";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export interface DrawerBounds {
     x0: number

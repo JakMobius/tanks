@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import React from "react";
 import CameraComponent from "src/client/graphics/camera";
 import Entity from "src/utils/ecs/entity";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 interface GestureEvent extends UIEvent {
     scale: number

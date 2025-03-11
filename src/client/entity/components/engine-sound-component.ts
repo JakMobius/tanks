@@ -1,6 +1,6 @@
 import SoundPrimaryComponent, { BufferSoundSource } from "src/client/sound/sound/sound-primary-component";
 import Entity from "src/utils/ecs/entity";
-import TransformComponent from "src/entity/components/transform-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
 import SoundPositionComponent from "src/client/sound/sound/sound-position-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TankEngineUnit from "src/entity/components/transmission/units/tank-engine-unit";
