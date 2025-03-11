@@ -1,6 +1,5 @@
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 import ClientBulletBehaviourComponent from "src/client/entity/components/client-bullet-behaviour-component";
 import * as Box2D from "@box2d/core";
 import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
@@ -9,6 +8,7 @@ import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/conve
 import TransformComponent from "src/entity/components/transform/transform-component";
 import MortarBallHeightComponent from "./mortar-ball-height-component";
 import MortarBallHeightReceiver from "./mortar-ball-height-receiver";
+import BasePrefab from "./prefab"
 
 export class Drawer extends EntityDrawer {
     static circleMesh = (() => {
@@ -50,14 +50,20 @@ export class Drawer extends EntityDrawer {
     }
 }
 
-ClientEntityPrefabs.types.set(EntityType.BULLET_MORTAR_BALL, (entity) => {
-    EntityPrefabs.Types.get(EntityType.BULLET_MORTAR_BALL)(entity)
-    ClientEntityPrefabs.configureGameWorldEntity(entity)
+const ClientPrefab = new EntityPrefab({
+    id: BasePrefab.id,
+    metadata: BasePrefab.metadata,
+    prefab: (entity) => {
+        BasePrefab.prefab(entity)
+        ClientEntityPrefabs.configureGameWorldEntity(entity)
 
-    entity.on("should-collide", (body: Box2D.b2Body) => false)
+        entity.on("should-collide", (body: Box2D.b2Body) => false)
 
-    entity.addComponent(new MortarBallHeightComponent())
-    entity.addComponent(new MortarBallHeightReceiver())
-    entity.addComponent(new ClientBulletBehaviourComponent())
-    entity.addComponent(new Drawer())
+        entity.addComponent(new MortarBallHeightComponent())
+        entity.addComponent(new MortarBallHeightReceiver())
+        entity.addComponent(new ClientBulletBehaviourComponent())
+        entity.addComponent(new Drawer())
+    }
 })
+
+export default ClientPrefab;

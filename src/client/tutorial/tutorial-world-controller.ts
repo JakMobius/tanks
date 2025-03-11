@@ -1,15 +1,17 @@
 import SocketPortalClient from "src/server/socket/socket-portal-client";
 import PhysicalComponent from "src/entity/components/physics-component";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
-import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
+import PlayerPrefab from "src/entity/types/player/server-prefab";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerRespawnEvent from "src/events/player-respawn-event";
 import HealthComponent from "src/entity/components/health/health-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { EntityPrefab } from "src/entity/entity-prefabs";
+import BigboiPrefab from "src/entity/types/tank-bigboi/server-prefab";
+import TinyPrefab from "src/entity/types/tank-tiny/server-prefab";
+import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
 
 export default class TutorialWorldController {
     game: Entity;
@@ -28,9 +30,9 @@ export default class TutorialWorldController {
         this.createDummies()
     }
 
-    private createTank(entityType: number, x: number, y: number, angle: number) {
+    private createTank(prefab: EntityPrefab, x: number, y: number, angle: number) {
         const tank = new Entity()
-        ServerEntityPrefabs.types.get(entityType)(tank)
+        prefab.prefab(tank)
         this.game.appendChild(tank)
 
         const body = tank.getComponent(PhysicalComponent).getBody()
@@ -44,20 +46,16 @@ export default class TutorialWorldController {
         // this.createTank(EntityType.TANK_SNIPER, 80, 200, 0)
         // this.createTank(EntityType.TANK_BOMBER, 95, 205, 0)
         // this.createTank(EntityType.TANK_MONSTER, 30, 205, 0)
-        this.createTank(EntityType.TANK_BIGBOI, 50, 205, 0)
-        this.createTank(EntityType.TANK_TINY, 30, 205, 0)
+        this.createTank(BigboiPrefab, 50, 205, 0)
+        this.createTank(TinyPrefab, 30, 205, 0)
     }
 
     private onClientConnect(client: SocketPortalClient) {
 
         const player = new Entity()
 
-        serverPlayerEntityPrefab(player, {
-            client: client,
-            db: null,
-            nick: "Вы"
-        })
-
+        PlayerPrefab.prefab(player)
+        player.getComponent(PlayerConnectionManagerComponent).setClient(client)
         player.getComponent(PlayerWorldComponent).connectToWorld(this.game)
 
         const selectedIndex = 0

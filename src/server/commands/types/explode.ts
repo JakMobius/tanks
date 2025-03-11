@@ -1,8 +1,7 @@
 import Command, {CommandConfig} from '../command';
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import Entity from "src/utils/ecs/entity";
-import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
+import ExplodeEffectPrefab from "src/entity/types/effect-world-explosion/server-prefab";
 
 export default class ExplodeCommand extends Command {
     public defaultPower: number;
@@ -43,7 +42,7 @@ export default class ExplodeCommand extends Command {
         let world = this.console.observingRoom
 
         let explodeEntity = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
+        ExplodeEffectPrefab.prefab(explodeEntity)
         world.appendChild(explodeEntity)
         explodeEntity.getComponent(ExplodeComponent).explode(x, y, power)
         explodeEntity.removeFromParent()

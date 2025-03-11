@@ -7,7 +7,7 @@ export type TankStat = {
 }
 export type TankStatJSON = {
     stats: {
-        [key: number]: TankStat
+        [key: string]: TankStat
     },
     median: TankStat
 };

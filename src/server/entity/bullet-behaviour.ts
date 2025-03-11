@@ -7,12 +7,11 @@ import BulletShooterComponent from "src/entity/components/bullet-shooter-compone
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import * as Box2D from "@box2d/core";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TilemapComponent from "src/map/tilemap-component";
+import ExplodeEffectPrefab from "src/entity/types/effect-world-explosion/server-prefab";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -120,7 +119,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
             let position = this.entity.getComponent(PhysicalComponent).getBody().GetPosition()
 
             let explodeEntity = new Entity()
-            ServerEntityPrefabs.types.get(EntityType.EFFECT_WORLD_EXPLOSION)(explodeEntity)
+            ExplodeEffectPrefab.prefab(explodeEntity)
             WorldComponent.getWorld(this.entity).appendChild(explodeEntity)
             explodeEntity.getComponent(ExplodeComponent).explode(position.x, position.y, this.config.explodePower)
             explodeEntity.removeFromParent()

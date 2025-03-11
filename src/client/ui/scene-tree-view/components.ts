@@ -2,7 +2,7 @@ import { Component } from "src/utils/ecs/component"
 import Entity from "src/utils/ecs/entity"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component"
 import { TreeNodeBase } from "../tree-view/tree-view"
-import PrefabIdComponent, { getPrefabNameForId } from "src/entity/components/prefab-id-component"
+import PrefabComponent from "src/entity/components/prefab-id-component"
 import { PropertyInspector, StringProperty } from "src/entity/components/inspector/property-inspector"
 
 export interface EntityTreeNode extends TreeNodeBase {
@@ -42,8 +42,8 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
     getName() {
         if(!this.entity) return null
         if(!this.name) {
-            let prefabId = this.entity.getComponent(PrefabIdComponent)?.prefabId
-            this.name = (prefabId ? getPrefabNameForId(prefabId) : null) ?? "Entity " + this.id
+            let prefab = this.entity.getComponent(PrefabComponent)?.prefab
+            this.name = prefab?.getDisplayName() ?? "Entity " + this.id
         }
         return this.name
     }

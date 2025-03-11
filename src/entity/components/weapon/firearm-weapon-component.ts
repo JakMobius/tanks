@@ -7,9 +7,10 @@ import Entity from "src/utils/ecs/entity";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
-import {EntityType} from "src/entity/entity-type";
 import SoundEffectComponent from "src/entity/types/effect-sound/sound-effect-component";
 import TimerComponent from "src/entity/types/timer/timer-component";
+import SoundEffectPrefab from "src/entity/types/effect-sound/server-prefab";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 
 export default class FirearmWeaponComponent extends ServerWeaponComponent {
     public maxAmmo: number = Infinity
@@ -34,9 +35,9 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
                 tank.appendChild(this.soundEntity)
             }
         })
-
+        
         this.soundEntity = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.EFFECT_SOUND_EFFECT)(this.soundEntity)
+        SoundEffectPrefab.prefab(this.soundEntity)
 
         this.updateState()
     }
@@ -145,7 +146,7 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
      * @param y Initial bullet X coordinate relative to the tank
      */
 
-    launchBullet(bullet: number, x: number, y: number): Entity {
+    launchBullet(bullet: EntityPrefab, x: number, y: number): Entity {
         const weaponComponent = this.entity.getComponent(WeaponComponent)
         const tank = weaponComponent.tank
         const tankPhysicalComponent = tank.getComponent(PhysicalComponent)
@@ -157,7 +158,7 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         const world = tank.parent
 
         const entity = new Entity()
-        ServerEntityPrefabs.types.get(bullet)(entity)
+        bullet.prefab(entity)
 
         let worldX = transform.transformX(x, y)
         let worldY = transform.transformY(x, y)

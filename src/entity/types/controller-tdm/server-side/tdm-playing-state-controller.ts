@@ -1,4 +1,4 @@
-import ServerTDMController, { TDMGameStateController } from "src/entity/types/controller-tdm/server-side/tdm-controller";
+import ServerTDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import {TDMMatchOverStateController} from "src/entity/types/controller-tdm/server-side/tdm-match-over-state-controller";
 import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
@@ -17,8 +17,10 @@ import PlayerRespawnActionComponent from "src/entity/types/player/server-side/pl
 import {chooseRandomIndex} from "src/utils/utils";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
+import TDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 
-export class TDMPlayingStateController extends TDMGameStateController {
+export class TDMPlayingStateController extends ServerGameStateController<TDMController, TDMGameState> {
 
     private teamStatistics = new Map<Team, TDMTeamStatistics>()
     private gameRunning = false;

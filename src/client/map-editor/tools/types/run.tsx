@@ -2,15 +2,13 @@ import Tool from '../tool';
 import * as Box2D from "@box2d/core";
 import KeyboardController from '../../../controls/input/keyboard/keyboard-controller';
 import ToolManager from "../toolmanager";
-import PhysicalComponent from "src/entity/components/physics-component";
 import TankControls from "src/controls/tank-controls";
 import RootControlsResponder from "src/client/controls/root-controls-responder";
-import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import Entity from "src/utils/ecs/entity";
 import React, { useEffect, useState } from 'react';
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import TransformComponent from 'src/entity/components/transform/transform-component';
+import SniperTankPrefab from 'src/entity/types/tank-sniper/server-prefab';
 
 const RunToolView: React.FC<ToolViewProps<RunTool>> = (props) => {
     
@@ -89,7 +87,7 @@ export default class RunTool extends Tool {
         // Client-only implementation limits the game functionality a lot
 
         this.tank = new Entity()
-        ClientEntityPrefabs.types.get(EntityType.TANK_SNIPER)(this.tank)
+        SniperTankPrefab.prefab(this.tank)
         this.manager.world.appendChild(this.tank)
         
         this.tank.getComponent(TransformComponent).setGlobal({

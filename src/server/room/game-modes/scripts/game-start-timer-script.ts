@@ -1,9 +1,8 @@
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import ServerGameScript from "src/server/room/game-modes/scripts/server-game-script";
 import Entity from "src/utils/ecs/entity";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import TimerComponent from "src/entity/types/timer/timer-component";
+import TimerEntityPrefab from "src/entity/types/timer/server-prefab";
 
 export default class GameStartTimerScript extends ServerGameScript {
     gameStartTimer: Entity;
@@ -15,7 +14,7 @@ export default class GameStartTimerScript extends ServerGameScript {
 
         this.delay = delay
         this.gameStartTimer = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.TIMER_ENTITY)(this.gameStartTimer)
+        TimerEntityPrefab.prefab(this.gameStartTimer)
         this.gameStartTimer.on("timer-finished", callback)
     }
 

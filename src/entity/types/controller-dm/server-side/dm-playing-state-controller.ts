@@ -1,4 +1,4 @@
-import DMController, { DMGameStateController } from "src/entity/types/controller-dm/server-side/dm-controller";
+import DMController from "src/entity/types/controller-dm/server-side/dm-controller";
 import {DMMatchOverStateController} from "src/entity/types/controller-dm/server-side/dm-match-over-state-controller";
 import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
@@ -13,8 +13,9 @@ import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 
-export class DMPlayingStateController extends DMGameStateController {
+export class DMPlayingStateController extends ServerGameStateController<DMController, DMGameState> {
 
     constructor(controller: DMController) {
         super(controller)

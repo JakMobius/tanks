@@ -7,10 +7,10 @@ import CollisionDisableReceiver from "src/entity/components/collisions/collision
 import HealthReceiver from "src/entity/components/health/health-receiver";
 import CollisionIgnoreListReceiver from "src/entity/components/collisions/collision-ignore-list-receiver";
 
+import clientPrefabs from 'src/entity/types/%/client-prefab.ts'
+import { EntityPrefab, EntityType } from "src/entity/entity-prefabs";
+
 export default class ClientEntityPrefabs {
-
-    static types = new Map<number, (model: Entity) => void>()
-
     static configureClientEntity(entity: Entity) {
         entity.addComponent(new EntityStateReceiver())
     }
@@ -24,4 +24,22 @@ export default class ClientEntityPrefabs {
         entity.addComponent(new HealthReceiver())
         entity.addComponent(new CollisionIgnoreListReceiver())
     }
+
+    static getByType(type: EntityType): EntityPrefab[] {
+        let result = []
+        for (let prefab of clientPrefabs) {
+            if (prefab.metadata.type == type) {
+                result.push(prefab)
+            }
+        }
+        return result
+    }
+
+    static getById(id: string) {
+        return this.prefabs.get(id)
+    }
+    
+    static prefabs = new Map<string, EntityPrefab>(clientPrefabs.map(prefab => [prefab.id, prefab]))
+    static tanks = this.getByType(EntityType.tank)
+    static gameModes = this.getByType(EntityType.gameController)
 }

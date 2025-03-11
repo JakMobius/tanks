@@ -31,6 +31,7 @@ import { SocketConnectionPrerequisite, SoundResourcePrerequisite, TexturesResour
 import Sprite from '../graphics/sprite';
 import WriteBuffer from 'src/serialization/binary/write-buffer';
 import { ControlsProvider } from "../utils/react-controls-responder";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 
 export interface GameViewConfig {
     client: ConnectionClient
@@ -60,8 +61,8 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         state.world?.emit("draw")
     }
 
-    const onTankSelected = useCallback((tank: number) => {
-        new PlayerTankSelectPacket(tank).sendTo(props.client.connection)
+    const onTankSelected = useCallback((tank: EntityPrefab) => {
+        new PlayerTankSelectPacket(tank.id).sendTo(props.client.connection)
     }, [props.client])
 
     useEffect(() => {

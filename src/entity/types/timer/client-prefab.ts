@@ -1,11 +1,16 @@
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 import TimerReceiverComponent from "./client-side/timer-receiver";
+import BasePrefab from "./prefab"
 
-ClientEntityPrefabs.types.set(EntityType.TIMER_ENTITY, (entity) => {
-    EntityPrefabs.Types.get(EntityType.TIMER_ENTITY)(entity)
-    ClientEntityPrefabs.configureClientEntity(entity)
-
-    entity.addComponent(new TimerReceiverComponent())
+const ClientPrefab = new EntityPrefab({
+    id: BasePrefab.id,
+    metadata: BasePrefab.metadata,
+    prefab: (entity) => {
+        BasePrefab.prefab(entity)
+        ClientEntityPrefabs.configureClientEntity(entity)
+        entity.addComponent(new TimerReceiverComponent())
+    }
 })
+
+export default ClientPrefab;

@@ -1,4 +1,4 @@
-import DMController, { DMGameStateController } from "src/entity/types/controller-dm/server-side/dm-controller";
+import DMController from "src/entity/types/controller-dm/server-side/dm-controller";
 import {DMGameState, DMGameStateType} from "src/entity/types/controller-dm/dm-game-state";
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
@@ -7,8 +7,9 @@ import {DMPlayingStateController} from "src/entity/types/controller-dm/server-si
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 
-export class DMPlayerWaitingStateController extends DMGameStateController {
+export class DMPlayerWaitingStateController extends ServerGameStateController<DMController, DMGameState> {
 
     constructor(controller: DMController) {
         super(controller)

@@ -1,6 +1,3 @@
-// Import prefabs
-import 'src/entity/prefab-loader'
-import 'src/entity/client-prefab-loader'
 
 // Import types
 import 'src/client/graphics/drawers/block/type-loader'

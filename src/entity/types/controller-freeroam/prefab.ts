@@ -1,7 +1,17 @@
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import { EntityPrefab, EntityType } from "src/entity/entity-prefabs";
+import PrefabComponent from "src/entity/components/prefab-id-component";
+import Entity from "src/utils/ecs/entity";
 
-EntityPrefabs.Types.set(EntityType.FREEROAM_CONTROLLER_ENTITY, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.FREEROAM_CONTROLLER_ENTITY))
+const Prefab = new EntityPrefab({
+    id: "FREEROAM_CONTROLLER",
+    metadata: {
+        type: EntityType.gameController,
+        displayName: "Фрирум (FR)",
+        shortName: "FR",
+    },
+    prefab: (entity: Entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+    }
 })
+
+export default Prefab;

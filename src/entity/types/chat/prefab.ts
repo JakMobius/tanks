@@ -1,7 +1,13 @@
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
 
-EntityPrefabs.Types.set(EntityType.CHAT_ENTITY, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.CHAT_ENTITY))  
+import PrefabComponent from "src/entity/components/prefab-id-component";
+import { EntityPrefab } from "src/entity/entity-prefabs";
+import Entity from "src/utils/ecs/entity";
+
+const Prefab = new EntityPrefab({
+    id: "CHAT",
+    prefab: (entity: Entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))  
+    }
 })
+
+export default Prefab;

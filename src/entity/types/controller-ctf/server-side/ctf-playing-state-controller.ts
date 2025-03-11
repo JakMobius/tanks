@@ -5,8 +5,9 @@ import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
-import CTFController, { CTFGameStateController } from "src/entity/types/controller-ctf/server-side/ctf-controller";
+import CTFController from "src/entity/types/controller-ctf/server-side/ctf-controller";
 import {
+    CTFEventData,
     CTFFlagEventType,
     CTFGameState,
     CTFGameStateType,
@@ -28,8 +29,9 @@ import TeamColor from "src/utils/team-color";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 import { FlagStateComponent } from "../../flag/server-side/flag-state-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 
-export default class CTFPlayingStateController extends CTFGameStateController {
+export default class CTFPlayingStateController extends ServerGameStateController<CTFController, CTFGameState, CTFEventData> {
     private teamStatistics = new Map<Team, CTFTeamStatistics>();
 
     constructor(controller: CTFController) {

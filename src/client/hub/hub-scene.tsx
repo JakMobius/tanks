@@ -20,8 +20,9 @@ import EmbeddedServerGame from "../embedded-server/embedded-server-game";
 import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
 import WriteBuffer from "src/serialization/binary/write-buffer";
-import { serverPlayerEntityPrefab } from "src/entity/types/player/server-side/server-prefab";
+import PlayerPrefab from "src/entity/types/player/server-prefab";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
+import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
 
 const HubView: React.FC = () => {
     const scene = useScene()
@@ -61,11 +62,8 @@ const HubView: React.FC = () => {
         game.serverGame.on("client-connect", (client) => {
             const player = new Entity()
 
-            serverPlayerEntityPrefab(player, {
-                client,
-                db: null,
-                nick: "Вы"
-            })
+            PlayerPrefab.prefab(player)
+            player.getComponent(PlayerConnectionManagerComponent).setClient(client)
 
             player.getComponent(PlayerWorldComponent).connectToWorld(game.serverGame)
         })

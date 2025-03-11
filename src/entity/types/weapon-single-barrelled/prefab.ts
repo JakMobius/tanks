@@ -1,14 +1,18 @@
-import {EntityType} from "src/entity/entity-type"
-import EntityPrefabs from "src/entity/entity-prefabs"
+import { EntityPrefab } from "src/entity/entity-prefabs"
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import PrefabComponent from "src/entity/components/prefab-id-component";
 import TimerComponent from "../timer/timer-component";
-import TimerTransmitter from "../timer/server-prefab";
 import { transmitterComponentFor } from "src/entity/components/network/transmitting/transmitter-component";
+import TimerTransmitter from "../timer/server-side/timer-transmitter";
 
-EntityPrefabs.Types.set(EntityType.WEAPON_SINGLE_BARRELLED, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.WEAPON_SINGLE_BARRELLED))
-    entity.addComponent(new WeaponComponent())
-    entity.addComponent(new TimerComponent())
-    entity.addComponent(transmitterComponentFor(TimerTransmitter))
+const Prefab = new EntityPrefab({
+    id: "WEAPON_SINGLE_BARRELLED",
+    prefab: (entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+        entity.addComponent(new WeaponComponent())
+        entity.addComponent(new TimerComponent())
+        entity.addComponent(transmitterComponentFor(TimerTransmitter))
+    }
 })
+
+export default Prefab;

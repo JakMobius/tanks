@@ -3,11 +3,7 @@ import Entity from "src/utils/ecs/entity";
 
 export default class PlayerNickComponent implements Component {
     entity: Entity | null
-    nick: string
-
-    constructor(nick: string) {
-        this.nick = nick
-    }
+    nick: string | null = null
 
     onAttach(entity: Entity) {
         this.entity = entity

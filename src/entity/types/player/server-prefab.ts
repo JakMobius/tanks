@@ -1,4 +1,3 @@
-import Entity from "src/utils/ecs/entity";
 import PlayerSelfDestructionComponent from "src/entity/types/player/server-side/player-self-destruction-component";
 import PlayerVisibilityManagerComponent from "src/entity/types/player/server-side/player-visibility-manager-component";
 import PlayerVisibilityDecisionComponent
@@ -16,6 +15,8 @@ import PlayerTankComponent from "src/entity/types/player/server-side/player-tank
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import PlayerTankControlComponent from "src/entity/types/player/server-side/player-tank-control-component";
+import { EntityPrefab } from "src/entity/entity-prefabs";
+import PrefabComponent from "src/entity/components/prefab-id-component";
 
 export interface ServerPlayerEntityPrefabConfig {
     client: SocketPortalClient
@@ -23,18 +24,27 @@ export interface ServerPlayerEntityPrefabConfig {
     nick: string
 }
 
-export function serverPlayerEntityPrefab(entity: Entity, config: ServerPlayerEntityPrefabConfig) {
-    entity.addComponent(new PlayerDataComponent(config.db))
-    entity.addComponent(new PlayerConnectionManagerComponent(config.client))
-    entity.addComponent(new PlayerNickComponent(config.nick))
-    entity.addComponent(new PlayerWorldComponent())
-    entity.addComponent(new PlayerTankComponent())
-    entity.addComponent(new PlayerTeamComponent())
-    entity.addComponent(new PlayerSelfDestructionComponent())
-    entity.addComponent(new PlayerFlagDropComponent())
-    entity.addComponent(new PlayerRespawnActionComponent())
-    entity.addComponent(new PlayerPrimaryEntityTransmitComponent())
-    entity.addComponent(new PlayerVisibilityManagerComponent())
-    entity.addComponent(new PlayerVisibilityDecisionComponent())
-    entity.addComponent(new PlayerTankControlComponent())
-}
+const Prefab = new EntityPrefab({
+    id: "PLAYER",
+    metadata: {
+        displayName: "Игрок",
+    },
+    prefab: (entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+        entity.addComponent(new PlayerDataComponent())
+        entity.addComponent(new PlayerConnectionManagerComponent())
+        entity.addComponent(new PlayerNickComponent())
+        entity.addComponent(new PlayerWorldComponent())
+        entity.addComponent(new PlayerTankComponent())
+        entity.addComponent(new PlayerTeamComponent())
+        entity.addComponent(new PlayerSelfDestructionComponent())
+        entity.addComponent(new PlayerFlagDropComponent())
+        entity.addComponent(new PlayerRespawnActionComponent())
+        entity.addComponent(new PlayerPrimaryEntityTransmitComponent())
+        entity.addComponent(new PlayerVisibilityManagerComponent())
+        entity.addComponent(new PlayerVisibilityDecisionComponent())
+        entity.addComponent(new PlayerTankControlComponent())
+    }
+})
+
+export default Prefab;

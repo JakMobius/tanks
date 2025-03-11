@@ -3,17 +3,19 @@ import './tank-select-overlay.scss'
 import {ControlsResponder} from "src/client/controls/root-controls-responder";
 import {TankStats} from "src/stat-tests/tank-stats";
 import React, { createContext, Ref, RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { TankDescription, tankDescriptions } from './tank-descriptions';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
 import { ControlsProvider, useControls } from 'src/client/utils/react-controls-responder';
 import TankPreviewCanvas from './tank-preview-canvas';
 import CanvasHandler from 'src/client/graphics/canvas-handler';
 import Sprite from 'src/client/graphics/sprite';
 import { useScene } from 'src/client/scenes/scene-controller';
-import AdapterLoop from 'src/utils/loop/adapter-loop';
 import EventEmitter from 'src/utils/event-emitter';
 import { availableFeatures } from 'src/client/utils/browsercheck/browser-check';
 import { degToRad } from 'src/utils/utils';
+import { EntityPrefab, EntityType } from 'src/entity/entity-prefabs';
+import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
+
+const tankDescriptions = ClientEntityPrefabs.getByType(EntityType.tank)
 
 const getTankForIndex = (item: number) => {
     let tankIndex = item % tankDescriptions.length
@@ -58,7 +60,7 @@ interface TankSelectCarouselItemProps {
 const TankSelectCarouselItem: React.FC<TankSelectCarouselItemProps> = (props) => {
     const ref = React.useRef<HTMLDivElement>(null)
 
-    const [tankType, setTankType] = useState<number | null>(null)
+    const [tankPrefab, setTankPrefab] = useState<EntityPrefab | null>(null)
 
     const selfWidth = 146 // TODO: hardcode?
 
@@ -100,7 +102,7 @@ const TankSelectCarouselItem: React.FC<TankSelectCarouselItemProps> = (props) =>
 
             let tankIndex = item.index % tankDescriptions.length
             if (tankIndex < 0) tankIndex += tankDescriptions.length
-            setTankType(tankDescriptions[tankIndex].type)
+            setTankPrefab(tankDescriptions[tankIndex])
         }
     }), [props.index])
 
@@ -110,7 +112,7 @@ const TankSelectCarouselItem: React.FC<TankSelectCarouselItemProps> = (props) =>
 
     return (
         <div ref={ref} onClick={onClick} className="tank-select-carousel-item">
-            <TankPreviewCanvas tankType={tankType}/>
+            <TankPreviewCanvas tankPrefab={tankPrefab}/>
         </div>
     )
 }
@@ -323,7 +325,7 @@ export interface TankSelectOverlayHandle {
 }
 
 export interface TankSelectOverlayProps {
-    onTankSelect: (tankType: number) => void
+    onTankSelect: (tankType: EntityPrefab) => void
     ref?: Ref<TankSelectOverlayHandle>
 }
 
@@ -333,7 +335,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     const [state, setState] = useState({
         shown: false,
         required: false,
-        tankDescription: null as TankDescription | null,
+        tankPrefab: null as EntityPrefab | null,
     })
 
     const scene = useScene()
@@ -380,7 +382,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
         setState((state) => {
             let nearTankIndex = getNearIndex(carouselRef.current.getPosition())
             let nearTank = getTankForIndex(nearTankIndex)
-            props.onTankSelect(nearTank.type)
+            props.onTankSelect(nearTank)
             return {
                 ...state,
                 shown: false,
@@ -410,22 +412,23 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
         let nearTank = getTankForIndex(nearTankIndex)
         let farTank = getTankForIndex(farTankIndex)
         
-        let nearStat = TankStats.stats[nearTank.type]
-        let farStat = TankStats.stats[farTank.type]
+        let nearStat = TankStats.stats[nearTank.id]
+        let farStat = TankStats.stats[farTank.id]
 
         speedRowRef.current.setValue(nearStat.speed * nearWeight + farStat.speed * farWeight)
         damageRowRef.current.setValue(nearStat.damage * nearWeight + farStat.damage * farWeight)
         healthRowRef.current.setValue(nearStat.health * nearWeight + farStat.health * farWeight)
 
         setState(state => {
-            if(state.tankDescription === nearTank) return state
-            return { ...state, tankDescription: nearTank }
+            if(state.tankPrefab === nearTank) return state
+            return { ...state, tankPrefab: nearTank }
         })
     }, [])
 
     const onCarouselClick = useCallback((index: number) => {
         if(targetPositionRef.current === index) {
-            props.onTankSelect(index)
+            let nearTank = getTankForIndex(index)
+            props.onTankSelect(nearTank)
         } else {
             targetPositionRef.current = index
         }
@@ -451,13 +454,16 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
         return () => scene.loop.off("tick", onFrame)
     }, [state.shown])
 
+    const tankName = state.tankPrefab?.metadata.displayName
+    const tankDescription = state.tankPrefab?.metadata.description
+
     return  (
         <ControlsProvider ref={controlsResponderRef} enabled={state.shown}>
             <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
                 <div className="tank-select-menu">
                     <TankSelectCarousel ref={carouselRef} shown={state.shown} initialPosition={initialPosition} onClick={onCarouselClick}/>
                     <div className="tank-title-container">
-                        <div className="tank-title">{state.tankDescription?.name}</div>
+                        <div className="tank-title">{tankName}</div>
                         <TankCarouselButton left
                             ref={leftButtonRef}
                             onClick={onNavigateLeft}/>
@@ -466,7 +472,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
                             onClick={onNavigateRight}/>
                     </div>
                     <div className="tank-description-menu">
-                        <div className="tank-description-text">{state.tankDescription?.description}</div>
+                        <div className="tank-description-text">{tankDescription}</div>
                         <div className="tank-description-stats">
                             <TankStatRow label="СКР" ref={speedRowRef} medianStatValue={TankStats.median.speed}/>
                             <TankStatRow label="АТК" ref={damageRowRef} medianStatValue={TankStats.median.damage}/>

@@ -12,13 +12,13 @@ export default class EntityStateReceiver extends ReceiverComponent {
             let newEntity = new Entity()
             newEntity.addComponent(new EntityDataReceiveComponent(identifier))
 
-            let configuration = buffer.readUint32()
-            if(configuration > 0) {
-                let configurationScript = ClientEntityPrefabs.types.get(configuration)
-                if(!configurationScript) {
+            let configuration = buffer.readString()
+            if(configuration) {
+                let prefab = ClientEntityPrefabs.getById(configuration)
+                if(!prefab) {
                     console.error("Attempt to configure entity with an unknown script id: " + configuration)
                 } else {
-                    configurationScript(newEntity)
+                    prefab.prefab(newEntity)
                 }
             }
 

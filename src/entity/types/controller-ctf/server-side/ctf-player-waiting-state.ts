@@ -1,14 +1,15 @@
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
-import {CTFGameState, CTFGameStateType} from "src/entity/types/controller-ctf/ctf-game-state";
-import CTFController, { CTFGameStateController } from "src/entity/types/controller-ctf/server-side/ctf-controller";
+import {CTFEventData, CTFGameState, CTFGameStateType} from "src/entity/types/controller-ctf/ctf-game-state";
+import CTFController from "src/entity/types/controller-ctf/server-side/ctf-controller";
 import CTFPlayingStateController from "src/entity/types/controller-ctf/server-side/ctf-playing-state-controller";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 
-export class CTFPlayerWaitingStateController extends CTFGameStateController {
+export class CTFPlayerWaitingStateController extends ServerGameStateController<CTFController, CTFGameState, CTFEventData> {
 
     constructor(controller: CTFController) {
         super(controller)

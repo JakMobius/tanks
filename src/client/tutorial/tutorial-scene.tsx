@@ -29,6 +29,7 @@ import Sprite from "../graphics/sprite";
 import WriteBuffer from "src/serialization/binary/write-buffer";
 import GameHUD, { GameHudListenerComponent } from "../ui/game-hud/game-hud";
 import { ControlsProvider } from "../utils/react-controls-responder";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 
 const TutorialView: React.FC = () => {
     const scene = useScene()
@@ -52,8 +53,8 @@ const TutorialView: React.FC = () => {
         state.game?.clientWorld.emit("draw")
     }
 
-    const onTankSelected = (tank: number) => {
-        new PlayerTankSelectPacket(tank).sendTo(state.game.clientConnection.connection)
+    const onTankSelected = (tank: EntityPrefab) => {
+        new PlayerTankSelectPacket(tank.id).sendTo(state.game.clientConnection.connection)
     }
 
     useEffect(() => {

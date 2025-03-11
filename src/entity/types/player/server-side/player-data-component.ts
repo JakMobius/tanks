@@ -6,11 +6,7 @@ import PlayerNickComponent from "src/entity/types/player/server-side/player-nick
 
 export default class PlayerDataComponent implements Component {
     entity: Entity | null = null
-    db: ServerDatabase
-
-    constructor(db: ServerDatabase) {
-        this.db = db
-    }
+    db: ServerDatabase | null = null
 
     async getUserInfo() {
         return this.db.getUserInfo(this.entity.getComponent(PlayerNickComponent).nick)

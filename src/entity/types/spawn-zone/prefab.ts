@@ -1,13 +1,20 @@
 import ChildTickComponent from "src/entity/components/child-tick-component"
-import PrefabIdComponent from "src/entity/components/prefab-id-component"
+import PrefabComponent from "src/entity/components/prefab-id-component"
 import TransformComponent from "src/entity/components/transform/transform-component"
-import EntityPrefabs from "src/entity/entity-prefabs"
-import { EntityType } from "src/entity/entity-type"
 import SpawnzoneComponent from "./spawnzone-component"
+import { EntityPrefab } from "src/entity/entity-prefabs"
 
-EntityPrefabs.Types.set(EntityType.SPAWNZONE, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.SPAWNZONE))
-    entity.addComponent(new TransformComponent())
-    entity.addComponent(new ChildTickComponent())
-    entity.addComponent(new SpawnzoneComponent())
+const Prefab = new EntityPrefab({
+    id: "SPAWNZONE",
+    metadata: {
+        displayName: "Зона спавна"
+    },
+    prefab: (entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+        entity.addComponent(new TransformComponent())
+        entity.addComponent(new ChildTickComponent())
+        entity.addComponent(new SpawnzoneComponent())
+    }
 })
+
+export default Prefab;

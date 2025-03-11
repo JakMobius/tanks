@@ -1,9 +1,13 @@
-import {EntityType} from "src/entity/entity-type"
-import EntityPrefabs from "src/entity/entity-prefabs"
-import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import { EntityPrefab } from "src/entity/entity-prefabs"
+import { WeaponComponent } from "src/entity/components/weapon/weapon-component";
+import PrefabComponent from "src/entity/components/prefab-id-component";
 
-EntityPrefabs.Types.set(EntityType.WEAPON_FLAMETHROWER, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.WEAPON_FLAMETHROWER))
-    entity.addComponent(new WeaponComponent())
+const Prefab = new EntityPrefab({
+    id: "WEAPON_FLAMETHROWER",
+    prefab: (entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+        entity.addComponent(new WeaponComponent())
+    }
 })
+
+export default Prefab;

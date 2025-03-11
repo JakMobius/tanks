@@ -1,7 +1,6 @@
 
 const serverStartupTime = Date.now()
 
-import CLIStyle from "./commands/cli-style";
 import Server from "./server";
 import Logger from './log/logger';
 import Console from './console/console';
@@ -59,10 +58,17 @@ async function initialize() {
 const serverInitializeTime = Date.now()
 
 initialize().then(() => {
-    Logger.global.log(
-        `§0F0;Server v${packageJson.version} has been started successfully §444;(${(Date.now() - serverInitializeTime) / 1000}s)\n` +
-        CLIStyle.tip("Type \"help\" for more information")
-    )
+    let billboard = 
+        ".----------------------------.\n" +
+        "|  _____           _         |\n" +
+        "| |_   _|_ _ _ __ | | _____  |\n" +
+        "|   | |/ _` | '_ \\| |/ / __| |\n" +
+        "|   | | (_| | | | |   <\\__ \\ |\n" +
+        "|   |_|\\__,_|_| |_|_|\\_\\___/ |\n" +
+        "'----------------------------'"
+    Logger.global.log(billboard)
+    let startupTime = (Date.now() - serverInitializeTime) / 1000
+    Logger.global.log(`§0F0;Booted up tanks v${packageJson.version}. Type "help". §444;(${startupTime}s)\n`)
 }).catch(e => {
     console.error("Failed to start server")
     console.error(e)

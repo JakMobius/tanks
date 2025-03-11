@@ -7,9 +7,8 @@ import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reaso
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import * as Box2D from "@box2d/core";
 import Entity from "src/utils/ecs/entity";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import PelletsEffectComponent from "src/entity/types/effect-pellets/pellets-effect-component";
+import PelletsEffectPrefab from "src/entity/types/effect-pellets/server-prefab";
 
 export default class WeaponShotgun extends FirearmWeaponComponent {
 
@@ -25,7 +24,7 @@ export default class WeaponShotgun extends FirearmWeaponComponent {
         super();
 
         this.pelletsEffect = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.EFFECT_SHOTGUN_PELLETS)(this.pelletsEffect)
+        PelletsEffectPrefab.prefab(this.pelletsEffect)
 
         this.eventHandler.on("tank-set", (tank: Entity) => {
             this.pelletsEffect.removeFromParent()

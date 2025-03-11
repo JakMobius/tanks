@@ -6,8 +6,6 @@ import EntityStateTransmitComponent from "src/server/entity/components/entity-st
 import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import ChildTickComponent from "src/entity/components/child-tick-component";
 import {Component} from "src/utils/ecs/component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
-import {EntityType} from "src/entity/entity-type";
 import * as Box2D from "@box2d/core"
 
 export interface GameWorldConfig {
@@ -36,7 +34,6 @@ export class WorldComponent implements Component {
 }
 
 export function gameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
-    entity.addComponent(new PrefabIdComponent(EntityType.WORLD))
     options = Object.assign({
         physicsTick: 0.002,
         maxTicks: 30,

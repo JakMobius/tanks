@@ -2,10 +2,11 @@ import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs"
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set"
 import Entity from "src/utils/ecs/entity"
 import EventEmitter from "src/utils/event-emitter"
-import PrefabIdComponent from "../prefab-id-component"
+import PrefabComponent from "../prefab-id-component"
+import { EntityPrefab } from "src/entity/entity-prefabs"
 
 export interface SerializedEntity {
-    prefab: number
+    prefab: string
     id: number
     properties: Record<string, any>
     children: SerializedEntity[]
@@ -277,19 +278,19 @@ export class PropertyInspector extends EventEmitter {
 }
 
 export interface EntityFactory {
-    root?: (prefab: number) => Entity,
-    leaf?: (prefab: number) => Entity
+    root?: (prefab: EntityPrefab) => Entity,
+    leaf?: (prefab: EntityPrefab) => Entity
 }
 
-export function manufactureEntity(prefabId: number, factory?: (prefabId: number) => Entity) {
+export function manufactureEntity(prefab: EntityPrefab, factory?: (prefab: EntityPrefab) => Entity) {
     let entity: Entity
     if(factory) {
-        entity = factory(prefabId)
+        entity = factory(prefab)
     } else {
         entity = new Entity
     }
     if(entity) {
-        ServerEntityPrefabs.types.get(prefabId)?.(entity)
+        prefab?.prefab(entity)
     }
     return entity
 }
@@ -305,11 +306,12 @@ export class EntityDeserializer {
 
     createTreeFor(serialized: SerializedEntity, root: boolean = true) {
         let entity: Entity
+        let prefab = ServerEntityPrefabs.getById(serialized.prefab)
 
         if(root) {
-            entity = manufactureEntity(serialized.prefab, this.factory?.root)
+            entity = manufactureEntity(prefab, this.factory?.root)
         } else {
-            entity = manufactureEntity(serialized.prefab, this.factory?.leaf)
+            entity = manufactureEntity(prefab, this.factory?.leaf)
         }
 
         if(!entity) return null
@@ -348,7 +350,7 @@ export class EntitySerializer {
         let cachedResult = this.result.get(entity)
         if(cachedResult) return cachedResult
 
-        let prefab = entity.getComponent(PrefabIdComponent)?.prefabId
+        let prefab = entity.getComponent(PrefabComponent)?.prefab.id
         let id = this.ctx.getIdFor(entity)
         let children = entity.children.map(child => {
             // Only the root entity can be dangling. All the children

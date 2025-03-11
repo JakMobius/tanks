@@ -1,15 +1,20 @@
-import EntityPrefabs from "src/entity/entity-prefabs";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import BulletBehaviour from "src/server/entity/bullet-behaviour";
-import {EntityType} from "src/entity/entity-type";
+import BasePrefab from "./prefab"
+import { EntityPrefab } from "src/entity/entity-prefabs";
 
-ServerEntityPrefabs.types.set(EntityType.BULLET_CANNONBALL, (entity) => {
-    ServerEntityPrefabs.setupEntity(entity)
-    EntityPrefabs.Types.get(EntityType.BULLET_CANNONBALL)(entity)
-
-    entity.addComponent(new BulletBehaviour({
-        explodePower: 0,
-        wallDamage: 1000,
-        entityDamage: 4
-    }))
+const ServerPrefab = new EntityPrefab({
+    id: BasePrefab.id,
+    metadata: BasePrefab.metadata,
+    prefab: (entity) => {
+        ServerEntityPrefabs.setupEntity(entity)
+        BasePrefab.prefab(entity)
+        entity.addComponent(new BulletBehaviour({
+            explodePower: 0,
+            wallDamage: 1000,
+            entityDamage: 4
+        }))
+    }
 })
+
+export default ServerPrefab;

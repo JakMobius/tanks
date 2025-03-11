@@ -9,6 +9,16 @@ declare module '*/%' {
     export default modules;
 }
 
+declare module '*/%/client-prefab.ts' {
+    const modules: any[];
+    export default modules;
+}
+
+declare module '*/%/server-prefab.ts' {
+    const modules: any[];
+    export default modules;
+}
+
 declare module '*%.texture.png' {
     const textures: string[];
     export default textures;

@@ -1,9 +1,14 @@
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 import PelletsEffectComponent from "src/entity/types/effect-pellets/pellets-effect-component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import PrefabComponent from "src/entity/components/prefab-id-component";
+import Entity from "src/utils/ecs/entity";
 
-EntityPrefabs.Types.set(EntityType.EFFECT_SHOTGUN_PELLETS, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.EFFECT_SHOTGUN_PELLETS))
-    entity.addComponent(new PelletsEffectComponent())
+const Prefab = new EntityPrefab({
+    id: "EFFECT_SHOTGUN_PELLETS",
+    prefab: (entity: Entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+        entity.addComponent(new PelletsEffectComponent())
+    }
 })
+
+export default Prefab;

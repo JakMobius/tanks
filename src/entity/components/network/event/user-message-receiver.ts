@@ -6,6 +6,7 @@ import ReadBuffer from "src/serialization/binary/read-buffer";
 import TankChangeEventView from "src/client/ui/events-hud/types/tank-change-event-view";
 import Entity from "src/utils/ecs/entity";
 import SelfDestructEventView from "src/client/ui/events-hud/types/self-destruct-event-view";
+import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 
 export default class UserMessageReceiver extends ReceiverComponent {
 
@@ -28,9 +29,10 @@ export default class UserMessageReceiver extends ReceiverComponent {
     }
 
     private handleTankChangeOnRespawnMessage(buffer: ReadBuffer) {
-        let tankId = buffer.readInt16()
+        let tankId = buffer.readString()
+        let tank = ClientEntityPrefabs.getById(tankId)
 
-        this.entity.emit("event-view", TankChangeEventView, { newTank: tankId })
+        this.entity.emit("event-view", TankChangeEventView, { newTank: tank })
     }
 
     private handleSelfDestructMessage(buffer: ReadBuffer) {

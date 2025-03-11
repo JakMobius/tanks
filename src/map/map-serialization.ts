@@ -1,12 +1,15 @@
 import Version from "src/utils/version"
 import BlockState from "./block-state/block-state"
 import Entity from "src/utils/ecs/entity"
-import { EntityType } from "src/entity/entity-type"
 import TilemapComponent, { charToId } from "./tilemap-component"
 import { EntityDeserializer, EntityFactory, EntitySerializer, manufactureEntity, SerializedEntity } from "src/entity/components/inspector/property-inspector"
 import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component"
 import TransformComponent from "src/entity/components/transform/transform-component"
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component"
+import GroupPrefab from 'src/entity/types/group/server-prefab';
+import TilemapPrefab from 'src/entity/types/tilemap/server-prefab';
+import SpawnzonePrefab from 'src/entity/types/spawn-zone/server-prefab';
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs"
 
 export interface SpawnZoneConfig {
     id: number
@@ -54,7 +57,7 @@ export function readEntityFile(file: MapFile) {
         let name = config.name ?? null
 
         const createEntity = (factory?: EntityFactory) => {
-            let entity = manufactureEntity(EntityType.GROUP, factory?.root)
+            let entity = manufactureEntity(GroupPrefab, factory?.root)
             if(!entity) return null
 
             let width = config.width
@@ -68,7 +71,7 @@ export function readEntityFile(file: MapFile) {
                 blocks.push(new Block())
             }
 
-            const tilemap = manufactureEntity(EntityType.TILEMAP, factory?.leaf)
+            const tilemap = manufactureEntity(TilemapPrefab, factory?.leaf)
             tilemap?.getComponent(TilemapComponent).setMap(width, height, blocks)
             if(tilemap) entity.appendChild(tilemap)
 
@@ -77,7 +80,7 @@ export function readEntityFile(file: MapFile) {
 
             let spawnzones: Entity[] = []
             for(let spawnZone of config.spawnZones) {
-                let zone = manufactureEntity(EntityType.SPAWNZONE, factory?.leaf)
+                let zone = manufactureEntity(SpawnzonePrefab, factory?.leaf)
                 if(!zone) continue
 
                 let centerX = (spawnZone.x1 + spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
@@ -99,14 +102,9 @@ export function readEntityFile(file: MapFile) {
                 spawnzones.push(zone)
             }
 
-            let controllerPrefabs = [
-                EntityType.DM_GAME_MODE_CONTROLLER_ENTITY,
-                EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY,
-                EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY,
-                EntityType.FREEROAM_CONTROLLER_ENTITY
-            ]
+            for(let controllerPrefab of ServerEntityPrefabs.gameModes) {
+                if(controllerPrefab.metadata.supportsOldMapFormat === false) continue
 
-            for(let controllerPrefab of controllerPrefabs) {
                 const controller = manufactureEntity(controllerPrefab, factory?.leaf)
                 if(controller) {
                     controller.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()

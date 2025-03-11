@@ -2,8 +2,6 @@ import ServerGameScript from "src/server/room/game-modes/scripts/server-game-scr
 import CTFController from "src/entity/types/controller-ctf/server-side/ctf-controller";
 import Team from "src/server/team";
 import Entity from "src/utils/ecs/entity";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import PlayerDropFlagEvent from "src/events/player-drop-flag-event";
@@ -15,6 +13,7 @@ import { chooseRandom } from "src/utils/utils";
 import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component";
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 import TimerComponent from "src/entity/types/timer/timer-component";
+import FlagPrefab from "../../flag/server-prefab";
 
 export default class CTFScript extends ServerGameScript<CTFController> {
 
@@ -30,7 +29,7 @@ export default class CTFScript extends ServerGameScript<CTFController> {
 
     private createFlagForTeam(team: Team) {
         const flagEntity = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.FLAG)(flagEntity)
+        FlagPrefab.prefab(flagEntity)
 
         const spawnzonesComponent = this.controller.entity.getComponent(GameSpawnzonesComponent)
         const spawnzones = spawnzonesComponent.spawnzones.filter((zone) => {

@@ -1,11 +1,11 @@
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
-import EntityPrefabs from "src/entity/entity-prefabs";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 import VisibilityInheritanceComponent
     from "src/entity/components/network/transmitting/visibility-inheritance-component";
 import Transmitter from "src/entity/components/network/transmitting/transmitter";
 import { Commands } from "src/entity/components/network/commands";
 import { transmitterComponentFor } from "src/entity/components/network/transmitting/transmitter-component";
+import BasePrefab from "./prefab"
 
 class FlameTransmitter extends Transmitter {
     constructor() {
@@ -19,10 +19,16 @@ class FlameTransmitter extends Transmitter {
     }
 }
 
-ServerEntityPrefabs.types.set(EntityType.EFFECT_FLAME, (entity) => {
-    ServerEntityPrefabs.setupEntity(entity)
-    EntityPrefabs.Types.get(EntityType.EFFECT_FLAME)(entity)
+const ServerPrefab = new EntityPrefab({
+    id: BasePrefab.id,
+    metadata: BasePrefab.metadata,
+    prefab: (entity) => {
+        ServerEntityPrefabs.setupEntity(entity)
+        BasePrefab.prefab(entity)
 
-    entity.addComponent(transmitterComponentFor(FlameTransmitter))
-    entity.addComponent(new VisibilityInheritanceComponent())
+        entity.addComponent(transmitterComponentFor(FlameTransmitter))
+        entity.addComponent(new VisibilityInheritanceComponent())
+    }
 })
+
+export default ServerPrefab;

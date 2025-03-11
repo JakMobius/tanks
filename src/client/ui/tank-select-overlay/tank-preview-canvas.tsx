@@ -2,16 +2,16 @@ import Entity from "src/utils/ecs/entity";
 import {gameWorldEntityPrefab} from "src/entity/game-world-entity-prefab";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import ParticleHostComponent from "src/client/entity/components/particle-host-component";
-import PhysicalComponent from "src/entity/components/physics-component";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import CameraComponent from "src/client/graphics/camera";
 import React, { useContext, useEffect, useRef } from "react";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import { TankSelectCarouselContext } from "./tank-select-overlay";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { EntityPrefab } from "src/entity/entity-prefabs";
 
 interface TankPreviewCanvasProps {
-    tankType: number | null
+    tankPrefab: EntityPrefab
 }
 
 const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
@@ -77,13 +77,13 @@ const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
     }, [])
 
     useEffect(() => {
-        if(props.tankType === null) return undefined
+        if(props.tankPrefab === null) return undefined
         
         stateRef.current.tank = new Entity()
-        ClientEntityPrefabs.types.get(props.tankType)(stateRef.current.tank)
+        props.tankPrefab.prefab(stateRef.current.tank)
         stateRef.current.world.appendChild(stateRef.current.tank)
         return () => stateRef.current.tank.removeFromParent()
-    }, [props.tankType])
+    }, [props.tankPrefab])
 
     return (
         <canvas ref={canvasRef} className="tank-preview-canvas"/>

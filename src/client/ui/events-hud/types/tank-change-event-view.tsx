@@ -1,12 +1,12 @@
 import './tank-change-event-view.scss'
 
 import LargeIconEventView from "src/client/ui/events-hud/types/large-icon-event-view";
-import {getTankDescription} from "src/client/ui/tank-select-overlay/tank-descriptions";
 import React, { useEffect } from 'react';
 import { useEvent } from '../events-hud';
+import { EntityPrefab } from 'src/entity/entity-prefabs';
 
 interface TankChangeEventViewProps {
-    newTank: number
+    newTank: EntityPrefab
 }
 
 const TankChangeEventView: React.FC<TankChangeEventViewProps> = (props) => {
@@ -23,12 +23,14 @@ const TankChangeEventView: React.FC<TankChangeEventViewProps> = (props) => {
         }
     }, [])
 
+    const tankName = props.newTank.metadata.displayName
+
     return (
         <LargeIconEventView icon={
             <div className="tank-change-event-icon"/>
         }>
             <div className="tank-change-event-title">
-                <span className="tank-type">{getTankDescription(props.newTank).name}</span>
+                <span className="tank-type">{tankName}</span>
                 &nbsp;
                 будет выбран после респавна
             </div>

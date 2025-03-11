@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tree, TreeApi } from '../react-arborist/src/index';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeBase, TreeViewDragPreview } from "../tree-view/tree-view";
 import Entity from "src/utils/ecs/entity";
-import { EntityType } from "src/entity/entity-type";
-import { getPrefabNameForId } from "src/entity/components/prefab-id-component";
+import { EntityPrefab } from "src/entity/entity-prefabs";
+import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 
 interface LibraryTreeNode extends TreeNodeBase {
@@ -13,10 +13,26 @@ interface LibraryTreeNode extends TreeNodeBase {
     children?: LibraryTreeNode[]
 }
 
-interface LibraryTreeNodeConfig {
-    name?: string
-    prefab?: number,
-    children?: LibraryTreeNodeConfig[]
+class VirtualLibraryTree {
+    prefabs: EntityPrefab[] = []
+    subgroups = new Map<string, VirtualLibraryTree>()
+
+    add(path: string, prefab: EntityPrefab) {
+        let parts = path.split("/")
+        let group: VirtualLibraryTree = this
+
+        for(let part of parts) {
+            let subgroup = group.subgroups.get(part)
+            if(subgroup === undefined) {
+                subgroup = new VirtualLibraryTree()
+                group.subgroups.set(part, subgroup)
+            }
+            group = subgroup
+        }
+
+        group.prefabs.push(prefab)
+        return
+    }
 }
 
 export class SceneEntityLibraryDropItem {
@@ -26,46 +42,36 @@ export class SceneEntityLibraryDropItem {
     }
 }
 
-function createLibraryTree(config: LibraryTreeNodeConfig, id: string = "root"): LibraryTreeNode {
-    let name = config.name ?? getPrefabNameForId(config.prefab)
-    let children = config.children?.map((childConfig, index) => {
-        return createLibraryTree(childConfig, id + "/" + String(index))   
-    }) ?? []
-    let prefab = config.prefab ? (entity: Entity) => {
-        return ServerEntityPrefabs.types.get(config.prefab)(entity)
-    } : null
+function createLibraryTree(tree: VirtualLibraryTree, id: string = "root"): LibraryTreeNode {
+    
+    let children = []
 
-    return { id, name, children, prefab }
+    for(let [name, subgroup] of tree.subgroups) {
+        let subtree = createLibraryTree(subgroup, id + "/" + name)
+        subtree.name = name
+        children.push(subtree)
+    }
+
+    for(let prefab of tree.prefabs) {
+        let childId = id + "/" + prefab.id
+        children.push({ id: childId, prefab: prefab.prefab, name: prefab.getDisplayName() })
+    }
+
+    return { id, children, name: "" }
 }
 
 const SceneEntityLibrary: React.FC = () => {
 
     const rootNode = useMemo(() => {
-        let rootNode: LibraryTreeNodeConfig = {
-            name: "",
-            prefab: null,
-            children: [{
-                name: "Игровые элементы",
-                children: [
-                    { prefab: EntityType.TILEMAP },
-                    { prefab: EntityType.SPAWNZONE }
-                ]
-            }, {
-                name: "Режимы",
-                children: [
-                    { prefab: EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY },
-                    { prefab: EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY },
-                    { prefab: EntityType.DM_GAME_MODE_CONTROLLER_ENTITY }
-                ],
-            }, {
-                name: "Утилиты",
-                children: [
-                    { prefab: EntityType.GROUP }
-                ]
-            }]
+        let tree = new VirtualLibraryTree()
+
+        for(let prefab of ClientEntityPrefabs.prefabs.values()) {
+            if(prefab.metadata.editorPath === undefined) continue
+            let correspondingServerPrefab = ServerEntityPrefabs.getById(prefab.id)
+            tree.add(prefab.metadata.editorPath, correspondingServerPrefab)
         }
 
-        return createLibraryTree(rootNode)
+        return createLibraryTree(tree)
     }, [])
 
     const treeRef = useRef<TreeApi<LibraryTreeNode> | null>(null)

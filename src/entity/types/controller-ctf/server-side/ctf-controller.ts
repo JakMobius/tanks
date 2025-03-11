@@ -2,14 +2,6 @@ import {CTFPlayerWaitingStateController} from "src/entity/types/controller-ctf/s
 import ServerTeamedGameController from "src/server/room/game-modes/server-teamed-game-controller";
 import PlayerPreferredTankComponent from "src/entity/types/player/server-side/player-preferred-tank-component";
 import Entity from "src/utils/ecs/entity";
-import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
-import { CTFEventData, CTFGameState } from "../ctf-game-state";
-
-
-export abstract class CTFGameStateController extends ServerGameStateController<CTFController, CTFGameState, CTFEventData> {
-
-}
-
 
 export default class CTFController extends ServerTeamedGameController {
 

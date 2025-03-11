@@ -9,6 +9,7 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { EntityType } from "src/entity/entity-prefabs";
 
 export default class WorldRespawnComponent extends EventHandlerComponent {
 
@@ -41,6 +42,9 @@ export default class WorldRespawnComponent extends EventHandlerComponent {
         const preferredTank = preferredTankComponent.preferredTank
         if (!preferredTank) return
 
+        let prefab = ServerEntityPrefabs.getById(preferredTank)
+        if (!prefab || prefab.metadata.type !== EntityType.tank) return
+
         const playerTankComponent = event.player.getComponent(PlayerTankComponent)
 
         if (playerTankComponent.tank) {
@@ -50,7 +54,7 @@ export default class WorldRespawnComponent extends EventHandlerComponent {
         }
 
         const tank = new Entity()
-        ServerEntityPrefabs.types.get(preferredTank)(tank)
+        prefab.prefab(tank)
         this.entity.appendChild(tank);
 
         tank.getComponent(TransformComponent).setGlobal({

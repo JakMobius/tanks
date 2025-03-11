@@ -40,5 +40,13 @@ export default class SpawnzoneDrawer extends EntityDrawer {
 
         program.drawConvexShape(shape, backgroundColor)
         LineDrawer.strokeShape(phase, shape, strokeColor, 0.06, true)
+
+        let center = spawnzone.center()
+        let angle = spawnzone.getGlobalSpawnAngle()
+
+        LineDrawer.strokeShape(phase, [
+            center.x, center.y, 
+            center.x + Math.cos(angle) * 10, center.y - Math.sin(angle) * 10
+        ], strokeColor, 0.1, false)
     }
 }

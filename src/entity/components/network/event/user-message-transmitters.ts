@@ -14,10 +14,10 @@ export class UserChooseTankMessageTransmitter extends Transmitter {
 }
 
 export class UserTankChangeOnRespawnMessageTransmitter extends Transmitter {
-    sendTankChangeOnRespawnMessage(tankId: number) {
+    sendTankChangeOnRespawnMessage(tankId: string) {
         this.packIfEnabled(Commands.USER_MESSAGE_COMMAND, (buffer) => {
             buffer.writeInt16(UserMessageType.tankChangeOnRespawnMessage)
-            buffer.writeInt16(tankId)
+            buffer.writeString(tankId)
         })
     }
 }

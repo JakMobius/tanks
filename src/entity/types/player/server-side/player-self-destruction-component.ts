@@ -1,7 +1,5 @@
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
 import Entity from "src/utils/ecs/entity";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
 import {UserSelfDestructMessageTransmitter} from "src/entity/components/network/event/user-message-transmitters";
 import HealthComponent from "src/entity/components/health/health-component";
 import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
@@ -11,6 +9,7 @@ import PlayerTankComponent from "src/entity/types/player/server-side/player-tank
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import TimerComponent from "../../timer/timer-component";
+import TimerPrefab from "../../timer/server-prefab";
 
 export default class PlayerSelfDestructionComponent extends EventHandlerComponent {
 
@@ -20,7 +19,7 @@ export default class PlayerSelfDestructionComponent extends EventHandlerComponen
 
     constructor() {
         super()
-        ServerEntityPrefabs.types.get(EntityType.TIMER_ENTITY)(this.selfDestructionTimer)
+        TimerPrefab.prefab(this.selfDestructionTimer)
         this.selfDestructionTimer.on("timer-finished", () => {
             this.cancelSelfDestruction()
 

@@ -6,17 +6,19 @@ import {Constructor} from "src/utils/constructor";
 
 export default class PlayerTankSelectPacket extends BinaryPacket {
     static typeName = 5
-    tank: number
+    tank: string
 
-    constructor(tank: number) {
+    constructor(tank: string) {
         super();
         this.tank = tank
     }
 
     toBinary(encoder: WriteBuffer): void {
-        encoder.writeInt16(this.tank)
+        encoder.writeString(this.tank)
     }
-    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T { return new this(decoder.readInt16()) }
+    static fromBinary<T>(this: Constructor<T>, decoder: ReadBuffer): T {
+        return new this(decoder.readString())
+    }
 }
 
 BinarySerializer.register(PlayerTankSelectPacket)

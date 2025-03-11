@@ -5,10 +5,9 @@ import ServerEntityPilotComponent from "src/server/entity/components/server-enti
 import DamageReason, { DamageTypes } from "src/server/damage-reason/damage-reason";
 import {WeaponComponent} from "src/entity/components/weapon/weapon-component";
 import ChargeWeaponComponent from "src/entity/components/weapon/charge-weapon-component";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 import Entity from "src/utils/ecs/entity";
-import {EntityType} from "src/entity/entity-type";
 import FlameEffectComponent from "src/entity/types/effect-flame/flame-effect-component";
+import FlameEffectPrefab from "src/entity/types/effect-flame/server-prefab";
 
 export default class WeaponFlamethrower extends ChargeWeaponComponent {
     public damage: number = 3;
@@ -21,7 +20,7 @@ export default class WeaponFlamethrower extends ChargeWeaponComponent {
         super();
 
         this.flameEffect = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.EFFECT_FLAME)(this.flameEffect)
+        FlameEffectPrefab.prefab(this.flameEffect)
 
         this.eventHandler.on("tank-set", (tank: Entity) => {
             this.flameEffect.removeFromParent()

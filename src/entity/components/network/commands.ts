@@ -31,7 +31,8 @@ export const Commands = {
     WEAPON_STATE:                    0x0F22,
     WEAPON_INFO:                     0x0F23,
     CHAT_MESSAGE_COMMAND:            0x0F24,
-    SPAWNZONE_TEAM_SET_COMMAND:      0x0F25
+    SPAWNZONE_DATA_COMMAND:          0x0F25,
+    CHECKPOINT_DATA_COMMAND:         0x0F26,
 }
 
 export function commandName(command: number) {

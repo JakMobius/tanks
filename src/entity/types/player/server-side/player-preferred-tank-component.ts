@@ -5,10 +5,11 @@ import {UserChooseTankMessageTransmitter} from "src/entity/components/network/ev
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import PlayerDataComponent from "src/entity/types/player/server-side/player-data-component";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
-import {EntityType} from "src/entity/entity-type";
+import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import { EntityType } from "src/entity/entity-prefabs";
 
 export default class PlayerPreferredTankComponent extends EventHandlerComponent {
-    preferredTank: number | null = null
+    preferredTank: string | null = null
     private fetchingPreferredTank = false
 
     constructor() {
@@ -81,31 +82,16 @@ export default class PlayerPreferredTankComponent extends EventHandlerComponent 
         worldComponent.redirectPlayerEventToWorld("preferred-tank-set", "player-preferred-tank-set")
     }
 
-    selectPreferredTank(tank: number) {
+    selectPreferredTank(tank: string) {
         if(tank === this.preferredTank) {
             return
         }
 
-        if(!PlayerPreferredTankComponent.isValidTankIdentifier(tank)) {
+        if(ServerEntityPrefabs.getById(tank)?.metadata.type !== EntityType.tank) {
             return
         }
 
         this.entity.emit("preferred-tank-set", tank)
         this.updatePreferredTank().then()
-    }
-
-    static isValidTankIdentifier(tank: number) {
-        let validTanks = [
-            EntityType.TANK_BIGBOI,
-            EntityType.TANK_BOMBER,
-            EntityType.TANK_MONSTER,
-            EntityType.TANK_NASTY,
-            EntityType.TANK_SNIPER,
-            EntityType.TANK_SHOTGUN,
-            EntityType.TANK_MORTAR,
-            EntityType.TANK_TESLA,
-            EntityType.TANK_TINY
-        ]
-        return validTanks.indexOf(tank) !== -1
     }
 }

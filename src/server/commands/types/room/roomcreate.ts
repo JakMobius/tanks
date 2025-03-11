@@ -4,13 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import RoomConfig from "src/server/room/room-config";
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
+import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
 
 export default class RoomCreateCommand extends Command {
-
-    static validModes = [
-        "CTF", "TDM", "DM", "FR"
-    ]
-
     constructor(options: CommandConfig) {
         super(options);
 
@@ -92,7 +88,8 @@ export default class RoomCreateCommand extends Command {
             let mapsDirectory = this.console.server.config.general.mapsDirectory
             return this.autocompletePath(args[args.length - 1], mapsDirectory, ".json", options)
         } else if(currentFlag?.name === "mode") {
-            return RoomCreateCommand.validModes.filter(mode => mode.startsWith(args[args.length - 1].toUpperCase()))
+            let modes = ServerEntityPrefabs.gameModes.map((mode) => mode.metadata.shortName)
+            return modes.filter(mode => mode.startsWith(args[args.length - 1].toUpperCase()))
         } else if(found.incompleteFlag) {
             return super.autocompleteFlags(found.incompleteFlag, options)
         } else {

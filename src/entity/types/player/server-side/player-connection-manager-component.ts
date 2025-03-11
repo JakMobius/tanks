@@ -17,20 +17,23 @@ import { commandName } from "src/entity/components/network/commands";
 import { getPrefabNameForEntity } from "src/entity/components/prefab-id-component";
 
 export default class PlayerConnectionManagerComponent extends EventHandlerComponent {
-    client: SocketPortalClient
+    client: SocketPortalClient | null = null
     end = new ReceivingEnd()
 
     private worldEventHandler = new BasicEventHandlerSet()
     private world: Entity
     private tank: Entity
 
-    constructor(client: SocketPortalClient) {
+    constructor() {
         super()
-        this.client = client
 
         this.worldEventHandler.on("tick", () => this.updateClient(), EventEmitter.PRIORITY_MONITOR)
         this.eventHandler.on("world-set", (world: Entity) => this.setWorld(world))
         this.eventHandler.on("tank-set", (tank: Entity) => this.setTank(tank))
+    }
+
+    setClient(client: SocketPortalClient) {
+        this.client = client
 
         client.on(WorldDataPacket, (packet) => {
             let buffer = new ReadBuffer(packet.buffer.buffer)

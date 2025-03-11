@@ -3,12 +3,6 @@ import { DMPlayerWaitingStateController } from "src/entity/types/controller-dm/s
 import PlayerPreferredTankComponent from "src/entity/types/player/server-side/player-preferred-tank-component";
 import Entity from "src/utils/ecs/entity";
 import { VectorProperty, PropertyInspector } from "src/entity/components/inspector/property-inspector";
-import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
-import { DMGameState } from "../dm-game-state";
-
-export abstract class DMGameStateController extends ServerGameStateController<DMController, DMGameState> {
-
-}
 
 export default class DMController extends ServerGameController {
 

@@ -1,5 +1,5 @@
 
-import ServerTDMController, { TDMGameStateController } from "src/entity/types/controller-tdm/server-side/tdm-controller";
+import ServerTDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 import {TDMPlayingStateController} from "src/entity/types/controller-tdm/server-side/tdm-playing-state-controller";
 import {TDMGameState, TDMGameStateType} from "src/entity/types/controller-tdm/tdm-game-state";
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
@@ -8,8 +8,10 @@ import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
+import TDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 
-export class TDMPlayerWaitingStateController extends TDMGameStateController {
+export class TDMPlayerWaitingStateController extends ServerGameStateController<TDMController, TDMGameState> {
 
     constructor(controller: ServerTDMController) {
         super(controller)

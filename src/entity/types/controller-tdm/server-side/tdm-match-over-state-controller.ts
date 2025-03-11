@@ -5,9 +5,10 @@ import DelayedActionScript from "src/server/room/game-modes/scripts/delayed-acti
 import ServerTDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 import {TDMPlayerWaitingStateController} from "src/entity/types/controller-tdm/server-side/tdm-player-waiting-state";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
-import { TDMGameStateController } from "./tdm-controller"
+import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
+import TDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
 
-export class TDMMatchOverStateController extends TDMGameStateController {
+export class TDMMatchOverStateController extends ServerGameStateController<TDMController, TDMGameState> {
     private statistics: TDMTeamStatistics[];
 
     constructor(controller: ServerTDMController, statistics: TDMTeamStatistics[]) {

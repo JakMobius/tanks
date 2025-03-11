@@ -10,10 +10,10 @@ import {WebserverSession} from "src/server/webserver/webserver-session";
 import Entity from "src/utils/ecs/entity";
 import serverGameRoomPrefab from "src/server/room/server-game-room-prefab";
 import RoomClientComponent from "src/server/room/components/room-client-component";
-import { EntityType } from 'src/entity/entity-type';
 import fs from 'fs'
 import { MapFile, readEntityFile } from 'src/map/map-serialization';
-import { manufactureEntity } from 'src/entity/components/inspector/property-inspector';
+import { EntityPrefab, EntityType } from 'src/entity/entity-prefabs';
+import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
 
 export class NoSuchMapError extends Error {
     constructor(message?: string) {
@@ -180,27 +180,24 @@ export default class GameSocketPortal extends SocketPortal {
 
         let json = JSON.parse(fs.readFileSync(config.map, "utf-8")) as unknown as MapFile
 
-        const controllers = {
-            [EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY]: "CTF",
-            [EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY]: "TDM",
-            [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY]: "DM",
-            [EntityType.FREEROAM_CONTROLLER_ENTITY]: "FR"
+        let gameController: Entity | null = null
+        let gameModes = ServerEntityPrefabs.gameModes
+
+        if(!gameModes.some((mode) => mode.metadata.shortName === config.mode)) {
+            throw new InvalidGameModeError(config.mode + " game mode is not supported by this server")
         }
 
-        let gameController: Entity | null = null
-
-        let factory = (prefab: number) => {
-            let isController = controllers.hasOwnProperty(prefab)
-            let requiredMode = isController ? controllers[prefab] : null
-            if(requiredMode && requiredMode !== config.mode) {
+        let factory = (prefab: EntityPrefab) => {
+            let isGameController = prefab.metadata.type === EntityType.gameController
+            if(isGameController && prefab.metadata.shortName !== config.mode) {
                 return null
             }
-            if(requiredMode && gameController) {
-                throw new BadMapError("Map has multiple " + requiredMode + " game controllers")
+            if(isGameController && gameController) {
+                throw new BadMapError("Map has multiple " + prefab.metadata.shortName + " game controllers")
             }
             let entity = new Entity()
             
-            if(requiredMode) {
+            if(isGameController) {
                 gameController = entity
             }
 

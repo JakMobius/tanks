@@ -6,21 +6,21 @@ export default class SpawnzoneTransmitter extends Transmitter {
     constructor() {
         super()
         
-        this.eventHandler.on("team-set", () => {
-            this.sendPositionUpdate()
-        })
+        this.eventHandler.on("team-set", () => this.sendUpdate())
+        this.eventHandler.on("spawn-angle-set", () => this.sendUpdate())
     }
 
     onEnable() {
         super.onEnable();
-        this.sendPositionUpdate()
+        this.sendUpdate()
     }
 
-    sendPositionUpdate() {
+    sendUpdate() {
         let spawnzone = this.getEntity().getComponent(SpawnzoneComponent)
 
-        this.packIfEnabled(Commands.SPAWNZONE_TEAM_SET_COMMAND, (buffer) => {
+        this.packIfEnabled(Commands.SPAWNZONE_DATA_COMMAND, (buffer) => {
             buffer.writeInt32(spawnzone.team)
+            buffer.writeFloat32(spawnzone.spawnAngle)
         })
     }
 }

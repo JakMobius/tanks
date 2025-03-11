@@ -1,7 +1,7 @@
 import Transmitter from "../transmitting/transmitter";
 import {Commands} from "../commands";
 import EntityDataTransmitComponent from "../transmitting/entity-data-transmit-component";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import PrefabComponent from "src/entity/components/prefab-id-component";
 
 export default class EntityStateTransmitter extends Transmitter {
 
@@ -24,7 +24,7 @@ export default class EntityStateTransmitter extends Transmitter {
 
         receivingEnd.packCommand(parentTransmitterSet, Commands.ENTITY_CREATE_COMMAND, (buffer) => {
             buffer.writeUint32(this.set.entityId)
-            buffer.writeUint32(this.set.transmitComponent.entity.getComponent(PrefabIdComponent).prefabId)
+            buffer.writeString(this.set.transmitComponent.entity.getComponent(PrefabComponent).prefab.id)
         })
     }
 

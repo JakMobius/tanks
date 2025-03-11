@@ -4,6 +4,7 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TeamColor from "src/utils/team-color";
 import SpawnzoneTransmitter from "./spawnzone-transmitter";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { degToRad, radToDeg } from "src/utils/utils";
 
 export default class SpawnzoneComponent extends EventHandlerComponent {
     team = 0
@@ -28,8 +29,8 @@ export default class SpawnzoneComponent extends EventHandlerComponent {
             let angleProperty = new VectorProperty("spawnAngle", 1)
                 .withName("Направление игроков при спавне")
                 .replaceNaN()
-                .withGetter(() => [this.spawnAngle])
-                .withSetter((angle) => this.setSpawnAngle(angle[0]))
+                .withGetter(() => [radToDeg(this.spawnAngle)])
+                .withSetter((angle) => this.setSpawnAngle(degToRad(angle[0])))
                 .updateOn("spawn-angle-set")
             inspector.addProperty(angleProperty)
         })
@@ -52,7 +53,7 @@ export default class SpawnzoneComponent extends EventHandlerComponent {
     }
 
     getGlobalSpawnAngle() {
-        return this.spawnAngle + this.entity.getComponent(TransformComponent).getGlobalAngle()
+        return this.spawnAngle
     }
 
     sample() {

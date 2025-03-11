@@ -23,14 +23,13 @@ import EmbeddedServerGame from '../embedded-server/embedded-server-game';
 import WorldDataPacket from 'src/networking/packets/game-packets/world-data-packet';
 import EntityDataReceiveComponent from 'src/entity/components/network/receiving/entity-data-receive-component';
 import WriteBuffer from 'src/serialization/binary/write-buffer';
-import { serverPlayerEntityPrefab } from 'src/entity/types/player/server-side/server-prefab';
+import PlayerPrefab from "src/entity/types/player/server-prefab";
 import PlayerWorldComponent from 'src/entity/types/player/server-side/player-world-component';
 import { writeEntityFile } from 'src/map/map-serialization';
 import { downloadFile } from 'src/utils/html5-download';
-import ServerEntityPrefabs from 'src/server/entity/server-entity-prefabs';
-import { EntityType } from 'src/entity/entity-type';
 import { FileDropOverlay } from '../ui/file-drop-overlay/file-drop-overlay';
-
+import GroupPrefab from 'src/entity/types/group/server-prefab';
+import PlayerConnectionManagerComponent from 'src/entity/types/player/server-side/player-connection-manager-component';
 
 interface MapEditorSceneContextProps {
     currentSelectedEntity: Entity | null 
@@ -114,7 +113,7 @@ const MapEditorView: React.FC = () => {
 
         const game = new EmbeddedServerGame()
         const rootGroup = new Entity()
-        ServerEntityPrefabs.types.get(EntityType.GROUP)(rootGroup)
+        GroupPrefab.prefab(rootGroup)
         game.serverGame.appendChild(rootGroup)
 
         game.clientConnection.on(WorldDataPacket, (packet) => {
@@ -128,12 +127,8 @@ const MapEditorView: React.FC = () => {
         game.serverGame.on("client-connect", (client) => {
             const player = new Entity()
 
-            serverPlayerEntityPrefab(player, {
-                client,
-                db: null,
-                nick: "Вы"
-            })
-
+            PlayerPrefab.prefab(player)
+            player.getComponent(PlayerConnectionManagerComponent).setClient(client)
             player.getComponent(PlayerWorldComponent).connectToWorld(game.serverGame)
         })
 

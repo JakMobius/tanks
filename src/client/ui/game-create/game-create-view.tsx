@@ -13,6 +13,10 @@ import Cloud from 'src/client/ui/cloud/cloud';
 import PageLocation from 'src/client/scenes/page-location';
 import { api } from 'src/client/networking/api';
 import { useAbortControllerCleanup } from 'src/client/utils/abort-controller-cleanup';
+import ClientEntityPrefabs from 'src/client/entity/client-entity-prefabs';
+import { EntityType } from 'src/entity/entity-prefabs';
+
+const gameModes = ClientEntityPrefabs.getByType(EntityType.gameController)
 
 const GameCreateViewComponent: React.FC = () => {
 
@@ -167,13 +171,13 @@ const GameCreateViewComponent: React.FC = () => {
         }))
     }, [state.roomValid, state.selectedMap, state.selectedMode])
 
-    const modes = [
-        { name: "Битва команд (TDM)", data: "TDM", displayName: "TDM" },
-        { name: "Каждый сам за себя (DM)", data: "DM", displayName: "DM" },
-        { name: "Захват флага (CTF)", data: "CTF", displayName: "CTF" },
-        { name: "Фрирум (FR)", data: "FR", displayName: "FR" },
-        { name: "Гонка (RACE)", data: "RACE", displayName: "RACE" },
-    ] as SelectOption[]
+    const modes = gameModes.map((mode) => {
+        return {
+            name: mode.metadata.displayName,
+            data: mode.metadata.shortName,
+            displayName: mode.metadata.shortName
+        }
+    }) as SelectOption[]
 
     return (
         <PauseNavigationItem title="Создание комнаты">

@@ -4,11 +4,14 @@ import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import {TransmitterSet} from "src/entity/components/network/transmitting/transmitter-set";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import {GameSocketPortalClient} from "src/server/socket/game-server/game-socket-portal";
-import {serverPlayerEntityPrefab} from "src/entity/types/player/server-side/server-prefab";
+import PlayerPrefab from "src/entity/types/player/server-prefab";
 import EventEmitter from "src/utils/event-emitter";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import ServerDatabase from "src/server/db/server-database";
 import GameModeEventTransmitter from "src/entity/components/game-mode/game-mode-event-transmitter";
+import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
+import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
+import PlayerDataComponent from "src/entity/types/player/server-side/player-data-component";
 
 
 export default abstract class ServerGameController extends EventHandlerComponent {
@@ -68,12 +71,10 @@ export default abstract class ServerGameController extends EventHandlerComponent
 
         let player = new Entity()
 
-        serverPlayerEntityPrefab(player, {
-            client: client,
-            db: this.db,
-            nick: client.data.name
-        })
-
+        PlayerPrefab.prefab(player)
+        player.getComponent(PlayerConnectionManagerComponent).setClient(client)
+        player.getComponent(PlayerDataComponent).db = this.db
+        player.getComponent(PlayerNickComponent).nick = client.data.name
         player.getComponent(PlayerWorldComponent).connectToWorld(this.world)
     }
 }

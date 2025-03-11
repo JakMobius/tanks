@@ -1,7 +1,17 @@
-import EntityPrefabs from "src/entity/entity-prefabs";
-import {EntityType} from "src/entity/entity-type";
-import PrefabIdComponent from "src/entity/components/prefab-id-component";
+import { EntityPrefab, EntityType } from "src/entity/entity-prefabs";
+import PrefabComponent from "src/entity/components/prefab-id-component";
+import Entity from "src/utils/ecs/entity";
 
-EntityPrefabs.Types.set(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY, (entity) => {
-    entity.addComponent(new PrefabIdComponent(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY))
+const Prefab = new EntityPrefab({
+    id: "CTF_CONTROLLER",
+    metadata: {
+        type: EntityType.gameController,
+        shortName: "CTF",
+        displayName: "Захват флага (CTF)",
+    },
+    prefab: (entity: Entity) => {
+        entity.addComponent(new PrefabComponent(Prefab))
+    }
 })
+
+export default Prefab;
