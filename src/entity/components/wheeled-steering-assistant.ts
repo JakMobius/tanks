@@ -112,7 +112,7 @@ export default class WheeledSteeringAssistant extends EventHandlerComponent {
         this.rollingBackwards = false
 
         if (this.velocity > 0.1) {
-            this.velocityAngle = Math.atan2(this.velocityVector.y, this.velocityVector.x) - Math.PI / 2
+            this.velocityAngle = Math.atan2(this.velocityVector.y, this.velocityVector.x)
             let velocityAngleDiff = this.velocityAngle - body.GetAngle()
             velocityAngleDiff = this.normalizeAngle(velocityAngleDiff)
 

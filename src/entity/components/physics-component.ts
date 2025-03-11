@@ -3,15 +3,13 @@ import Entity from "src/utils/ecs/entity";
 import TransformComponent from "./transform-component";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import { ReadonlyMatrix3 } from "src/utils/matrix3";
 import { b2ScaledCircleShape, b2ScaledPolygonShape } from "src/physics/b2-scale-shape";
 
 export default class PhysicalComponent extends EventHandlerComponent {
     body: Box2D.b2Body
     host: PhysicalHostComponent
-    positionUpdated: boolean = false
     bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body
-    oldTransform: ReadonlyMatrix3
+    transformDirty = true
 
     constructor(bodyConstructor: (host: PhysicalHostComponent) => Box2D.b2Body) {
         super()
@@ -21,45 +19,20 @@ export default class PhysicalComponent extends EventHandlerComponent {
 
         this.eventHandler.on("physical-host-attached", (host) => this.setHost(host))
         this.eventHandler.on("physical-host-detached", (host) => this.setHost(null))
+        this.eventHandler.on("position-update", () => this.transformDirty = true)
     }
 
     beforePhysics() {
-        let updatePos = false
-        let transformComponent = this.entity.getComponent(TransformComponent)
-        if(this.oldTransform) {
-            let currentTransform = transformComponent.getGlobalTransform()
-            if(!this.oldTransform.equals(currentTransform)) {
-                this.oldTransform = currentTransform.clone()
-                updatePos = true
-            }
-        } else {
-            updatePos = true
-        }
-
-        if(updatePos) {
-            let position = transformComponent.getGlobalPosition()
-            let angle = transformComponent.getGlobalAngle()
-            
-            let fixtures = this.body.GetFixtureList()
-            while(fixtures) {
-                let shape = fixtures.GetShape()
-                if(shape instanceof b2ScaledPolygonShape) {
-                    shape.SetScale(transformComponent.getGlobalScale())
-                }
-                if(shape instanceof b2ScaledCircleShape) {
-                    shape.SetScale(transformComponent.getGlobalScale())
-                }
-
-                fixtures = fixtures.GetNext()
-            }
-
-            this.body.SetTransformVec(position, -angle)
-        }
+        this.entity.emit("before-physics")
     }
 
     onPhysicsTick(dt: number) {
+        this.readTransform()
         this.entity.emit("physics-tick", dt)
-        this.updateTransform()
+    }
+
+    afterPhysics(timeRemaining: number) {
+        this.writeTransform(timeRemaining)
     }
 
     onDetach() {
@@ -112,10 +85,44 @@ export default class PhysicalComponent extends EventHandlerComponent {
         this.body.SetAngularVelocity(velocity)
     }
 
-    private updateTransform() {
-        this.entity.getComponent(TransformComponent).setGlobal({
-            position: this.body.GetPosition(),
-            angle: -this.body.GetAngle()
+    private readTransform() {
+        if(!this.transformDirty) return
+
+        let transformComponent = this.entity.getComponent(TransformComponent)
+        let position = transformComponent.getGlobalPosition()
+        let angle = transformComponent.getGlobalAngle()
+        
+        let fixtures = this.body.GetFixtureList()
+        while(fixtures) {
+            let shape = fixtures.GetShape()
+            if(shape instanceof b2ScaledPolygonShape) {
+                shape.SetScale(transformComponent.getGlobalScale())
+            }
+            if(shape instanceof b2ScaledCircleShape) {
+                shape.SetScale(transformComponent.getGlobalScale())
+            }
+
+            fixtures = fixtures.GetNext()
+        }
+
+        this.body.SetTransformVec(position, -angle)
+
+        this.transformDirty = false
+    }
+
+    private writeTransform(extraTime: number) {
+        if(this.body.GetType() === Box2D.b2BodyType.b2_staticBody) return
+
+        let transform = this.entity.getComponent(TransformComponent)
+
+        let position = this.body.GetPosition()
+        let velocity = this.body.GetLinearVelocity()
+        let angle = -this.body.GetAngle()
+        let angularVelocity = -this.body.GetAngularVelocity()
+
+        transform.setGlobal({
+            position: { x: position.x + velocity.x * extraTime, y: position.y + velocity.y * extraTime },
+            angle: angle + angularVelocity * extraTime
         })
     }
 }

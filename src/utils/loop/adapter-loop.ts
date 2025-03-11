@@ -36,8 +36,7 @@ export default class AdapterLoop extends Loop {
         if(!this.running) return;
 
         // The step count is precalculated instead of subtracting the interval from the accumulator
-        // because of floating point errors, which were causing the physics to not be deterministic
-        // over time.
+        // because of floating point errors, which were causing some unwanted floating-point imprecisions
 
         let stepsRequired = Math.floor(this.accumulator / this.interval)
 
@@ -60,5 +59,9 @@ export default class AdapterLoop extends Loop {
 
     setInterval(interval: number) {
         this.interval = interval
+    }
+
+    getRemainingTime() {
+        return this.accumulator
     }
 }

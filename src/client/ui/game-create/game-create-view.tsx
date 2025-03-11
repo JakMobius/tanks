@@ -171,6 +171,7 @@ const GameCreateViewComponent: React.FC = () => {
         { name: "Битва команд (TDM)", data: "TDM", displayName: "TDM" },
         { name: "Каждый сам за себя (DM)", data: "DM", displayName: "DM" },
         { name: "Захват флага (CTF)", data: "CTF", displayName: "CTF" },
+        { name: "Фрирум (FR)", data: "FR", displayName: "FR" },
         { name: "Гонка (RACE)", data: "RACE", displayName: "RACE" },
     ] as SelectOption[]
 

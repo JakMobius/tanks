@@ -22,7 +22,7 @@ ServerEntityPrefabs.types.set(EntityType.TANK_BIGBOI, (entity) => {
         .setShootRate(2)
         .setReloadTime(7)
         .setBulletType(EntityType.BULLET_CANNONBALL)
-        .setMuzzlePoint({x: 0, y: 2.5})
+        .setMuzzlePoint({x: 2.5, y: 0})
         .setFireSound(SoundType.SHOOT_BOMBER)
         .setInitialBulletVelocity(80)
 

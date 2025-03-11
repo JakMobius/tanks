@@ -1,4 +1,4 @@
-import BlockState from '../block-state'
+import BlockState, { BlockStateConfig } from '../block-state'
 
 export default class WoodBlockState extends BlockState {
 	public variant: number;
@@ -6,8 +6,8 @@ export default class WoodBlockState extends BlockState {
     static typeName = "wood";
     static typeId = 3;
 
-    constructor() {
-        super();
+    constructor(options?: BlockStateConfig) {
+        super(options);
 
         this.variant = Math.floor(Math.random() * 18)
     }

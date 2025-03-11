@@ -1,6 +1,5 @@
 import PhysicsUtils from 'src/utils/physics-utils';
 import TrackedTankController from 'src/entity/components/tank-controllers/tracked-tank-controller';
-import * as Box2D from '@box2d/core';
 import {physicsFilters} from "src/physics/categories";
 import PhysicalComponent from "src/entity/components/physics-component";
 import EntityPrefabs from "src/entity/entity-prefabs";
@@ -55,13 +54,13 @@ EntityPrefabs.Types.set(EntityType.TANK_SNIPER, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1.125, 1.0125, new Box2D.b2Vec2(0, 0), {
+        let bodyFixture = PhysicsUtils.squareFixture(1.0125, 1.125, { x: 0, y: 0 }, {
             density: 680,
             filter: physicsFilters.tank,
             restitution: 0.05
         })
 
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.5625, 2.25, new Box2D.b2Vec2(-1.6875, 0.45), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 0.5625, { x: 0.45, y: -1.6875 }, {
             filter: physicsFilters.tank,
             density: 680,
             restitution: 0.05

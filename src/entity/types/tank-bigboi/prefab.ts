@@ -61,11 +61,11 @@ EntityPrefabs.Types.set(EntityType.TANK_BIGBOI, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixtureDef = PhysicsUtils.squareFixture(2.25, 1.9575, null, {
+        let bodyFixtureDef = PhysicsUtils.squareFixture(1.9575, 2.25, null, {
             density: 1344,
             filter: physicsFilters.tank
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(1.125, 2.25, new Box2D.b2Vec2(2.25, 0), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 1.125, { x: 0, y: 2.25 }, {
             density: 1344,
             filter: physicsFilters.tank
         })

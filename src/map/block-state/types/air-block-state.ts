@@ -2,7 +2,7 @@ import TilemapComponent from 'src/map/tilemap-component';
 import BlockState from '../block-state';
 
 export default class AirBlockState extends BlockState {
-    static isSolid = false;
+    static isSolid = false
     static typeName = "air";
     static typeId = 0;
 

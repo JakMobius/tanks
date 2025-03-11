@@ -13,6 +13,7 @@ import ServerWorldPlayerManagerComponent from "src/server/entity/components/serv
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 
 export class DMPlayingStateController extends DMGameStateController {
 
@@ -38,8 +39,9 @@ export class DMPlayingStateController extends DMGameStateController {
 
     activate() {
         super.activate()
+        const timeComponent = this.controller.entity.getComponent(GameTimeComponent)
         this.controller.world.getComponent(WorldStatisticsComponent)
-            .getMatchLeftTimerComponent().countdownFrom(this.controller.matchTime)
+            .getMatchLeftTimerComponent().countdownFrom(timeComponent.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
         // TODO: reload map
         this.controller.triggerStateBroadcast()

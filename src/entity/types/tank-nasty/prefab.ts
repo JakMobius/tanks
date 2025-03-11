@@ -14,14 +14,14 @@ import PrefabIdComponent from "src/entity/components/prefab-id-component";
 import { DamageModifiers, DamageTypes } from 'src/server/damage-reason/damage-reason';
 
 const vertices = [
-    [-1.00, -1.10],
-    [-0.80, -1.30],
-    [0.80, -1.30],
-    [1.00, -1.10],
-    [1.00, -0.25],
-    [0.55, 0.90],
-    [-0.55, 0.90],
-    [-1.00, -0.25],
+    [-1.10, -1.00],
+    [-1.30, -0.80],
+    [-1.30, 0.80],
+    [-1.10, 1.00],
+    [-0.25, 1.00],
+    [0.90, 0.55],
+    [0.90, -0.55],
+    [-0.25, -1.00],
 ].map(v => new Box2D.b2Vec2(v[0] * 2.25, v[1] * 2.25))
 
 EntityPrefabs.Types.set(EntityType.TANK_NASTY, (entity) => {
@@ -39,21 +39,21 @@ EntityPrefabs.Types.set(EntityType.TANK_NASTY, (entity) => {
     entity.addComponent(new AirbagTankController({
         propellers: [
             {
-                x: 1.05,
-                y: -2.3,
+                x: -2.3,
+                y: 1.05,
                 angleSetting: 1.0,
                 efficiency: 1.8, // todo: unreal
                 resistance: 200.0,
-                angle: Math.PI / 2,
+                angle: 0,
                 steeringAngle: -Math.PI / 4,
                 momentum: 1
             }, {
-                x: -1.05,
-                y: -2.3,
+                x: -2.3,
+                y: -1.05,
                 angleSetting: 1.0,
                 efficiency: 1.8, // todo: unreal
                 resistance: 200.0,
-                angle: Math.PI / 2,
+                angle: 0,
                 steeringAngle: -Math.PI / 4,
                 momentum: 1
             }

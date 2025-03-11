@@ -69,16 +69,16 @@ export default class WheelTruckGenerator {
         const totalWheels = wheelRows * wheelColumns
         const wheelGrip = config.grip / totalWheels
 
-        const startXPosition = config.x - trackWidth / 2
-        const startYPosition = config.y - trackLength / 2
+        const startXPosition = config.x - trackLength / 2
+        const startYPosition = config.y - trackWidth / 2
 
-        const horizontalWheelSpacing = wheelColumns > 1 ? trackWidth / (wheelColumns - 1) : 0
-        const verticalWheelSpacing = wheelRows > 1 ? trackLength / (wheelRows - 1) : 0
+        const horizontalWheelSpacing = wheelRows > 1 ? trackLength / (wheelRows - 1) : 0
+        const verticalWheelSpacing = wheelColumns > 1 ? trackWidth / (wheelColumns - 1) : 0
 
         let wheelsConfig: TankWheelConfig[] = []
 
-        for (let y = 0; y < wheelRows; y++) {
-            for (let x = 0; x < wheelColumns; x++) {
+        for (let x = 0; x < wheelRows; x++) {
+            for (let y = 0; y < wheelColumns; y++) {
                 wheelsConfig.push({
                     x: startXPosition + horizontalWheelSpacing * x,
                     y: startYPosition + verticalWheelSpacing * y,

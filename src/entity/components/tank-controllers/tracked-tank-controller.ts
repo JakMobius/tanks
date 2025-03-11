@@ -53,18 +53,17 @@ export default class TrackedTankController extends EventHandlerComponent {
     createWheels() {
         const leftTrackConfig = Object.assign({}, this.config.trackConfig)
         const rightTrackConfig = Object.assign({}, this.config.trackConfig)
-        const transmissionComponent = this.entity.getComponent(TransmissionComponent)
 
         const trackOffset = this.config.trackOffset ?? 0
 
         const leftTrackWheels = WheelTruckGenerator.generateWheels(Object.assign(leftTrackConfig, {
-            x: this.config.trackGauge / 2,
-            y: trackOffset
+            x: trackOffset,
+            y: -this.config.trackGauge / 2
         }))
 
         const rightTrackWheels = WheelTruckGenerator.generateWheels(Object.assign(rightTrackConfig, {
-            x: -this.config.trackGauge / 2,
-            y: trackOffset
+            x: trackOffset,
+            y: this.config.trackGauge / 2,
         }))
 
         this.leftTrackWheels = leftTrackWheels

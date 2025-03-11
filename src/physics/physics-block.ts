@@ -25,12 +25,27 @@ export class PhysicsBlock {
         return null
     }
 
-    updateBlock(block: BlockState) {
-        if(!block) this.edges = []
-        else {
-            // TODO: This is wrong
-            if((block.constructor as typeof BlockState).typeId === 0) this.edges = []
-            else this.edges = solidBlockShape
+    setEdges(edges: PhysicsEdge[]) {
+        if(edges.length !== this.edges.length) {
+            this.edges = edges
+            return true
         }
+        for(let i = 0; i < edges.length; i++) {
+            let e1 = this.edges[i]
+            let e2 = this.edges[i]
+
+            if(!e1.equals(e2)) {
+                this.edges = edges
+                return true
+            }
+        }
+        return false
+    }
+
+    updateBlock(block: BlockState) {
+        if(block?.solid) {
+            return this.setEdges(solidBlockShape)
+        }
+        return this.setEdges([])
     }
 }

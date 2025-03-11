@@ -38,7 +38,7 @@ export default class PhysicsChunk {
         this.meshGenerationContext = new MeshGenerationContext(this)
 
         this.eventHandlers = new BasicEventHandlerSet()
-        this.eventHandlers.on("map-block-change", (event) => this.onBlockUpdate(event.x, event.y))
+        this.eventHandlers.on("block-change", (event) => this.onBlockUpdate(event.x, event.y))
     }
 
     onBlockUpdate(x: number, y: number) {
@@ -46,8 +46,10 @@ export default class PhysicsChunk {
         let localY = y - this.y
 
         if (localX >= 0 && localY >= 0 && localX < this.width && localY < this.height) {
-            this.blocks[localX + localY * this.width].updateBlock(this.collider.getMap().getBlock(x, y))
-            this.needsUpdate = true
+            let newBlock = this.collider.getMap().getBlock(x, y)
+            if(this.blocks[localX + localY * this.width].updateBlock(newBlock)) {
+                this.needsUpdate = true
+            }
         }
     }
 
@@ -81,15 +83,20 @@ export default class PhysicsChunk {
     public updateBody() {
         if (!this.blocks) this.loadBlocks()
 
-        this.removeBody()
         this.generateMesh()
+        this.removeBody()
+
+        // It should be possible to avoid recreating the entire body
+        // just by recreating its fixtures (whenever they change).
+        // However, i tried, and box2d refused to work this way.
 
         this.entity = new Entity()
+        this.entity.on("before-physics", () => this.update())
         this.entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
         this.entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
             let body = host.world.CreateBody({ type: Box2D.b2BodyType.b2_staticBody })
 
-            for (let shape of this.edgeMesh) {
+            for(let shape of this.edgeMesh) {
                 const pointShape = shape.map(point => ({
                     x: point[0],
                     y: point[1]
@@ -97,7 +104,6 @@ export default class PhysicsChunk {
     
                 const polygonShape = new b2ScaledPolygonShape()
                 polygonShape.Set(pointShape)
-    
                 body.CreateFixture({
                     shape: polygonShape,
                     density: 1.0,
@@ -109,22 +115,26 @@ export default class PhysicsChunk {
                     }
                 })
             }
-    
+
             // Box2D solvers are stored statically. Resolved contacts
             // are sometimes cached in memory, as well as corresponding
-            // bodies and their user data. This is not much of a
-            // performance problem, but it makes real memory leaks harder
-            // to detect.
+            // bodies and their user data. It's not much of a performance
+            // problem, but it makes real memory leaks harder to detect.
             body.SetUserData({
                 physicsChunk: new WeakRef(this)
             })
 
             return body
         }))
+        this.collider.entity.appendChild(this.entity)
 
         this.needsUpdate = false
+    }
 
-        this.collider.entity.appendChild(this.entity)
+    update() {
+        if(this.needsUpdate) {
+            this.updateBody()
+        }
     }
 
     getBlock(x: number, y: number) {

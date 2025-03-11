@@ -144,7 +144,7 @@ export default class WheeledTankController extends EventHandlerComponent {
             for (let wheel of wheelGroup.wheels) {
                 if (radius === 0) wheel.angle = 0
                 else {
-                    wheel.angle = Math.atan2(wheel.y - this.config.steerAnchorOffset, radius + wheel.x)
+                    wheel.angle = Math.atan2(wheel.x - this.config.steerAnchorOffset, radius - wheel.y)
                     if (wheel.angle > Math.PI / 2) wheel.angle = -Math.PI + wheel.angle
                     if (wheel.angle < -Math.PI / 2) wheel.angle = Math.PI + wheel.angle
                 }

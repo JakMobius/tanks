@@ -118,7 +118,7 @@ export default class TilemapComponent extends EventHandlerComponent {
 
 		let health = block.getHealth()
 
-		let event = new BlockDamageEvent(block, x, y, d)
+		let event =  new BlockDamageEvent(block, x, y, d)
 		this.entity.emit("block-damage", event)
 		if(event.cancelled) return
 

@@ -1,5 +1,4 @@
 import EngineSoundComponent from "src/client/entity/components/engine-sound-component";
-import {SoundAssets} from "src/client/sound/sounds";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import EntityPrefabs from "src/entity/entity-prefabs";
 import {EntityType} from "src/entity/entity-type";

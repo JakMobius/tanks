@@ -1,8 +1,6 @@
 import PhysicsUtils from 'src/utils/physics-utils';
 import TankWheelsComponent from 'src/entity/components/tank-wheels-component';
-import * as Box2D from "@box2d/core";
 import {physicsFilters} from "src/physics/categories";
-import WheelAxlesGenerator from "src/utils/wheel-axles-generator";
 import PhysicalComponent from "src/entity/components/physics-component";
 import EntityPrefabs from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
@@ -105,7 +103,7 @@ EntityPrefabs.Types.set(EntityType.TANK_MONSTER, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1.5, 2.5, new Box2D.b2Vec2(), {
+        let bodyFixture = PhysicsUtils.squareFixture(2.5, 1.5, { x: 0, y: 0 }, {
             density: 512,
             filter: physicsFilters.tank,
         })
@@ -121,7 +119,7 @@ EntityPrefabs.Types.set(EntityType.TANK_MONSTER, (entity) => {
 
         for (let wheelGroup of behaviour.getWheelGroups()) {
             for (let wheel of wheelGroup.wheels) {
-                const fixture = PhysicsUtils.squareFixture(0.175, 0.5, {x: wheel.x, y: wheel.y}, {
+                const fixture = PhysicsUtils.squareFixture(0.5, 0.175, {x: wheel.x, y: wheel.y}, {
                     density: 512,
                     filter: physicsFilters.tank
                 })

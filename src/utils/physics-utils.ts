@@ -3,19 +3,20 @@ import { b2ScaledPolygonShape } from "src/physics/b2-scale-shape";
 
 export default class PhysicsUtils {
     static createFixture(shape: Box2D.b2Shape, fixture?: Partial<Box2D.b2FixtureDef>): Box2D.b2FixtureDef {
-        if(!fixture) fixture = {}
-
-        fixture.friction = fixture.friction || 0.3
-        fixture.density = fixture.density || 1
-        fixture.restitution = fixture.restitution || 0;
-        fixture.shape = shape
-
-        return fixture as Box2D.b2FixtureDef
+        return {
+            friction: 0.3,
+            density: 1,
+            restitution: 0,
+            shape,
+            ...(fixture ?? {}),
+        } as Box2D.b2FixtureDef
     }
 
     static dynamicBody(world: Box2D.b2World, options?: Partial<Box2D.b2BodyDef>) {
-        options = options || {}
-        options.type = options.type || Box2D.b2BodyType.b2_dynamicBody;
+        options = {
+            type: Box2D.b2BodyType.b2_dynamicBody,
+            ...(options ?? {})
+        }
 
         return world.CreateBody(options);
     }
@@ -31,8 +32,8 @@ export default class PhysicsUtils {
 
     static horizontalSquareFixtures(width: number, height: number, offset: Box2D.XY, options?: Partial<Box2D.b2FixtureDef>) {
         return [
-            this.squareFixture(width, height, new Box2D.b2Vec2(-offset.x, offset.y), Object.assign({}, options)),
-            this.squareFixture(width, height, new Box2D.b2Vec2(offset.x, offset.y), Object.assign({}, options))
+            this.squareFixture(width, height, { x: offset.x, y: -offset.y }, options),
+            this.squareFixture(width, height, { x: offset.x, y: offset.y }, options)
         ]
     }
 

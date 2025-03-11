@@ -80,9 +80,9 @@ const CTFPlayingStateView: React.FC<CTFPlayingStateViewProps> = (props) => {
                 <span style={{color: TeamColor.getColor(props.event.playerTeam).code()}}>
                     {props.event.player}
                 </span>
-                <span>
-                    {localizedCTFFlagEventTypes[props.event.event]}
-                </span>
+                &nbsp;
+                {localizedCTFFlagEventTypes[props.event.event]}
+                &nbsp;
                 <span style={{color: TeamColor.getColor(props.event.flagTeam).code()}}>
                     флаг {TeamColor.teamNames[props.event.flagTeam]}
                 </span>

@@ -38,7 +38,7 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
         this.chunkHeight = config.chunkHeight
 
         this.eventHandler.on("map-change", () => this.resetChunks())
-        this.eventHandler.on("tick", (dt) => this.updateChunks(dt))
+        this.eventHandler.on("tick", (dt) => this.markRelevance(dt))
 
         this.relevanceRadius = 6
         this.relevanceDuration = 1.0 // in seconds
@@ -61,6 +61,7 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
         let chunk = new PhysicsChunk(this, x, y)
         this.chunkMap.set(x, y, chunk)
         chunk.listen()
+        chunk.update()
 
         return chunk
     }
@@ -79,7 +80,7 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
         this.chunkMap.clear()
     }
 
-    private updateChunks(dt: number) {
+    private markRelevance(dt: number) {
         this.time += dt
         const transform = this.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
         const world = WorldComponent.getWorld(this.entity)
@@ -99,8 +100,6 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
             for(let chunk of row.values()) {
                 if(!this.isChunkRelevant(chunk)) {
                     this.unloadChunk(chunk)
-                } else if(chunk.needsUpdate) {
-                    chunk.updateBody()
                 }
             }
         }

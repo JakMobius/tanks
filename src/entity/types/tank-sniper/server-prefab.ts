@@ -22,7 +22,7 @@ ServerEntityPrefabs.types.set(EntityType.TANK_SNIPER, (entity) => {
         .setShootRate(0.4)
         .setReloadTime(5)
         .setBulletType(EntityType.BULLET_42MM)
-        .setMuzzlePoint({x: 0, y: 2.5})
+        .setMuzzlePoint({x: 2.5, y: 0})
         .setFireSound(SoundType.SHOOT_SNIPER)
         .setInitialBulletVelocity(112.5)
 

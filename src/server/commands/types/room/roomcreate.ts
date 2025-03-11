@@ -8,7 +8,7 @@ import {ConsoleAutocompleteOptions} from "src/server/console/console";
 export default class RoomCreateCommand extends Command {
 
     static validModes = [
-        "CTF", "TDM", "DM"
+        "CTF", "TDM", "DM", "FR"
     ]
 
     constructor(options: CommandConfig) {
@@ -54,7 +54,7 @@ export default class RoomCreateCommand extends Command {
             return
         }
 
-        let mode = (flags.get("mode") as string[])?.[0] ?? "DM"
+        let mode = (flags.get("mode") as string[])?.[0] ?? "FR"
         let mapName = (flags.get("map") as string[])[0]
         let gameName = mapName
         if(flags.has("name")) gameName = (flags.get("name") as string[])[0]

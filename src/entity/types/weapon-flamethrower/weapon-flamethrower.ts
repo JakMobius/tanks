@@ -57,7 +57,7 @@ export default class WeaponFlamethrower extends ChargeWeaponComponent {
         const tankLocation = tankBody.GetPosition()
         const tankAngle = tankBody.GetAngle()
 
-        const pAngle = (tankAngle + Math.PI) % (Math.PI * 2) - Math.PI;
+        const normalizedAngle = (tankAngle + Math.PI) % (Math.PI * 2) - Math.PI;
 
         const world = tank.parent
 
@@ -74,18 +74,18 @@ export default class WeaponFlamethrower extends ChargeWeaponComponent {
             const x = anotherTankLocation.x - tankLocation.x;
             const y = anotherTankLocation.y - tankLocation.y;
 
-            const dist = x ** 2 + y ** 2;
+            const distSquared = x ** 2 + y ** 2;
 
-            if (dist > this.squareRadius) continue
+            if (distSquared > this.squareRadius) continue
 
-            let angle = Math.atan2(x, y) + pAngle;
+            let angle = Math.atan2(-y, x) + normalizedAngle;
 
             if (angle > Math.PI) angle -= Math.PI * 2
             if (angle < -Math.PI) angle += Math.PI * 2
 
             if (Math.abs(angle) >= this.angle / 2) continue
 
-            const damage = (Math.sqrt(1 - dist / this.squareRadius)) * this.damage * dt
+            const damage = (Math.sqrt(1 - distSquared / this.squareRadius)) * this.damage * dt
 
             const damageReason = new DamageReason()
             const pilotComponent = tank.getComponent(ServerEntityPilotComponent)

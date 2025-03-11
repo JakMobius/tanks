@@ -19,9 +19,9 @@ export class Drawer extends TankDrawer {
     public bodyLightMask: Sprite;
     public truckSprite: Sprite;
 
-    static bodyQuadrangle = squareQuadrangle(-2.025, -1.575, 4.05, 4.5)
-    static leftTrack = squareQuadrangle(1.125, -1.8, 1.125, 4.5)
-    static rightTrack = squareQuadrangle(-2.25, -1.8, 1.125, 4.5)
+    static bodyQuadrangle = squareQuadrangle(-1.575, -2.025, 4.5, 4.05)
+    static leftTrack = squareQuadrangle(-1.8, -2.25, 4.5, 1.125)
+    static rightTrack = squareQuadrangle(-1.8, 1.125, 4.5, 1.125)
 
     constructor() {
         super();

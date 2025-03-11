@@ -33,7 +33,7 @@ export default class BasicEntityDrawer extends EntityDrawer {
         const transform = this.entity.getComponent(TransformComponent)
 
         const quadrangle = squareQuadrangle(-width / 2, -height / 2, width, height)
-        transformQuadrangle(quadrangle, transform.getTransform())
+        transformQuadrangle(quadrangle, transform.getGlobalTransform())
 
         program.drawSprite(sprite, quadrangle, z)
     }

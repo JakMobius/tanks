@@ -1,4 +1,4 @@
-import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
+import {FlagStateComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-state-component";
 import * as Box2D from "@box2d/core";
 import PhysicsChunk from "src/physics/physics-chunk";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
@@ -18,7 +18,7 @@ export default class FlagContactComponent extends EventHandlerComponent {
     }
 
     private onContactBegin(body: Box2D.b2Body) {
-        const flagState = this.entity.getComponent(FlagDataComponent)
+        const flagState = this.entity.getComponent(FlagStateComponent)
 
         const entity = getObjectFromBody(body)?.entity?.deref()        
         if(!entity) return
@@ -28,7 +28,7 @@ export default class FlagContactComponent extends EventHandlerComponent {
     }
 
     private onContactEnd(body: Box2D.b2Body) {
-        const flagState = this.entity.getComponent(FlagDataComponent)
+        const flagState = this.entity.getComponent(FlagStateComponent)
 
         const entity = getObjectFromBody(body)?.entity?.deref()
         if(!entity) return

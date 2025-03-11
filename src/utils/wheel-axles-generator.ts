@@ -26,8 +26,8 @@ export default class WheelAxlesGenerator {
 
     getWheelOffset(axle: number, side: number) {
         return {
-            x: this.axleWidth / 2 * (side === 1 ? 1 : -1),
-            y: this.axleOffsets[axle]
+            x: this.axleOffsets[axle],
+            y: this.axleWidth / 2 * (side === 1 ? 1 : -1),
         }
     }
 }

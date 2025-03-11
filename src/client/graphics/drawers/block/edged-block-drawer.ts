@@ -4,7 +4,6 @@ import TextureProgram from '../../programs/texture-program';
 import BlockState from 'src/map/block-state/block-state';
 import {squareQuadrangle} from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
-import TilemapComponent from 'src/map/tilemap-component';
 
 export default class EdgedBlockDrawer extends BlockDrawer {
     public variants: Sprite[][];
@@ -82,6 +81,6 @@ export default class EdgedBlockDrawer extends BlockDrawer {
             this.drawSlice(program, x, y, variant[block.facing & 7].rect, s, 0.5, 0, 0)
         }
 
-        super.draw(program, x, y, block)
+        this.drawCrack(program, x, y, block)
     }
 }

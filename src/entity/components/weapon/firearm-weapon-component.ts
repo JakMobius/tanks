@@ -150,8 +150,9 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         const tank = weaponComponent.tank
         const tankPhysicalComponent = tank.getComponent(PhysicalComponent)
         const tankBody = tankPhysicalComponent.getBody()
-        const tankVelocity = tankPhysicalComponent.getBody().GetLinearVelocity()
-        const transform = tank.getComponent(TransformComponent).getGlobalTransform()
+        const tankVelocity = tankBody.GetLinearVelocity()
+        const transformComponent = tank.getComponent(TransformComponent)
+        const transform = transformComponent.getGlobalTransform()
 
         const world = tank.parent
 
@@ -162,10 +163,10 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         let worldY = transform.transformY(x, y)
 
         entity.once("physical-body-created", (component: PhysicalComponent) => {
-            let angle = tankBody.GetAngle()
+            let direction = transformComponent.getGlobalDirection()
 
-            let vx = -Math.sin(angle) * this.initialBulletVelocity + tankVelocity.x
-            let vy = Math.cos(angle) * this.initialBulletVelocity + tankVelocity.y
+            let vx = direction.x * this.initialBulletVelocity + tankVelocity.x
+            let vy = direction.y * this.initialBulletVelocity + tankVelocity.y
 
             component.setVelocity({ x: vx, y: vy })
 
@@ -187,7 +188,7 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
                 x: worldX,
                 y: worldY
             },
-            angle: tankBody.GetAngle()
+            angle: transformComponent.getGlobalAngle()
         })
 
         return entity

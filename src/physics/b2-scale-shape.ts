@@ -28,7 +28,7 @@ export class b2ScaledPolygonShape extends Box2D.b2PolygonShape {
 
     SetHull(hull: Readonly<Box2D.b2Hull>, count: number): Box2D.b2PolygonShape {
         let result = super.SetHull(hull, count)
-        if(!result) return null
+        if(!result) return this
         this.updateOriginal()
         return this
     }
@@ -43,10 +43,11 @@ export class b2ScaledPolygonShape extends Box2D.b2PolygonShape {
     private updateOriginal() {
         this.originalVertices = this.m_vertices.map(v => v.Clone())
         this.originalCount = this.m_count
-        this.SetScale(this.scale)
+        this.SetScale(this.scale, true)
     }
 
-    SetScale(scale: Box2D.XY) {
+    SetScale(scale: Box2D.XY, force = false) {
+        if(!force && this.scale.x === scale.x && this.scale.y === scale.y) return
         this.scale.Set(scale.x, scale.y)
 
         let scaled = this.originalVertices.map(v => {
@@ -77,11 +78,12 @@ export class b2ScaledCircleShape extends Box2D.b2CircleShape {
     Set(position: Box2D.XY, radius: number = this.originalRadius): this {
         this.m_p.Set(position.x, position.y)
         this.originalRadius = radius
-        this.SetScale(this.scale)
+        this.SetScale(this.scale, true)
         return this
     }
 
-    SetScale(scale: Box2D.XY) {
+    SetScale(scale: Box2D.XY, force = false) {
+        if(!force && this.scale.x === scale.x && this.scale.y === scale.y) return
         this.scale.Set(scale.x, scale.y)
         this.m_p.Set(this.originalPosition.x * scale.x, this.originalPosition.y * scale.y)
         this.m_radius = this.originalRadius * Math.max(scale.x, scale.y)

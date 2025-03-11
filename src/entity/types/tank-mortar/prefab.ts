@@ -54,12 +54,12 @@ EntityPrefabs.Types.set(EntityType.TANK_MORTAR, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1.125, 1.8, new Box2D.b2Vec2(0, 0), {
+        let bodyFixture = PhysicsUtils.squareFixture(1.8, 1.125, { x: 0, y: 0 }, {
             density: 480,
             filter: physicsFilters.tank
         })
 
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.7, 2.25, new Box2D.b2Vec2(-1.825, 0), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(2.25, 0.7, {x: 0, y: -1.825 }, {
             filter: physicsFilters.tank,
             density: 480
         })

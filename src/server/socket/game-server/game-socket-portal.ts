@@ -183,7 +183,8 @@ export default class GameSocketPortal extends SocketPortal {
         const controllers = {
             [EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY]: "CTF",
             [EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY]: "TDM",
-            [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY]: "DM"
+            [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY]: "DM",
+            [EntityType.FREEROAM_CONTROLLER_ENTITY]: "FR"
         }
 
         let gameController: Entity | null = null

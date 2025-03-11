@@ -22,7 +22,7 @@ ServerEntityPrefabs.types.set(EntityType.TANK_MORTAR, (entity) => {
         .setShootRate(1)
         .setReloadTime(5)
         .setBulletType(EntityType.BULLET_MORTAR_BALL)
-        .setMuzzlePoint({x: 0, y: 1.25})
+        .setMuzzlePoint({x: 1.25, y: 0})
         .setFireSound(SoundType.SHOOT_MORTAR)
         .setInitialBulletVelocity(30)
 

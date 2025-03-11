@@ -7,20 +7,23 @@ import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 
 export class TDMPlayerWaitingStateController extends TDMGameStateController {
 
     constructor(controller: ServerTDMControllerComponent) {
         super(controller)
 
+        const timeComponent = controller.entity.getComponent(GameTimeComponent)   
+
         this.addScript(new NoDamageScript(this.controller))
 
-        this.addScript(new GameStartTimerScript(this.controller, this.controller.matchStartDelay, () => {
+        this.addScript(new GameStartTimerScript(this.controller, timeComponent.matchStartDelay, () => {
             this.controller.activateGameState(new TDMPlayingStateController(this.controller))
         }))
 
         this.addScript(new PlayerCountCallbackScript(this.controller, (playerCount) => {
-            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= this.controller.minPlayers)
+            this.getScript(GameStartTimerScript).setTimerStarted(playerCount >= timeComponent.minPlayers)
             this.controller.triggerStateBroadcast()
         }))
 
@@ -28,9 +31,11 @@ export class TDMPlayerWaitingStateController extends TDMGameStateController {
     }
 
     getState(): TDMGameState {
+        let timeComponent = this.controller.entity.getComponent(GameTimeComponent)
+        
         return {
             state: TDMGameStateType.waitingForPlayers,
-            minPlayers: this.controller.minPlayers,
+            minPlayers: timeComponent.minPlayers,
             currentPlayers: this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length,
             timer: this.getScript(GameStartTimerScript).gameStartTimer
         }

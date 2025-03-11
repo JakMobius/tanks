@@ -1,12 +1,6 @@
 import TankDrawer from "src/client/graphics/drawers/tank-drawer";
 import Sprite from "src/client/graphics/sprite";
-import {
-    copyQuadrangle,
-    squareQuadrangle,
-    transformQuadrangle,
-    translateQuadrangle,
-    turnQuadrangle
-} from "src/utils/quadrangle";
+import { squareQuadrangle } from "src/utils/quadrangle";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import TransformComponent from "src/entity/components/transform-component";
@@ -20,8 +14,8 @@ export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
     public wheelSprites: Sprite[];
 
-    static bodyQuadrangle = squareQuadrangle(-1.25, -1.65, 2.5, 3.3)
-    static wheelQuadrangle = squareQuadrangle(-0.425, -0.675, 0.85, 1.35)
+    static bodyQuadrangle = squareQuadrangle(-1.65, -1.25, 3.3, 2.5)
+    static wheelQuadrangle = squareQuadrangle(-0.675, -0.425, 1.35, 0.85)
 
     static spritesPerMeter = 10
     static wheelSpriteCount = 5

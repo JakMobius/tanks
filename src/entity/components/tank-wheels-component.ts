@@ -46,7 +46,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             // set wheelTranslation to wheel-space velocity of the wheel
             Box2D.b2Vec2.prototype.Rotate.call(wheelTranslation, -angle)
 
-            wheel.groundSpeed = wheelTranslation.y
+            wheel.groundSpeed = wheelTranslation.x
 
             // set wheelTranslation to wheel-space translation of the wheel on this tick
             Box2D.b2Vec2.prototype.Scale.call(wheelTranslation, dt)
@@ -54,7 +54,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             let tickMovement = wheelRotationSpeed * dt * wheelGroup.circumference
 
             wheel.tensionVector.Add(wheelTranslation)
-            wheel.tensionVector.y -= tickMovement
+            wheel.tensionVector.x -= tickMovement
 
             let tickDistance = Math.abs(tickMovement)
 
@@ -82,7 +82,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
                 wheel.slideVelocity = 0
             }
 
-            torque += this.getWheelTorqueFromTension(wheel, wheel.tensionVector.y)
+            torque += this.getWheelTorqueFromTension(wheel, wheel.tensionVector.x)
 
             // if(wheelRotationSpeed > 0) {
             //     wheelRotationSpeed -= wheel.brakeTorque / wheelRotationSpeed * dt
@@ -95,9 +95,9 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             let wheelTension = {x: wheel.tensionVector.x, y: wheel.tensionVector.y}
 
             // Decreasing wheel reaction if the vehicle is moving back to its neutral position
-            let projection = wheelTranslation.x / wheel.tensionVector.x
+            let projection = wheelTranslation.y / wheel.tensionVector.y
             if (projection < 0) {
-                wheelTension.x /= (1 - projection * 10);
+                wheelTension.y /= (1 - projection * 10);
             }
 
             Box2D.b2Vec2.prototype.Scale.call(wheelTension, wheel.grip / wheel.tensionLimit);

@@ -1,56 +1,26 @@
-import Transmitter from "src/entity/components/network/transmitting/transmitter";
-import PhysicalComponent from "src/entity/components/physics-component";
-import {Commands} from "src/entity/components/network/commands";
-import TransmitterVisibilityPrecondition
-    from "src/entity/components/network/transmitting/precondition/transmitter-visibility-precondition";
-import FlagStateComponent from "src/entity/types/flag/flag-state-component";
+import Transmitter from "src/entity/components/network/transmitting/transmitter"
+import { FlagStateComponent } from "../../controller-ctf/server-side/scripts/flag-state-component"
+import { Commands } from "src/entity/components/network/commands"
+
 
 export default class FlagStateTransmitter extends Transmitter {
-
-    private visibilityPrecondition = new TransmitterVisibilityPrecondition(this)
-
     constructor() {
         super()
-
-        this.eventHandler.on("flag-state-changed", () => {
-            this.updatePrecondition()
-            this.sendUpdate()
+        this.eventHandler.on("team-set", (entity) => {
+            this.sendTeam()
         })
-
-        this.transmitterPrecondition = this.visibilityPrecondition
     }
 
-    updatePrecondition() {
-        let flagState = this.getEntity().getComponent(FlagStateComponent)
-
-        if(flagState.carrier) {
-            this.visibilityPrecondition.setEntityArray([flagState.carrier])
-        } else {
-            this.visibilityPrecondition.setEntityArray([])
-        }
+    onEnable(): void {
+        super.onEnable()
+        this.sendTeam()
     }
 
-    onEnable() {
-        super.onEnable();
-        this.sendUpdate()
-    }
+    sendTeam() {
+        const flagData = this.getEntity().getComponent(FlagStateComponent)
 
-    sendUpdate() {
-        let flagState = this.getEntity().getComponent(FlagStateComponent)
-
-        this.packIfEnabled(Commands.FLAG_POSITION_COMMAND, (buffer) => {
-            buffer.writeInt8(flagState.teamId === null ? -1 : flagState.teamId)
-            if (flagState.carrier) {
-                buffer.writeUint8(1)
-                this.pointToEntity(flagState.carrier)
-            } else {
-                buffer.writeUint8(0)
-                let body = this.getEntity().getComponent(PhysicalComponent).getBody()
-
-                let position = body.GetPosition()
-                buffer.writeFloat32(position.x)
-                buffer.writeFloat32(position.y)
-            }
+        this.packIfEnabled(Commands.FLAG_DATA_COMMAND, (buffer) => {
+            buffer.writeInt8(flagData.team.id)
         })
     }
 }

@@ -1,6 +1,6 @@
 import TankDrawer from "src/client/graphics/drawers/tank-drawer";
 import Sprite from "src/client/graphics/sprite";
-import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
+import {squareQuadrangle} from "src/utils/quadrangle";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import TransformComponent from "src/entity/components/transform-component";
@@ -15,9 +15,9 @@ export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
     public truckSprite: Sprite;
 
-    static bodyQuadrangle = squareQuadrangle(-1.575, -1.8, 3.15, 3.6)
-    static leftTrack = squareQuadrangle(1.125, -2.25, 1.4, 4.5)
-    static rightTrack = squareQuadrangle(-2.525, -2.25, 1.4, 4.5)
+    static bodyQuadrangle = squareQuadrangle(-1.8, -1.575, 3.6, 3.15)
+    static leftTrack = squareQuadrangle(-2.25, -2.525, 4.5, 1.4)
+    static rightTrack = squareQuadrangle(-2.25, 1.125, 4.5, 1.4)
 
     constructor() {
         super();

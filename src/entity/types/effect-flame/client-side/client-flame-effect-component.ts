@@ -97,32 +97,32 @@ export default class ClientFlameEffectComponent extends EventHandlerComponent {
         const body = tank.getComponent(PhysicalComponent).getBody()
         const transformComponent = tank.getComponent(TransformComponent)
         const transform = transformComponent.getGlobalTransform()
+        const angle = transformComponent.getAngle()
 
         this.soundEntity?.getComponent(SoundPositionComponent).setPosition(transformComponent.getPosition())
 
         const velocity = body.GetLinearVelocity()
-        const angle = body.GetAngle()
 
         this.particleQueue += dt * this.particleFrequency
 
         const world = tank.parent
         const particleComponent = world.getComponent(ParticleHostComponent)
 
-        const particlePositionX = transform.transformX(0, 2.5)
-        const particlePositionY = transform.transformY(0, 2.5)
+        const particlePositionX = transform.transformX(2.5, 0)
+        const particlePositionY = transform.transformY(2.5, 0)
 
         while (this.particleQueue > 0) {
-            const heading = -angle + (Math.random() - 0.5) * Math.PI / 4;
-            const sin = Math.sin(heading);
-            const cos = Math.cos(heading);
+            const heading = angle + (Math.random() - 0.5) * Math.PI / 4;
+            const vx = Math.cos(heading);
+            const vy = -Math.sin(heading);
             const vel = 60 + Math.random() * 5;
             const dist = Math.random() * 6;
 
             const smoke = new FireParticle({
-                x: particlePositionX + sin * dist,
-                y: particlePositionY + cos * dist,
-                dx: velocity.x + sin * vel,
-                dy: velocity.y + cos * vel,
+                x: particlePositionX + vx * dist,
+                y: particlePositionY + vy * dist,
+                dx: velocity.x + vx * vel,
+                dy: velocity.y + vy * vel,
                 width: 1,
                 height: 1,
                 scaling: 15,

@@ -72,6 +72,9 @@ export function readEntityFile(file: MapFile) {
             tilemap?.getComponent(TilemapComponent).setMap(width, height, blocks)
             if(tilemap) entity.appendChild(tilemap)
 
+            let mapCenterX = width / 2 * TilemapComponent.DEFAULT_SCALE
+            let mapCenterY = height / 2 * TilemapComponent.DEFAULT_SCALE
+
             let spawnzones: Entity[] = []
             for(let spawnZone of config.spawnZones) {
                 let zone = manufactureEntity(EntityType.SPAWNZONE, factory?.leaf)
@@ -83,31 +86,32 @@ export function readEntityFile(file: MapFile) {
                 let scaleX = Math.abs(spawnZone.x1 - spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
                 let scaleY = Math.abs(spawnZone.y1 - spawnZone.y2) / 2 * TilemapComponent.DEFAULT_SCALE
 
+                let angleTowardsCenter = Math.atan2(-(centerY - mapCenterY), centerX - mapCenterX) + Math.PI
+
                 zone.getComponent(TransformComponent).set({
                     position: { x: centerX, y: centerY },
                     scale: { x: scaleX, y: scaleY }
                 })
-                zone.getComponent(SpawnzoneComponent).setTeam(spawnZone.id)
+                zone.getComponent(SpawnzoneComponent)
+                    .setTeam(spawnZone.id)
+                    .setSpawnAngle(angleTowardsCenter)
                 entity.appendChild(zone)
                 spawnzones.push(zone)
             }
 
-            const dmController = manufactureEntity(EntityType.DM_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
-            if(dmController) {
-                dmController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
-                entity.appendChild(dmController)
-            }
+            let controllerPrefabs = [
+                EntityType.DM_GAME_MODE_CONTROLLER_ENTITY,
+                EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY,
+                EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY,
+                EntityType.FREEROAM_CONTROLLER_ENTITY
+            ]
 
-            const tdmController = manufactureEntity(EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
-            if(tdmController) {
-                tdmController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
-                entity.appendChild(tdmController)
-            }
-
-            const ctfController = manufactureEntity(EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY, factory?.leaf)
-            if(ctfController) {
-                ctfController.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
-                entity.appendChild(ctfController)
+            for(let controllerPrefab of controllerPrefabs) {
+                const controller = manufactureEntity(controllerPrefab, factory?.leaf)
+                if(controller) {
+                    controller.getComponent(GameSpawnzonesComponent).spawnzones = spawnzones.slice()
+                    entity.appendChild(controller)
+                }
             }
 
             return entity

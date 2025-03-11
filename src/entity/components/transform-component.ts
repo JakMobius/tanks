@@ -6,7 +6,9 @@ import { PropertyInspector, VectorProperty } from "./inspector/property-inspecto
 import { TransmitterSet } from "./network/transmitting/transmitter-set";
 import PositionTransmitter from "./network/position/position-transmitter";
 import { degToRad, radToDeg } from "src/utils/utils";
-import { getPrefabNameForEntity } from "./prefab-id-component";
+import PrefabIdComponent, { getPrefabNameForEntity } from "./prefab-id-component";
+import { EntityType } from "../entity-type";
+import FlagStateReceiver from "../types/flag/client-side/flag-state-receiver";
 
 function getScale(transform: ReadonlyMatrix3) {
     let x = Math.sqrt(transform.get(0) ** 2 + transform.get(1) ** 2)

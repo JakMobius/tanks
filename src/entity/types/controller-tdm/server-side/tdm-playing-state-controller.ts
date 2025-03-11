@@ -17,6 +17,7 @@ import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import {chooseRandomIndex} from "src/utils/utils";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 
 export class TDMPlayingStateController extends TDMGameStateController {
 
@@ -51,8 +52,10 @@ export class TDMPlayingStateController extends TDMGameStateController {
     activate() {
         super.activate()
 
+        let timeComponent = this.controller.entity.getComponent(GameTimeComponent)
+
         this.controller.world.getComponent(WorldStatisticsComponent)
-            .getMatchLeftTimerComponent().countdownFrom(this.controller.matchTime)
+            .getMatchLeftTimerComponent().countdownFrom(timeComponent.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
 
         this.setupTeams()

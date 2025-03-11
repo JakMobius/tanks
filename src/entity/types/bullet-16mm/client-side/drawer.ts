@@ -10,6 +10,6 @@ export class Drawer extends BulletDrawer {
     draw(phase: DrawPhase) {
         if (!this.entity.getComponent(ClientBulletBehaviourComponent).visible) return
         this.drawTrace(phase, 0.2)
-        this.drawSprite(Drawer.getSprite(0), 0.166, 0.5, phase)
+        this.drawSprite(Drawer.getSprite(0), 0.5, 0.166, phase)
     }
 }

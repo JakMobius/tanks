@@ -64,6 +64,7 @@ const prefabNames = new Map<number, string>([
     [EntityType.TDM_GAME_MODE_CONTROLLER_ENTITY, "Контроллер режима TDM"],
     [EntityType.CTF_GAME_MODE_CONTROLLER_ENTITY, "Контроллер режима CTF"],
     [EntityType.DM_GAME_MODE_CONTROLLER_ENTITY,  "Контроллер режима DM"],
+    [EntityType.FREEROAM_CONTROLLER_ENTITY,      "Контроллер режима FR"],
 
     // Utilities:
     [EntityType.TIMER_ENTITY,                    "Таймер"],

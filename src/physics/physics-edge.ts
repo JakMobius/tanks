@@ -1,7 +1,6 @@
 import PhysicsChunk from "./physics-chunk";
 
 export default class PhysicsEdge {
-
     static cornerXCoordinates = [0, 1, 1, 0]
     static cornerYCoordinates = [0, 0, 1, 1]
     static directions = [
@@ -103,6 +102,10 @@ export default class PhysicsEdge {
 
     static oppositeDirectionIndex(directionIndex: number) {
         return (directionIndex + 4) & 7
+    }
+
+    equals(other: PhysicsEdge) {
+        return this.source === other.source && this.target === other.target
     }
 }
 

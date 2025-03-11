@@ -11,8 +11,8 @@ import CTFMatchOverStateView from "./ctf-match-over-state-view";
 import Entity from "src/utils/ecs/entity";
 
 interface CTFGameStateHUDProps {
-    state?: CTFGameState
     event?: CTFEventData
+    state: CTFGameState
     world: Entity
 }
 

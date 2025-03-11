@@ -52,11 +52,11 @@ EntityPrefabs.Types.set(EntityType.TANK_BOMBER, (entity) => {
     }))
     
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1.115, 1.6875, new Box2D.b2Vec2(0, -0.5625), {
+        let bodyFixture = PhysicsUtils.squareFixture(1.6875, 1.115, { x: -0.5625, y: 0 }, {
             filter: physicsFilters.tank,
             density: 400
         })
-        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(0.67, 1.6875, new Box2D.b2Vec2(1.805, 0), {
+        let trackFixtures = PhysicsUtils.horizontalSquareFixtures(1.6875, 0.67, { x: 0, y: 1.805 }, {
             filter: physicsFilters.tank,
             density: 400
         })

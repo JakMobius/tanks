@@ -11,7 +11,7 @@ export default class NoDamageScript extends ServerGameScript {
     constructor(controller: ServerGameController) {
         super(controller)
         this.worldEventHandler.on("entity-damage", (event: EntityDamageEvent) => this.onEntityDamage(event))
-        this.worldEventHandler.on("map-block-damage", (event: BlockDamageEvent) => event.cancel())
+        this.worldEventHandler.on("block-damage", (event: BlockDamageEvent) => event.cancel())
     }
 
     private onEntityDamage(event: EntityDamageEvent) {

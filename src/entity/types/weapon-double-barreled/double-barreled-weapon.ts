@@ -17,7 +17,7 @@ export default class DoubleBarreledWeapon extends FirearmWeaponComponent {
 		super.shoot()
 		const shift = (this.state === 0) ? -this.barrelOffset : this.barrelOffset;
 
-		let bullet = this.launchBullet(EntityType.BULLET_16MM, shift, this.barrelLength)
+		let bullet = this.launchBullet(EntityType.BULLET_16MM, this.barrelLength, shift)
 		Object.assign(bullet.getComponent(BulletBehaviour).config, this.bulletConfig)
 
 		this.state = 1 - this.state

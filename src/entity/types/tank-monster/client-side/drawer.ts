@@ -3,7 +3,6 @@ import Sprite from "src/client/graphics/sprite";
 import {
     copyQuadrangle,
     squareQuadrangle,
-    transformQuadrangle,
     translateQuadrangle,
     turnQuadrangle
 } from "src/utils/quadrangle";
@@ -25,8 +24,8 @@ export class Drawer extends TankDrawer {
     public bodyLightMask: Sprite;
     public wheelSprites: Sprite[];
 
-    static bodyQuadrangle = squareQuadrangle(-2, -2.5, 4, 5)
-    static wheelQuadrangle = squareQuadrangle(-0.45, -0.75, 0.9, 1.5)
+    static bodyQuadrangle = squareQuadrangle(-2.5, -2, 5, 4)
+    static wheelQuadrangle = squareQuadrangle(-0.75, -0.45, 1.5, 0.9)
 
     static spritesPerMeter = 20
     static wheelSpriteCount = 10

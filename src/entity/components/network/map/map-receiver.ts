@@ -10,7 +10,7 @@ export default class MapReceiver extends ReceiverComponent {
         receiveComponent.commandHandlers.set(Commands.BLOCK_UPDATE_COMMAND, (buffer) => {
             let x = buffer.readUint16()
             let y = buffer.readUint16()
-            let id = buffer.readUint8()
+            let id = buffer.readUint16()
             let damage = buffer.readFloat32()
 
             let Block = BlockState.getBlockStateClass(id)

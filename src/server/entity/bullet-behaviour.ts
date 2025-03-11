@@ -12,6 +12,7 @@ import {EntityType} from "src/entity/entity-type";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import {WorldComponent} from "src/entity/game-world-entity-prefab";
 import TransformComponent from "src/entity/components/transform-component";
+import TilemapComponent from "src/map/tilemap-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -50,8 +51,8 @@ export default class BulletBehaviour extends EventHandlerComponent {
             this.handleEntityHit(hitEntity, contact)
         })
 
-        this.eventHandler.on("block-hit", (x: number, y: number, point: Box2D.XY) => {
-            this.handleBlockHit(x, y, point)
+        this.eventHandler.on("block-hit", (x: number, y: number, point: Box2D.XY, tilemap: TilemapComponent) => {
+            this.handleBlockHit(x, y, point, tilemap)
         })
 
         this.eventHandler.on("health-set", (health: number) => {
@@ -90,17 +91,17 @@ export default class BulletBehaviour extends EventHandlerComponent {
         })
     }
 
-    private handleBlockHit(x: number, y: number, point: Box2D.XY) {
+    private handleBlockHit(x: number, y: number, point: Box2D.XY, tilemap: TilemapComponent) {
         if (this.isDead) return
         if (this.config.diesOnWallHit !== false) {
             this.die()
         }
-        const world = this.entity.parent
+        const world = this.entity.parent 
 
         this.nextPhysicalTick(() => {
             if (this.config.wallDamage) {
                 world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                    // tilemap?.damageBlock(x, y, this.config.wallDamage)
+                     tilemap?.damageBlock(x, y, this.config.wallDamage)
                 })
             }
 
@@ -126,7 +127,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
         }
     }
 
-    die() {
+     die() {
         this.isDead = true
     }
 

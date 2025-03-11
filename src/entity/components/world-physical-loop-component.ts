@@ -11,6 +11,8 @@ export default class WorldPhysicalLoopComponent extends EventHandlerComponent {
         this.eventHandler.on("tick", (dt: number) => {
             this.entity.getComponent(PhysicalHostComponent).beforePhysics()
             this.loop.timePassed(dt)
+            let timeRemaining = this.loop.getRemainingTime()
+            this.entity.getComponent(PhysicalHostComponent).afterPhysics(timeRemaining)
 
             // It's convenient to use physical loop schedule
             // when we speak about contact listeners. There is

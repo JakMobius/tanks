@@ -16,7 +16,7 @@ vec4 pixel(vec2 delta) {
     vec4 mask = texture2D(u_texture, v_mask_position + delta);
 
     float intense = mask.a;
-    float angle = mask.r + mod(u_angle - v_angle, 1.0);
+    float angle = mask.r + mod(v_angle - u_angle, 1.0);
 
     if(angle > 1.0) angle = angle - 1.0;
     if(angle > 0.75) angle = 1.0 - angle;

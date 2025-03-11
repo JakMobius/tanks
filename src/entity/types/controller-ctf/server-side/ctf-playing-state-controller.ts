@@ -1,7 +1,6 @@
 import WorldStatisticsComponent from "src/entity/components/network/world-statistics/world-statistics-component";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
-import MapLoaderComponent from "src/server/room/components/map-loader-component";
 import QuickMatchEndScript from "src/server/room/game-modes/scripts/quick-match-end-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import MatchTimerExpireScript from "src/server/room/game-modes/scripts/match-timer-expire-script";
@@ -25,10 +24,11 @@ import PlayerRespawnActionComponent from "src/entity/types/player/server-side/pl
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import {chooseRandomIndex} from "src/utils/utils";
 import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
-import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
+import {FlagStateComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-state-component";
 import RoomClientComponent from "src/server/room/components/room-client-component";
 import TeamColor from "src/utils/team-color";
 import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 
 export default class CTFPlayingStateController extends CTFGameStateController {
     private teamStatistics = new Map<Team, CTFTeamStatistics>();
@@ -62,8 +62,9 @@ export default class CTFPlayingStateController extends CTFGameStateController {
 
     activate() {
         super.activate()
+        const timeComponent = this.controller.entity.getComponent(GameTimeComponent)
         this.controller.world.getComponent(WorldStatisticsComponent)
-            .getMatchLeftTimerComponent().countdownFrom(this.controller.matchTime)
+            .getMatchLeftTimerComponent().countdownFrom(timeComponent.matchTime)
         this.controller.world.getComponent(WorldPlayerStatisticsComponent).resetAllStatistics()
         // TODO: reload map
         this.controller.triggerStateBroadcast()
@@ -177,23 +178,23 @@ export default class CTFPlayingStateController extends CTFGameStateController {
         }
     }
 
-    private onFlagDelivered(flagState: FlagDataComponent, tank: Entity) {
+    private onFlagDelivered(flagState: FlagStateComponent, tank: Entity) {
         const pilot = this.getTankPilot(tank)
         if (pilot) this.scorePlayer(pilot, 25)
         this.broadcastFlagEvent(CTFFlagEventType.flagDeliver, flagState.team.id, pilot)
     }
 
-    private onFlagDrop(flagState: FlagDataComponent, tank: Entity) {
+    private onFlagDrop(flagState: FlagStateComponent, tank: Entity) {
         const pilot = this.getTankPilot(tank)
         this.broadcastFlagEvent(CTFFlagEventType.flagDrop, flagState.team.id, pilot)
     }
 
-    private onFlagCapture(flagState: FlagDataComponent, tank: Entity) {
+    private onFlagCapture(flagState: FlagStateComponent, tank: Entity) {
         const pilot = this.getTankPilot(tank)
         this.broadcastFlagEvent(CTFFlagEventType.flagCapture, flagState.team.id, pilot)
     }
 
-    private onFlagReturn(flagState: FlagDataComponent, tank: Entity) {
+    private onFlagReturn(flagState: FlagStateComponent, tank: Entity) {
         const pilot = this.getTankPilot(tank)
         if (pilot) this.scorePlayer(pilot, 2)
         this.broadcastFlagEvent(CTFFlagEventType.flagReturn, flagState.team.id, pilot)

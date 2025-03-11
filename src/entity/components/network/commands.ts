@@ -25,7 +25,7 @@ export const Commands = {
     GAME_EVENT_COMMAND:              0x0F16,
     ENTITY_PILOT_LIST_COMMAND:       0x0F17,
     TIMER_VALUE_COMMAND:             0x0F18,
-    FLAG_POSITION_COMMAND:           0x0F19,
+    FLAG_DATA_COMMAND:               0x0F19,
     USER_MESSAGE_COMMAND:            0x0F20,
     MORTAR_BALL_HEIGHT_SET:          0x0F21,
     WEAPON_STATE:                    0x0F22,

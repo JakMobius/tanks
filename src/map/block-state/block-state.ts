@@ -1,6 +1,6 @@
 import TilemapComponent from "../tilemap-component";
 
-interface BlockStateConfig {
+export interface BlockStateConfig {
     damage: number
 }
 

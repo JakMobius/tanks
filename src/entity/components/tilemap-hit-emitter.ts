@@ -3,6 +3,7 @@ import PhysicalComponent from "./physics-component";
 import TilemapComponent from "src/map/tilemap-component";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { getObjectFromBody } from "../physical-body-data";
+import TransformComponent from "./transform-component";
 
 export default class TilemapHitEmitter extends EventHandlerComponent {
     constructor() {
@@ -14,16 +15,16 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
 
     onBodyHit(body: Box2D.b2Body, contact: Box2D.b2Contact) {
         const data = getObjectFromBody(body)
-        
-        if(data.entity?.deref()) {
-            this.entity.emit("entity-hit", data.entity.deref(), contact)
-        }
 
         if(data.physicsChunk?.deref()) {
             const worldManifold = new Box2D.b2WorldManifold()
             contact.GetWorldManifold(worldManifold)
             const points = worldManifold.points.slice(0, contact.GetManifold().pointCount)
             this.emitMultipleBlockHits(points, data.physicsChunk.deref().getMap())
+        }
+
+        if(data.entity?.deref()) {
+            this.entity.emit("entity-hit", data.entity.deref(), contact)
         }
     }
 
@@ -34,50 +35,57 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         }
     }
 
-    private emitBlockHit(point: Box2D.b2Vec2, map: TilemapComponent) {
-        let blockX = point.x / 1
-        let blockY = point.y / 1
+    private emitBlockHit(point: Box2D.XY, map: TilemapComponent) {
+        let transform = map.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
+
+        let blockX = transform.transformX(point.x, point.y)
+        let blockY = transform.transformY(point.y, point.y)
 
         const gridX = Math.floor(blockX)
         const gridY = Math.floor(blockY)
 
         const block = map.getBlock(gridX, gridY)
         if (block && block.solid) {
-            this.entity.emit("block-hit", gridX, gridY, point)
+            this.entity.emit("block-hit", gridX, gridY, point, map)
             return
         }
 
-        const velocity = new Box2D.b2Vec2()
+        const velocity = { x: 0, y: 0 }
         this.entity.getComponent(PhysicalComponent).getBody().GetLinearVelocityFromWorldPoint(point, velocity)
 
-        if (velocity.x === 0 && velocity.y === 0) return
+        const localVelocity = {
+            x: transform.transformX(velocity.x, velocity.y, 0),
+            y: transform.transformY(velocity.x, velocity.y, 0),
+        }
 
-        while (true) {
-            let nextDistanceX = velocity.x > 0 ? Math.ceil(blockX) - blockX : Math.floor(blockX) - blockX
-            let nextDistanceY = velocity.y > 0 ? Math.ceil(blockY) - blockY : Math.floor(blockY) - blockY
+        if (localVelocity.x === 0 && localVelocity.y === 0) return
 
-            if (nextDistanceX === 0) nextDistanceX = Math.sign(velocity.x)
-            if (nextDistanceY === 0) nextDistanceY = Math.sign(velocity.y)
+        for(let i = 0; i < 3; i++) {
+            let nextDistanceX = localVelocity.x > 0 ? Math.ceil(blockX) - blockX : Math.floor(blockX) - blockX
+            let nextDistanceY = localVelocity.y > 0 ? Math.ceil(blockY) - blockY : Math.floor(blockY) - blockY
+
+            if (nextDistanceX === 0) nextDistanceX = Math.sign(localVelocity.x)
+            if (nextDistanceY === 0) nextDistanceY = Math.sign(localVelocity.y)
 
             let nextDistanceFraction = 1
 
-            if (velocity.x !== 0) nextDistanceFraction = nextDistanceX / velocity.x
-            if (velocity.y !== 0) nextDistanceFraction = Math.min(nextDistanceFraction, nextDistanceY / velocity.y)
+            if (localVelocity.x !== 0) nextDistanceFraction = nextDistanceX / localVelocity.x
+            if (localVelocity.y !== 0) nextDistanceFraction = Math.min(nextDistanceFraction, nextDistanceY / localVelocity.y)
 
             if (nextDistanceFraction < Number.EPSILON) {
                 nextDistanceFraction = Number.EPSILON
             }
 
-            const checkX = Math.floor(blockX + velocity.x * nextDistanceFraction * 0.5)
-            const checkY = Math.floor(blockY + velocity.y * nextDistanceFraction * 0.5)
+            const checkX = Math.floor(blockX + localVelocity.x * nextDistanceFraction * 0.5)
+            const checkY = Math.floor(blockY + localVelocity.y * nextDistanceFraction * 0.5)
 
-            if (checkX !== gridX || checkY !== gridY) {
-                this.entity.emit("block-hit", checkX, checkY, point)
+            if (map.getBlock(checkX, checkY)?.solid) {
+                this.entity.emit("block-hit", checkX, checkY, point, map)
                 return
             }
 
-            blockX += velocity.x * nextDistanceFraction
-            blockY += velocity.y * nextDistanceFraction
+            blockX += localVelocity.x * nextDistanceFraction
+            blockY += localVelocity.y * nextDistanceFraction
         }
     }
 }

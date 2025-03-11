@@ -1,4 +1,4 @@
-import { PropertyInspector, SelectProperty } from "src/entity/components/inspector/property-inspector";
+import { PropertyInspector, SelectProperty, VectorProperty } from "src/entity/components/inspector/property-inspector";
 import { TransmitterSet } from "src/entity/components/network/transmitting/transmitter-set";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TeamColor from "src/utils/team-color";
@@ -7,6 +7,7 @@ import TransformComponent from "src/entity/components/transform-component";
 
 export default class SpawnzoneComponent extends EventHandlerComponent {
     team = 0
+    spawnAngle = 0
 
     constructor() {
         super()
@@ -23,6 +24,14 @@ export default class SpawnzoneComponent extends EventHandlerComponent {
                 .withSetter((team) => this.setTeam(Number(team)))
                 .updateOn("team-set")
             inspector.addProperty(property)
+
+            let angleProperty = new VectorProperty("spawnAngle", 1)
+                .withName("Направление игроков при спавне")
+                .replaceNaN()
+                .withGetter(() => [this.spawnAngle])
+                .withSetter((angle) => this.setSpawnAngle(angle[0]))
+                .updateOn("spawn-angle-set")
+            inspector.addProperty(angleProperty)
         })
 
         this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
@@ -33,6 +42,17 @@ export default class SpawnzoneComponent extends EventHandlerComponent {
     setTeam(team: number) {
         this.team = team
         this.entity.emit("team-set", team)
+        return this
+    }
+
+    setSpawnAngle(angle: number) {
+        this.spawnAngle = angle
+        this.entity.emit("spawn-angle-set", angle)
+        return this
+    }
+
+    getGlobalSpawnAngle() {
+        return this.spawnAngle + this.entity.getComponent(TransformComponent).getGlobalAngle()
     }
 
     sample() {

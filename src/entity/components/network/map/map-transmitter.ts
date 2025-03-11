@@ -9,11 +9,11 @@ export default class MapTransmitter extends Transmitter {
     constructor() {
         super()
 
-        this.eventHandler.on("map-block-damage", (event: BlockDamageEvent) => {
+        this.eventHandler.on("block-damage", (event: BlockDamageEvent) => {
             if(event.cancelled) return
             this.sendBlockUpdate(event.x, event.y)
         })
-        this.eventHandler.on("map-block-change", (event: BlockChangeEvent) => {
+        this.eventHandler.on("block-change", (event: BlockChangeEvent) => {
             this.sendBlockUpdate(event.x, event.y)
         })
         this.eventHandler.on("update", (event: BlockChangeEvent) => {

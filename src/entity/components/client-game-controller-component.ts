@@ -31,6 +31,7 @@ export class ClientGameControllerComponent extends EventHandlerComponent {
         this.eventHandler.on("game-event", (event: any) => {
             this.entity.emit("hud-view", this.hudFC, {
                 event: event,
+                state: this.state,
                 world: this.world
             })
         })
@@ -44,6 +45,7 @@ export class ClientGameControllerComponent extends EventHandlerComponent {
     updateHud() {
         this.entity.emit("hud-view", this.hudFC, {
             state: this.state,
+            event: null,
             world: WorldComponent.getWorld(this.entity)
         })
     }

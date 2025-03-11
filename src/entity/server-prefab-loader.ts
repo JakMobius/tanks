@@ -12,6 +12,7 @@ import 'src/entity/types/chat/server-side/server-prefab'
 import 'src/entity/types/controller-ctf/server-side/server-prefab'
 import 'src/entity/types/controller-dm/server-side/server-prefab'
 import 'src/entity/types/controller-tdm/server-side/server-prefab'
+import 'src/entity/types/controller-freeroam/server-side/server-prefab'
 
 import 'src/entity/types/tank-bigboi/server-prefab'
 import 'src/entity/types/tank-tesla/server-prefab'

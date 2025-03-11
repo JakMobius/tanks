@@ -17,7 +17,7 @@ EntityPrefabs.Types.set(EntityType.BULLET_16MM, (entity) => {
     entity.addComponent(new HealthComponent())
     entity.addComponent(new SailingComponent(1))
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(0.0825, 0.25, null, {
+        let bodyFixture = PhysicsUtils.squareFixture(0.25, 0.0825, null, {
             density: 48,
             filter: physicsFilters.bullet
         })

@@ -49,8 +49,8 @@ export default class DamageSmokeEffectComponent extends EventHandlerComponent {
         const particleComponent = tank.parent.getComponent(ParticleHostComponent)
 
         const position = physicalComponent.getBody().GetPosition()
-        const velocityX = transform.transformX(0, -2, 0)
-        const velocityY = transform.transformY(0, -2, 0)
+        const velocityX = transform.transformX(-2, 0, 0)
+        const velocityY = transform.transformY(-2, 0, 0)
 
         if (normalizedHealth !== 0 || Math.random() < 0.5) {
             const gray = normalizedHealth / 0.7

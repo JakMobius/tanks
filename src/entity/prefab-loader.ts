@@ -13,6 +13,7 @@ import 'src/entity/types/flag/prefab'
 import 'src/entity/types/controller-ctf/prefab'
 import 'src/entity/types/controller-dm/prefab'
 import 'src/entity/types/controller-tdm/prefab'
+import 'src/entity/types/controller-freeroam/prefab'
 
 import 'src/entity/types/tank-bigboi/prefab'
 import 'src/entity/types/tank-tesla/prefab'

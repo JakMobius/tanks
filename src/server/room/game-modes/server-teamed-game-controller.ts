@@ -1,6 +1,9 @@
 import { PropertyInspector, VectorProperty } from "src/entity/components/inspector/property-inspector";
+import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import Team from "src/server/team";
+import Entity from "src/utils/ecs/entity";
+import GameSpawnzonesComponent from "./game-spawnzones-component";
 
 export default abstract class ServerTeamedGameController extends ServerGameController {
     teams: Team[] = []
@@ -32,11 +35,26 @@ export default abstract class ServerTeamedGameController extends ServerGameContr
         return leastPopulatedTeam
     }
 
-    private createTeams(teams: number) {
-        for (let i = 0; i < teams; i++) {
+    private createTeams() {
+        this.teams = []
+        
+        let spawnzonesComponent = this.entity.getComponent(GameSpawnzonesComponent)
+        let teams = new Set<number>()
+
+        for(let entity of spawnzonesComponent.spawnzones) {
+            let zone = entity.getComponent(SpawnzoneComponent)
+            teams.add(zone.team)
+        }
+
+        for (let teamId of teams) {
             let team = new Team()
-            team.id = i
+            team.id = teamId
             this.teams.push(team)
         }
+    }
+
+    setWorld(world: Entity): void {
+        super.setWorld(world)
+        this.createTeams()
     }
 }

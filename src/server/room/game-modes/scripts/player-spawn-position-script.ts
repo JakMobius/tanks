@@ -4,7 +4,6 @@ import PlayerRespawnEvent from "src/events/player-respawn-event";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import Entity from "src/utils/ecs/entity";
 import { chooseRandom } from "src/utils/utils";
-import { Spawnzone } from "src/map/spawnzone";
 import GameSpawnzonesComponent from "../game-spawnzones-component";
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 
@@ -31,12 +30,16 @@ export class TeamedRespawnScript extends ServerGameScript {
             zones = spawnzonesComponent.spawnzones
         } else {
             zones = spawnzonesComponent.spawnzones.filter(entity => {
-                let spawnzone = entity.getComponent(SpawnzoneComponent)
-                return spawnzone.team === id
+                return entity.getComponent(SpawnzoneComponent).team === id
             });
         }
 
-        return chooseRandom(zones)?.getComponent(SpawnzoneComponent).sample() ?? { x: 0, y: 0 }
+        let randomZone = chooseRandom(zones)?.getComponent(SpawnzoneComponent)
+
+        return {
+            position: randomZone?.sample() ?? { x: 0, y: 0 },
+            angle: randomZone?.getGlobalSpawnAngle() ?? 0
+        }
     }
 
     private getSpawnPosition(player: Entity) {
@@ -49,7 +52,9 @@ export class TeamedRespawnScript extends ServerGameScript {
     }
 
     private onPlayerRespawn(event: PlayerRespawnEvent) {
-        event.respawnPosition = this.getSpawnPosition(event.player)
+        let respawnPosition = this.getSpawnPosition(event.player)
+        event.respawnPosition = respawnPosition.position
+        event.respawnAngle = respawnPosition.angle
     }
 }
 
@@ -61,7 +66,9 @@ export class RandomRespawnScript extends ServerGameScript {
 
     private onPlayerRespawn(event: PlayerRespawnEvent) {
         let spawnzonesComponent = this.controller.entity.getComponent(GameSpawnzonesComponent).spawnzones
-        let position = chooseRandom(spawnzonesComponent)?.getComponent(SpawnzoneComponent).sample()
-        event.respawnPosition = position ?? { x: 0, y: 0 }
+        let zone = chooseRandom(spawnzonesComponent)?.getComponent(SpawnzoneComponent)
+        
+        event.respawnPosition = zone?.sample() ?? { x: 0, y: 0 }
+        event.respawnAngle = zone?.getGlobalSpawnAngle() ?? 0
     }
 }

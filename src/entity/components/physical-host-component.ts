@@ -45,6 +45,12 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
         }
     }
 
+    afterPhysics(timeRemaining: number) {
+        for(let component of this.physicalComponents) {
+            component.afterPhysics(timeRemaining);
+        }
+    }
+
     tickPhysics() {
         this.world.ClearForces()
         for(let component of this.physicalComponents) {

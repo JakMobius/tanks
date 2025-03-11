@@ -119,14 +119,14 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
     }))
 
     entity.addComponent(new PhysicalComponent((host) => {
-        let bodyFixture = PhysicsUtils.squareFixture(1, 1.2, new Box2D.b2Vec2(0, 0.13), {
+        let bodyFixture = PhysicsUtils.squareFixture(1.2, 1, new Box2D.b2Vec2(0.13, 0), {
             density: 512,
             filter: physicsFilters.tank
         })
 
         const body = PhysicsUtils.dynamicBody(host.world, {
             angularDamping: 0.1,
-            linearDamping: 0.1
+            linearDamping: 0.1,
         });
 
         body.CreateFixture(bodyFixture)
@@ -135,7 +135,7 @@ EntityPrefabs.Types.set(EntityType.TANK_TINY, (entity) => {
 
         for (let wheelGroup of behaviour.getWheelGroups()) {
             for (let wheel of wheelGroup.wheels) {
-                const fixture = PhysicsUtils.squareFixture(0.175, 0.5, {x: wheel.x, y: wheel.y}, {
+                const fixture = PhysicsUtils.squareFixture(0.5, 0.175, {x: wheel.x, y: wheel.y}, {
                     density: 512,
                     filter: physicsFilters.tank
                 })

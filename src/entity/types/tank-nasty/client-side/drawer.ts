@@ -21,7 +21,7 @@ import ruderSprite from "textures/tanks/nasty/ruder.texture.png"
 import propellerSprites from "textures/tanks/nasty/propeller%.texture.png"
 
 export class Drawer extends TankDrawer {
-    static bodyQuadrangle = squareQuadrangle(-2.16, -2.97, 4.32, 5.94)
+    static bodyQuadrangle = squareQuadrangle(-2.97, -2.16, 5.94, 4.32)
     static ruderOffset = -0.4225
     static distanceCoefficient = 0.4
     static propellerSpriteCount = 4

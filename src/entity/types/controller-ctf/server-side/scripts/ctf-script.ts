@@ -7,7 +7,7 @@ import {EntityType} from "src/entity/entity-type";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
 import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import PlayerDropFlagEvent from "src/events/player-drop-flag-event";
-import {FlagDataComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-data-component";
+import {FlagStateComponent} from "src/entity/types/controller-ctf/server-side/scripts/flag-state-component";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
 import PlayerTankComponent from "src/entity/types/player/server-side/player-tank-component";
 import HealthComponent from "src/entity/components/health-component";
@@ -26,14 +26,6 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
 
         this.worldEventHandler.on("player-death", (player) => this.onPlayerDeath(player))
         this.worldEventHandler.on("player-flag-drop", (player, event) => this.onFlagDrop(event))
-
-        this.flagEntities = this.controller.teams.map((team) => this.createFlagForTeam(team))
-
-        for (let flag of this.flagEntities) {
-            flag.on("timer-finished", () => {
-                this.returnFlagHome(flag.getComponent(FlagDataComponent), null)
-            })
-        }
     }
 
     private createFlagForTeam(team: Team) {
@@ -47,7 +39,7 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         })
         const spawnzone = chooseRandom(spawnzones)?.getComponent(SpawnzoneComponent).center() ?? { x: 0, y: 0}
 
-        const flagState = flagEntity.getComponent(FlagDataComponent)
+        const flagState = flagEntity.getComponent(FlagStateComponent)
         flagState.basePosition = spawnzone
         flagState.setTeam(team)
 
@@ -59,9 +51,17 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
     activate() {
         super.activate();
 
+        this.flagEntities = this.controller.teams.map((team) => this.createFlagForTeam(team))
+
+        for (let flag of this.flagEntities) {
+            flag.on("timer-finished", () => {
+                this.returnFlagHome(flag.getComponent(FlagStateComponent), null)
+            })
+        }
+
         for (let [, flag] of this.flagEntities.entries()) {
             this.controller.world.appendChild(flag)
-            flag.getComponent(FlagDataComponent).returnToBase()
+            flag.getComponent(FlagStateComponent).returnToBase()
         }
     }
 
@@ -71,6 +71,7 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         for (let flag of this.flagEntities.values()) {
             flag.removeFromParent()
         }
+        this.flagEntities = []
     }
 
     private onPlayerDeath(player: Entity) {
@@ -82,7 +83,7 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         this.dropPlayerFlag(event.player)
     }
 
-    private onFlagContact(flagState: FlagDataComponent, entity: Entity) {
+    private onFlagContact(flagState: FlagStateComponent, entity: Entity) {
         if (flagState.carrier) return
 
         const pilotComponent = entity.getComponent(ServerEntityPilotComponent)
@@ -125,7 +126,7 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
 
     private getFlagByCarrier(carrier: Entity) {
         for (let flag of this.flagEntities) {
-            let flagState = flag.getComponent(FlagDataComponent)
+            let flagState = flag.getComponent(FlagStateComponent)
 
             if (flagState.carrier === carrier) return flagState
         }
@@ -140,25 +141,25 @@ export default class CTFScript extends ServerGameScript<ServerCTFControllerCompo
         }
     }
 
-    private captureFlag(flagState: FlagDataComponent, tank: Entity) {
+    private captureFlag(flagState: FlagStateComponent, tank: Entity) {
         this.controller.world.emit("flag-capture", flagState, tank)
         flagState.entity.getComponent(TimerComponent).countdownFrom(0)
         flagState.captureBy(tank)
     }
 
-    private returnFlagHome(flagState: FlagDataComponent, tank: Entity) {
+    private returnFlagHome(flagState: FlagStateComponent, tank: Entity) {
         this.controller.world.emit("flag-return", flagState, tank)
         flagState.entity.getComponent(TimerComponent).countdownFrom(0)
         flagState.returnToBase()
     }
 
-    private dropFlag(flagState: FlagDataComponent, tank: Entity) {
+    private dropFlag(flagState: FlagStateComponent, tank: Entity) {
         this.controller.world.emit("flag-drop", flagState, tank)
         flagState.entity.getComponent(TimerComponent).countdownFrom(this.droppedFlagTimeout)
         flagState.drop()
     }
 
-    private flagDelivered(flagState: FlagDataComponent, tank: Entity) {
+    private flagDelivered(flagState: FlagStateComponent, tank: Entity) {
         this.controller.world.emit("flag-delivery", flagState, tank)
         flagState.returnToBase()
     }

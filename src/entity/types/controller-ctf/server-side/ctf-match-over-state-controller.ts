@@ -4,6 +4,7 @@ import CTFGameStateController from "src/entity/types/controller-ctf/server-side/
 import ServerCTFControllerComponent from "src/entity/types/controller-ctf/server-side/server-ctf-controller-component";
 import {CTFGameState, CTFGameStateType, CTFTeamStatistics} from "src/entity/types/controller-ctf/ctf-game-state";
 import {CTFPlayerWaitingStateController} from "src/entity/types/controller-ctf/server-side/ctf-player-waiting-state";
+import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 
 export class CTFMatchOverStateController extends CTFGameStateController {
     private statistics: CTFTeamStatistics[];
@@ -12,9 +13,10 @@ export class CTFMatchOverStateController extends CTFGameStateController {
         super(controller)
 
         this.statistics = statistics
+        const timeComponent = this.controller.entity.getComponent(GameTimeComponent)
 
         this.addScript(new NoDamageScript(this.controller))
-        this.addScript(new DelayedActionScript(this.controller, controller.matchEndDelay, () => {
+        this.addScript(new DelayedActionScript(this.controller, timeComponent.matchEndDelay, () => {
             this.controller.activateGameState(new CTFPlayerWaitingStateController(this.controller))
         }))
     }

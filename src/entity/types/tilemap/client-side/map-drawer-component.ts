@@ -30,9 +30,6 @@ export default class MapDrawerComponent extends EventHandlerComponent {
     constructor() {
         super()
 
-        // this.eventHandler.on("map-change", () => this.onWorldMapChanged())
-        // this.eventHandler.on("map-block-update", () => this.onMapBlockUpdate())
-
         this.eventHandler.on("camera-attach", (camera: Entity) => {
             camera.getComponent(WorldDrawerComponent).backgroundDrawPhase.on("draw", this.backgroundDrawCallback)
             camera.getComponent(WorldDrawerComponent).mapDrawPhase.on("draw", this.mapDrawCallback)
