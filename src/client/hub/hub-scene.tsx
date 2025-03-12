@@ -23,6 +23,7 @@ import WriteBuffer from "src/serialization/binary/write-buffer";
 import PlayerPrefab from "src/entity/types/player/server-prefab";
 import PlayerWorldComponent from "src/entity/types/player/server-side/player-world-component";
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
+import { gameEntityFactory } from "../game/game-entity-factory";
 
 const HubView: React.FC = () => {
     const scene = useScene()
@@ -35,7 +36,7 @@ const HubView: React.FC = () => {
     
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        state.camera?.getComponent(CameraRandomMovement)
+        state.camera?.getComponent(CameraComponent)
             .setViewport({x: scene.canvas.width, y: scene.canvas.height})
         state.game?.tick(dt)
         state.backgroundWorld?.emit("draw")
@@ -47,6 +48,7 @@ const HubView: React.FC = () => {
         scene.canvas.clear()
 
         const game = new EmbeddedServerGame()
+        game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
 
         const map = readEntityFile(getHubMap()).createEntity()
         game.serverGame.appendChild(map)
@@ -70,9 +72,9 @@ const HubView: React.FC = () => {
 
         const camera = new Entity()
         camera.addComponent(new TransformComponent())
-        camera.addComponent(new CameraComponent())
+        camera.addComponent(new CameraComponent()
+            .setViewport({x: scene.canvas.width, y: scene.canvas.height}))
         camera.addComponent(new CameraRandomMovement()
-            .setViewport({x: scene.canvas.width, y: scene.canvas.height})
             .setMapSize(150 * TilemapComponent.DEFAULT_SCALE, 150 * TilemapComponent.DEFAULT_SCALE))
 
         camera.addComponent(new WorldDrawerComponent(scene.canvas))

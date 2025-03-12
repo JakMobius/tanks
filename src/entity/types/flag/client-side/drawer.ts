@@ -3,11 +3,11 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import ColoredTextureProgram from "src/client/graphics/programs/colored-texture-program";
 import FlagStateReceiver from "src/entity/types/flag/client-side/flag-state-receiver";
 import TeamColor from "src/utils/team-color";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import flagSprite from "textures/misc/flag.texture.png"
 import TransformComponent from "src/entity/components/transform/transform-component";
-import { squareQuadrangle, transformQuadrangle, translateQuadrangle } from "src/utils/quadrangle";
+import { squareQuadrangle, translateQuadrangle } from "src/utils/quadrangle";
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends BasicEntityDrawer {
     static spriteNames = [flagSprite]
@@ -31,6 +31,6 @@ export class Drawer extends BasicEntityDrawer {
 
         const quadrangle = squareQuadrangle(-2 - 1.35, -2 - 1.85, 4, 4)
         translateQuadrangle(quadrangle, position.x, position.y)
-        program.drawSprite(Drawer.getSprite(0), quadrangle, WorldDrawerComponent.depths.overlay)
+        program.drawSprite(Drawer.getSprite(0), quadrangle, depths.overlay)
     }
 }

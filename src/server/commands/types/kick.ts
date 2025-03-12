@@ -1,13 +1,13 @@
 import Command from '../command';
 
 export default class KickCommand extends Command {
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
 
         let logger = this.console.logger
 
         if(args.length < 1) {
             logger.log("Usage: " + this.getUsage())
-            return
+            return false
         }
 
         const name = args.join(" ")
@@ -24,7 +24,10 @@ export default class KickCommand extends Command {
 
         if(!kicked) {
             logger.log("'" + name + "' is offline")
+            return false
         }
+
+        return true
     }
 
     getDescription(): string {

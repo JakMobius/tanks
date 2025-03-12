@@ -6,12 +6,12 @@ import TrackedTankController from "src/entity/components/tank-controllers/tracke
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/bigboi/body-bright.texture.png"
 import bodyDarkSprite from "textures/tanks/bigboi/body-dark.texture.png"
 import bodyLightMask from "textures/tanks/bigboi/mask.texture.png"
 import truckSprite from "textures/tanks/bigboi/truck.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -57,7 +57,7 @@ export class Drawer extends TankDrawer {
             this.bodyLightMask,
             Drawer.bodyQuadrangle,
             transform.getGlobalAngle(),
-            WorldDrawerComponent.depths.tankBody
+            depths.tankBody
         )
 
         truckProgram.transform.restore()

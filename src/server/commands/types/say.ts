@@ -1,10 +1,12 @@
 import Command from '../command';
 
 export default class SayCommand extends Command {
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
         let text = args.join(" ")
         this.console.observingRoom.emit("chat", text)
         this.console.logger.log(text)
+
+        return true
     }
 
     getName(): string {

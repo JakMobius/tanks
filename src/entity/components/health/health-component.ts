@@ -1,9 +1,7 @@
 import Entity from "src/utils/ecs/entity";
-import {TransmitterSet} from "../network/transmitting/transmitter-set";
 import DamageReason, { DamageType, DamageTypes } from "src/server/damage-reason/damage-reason";
 import EntityDamageEvent from "src/events/tank-damage-event";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
-import HealthTransmitter from "./health-transmitter";
 
 export default class HealthComponent extends EventHandlerComponent {
     private health: number = 0
@@ -13,9 +11,6 @@ export default class HealthComponent extends EventHandlerComponent {
 
     constructor() {
         super()
-        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
-            transmitterSet.initializeTransmitter(HealthTransmitter)
-        })
 
         this.eventHandler.on("respawn", () => {
             this.setHealth(this.maxHealth)

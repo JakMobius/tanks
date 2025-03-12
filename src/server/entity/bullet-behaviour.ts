@@ -4,7 +4,6 @@ import HealthComponent from "src/entity/components/health/health-component";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import DamageReason, { DamageTypes } from "../damage-reason/damage-reason";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
-import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import * as Box2D from "@box2d/core";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
@@ -12,6 +11,7 @@ import {WorldComponent} from "src/entity/game-world-entity-prefab";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TilemapComponent from "src/map/tilemap-component";
 import ExplodeEffectPrefab from "src/entity/types/effect-world-explosion/server-prefab";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
 
 export interface BulletBehaviourConfig {
     diesOnWallHit?: boolean;
@@ -66,24 +66,20 @@ export default class BulletBehaviour extends EventHandlerComponent {
         let contactMidpoint = this.getContactMidpoint(contact)
 
         this.nextPhysicalTick(() => {
-            const world = this.entity.parent
-
             if (this.config.entityDamage) {
-                world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                    let healthComponent = hitEntity.getComponent(HealthComponent)
-                    let damageReason = new DamageReason()
-                    damageReason.damageType = DamageTypes.IMPACT
+                let healthComponent = hitEntity.getComponent(HealthComponent)
+                let damageReason = new DamageReason()
+                damageReason.damageType = DamageTypes.IMPACT
 
-                    // TODO: Maybe bullet shooter component should handle this by itself?
-                    // i.e shooter component is not even set on the client side, so this
-                    // code become useless
-                    let shooterComponent = this.entity.getComponent(BulletShooterComponent)
-                    if (shooterComponent) {
-                        damageReason.player = shooterComponent.shooter
-                    }
+                // TODO: Maybe bullet shooter component should handle this by itself?
+                // i.e shooter component is not even set on the client side, so this
+                // code become useless
+                let shooterComponent = this.entity.getComponent(BulletShooterComponent)
+                if (shooterComponent) {
+                    damageReason.player = shooterComponent.shooter
+                }
 
-                    if (healthComponent) healthComponent.damage(this.config.entityDamage, damageReason)
-                })
+                if (healthComponent) healthComponent.damage(this.config.entityDamage, damageReason)
             }
 
             this.stuckAtPoint(contactMidpoint)
@@ -99,9 +95,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
 
         this.nextPhysicalTick(() => {
             if (this.config.wallDamage) {
-                world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(() => {
-                     tilemap?.damageBlock(x, y, this.config.wallDamage)
-                })
+                tilemap?.damageBlock(x, y, this.config.wallDamage)
             }
 
             if (this.config.diesOnWallHit !== false) {
@@ -111,7 +105,7 @@ export default class BulletBehaviour extends EventHandlerComponent {
     }
 
     private nextPhysicalTick(callback: () => void) {
-        this.entity.parent.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(callback)
+        this.entity.parent.getComponent(PhysicalHostComponent).loop.scheduleTask(callback)
     }
 
     maybeExplode() {

@@ -1,7 +1,6 @@
 import ConnectionClient from "src/networking/connection-client";
 import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
-import ReadBuffer from "src/serialization/binary/read-buffer";
 import Entity from "src/utils/ecs/entity";
 import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-entity-prefab";
 import PlayerTankSelectPacket from "src/networking/packets/game-packets/player-tank-select-packet";
@@ -32,6 +31,7 @@ import Sprite from '../graphics/sprite';
 import WriteBuffer from 'src/serialization/binary/write-buffer';
 import { ControlsProvider } from "../utils/react-controls-responder";
 import { EntityPrefab } from "src/entity/entity-prefabs";
+import { gameEntityFactory } from "./game-entity-factory";
 
 export interface GameViewConfig {
     client: ConnectionClient
@@ -55,7 +55,7 @@ const GameView: React.FC<GameViewConfig> = (props) => {
 
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        state.camera?.getComponent(CameraPositionController)
+        state.camera?.getComponent(CameraComponent)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
         state.world?.emit("tick", dt)
         state.world?.emit("draw")
@@ -74,7 +74,8 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         const camera = new Entity()
         const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, props.client.connection)
         
-        clientGameWorldEntityPrefab(world, {})
+        clientGameWorldEntityPrefab(world)
+        world.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
         world.addComponent(new PrimaryEntityControls(controlsResponderRef.current))
 
         remoteControlsManager.attach()
@@ -92,10 +93,10 @@ const GameView: React.FC<GameViewConfig> = (props) => {
         })
 
         camera.addComponent(new TransformComponent())
-        camera.addComponent(new CameraComponent())
-        camera.addComponent(new CameraPositionController()
-            .setBaseScale(12)
+        camera.addComponent(new CameraComponent()
             .setViewport({ x: screen.width, y: screen.height }))
+        camera.addComponent(new CameraPositionController()
+            .setBaseScale(12))
         camera.addComponent(new CameraPrimaryEntityController())
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))

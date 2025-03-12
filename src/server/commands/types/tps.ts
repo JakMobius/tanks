@@ -18,6 +18,7 @@ export default class TPSCommand extends Command {
         // this.console.observingRoom.profile(ticks, function(time) {
         //     logger.log(`Среднее время выполнения ${ticks} тика(ов): ${Math.round(time)}ms`)
         // })
+        return true
 	}
 
 	getName() {

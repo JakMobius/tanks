@@ -1,7 +1,5 @@
 import Logger from '../log/logger';
 import * as fs from 'fs';
-
-// @ts-ignore
 import CommandList from "../commands/types/%"
 import Command from "../commands/command";
 import Server from "../server";
@@ -336,11 +334,11 @@ export default class Console {
         this.window.suggest(null)
     }
 
-    evaluate(line: string): void {
+    evaluate(line: string): Promise<boolean> {
         console.log(this.window.getFullPrompt() + line)
         line = line.trim()
 
-        if(line.length === 0) return
+        if(line.length === 0) return Promise.resolve(true)
 
         let ast = Parser.shared.parseGlobalSource(line)
 
@@ -349,23 +347,29 @@ export default class Console {
 
             let parameters = children.getParameters()
 
-            if (!parameters.length || parameters[0].length === 0) return
+            if (!parameters.length || parameters[0].length === 0) return Promise.resolve(true)
 
             let handle = this.commands.get(parameters[0])
 
             if (handle) {
-                this.callHandle(handle, parameters.slice(1))
+                return this.callHandle(handle, parameters.slice(1))
             } else {
                 this.logger.log("§F00;Unknown command: '" + parameters[0] + "'")
+                return Promise.resolve(false)
             }
         }
+
+        return Promise.resolve(true)
     }
 
-    callHandle(handle: Command, args: string[]) {
+    callHandle(handle: Command, args: string[]): Promise<boolean> {
         if (handle.requiresRoom() && !this.observingRoom) {
             this.logger.log("§F00;You should enter a room to execute this command")
+            return Promise.resolve(false)
         } else {
-            handle.onPerform(args)
+            let result = handle.onPerform(args)
+            if(typeof result === "boolean") return Promise.resolve(result)
+            return result
         }
     }
 
@@ -377,20 +381,22 @@ export default class Console {
         this.currentLogger = logger
     }
 
-    runScript(name: string, index: number = 0) {
+    async runScript(name: string, index: number = 0) {
         const file = this.server.getResourcePath("scripts/" + name + ".script")
 
         if(!fs.existsSync(file)) {
             this.logger.log("§F00;Could not find script named '" + name + "'.")
-            return
+            return false
         }
-        this.logger.log("§FF0;Running script '" + name + "'")
 
+        let result = true
         const commands = fs.readFileSync(file, 'utf8').split("\n")
         for(let i = index; i < commands.length; i++) {
             const command = commands[i]
-            this.evaluate(command)
+            result = await this.evaluate(command)
         }
+
+        return result
     }
 
     loadCommands() {

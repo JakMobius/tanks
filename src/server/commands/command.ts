@@ -5,16 +5,16 @@ import path from "path";
 import fs from "fs";
 import ConsoleTableDrawer from "../console/console-table-drawer";
 
-export interface CommandConfig {
-	console: Console
-}
-
 export interface CommandParsedFlags {
     flags: Map<string, string[] | boolean>
 	unknown: string[]
 	errors: string[] | null
 	currentFlag: CommandFlag | null
     incompleteFlag: string
+}
+
+export interface CommandConfig {
+	console: Console
 }
 
 export default class Command {
@@ -24,10 +24,8 @@ export default class Command {
 	flags: CommandFlag[] = []
 	supercommand: Command = null
 
-	constructor(options?: CommandConfig) {
-		if(options) {
-			this.console = options.console
-		}
+	constructor(options: CommandConfig) {
+		this.console = options.console
 	}
 
 	/**
@@ -52,10 +50,15 @@ export default class Command {
 	 * @param args Command arguments array
 	 */
 
-	public onPerform(args: string[]) {
-		if(!this.trySubcommand(args)) {
+	public onPerform(args: string[]): Promise<boolean> | boolean {
+		let subcommand = this.getSubcommand(args[0])
+
+		if(!subcommand) {
 			this.console.logger.log(this.getHelp())
+			return false
 		}
+
+		return subcommand.onPerform(args.slice(1))
 	}
 
 	/**
@@ -178,25 +181,6 @@ export default class Command {
 		}
 
 		return null
-	}
-
-	/**
-	 * Calls the corresponding subcommand based on command call arguments
-	 * @param args Call arguments
-	 * @returns True if subcommand was called successfully, false otherwise
-	 * @example
-	 * // Will try to call subcommand called `"create"` with arguments `["empty", "-n", "Empty Room"]`
-	 * this.trySubcommand(["create", "empty", "-n", "Empty Room"])
-	 */
-	protected trySubcommand(args: string[]): boolean {
-		if(args.length === 0) return false
-
-		let found = this.getSubcommand(args[0])
-
-		if(!found) return false
-
-		found.onPerform(args.slice(1))
-		return true
 	}
 
 	/**

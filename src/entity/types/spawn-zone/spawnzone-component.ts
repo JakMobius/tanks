@@ -1,8 +1,6 @@
 import { PropertyInspector, SelectProperty, VectorProperty } from "src/entity/components/inspector/property-inspector";
-import { TransmitterSet } from "src/entity/components/network/transmitting/transmitter-set";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TeamColor from "src/utils/team-color";
-import SpawnzoneTransmitter from "./spawnzone-transmitter";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import { degToRad, radToDeg } from "src/utils/utils";
 
@@ -33,10 +31,6 @@ export default class SpawnzoneComponent extends EventHandlerComponent {
                 .withSetter((angle) => this.setSpawnAngle(degToRad(angle[0])))
                 .updateOn("spawn-angle-set")
             inspector.addProperty(angleProperty)
-        })
-
-        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
-            transmitterSet.initializeTransmitter(SpawnzoneTransmitter)
         })
     }
 

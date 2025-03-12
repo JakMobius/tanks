@@ -3,6 +3,8 @@ import EntityContextProvider from "src/utils/ecs/entity-context-provider";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 
 export default class CameraComponent extends EventHandlerComponent {
+    viewport = { x: 0, y: 0 }
+
     constructor() {
         super();
 
@@ -17,5 +19,10 @@ export default class CameraComponent extends EventHandlerComponent {
         this.eventHandler.on("detached-from-parent", (parent) => {
             provider.setEntity(this.entity.parent)
         })
+    }
+
+    setViewport(viewport: { x: number, y: number }) {
+        this.viewport = viewport
+        return this
     }
 }

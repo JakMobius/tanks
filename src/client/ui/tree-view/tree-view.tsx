@@ -34,11 +34,15 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
 
     useEffect(() => {
         if(props.node.isEditing) {
-            inputRef.current.focus()
-            inputRef.current.value = props.node.data.name
-            inputRef.current.setSelectionRange(0, inputRef.current.value.length)
+            if(!props.node.isFocused) {
+                props.node.reset()
+            } else {
+                inputRef.current.focus()
+                inputRef.current.value = props.node.data.name
+                inputRef.current.setSelectionRange(0, inputRef.current.value.length)
+            }
         }
-    }, [props.node.isEditing, props.node.data.name])
+    }, [props.node.isEditing, props.node.isFocused, props.node.data.name])
 
     const onInputKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === "Enter") {

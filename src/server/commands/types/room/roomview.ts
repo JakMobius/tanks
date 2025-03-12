@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import Command from '../../command';
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
 
@@ -7,7 +6,7 @@ export default class RoomViewCommand extends Command {
         let logger = this.console.logger
         if (args.length !== 1) {
             logger.log(this.getHelp())
-            return
+            return false
         }
 
         let id = args[0]
@@ -15,12 +14,13 @@ export default class RoomViewCommand extends Command {
 
         if (!world) {
             logger.log("No such room: '" + id + "'")
-            return
+            return false
         }
 
         this.console.observingRoom = world
         this.console.window.setPrompt("(" + id + ")")
-        // this.console.switchToLogger(world.logger)
+
+        return true
     }
 
     onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {

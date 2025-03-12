@@ -5,10 +5,10 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/tiny/body.texture.png"
 import wheelSprites from "textures/tanks/tiny/wheel%.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
@@ -56,7 +56,7 @@ export class Drawer extends TankDrawer {
             }
         }
 
-        bodyProgram.drawSprite(this.bodySprite, Drawer.bodyQuadrangle, WorldDrawerComponent.depths.tankBody)
+        bodyProgram.drawSprite(this.bodySprite, Drawer.bodyQuadrangle, depths.tankBody)
 
         wheelProgram.transform.restore()
         bodyProgram.transform.restore

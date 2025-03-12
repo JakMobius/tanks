@@ -1,14 +1,18 @@
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
-import CollisionDisableComponent from "src/entity/components/collisions/collision-disable";
-import { EntityPrefab } from "src/entity/entity-prefabs";
+import ClientEntityPrefab from "src/client/entity/client-entity-prefab";
 import onSprite from "textures/bullets/mine/on.texture.png"
 import offSprite from "textures/bullets/mine/off.texture.png"
 import BasicEntityDrawer from "src/client/graphics/drawers/basic-entity-drawer";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import BasePrefab from "./prefab"
+import EntityStateReceiver from "src/entity/components/network/entity/entity-state-receiver";
+import ServerPositionComponent from "src/client/entity/components/server-position-component";
+import TransformReceiver from "src/entity/components/transform/transform-receiver";
+import HealthReceiver from "src/entity/components/health/health-receiver";
+import CollisionIgnoreListReceiver from "src/entity/components/collisions/collision-ignore-list-receiver";
 
 export class Drawer extends BasicEntityDrawer {
-    public shift: any;
+    public shift: number;
     static spriteNames = [
         onSprite,
         offSprite
@@ -28,14 +32,17 @@ export class Drawer extends BasicEntityDrawer {
     }
 }
 
-const ClientPrefab = new EntityPrefab({
+const ClientPrefab = new ClientEntityPrefab({
     id: BasePrefab.id,
     metadata: BasePrefab.metadata,
     prefab: (entity) => {
         BasePrefab.prefab(entity)
-        ClientEntityPrefabs.configureGameWorldEntity(entity)
+        entity.addComponent(new EntityStateReceiver())
+        entity.addComponent(new ServerPositionComponent())
+        entity.addComponent(new TransformReceiver())
+        entity.addComponent(new HealthReceiver())
+        entity.addComponent(new CollisionIgnoreListReceiver())
         entity.addComponent(new Drawer())
-        entity.getComponent(CollisionDisableComponent).setCollisionsDisabled(true)
     }
 })
 

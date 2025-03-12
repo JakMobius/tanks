@@ -1,6 +1,4 @@
 import Entity from "src/utils/ecs/entity";
-import {TransmitterSet} from "../network/transmitting/transmitter-set";
-import WorldStatisticsTransmitter from "./world-statistics-transmitter";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import TimerComponent from "src/entity/types/timer/timer-component";
 
@@ -17,13 +15,6 @@ export default class WorldStatisticsComponent extends EventHandlerComponent {
     playerStatistics: PlayerStatistics[] = []
     mapName: string | null = null
     matchTimeLeftTimer?: Entity | null = null
-
-    constructor() {
-        super()
-        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
-            transmitterSet.initializeTransmitter(WorldStatisticsTransmitter)
-        })
-    }
 
     setMapName(mapName?: string) {
         this.mapName = mapName

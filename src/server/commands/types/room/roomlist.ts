@@ -13,37 +13,37 @@ class RoomListCommand extends Command {
         if (roomCount === 0) {
             logger.log(
                 "§F77;No active rooms\n" +
-                CLIStyle.tip("To create a room, use 'room create' command")
-        );
-
-        } else {
-            let string = ""
-
-            let totalOnline = 0
-            let dot = Chalk.gray(" • ")
-            let lines: string[][] = []
-
-            lines.push([Chalk.bold("Room name"), Chalk.bold("Players online")])
-
-            for (let [id, room] of rooms.entries()) {
-                let clientComponent = room.getComponent(RoomClientComponent)
-                let online = clientComponent.getCurrentOnline()
-                totalOnline += online
-
-                lines.push([dot + id, Chalk.cyanBright(online)])
-            }
-
-            string += new ConsoleTableDrawer({
-                lines: lines,
-                rowPadding: 1
-            }).draw()
-
-            string += "\n"
-                    + "Active rooms: §7FF;" + roomCount + "\n"
-                    + "Total players online: §7FF;" + totalOnline
-
-            logger.log(string)
+                CLIStyle.tip("To create a room, use 'room create' command"))
+            return true
         }
+        
+        let string = ""
+
+        let totalOnline = 0
+        let dot = Chalk.gray(" • ")
+        let lines: string[][] = []
+
+        lines.push([Chalk.bold("Room name"), Chalk.bold("Players online")])
+
+        for (let [id, room] of rooms.entries()) {
+            let clientComponent = room.getComponent(RoomClientComponent)
+            let online = clientComponent.getCurrentOnline()
+            totalOnline += online
+
+            lines.push([dot + id, Chalk.cyanBright(online)])
+        }
+
+        string += new ConsoleTableDrawer({
+            lines: lines,
+            rowPadding: 1
+        }).draw()
+
+        string += "\n"
+                + "Active rooms: §7FF;" + roomCount + "\n"
+                + "Total players online: §7FF;" + totalOnline
+
+        logger.log(string)
+        return true
     }
 
     getName() {

@@ -3,7 +3,7 @@ import ConsoleTableDrawer from "src/server/console/console-table-drawer";
 
 export default class HelpCommand extends Command {
 
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
         let logger = this.console.logger
 
         let lines: string[][] = []
@@ -20,6 +20,8 @@ export default class HelpCommand extends Command {
         }).draw()
 
         logger.log(string)
+        
+        return true
     }
 
     getName(): string {

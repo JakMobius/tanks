@@ -3,13 +3,12 @@ import "./scene-entity-library.scss"
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Tree, TreeApi } from '../react-arborist/src/index';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeBase, TreeViewDragPreview } from "../tree-view/tree-view";
-import Entity from "src/utils/ecs/entity";
 import { EntityPrefab } from "src/entity/entity-prefabs";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
 
 interface LibraryTreeNode extends TreeNodeBase {
-    prefab?: (entity: Entity) => void,
+    prefab?: EntityPrefab,
     children?: LibraryTreeNode[]
 }
 
@@ -36,15 +35,15 @@ class VirtualLibraryTree {
 }
 
 export class SceneEntityLibraryDropItem {
-    prefabs: Array<(entity: Entity) => void>
-    constructor(prefabs: Array<(entity: Entity) => void>) {
+    prefabs: EntityPrefab[]
+    constructor(prefabs: EntityPrefab[]) {
         this.prefabs = prefabs
     }
 }
 
 function createLibraryTree(tree: VirtualLibraryTree, id: string = "root"): LibraryTreeNode {
     
-    let children = []
+    let children: LibraryTreeNode[] = []
 
     for(let [name, subgroup] of tree.subgroups) {
         let subtree = createLibraryTree(subgroup, id + "/" + name)
@@ -54,7 +53,7 @@ function createLibraryTree(tree: VirtualLibraryTree, id: string = "root"): Libra
 
     for(let prefab of tree.prefabs) {
         let childId = id + "/" + prefab.id
-        children.push({ id: childId, prefab: prefab.prefab, name: prefab.getDisplayName() })
+        children.push({ id: childId, prefab: prefab, name: prefab.getDisplayName() })
     }
 
     return { id, children, name: "" }
@@ -90,7 +89,7 @@ const SceneEntityLibrary: React.FC = () => {
     }, [divRef.current])
 
     const disableDrag = (node: LibraryTreeNode) => {
-        return node.prefab === null
+        return !node.prefab
     }
 
     const dragItemUserData = (nodes: LibraryTreeNode[]) => {

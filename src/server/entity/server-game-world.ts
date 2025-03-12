@@ -4,7 +4,7 @@ import Entity from "src/utils/ecs/entity";
 import WorldPlayerStatisticsComponent from "src/server/entity/components/world-player-statistics-component";
 import DamageRecorderComponent from "src/server/entity/components/damage-recorder-component";
 import WorldRespawnComponent from "src/server/room/components/world-respawn-component";
-import {GameWorldConfig, gameWorldEntityPrefab} from "src/entity/game-world-entity-prefab";
+import {gameWorldEntityPrefab} from "src/entity/game-world-entity-prefab";
 
 import "src/map/block-state/type-loader"
 import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
@@ -14,9 +14,9 @@ import UserMessageTransmitComponent from "src/server/entity/components/user-mess
 import TimerEntityPrefab from "src/entity/types/timer/server-prefab";
 import ChatEntityPrefab from "src/entity/types/chat/server-prefab";
 
-export function serverGameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
+export function serverGameWorldEntityPrefab(entity: Entity) {
 
-    gameWorldEntityPrefab(entity, options)
+    gameWorldEntityPrefab(entity)
 
     entity.addComponent(new ServerWorldPlayerManagerComponent())
     entity.addComponent(new EntityDataTransmitComponent())

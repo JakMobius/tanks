@@ -1,10 +1,9 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
 import TransformComponent from "./transform/transform-component";
+import CameraComponent from "src/client/graphics/camera";
 
 export default class CameraRandomMovement extends EventHandlerComponent {
-    public viewport: Box2D.XY
-
     private oldScale: number = null
     private oldPosition: Box2D.XY = null
 
@@ -78,14 +77,16 @@ export default class CameraRandomMovement extends EventHandlerComponent {
         this.currentPosition.y += this.currentVelocity.y * dt
         this.currentScale += this.currentScaleVelocity * dt
 
+        let viewport = this.entity.getComponent(CameraComponent).viewport
+
         cameraComponent.set({
             position: {
                 x: this.currentPosition.x,
                 y: this.currentPosition.y
             },
             scale: {
-                x: this.viewport.x / this.currentScale / 2,
-                y: -this.viewport.y / this.currentScale / 2
+                x: viewport.x / this.currentScale / 2,
+                y: -viewport.y / this.currentScale / 2
             }
         })
     }
@@ -97,11 +98,6 @@ export default class CameraRandomMovement extends EventHandlerComponent {
         }
 
         this.targetScale = 2 + Math.random() * 5
-    }
-
-    setViewport(viewport: Box2D.XY) {
-        this.viewport = viewport
-        return this
     }
 
     setMapSize(width: number, height: number) {

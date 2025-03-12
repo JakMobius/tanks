@@ -3,13 +3,13 @@ import Command from '../command';
 class BanIPCommand extends Command {
 	public server: any;
 
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
 
         let logger = this.console.logger
 
         if(args.length < 1) {
             logger.log("Usage: " + this.getUsage())
-            return
+            return false
         }
 
         const name = args.join(" ")
@@ -31,7 +31,10 @@ class BanIPCommand extends Command {
 
         if(!kicked) {
             logger.log("Player " + name + " is offline")
+            return false
         }
+
+        return true
     }
 
     getDescription(): string {

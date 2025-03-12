@@ -10,7 +10,7 @@ let components = new Map<Constructor<Transmitter>, Constructor<Component>>()
 export function transmitterComponentFor(transmitter: Constructor<Transmitter>) {
     let existingComponent = components.get(transmitter)
     if(existingComponent) {
-        return new existingComponent()
+        return existingComponent
     }
 
     class TransmitterComponent extends EventHandlerComponent {
@@ -25,5 +25,9 @@ export function transmitterComponentFor(transmitter: Constructor<Transmitter>) {
     Object.defineProperty(TransmitterComponent, 'name', { value: `TransmitterComponent<${transmitter.name}>` });
     existingComponent = TransmitterComponent
     components.set(transmitter, existingComponent)
-    return new existingComponent()
+    return existingComponent
+}
+
+export function createTransmitterComponentFor(transmitter: Constructor<Transmitter>) {
+    return new (transmitterComponentFor(transmitter))
 }

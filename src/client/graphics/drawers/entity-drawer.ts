@@ -8,6 +8,8 @@ export default class EntityDrawer extends EventHandlerComponent {
 
     drawCallback = (phase: DrawPhase) => this.draw(phase)
 
+    cameras = new Set<Entity>()
+
     constructor() {
         super()
         this.eventHandler.on("camera-attach", (camera: Entity) => {

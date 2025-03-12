@@ -1,6 +1,3 @@
-
-const serverStartupTime = Date.now()
-
 import Server from "./server";
 import Logger from './log/logger';
 import Console from './console/console';
@@ -14,18 +11,13 @@ async function initialize() {
     let serverConsole: Console
 
     try {
-
         await Preferences.read()
 
         serverConsole = new Console()
         serverConsole.createWindow()
-        Logger.global.log(`Loaded libraries within ${(Date.now() - serverStartupTime)/1000}s`)
 
         const preferences = Preferences.root
-        const bootCommand = new BootCommand({
-            console: serverConsole
-        })
-
+        const bootCommand = new BootCommand({ console: serverConsole })
         serverConsole.callHandle(bootCommand, process.argv)
         if(bootCommand.preferencesOverride.errors.length) {
             throw bootCommand.preferencesOverride.errors
@@ -42,7 +34,7 @@ async function initialize() {
             serverConsole.destroy()
         })
 
-        bootCommand.runPostInit()
+        await bootCommand.runPostInit()
     } catch(e) {
 
         // Cleaning up everything that would cause program to stay active
@@ -68,7 +60,7 @@ initialize().then(() => {
         "'----------------------------'"
     Logger.global.log(billboard)
     let startupTime = (Date.now() - serverInitializeTime) / 1000
-    Logger.global.log(`§0F0;Booted up tanks v${packageJson.version}. Type "help". §444;(${startupTime}s)\n`)
+    Logger.global.log(`§0F0;Booted up tanks v${packageJson.version}. Type "help". §444;(${startupTime}s)`)
 }).catch(e => {
     console.error("Failed to start server")
     console.error(e)

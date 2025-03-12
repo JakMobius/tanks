@@ -11,12 +11,12 @@ import TankWheelsComponent from "src/entity/components/tank-wheels-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/monster/body-bright.texture.png"
 import bodyDarkSprite from "textures/tanks/monster/body-dark.texture.png"
 import bodyLightMask from "textures/tanks/monster/mask.texture.png"
 import wheelSprites from "textures/tanks/monster/wheel%.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -74,7 +74,7 @@ export class Drawer extends TankDrawer {
             this.bodyLightMask,
             Drawer.bodyQuadrangle,
             transform.getGlobalAngle(),
-            WorldDrawerComponent.depths.tankBody
+            depths.tankBody
         )
 
         wheelProgram.transform.restore()

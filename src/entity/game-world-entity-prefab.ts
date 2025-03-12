@@ -1,18 +1,11 @@
-import AdapterLoop from "src/utils/loop/adapter-loop";
 import Entity from "src/utils/ecs/entity";
 import PhysicalHostComponent from "src/entity/components/physical-host-component";
-import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import EntityStateTransmitComponent from "src/server/entity/components/entity-state-transmit-component";
 import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import ChildTickComponent from "src/entity/components/child-tick-component";
 import {Component} from "src/utils/ecs/component";
-import * as Box2D from "@box2d/core"
-
-export interface GameWorldConfig {
-    physicsTick?: number
-    maxTicks?: number
-    iterations?: Box2D.b2StepConfig
-}
+import { createTransmitterComponentFor } from "./components/network/transmitting/transmitter-component";
+import WorldStatisticsTransmitter from "./components/world-statistics/world-statistics-transmitter";
 
 export class WorldComponent implements Component {
     entity: Entity | null = null
@@ -33,27 +26,12 @@ export class WorldComponent implements Component {
     }
 }
 
-export function gameWorldEntityPrefab(entity: Entity, options?: GameWorldConfig) {
-    options = Object.assign({
-        physicsTick: 0.002,
-        maxTicks: 30,
-        iterations: {
-            positionIterations: 1,
-            velocityIterations: 1
-        } as Box2D.b2StepConfig
-    }, options)
-
+export function gameWorldEntityPrefab(entity: Entity) {
     entity.addComponent(new WorldComponent())
     entity.addComponent(new EntityStateTransmitComponent())
-    entity.addComponent(new PhysicalHostComponent({
-        physicsTick: options.physicsTick,
-        iterations: options.iterations
-    }))
-    entity.addComponent(new WorldPhysicalLoopComponent(new AdapterLoop({
-        maximumSteps: options.maxTicks,
-        interval: options.physicsTick
-    })))
+    entity.addComponent(new PhysicalHostComponent())
     entity.addComponent(new WorldStatisticsComponent())
+    entity.addComponent(createTransmitterComponentFor(WorldStatisticsTransmitter))
 
     // World entities should tick at the very specific time
     // They should do so after physics tick, but before

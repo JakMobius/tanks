@@ -12,7 +12,7 @@ interface GestureEvent extends UIEvent {
 }
 
 interface MapEditorBackgroundOverlayProps {
-    onZoom?: (scale: number) => void
+    onZoom?: (scale: number, x: number, y: number) => void
     onDrag?: (dx: number, dy: number) => void
     onMouseDown?: (x: number, y: number) => void
     onMouseUp?: (x: number, y: number) => void
@@ -45,7 +45,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
         event.preventDefault()
         if (isMacOS) {
             if (event.scale) {
-                propsRef.current.onZoom?.(event.scale / ref.current.oldScale)
+                emitZoom(event.scale / ref.current.oldScale)
                 ref.current.oldScale = event.scale
             }
         }
@@ -112,15 +112,23 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
         propsRef.current.onDrag?.(x, y)
     }
 
-    const emitZoom = (movement: number) => {
-        propsRef.current.onZoom?.(1 - (movement / 150))
+    const emitZoom = (zoom: number) => {
+        let viewport = propsRef.current.camera.getComponent(CameraComponent).viewport
+        let x = (ref.current.oldX / viewport.x) * 2 - 1
+        let y = (ref.current.oldY / viewport.y) * 2 - 1
+
+        propsRef.current.onZoom?.(zoom, x, y)
+    }
+
+    const emitScrollZoom = (movement: number) => {
+        emitZoom(1 - (movement / 150))
     }
 
     const onWheel = (event: WheelEvent) => {
         event.preventDefault()
         if (event.ctrlKey) {
             if (event.deltaY)
-                emitZoom(event.deltaY)
+                emitScrollZoom(event.deltaY)
         } else if (isMacOS) {
             if (event.deltaX || event.deltaY) {
                 emitDrag(event.deltaX, event.deltaY)
@@ -129,7 +137,7 @@ const MapEditorBackgroundOverlay: React.FC<MapEditorBackgroundOverlayProps> = Re
             if (event.deltaZ)
                 emitZoom(-event.deltaZ)
         } else {
-            emitZoom(event.deltaY)
+            emitScrollZoom(event.deltaY)
         }
     }
 

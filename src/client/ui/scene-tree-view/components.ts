@@ -4,6 +4,9 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component"
 import { TreeNodeBase } from "../tree-view/tree-view"
 import PrefabComponent from "src/entity/components/prefab-id-component"
 import { PropertyInspector, StringProperty } from "src/entity/components/inspector/property-inspector"
+import EntityContextProvider from "src/utils/ecs/entity-context-provider"
+import { transmitterComponentFor } from "src/entity/components/network/transmitting/transmitter-component"
+import EditorEventTransmitter from "src/client/map-editor/editor-event-transmitter"
 
 export interface EntityTreeNode extends TreeNodeBase {
     id: string,
@@ -21,8 +24,6 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
 
     constructor() {
         super()
-        this.eventHandler.on("child-added", (child) => this.onChildAdded(child))
-        this.eventHandler.on("did-remove-child", (child) => this.onChildRemoved(child))
         this.id = (EntityEditorTreeNodeComponent.counter++).toString(36)
 
         this.eventHandler.on("inspector-added", (inspector: PropertyInspector) => {
@@ -32,9 +33,23 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
                 .withSetter((name) => this.setName(name))
             inspector.addProperty(property)
         })
+
+        this.eventHandler.on("will-detach-from-parent", () => {
+            this.markDirty()
+        })
+
+        this.eventHandler.on("child-added", () => {
+            this.markDirty()
+        })
+        
+        this.eventHandler.on("request-focus-self", () => {
+            this.root?.entity.emit("request-focus", this.entity)
+        })
     }
 
     markDirty() {
+        if(!this.descriptor) return
+        this.entity.emit("tree-node-dirty")
         this.descriptor = null
         this.entity.parent?.getComponent(EntityEditorTreeNodeComponent)?.markDirty()
     }
@@ -65,25 +80,7 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
     }
 
     onAttach(entity: Entity): void {
-        super.onAttach(entity)        
-        for (let child of entity.children) {
-            this.onChildAdded(child)
-        }
-    }
-
-    onChildAdded(child: Entity) {
-        this.markDirty()
-        let component = child.getComponent(EntityEditorTreeNodeComponent)
-        if (!component) {
-            component = new EntityEditorTreeNodeComponent()
-            child.addComponent(component)
-        }
-        component.updateRoot()
-    }
-
-    onChildRemoved(child: Entity) {
-        this.markDirty()
-        child.getComponent(EntityEditorTreeNodeComponent)?.updateRoot()
+        super.onAttach(entity)
     }
 
     setName(name: string) {
@@ -92,25 +89,9 @@ export class EntityEditorTreeNodeComponent extends EventHandlerComponent {
         this.markDirty()
     }
 
-    updateRoot() {
-        let newRoot = null
-        let entity = this.entity
-
-        while (entity) {
-            let rootComponent = entity.getComponent(EntityEditorTreeRootComponent)
-            if (rootComponent) break
-            entity = entity.parent
-            continue
-        }
-
-        if (entity) {
-            newRoot = entity.getComponent(EntityEditorTreeRootComponent)
-        }
-
+    setRoot(newRoot: EntityEditorTreeRootComponent) {
         if (newRoot !== this.root) {
-            this.root?.removeNode(this)
             this.root = newRoot
-            this.root?.addNode(this)
             this.markDirty()
         }
     }
@@ -120,12 +101,18 @@ export class EntityEditorTreeRootComponent implements Component {
     entity?: Entity;
     map: Map<string, Entity> = new Map()
 
+    context = new EntityContextProvider()
+        .setAddHandler((entity: Entity) => this.onChildAdded(entity))
+        .setRemoveHandler((entity: Entity) => this.onChildRemoved(entity))
+
     onAttach(entity: Entity): void {
         this.entity = entity
+        this.context.setEntity(this.entity)
     }
 
     onDetach(): void {
         this.entity = null
+        this.context.setEntity(null)
     }
 
     addNode(node: EntityEditorTreeNodeComponent) {
@@ -133,6 +120,26 @@ export class EntityEditorTreeRootComponent implements Component {
     }
 
     removeNode(node: EntityEditorTreeNodeComponent) {
+        this.map.delete(node.id)
+    }
+
+    onChildAdded(entity: Entity) {
+        let EventTransmitterComponent = transmitterComponentFor(EditorEventTransmitter)
+
+        if(!entity.getComponent(EventTransmitterComponent)) 
+            entity.addComponent(new EventTransmitterComponent())
+
+        if(!entity.getComponent(EntityEditorTreeNodeComponent))
+            entity.addComponent(new EntityEditorTreeNodeComponent())
+        
+        let node = entity.getComponent(EntityEditorTreeNodeComponent)
+        node.setRoot(this)
+        this.map.set(node.id, entity)
+    }
+
+    onChildRemoved(entity: Entity) {
+        let node = entity.getComponent(EntityEditorTreeNodeComponent)
+        node.setRoot(null)
         this.map.delete(node.id)
     }
 }

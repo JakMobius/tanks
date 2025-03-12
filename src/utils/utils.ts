@@ -172,3 +172,22 @@ export function chooseRandom<T>(from: Array<T>) {
     }
     return from[chooseRandomIndex(from)]
 }
+
+export function raycastPolygon(point: { x: number, y: number }, vs: Array<{x: number, y: number}>) {
+    // ray-casting algorithm based on
+    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
+    
+    let x = point.x, y = point.y;
+    
+    let inside = false;
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        let xi = vs[i].x, yi = vs[i].y;
+        let xj = vs[j].x, yj = vs[j].y;
+        
+        let intersect = ((yi > y) != (yj > y))
+            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    
+    return inside;
+};

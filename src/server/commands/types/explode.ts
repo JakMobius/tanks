@@ -1,23 +1,17 @@
-import Command, {CommandConfig} from '../command';
+import Command from '../command';
 import Entity from "src/utils/ecs/entity";
 import ExplodeComponent from "src/entity/types/effect-world-explosion/explode-component";
 import ExplodeEffectPrefab from "src/entity/types/effect-world-explosion/server-prefab";
 
 export default class ExplodeCommand extends Command {
-    public defaultPower: number;
+    public defaultPower = 4
 
-    constructor(options?: CommandConfig) {
-        super(options);
-
-        this.defaultPower = 4
-    }
-
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
         let logger = this.console.logger
 
         if (args.length < 2) {
             logger.log(this.getHelp())
-            return
+            return false
         }
 
         let x = Number(args[0])
@@ -26,17 +20,17 @@ export default class ExplodeCommand extends Command {
 
         if (!Number.isFinite(x)) {
             logger.log("'" + args[0] + "' is not a number")
-            return
+            return false
         }
 
         if (!Number.isFinite(y)) {
             logger.log("'" + args[1] + "' is not a number")
-            return
+            return false
         }
 
         if (!Number.isFinite(power)) {
             logger.log("'" + args[2] + "' is not a number")
-            return
+            return false
         }
 
         let world = this.console.observingRoom
@@ -46,6 +40,8 @@ export default class ExplodeCommand extends Command {
         world.appendChild(explodeEntity)
         explodeEntity.getComponent(ExplodeComponent).explode(x, y, power)
         explodeEntity.removeFromParent()
+        
+        return true
     }
 
     getName() {

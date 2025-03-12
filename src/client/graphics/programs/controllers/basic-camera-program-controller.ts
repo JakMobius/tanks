@@ -1,6 +1,8 @@
 import ProgramController from "./program-controller";
 import CameraProgram from "../camera-program";
 import Entity from "src/utils/ecs/entity";
+import TransformComponent from "src/entity/components/transform/transform-component";
+import { Matrix3 } from "src/utils/matrix3";
 
 export default class BasicCameraProgramController<ProgramClass extends CameraProgram = CameraProgram> extends ProgramController<ProgramClass> {
 
@@ -13,7 +15,11 @@ export default class BasicCameraProgramController<ProgramClass extends CameraPro
 
     reset() {
         this.program.reset()
-        this.program.setCamera(this.camera)
+        let matrix = this.camera.getComponent(TransformComponent).getInvertedGlobalTransform()
+
+        // Dirty hack: to avoid copying the matrix to new Float32Array
+        // it's casted from ReadonlyMatrix3 to Matrix3. TODO: figure out how to avoid this
+        this.program.setCamera((matrix as Matrix3).getArray())
     }
 
     draw() {

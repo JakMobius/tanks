@@ -4,13 +4,13 @@ import path from "path";
 
 export default class RunCommand extends Command {
 
-    onPerform(args: string[]): void {
+    onPerform(args: string[]) {
         if(args.length !== 1) {
             this.console.logger.log("Usage: " + this.getUsage())
-            return
+            return false
         }
 
-        this.console.runScript(args[0], 0)
+        return this.console.runScript(args[0], 0)
     }
 
     onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {

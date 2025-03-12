@@ -30,6 +30,10 @@ import { downloadFile } from 'src/utils/html5-download';
 import { FileDropOverlay } from '../ui/file-drop-overlay/file-drop-overlay';
 import GroupPrefab from 'src/entity/types/group/server-prefab';
 import PlayerConnectionManagerComponent from 'src/entity/types/player/server-side/player-connection-manager-component';
+import { mapEditorEntityFactory } from './editor-entity-factory';
+import { EditorOutlineBoundsComponent } from './editor-outline-bounds-component';
+import { EntityEditorTreeRootComponent } from '../ui/scene-tree-view/components';
+import { raycastPolygon } from 'src/utils/utils';
 
 interface MapEditorSceneContextProps {
     currentSelectedEntity: Entity | null 
@@ -80,7 +84,7 @@ const MapEditorView: React.FC = () => {
         controlsResponder: null as ControlsResponder | null,
         camera: null as Entity | null,
         toolList: [] as Tool[],
-        game: null as EmbeddedServerGame | null
+        game: null as EmbeddedServerGame | null,
     })
 
     const stateRef = useRef(state)
@@ -96,7 +100,7 @@ const MapEditorView: React.FC = () => {
         if(!needsRedrawRef.current && !needsRedraw && !scene.canvas.needsResize) return
         needsRedrawRef.current = false
         
-        state.camera?.getComponent(CameraPositionController)
+        state.camera?.getComponent(CameraComponent)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
         state.game?.serverLoop.emit("tick", dt)
         state.game?.clientWorld.emit("tick", dt)
@@ -111,9 +115,12 @@ const MapEditorView: React.FC = () => {
         scene.setTitle("Танчики - Редактор карт")
         scene.canvas.clear()
 
-        const game = new EmbeddedServerGame()
         const rootGroup = new Entity()
         GroupPrefab.prefab(rootGroup)
+
+        const game = new EmbeddedServerGame()
+        game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(mapEditorEntityFactory)
+        game.serverGame.addComponent(new EntityEditorTreeRootComponent())
         game.serverGame.appendChild(rootGroup)
 
         game.clientConnection.on(WorldDataPacket, (packet) => {
@@ -124,6 +131,10 @@ const MapEditorView: React.FC = () => {
             new WorldDataPacket(buffer.buffer).sendTo(game.clientConnection.connection)
         })
 
+        game.serverGame.on("request-focus", (entity) => {
+            selectEntity(entity)
+        })
+
         game.serverGame.on("client-connect", (client) => {
             const player = new Entity()
 
@@ -131,8 +142,6 @@ const MapEditorView: React.FC = () => {
             player.getComponent(PlayerConnectionManagerComponent).setClient(client)
             player.getComponent(PlayerWorldComponent).connectToWorld(game.serverGame)
         })
-
-        const world = game.clientWorld
 
         controlsResponderRef.current.on("editor-save-maps", () => {
             setSceneContext(sceneContext => {
@@ -144,15 +153,15 @@ const MapEditorView: React.FC = () => {
 
         const camera = new Entity()
         camera.addComponent(new TransformComponent())
-        camera.addComponent(new CameraComponent())
+        camera.addComponent(new CameraComponent()
+            .setViewport({ x: screen.width, y: screen.height }))
         camera.addComponent(new CameraPositionController()
             .setBaseScale(12)
-            .setViewport({ x: screen.width, y: screen.height })
             .setTarget({ x: 0, y: 0 }))
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
-        world.appendChild(camera)
+        game.clientWorld.appendChild(camera)
 
         setState((state) => ({
             ...state,
@@ -195,12 +204,67 @@ const MapEditorView: React.FC = () => {
         setNeedsRedraw()
     }, [state.camera])
 
-    const onZoom = useCallback((zoom: number) => {
+    const onZoom = useCallback((zoom: number, x: number, y: number) => {
         let camera = stateRef.current.camera.getComponent(CameraPositionController)
-        camera.baseScale *= zoom;
+        let cameraTransform = stateRef.current.camera.getComponent(TransformComponent).getGlobalTransform()
+        let rightX = cameraTransform.transformX(1, 0, 0)
+        let rightY = cameraTransform.transformY(1, 0, 0)
+        let topX = cameraTransform.transformX(0, -1, 0)
+        let topY = cameraTransform.transformY(0, -1, 0)
+
+        let coef = 1 - (1 / zoom)
+        let moveX = (rightX + topX) * x * coef
+        let moveY = (rightY + topY) * y * coef
+
+        camera.baseScale *= zoom
+        camera.target.x += moveX
+        camera.target.y += moveY
         camera.onTick(0)
         setNeedsRedraw()
     }, [state.camera])
+
+    const onMouseDown = useCallback((x: number, y: number) => {
+        const raycast = (entity: Entity): Entity => {
+            let children = entity.children
+            for(let i = children.length - 1; i >= 0; i--) {
+                let child = children[i]
+                let result = raycast(child)
+                if (result) return result
+            }
+
+            let outline = EditorOutlineBoundsComponent.getOutline(entity)
+            let transform = entity.getComponent(TransformComponent)?.getInvertedGlobalTransform()
+
+            if(outline && transform) {
+                let localX = transform.transformX(x, y)
+                let localY = transform.transformY(x, y)
+                if(raycastPolygon({ x: localX, y: localY }, outline)) return entity
+            }
+
+            return null
+        }
+
+        let entity = raycast(stateRef.current.game.clientWorld)
+        // TODO: hack to avoid raycasting the camera and stuff outside the desired subtree
+        if(entity.parent === stateRef.current.game.clientWorld) entity = null
+        if(entity) {
+            entity?.emit("request-focus-self")
+        } else {
+            selectEntity(null)
+        }
+    }, [])
+
+    const selectEntity = useCallback((entity: Entity) => {            
+        setSceneContext((context) => {
+            context.currentSelectedEntity?.emit("editor-blur")
+            entity?.emit("editor-focus")
+            return {
+                ...context,
+                currentSelectedEntity: entity
+            }
+        })
+        setNeedsRedraw()
+    }, [])
 
     const loadMap = useCallback((name: string, entity: Entity) => {
         setSceneContext((context) => {
@@ -210,8 +274,8 @@ const MapEditorView: React.FC = () => {
             return {
                 ...context,
                 currentSelectedEntity: null,
-                rootEntity: entity,
-                mapName: name
+                mapName: name,
+                rootEntity: entity
             }
         })
         setNeedsRedraw()
@@ -223,12 +287,7 @@ const MapEditorView: React.FC = () => {
         mapName: null,
         update: setNeedsRedraw,
         loadMap,
-        selectEntity: (entity) => {
-            setSceneContext((context) => ({
-                ...context,
-                currentSelectedEntity: entity
-            }))
-        }
+        selectEntity: selectEntity
     })
 
     return (
@@ -240,7 +299,7 @@ const MapEditorView: React.FC = () => {
                         camera={state.camera}
                         onDrag={onDrag}
                         onZoom={onZoom}
-                        // onMouseDown={onMouseDown}
+                        onMouseDown={onMouseDown}
                         // onMouseUp={onMouseUp}
                         // onMouseMove={onMouseMove}
                     />

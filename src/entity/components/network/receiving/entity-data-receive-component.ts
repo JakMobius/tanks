@@ -8,6 +8,16 @@ import GameObjectReader from "src/entity/components/network/receiving/game-objec
 import {commandName} from "src/entity/components/network/commands";
 import WriteBuffer from "src/serialization/binary/write-buffer";
 import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
+import { getPrefabNameForEntity } from "../../prefab-id-component";
+
+export class EntityDataRecieveContext {
+    idTable = new EntityIdTable()
+    entityFactory?: (id: string, entity: Entity) => void
+
+    constructor(factory: (id: string, entity: Entity) => void) {
+        this.entityFactory = factory
+    }
+}
 
 export default class EntityDataReceiveComponent extends EventHandlerComponent {
 
@@ -15,8 +25,8 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
     entityId: number
 
     private parentEventHandler = new BasicEventHandlerSet()
-    private entityIdTable: EntityIdTable | null = null
-    private root: EntityDataReceiveComponent | null = null
+    private context: EntityDataRecieveContext | null = null
+    root: EntityDataReceiveComponent | null = null
 
     constructor(identifier: number) {
         super();
@@ -53,14 +63,9 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
         })
     }
 
-    makeRoot(root: boolean) {
-        if (root && !this.entityIdTable) {
-            this.entityIdTable = new EntityIdTable()
-            this.updateRoot()
-        } else if(!root) {
-            this.entityIdTable = null
-            this.updateRoot()
-        }
+    makeRoot(entityFactory: (id: string, entity: Entity) => void) {
+        this.context = new EntityDataRecieveContext(entityFactory)
+        this.updateRoot()
         return this
     }
 
@@ -85,7 +90,7 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
             throw new Error("EntityDataReceiveComponent.readEntity called without a valid root receive component")
         }
 
-        return this.root.entityIdTable.getEntityFor(index)
+        return this.root.context.idTable.getEntityFor(index)
     }
 
     readObject(buffer: ReadBuffer): any {
@@ -96,16 +101,16 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
         let oldRoot = this.root
         this.parentEventHandler.setTarget(this.entity?.parent)
 
-        if(this.entityIdTable) {
+        if(this.context) {
             this.root = this
         } else {
             this.root = this.entity.parent?.getComponent(EntityDataReceiveComponent).root
         }
 
         if(this.root !== oldRoot) {
-            oldRoot?.entityIdTable?.removeId(this.entityId)
+            oldRoot?.context?.idTable.removeId(this.entityId)
         }
-        this.root?.entityIdTable?.setEntityId(this.entity, this.entityId)
+        this.root?.context?.idTable.setEntityId(this.entity, this.entityId)
     }
 
     onAttach(entity: Entity) {
@@ -113,10 +118,14 @@ export default class EntityDataReceiveComponent extends EventHandlerComponent {
         this.updateRoot()
     }
 
+    getContext() {
+        return this.root.context
+    }
+
     private handleCommand(command: number, buffer: ReadBuffer) {
         let handler = this.commandHandlers.get(command)
         if (!handler) {
-            console.error("ReceiverComponent received unknown command: " + command, this)
+            console.error("EntityDataReceiveComponent received unknown command 0x" + command.toString(16) + " for entity " + getPrefabNameForEntity(this.entity), this)
             return
         }
 

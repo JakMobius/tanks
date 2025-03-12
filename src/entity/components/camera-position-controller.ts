@@ -1,6 +1,7 @@
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import * as Box2D from "@box2d/core";
 import TransformComponent from "./transform/transform-component";
+import CameraComponent from "src/client/graphics/camera";
 
 export default class CameraPositionController extends EventHandlerComponent {
     public baseScale: number = 1
@@ -8,7 +9,6 @@ export default class CameraPositionController extends EventHandlerComponent {
     public velocity = {x: 0, y: 0}
     public realTarget = {x: 0, y: 0}
     public targetVelocity: Box2D.XY | null = null
-    public viewportLimit: Box2D.XY | null = {x: 1440, y: 900}
     public scale: number = 1
     public viewport: Box2D.XY
 
@@ -63,15 +63,6 @@ export default class CameraPositionController extends EventHandlerComponent {
         let target = this.target || this.defaultPosition
         this.scale = this.baseScale
 
-        if (this.viewportLimit !== null) {
-            if (this.viewport.x > this.viewportLimit.x) {
-                this.scale = this.viewport.x / this.viewportLimit.x * this.baseScale
-            }
-            if (this.viewport.y > this.viewportLimit.y) {
-                this.scale = Math.max(this.scale, this.viewport.y / this.viewportLimit.y * this.baseScale)
-            }
-        }
-
         if (this.position) {
             if (this.inertial) {
 
@@ -100,14 +91,16 @@ export default class CameraPositionController extends EventHandlerComponent {
             }
         }
 
+        let viewport = this.entity.getComponent(CameraComponent).viewport
+
         this.entity.getComponent(TransformComponent).set({
             position: {
                 x: this.position.x + this.shaking.x,
                 y: this.position.y + this.shaking.y
             },
             scale: {
-                x: this.viewport.x / this.scale / 2,
-                y: -this.viewport.y / this.scale / 2
+                x: viewport.x / this.scale / 2,
+                y: -viewport.y / this.scale / 2
             },
             // angle: this.inertial ? -Math.atan2(this.velocity.y, this.velocity.x) - Math.PI / 2 : 0
         })
@@ -120,16 +113,6 @@ export default class CameraPositionController extends EventHandlerComponent {
 
     setBaseScale(scale: number) {
         this.baseScale = scale
-        return this
-    }
-
-    setViewport(viewport: Box2D.XY) {
-        this.viewport = viewport
-        return this
-    }
-
-    setViewportLimit(limit: Box2D.XY) {
-        this.viewportLimit = limit
         return this
     }
 

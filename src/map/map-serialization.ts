@@ -2,7 +2,6 @@ import Version from "src/utils/version"
 import BlockState from "./block-state/block-state"
 import Entity from "src/utils/ecs/entity"
 import TilemapComponent, { charToId } from "./tilemap-component"
-import { EntityDeserializer, EntityFactory, EntitySerializer, manufactureEntity, SerializedEntity } from "src/entity/components/inspector/property-inspector"
 import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-component"
 import TransformComponent from "src/entity/components/transform/transform-component"
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component"
@@ -10,6 +9,7 @@ import GroupPrefab from 'src/entity/types/group/server-prefab';
 import TilemapPrefab from 'src/entity/types/tilemap/server-prefab';
 import SpawnzonePrefab from 'src/entity/types/spawn-zone/server-prefab';
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs"
+import { EntityDeserializer, PrefabFilter, EntitySerializer, manufactureEntity, SerializedEntity } from "src/entity/components/inspector/entity-serializer"
 
 export interface SpawnZoneConfig {
     id: number
@@ -56,7 +56,7 @@ export function readEntityFile(file: MapFile) {
 
         let name = config.name ?? null
 
-        const createEntity = (factory?: EntityFactory) => {
+        const createEntity = (factory?: PrefabFilter) => {
             let entity = manufactureEntity(GroupPrefab, factory?.root)
             if(!entity) return null
 
@@ -122,7 +122,7 @@ export function readEntityFile(file: MapFile) {
         let config = file as MapFileV0_1_0
         let name = config.name ?? null
     
-        return { name, createEntity: (factory: EntityFactory) => {
+        return { name, createEntity: (factory: PrefabFilter) => {
             let ctx = new EntityDeserializer(factory)
 
             if(config.danglingEntities) {

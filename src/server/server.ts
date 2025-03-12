@@ -199,6 +199,8 @@ export default class Server extends EventEmitter {
         this.setClusterSocketServerActive(false)
         await this.db.disconnect(false)
 
+        this.console.destroy()
+
         this.emit("terminate")
     }
 

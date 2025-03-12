@@ -9,6 +9,8 @@ import WorldDrawerComponent from "src/client/entity/components/world-drawer-comp
 import { TankSelectCarouselContext } from "./tank-select-overlay";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import { EntityPrefab } from "src/entity/entity-prefabs";
+import PhysicalComponent from "src/entity/components/physics-component";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
 
 interface TankPreviewCanvasProps {
     tankPrefab: EntityPrefab
@@ -50,22 +52,17 @@ const TankPreviewCanvas: React.FC<TankPreviewCanvasProps> = (props) => {
         stateRef.current.world = new Entity()
         let camera = new Entity()
         camera.addComponent(new TransformComponent())
-        camera.addComponent(new CameraComponent())
+        camera.addComponent(new CameraComponent()
+            .setViewport({x: drawContext.canvas.width, y: drawContext.canvas.height}))
         camera.addComponent(new CameraPositionController()
-            .setViewport({x: drawContext.canvas.width, y: drawContext.canvas.height})
             .setBaseScale(12)
             .setDefaultPosition({x: 0, y: 0}))
         camera.addComponent(new WorldDrawerComponent(drawContext.canvas))
 
-        // Disable Box2D stepping, as we don't use much physics here
+        gameWorldEntityPrefab(stateRef.current.world)
 
-        gameWorldEntityPrefab(stateRef.current.world, {
-            physicsTick: 1 / 60,
-            iterations: {
-                positionIterations: 0,
-                velocityIterations: 0
-            }
-        })
+        // Disable Box2D stepping, as we don't use much physics here
+        stateRef.current.world.getComponent(PhysicalHostComponent).setPhysicsTick(0)
 
         stateRef.current.world.addComponent(new ParticleHostComponent())
         stateRef.current.world.appendChild(camera)

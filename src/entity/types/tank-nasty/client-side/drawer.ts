@@ -1,8 +1,6 @@
 import TankDrawer from "src/client/graphics/drawers/tank-drawer";
 import {
-    copyQuadrangle,
     squareQuadrangle,
-    transformQuadrangle,
     translateQuadrangle,
     turnQuadrangle
 } from "src/utils/quadrangle";
@@ -12,13 +10,13 @@ import AirbagTankController from "src/entity/components/tank-controllers/airbag-
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/nasty/body-bright.texture.png"
 import bodyDarkSprite from "textures/tanks/nasty/body-dark.texture.png"
 import bodyLightMask from "textures/tanks/nasty/mask.texture.png"
 import ruderSprite from "textures/tanks/nasty/ruder.texture.png"
 import propellerSprites from "textures/tanks/nasty/propeller%.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     static bodyQuadrangle = squareQuadrangle(-2.97, -2.16, 5.94, 4.32)
@@ -62,7 +60,7 @@ export class Drawer extends TankDrawer {
             this.bodyLightMask,
             Drawer.bodyQuadrangle,
             transform.getGlobalAngle(),
-            WorldDrawerComponent.depths.tankBody
+            depths.tankBody
         )
 
         for(let propeller of behaviour.propellers) {
@@ -83,8 +81,8 @@ export class Drawer extends TankDrawer {
                 propeller.position.x + propellerDirection.x * Drawer.ruderOffset,
                 propeller.position.y + propellerDirection.y * Drawer.ruderOffset)
 
-            propellerProgram.drawSprite(this.ruderSprite, ruderQuadrangle, WorldDrawerComponent.depths.tankTop)
-            propellerProgram.drawSprite(propellerSprite, propellerQuadrangle, WorldDrawerComponent.depths.tankTop)
+            propellerProgram.drawSprite(this.ruderSprite, ruderQuadrangle, depths.tankTop)
+            propellerProgram.drawSprite(propellerSprite, propellerQuadrangle, depths.tankTop)
         }
 
         propellerProgram.transform.restore()

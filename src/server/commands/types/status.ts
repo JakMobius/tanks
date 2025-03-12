@@ -1,4 +1,4 @@
-import Command, {CommandConfig} from '../command';
+import Command, { CommandConfig } from '../command';
 import CommandFlag from '../command-flag';
 import Chalk from 'chalk';
 import filesize from 'src/utils/fs/file-size';
@@ -14,8 +14,8 @@ export default class StatusCommand extends Command {
     static connectingText = "§!FF0;connecting"
     static connectedText = "§!0F0;connected"
 
-    constructor(options: CommandConfig) {
-        super(options);
+    constructor(config: CommandConfig) {
+        super(config);
 
         this.addFlag(new CommandFlag({
             type: "flag",
@@ -108,6 +108,8 @@ export default class StatusCommand extends Command {
         this.logFlagErrors(flags, this.console.logger)
 
         this.printServerStatus(flags.flags)
+
+        return !flags.errors
     }
 
     printServerStatus(flags: Map<string, boolean | string[]>) {

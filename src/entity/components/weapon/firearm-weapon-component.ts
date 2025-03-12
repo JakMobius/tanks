@@ -1,8 +1,6 @@
 import ServerWeaponComponent from "src/entity/components/weapon/server-weapon-component";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
-import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
-import CollisionIgnoreList from "src/entity/components/collisions/collision-ignore-list";
 import Entity from "src/utils/ecs/entity";
 import BulletShooterComponent from "src/entity/components/bullet-shooter-component";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
@@ -11,6 +9,7 @@ import SoundEffectComponent from "src/entity/types/effect-sound/sound-effect-com
 import TimerComponent from "src/entity/types/timer/timer-component";
 import SoundEffectPrefab from "src/entity/types/effect-sound/server-prefab";
 import { EntityPrefab } from "src/entity/entity-prefabs";
+import CollisionIgnore from "../collisions/collision-ignore";
 
 export default class FirearmWeaponComponent extends ServerWeaponComponent {
     public maxAmmo: number = Infinity
@@ -180,7 +179,7 @@ export default class FirearmWeaponComponent extends ServerWeaponComponent {
         let shooter = tank.getComponent(ServerEntityPilotComponent).pilot
         entity.addComponent(new BulletShooterComponent(shooter))
 
-        CollisionIgnoreList.ignoreCollisions(entity, tank)
+        CollisionIgnore.ignoreCollisions(entity, tank)
 
         world.appendChild(entity)
 

@@ -3,8 +3,6 @@ import Entity from "src/utils/ecs/entity";
 import { Matrix3, ReadonlyMatrix3 } from "src/utils/matrix3";
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { PropertyInspector, VectorProperty } from "../inspector/property-inspector";
-import { TransmitterSet } from "../network/transmitting/transmitter-set";
-import TransformTransmitter from "./transform-transmitter";
 import { degToRad, radToDeg } from "src/utils/utils";
 
 function getScale(transform: ReadonlyMatrix3) {
@@ -108,10 +106,6 @@ export default class TransformComponent extends EventHandlerComponent {
 
         this.eventHandler.on("attached-to-parent", () => this.markDirty())
         this.eventHandler.on("detached-from-parent", () => this.markDirty())
-
-        this.eventHandler.on("transmitter-set-added", (transmitterSet: TransmitterSet) => {
-            transmitterSet.initializeTransmitter(TransformTransmitter)
-        })
     }
 
     getTransform() {

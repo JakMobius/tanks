@@ -11,6 +11,8 @@ import Entity from "src/utils/ecs/entity";
 import PhysicalComponent from "src/entity/components/physics-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import { b2ScaledPolygonShape } from "./b2-scale-shape";
+import { createTransmitterComponentFor } from "src/entity/components/network/transmitting/transmitter-component";
+import TransformTransmitter from "src/entity/components/transform/transform-transmitter";
 
 export default class PhysicsChunk {
     public readonly collider: ChunkedMapCollider;
@@ -93,6 +95,7 @@ export default class PhysicsChunk {
         this.entity = new Entity()
         this.entity.on("before-physics", () => this.update())
         this.entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
+        this.entity.addComponent(createTransmitterComponentFor(TransformTransmitter))
         this.entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
             let body = host.world.CreateBody({ type: Box2D.b2BodyType.b2_staticBody })
 

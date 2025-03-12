@@ -8,9 +8,10 @@ class AICommand extends Command {
 
         if (args.length < 1) {
             logger.log("Usage: " + this.getUsage())
-            return
+            return false
         }
 
+        return true
     }
 
     getDescription(): string {

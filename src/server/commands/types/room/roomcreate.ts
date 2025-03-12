@@ -1,4 +1,4 @@
-import Command, {CommandConfig} from '../../command';
+import Command, { CommandConfig } from '../../command';
 import CommandFlag from '../../command-flag';
 import fs from 'fs';
 import path from 'path';
@@ -32,12 +32,12 @@ export default class RoomCreateCommand extends Command {
         }))
     }
 
-    onPerform(args: string[]) {
+    async onPerform(args: string[]) {
         let logger = this.console.logger
 
         if(!this.console.server.gameSocket) {
             logger.log("§F00;This command requires game socket to be running")
-            return;
+            return false
         }
 
         let found = this.findFlags(args)
@@ -47,7 +47,7 @@ export default class RoomCreateCommand extends Command {
 
         if(!flags.has("map")) {
             logger.log(this.getHelp())
-            return
+            return false
         }
 
         let mode = (flags.get("mode") as string[])?.[0] ?? "FR"
@@ -57,7 +57,7 @@ export default class RoomCreateCommand extends Command {
 
         if (this.console.server.gameSocket.games.get(gameName)) {
             logger.log( `§F00;Room '${gameName}' already exist\n`)
-            return
+            return false
         }
 
         let mapsDirectory = this.console.server.config.general.mapsDirectory
@@ -65,7 +65,7 @@ export default class RoomCreateCommand extends Command {
 
         if (!fs.existsSync(mapPath)) {
             logger.log("§F00;No such map: '" + mapName + "'")
-            return
+            return false
         }
 
         let roomConfig = new RoomConfig()
@@ -74,9 +74,8 @@ export default class RoomCreateCommand extends Command {
         roomConfig.map = mapPath
         roomConfig.mode = mode
 
-        this.console.server.gameSocket.createRoom(roomConfig).then(() => {
-            logger.log(`§0F0; Created room '${gameName}'`)
-        })
+        await this.console.server.gameSocket.createRoom(roomConfig)
+        return true
     }
 
     onTabComplete(args: string[], options: ConsoleAutocompleteOptions) {

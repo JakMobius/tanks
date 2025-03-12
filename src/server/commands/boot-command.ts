@@ -1,4 +1,5 @@
-import Command, {CommandConfig} from './command';
+import Command from './command';
+import { CommandConfig } from './command';
 import CommandFlag from './command-flag';
 
 export interface ConfigOverride {
@@ -15,8 +16,8 @@ export default class BootCommand extends Command {
 	public preferencesOverride: ConfigOverrideList;
 	public parsedFlags: Map<string, boolean | string[]>;
 
-    constructor(options: CommandConfig) {
-        super(options);
+    constructor(config: CommandConfig) {
+        super(config)
 
         this.preferencesOverride = null
 
@@ -122,24 +123,26 @@ export default class BootCommand extends Command {
     onPerform(args: string[]) {
         let flags = this.findFlags(args.slice(2))
         if (flags.errors) {
-            return
+            return false
         }
 
         this.parsedFlags = flags.flags
 
         let preferencesOverrideResult = BootCommand.parsePreferencesOverrides(this.parsedFlags)
 
+        this.preferencesOverride = preferencesOverrideResult
+
         if(preferencesOverrideResult.errors.length) {
             for(let error of preferencesOverrideResult.errors) {
                 console.log(error)
             }
+            return false
         }
 
-        this.preferencesOverride = preferencesOverrideResult
-
+        return true
     }
 
-    public runPostInit() {
+    public async runPostInit() {
         let scripts = this.parsedFlags.get("script")
         
         if(!Array.isArray(scripts)) {
@@ -148,7 +151,7 @@ export default class BootCommand extends Command {
         }
 
         for(let script of scripts) {
-            this.console.runScript(script)
+            await this.console.runScript(script)
         }
     }
 

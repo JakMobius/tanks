@@ -1,24 +1,27 @@
 import Command from '../command';
 
 export default class UnbanCommand extends Command {
-	public server: any;
 
     onPerform(args: string[]) {
         let logger = this.console.logger
         if(args.length !== 1) {
             logger.log("Usage: " + this.getUsage())
-            return
+            return false
         }
 
         const ip = args[0]
-        const index = this.server.banned.indexOf(ip)
+        // const index = this.server.banned.indexOf(ip)
 
-        if(index === -1) {
-            logger.log("ip " + ip + " is not banned")
-        } else {
-            this.server.banned.splice(index, 1)
-            logger.log(" - Unbanned ip " + ip)
-        }
+        // if(index === -1) {
+        //     logger.log("ip " + ip + " is not banned")
+        //     return false
+        // } else {
+        //     this.server.banned.splice(index, 1)
+        //     logger.log(" - Unbanned ip " + ip)
+        //     return true
+        // }
+
+        return true
     }
 
     getDescription() {

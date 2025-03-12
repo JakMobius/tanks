@@ -6,10 +6,10 @@ import TrackedTankController from "src/entity/components/tank-controllers/tracke
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
 import TextureProgram from "src/client/graphics/programs/texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/mortar/body.texture.png"
 import truckSprite from "textures/tanks/mortar/truck.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
@@ -47,7 +47,7 @@ export class Drawer extends TankDrawer {
 
         truckProgram.drawTruck(Drawer.leftTrack, leftTrackDist, 0.25, this.truckSprite, 4.0, 0.85)
         truckProgram.drawTruck(Drawer.rightTrack, rightTrackDist, 0.25, this.truckSprite, 4.0, 0.85)
-        bodyProgram.drawSprite(this.bodySprite, Drawer.bodyQuadrangle, WorldDrawerComponent.depths.tankBody)
+        bodyProgram.drawSprite(this.bodySprite, Drawer.bodyQuadrangle, depths.tankBody)
 
         truckProgram.transform.restore()
         bodyProgram.transform.restore()

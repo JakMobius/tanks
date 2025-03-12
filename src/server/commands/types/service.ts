@@ -1,4 +1,4 @@
-import Command, {CommandConfig} from '../command';
+import Command, { CommandConfig } from '../command';
 import {ConsoleAutocompleteOptions} from "src/server/console/console";
 
 export interface ServerServiceConfig {
@@ -10,8 +10,8 @@ export interface ServerServiceConfig {
 export default class ServiceCommand extends Command {
 	public actions: Map<string, ServerServiceConfig>;
 
-    constructor(options: CommandConfig) {
-        super(options);
+    constructor(config: CommandConfig) {
+        super(config);
 
         this.actions = new Map([
             ["on", {
@@ -48,7 +48,7 @@ export default class ServiceCommand extends Command {
     onPerform(args: string[]) {
         if(args.length !== 1 || !this.actions.has(args[0])) {
             this.console.logger.log(this.getHelp())
-            return;
+            return false
         }
 
         let server = this.console.server
@@ -57,6 +57,8 @@ export default class ServiceCommand extends Command {
         server.setHubPageActive(config.hubPage)
         server.setGamePageActive(config.gamePage)
         server.setGameSocketActive(config.rooms)
+
+        return true
     }
 
     getDescription() {

@@ -30,6 +30,7 @@ import WriteBuffer from "src/serialization/binary/write-buffer";
 import GameHUD, { GameHudListenerComponent } from "../ui/game-hud/game-hud";
 import { ControlsProvider } from "../utils/react-controls-responder";
 import { EntityPrefab } from "src/entity/entity-prefabs";
+import { gameEntityFactory } from "../game/game-entity-factory";
 
 const TutorialView: React.FC = () => {
     const scene = useScene()
@@ -47,7 +48,7 @@ const TutorialView: React.FC = () => {
     const onDraw = (dt: number) => {
         RootControlsResponder.getInstance().refresh()
         state.remoteControlsManager?.updateIfNeeded()
-        state.camera?.getComponent(CameraPositionController)
+        state.camera?.getComponent(CameraComponent)
             .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
         state.game?.tick(dt)
         state.game?.clientWorld.emit("draw")
@@ -63,6 +64,7 @@ const TutorialView: React.FC = () => {
         scene.canvas.clear()
 
         const game = new EmbeddedServerGame()
+        game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
         const worldController = new TutorialWorldController(game.serverGame)
         const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, game.clientConnection.connection)
 
@@ -79,10 +81,10 @@ const TutorialView: React.FC = () => {
         const camera = new Entity()
 
         camera.addComponent(new TransformComponent())
-        camera.addComponent(new CameraComponent())
-        camera.addComponent(new CameraPositionController()
-            .setBaseScale(12)
+        camera.addComponent(new CameraComponent()
             .setViewport({ x: screen.width, y: screen.height }))
+        camera.addComponent(new CameraPositionController()
+            .setBaseScale(12))
         camera.addComponent(new CameraPrimaryEntityController())
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))

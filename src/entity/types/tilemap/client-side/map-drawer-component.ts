@@ -84,7 +84,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         program.transform.save()
         program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
 
-        this.updateBounds(map, program.camera)
+        this.updateBounds(map, phase.camera)
 
         for (let x = this.bounds.x0; x <= this.bounds.x1; x++) {
             for (let y = this.bounds.y0; y <= this.bounds.y1; y++) {
@@ -117,7 +117,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         program.transform.save()
         program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
 
-        this.updateBounds(map, program.camera)
+        this.updateBounds(map, phase.camera)
 
         const gridColor = 0xffe6e6e6
 

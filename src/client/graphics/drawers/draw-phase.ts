@@ -3,14 +3,17 @@ import {Constructor} from "src/utils/constructor"
 import Program from "../programs/program";
 import ProgramPool from "src/client/graphics/program-pool";
 import EventEmitter from "src/utils/event-emitter";
+import Entity from "src/utils/ecs/entity";
 
 export default class DrawPhase extends EventEmitter {
     private programPool: ProgramPool
     private controllers = new Map<Constructor<Program>, ProgramController>()
+    camera: Entity
 
-    constructor(programPool: ProgramPool) {
+    constructor(camera: Entity, programPool: ProgramPool) {
         super()
         this.programPool = programPool
+        this.camera = camera
     }
 
     getProgram<T extends Program>(programType: Constructor<T>): T {
@@ -37,9 +40,7 @@ export default class DrawPhase extends EventEmitter {
 
     draw() {
         this.prepare()
-
         this.emit("draw", this)
-
         this.runPrograms()
     }
 }

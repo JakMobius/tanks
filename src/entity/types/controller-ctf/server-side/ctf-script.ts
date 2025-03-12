@@ -3,7 +3,6 @@ import CTFController from "src/entity/types/controller-ctf/server-side/ctf-contr
 import Team from "src/server/team";
 import Entity from "src/utils/ecs/entity";
 import ServerEntityPilotComponent from "src/server/entity/components/server-entity-pilot-component";
-import WorldPhysicalLoopComponent from "src/entity/components/world-physical-loop-component";
 import PlayerDropFlagEvent from "src/events/player-drop-flag-event";
 import {FlagStateComponent} from "src/entity/types/flag/server-side/flag-state-component";
 import PlayerTeamComponent from "src/entity/types/player/server-side/player-team-component";
@@ -14,6 +13,7 @@ import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-
 import SpawnzoneComponent from "src/entity/types/spawn-zone/spawnzone-component";
 import TimerComponent from "src/entity/types/timer/timer-component";
 import FlagPrefab from "../../flag/server-prefab";
+import PhysicalHostComponent from "src/entity/components/physical-host-component";
 
 export default class CTFScript extends ServerGameScript<CTFController> {
 
@@ -120,7 +120,7 @@ export default class CTFScript extends ServerGameScript<CTFController> {
     }
 
     private nextTick(callback: () => void) {
-        this.controller.world.getComponent(WorldPhysicalLoopComponent).loop.scheduleTask(callback)
+        this.controller.world.getComponent(PhysicalHostComponent).loop.scheduleTask(callback)
     }
 
     private getFlagByCarrier(carrier: Entity) {

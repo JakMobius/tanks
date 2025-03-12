@@ -1,16 +1,16 @@
-import Command, {CommandConfig} from '../command';
+import Command, { CommandConfig } from '../command';
 import RoomCreateCommand from './room/roomcreate';
 import RoomListCommand from './room/roomlist';
 import RoomViewCommand from './room/roomview';
 
 export default class RoomCommand extends Command {
 
-    constructor(options: CommandConfig) {
-        super(options);
+    constructor(config: CommandConfig) {
+        super(config);
 
-        this.addSubcommand(new RoomCreateCommand(options))
-        this.addSubcommand(new RoomListCommand(options))
-        this.addSubcommand(new RoomViewCommand(options))
+        this.addSubcommand(new RoomCreateCommand(config))
+        this.addSubcommand(new RoomListCommand(config))
+        this.addSubcommand(new RoomViewCommand(config))
     }
 
     getDescription() {

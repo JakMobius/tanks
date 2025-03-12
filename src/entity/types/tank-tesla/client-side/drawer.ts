@@ -5,11 +5,11 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 
 import bodyBrightSprite from "textures/tanks/tesla/body.texture.png"
 import truckSprite from "textures/tanks/tesla/truck.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodySprite: Sprite;
@@ -50,7 +50,7 @@ export class Drawer extends TankDrawer {
         bodyProgram.drawSprite(
             this.bodySprite,
             Drawer.bodyQuadrangle,
-            WorldDrawerComponent.depths.tankBody
+            depths.tankBody
         )
 
         truckProgram.transform.restore()

@@ -1,17 +1,17 @@
 import TankDrawer from "src/client/graphics/drawers/tank-drawer";
 import Sprite from "src/client/graphics/sprite";
-import {copyQuadrangle, squareQuadrangle, transformQuadrangle} from "src/utils/quadrangle";
+import {squareQuadrangle} from "src/utils/quadrangle";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import TrackedTankController from "src/entity/components/tank-controllers/tracked-tank-controller";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import TruckProgram from "src/client/graphics/programs/truck-program";
 import LightMaskTextureProgram from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program";
-import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 import bodyBrightSprite from "textures/tanks/sniper/body-bright.texture.png"
 import bodyDarkSprite from "textures/tanks/sniper/body-dark.texture.png"
 import bodyLightMask from "textures/tanks/sniper/mask.texture.png"
 import truckSprite from "textures/tanks/sniper/truck.texture.png"
+import { depths } from "src/client/graphics/depths";
 
 export class Drawer extends TankDrawer {
     public bodyBrightSprite: Sprite;
@@ -59,7 +59,7 @@ export class Drawer extends TankDrawer {
             this.bodyLightMask,
             Drawer.bodyQuadrangle,
             transform.getGlobalAngle(),
-            WorldDrawerComponent.depths.tankBody
+            depths.tankBody
         )
 
         truckProgram.transform.restore()

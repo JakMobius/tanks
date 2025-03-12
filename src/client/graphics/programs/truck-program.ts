@@ -7,6 +7,7 @@ import vertexShaderSource from "src/client/graphics/shaders/vertex/truck-vertex.
 import fragmentShaderSource from "src/client/graphics/shaders/fragment/truck-fragment.glsl"
 import { Matrix3 } from 'src/utils/matrix3';
 import { copyQuadrangle, Quadrangle, transformQuadrangle } from 'src/utils/quadrangle';
+import { depths } from '../depths';
 
 export default class TruckProgram extends CameraProgram {
 	public vertexBuffer: GLBuffer<Float32Array>;
@@ -36,7 +37,7 @@ export default class TruckProgram extends CameraProgram {
 
     drawTruck(quadrangle: Quadrangle, distance: number, radius: number, texture: Sprite, lengthInTextures: number, speedCoefficient: number, z?: number) {
 
-        if(z === undefined) z = WorldDrawerComponent.depths.tankTrack
+        if(z === undefined) z = depths.tankTrack
 
         distance = -((distance * speedCoefficient) % lengthInTextures)
 

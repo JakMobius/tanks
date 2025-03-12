@@ -8,8 +8,9 @@ import MaskTextureProgramController
     from "src/client/graphics/programs/light-mask-texture/light-mask-texture-program-controller";
 import ProgramPool from "src/client/graphics/program-pool";
 import Entity from "src/utils/ecs/entity";
+import UICameraProgramController from "./programs/controllers/ui-camera-program-controller";
 
-export default class GameProgramPool extends ProgramPool {
+export class GameProgramPool extends ProgramPool {
     constructor(camera: Entity, ctx: WebGLRenderingContext) {
         super();
 
@@ -36,6 +37,27 @@ export default class GameProgramPool extends ProgramPool {
         this.registerFactory(LightMaskTextureProgram, () => {
             const maskTextureProgram = new LightMaskTextureProgram(ctx)
             return new MaskTextureProgramController(maskTextureProgram, camera)
+        })
+
+        this.registerFactory(ConvexShapeProgram, () => {
+            const convexShapeProgram = new ConvexShapeProgram(ctx)
+            return new BasicCameraProgramController(convexShapeProgram, camera)
+        })
+    }
+}
+
+export class UIProgramPool extends ProgramPool {
+    constructor(camera: Entity, ctx: WebGLRenderingContext) {
+        super();
+
+        this.registerFactory(ConvexShapeProgram, () => {
+            const convexShapeProgram = new ConvexShapeProgram(ctx)
+            return new UICameraProgramController(convexShapeProgram, camera)
+        })
+
+        this.registerFactory(TextureProgram, () => {
+            const textureProgram = new TextureProgram(ctx)
+            return new UICameraProgramController(textureProgram, camera)
         })
     }
 }
