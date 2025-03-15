@@ -2,74 +2,119 @@ import "./toolbar.scss"
 
 import BlockState from "src/map/block-state/block-state";
 import Tool from "src/client/map-editor/tools/tool";
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import ToolManager from 'src/client/map-editor/tools/toolmanager';
 import BlockSelectOverlay from "../block-select/block-select-overlay";
+import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
+import Pencil from "src/client/map-editor/tools/types/pencil";
+import Drag from "src/client/map-editor/tools/types/drag";
+import Eraser from "src/client/map-editor/tools/types/eraser";
+import Cursor from "src/client/map-editor/tools/types/cursor";
+import BlockSelect from "src/client/map-editor/tools/types/block-select";
+import BrickBlockState from "src/map/block-state/types/brick-block-state";
+import { useScene } from "src/client/scenes/scene-controller";
+import Fill from "src/client/map-editor/tools/types/fill";
+import Scale from "src/client/map-editor/tools/types/scale";
 
-interface BlockSelectButton {
-    block?: BlockState
-    onClick: () => void
-}
-
-const BlockSelectButton: React.FC<BlockSelectButton> = (props) => {
-    const blockType = props.block?.constructor as typeof BlockState
-    return (
-        <div 
-            className="editor-block-select"
-            onClick={props.onClick}
-            style={{ backgroundImage: props.block ? `url(static/map-editor/blocks/${blockType.typeName}.png)` : undefined }}
-        />
-    )
-}
-
-interface ToolBarViewProps {
-    toolList: Tool[]
+export interface ToolBarRef {
     toolManager: ToolManager
 }
 
-const ToolBarView: React.FC<ToolBarViewProps> = React.memo((props) => {
+export interface ToolBarProps {
+    ref: Ref<ToolBarRef>
+}
+
+const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
+
+    const mapEditorScene = useMapEditorScene()
+    const mapEditorSceneRef = useRef(mapEditorScene)
+    useEffect(() => { mapEditorSceneRef.current = mapEditorScene }, [mapEditorScene])
+
+    const scene = useScene()
+    const sceneRef = useRef(scene)
+    useEffect(() => { sceneRef.current = scene }, [scene])
 
     const [state, setState] = useState({
         blockOverlayShown: false,
         selectedBlock: null as BlockState | null,
-        selectedTool: null as Tool | null
+        selectedTool: null as Tool | null,
+        tools: [] as Tool[]
     })
 
-    const onToolSelect = useCallback((tool: Tool) => {
-        props.toolManager.selectTool(tool)
-    }, [props.toolManager])
+    const toolManager = useMemo(() => {
+        let toolManager = new ToolManager()
+        let toolList = [
+            new Cursor(toolManager),
+            new Scale(toolManager),
+            new Drag(toolManager),
+            new Eraser(toolManager),
+            new Pencil(toolManager),
+            new Fill(toolManager),
+            new BlockSelect(toolManager)
+        ]
+        
+        toolManager.selectBlock(new BrickBlockState())
+        toolManager.setClientRoot(mapEditorScene.game.clientWorld)
+        toolManager.setServerRoot(mapEditorScene.game.serverGame)
+        toolManager.setClientCameraEntity(mapEditorScene.clientCameraEntity)
+        toolManager.setDefaultTool(toolList[0])
 
-    const onBlockSelect = useCallback((Block: typeof BlockState) => {
-        props.toolManager.selectBlock(new Block())
-    }, [props.toolManager])
+        const onUpdate = () => {
+            setState(state => ({
+                ...state,
+                selectedBlock: toolManager?.selectedBlock,
+                selectedTool: toolManager?.selectedTool,
+                tools: toolList.filter(tool => tool.isSuitable()) ?? []
+            }))
+        }
 
-    const onToolChange = useCallback((tool: Tool) => setState((state) => ({
-        ...state,
-        selectedTool: tool
-    })), [])
+        const onEntitySelect = () => {
+            if(toolManager.selectedServerEntity !== mapEditorSceneRef.current.selectedServerEntity) {
+                mapEditorSceneRef.current.selectEntity(toolManager.selectedServerEntity)
+            }
+            onUpdate()
+        }
 
-    const onBlockChange = useCallback((block: BlockState) => setState((state) => ({
-        ...state,
-        selectedBlock: block
-    })), [])
+        onUpdate()
+
+        if(!toolManager) return undefined
+
+        toolManager.on("select-tool", onUpdate)
+        toolManager.on("select-block", onUpdate)
+        toolManager.on("select-entity", onEntitySelect)
+        toolManager.on("redraw", () => mapEditorScene.update())
+
+        return toolManager
+    }, [])
 
     useEffect(() => {
-        setState(state => ({
-            ...state,
-            selectedBlock: props.toolManager?.selectedBlock,
-            selectedTool: props.toolManager?.selectedTool
-        }))
-
-        if(!props.toolManager) return undefined
-
-        props.toolManager.on("select-tool", onToolChange)
-        props.toolManager.on("select-block", onBlockChange)
-
-        return () => {
-            props.toolManager.off("select-tool", onToolChange)
-            props.toolManager.off("select-block", onBlockChange)
+        const setCursor = (cursor: string | null) => {
+            let canvas = sceneRef.current.canvas.canvas
+            if(canvas instanceof HTMLCanvasElement) {
+                canvas.style.cursor = cursor
+            }
         }
-    }, [props.toolManager])
+        const onCursorUpdate = () => {
+            setCursor(toolManager.getCursor())
+        }
+
+        toolManager.on("cursor", onCursorUpdate)
+        return () => setCursor(null)
+    }, [])
+
+    useEffect(() => {
+        toolManager.setSelectedEntity(mapEditorScene.selectedServerEntity)
+    }, [mapEditorScene.selectedServerEntity])
+
+    useImperativeHandle(props.ref, () => ({ toolManager }), [])
+
+    const onToolSelect = useCallback((tool: Tool) => {
+        toolManager.selectTool(tool)
+    }, [])
+
+    const onBlockSelect = useCallback((Block: typeof BlockState) => {
+        toolManager.selectBlock(new Block())
+    }, [])
 
     const openBlockSelectOverlay = useCallback(() => {
         setState(state => ({ ...state, blockOverlayShown: true }))
@@ -82,11 +127,10 @@ const ToolBarView: React.FC<ToolBarViewProps> = React.memo((props) => {
 
     return (<>
         <div className="editor-toolbar">
-            <BlockSelectButton block={state.selectedBlock} onClick={openBlockSelectOverlay}/>
-            <div className="menu editor-toollist">
-                {props.toolList.map((tool, i) => (
+            <div className="editor-toollist">
+                {state.tools.map((tool, index) => (
                     <div
-                        key={i}
+                        key={tool.name ?? index}
                         className={"tool " + (state.selectedTool === tool ? "selected" : "")}
                         style={{ backgroundImage: `url(${tool.image})` }}
                         onClick={() => onToolSelect(tool)} />

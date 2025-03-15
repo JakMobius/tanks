@@ -21,7 +21,7 @@ const production = !!process.env.PRODUCTION;
 
 const projectRootDir = path.resolve(__dirname);
 
-const sharedPlugins = () => [
+const sharedPlugins = (side) => [
 	alias({
 		entries: [
 			{
@@ -41,7 +41,9 @@ const sharedPlugins = () => [
 	resolve({
 		extensions: ['.ts', '.tsx', '.js', '.json'],
 	}),
-	typescript(),
+	typescript({
+		// cacheDir: '.rollup.' + side + '.tscache'
+	}),
 	commonjs(),
 	replace({
 		preventAssignment: false,
@@ -60,7 +62,7 @@ const serverBuild = (config) => {
 		},
 		external: [/node_modules/],
 		plugins: [
-			...sharedPlugins(),
+			...sharedPlugins("server"),
 			copy({
 				targets: [
 					{ src: "src/client/web/static/*", dest: "dist/resources/web/static" },
@@ -87,7 +89,7 @@ const clientBuild = (config) => {
 			sourcemap: true
 		},
 		plugins: [
-			...sharedPlugins(),
+			...sharedPlugins("client"),
 			shaders({
 				include: ["**/*.glsl"]
 			}),

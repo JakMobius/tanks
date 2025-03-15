@@ -20,16 +20,19 @@ export default class SpawnzoneDrawer extends EventHandlerComponent {
     ]
     
     focused = false;
-    drawCallback = (phase: DrawPhase) => this.draw(phase)
+    uiDrawCallback = (phase: DrawPhase) => this.uiDraw(phase)
+    entityDrawCallback = (phase: DrawPhase) => this.entityDraw(phase)
     
     constructor() {
         super()
         this.eventHandler.on("camera-attach", (camera: Entity) => {
-            camera.getComponent(WorldDrawerComponent).uiDrawPhase.on("draw", this.drawCallback)
+            camera.getComponent(WorldDrawerComponent).uiDrawPhase.on("draw", this.uiDrawCallback)
+            camera.getComponent(WorldDrawerComponent).entityDrawPhase.on("draw", this.entityDrawCallback)
         })
 
         this.eventHandler.on("camera-detach", (camera: Entity) => {
-            camera.getComponent(WorldDrawerComponent).uiDrawPhase.off("draw", this.drawCallback)
+            camera.getComponent(WorldDrawerComponent).uiDrawPhase.off("draw", this.uiDrawCallback)
+            camera.getComponent(WorldDrawerComponent).entityDrawPhase.off("draw", this.entityDrawCallback)
         })
 
         this.eventHandler.on("editor-focus", () => this.onFocus())
@@ -44,21 +47,31 @@ export default class SpawnzoneDrawer extends EventHandlerComponent {
         this.focused = false
     }
 
-    draw(phase: DrawPhase) {
+    entityDraw(phase: DrawPhase) {
         const program = phase.getProgram(ConvexShapeProgram)
         const spawnzone = this.entity.getComponent(SpawnzoneComponent)
         const transform = this.entity.getComponent(TransformComponent)
-        const cameraTransform = phase.camera.getComponent(TransformComponent)
-        const cameraMatrix = cameraTransform.getInvertedGlobalTransform()
-        const viewport = phase.camera.getComponent(CameraComponent).viewport
 
         let teamColor = TeamColor.getColor(spawnzone.team).getUint32()
 
         // Set alpha to 0.5
         let backgroundColor = (teamColor & ~0xFF000000) | 0x70000000
-        let strokeColor = teamColor
 
-        let matrix = transform.getGlobalTransform()
+        program.transform.save()
+        program.transform.set(transform.getGlobalTransform())
+        program.drawConvexShape(SpawnzoneDrawer.vertices, backgroundColor)
+        program.transform.restore()
+    }
+
+    uiDraw(phase: DrawPhase) {
+        const spawnzone = this.entity.getComponent(SpawnzoneComponent)
+        const transform = this.entity.getComponent(TransformComponent)
+        const matrix = transform.getGlobalTransform()
+        const cameraTransform = phase.camera.getComponent(TransformComponent)
+        const cameraMatrix = cameraTransform.getInvertedGlobalTransform()
+        const viewport = phase.camera.getComponent(CameraComponent).viewport
+
+        let teamColor = TeamColor.getColor(spawnzone.team).getUint32()
 
         let shape = []
 
@@ -75,8 +88,7 @@ export default class SpawnzoneDrawer extends EventHandlerComponent {
             shape.push(cx, cy)
         }
 
-        program.drawConvexShape(shape, backgroundColor)
-        LineDrawer.strokeShape(phase, shape, strokeColor, 1, true)
+        LineDrawer.strokeShape(phase, shape, teamColor, 1, true)
 
         if(this.focused) {
             let directionColor = 0xFFE98C0C
@@ -93,10 +105,10 @@ export default class SpawnzoneDrawer extends EventHandlerComponent {
             ArrowDrawer.drawArrow(phase, {
                 start: { x: cx - dirX * halfLen, y: cy - dirY * halfLen },
                 end: { x: cx + dirX * halfLen, y: cy + dirY * halfLen },
-                color: directionColor,
+                strokeColor: directionColor,
                 headLength: 10,
-                headWidth: 10,
-                thickness: 5
+                headWidth: 20,
+                strokeWidth: 5
             })
         }
     }

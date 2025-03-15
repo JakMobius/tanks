@@ -232,11 +232,11 @@ export const SceneComponentsView: React.FC = (props) => {
     let [inspector, setInspector] = useState<PropertyInspector | null>(null)
 
     useEffect(() => {
-        if(!mapEditor.currentSelectedEntity) return undefined
+        if(!mapEditor.selectedServerEntity) return undefined
         let onSet = () => mapEditor.update()
         let onRefresh = () => rerender({})
 
-        let inspector = new PropertyInspector(mapEditor.currentSelectedEntity)
+        let inspector = new PropertyInspector(mapEditor.selectedServerEntity)
         inspector.on("set", onSet)
         inspector.on("refresh", onRefresh)
         setInspector(inspector)
@@ -247,7 +247,7 @@ export const SceneComponentsView: React.FC = (props) => {
             inspector.cleanup()
             setInspector(null)
         }
-    }, [mapEditor.currentSelectedEntity])
+    }, [mapEditor.selectedServerEntity])
 
     if(inspector && inspector.properties.length) return (
         <div className="properties-container">
@@ -270,7 +270,7 @@ export const SceneComponentsSection: React.FC = (props) => {
     let mapEditor = useMapEditorScene()
 
     const getName = () => {
-        let entity = mapEditor.currentSelectedEntity
+        let entity = mapEditor.selectedServerEntity
         let treeComponent = entity?.getComponent(EntityEditorTreeNodeComponent)
         return treeComponent?.name || "Свойства"
     }
@@ -278,13 +278,13 @@ export const SceneComponentsSection: React.FC = (props) => {
     let [name, setName] = useState(useMemo(() => getName(), []))
 
     useEffect(() => {
-        let entity = mapEditor.currentSelectedEntity
+        let entity = mapEditor.selectedServerEntity
         if(!entity) return undefined
         setName(getName())
         let handler = () => setName(getName())
         entity.on("name-set", handler)
         return () => entity.off("name-set", handler)
-    }, [mapEditor.currentSelectedEntity])
+    }, [mapEditor.selectedServerEntity])
 
     return (
         <SidebarSection header={name}>

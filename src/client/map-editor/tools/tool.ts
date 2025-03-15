@@ -2,11 +2,12 @@ import ToolManager from "./toolmanager";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import RootControlsResponder from "src/client/controls/root-controls-responder";
 import EventEmitter from "src/utils/event-emitter";
+import CameraPositionController from "src/entity/components/camera-position-controller";
+import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class Tool extends EventEmitter {
 	public dragging: boolean;   
 	public cursor: string;
-	public locksDragging: boolean;
 	public settingsView: React.FC | null;
     public controlsEventHandler = new BasicEventHandlerSet()
 
@@ -32,25 +33,53 @@ export default class Tool extends EventEmitter {
         this.name = null
         this.dragging = false
         this.cursor = null
-        this.locksDragging = true
         this.settingsView = null
     }
 
     setCursor(cursor: string): void {
+        if(this.cursor === cursor) return
         this.cursor = cursor
         this.manager.updateCursor()
     }
 
-    mouseDown(x: number, y: number): void {
+    onMouseDown(x: number, y: number): void {
         this.dragging = true
     }
 
-    mouseMove(x: number, y: number): void {
+    onMouseMove(x: number, y: number): void {
 
     }
 
-    mouseUp(x: number, y: number): void {
+    onMouseUp(x: number, y: number): void {
         this.dragging = false
+    }
+
+    onDrag(dx: number, dy: number) {
+        let camera = this.manager.clientCameraEntity.getComponent(CameraPositionController)
+        camera.target.x += dx
+        camera.target.y += dy
+        camera.onTick(0)
+        this.manager.setNeedsRedraw()
+    }
+
+    onZoom(zoom: number, x: number, y: number) {
+        let camera = this.manager.clientCameraEntity
+        let cameraPositionController = camera.getComponent(CameraPositionController)
+        let cameraMatrix = camera.getComponent(TransformComponent).getGlobalTransform()
+        let rightX = cameraMatrix.transformX(1, 0, 0)
+        let rightY = cameraMatrix.transformY(1, 0, 0)
+        let topX = cameraMatrix.transformX(0, -1, 0)
+        let topY = cameraMatrix.transformY(0, -1, 0)
+
+        let coef = 1 - (1 / zoom)
+        let moveX = (rightX + topX) * x * coef
+        let moveY = (rightY + topY) * y * coef
+
+        cameraPositionController.baseScale *= zoom
+        cameraPositionController.target.x += moveX
+        cameraPositionController.target.y += moveY
+        cameraPositionController.onTick(0)
+        this.manager.setNeedsRedraw()
     }
 
     becomeActive(): void {
@@ -94,5 +123,14 @@ export default class Tool extends EventEmitter {
             y += dy
             if((dx !== 0 && x !== x2 && (x > x2) === sx) || (dy !== 0 && y !== y2 && (y > y2) === sy)) break;
         }
+    }
+
+    setImage(image: string) {
+        this.image = image
+        this.emit("image-set")
+    }
+
+    isSuitable() {
+        return true
     }
 }

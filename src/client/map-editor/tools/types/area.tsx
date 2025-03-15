@@ -15,6 +15,7 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import React from 'react';
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
+import TilemapComponent from 'src/map/tilemap-component';
 
 export class AreaToolDrawer extends EntityDrawer {
     private tool: AreaTool;
@@ -117,7 +118,7 @@ export default class AreaTool extends Tool {
 
         const observe = createObservation(model, superpos);
 
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         let modification = new MapAreaModification(tilemap.entity, this.area.clone(), [])
         let newData = modification.fetchData()
         modification.newData = newData
@@ -189,7 +190,7 @@ export default class AreaTool extends Tool {
     }
 
     selectAll() {
-        const tilemap =this.manager.tilemap
+        const tilemap = this.getTilemap()
         this.area.setFrom(0, 0)
         this.area.setTo(tilemap.width, tilemap.height)
         this.manager.setNeedsRedraw()
@@ -200,13 +201,13 @@ export default class AreaTool extends Tool {
 
         this.manager.createEvent(this.area.width() * this.area.height() + " блок(-ов) удалено")
 
-        const map = this.manager.tilemap.entity
-        const history = map.getComponent(GameMapHistoryComponent)
+        // const map = this.getTilemap()
+        // const history = map.getComponent(GameMapHistoryComponent)
 
-        let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
-        areaModification.perform()
-        history.registerModification(areaModification)
-        history.commitActions("Удаление")
+        // let areaModification = new MapAreaModification(map, this.area.clone(), void 0)
+        // areaModification.perform()
+        // history.registerModification(areaModification)
+        // history.commitActions("Удаление")
         this.resetSelection()
         this.manager.setNeedsRedraw()
     }
@@ -214,7 +215,7 @@ export default class AreaTool extends Tool {
     copy(cut: boolean) {
         if(!this.area.isValid()) return
 
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
 
         let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
@@ -291,7 +292,7 @@ export default class AreaTool extends Tool {
     commitPaste() {
         this.pasting = false
 
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
         let modification = new MapAreaModification(tilemap.entity, this.area.clone(), this.copyBuffer.blocks.map((a: BlockState) => a.clone()))
@@ -304,17 +305,17 @@ export default class AreaTool extends Tool {
     }
 
     clampX(x: number) {
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         return Math.max(0, Math.min(tilemap.width - 1, x))
     }
 
     clampY(y: number) {
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         return Math.max(0, Math.min(tilemap.height - 1, y))
     }
 
-    mouseDown(x: number, y: number) {
-        super.mouseDown(x, y);
+    onMouseDown(x: number, y: number) {
+        super.onMouseDown(x, y);
 
         x = Math.floor(x / 1)
         y = Math.floor(y / 1)
@@ -343,8 +344,8 @@ export default class AreaTool extends Tool {
         this.initialAreaState = true
     }
 
-    mouseUp(x: number, y: number) {
-        super.mouseUp(x, y);
+    onMouseUp(x: number, y: number) {
+        super.onMouseUp(x, y);
 
         if(this.area.width() === 0 && this.area.height() === 0) {
             if(this.pasting) {
@@ -358,8 +359,8 @@ export default class AreaTool extends Tool {
         this.movingArea = false
     }
 
-    mouseMove(x: number, y: number) {
-        super.mouseMove(x, y);
+    onMouseMove(x: number, y: number) {
+        super.onMouseMove(x, y);
 
         x = Math.floor(x / 1)
         y = Math.floor(y / 1)
@@ -398,7 +399,7 @@ export default class AreaTool extends Tool {
         super.becomeActive();
 
         this.manager.setNeedsRedraw()
-        this.manager.world.appendChild(this.visibleEntity)
+        // this.manager.world.appendChild(this.visibleEntity)
     }
 
     resignActive() {
@@ -406,5 +407,13 @@ export default class AreaTool extends Tool {
 
         this.manager.setNeedsRedraw()
         this.visibleEntity.removeFromParent()
+    }
+
+    getTilemap() {
+        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+    }
+
+    isSuitable(): boolean {
+        return !!this.getTilemap()
     }
 }

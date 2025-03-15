@@ -2,22 +2,46 @@
 import Tool from '../tools/tool';
 import KeyboardController from "src/client/controls/input/keyboard/keyboard-controller";
 import BlockState from "src/map/block-state/block-state";
-import TilemapComponent from 'src/map/tilemap-component';
 import Entity from "src/utils/ecs/entity";
 import EventEmitter from "src/utils/event-emitter";
 
 export default class ToolManager extends EventEmitter {
     keyboard: KeyboardController = null
     selectedTool: Tool = null
-    world: Entity = null
-    tilemap: TilemapComponent
+    selectedServerEntity: Entity = null
     selectedBlock: BlockState = null
+    clientRoot: Entity
+    clientCameraEntity: Entity
+    serverRoot: Entity
+    defaultTool: Tool = null
 
-    constructor(world: Entity) {
+    constructor() {
         super()
-        this.world = world
         this.selectedTool = null
         this.selectedBlock = null
+    }
+
+    setDefaultTool(tool: Tool) {
+        this.defaultTool = tool
+        if(!this.selectedTool) {
+            this.selectTool(tool)
+        }
+        return this
+    }
+
+    setClientRoot(entity: Entity) {
+        this.clientRoot = entity
+        return this
+    }
+
+    setServerRoot(entity: Entity) {
+        this.serverRoot = entity
+        return this
+    }
+
+    setClientCameraEntity(entity: Entity) {
+        this.clientCameraEntity = entity
+        return this
     }
 
     setNeedsRedraw() {
@@ -53,7 +77,7 @@ export default class ToolManager extends EventEmitter {
     }
 
     updateCursor() {
-        // this.screen.canvas.style.cursor = this.getCursor()
+        this.emit("cursor", this.getCursor())
     }
 
     createEvent(name: string) {
@@ -64,26 +88,11 @@ export default class ToolManager extends EventEmitter {
         this.emit("world-alive", alive)
     }
 
-    setCameraMovementEnabled(enabled: boolean) {
-        this.emit("camera-movement", enabled)
-    }
-
-    mouseDown(x: number, y: number) {
-        if(this.selectedTool) {
-            this.selectedTool.mouseDown(x, y)
+    setSelectedEntity(entity: Entity) {
+        this.selectedServerEntity = entity
+        if(!this.selectedTool?.isSuitable()) {
+            this.selectTool(this.defaultTool)
         }
+        this.emit("select-entity")
     }
-
-    mouseUp(x: number, y: number) {
-        if(this.selectedTool) {
-            this.selectedTool.mouseUp(x, y)
-        }
-    }
-
-    mouseMove(x: number, y: number) {
-        if(this.selectedTool) {
-            this.selectedTool.mouseMove(x, y)
-        }
-    }
-
 }

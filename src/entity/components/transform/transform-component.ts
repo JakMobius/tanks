@@ -5,36 +5,6 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import { PropertyInspector, VectorProperty } from "../inspector/property-inspector";
 import { degToRad, radToDeg } from "src/utils/utils";
 
-function getScale(transform: ReadonlyMatrix3) {
-    let x = Math.sqrt(transform.get(0) ** 2 + transform.get(1) ** 2)
-    let y = Math.sqrt(transform.get(3) ** 2 + transform.get(4) ** 2)
-
-    let basis1X = transform.get(0) / x
-    let basis1Y = transform.get(1) / x
-
-    let basis2X = transform.get(3) / y
-    let basis2Y = transform.get(4) / y
-
-    if(basis1X * basis2Y - basis1Y * basis2X < 0) {
-        y = -y
-    }
-
-    return { x, y }
-}
-
-function getPosition(transform: ReadonlyMatrix3) {
-    return { x: transform.get(6), y: transform.get(7) }
-}
-
-function getDirection(transform: ReadonlyMatrix3) {
-    return { x: transform.get(0), y: transform.get(1) }
-}
-
-function getAngle(transform: ReadonlyMatrix3) {
-    let direction = getDirection(transform)
-    return Math.atan2(-direction.y, direction.x);
-}
-
 interface TransformParameters {
     position?: Box2D.XY
     angle?: number
@@ -42,9 +12,9 @@ interface TransformParameters {
 }
 
 function alterTransform(transform: Matrix3, params: TransformParameters) {
-    let position = params.position ?? getPosition(transform)
-    let angle = params.angle ?? getAngle(transform)
-    let scale = params.scale ?? getScale(transform)
+    let position = params.position ?? transform.getPosition()
+    let angle = params.angle ?? transform.getAngle()
+    let scale = params.scale ?? transform.getScale()
 
     transform.reset()
     transform.translate(position.x, position.y)
@@ -112,10 +82,10 @@ export default class TransformComponent extends EventHandlerComponent {
         return this.transform as ReadonlyMatrix3
     }
 
-    getAngle() { return getAngle(this.transform)}
-    getScale() { return getScale(this.transform) }
-    getPosition() { return getPosition(this.transform) }
-    getDirection() { return getDirection(this.transform) }
+    getAngle() { return this.transform.getAngle()}
+    getScale() { return this.transform.getScale() }
+    getPosition() { return this.transform.getPosition() }
+    getDirection() { return this.transform.getDirection() }
 
     set(parameters: TransformParameters) {
         this.setTransform(alterTransform(this.transform, parameters))
@@ -128,10 +98,10 @@ export default class TransformComponent extends EventHandlerComponent {
         return this
     }
 
-    getGlobalAngle(): number { return getAngle(this.getGlobalTransform()) }
-    getGlobalScale() { return getScale(this.getGlobalTransform()) }
-    getGlobalPosition() { return getPosition(this.getGlobalTransform()) }
-    getGlobalDirection() { return getDirection(this.getGlobalTransform()) }
+    getGlobalAngle() { return this.getGlobalTransform().getAngle() }
+    getGlobalScale() { return this.getGlobalTransform().getScale() }
+    getGlobalPosition() { return this.getGlobalTransform().getPosition() }
+    getGlobalDirection() { return this.getGlobalTransform().getDirection() }
 
     setGlobal(parameters: TransformParameters) {
         let transform = this.getGlobalTransform().clone()

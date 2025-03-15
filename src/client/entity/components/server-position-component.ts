@@ -53,7 +53,7 @@ export default class ServerPositionComponent extends EventHandlerComponent {
 
         position.x += this.serverVelocity.x * timeDifference
         position.y += this.serverVelocity.y * timeDifference
-        angle -= this.serverAngularVelocity * timeDifference // Note: minus here
+        angle += this.serverAngularVelocity * timeDifference
 
         transformComponent.setGlobal({ position, angle })
 

@@ -4,16 +4,17 @@ import Tool from '../tool';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
 import Color from "src/utils/color";
-import { squareQuadrangleFromPoints } from "src/utils/quadrangle";
 import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
-import EntityDrawer from "src/client/graphics/drawers/entity-drawer";
-import DrawPhase from "src/client/graphics/drawers/draw-phase";
-import Entity from "src/utils/ecs/entity";
-import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import { clamp } from "src/utils/utils";
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import React, { useEffect, useState } from 'react';
 import RangeView from 'src/client/ui/elements/range/range';
+import TilemapComponent from "src/map/tilemap-component";
+import TransformComponent from "src/entity/components/transform/transform-component";
+import DrawPhase from "src/client/graphics/drawers/draw-phase";
+import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
+import { squareQuadrangleFromPoints } from "src/utils/quadrangle";
+import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
 
 const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
@@ -62,44 +63,6 @@ const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
     )
 }
 
-export class PencilDrawer extends EntityDrawer {
-    tool: Pencil
-
-    constructor(tool: Pencil) {
-        super()
-
-        this.tool = tool
-    }
-
-    draw(phase: DrawPhase) {
-        if (!this.tool.brushPositionKnown) {
-            return
-        }
-
-        const program = phase.getProgram(ConvexShapeProgram)
-
-        const tilemap = this.tool.manager.tilemap
-
-        const scale = 1
-        const x = this.tool.brushX
-        const y = this.tool.brushY
-
-        let dyStart = Math.max(0, -y)
-        let dyEnd = Math.min(this.tool.thickness, tilemap.height - y)
-
-        for (let dy = dyStart; dy < dyEnd; dy++) {
-            let bounds = this.tool.brushRowBoundsFor(dy)
-
-            bounds[0] = clamp(bounds[0] + x, 0, tilemap.width) * scale
-            bounds[1] = clamp(bounds[1] + x, 0, tilemap.width) * scale
-
-            let quadrangle = squareQuadrangleFromPoints(bounds[0], (y + dy) * scale, bounds[1], (y + dy + 1) * scale)
-
-            program.drawQuadrangle(quadrangle, this.tool.brushColor.getUint32())
-        }
-    }
-}
-
 export default class Pencil extends Tool {
     public actionName = "Карандаш";
     public image = "static/map-editor/pencil.png"
@@ -108,10 +71,8 @@ export default class Pencil extends Tool {
     public mouseY = 0
 
     // Coordinates of the top-left corner of the brush
-    public brushX = 0;
-    public brushY = 0;
-
-    public brushPositionKnown = false;
+    public brushX : number | null = null;
+    public brushY : number | null = null;
 
     public isSquare = false;
     public thickness: number;
@@ -119,14 +80,13 @@ export default class Pencil extends Tool {
     public oldY: number | null = null;
     public brushColor = new Color().setRGB(0, 1, 0, 0.5)
 
-    public maxSize = 32
+    cameraDrawCallback = (phase: DrawPhase) => this.drawPreview(phase)
 
-    public visibleEntity = new Entity()
+    public maxSize = 32
 
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.visibleEntity.addComponent(new PencilDrawer(this))
         this.settingsView = PencilToolView
 
         this.setThickness(1)
@@ -138,6 +98,8 @@ export default class Pencil extends Tool {
         this.controlsEventHandler.on("editor-decrease-brush-size", () => {
             this.setThickness(this.thickness - 1)
         })
+
+        this.setCursor("url(static/map-editor/pencil.png) 0 18, auto")
     }
 
     setThickness(thickness: number) {
@@ -161,19 +123,23 @@ export default class Pencil extends Tool {
         this.emit("mode-changed", this.isSquare)
     }
 
-    mouseDown(x: number, y: number) {
-        super.mouseDown(x, y);
+    onMouseDown(x: number, y: number) {
+        super.onMouseDown(x, y);
         this.onMouse(x, y)
     }
 
-    mouseMove(x: number, y: number) {
-        super.mouseMove(x, y)
+    onMouseMove(x: number, y: number) {
+        super.onMouseMove(x, y)
         this.onMouse(x, y)
     }
 
     onMouse(x: number, y: number) {
-        this.mouseX = x
-        this.mouseY = y
+        let tilemapTransform = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        let tilemapMatrix = tilemapTransform?.getInvertedGlobalTransform()
+        if(!tilemapTransform) return
+        
+        this.mouseX = tilemapMatrix.transformX(x, y)
+        this.mouseY = tilemapMatrix.transformY(x, y)
 
         if (this.dragging) {
             this.performDrawing(this.brushX, this.brushY)
@@ -186,22 +152,22 @@ export default class Pencil extends Tool {
 
     performDrawing(x: number, y: number) {
         if (this.oldX !== null) {
-            this.trace(this.oldX, this.oldY, x, y, (x, y) => this.draw(x, y))
+            this.trace(this.oldX, this.oldY, x, y, (x, y) => this.drawTilemap(x, y))
         } else {
-            this.draw(x, y)
+            this.drawTilemap(x, y)
         }
 
         this.oldX = x
         this.oldY = y
     }
 
-    mouseUp(x: number, y: number) {
-        super.mouseUp(x, y);
+    onMouseUp(x: number, y: number) {
+        super.onMouseUp(x, y);
 
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
-        history.commitActions(this.actionName)
+        history?.commitActions(this.actionName)
 
         this.oldX = null
         this.oldY = null
@@ -227,8 +193,8 @@ export default class Pencil extends Tool {
         }
     }
 
-    draw(x: number, y: number) {
-        const tilemap = this.manager.tilemap
+    drawTilemap(x: number, y: number) {
+        const tilemap = this.getTilemap()
 
         for (let by = 0; by < this.thickness; by++) {
 
@@ -249,10 +215,10 @@ export default class Pencil extends Tool {
     }
 
     fragment(x: number, y: number) {
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
 
         if ((tilemap.getBlock(x, y).constructor as typeof BlockState).typeId ===
-            (this.manager.selectedBlock.constructor as typeof BlockState).typeId)
+            (this.manager.selectedBlock?.constructor as typeof BlockState).typeId)
             return
 
         let block = this.manager.selectedBlock.clone()
@@ -262,19 +228,23 @@ export default class Pencil extends Tool {
 
     becomeActive() {
         super.becomeActive()
-        this.setCursor("url(static/map-editor/cursors/pencil.png) 0 32, auto")
-        this.brushPositionKnown = false
-        this.manager.world.appendChild(this.visibleEntity)
+        this.brushX = null
+        this.brushY = null
+        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        drawer.entityDrawPhase.on("draw", this.cameraDrawCallback)
+        this.manager.setNeedsRedraw()
     }
 
     resignActive() {
         super.resignActive();
-        this.visibleEntity.removeFromParent()
+        this.brushX = null
+        this.brushY = null
+        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        drawer.entityDrawPhase.off("draw", this.cameraDrawCallback)
+        this.manager.setNeedsRedraw()
     }
 
     refreshBrush() {
-        this.brushPositionKnown = true
-
         let brushX = (Math.floor(this.mouseX / 1))
         let brushY = (Math.floor(this.mouseY / 1))
 
@@ -297,5 +267,46 @@ export default class Pencil extends Tool {
         }
 
         return false
+    }
+
+    drawPreview(phase: DrawPhase) {
+        if (this.brushX === null || this.brushY === null) {
+            return
+        }
+
+        const program = phase.getProgram(ConvexShapeProgram)
+
+        let transform = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        program.transform.save()
+        program.transform.set(transform.getGlobalTransform())
+
+        const tilemap = this.getTilemap()
+
+        const x = this.brushX
+        const y = this.brushY
+
+        let dyStart = Math.max(0, -y)
+        let dyEnd = Math.min(this.thickness, tilemap.height - y)
+
+        for (let dy = dyStart; dy < dyEnd; dy++) {
+            let bounds = this.brushRowBoundsFor(dy)
+
+            bounds[0] = clamp(bounds[0] + x, 0, tilemap.width)
+            bounds[1] = clamp(bounds[1] + x, 0, tilemap.width)
+
+            let quadrangle = squareQuadrangleFromPoints(bounds[0], y + dy, bounds[1], y + dy + 1)
+
+            program.drawQuadrangle(quadrangle, this.brushColor.getUint32())
+        }
+
+        program.transform.restore()
+    }
+
+    getTilemap() {
+        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+    }
+    
+    isSuitable(): boolean {
+        return !!this.getTilemap()
     }
 }

@@ -12,7 +12,7 @@ export default class Eraser extends Pencil {
     }
 
     fragment(x: number, y: number) {
-        const tilemap = this.manager.tilemap
+        const tilemap = this.getTilemap()
         if((tilemap.getBlock(x, y).constructor as typeof BlockState).typeId) {
             tilemap.setBlock(x, y, new AirBlockState())
         }
@@ -20,6 +20,6 @@ export default class Eraser extends Pencil {
 
     becomeActive() {
         super.becomeActive()
-        this.setCursor("url(static/map-editor/cursors/eraser.png) 0 32, auto")
+        this.setCursor("url(static/map-editor/eraser.png) 0 18, auto")
     }
 }

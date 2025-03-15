@@ -27,7 +27,8 @@ export const FileDropOverlay: React.FC = () => {
                 let json = JSON.parse(reader.result as string)
                 let { name, createEntity } = readEntityFile(json)
                 let entity = createEntity()
-                mapEditorScene.loadMap(name, entity)
+                if(entity) mapEditorScene.loadMap(name, entity)
+                else handleError()
             } catch(e) {
                 console.error(e)
                 handleError()

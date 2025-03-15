@@ -105,7 +105,7 @@ export default class PhysicalComponent extends EventHandlerComponent {
             fixtures = fixtures.GetNext()
         }
 
-        this.body.SetTransformVec(position, -angle)
+        this.body.SetTransformVec(position, angle)
 
         this.transformDirty = false
     }
@@ -117,7 +117,7 @@ export default class PhysicalComponent extends EventHandlerComponent {
 
         let position = this.body.GetPosition()
         let velocity = this.body.GetLinearVelocity()
-        let angle = -this.body.GetAngle()
+        let angle = this.body.GetAngle()
         let angularVelocity = -this.body.GetAngularVelocity()
 
         transform.setGlobal({

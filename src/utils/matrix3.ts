@@ -93,8 +93,8 @@ export function translate(m: Float32Array, tx: number, ty: number) {
 
 export function rotation(s: number, c: number) {
     return new Float32Array([
-        c, -s, 0,
-        s, c, 0,
+        c, s, 0,
+        -s, c, 0,
         0, 0, 1,
     ]);
 }
@@ -188,6 +188,40 @@ export class ReadonlyMatrix3 {
 
     get(i: number) {
         return this.m[i]
+    }
+
+    getScale() {
+        let x = Math.sqrt(this.get(0) ** 2 + this.get(1) ** 2)
+        let y = Math.sqrt(this.get(3) ** 2 + this.get(4) ** 2)
+    
+        let basis1X = this.get(0) / x
+        let basis1Y = this.get(1) / x
+    
+        let basis2X = this.get(3) / y
+        let basis2Y = this.get(4) / y
+    
+        if(basis1X * basis2Y - basis1Y * basis2X < 0) {
+            y = -y
+        }
+    
+        return { x, y }
+    }
+    
+    getPosition() {
+        return { x: this.get(6), y: this.get(7) }
+    }
+    
+    getDirection() {
+        return { x: this.get(0), y: this.get(1) }
+    }
+
+    getUpDirection() {
+        return { x: this.get(3), y: this.get(4) }
+    }
+    
+    getAngle() {
+        let direction = this.getDirection()
+        return Math.atan2(direction.y, direction.x);
     }
 }
 

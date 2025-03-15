@@ -19,7 +19,7 @@ const SceneTreeView: React.FC = () => {
 
     const editorScene = useMapEditorScene()
 
-    const rootEntity = editorScene.rootEntity
+    const serverMapEntity = editorScene.serverMapEntity
 
     const treeRef = useRef<TreeApi<EntityTreeNode> | null>(null)
     const divRef = useRef<HTMLDivElement | null>(null)
@@ -32,14 +32,14 @@ const SceneTreeView: React.FC = () => {
     const [height, setHeight] = useState<number | null>(null)
 
     const getNodeById = (id: string) => {
-        let rootNode = rootEntity?.getComponent(EntityEditorTreeNodeComponent)
+        let rootNode = serverMapEntity?.getComponent(EntityEditorTreeNodeComponent)
         if (id === null) return rootNode
         let targetEntity = rootNode.root?.map.get(id)
         return targetEntity?.getComponent(EntityEditorTreeNodeComponent)
     }
 
     const getRoot = () => {
-        return rootEntity?.getComponent(EntityEditorTreeNodeComponent).getDescriptor()
+        return serverMapEntity?.getComponent(EntityEditorTreeNodeComponent).getDescriptor()
     }
 
     const onRename: RenameHandler<EntityTreeNode> = ({ id, name }) => {
@@ -102,11 +102,11 @@ const SceneTreeView: React.FC = () => {
     }, [])
 
     useEffect(() => {
-        let node = editorScene.currentSelectedEntity?.getComponent(EntityEditorTreeNodeComponent)
+        let node = editorScene.selectedServerEntity?.getComponent(EntityEditorTreeNodeComponent)
         if(treeRef.current?.focusedNode?.id !== node?.id) {
             treeRef.current?.focus(node?.id)
         }
-    }, [editorScene.currentSelectedEntity])
+    }, [editorScene.selectedServerEntity])
 
     useEffect(() => {
         if(!divRef.current) return undefined
@@ -119,14 +119,14 @@ const SceneTreeView: React.FC = () => {
     }, [divRef.current])
 
     useEffect(() => {
-        if(!editorScene.rootEntity) return undefined
+        if(!editorScene.serverMapEntity) return undefined
         const dirtyHandler = () => {
             rerender({})
             editorScene.update()
         }
-        editorScene.rootEntity.on("tree-node-dirty", dirtyHandler)
-        return () => editorScene.rootEntity.off("tree-node-dirty", dirtyHandler)
-    }, [editorScene.rootEntity])
+        editorScene.serverMapEntity.on("tree-node-dirty", dirtyHandler)
+        return () => editorScene.serverMapEntity.off("tree-node-dirty", dirtyHandler)
+    }, [editorScene.serverMapEntity])
 
     const dragItemUserData = (nodes: EntityTreeNode[]) => {
         return new SceneTreeViewDropItem(nodes.map(node => node.entity))

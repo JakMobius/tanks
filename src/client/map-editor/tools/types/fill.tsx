@@ -1,25 +1,72 @@
+import TransformComponent from 'src/entity/components/transform/transform-component';
 import Tool from '../tool';
 import ToolManager from '../toolmanager';
 import BlockState from "src/map/block-state/block-state";
-import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
+import TilemapComponent from 'src/map/tilemap-component';
+import WorldDrawerComponent from 'src/client/entity/components/world-drawer-component';
+import DrawPhase from 'src/client/graphics/drawers/draw-phase';
+import ConvexShapeProgram from 'src/client/graphics/programs/convex-shapes/convex-shape-program';
+import Color from 'src/utils/color';
+import { squareQuadrangleFromPoints } from 'src/utils/quadrangle';
 
 export default class Fill extends Tool {
-    public actionName: any;
+    blockX: number | null = null
+    blockY: number | null = null
+
+    public brushColor = new Color().setRGB(0, 1, 0, 0.5)
+
+    cameraDrawCallback = (phase: DrawPhase) => this.drawPreview(phase)
 
     constructor(manager: ToolManager) {
         super(manager);
 
         this.image = "static/map-editor/fill.png"
-        this.actionName = "Заливка"
+        // this.actionName = "Заливка"
+        this.setCursor("url(static/map-editor/fill.png) 18 18, auto")
     }
 
-    mouseDown(x: number, y: number) {
-        super.mouseDown(x, y);
+    handleMouse(x: number, y: number) {
+        let transformComponent = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        let transformMatrix = transformComponent.getInvertedGlobalTransform()
 
-        x = Math.floor(x / 1)
-        y = Math.floor(y / 1)
+        let blockX = Math.floor(transformMatrix.transformX(x, y))
+        let blockY = Math.floor(transformMatrix.transformY(x, y))
 
-        this.fill(x, y)
+        if(blockX !== this.blockX || blockY !== this.blockY) {
+            this.blockX = blockX
+            this.blockY = blockY
+            this.manager.setNeedsRedraw()
+        }
+    }
+
+    onMouseMove(x: number, y: number): void {
+        super.onMouseMove(x, y)
+        this.handleMouse(x, y)
+    }
+
+    onMouseDown(x: number, y: number) {
+        super.onMouseDown(x, y);
+
+        this.handleMouse(x, y)
+        this.fill()
+    }
+
+    becomeActive() {
+        super.becomeActive()
+        this.blockX = null
+        this.blockY = null
+        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        drawer.entityDrawPhase.on("draw", this.cameraDrawCallback)
+        this.manager.setNeedsRedraw()
+    }
+
+    resignActive() {
+        super.resignActive();
+        this.blockX = null
+        this.blockY = null
+        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        drawer.entityDrawPhase.off("draw", this.cameraDrawCallback)
+        this.manager.setNeedsRedraw()
     }
 
     getBitset(bitset: Uint8Array, index: number) {
@@ -35,15 +82,15 @@ export default class Fill extends Tool {
         }
     }
 
-    fill(x: number, y: number) {
-        const tilemap = this.manager.tilemap
-        let baseBlock = tilemap.getBlock(x, y)
+    fill() {
+        const tilemap = this.getTilemap()
+        let baseBlock = tilemap.getBlock(this.blockX, this.blockY)
 
         if(!baseBlock) return
 
         let baseId = (baseBlock.constructor as typeof BlockState).typeId
         let copy = new Uint8Array(Math.ceil(tilemap.blocks.length / 8))
-        let carets = [x + y * tilemap.width]
+        let carets = [this.blockX + this.blockY * tilemap.width]
 
         while(carets.length) {
             let newCarets = []
@@ -78,7 +125,32 @@ export default class Fill extends Tool {
 
         this.manager.setNeedsRedraw()
 
-        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
-        history.commitActions(this.actionName)
+        // const history = tilemap.entity.getComponent(GameMapHistoryComponent)
+        // history.commitActions(this.actionName)
+    }
+
+    drawPreview(phase: DrawPhase) {
+        if (this.blockX === null || this.blockX === null) {
+            return
+        }
+
+        const program = phase.getProgram(ConvexShapeProgram)
+
+        let transform = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        program.transform.save()
+        program.transform.set(transform.getGlobalTransform())
+
+        let quadrangle = squareQuadrangleFromPoints(this.blockX, this.blockY, this.blockX + 1, this.blockY + 1)
+        program.drawQuadrangle(quadrangle, this.brushColor.getUint32())
+
+        program.transform.restore()
+    }
+
+    getTilemap() {
+        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+    }
+    
+    isSuitable(): boolean {
+        return !!this.getTilemap()
     }
 }

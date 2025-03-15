@@ -81,14 +81,13 @@ export default class RunTool extends Tool {
     onRun() {
         this.manager.setNeedsRedraw()
         this.manager.setWorldAlive(true)
-        // this.manager.setCameraMovementEnabled(false)
 
         // TODO: Setup an embedded server to run the game on
         // Client-only implementation limits the game functionality a lot
 
         this.tank = new Entity()
         SniperTankPrefab.prefab(this.tank)
-        this.manager.world.appendChild(this.tank)
+        // this.manager.world.appendChild(this.tank)
         
         this.tank.getComponent(TransformComponent).setGlobal({
             position: this.spawnPoint,
@@ -105,7 +104,6 @@ export default class RunTool extends Tool {
 
     onStop() {
         this.manager.setWorldAlive(false)
-        // this.manager.setCameraMovementEnabled(true)
 
         this.tank.removeFromParent()
 
@@ -138,8 +136,8 @@ export default class RunTool extends Tool {
         }
     }
 
-    mouseDown(x: number, y: number) {
-        super.mouseDown(x, y);
+    onMouseDown(x: number, y: number) {
+        super.onMouseDown(x, y);
 
         if(this.selectingLocation) {
             this.toggleSelectLocation()

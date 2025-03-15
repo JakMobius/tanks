@@ -2,12 +2,13 @@ import Command from '../command';
 
 export default class ExitCommand extends Command {
 
-	onPerform(): void {
+	async onPerform() {
 		// if(this.console.currentLogger !== this.console.server.logger) {
 		// 	this.console.render()
 		// 	return
 		// }
-		this.console.server.terminate().then()
+		await this.console.server.terminate()
+		return true
 	}
 
 	getName(): string {

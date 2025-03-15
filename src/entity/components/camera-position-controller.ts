@@ -100,9 +100,8 @@ export default class CameraPositionController extends EventHandlerComponent {
             },
             scale: {
                 x: viewport.x / this.scale / 2,
-                y: -viewport.y / this.scale / 2
+                y: viewport.y / this.scale / 2
             },
-            // angle: this.inertial ? -Math.atan2(this.velocity.y, this.velocity.x) - Math.PI / 2 : 0
         })
     }
 

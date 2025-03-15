@@ -69,7 +69,7 @@ const ToolSettingsView: React.FC<ToolSettingsViewProps> = React.memo((props) => 
     }, [state.shown])
 
     return (
-        <div className="menu editor-tool-settings" style={state.style}>
+        <div className="editor-tool-settings" style={state.style}>
             {state.displayedView ? <state.displayedView tool={state.tool}/> : null}
         </div>
     )

@@ -6,6 +6,8 @@ import SpawnzoneDrawer from "./client-side/spawnzone-drawer";
 import SpawnzoneReceiver from "./client-side/spawnzone-receiver";
 import BasePrefab from "./prefab"
 import EntityStateReceiver from "src/entity/components/network/entity/entity-state-receiver";
+import EditorEventReceiver from "src/client/map-editor/editor-event-receiver";
+import EditorOutlineDrawerComponent from "src/client/map-editor/editor-outline-drawer-component";
 
 const ClientPrefab = new ClientEntityPrefab({
     id: BasePrefab.id,
@@ -23,6 +25,8 @@ const ClientPrefab = new ClientEntityPrefab({
     },
     editorPrefab(entity) {
         ClientPrefab.prefab(entity)
+        entity.addComponent(new EditorEventReceiver())
+        entity.addComponent(new EditorOutlineDrawerComponent())
         entity.addComponent(new SpawnzoneDrawer())
     },
 })

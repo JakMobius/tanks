@@ -86,7 +86,7 @@ export default class CameraRandomMovement extends EventHandlerComponent {
             },
             scale: {
                 x: viewport.x / this.currentScale / 2,
-                y: -viewport.y / this.currentScale / 2
+                y: viewport.y / this.currentScale / 2
             }
         })
     }

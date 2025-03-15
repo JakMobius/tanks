@@ -109,3 +109,5 @@ dist
 .DS_Store
 dist
 package-lock.json
+*.tscache
+.rollup.cache

@@ -10,7 +10,7 @@ interface BlockSelectOverlayProps {
 const BlockSelectOverlay: React.FC<BlockSelectOverlayProps> = (props) => {
     return (
         <div className="block-select-overlay">
-            <div className="menu editor-block-select-menu">
+            <div className="editor-block-select-menu">
                 <div className="title">Выбор блока</div>
                 <div className="block-list">
                     { Array.from(BlockState.Types.entries()).map(([id, Block]) => {

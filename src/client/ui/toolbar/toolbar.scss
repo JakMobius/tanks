@@ -1,61 +1,42 @@
 .editor-toolbar {
     position: absolute;
-    left: 0px;
-    bottom: 20px;
-    width: 100%;
+    right: 0;
+    top: 0;
+    max-height: 100%;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     gap: 10px;
+    padding: 20px;
+    overflow-y: auto;
 
     .editor-toollist {
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        overflow-y: auto;
-        gap: 7px;
-        padding: 7px 7px;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .editor-block-select {
-        width: 47px;
-        height: 47px;
-        background-position: center;
         background-size: 32px;
-        background-repeat: no-repeat;
-        cursor: pointer;
     }
 
-    .editor-toollist, .editor-block-select {
+    .tool {
+        background-size: 20px auto;
+    }
+
+    .tool.selected {
+        border: solid 2px #00c4ff;
+    }
+
+    .editor-block-select, .tool {
         background-color: white;
         border-radius: 5px;
-        box-shadow: rgba(0, 0, 0, .3) 0 0 15px;
+        border: solid 1px #C8C8C8;
+        box-sizing: border-box;
+        cursor: pointer;
+        background-position: center;
+        background-repeat: no-repeat;
+        width: 47px;
+        height: 47px;
     }
-}
-
-.tool {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    width: 35px;
-    height: 35px;
-    background-size: 20px;
-    background-position: center;
-    background-repeat: no-repeat;
-    border: solid #c8c8c8 1px;
-    border-radius: 3px;
-    transition: border 0.5s;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
-.tool.inline {
-    position: relative;
-    display: inline-block;
-}
-
-.tool.selected {
-    border: solid 2px #00c4ff;
 }
