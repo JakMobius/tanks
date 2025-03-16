@@ -15,10 +15,26 @@ export type KeyboardInputConfig =
 export default class KeyboardController extends InputDevice {
     listener: KeyboardListener;
 
+    metaKeyPressed: boolean = false
+    ctrlKeyPressed: boolean = false
+    shiftKeyPressed: boolean = false
+
     constructor() {
         super()
         this.listener = new KeyboardListener()
         this.listener.setTarget(document.body)
+
+        this.listener.on("keydown", (e) => {
+            if(e.metaKey) this.metaKeyPressed = true
+            if(e.ctrlKey) this.ctrlKeyPressed = true
+            if(e.shiftKey) this.shiftKeyPressed = true
+        })
+
+        this.listener.on("keyup", (e) => {
+            if(!e.metaKey) this.metaKeyPressed = false
+            if(!e.ctrlKey) this.ctrlKeyPressed = false
+            if(!e.shiftKey) this.shiftKeyPressed = false
+        })
     }
 
     getType(): InputDeviceType {

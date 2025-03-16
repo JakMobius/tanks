@@ -15,6 +15,7 @@ import BrickBlockState from "src/map/block-state/types/brick-block-state";
 import { useScene } from "src/client/scenes/scene-controller";
 import Fill from "src/client/map-editor/tools/types/fill";
 import Scale from "src/client/map-editor/tools/types/scale";
+import Entity from "src/utils/ecs/entity";
 
 export interface ToolBarRef {
     toolManager: ToolManager
@@ -68,10 +69,8 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
             }))
         }
 
-        const onEntitySelect = () => {
-            if(toolManager.selectedServerEntity !== mapEditorSceneRef.current.selectedServerEntity) {
-                mapEditorSceneRef.current.selectEntity(toolManager.selectedServerEntity)
-            }
+        const onEntitiesSelect = (entities: Entity[]) => {
+            mapEditorSceneRef.current.selectEntities(entities)
             onUpdate()
         }
 
@@ -81,7 +80,7 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
 
         toolManager.on("select-tool", onUpdate)
         toolManager.on("select-block", onUpdate)
-        toolManager.on("select-entity", onEntitySelect)
+        toolManager.on("select-entities", onEntitiesSelect)
         toolManager.on("redraw", () => mapEditorScene.update())
 
         return toolManager
@@ -103,8 +102,9 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
     }, [])
 
     useEffect(() => {
-        toolManager.setSelectedEntity(mapEditorScene.selectedServerEntity)
-    }, [mapEditorScene.selectedServerEntity])
+        toolManager.setSelectedEntities(mapEditorScene.selectedServerEntities)
+        toolManager.setNeedsRedraw()
+    }, [mapEditorScene.selectedServerEntities])
 
     useImperativeHandle(props.ref, () => ({ toolManager }), [])
 

@@ -26,7 +26,7 @@ export default class Fill extends Tool {
     }
 
     handleMouse(x: number, y: number) {
-        let transformComponent = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        let transformComponent = this.getOnlySelectedEntity().getComponent(TransformComponent)
         let transformMatrix = transformComponent.getInvertedGlobalTransform()
 
         let blockX = Math.floor(transformMatrix.transformX(x, y))
@@ -136,7 +136,7 @@ export default class Fill extends Tool {
 
         const program = phase.getProgram(ConvexShapeProgram)
 
-        let transform = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        let transform = this.getOnlySelectedEntity().getComponent(TransformComponent)
         program.transform.save()
         program.transform.set(transform.getGlobalTransform())
 
@@ -147,7 +147,7 @@ export default class Fill extends Tool {
     }
 
     getTilemap() {
-        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+        return this.getOnlySelectedEntity()?.getComponent(TilemapComponent)
     }
     
     isSuitable(): boolean {

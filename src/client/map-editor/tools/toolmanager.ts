@@ -8,7 +8,7 @@ import EventEmitter from "src/utils/event-emitter";
 export default class ToolManager extends EventEmitter {
     keyboard: KeyboardController = null
     selectedTool: Tool = null
-    selectedServerEntity: Entity = null
+    selectedServerEntities: Entity[] = []
     selectedBlock: BlockState = null
     clientRoot: Entity
     clientCameraEntity: Entity
@@ -88,11 +88,22 @@ export default class ToolManager extends EventEmitter {
         this.emit("world-alive", alive)
     }
 
-    setSelectedEntity(entity: Entity) {
-        this.selectedServerEntity = entity
+    getOnlySelectedEntity() {
+        return this.selectedServerEntities.length === 1 ? this.selectedServerEntities[0] : null
+    }
+
+    // Can be called from anywhere to select entities, forwards the request
+    // to the map editor context
+    selectEntities(entities: Entity[]) {
+        this.emit("select-entities", entities)
+    }
+
+    // Should only be called from outside the map editor context to confirm
+    // the selection of entities, thus maintaining single source-of-truth
+    setSelectedEntities(entities: Entity[]) {
+        this.selectedServerEntities = entities
         if(!this.selectedTool?.isSuitable()) {
             this.selectTool(this.defaultTool)
         }
-        this.emit("select-entity")
     }
 }

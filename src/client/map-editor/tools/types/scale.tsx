@@ -20,42 +20,42 @@ export default class Scale extends Cursor {
     getArrowConfig(type: "x" | "y"): ArrowControlConfig {
         let hovered = type === this.hoveredControl
         
-        if(hovered) {
-        
-            let length = this.defaultArrowLength + this.hoverArrowWidth / 2
-
-            if(this.dragging) {
-                const transformComponent = this.manager.selectedServerEntity.getComponent(TransformComponent)
-                const transform = transformComponent.getGlobalTransform()
-                const testVector = type === "x" ? { x: 1, y: 0 } : { x: 0, y: 1 }
-
-                const initialX = this.initialEntityTransform.transformX(testVector.x, testVector.y, 0)
-                const initialY = this.initialEntityTransform.transformY(testVector.x, testVector.y, 0)
-
-                const currentX = transform.transformX(testVector.x, testVector.y, 0)
-                const currentY = transform.transformY(testVector.x, testVector.y, 0)
-
-                // Project current on initial
-                const currentScale = (currentX * initialX + currentY * initialY) / (initialX ** 2 + initialY ** 2)
-
-                length = this.defaultArrowLength * currentScale
-                if(currentScale > 0) {
-                    length += this.hoverArrowWidth / 2
-                } else {
-                    length -= this.hoverArrowWidth / 2
-                }
-            } 
-            return {
-                arrowLength: length,
-                headLength: this.hoverArrowWidth,
-                headWidth: this.hoverArrowWidth
-            }
-        } else {
+        if(!hovered) {
             return {
                 arrowLength: this.defaultArrowLength + this.defaultArrowWidth / 2,
                 headLength: this.defaultArrowWidth,
                 headWidth: this.defaultArrowWidth
             }
+        }
+
+        let length = this.defaultArrowLength + this.hoverArrowWidth / 2
+
+        if(this.dragging) {
+            const transformComponent = this.getOnlySelectedEntity().getComponent(TransformComponent)
+            const transform = transformComponent.getGlobalTransform()
+            const testVector = type === "x" ? { x: 1, y: 0 } : { x: 0, y: 1 }
+
+            const initialX = this.initialEntityTransform.transformX(testVector.x, testVector.y, 0)
+            const initialY = this.initialEntityTransform.transformY(testVector.x, testVector.y, 0)
+
+            const currentX = transform.transformX(testVector.x, testVector.y, 0)
+            const currentY = transform.transformY(testVector.x, testVector.y, 0)
+
+            // Project current on initial
+            const currentScale = (currentX * initialX + currentY * initialY) / (initialX ** 2 + initialY ** 2)
+
+            length = this.defaultArrowLength * currentScale
+            if(currentScale > 0) {
+                length += this.hoverArrowWidth / 2
+            } else {
+                length -= this.hoverArrowWidth / 2
+            }
+        } 
+
+        return {
+            arrowLength: length,
+            headLength: this.hoverArrowWidth,
+            headWidth: this.hoverArrowWidth
         }
     }
 
@@ -79,7 +79,7 @@ export default class Scale extends Cursor {
         let controlsPosition = this.getControlsScreenPosition()
         if(!controlsPosition.screenPos) return
         
-        let entity = this.manager.selectedServerEntity
+        let entity = this.getOnlySelectedEntity()
         let transformComponent = entity?.getComponent(TransformComponent)
         if(!transformComponent) return
 
@@ -134,7 +134,7 @@ export default class Scale extends Cursor {
         }
 
         if(!transform) {
-            let entity = this.manager.selectedServerEntity
+            let entity = this.getOnlySelectedEntity()
             transform = entity?.getComponent(TransformComponent)?.getGlobalTransform()
         }
         

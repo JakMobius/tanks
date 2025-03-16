@@ -33,7 +33,7 @@ export const useProfile = () => {
 
 const HubPage: React.FC<HubPageProps> = (props) => {
     return (
-        <ControlsProvider>
+        <ControlsProvider autofocus>
             <EventsProvider>
                 <ProfileContext.Provider value={props.userData}>
                     <div className="hub-body">

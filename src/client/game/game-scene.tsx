@@ -45,7 +45,7 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     const eventContextRef = useRef<KeyedComponentsHandle | null>(null)
     const gameHudRef = useRef<KeyedComponentsHandle | null>(null)
     const tankSelectRef = useRef<TankSelectOverlayHandle | null>(null)
-    const controlsResponderRef = useRef<ControlsResponder | null>(null)
+    const gameControlsResponder = useRef<ControlsResponder | null>(null)
 
     const [state, setState] = React.useState({
         camera: null as Entity | null,
@@ -72,15 +72,15 @@ const GameView: React.FC<GameViewConfig> = (props) => {
 
         const world = new Entity()
         const camera = new Entity()
-        const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, props.client.connection)
+        const remoteControlsManager = new RemoteControlsManager(gameControlsResponder.current, props.client.connection)
         
         clientGameWorldEntityPrefab(world)
         world.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
-        world.addComponent(new PrimaryEntityControls(controlsResponderRef.current))
+        world.addComponent(new PrimaryEntityControls(gameControlsResponder.current))
 
         remoteControlsManager.attach()
 
-        controlsResponderRef.current.on("game-toggle-debug", () => {
+        gameControlsResponder.current.on("game-toggle-debug", () => {
             camera.getComponent(WorldDrawerComponent).toggleDebugDraw()
         })
 
@@ -190,7 +190,8 @@ const GameView: React.FC<GameViewConfig> = (props) => {
     }, [])
 
     return (
-        <ControlsProvider ref={controlsResponderRef}>
+        <ControlsProvider default>
+            <ControlsProvider ref={gameControlsResponder} default></ControlsProvider>
             <EventsProvider ref={eventContextRef}>
                 <PlayerNicksHUD world={state.world} screen={scene.canvas} camera={state.camera} />
                 <TankInfoHUD world={state.world} />

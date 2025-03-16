@@ -44,7 +44,9 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardI
         "editor-cut": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-KeyX"}],
         "editor-reset-selection": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-KeyD"}],
         "editor-select-all": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Ctrl-KeyA"}],
-        "editor-clear-area": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Backspace"}],
+        "editor-delete": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Backspace"}],
+        "editor-tree-toggle": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Space"}],
+        "editor-rename": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Enter"}],
 
         "editor-increase-brush-size": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Shift-Equal"}],
         "editor-decrease-brush-size": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Minus"}]

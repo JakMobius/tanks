@@ -31,7 +31,7 @@ export const RoomListErrorComponent: React.FC<RoomListErrorProps> = (props) => {
                     Может быть, стоит <a onClick={props.onRetry}>попробовать еще раз?</a>
                 </span>
             }
-            shown={true} />
+            shown />
     );
 }
 

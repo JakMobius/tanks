@@ -1,6 +1,5 @@
 import { NodeApi } from "../interfaces/node-api";
 import { TreeApi } from "../interfaces/tree-api";
-import { IdObj } from "../types/utils";
 
 export function createList<T>(tree: TreeApi<T>) {
   if (tree.isFiltered) {

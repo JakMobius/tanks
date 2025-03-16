@@ -232,11 +232,13 @@ export const SceneComponentsView: React.FC = (props) => {
     let [inspector, setInspector] = useState<PropertyInspector | null>(null)
 
     useEffect(() => {
-        if(!mapEditor.selectedServerEntity) return undefined
+        if(mapEditor.selectedServerEntities.length !== 1) return undefined
+
+        let entity = mapEditor.selectedServerEntities[0]
         let onSet = () => mapEditor.update()
         let onRefresh = () => rerender({})
 
-        let inspector = new PropertyInspector(mapEditor.selectedServerEntity)
+        let inspector = new PropertyInspector(entity)
         inspector.on("set", onSet)
         inspector.on("refresh", onRefresh)
         setInspector(inspector)
@@ -247,7 +249,7 @@ export const SceneComponentsView: React.FC = (props) => {
             inspector.cleanup()
             setInspector(null)
         }
-    }, [mapEditor.selectedServerEntity])
+    }, [mapEditor.selectedServerEntities])
 
     if(inspector && inspector.properties.length) return (
         <div className="properties-container">
@@ -256,6 +258,16 @@ export const SceneComponentsView: React.FC = (props) => {
             })}
         </div>
     )
+
+    if(mapEditor.selectedServerEntities.length > 1) {
+        return (
+            <div className="properties-container">
+                <div className="no-properties-text">
+                    Групповые изменения пока не поддерживаются
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="properties-container">
@@ -270,7 +282,10 @@ export const SceneComponentsSection: React.FC = (props) => {
     let mapEditor = useMapEditorScene()
 
     const getName = () => {
-        let entity = mapEditor.selectedServerEntity
+        if(mapEditor.selectedServerEntities.length > 1) {
+            return "Выбрано сущностей: " + mapEditor.selectedServerEntities.length
+        }
+        let entity = mapEditor.selectedServerEntities[0]
         let treeComponent = entity?.getComponent(EntityEditorTreeNodeComponent)
         return treeComponent?.name || "Свойства"
     }
@@ -278,13 +293,15 @@ export const SceneComponentsSection: React.FC = (props) => {
     let [name, setName] = useState(useMemo(() => getName(), []))
 
     useEffect(() => {
-        let entity = mapEditor.selectedServerEntity
-        if(!entity) return undefined
         setName(getName())
+        if(mapEditor.selectedServerEntities.length !== 1) {
+            return undefined
+        }
+        let entity = mapEditor.selectedServerEntities[0]
         let handler = () => setName(getName())
         entity.on("name-set", handler)
         return () => entity.off("name-set", handler)
-    }, [mapEditor.selectedServerEntity])
+    }, [mapEditor.selectedServerEntities])
 
     return (
         <SidebarSection header={name}>

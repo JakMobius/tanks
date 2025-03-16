@@ -14,7 +14,7 @@ export default class KeyboardListener extends EventEmitter {
     }
 
     keyup(e: KeyboardEvent) {
-        if(e.target !== this.handlerSet.target && !this.keys.has(e.code)) {
+        if(e.target instanceof HTMLInputElement && !this.keys.has(e.code)) {
             return
         }
 
@@ -23,9 +23,7 @@ export default class KeyboardListener extends EventEmitter {
     }
 
     keydown(e: KeyboardEvent) {
-        if(e.target !== this.handlerSet.target) {
-            return
-        }
+        if(e.target instanceof HTMLInputElement) return
 
         if(e.repeat) {
             e.preventDefault()

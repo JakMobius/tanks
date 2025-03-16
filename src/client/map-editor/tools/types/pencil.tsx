@@ -134,9 +134,10 @@ export default class Pencil extends Tool {
     }
 
     onMouse(x: number, y: number) {
-        let tilemapTransform = this.manager.selectedServerEntity.getComponent(TransformComponent)
-        let tilemapMatrix = tilemapTransform?.getInvertedGlobalTransform()
+        let tilemapTransform = this.manager.getOnlySelectedEntity()?.getComponent(TransformComponent)
         if(!tilemapTransform) return
+
+        let tilemapMatrix = tilemapTransform?.getInvertedGlobalTransform()
         
         this.mouseX = tilemapMatrix.transformX(x, y)
         this.mouseY = tilemapMatrix.transformY(x, y)
@@ -276,7 +277,7 @@ export default class Pencil extends Tool {
 
         const program = phase.getProgram(ConvexShapeProgram)
 
-        let transform = this.manager.selectedServerEntity.getComponent(TransformComponent)
+        let transform = this.manager.getOnlySelectedEntity()?.getComponent(TransformComponent)
         program.transform.save()
         program.transform.set(transform.getGlobalTransform())
 
@@ -303,7 +304,7 @@ export default class Pencil extends Tool {
     }
 
     getTilemap() {
-        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+        return this.getOnlySelectedEntity()?.getComponent(TilemapComponent)
     }
     
     isSuitable(): boolean {

@@ -86,7 +86,7 @@ export default class AreaTool extends Tool {
         this.controlsEventHandler.on("editor-paste", () => this.paste())
         this.controlsEventHandler.on("editor-cut", () => this.copy(true))
         this.controlsEventHandler.on("editor-reset-selection", () => this.resetSelection())
-        this.controlsEventHandler.on("editor-clear-area", () => this.deleteArea())
+        this.controlsEventHandler.on("editor-delete", () => this.deleteArea())
         this.controlsEventHandler.on("editor-select-all", () => this.selectAll())
 
         this.initialAreaState = false
@@ -410,7 +410,7 @@ export default class AreaTool extends Tool {
     }
 
     getTilemap() {
-        return this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+        return this.getOnlySelectedEntity()?.getComponent(TilemapComponent)
     }
 
     isSuitable(): boolean {

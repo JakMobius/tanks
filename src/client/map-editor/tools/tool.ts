@@ -125,6 +125,14 @@ export default class Tool extends EventEmitter {
         }
     }
 
+    getOnlySelectedEntity() {
+        return this.manager.getOnlySelectedEntity()
+    }
+
+    getSelectedEntities() {
+        return this.manager.selectedServerEntities
+    }
+
     setImage(image: string) {
         this.image = image
         this.emit("image-set")

@@ -164,19 +164,3 @@ export function waitFor(fn: () => boolean) {
     check();
   });
 }
-
-export function getInsertIndex(tree: TreeApi<any>) {
-  const focus = tree.focusedNode;
-  if (!focus) return tree.root.children?.length ?? 0;
-  if (focus.isOpen) return 0;
-  if (focus.parent) return focus.childIndex + 1;
-  return 0;
-}
-
-export function getInsertParentId(tree: TreeApi<any>) {
-  const focus = tree.focusedNode;
-  if (!focus) return null;
-  if (focus.isOpen) return focus.id;
-  if (focus.parent && !focus.parent.isRoot) return focus.parent.id;
-  return null;
-}

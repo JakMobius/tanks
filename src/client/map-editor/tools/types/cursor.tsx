@@ -71,15 +71,20 @@ export default class Cursor extends Tool {
                 default:
                     break
             }
+            this.oldX = x
+            this.oldY = y
         } else {
-            let arrow = this.raycastControls(x, y)
-            if(this.hoveredControl !== arrow) {
-                this.hoveredControl = arrow
-                this.updateCursor()
-                this.manager.setNeedsRedraw()
-            }
+            this.updateHover(x, y)
         }
+    }
 
+    updateHover(x: number, y: number) {
+        let arrow = this.raycastControls(x, y)
+        if(this.hoveredControl !== arrow) {
+            this.hoveredControl = arrow
+            this.updateCursor()
+            this.manager.setNeedsRedraw()
+        }
         this.oldX = x
         this.oldY = y
     }
@@ -93,6 +98,7 @@ export default class Cursor extends Tool {
         this.initialEntityLocalTransform = null
         this.initialEntityTransform = null
 
+        this.updateHover(x, y)
         this.updateCursor()
         if(this.hoveredControl) {
             this.manager.setNeedsRedraw()
@@ -104,7 +110,7 @@ export default class Cursor extends Tool {
 
         this.updateCursor()
         if(this.hoveredControl) {
-            let entity = this.manager.selectedServerEntity
+            let entity = this.getOnlySelectedEntity()
             let transformComponent = entity?.getComponent(TransformComponent)
 
             this.oldX = x
@@ -126,7 +132,7 @@ export default class Cursor extends Tool {
         if(clickedEntity) {
             clickedEntity?.emit("request-focus-self")
         } else {
-            this.manager.setSelectedEntity(null)
+            this.manager.selectEntities([])
         }
     }
 
@@ -143,7 +149,7 @@ export default class Cursor extends Tool {
     }
 
     rotateEntity(x: number, y: number) {
-        let entity = this.manager.selectedServerEntity
+        let entity = this.getOnlySelectedEntity()
         let transformComponent = entity?.getComponent(TransformComponent)
         if(!transformComponent) return
 
@@ -182,7 +188,7 @@ export default class Cursor extends Tool {
         let dx = x - this.oldX
         let dy = y - this.oldY
 
-        let entity = this.manager.selectedServerEntity
+        let entity = this.getOnlySelectedEntity()
         let transformComponent = entity?.getComponent(TransformComponent)
         if(!transformComponent) return
 
@@ -245,16 +251,16 @@ export default class Cursor extends Tool {
     }
 
     getControlsGlobalPosition() {
-        let entity = this.manager.selectedServerEntity
+        let entity = this.getOnlySelectedEntity()
         let transformComponent = entity?.getComponent(TransformComponent)
         if(!transformComponent) return { globalPos: null, globalDirX: null, globalDirY: null }
 
         let parentTransformComponent = entity.parent?.getComponent(TransformComponent)
-        let parentTransformMatrix = parentTransformComponent.getGlobalTransform()
+        let parentTransformMatrix = parentTransformComponent?.getGlobalTransform()
 
         let globalPos = transformComponent.getGlobalPosition()
-        let globalDirX = parentTransformMatrix.getDirection() ?? { x: 1, y: 0 }
-        let globalDirY = parentTransformMatrix.getUpDirection() ?? { x: 0, y: 1 }
+        let globalDirX = parentTransformMatrix?.getDirection() ?? { x: 1, y: 0 }
+        let globalDirY = parentTransformMatrix?.getUpDirection() ?? { x: 0, y: 1 }
 
         if(this.dragging && this.hoveredControl === "arc") {
             let initialAngle = this.initialEntityLocalTransform.getAngle()
@@ -458,7 +464,7 @@ export default class Cursor extends Tool {
     }
 
     drawArc(phase: DrawPhase, position: Box2D.XY, dirX: Box2D.XY, dirY: Box2D.XY) {
-        let entity = this.manager.selectedServerEntity
+        let entity = this.getOnlySelectedEntity()
         let transformComponent = entity?.getComponent(TransformComponent)
         if(!transformComponent) return
 

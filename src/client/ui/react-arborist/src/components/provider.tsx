@@ -64,7 +64,7 @@ export function TreeProvider<T>({
   /* Change selection based on props */
   useEffect(() => {
     if (api.props.selection) {
-      api.select(api.props.selection, { focus: false });
+      api.select(api.props.selection);
     } else {
       api.deselectAll();
     }

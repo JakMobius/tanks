@@ -1,6 +1,6 @@
 import './tank-select-overlay.scss'
 
-import {ControlsResponder} from "src/client/controls/root-controls-responder";
+import RootControlsResponder, {ControlsResponder} from "src/client/controls/root-controls-responder";
 import {TankStats} from "src/stat-tests/tank-stats";
 import React, { createContext, Ref, RefObject, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CarouselController, { CarouselConfig, CarouselItem } from '../carousel/carousel-controller';
@@ -435,7 +435,6 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     }, [])
 
     useEffect(() => {
-        controlsResponderRef.current.on("game-change-tank", toggleVisibility)
         controlsResponderRef.current.on("navigate-left", onNavigateLeft)
         controlsResponderRef.current.on("navigate-right", onNavigateRight)
         controlsResponderRef.current.on("confirm", onConfirm)
@@ -443,12 +442,18 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     }, [])
 
     useEffect(() => {
+        let callback = (responder: RootControlsResponder) => {
+            responder.onUpdate(toggleVisibility)
+        }
         if(!gameControls) return undefined
-        gameControls.on("game-change-tank", toggleVisibility)
-        return () => gameControls.off("game-change-tank", toggleVisibility)
+        gameControls.on("game-change-tank", callback)
+        return () => gameControls.off("game-change-tank", callback)
     }, [gameControls])
 
-    useEffect(() => {   
+    useEffect(() => {
+        if(state.shown) controlsResponderRef.current.focus()
+        else controlsResponderRef.current.blur()
+        
         if(!state.shown) return undefined
         scene.loop.on("tick", onFrame)
         return () => scene.loop.off("tick", onFrame)
@@ -458,7 +463,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     const tankDescription = state.tankPrefab?.metadata.description
 
     return  (
-        <ControlsProvider ref={controlsResponderRef} enabled={state.shown}>
+        <ControlsProvider ref={controlsResponderRef}>
             <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
                 <div className="tank-select-menu">
                     <TankSelectCarousel ref={carouselRef} shown={state.shown} initialPosition={initialPosition} onClick={onCarouselClick}/>

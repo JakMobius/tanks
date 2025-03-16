@@ -96,7 +96,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = (props: ChatMessagesProps) => 
         <div className="chat" style={{ height: Math.min(state.height, maxHeight) }}>
             <Virtuoso
                 components={{ Scroller }}
-                followOutput={true}
+                followOutput
                 tabIndex={null}
                 ref={virtuosoRef}
                 scrollerRef={(scroller) => { scrollerRef.current = scroller as HTMLElement }}

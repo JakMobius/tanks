@@ -7,6 +7,7 @@ import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewD
 import { EntityEditorTreeNodeComponent, EntityTreeNode } from "./components";
 import { SceneEntityLibraryDropItem } from "../scene-entity-library/scene-entity-library";
 import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
+import { ControlsProvider } from "src/client/utils/react-controls-responder";
 
 export class SceneTreeViewDropItem {
     entities: Entity[]
@@ -82,11 +83,9 @@ const SceneTreeView: React.FC = () => {
                 ids.push(id)
                 after = entity
             }
-            treeRef.current?.focus(ids[0])
-            treeRef.current?.setSelection({ ids: ids, anchor: null, mostRecent: null })
 
             // onFocus is not called in this case. TODO: fix in react-arborist
-            editorScene.selectEntity(entities[0])
+            editorScene.selectEntities(entities)
         }
     }
 
@@ -94,19 +93,40 @@ const SceneTreeView: React.FC = () => {
         for (let id of ids) {
             getNodeById(id)?.entity.removeFromParent()
         }
-        editorScene.selectEntity(null)
+        editorScene.selectEntities([])
     };
 
-    const onFocus = useCallback((node: NodeApi<EntityTreeNode>) => {
-        editorScene.selectEntity(node.data.entity)
+    const onSelect = useCallback((nodes: NodeApi<EntityTreeNode>[]) => {
+        editorScene.selectEntities(nodes.map(node => node.data.entity))
     }, [])
 
     useEffect(() => {
-        let node = editorScene.selectedServerEntity?.getComponent(EntityEditorTreeNodeComponent)
-        if(treeRef.current?.focusedNode?.id !== node?.id) {
-            treeRef.current?.focus(node?.id)
+        if(!treeRef.current) return
+
+        let ids = editorScene.selectedServerEntities.map((node) => {
+            return node?.getComponent(EntityEditorTreeNodeComponent)?.id
+        }).filter(node => node !== undefined)
+        
+        // Since tree maintains its own selection state, the selection should be compared
+        // with the current selection state and only updated if necessary in order to break
+        // infinite recursion. TODO: allow external selection state in react-arborist
+
+        // Luckily, the selected sets are stored in a set, so we can compare them in O(n)
+        let matches = true
+        for(let id of ids) {
+            if(!treeRef.current.selectedIds.has(id)) {
+                matches = false
+                break
+            }
         }
-    }, [editorScene.selectedServerEntity])
+        
+        if(matches && ids.length === treeRef.current.selectedIds.size) {
+            return
+        }
+
+        treeRef.current?.setSelection({ ids: ids, anchor: null, mostRecent: ids[0] ?? null })
+        
+    }, [editorScene.selectedServerEntities])
 
     useEffect(() => {
         if(!divRef.current) return undefined
@@ -133,26 +153,28 @@ const SceneTreeView: React.FC = () => {
     }
 
     return (
-        <div className="tree-view" ref={divRef}>
-            {height !== null ? <Tree
-                data={getRoot()?.children}
-                onRename={onRename}
-                onDrop={onDrop}
-                onDelete={onDelete}
-                onFocus={onFocus}
-                ref={treeRef}
-                renderCursor={TreeViewCursor}
-                renderContainer={TreeViewContainer}
-                renderDragPreview={TreeViewDragPreview}
-                renderRow={TreeViewRow}
-                rowHeight={27}
-                height={height}
-                selectionFollowsFocus={true}
-                dragItemUserData={dragItemUserData}
-            >
-                {TreeViewNode}
-            </Tree> : null}
-        </div>
+        <ControlsProvider default>
+            <div className="tree-view" ref={divRef}>
+                {height !== null ? <Tree
+                    data={getRoot()?.children}
+                    onRename={onRename}
+                    onDrop={onDrop}
+                    onDelete={onDelete}
+                    onSelect={onSelect}
+                    ref={treeRef}
+                    renderCursor={TreeViewCursor}
+                    renderContainer={TreeViewContainer}
+                    renderDragPreview={TreeViewDragPreview}
+                    renderRow={TreeViewRow}
+                    rowHeight={27}
+                    height={height}
+                    // selectionFollowsFocus
+                    dragItemUserData={dragItemUserData}
+                >
+                    {TreeViewNode}
+                </Tree> : null}
+            </div>
+        </ControlsProvider>
     )
 }
 

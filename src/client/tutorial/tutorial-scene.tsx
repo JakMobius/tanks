@@ -2,7 +2,6 @@
 import EmbeddedServerGame from "src/client/embedded-server/embedded-server-game";
 import TutorialWorldController from "src/client/tutorial/tutorial-world-controller";
 import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet";
-import ReadBuffer from "src/serialization/binary/read-buffer";
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component";
 import RemoteControlsManager from "src/client/controls/remote-controls-manager";
 import SceneController, { useScene } from "../scenes/scene-controller";
@@ -134,7 +133,8 @@ const TutorialView: React.FC = () => {
     }, [gameHudRef.current])
 
     return (
-        <ControlsProvider ref={controlsResponderRef}>
+        <ControlsProvider default>
+            <ControlsProvider default ref={controlsResponderRef}/>
             <EventsProvider ref={eventContextRef}>
                 <PlayerNicksHUD world={state.game?.clientWorld} screen={scene.canvas} camera={state.camera} />
                 <TankInfoHUD world={state.game?.clientWorld} />

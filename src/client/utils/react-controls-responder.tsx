@@ -2,73 +2,39 @@ import { createContext, Ref, useContext, useEffect, useImperativeHandle, useMemo
 import RootControlsResponder, { ControlsResponder } from "../controls/root-controls-responder"
 import React from "react"
 
-interface ControlsContextProps {
-    responder: ControlsResponder
-    overriden: boolean
-    enabled: boolean
-    override: (flag: boolean) => void
-}
-
-export const ControlsContext = createContext<ControlsContextProps | null>(null)
+export const ControlsContext = createContext<ControlsResponder | null>(null)
 
 interface ControlsProviderProps {
     children?: React.ReactNode
-    enabled?: boolean
     ref?: Ref<ControlsResponder>
+    default?: boolean
+    flat?: boolean
+    autofocus?: boolean
 }
 
 export const ControlsProvider: React.FC<ControlsProviderProps> = (props) => {
     let controlsContext = useContext(ControlsContext)
     
-    let newResponder = useMemo(() => new ControlsResponder(), [])
-    let isEnabled = props.enabled === undefined ? true : props.enabled
-    let parentEnabled = controlsContext ? controlsContext.enabled : true
-
-    const [state, setState] = useState({
-        responder: newResponder,
-        overriden: false,
-        enabled: false,
-        current: false,
-        override: (flag: boolean) => setState((state) => {
-            if(flag && state.overriden) {
-                throw new Error("Current controls context have already been overriden")
-            }
-            return {
-                ...state,
-                overriden: flag
-            }
-        })
-    })
+    let newResponder = useMemo(() => {
+        let responder = new ControlsResponder()
+        responder.isDefault = props.default ?? false
+        responder.isFlat = props.flat ?? false
+        return responder
+    }, [])
 
     useImperativeHandle(props.ref, () => {
         return newResponder
     }, [])
 
     useEffect(() => {
-        setState(state => {
-            let enabled = isEnabled && parentEnabled 
-            let current = enabled && !state.overriden
-            if(state.enabled === enabled && state.current === current) return state
-            return { ...state, enabled, current }
-        })
-    }, [isEnabled, parentEnabled, state.overriden])
-
-    useEffect(() => {
-        if(!state.enabled || !controlsContext) return undefined
-        controlsContext?.override(true)
-        return () => {
-            controlsContext?.override(false)
-        }
-    }, [state.enabled])
-
-    useEffect(() => {
-        if(!state.current) return undefined
-        RootControlsResponder.getInstance().setMainResponderDelayed(newResponder)
+        let parent = controlsContext ?? RootControlsResponder.getInstance()
+        newResponder.setParentResponder(parent)
+        if(props.autofocus) newResponder.focus()
         return () => newResponder.setParentResponder(null)
-    }, [state.current])
+    }, [])
     
     return (
-        <ControlsContext.Provider value={state}>
+        <ControlsContext.Provider value={newResponder}>
             {props.children}
         </ControlsContext.Provider>
     )
@@ -79,5 +45,5 @@ export function useControls() {
     if(context === null) {
         throw new Error("useControls must be used within ControlsProvider")
     }
-    return context.responder
+    return context
 }

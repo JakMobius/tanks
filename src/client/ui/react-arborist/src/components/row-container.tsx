@@ -49,15 +49,8 @@ export const RowContainerInner = React.memo(function RowContainerInner<T>(props:
     "aria-level": node.level + 1,
     "aria-selected": node.isSelected,
     "aria-expanded": node.isOpen,
-    tabIndex: -1,
     className: tree.props.rowClassName,
   };
-
-  useEffect(() => {
-    if (!node.isEditing && node.isFocused) {
-      el.current?.focus({ preventScroll: true });
-    }
-  }, [node.isEditing, node.isFocused, el.current]);
 
   const Node = tree.renderNode;
   const Row = tree.renderRow;

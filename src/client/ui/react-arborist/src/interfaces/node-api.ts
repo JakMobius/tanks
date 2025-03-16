@@ -1,6 +1,5 @@
 import React from "react";
 import { TreeApi } from "./tree-api";
-import { IdObj } from "../types/utils";
 import { ROOT_ID } from "../data/create-root";
 
 type Params<T> = {
@@ -79,10 +78,6 @@ export class NodeApi<T = any> {
     return this.isSelected && !this.next?.isSelected;
   }
 
-  get isFocused() {
-    return this.tree.isFocused(this.id);
-  }
-
   get isDragging() {
     return this.tree.isDragging(this.id);
   }
@@ -96,7 +91,6 @@ export class NodeApi<T = any> {
       isClosed: this.isClosed,
       isDragging: this.isDragging,
       isEditing: this.isEditing,
-      isFocused: this.isFocused,
       isInternal: this.isInternal,
       isLeaf: this.isLeaf,
       isOpen: this.isOpen,
@@ -158,10 +152,6 @@ export class NodeApi<T = any> {
 
   activate() {
     this.tree.activate(this);
-  }
-
-  focus() {
-    this.tree.focus(this);
   }
 
   toggle() {

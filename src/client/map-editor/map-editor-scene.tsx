@@ -36,10 +36,10 @@ import { MapEditorMouseHandler } from '../controls/interact/map-editor-mouse-han
 interface MapEditorSceneContextProps {
     clientCameraEntity: Entity,
     game: EmbeddedServerGame,
-    selectedServerEntity: Entity | null 
+    selectedServerEntities: Entity[]
     serverMapEntity: Entity,
     mapName: string | null,
-    selectEntity: (entity: Entity) => void
+    selectEntities: (entities: Entity[]) => void
     update: () => void
     loadMap: (name: string, entity: Entity) => void
 }
@@ -102,13 +102,16 @@ const MapEditorView: React.FC = () => {
         setNeedsRedraw()
     }, [])
 
-    const selectEntity = useCallback((entity: Entity) => {            
+    const selectEntities = useCallback((entities: Entity[]) => {    
+        // Reset the focus to the default controls responders
+        controlsResponderRef.current.focus()        
         setSceneContext((context) => {
-            context.selectedServerEntity?.emit("editor-blur")
-            entity?.emit("editor-focus")
+            for(let oldEntity of context.selectedServerEntities) oldEntity.emit("editor-blur")
+            for(let newEntity of entities) newEntity.emit("editor-focus")
+
             return {
                 ...context,
-                selectedServerEntity: entity
+                selectedServerEntities: entities
             }
         })
         setNeedsRedraw()
@@ -132,7 +135,7 @@ const MapEditorView: React.FC = () => {
         })
 
         game.serverGame.on("request-focus", (entity) => {
-            selectEntity(entity)
+            selectEntities([entity])
         })
 
         game.serverGame.on("client-connect", (client) => {
@@ -159,12 +162,12 @@ const MapEditorView: React.FC = () => {
         return {
             clientCameraEntity: camera,
             game,
-            selectedServerEntity: null,
+            selectedServerEntities: [],
             serverMapEntity: rootGroup,
             mapName: "Новая карта",
             update: setNeedsRedraw,
             loadMap,
-            selectEntity: selectEntity
+            selectEntities: selectEntities
         } as MapEditorSceneContextProps
     }, [])
 
@@ -236,7 +239,7 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     return (
-        <ControlsProvider ref={controlsResponderRef}>
+        <ControlsProvider default ref={controlsResponderRef}>
             <MapEditorSceneContext.Provider value={sceneContext}>
                 <EventsProvider ref={eventRef}>
                     <MapEditorMouseHandler

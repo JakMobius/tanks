@@ -18,6 +18,6 @@ export default class BlockSelect extends Tool {
     }
 
     isSuitable(): boolean {
-        return !!this.manager.selectedServerEntity?.getComponent(TilemapComponent)
+        return !!this.getOnlySelectedEntity()?.getComponent(TilemapComponent)
     }
 }

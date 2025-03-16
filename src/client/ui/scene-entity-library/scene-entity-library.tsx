@@ -1,11 +1,13 @@
 import "./scene-entity-library.scss"
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Tree, TreeApi } from '../react-arborist/src/index';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeNodeBase, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityPrefab } from "src/entity/entity-prefabs";
 import ClientEntityPrefabs from "src/client/entity/client-entity-prefabs";
 import ServerEntityPrefabs from "src/server/entity/server-entity-prefabs";
+import { ControlsProvider } from "src/client/utils/react-controls-responder";
+import { ControlsResponder } from "src/client/controls/root-controls-responder";
 
 interface LibraryTreeNode extends TreeNodeBase {
     prefab?: EntityPrefab,
@@ -77,6 +79,7 @@ const SceneEntityLibrary: React.FC = () => {
     const divRef = useRef<HTMLDivElement | null>(null)
     const [height, setHeight] = useState<number | null>(null)
     const [treeRoot, setTreeRoot] = useState(rootNode)
+    const controlsProviderRef = useRef<ControlsResponder | null>(null)
 
     useEffect(() => {
         if(!divRef.current) return undefined
@@ -96,26 +99,49 @@ const SceneEntityLibrary: React.FC = () => {
         return new SceneEntityLibraryDropItem(nodes.map(node => node.prefab))
     }
 
+    const onFocus = useCallback(() => {
+        controlsProviderRef.current.focus()
+    }, [])
+
+    const onBlur = useCallback(() => {
+        controlsProviderRef.current.blur()
+        treeRef.current.setSelection({ ids: [], anchor: null, mostRecent: null })
+    }, [])
+
+    useEffect(() => {
+        controlsProviderRef.current.on("blur", () => {
+            divRef.current.blur()
+            treeRef.current.setSelection({ ids: [], anchor: null, mostRecent: null })
+        })
+    }, [])
+
     return (
-        <div className="tree-view" ref={divRef}>
-            {height !== null ? <Tree
-                data={treeRoot.children}
-                selectionFollowsFocus={true}
-                ref={treeRef}
-                renderCursor={TreeViewCursor}
-                renderContainer={TreeViewContainer}
-                renderDragPreview={TreeViewDragPreview}
-                renderRow={TreeViewRow}
-                rowHeight={27}
-                height={height}
-                disableDrop={true}
-                disableEdit={true}
-                disableDrag={disableDrag}
-                dragItemUserData={dragItemUserData}
-            >
-                {TreeViewNode}
-            </Tree> : null}
-        </div>
+        <ControlsProvider ref={controlsProviderRef}>
+            <div
+                className="tree-view"
+                tabIndex={0}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                ref={divRef}>
+                {height !== null ? <Tree
+                    data={treeRoot.children}
+                    // selectionFollowsFocus
+                    ref={treeRef}
+                    renderCursor={TreeViewCursor}
+                    renderContainer={TreeViewContainer}
+                    renderDragPreview={TreeViewDragPreview}
+                    renderRow={TreeViewRow}
+                    rowHeight={27}
+                    height={height}
+                    disableDrop
+                    disableEdit
+                    disableDrag={disableDrag}
+                    dragItemUserData={dragItemUserData}
+                >
+                    {TreeViewNode}
+                </Tree> : null}
+            </div>
+        </ControlsProvider>
     )
 }
 

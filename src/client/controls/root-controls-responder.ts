@@ -10,8 +10,63 @@ import TankControls from "src/controls/tank-controls";
 
 export class ControlsResponder extends EventEmitter {
     protected controlAxles: Map<string, Axle> = new Map()
-    private childrenResponders: ControlsResponder[] = []
     private parentResponder: ControlsResponder | null = null
+    private childrenResponders: ControlsResponder[] = []
+    private focusedResponder: ControlsResponder | null = null
+
+    // Determines whether this responder should be implicitly focused
+    // when focusedResponder is null
+    isDefault: boolean = false
+
+    // Determines whether this responder should always receive controls updates
+    // (i.e if it's used as a handler group)
+    isFlat: boolean = false
+    
+    focus() {
+        if(this.parentResponder) {
+            let responder: ControlsResponder = this
+
+            // Cut the focus from the children
+            if(this.focusedResponder) {
+                let focused = this.focusedResponder
+                this.focusedResponder = null
+                focused.blur()
+                focused.emit("blur")
+            }
+
+            while(responder.parentResponder) {
+                let parent = this.parentResponder
+                let oldResponder = parent.focusedResponder
+                if(oldResponder === responder) break
+
+                this.parentResponder.focusedResponder = null
+                oldResponder?.blur()
+                oldResponder?.emit("blur")
+                this.parentResponder.focusedResponder = responder
+            }
+
+            // Notify newly focused responders
+            while(responder.focusedResponder) {
+                responder = responder.focusedResponder
+                responder.emit("focus")
+            }
+        }
+    }
+
+    blur() {
+        if(this.parentResponder?.focusedResponder !== this) return
+        
+        let responder: ControlsResponder = this
+        while(responder.focusedResponder) {
+            responder = responder.focusedResponder
+        }
+
+        while(responder.parentResponder) {
+            responder.parentResponder.focusedResponder = null
+            responder.emit("blur")
+            responder = responder.parentResponder
+        }
+    }
 
     public getControlAxle(name: string): Axle {
         if (!this.controlAxles.has(name)) {
@@ -76,14 +131,35 @@ export class ControlsResponder extends EventEmitter {
         controls.axles.get("miner").removeSource(this.getControlAxle("tank-miner"))
     }
 
-    emit(type: string, ...values: any[]): boolean {
-        let result = super.emit(type, ...values);
+    setMainResponderDelayed(responder: ControlsResponder) {
+        this.once("update", () => {
+            this.clearChildResponders()
 
-        for (let responder of this.childrenResponders) {
-            if (responder.emit(type, ...values) === false) result = false
+            if (responder) {
+                responder.setParentResponder(this)
+            }
+        })
+    }
+
+    emit(type: string, ...values: any[]): boolean {   
+        let result = true
+
+        for(let child of this.childrenResponders) {
+            let childSuitable = child.isFlat
+            if(child === this.focusedResponder) childSuitable = true
+            if(!this.focusedResponder && child.isDefault) childSuitable = true
+            if(!childSuitable) continue
+            
+            if(child?.emit(type, ...values) === false) result = false
         }
 
+        if(super.emit(type, ...values) === false) result = false
+        
         return result
+    }
+
+    onUpdate(callback: () => void) {
+        this.once("update", callback)
     }
 }
 
@@ -147,7 +223,9 @@ export default class RootControlsResponder extends ControlsResponder {
         this.configureTriggerAxle("editor-cut")
         this.configureTriggerAxle("editor-reset-selection")
         this.configureTriggerAxle("editor-select-all")
-        this.configureTriggerAxle("editor-clear-area")
+        this.configureTriggerAxle("editor-delete")
+        this.configureTriggerAxle("editor-tree-toggle")
+        this.configureTriggerAxle("editor-rename")
 
         this.configureTriggerAxle("editor-increase-brush-size")
         this.configureTriggerAxle("editor-decrease-brush-size")
@@ -223,17 +301,7 @@ export default class RootControlsResponder extends ControlsResponder {
 
     private emitOnUpdate(activateName: string) {
         this.once("update", () => {
-            this.emit(activateName)
-        })
-    }
-
-    public setMainResponderDelayed(responder: ControlsResponder) {
-        this.once("update", () => {
-            this.clearChildResponders()
-
-            if (responder) {
-                responder.setParentResponder(this)
-            }
+            this.emit(activateName, this)
         })
     }
 }
