@@ -124,6 +124,13 @@ const SceneTreeView: React.FC = () => {
             return
         }
 
+        for(let id of ids) {
+            treeRef.current?.openParents(id)
+        }
+        
+        // TODO: this updates the tree twice. It feels like at this point
+        // I need my own tree visualizer.
+        treeRef.current?.update(treeRef.current?.props)
         treeRef.current?.setSelection({ ids: ids, anchor: null, mostRecent: ids[0] ?? null })
         
     }, [editorScene.selectedServerEntities])
