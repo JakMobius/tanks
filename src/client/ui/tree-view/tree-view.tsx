@@ -147,7 +147,7 @@ export const TreeViewContainer: React.FC = () => {
     const onNavigateDown = (responder: RootControlsResponder) => {
         const keyboard = responder.keyboard
 
-        let maxIndex = tree.selectedNodes[0].rowIndex ?? -1
+        let maxIndex = tree.selectedNodes[0]?.rowIndex ?? -1
         for(let node of tree.selectedNodes) {
             maxIndex = Math.max(maxIndex, node.rowIndex)
         }
@@ -165,7 +165,7 @@ export const TreeViewContainer: React.FC = () => {
     const onNavigateUp = (responder: RootControlsResponder) => {
         const keyboard = responder.keyboard
 
-        let minIndex = tree.selectedNodes[0].rowIndex ?? -1
+        let minIndex = tree.selectedNodes[0]?.rowIndex ?? -1
         for(let node of tree.selectedNodes) {
             minIndex = Math.min(minIndex, node.rowIndex)
         }

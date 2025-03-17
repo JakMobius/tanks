@@ -18,3 +18,21 @@ export function readMapFromFile(file: File): Promise<PackedEntity> {
         reader.readAsText(file)
     })
 }
+
+export function readMapFromDialog(): Promise<PackedEntity> {
+    let input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.click()
+    
+    return new Promise<PackedEntity>((resolve, reject) => {
+        input.onchange = () => {
+            let file = input.files[0]
+            if(file) {
+                readMapFromFile(file).then(resolve).catch(reject)
+            } else {
+                reject()
+            }
+            input.remove()
+        }
+    })
+}

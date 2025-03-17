@@ -42,7 +42,16 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
         tools: [] as Tool[]
     })
 
-    const toolManager = useMemo(() => {
+    const onUpdate = () => {
+        setState(state => ({
+            ...state,
+            selectedBlock: toolManager?.selectedBlock,
+            selectedTool: toolManager?.selectedTool,
+            tools: toolList.filter(tool => tool.isSuitable()) ?? []
+        }))
+    }
+
+    const [toolManager, toolList] = useMemo(() => {
         let toolManager = new ToolManager()
         let toolList = [
             new Cursor(toolManager),
@@ -60,21 +69,10 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
         toolManager.setClientCameraEntity(mapEditorScene.clientCameraEntity)
         toolManager.setDefaultTool(toolList[0])
 
-        const onUpdate = () => {
-            setState(state => ({
-                ...state,
-                selectedBlock: toolManager?.selectedBlock,
-                selectedTool: toolManager?.selectedTool,
-                tools: toolList.filter(tool => tool.isSuitable()) ?? []
-            }))
-        }
-
         const onEntitiesSelect = (entities: Entity[]) => {
             mapEditorSceneRef.current.selectEntities(entities)
             onUpdate()
         }
-
-        onUpdate()
 
         if(!toolManager) return undefined
 
@@ -83,7 +81,7 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
         toolManager.on("select-entities", onEntitiesSelect)
         toolManager.on("redraw", () => mapEditorScene.update())
 
-        return toolManager
+        return [toolManager, toolList]
     }, [])
 
     useEffect(() => {
@@ -103,6 +101,7 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
 
     useEffect(() => {
         toolManager.setSelectedEntities(mapEditorScene.selectedServerEntities)
+        onUpdate()
         toolManager.setNeedsRedraw()
     }, [mapEditorScene.selectedServerEntities])
 

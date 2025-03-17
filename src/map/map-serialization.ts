@@ -67,13 +67,18 @@ export function readEntityFile(file: MapFile) {
 
             let width = config.width
             let height = config.height
-            let blocks: BlockState[] = []
+            let blocks: BlockState[] = Array(width * height)
 
             let blockCount = width * height
             for(let i = 0; i < blockCount; i++) {
                 let id = charToId(config.blocks[i])
                 let Block = BlockState.getBlockStateClass(id)
-                blocks.push(new Block())
+
+                // Invert the y-axis, since v0.0.1 used different Y direction
+                let x = Math.floor(i % width)
+                let y = Math.floor(i / width)
+                y = height - y - 1
+                blocks[y * width + x] = new Block()
             }
 
             const tilemap = manufactureEntity(TilemapPrefab, factory?.leaf)
@@ -88,13 +93,18 @@ export function readEntityFile(file: MapFile) {
                 let zone = manufactureEntity(SpawnzonePrefab, factory?.leaf)
                 if(!zone) continue
 
-                let centerX = (spawnZone.x1 + spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
-                let centerY = (spawnZone.y1 + spawnZone.y2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let {x1, x2, y1, y2} = spawnZone
+                // Invert the y-axis, since v0.0.1 used different Y direction
+                y1 = height - y1
+                y2 = height - y2
 
-                let scaleX = Math.abs(spawnZone.x1 - spawnZone.x2) / 2 * TilemapComponent.DEFAULT_SCALE
-                let scaleY = Math.abs(spawnZone.y1 - spawnZone.y2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let centerX = (x1 + x2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let centerY = (y1 + y2) / 2 * TilemapComponent.DEFAULT_SCALE
 
-                let angleTowardsCenter = Math.atan2(-(centerY - mapCenterY), centerX - mapCenterX) + Math.PI
+                let scaleX = Math.abs(x1 - x2) / 2 * TilemapComponent.DEFAULT_SCALE
+                let scaleY = Math.abs(y1 - y2) / 2 * TilemapComponent.DEFAULT_SCALE
+
+                let angleTowardsCenter = Math.atan2((centerY - mapCenterY), centerX - mapCenterX) + Math.PI
 
                 zone.getComponent(TransformComponent).set({
                     position: { x: centerX, y: centerY },

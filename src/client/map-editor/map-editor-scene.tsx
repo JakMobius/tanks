@@ -32,6 +32,8 @@ import { EntityEditorTreeRootComponent } from '../ui/scene-tree-view/components'
 import ToolBarView, { ToolBarRef } from '../ui/toolbar/toolbar';
 import { MapEditorMouseHandler } from '../controls/interact/map-editor-mouse-handler';
 import FileSaver from 'file-saver';
+import { readMapFromDialog } from './read-map-from-file';
+import { BasicEvent } from '../ui/events-hud/basic-event-view';
 
 interface MapEditorSceneContextProps {
     clientCameraEntity: Entity,
@@ -43,6 +45,7 @@ interface MapEditorSceneContextProps {
     update: () => void
     loadMap: (name: string, entity: Entity) => void
     saveMap: () => void,
+    openMap: () => void,
     setMapName: (name: string) => void
 }
 
@@ -97,6 +100,14 @@ const MapEditorView: React.FC = () => {
         FileSaver.saveAs(blob, name + ".json")
     }, [])
 
+    const openMap = useCallback(() => {
+        readMapFromDialog().then((packedEntity) => {
+            loadMap(packedEntity.name, packedEntity.createEntity())
+        }).catch(() => {
+            eventRef.current.addEvent(() => <BasicEvent text="Не удалось загрузить карту"/>)
+        })
+    }, [])
+
     const setMapName = useCallback((name: string) => {
         name = name || "Без названия"
         setSceneContext((context) => ({
@@ -113,7 +124,7 @@ const MapEditorView: React.FC = () => {
             return {
                 ...context,
                 serverMapEntity: entity,
-                selectedServerEntity: null,
+                selectedServerEntities: [],
                 mapName: name,
             }
         })
@@ -186,6 +197,7 @@ const MapEditorView: React.FC = () => {
             update: setNeedsRedraw,
             loadMap,
             saveMap,
+            openMap,
             setMapName,
             selectEntities: selectEntities
         } as MapEditorSceneContextProps
@@ -217,6 +229,7 @@ const MapEditorView: React.FC = () => {
         let texture = Sprite.applyTexture(scene.canvas.ctx)
 
         controlsResponderRef.current.on("editor-save", saveMap)
+        controlsResponderRef.current.on("editor-open", openMap)
         
         return () => {
             Sprite.cleanupTexture(scene.canvas.ctx, texture)

@@ -16,6 +16,10 @@
         font-size: 12px;
         line-height: 20px;
         color: #000000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .no-properties-text {
