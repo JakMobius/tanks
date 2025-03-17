@@ -217,7 +217,7 @@ export default class RootControlsResponder extends ControlsResponder {
 
         this.configureTriggerAxle("editor-undo")
         this.configureTriggerAxle("editor-redo")
-        this.configureTriggerAxle("editor-save-maps")
+        this.configureTriggerAxle("editor-save")
         this.configureTriggerAxle("editor-copy")
         this.configureTriggerAxle("editor-paste")
         this.configureTriggerAxle("editor-cut")

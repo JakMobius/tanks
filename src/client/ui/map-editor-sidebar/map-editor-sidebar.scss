@@ -7,13 +7,12 @@
     padding: 0px;
 
     position: absolute;
-    width: 318px;
     height: 100%;
     left: 0px;
     top: 0px;
 
     background: #FFFFFF;
-    border-right: 1px solid #7F7F7F;
+    overflow: hidden;
 
     .map-editor-sidebar-header {
         display: flex;
@@ -49,6 +48,25 @@
         font-weight: 700;
         font-size: 14px;
         color: #000000;
+        height: 40px;
+        line-height: 40px;
+        flex-grow: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    input.map-editor-sidebar-header-text {
+        font-family: 'Roboto';
+        box-shadow: none;
+        outline: none;
+        margin: 0;
+        padding: 0;
+        background: white;
+        border: 2px solid rgb(200, 200, 200);
+        border-radius: 5px;
+        height: 20px;
+        padding: 2px 5px;
     }
 
     .map-editor-sidebar-close-button {
@@ -58,5 +76,37 @@
         background-repeat: no-repeat;
         background-position: center;
         background-size: 28px 22px;
+        cursor: pointer;
     }
+
+    .sidebar-drag-edge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 2px;
+        background-color: rgb(200, 200, 200);
+        cursor: ew-resize
+    }
+
+    .sidebar-drag-edge:hover {
+        width: 4px;
+        background-color: rgb(200, 200, 200);
+    }
+}
+
+.map-editor-sidebar-show-button {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 47px;
+    height: 47px;
+    background-color: white;
+    background-image: url("../map-editor/sidebar@3x.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 28px 22px;
+    cursor: pointer;
+    border: solid 1px #C8C8C8;
+    border-radius: 5px;
 }

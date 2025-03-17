@@ -38,12 +38,11 @@ export default class GameControlsSettings extends EventEmitter {
 
     getConfigForDevice(device: InputDevice): ControllerControls<AxleConfig> {
         let deviceSectionName = this.getDeviceSectionName(device)
-        let config = this.controllerConfig.get(deviceSectionName)
+        let config = this.controllerConfig.get(deviceSectionName) ?? new Map()
+        let defaultConfig = defaultSettingsForDevice(device)
 
-        // Load default settings for controller
-        if(!config) {
-            config = defaultSettingsForDevice(device)
-            this.controllerConfig.set(deviceSectionName, config)
+        for(let [key, value] of Object.entries(defaultConfig)) {
+            if(!config.has(key)) config.set(key, value)
         }
 
         return config

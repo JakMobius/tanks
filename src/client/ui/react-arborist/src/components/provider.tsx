@@ -61,15 +61,6 @@ export function TreeProvider<T>({
   /* Expose the tree api */
   useImperativeHandle(imperativeHandle, () => api);
 
-  /* Change selection based on props */
-  useEffect(() => {
-    if (api.props.selection) {
-      api.select(api.props.selection);
-    } else {
-      api.deselectAll();
-    }
-  }, [api.props.selection]);
-
   /* Clear visability for filtered nodes */
   useEffect(() => {
     if (!api.props.searchTerm) {

@@ -18,6 +18,7 @@ export class SceneTreeViewDropItem {
 
 const SceneTreeView: React.FC = () => {
 
+    const leftPadding = 10
     const editorScene = useMapEditorScene()
 
     const serverMapEntity = editorScene.serverMapEntity
@@ -30,7 +31,7 @@ const SceneTreeView: React.FC = () => {
     // While the internal Virtuoso state is misaligned with the root node, the react-arborist
     // might be asked to render a note that is out of bounds in case the row count is decreased.
     const [_, rerender] = useState({})
-    const [height, setHeight] = useState<number | null>(null)
+    const [size, setSize] = useState<[number, number] | null>([0, 0])
 
     const getNodeById = (id: string) => {
         let rootNode = serverMapEntity?.getComponent(EntityEditorTreeNodeComponent)
@@ -137,11 +138,12 @@ const SceneTreeView: React.FC = () => {
 
     useEffect(() => {
         if(!divRef.current) return undefined
-        let observer = new ResizeObserver(() => {
-            setHeight(divRef.current.clientHeight)
-        })
-        setHeight(divRef.current.clientHeight)
+        const update = () => {
+            setSize([divRef.current.clientWidth, divRef.current.clientHeight])
+        }
+        let observer = new ResizeObserver(update)
         observer.observe(divRef.current)
+        update()
         return () => observer.disconnect()
     }, [divRef.current])
 
@@ -162,7 +164,7 @@ const SceneTreeView: React.FC = () => {
     return (
         <ControlsProvider default>
             <div className="tree-view" ref={divRef}>
-                {height !== null ? <Tree
+                <Tree
                     data={getRoot()?.children}
                     onRename={onRename}
                     onDrop={onDrop}
@@ -174,12 +176,12 @@ const SceneTreeView: React.FC = () => {
                     renderDragPreview={TreeViewDragPreview}
                     renderRow={TreeViewRow}
                     rowHeight={27}
-                    height={height}
-                    // selectionFollowsFocus
+                    width={size[0] - leftPadding}
+                    height={size[1]}
                     dragItemUserData={dragItemUserData}
                 >
                     {TreeViewNode}
-                </Tree> : null}
+                </Tree>
             </div>
         </ControlsProvider>
     )

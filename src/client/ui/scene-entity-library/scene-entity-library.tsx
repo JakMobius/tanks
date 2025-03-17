@@ -63,6 +63,7 @@ function createLibraryTree(tree: VirtualLibraryTree, id: string = "root"): Libra
 
 const SceneEntityLibrary: React.FC = () => {
 
+    const leftPadding = 10
     const rootNode = useMemo(() => {
         let tree = new VirtualLibraryTree()
 
@@ -77,17 +78,17 @@ const SceneEntityLibrary: React.FC = () => {
 
     const treeRef = useRef<TreeApi<LibraryTreeNode> | null>(null)
     const divRef = useRef<HTMLDivElement | null>(null)
-    const [height, setHeight] = useState<number | null>(null)
-    const [treeRoot, setTreeRoot] = useState(rootNode)
+    const [size, setSize] = useState<[number, number] | null>([0, 0])
     const controlsProviderRef = useRef<ControlsResponder | null>(null)
 
     useEffect(() => {
         if(!divRef.current) return undefined
-        let observer = new ResizeObserver(() => {
-            setHeight(divRef.current.clientHeight)
-        })
-        setHeight(divRef.current.clientHeight)
+        const update = () => {
+            setSize([divRef.current.clientWidth, divRef.current.clientHeight])
+        }
+        let observer = new ResizeObserver(update)
         observer.observe(divRef.current)
+        update()
         return () => observer.disconnect()
     }, [divRef.current])
 
@@ -123,23 +124,23 @@ const SceneEntityLibrary: React.FC = () => {
                 onFocus={onFocus}
                 onBlur={onBlur}
                 ref={divRef}>
-                {height !== null ? <Tree
-                    data={treeRoot.children}
-                    // selectionFollowsFocus
+                <Tree
+                    data={rootNode.children}
                     ref={treeRef}
                     renderCursor={TreeViewCursor}
                     renderContainer={TreeViewContainer}
                     renderDragPreview={TreeViewDragPreview}
                     renderRow={TreeViewRow}
                     rowHeight={27}
-                    height={height}
                     disableDrop
                     disableEdit
                     disableDrag={disableDrag}
                     dragItemUserData={dragItemUserData}
+                    width={size[0] - leftPadding}
+                    height={size[1]}
                 >
                     {TreeViewNode}
-                </Tree> : null}
+                </Tree>
             </div>
         </ControlsProvider>
     )

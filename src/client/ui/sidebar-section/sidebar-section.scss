@@ -12,6 +12,12 @@
     color: #000000;
     box-sizing: border-box;
 
+    .sidebar-section-header-text {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
     .expand-arrow {
         background-position: center;
         background-size: 100% auto;

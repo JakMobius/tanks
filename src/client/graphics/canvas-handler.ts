@@ -35,8 +35,6 @@ export default class CanvasHandler extends EventEmitter {
             } catch(ignored) {}
         }
 
-        if(!ctx) throw new Error("WebGL not supported")
-
         ctx.clearColor(1.0, 1.0, 1.0, 1.0);
         ctx.blendFuncSeparate(ctx.SRC_ALPHA, ctx.ONE_MINUS_SRC_ALPHA, ctx.ONE, ctx.ONE_MINUS_SRC_ALPHA);
         ctx.depthFunc(ctx.LEQUAL)

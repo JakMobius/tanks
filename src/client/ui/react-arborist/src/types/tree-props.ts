@@ -37,7 +37,6 @@ export interface TreeProps<T> {
   childrenAccessor?: string | ((d: T) => readonly T[] | null);
   idAccessor?: string | ((d: T) => string);
   openByDefault?: boolean;
-  selectionFollowsFocus?: boolean;
   disableMultiSelection?: boolean;
   disableEdit?: string | boolean | BoolFunc<T>;
   disableDrag?: string | boolean | BoolFunc<T>;
@@ -56,9 +55,6 @@ export interface TreeProps<T> {
   onScroll?: (props: ListOnScrollProps) => void;
   onToggle?: (id: string) => void;
   onFocus?: (node: NodeApi<T>) => void;
-
-  /* Selection */
-  selection?: string;
 
   /* Open State */
   initialOpenState?: OpenMap;

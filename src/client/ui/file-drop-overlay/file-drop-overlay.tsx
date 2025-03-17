@@ -5,9 +5,9 @@ import { DropTargetMonitor, useDrop } from "react-dnd"
 import { NativeTypes } from "react-dnd-html5-backend"
 import { useScene } from "../../scenes/scene-controller"
 import { useEvents } from "../events-hud/events-hud"
-import { readEntityFile } from "src/map/map-serialization"
 import { BasicEvent } from "../events-hud/basic-event-view"
 import { useMapEditorScene } from "src/client/map-editor/map-editor-scene"
+import { readMapFromFile } from "src/client/map-editor/read-map-from-file"
 
 export const FileDropOverlay: React.FC = () => {
     const scene = useScene()
@@ -21,23 +21,11 @@ export const FileDropOverlay: React.FC = () => {
     }
 
     const loadFile = useCallback((file: File) => {
-        let reader = new FileReader()
-        reader.onload = () => {
-            try {
-                let json = JSON.parse(reader.result as string)
-                let { name, createEntity } = readEntityFile(json)
-                let entity = createEntity()
-                if(entity) mapEditorScene.loadMap(name, entity)
-                else handleError()
-            } catch(e) {
-                console.error(e)
-                handleError()
-            }
-        }
-        reader.onerror = () => {
+        readMapFromFile(file).then((packedEntity) => {
+            mapEditorScene.loadMap(packedEntity.name, packedEntity.createEntity())
+        }).catch((e) => {
             handleError()
-        }
-        reader.readAsText(file)
+        })
     }, [])
 
     const onFileDrop = useCallback((props: { files: any }) => {

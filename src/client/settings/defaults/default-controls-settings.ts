@@ -1,21 +1,15 @@
-import {ControllerControls, ControllerControlsConfig} from "../game-controls-settings";
+import {ControllerControlsConfig} from "../game-controls-settings";
 import InputDevice, {AxleConfig, InputDeviceType} from "src/client/controls/input/input-device";
 import {getDefaultKeyboardControls} from "./default-keyboard-settings";
 import {getDefaultGamepadSettings} from "./default-gamepad-settings";
 
-export function defaultSettingsForDevice(device: InputDevice) : ControllerControls<AxleConfig> {
-    let result: ControllerControlsConfig<AxleConfig>
+export function defaultSettingsForDevice(device: InputDevice) : ControllerControlsConfig<AxleConfig> {
     switch (device.getType()) {
         case InputDeviceType.keyboard:
-            result = getDefaultKeyboardControls()
-            break
+            return getDefaultKeyboardControls()
         case InputDeviceType.gamepad:
-            result = getDefaultGamepadSettings()
-            break
+            return getDefaultGamepadSettings()
         default:
-            result = {}
-            break
+            return {}
     }
-
-    return new Map(Object.entries(result))
 }

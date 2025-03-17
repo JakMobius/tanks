@@ -50,8 +50,6 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     const mouseDown = (event: MouseEvent) => {
-        event.preventDefault()
-
         ref.current.oldX = event.pageX
         ref.current.oldY = event.pageY
 
@@ -61,16 +59,12 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     const mouseUp = (event: MouseEvent) => {
-        event.preventDefault()
-
         let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseUp?.(x, y)
     }
 
     const mouseMove = (event: MouseEvent) => {
-        event.preventDefault()
-
         ref.current.oldX = event.pageX
         ref.current.oldY = event.pageY
 

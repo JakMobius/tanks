@@ -79,6 +79,7 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
             ref={props.dragHandle}
             onClick={onClick}
         >
+            <div className="background"></div>
             <div className="inner">
                 <div className={expandNodeClassnames.join(" ")} onClick={onExpand}></div>
                 {props.node.isEditing ?
@@ -86,8 +87,8 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
                         ref={inputRef}
                         onKeyDown={onInputKeyDown}
                         onBlur={onInputBlur}
-                    ></input>
-                : props.node.data.name }
+                    ></input> :
+                    <div className="text">{props.node.data.name}</div> }
             </div>
         </div>
     );

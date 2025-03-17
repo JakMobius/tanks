@@ -44,6 +44,11 @@ export class MalformedMapFileError extends Error {
     }
 }
 
+export interface PackedEntity {
+    name: string
+    createEntity: (factory?: PrefabFilter) => Entity
+}
+
 export function readEntityFile(file: MapFile) {
     if(file.signature !== "TNKS") {
         throw new MalformedMapFileError("Invalid map file signature")

@@ -3,7 +3,7 @@ import "./sidebar-section.scss"
 import React from "react"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { SidebarSectionContext } from "../sidebar-sections/sidebar-sections"
-import Dragger from "../sidebar-drag-edge/sidebar-drag-edge"
+import Dragger from "../dragger/dragger"
 
 interface SidebarSectionHeaderProps {
     text: string
@@ -15,7 +15,7 @@ const SidebarSectionHeader: React.FC<SidebarSectionHeaderProps> = (props) => {
     return (
         <div className="sidebar-section-header">
             <div className={"expand-arrow " + (props.open ? "open" : "")} onClick={props.onToggle}/>
-            {props.text}
+            <div className="sidebar-section-header-text">{props.text}</div>
         </div>
     )
 }

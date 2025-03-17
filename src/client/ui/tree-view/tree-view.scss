@@ -3,7 +3,7 @@
     flex-direction: column;
     align-items: flex-start;
     align-self: stretch;
-    padding: 0 10px;
+    padding: 0 0 0 10px;
     flex-grow: 1;
     min-height: 0;
     outline: none;
@@ -25,42 +25,58 @@
 
     .tree-row {
         height: 100%;
-        border: 1px solid transparent;
         box-sizing: border-box;
+        padding-right: 10px;
+        position: relative;
 
-        &:hover:not(.selected) {
+        &:hover:not(.selected) .background {
             background-color: rgb(240, 240, 240);
             border-radius: 5px;
         }
 
-        &.will-receive-drop {
+        &.will-receive-drop .background {
             border: 1px dashed gray;
         }
 
-        &.selected {
+        &.selected .background {
             background-color: rgb(220, 220, 220);
         }
 
-        &.selected-start {
+        &.selected-start .background {
             border-radius: 5px 5px 0 0;
         }
 
-        &.selected-end {
+        &.selected-end .background {
             border-radius: 0 0 5px 5px;
         }
 
-        &.selected-start.selected-end, &.will-receive-drop {
+        &.selected-start.selected-end .background, &.will-receive-drop .background {
             border-radius: 5px;
         }
     }
 
+    .tree-row .background {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        right: 10px;
+        bottom: 0px;
+    }
+
     .tree-row .inner {
+        position: relative;
         display: flex;
         flex-direction: row;
         align-items: center;
         padding: 0 0 0 5px;
         gap: 6px;
         height: 100%;
+    }
+
+    .tree-row .inner .text {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     .tree-row input {

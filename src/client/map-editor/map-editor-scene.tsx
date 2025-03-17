@@ -24,7 +24,6 @@ import WriteBuffer from 'src/serialization/binary/write-buffer';
 import PlayerPrefab from "src/entity/types/player/server-prefab";
 import PlayerWorldComponent from 'src/entity/types/player/server-side/player-world-component';
 import { writeEntityFile } from 'src/map/map-serialization';
-import { downloadFile } from 'src/utils/html5-download';
 import { FileDropOverlay } from '../ui/file-drop-overlay/file-drop-overlay';
 import GroupPrefab from 'src/entity/types/group/server-prefab';
 import PlayerConnectionManagerComponent from 'src/entity/types/player/server-side/player-connection-manager-component';
@@ -32,6 +31,7 @@ import { mapEditorEntityFactory } from './editor-entity-factory';
 import { EntityEditorTreeRootComponent } from '../ui/scene-tree-view/components';
 import ToolBarView, { ToolBarRef } from '../ui/toolbar/toolbar';
 import { MapEditorMouseHandler } from '../controls/interact/map-editor-mouse-handler';
+import FileSaver from 'file-saver';
 
 interface MapEditorSceneContextProps {
     clientCameraEntity: Entity,
@@ -42,6 +42,8 @@ interface MapEditorSceneContextProps {
     selectEntities: (entities: Entity[]) => void
     update: () => void
     loadMap: (name: string, entity: Entity) => void
+    saveMap: () => void,
+    setMapName: (name: string) => void
 }
 
 const MapEditorSceneContext = createContext<MapEditorSceneContextProps | undefined>(undefined);
@@ -86,6 +88,22 @@ const MapEditorView: React.FC = () => {
     const setNeedsRedraw = () => {
         needsRedrawRef.current = true
     }
+
+    const saveMap = useCallback(() => {
+        let name = contextRef.current.mapName ?? "Новая карта"
+        let serialized = writeEntityFile(contextRef.current.serverMapEntity, contextRef.current.mapName)
+        let blob = new Blob([JSON.stringify(serialized)], {type: "application/json;charset=utf-8"});
+
+        FileSaver.saveAs(blob, name + ".json")
+    }, [])
+
+    const setMapName = useCallback((name: string) => {
+        name = name || "Без названия"
+        setSceneContext((context) => ({
+            ...context,
+            mapName: name    
+        }))
+    }, [])
 
     const loadMap = useCallback((name: string, entity: Entity) => {
         setSceneContext((context) => {
@@ -167,6 +185,8 @@ const MapEditorView: React.FC = () => {
             mapName: "Новая карта",
             update: setNeedsRedraw,
             loadMap,
+            saveMap,
+            setMapName,
             selectEntities: selectEntities
         } as MapEditorSceneContextProps
     }, [])
@@ -196,13 +216,7 @@ const MapEditorView: React.FC = () => {
 
         let texture = Sprite.applyTexture(scene.canvas.ctx)
 
-        controlsResponderRef.current.on("editor-save-maps", () => {
-            setSceneContext(sceneContext => {
-                let name = sceneContext.mapName ?? "Новая карта"
-                downloadFile(name + ".json", writeEntityFile(sceneContext.serverMapEntity, sceneContext.mapName))
-                return sceneContext
-            })
-        })
+        controlsResponderRef.current.on("editor-save", saveMap)
         
         return () => {
             Sprite.cleanupTexture(scene.canvas.ctx, texture)
