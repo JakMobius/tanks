@@ -225,7 +225,7 @@ export const ComponentPropertyView: React.FC<ComponentPropertyViewProps> = (prop
     )
 }
 
-export const SceneComponentsView: React.FC = (props) => {
+export const SceneComponentsView: React.FC = React.memo(() => {
     let mapEditor = useMapEditorScene()
 
     let [_, rerender] = useState({})
@@ -276,9 +276,9 @@ export const SceneComponentsView: React.FC = (props) => {
             </div>
         </div>
     )
-}
+})
 
-export const SceneComponentsSection: React.FC = (props) => {
+export const SceneComponentsSection: React.FC = () => {
     let mapEditor = useMapEditorScene()
 
     const getName = () => {

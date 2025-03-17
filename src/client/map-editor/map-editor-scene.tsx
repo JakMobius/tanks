@@ -45,7 +45,7 @@ interface MapEditorSceneContextProps {
     update: () => void
     loadMap: (name: string, entity: Entity) => void
     saveMap: () => void,
-    openMap: () => void,
+    openMap: () => Promise<void>,
     setMapName: (name: string) => void
 }
 
@@ -101,7 +101,7 @@ const MapEditorView: React.FC = () => {
     }, [])
 
     const openMap = useCallback(() => {
-        readMapFromDialog().then((packedEntity) => {
+        return readMapFromDialog().then((packedEntity) => {
             loadMap(packedEntity.name, packedEntity.createEntity())
         }).catch(() => {
             eventRef.current.addEvent(() => <BasicEvent text="Не удалось загрузить карту"/>)

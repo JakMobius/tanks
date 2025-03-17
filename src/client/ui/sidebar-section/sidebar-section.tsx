@@ -25,7 +25,7 @@ interface SidebarSectionProps {
     children?: React.ReactNode
 }
 
-export const SidebarSection: React.FC<SidebarSectionProps> = (props) => {
+export const SidebarSection: React.FC<SidebarSectionProps> = React.memo((props) => {
 
     const [open, setOpen] = useState(true)
     const section = useContext(SidebarSectionContext)
@@ -51,4 +51,4 @@ export const SidebarSection: React.FC<SidebarSectionProps> = (props) => {
             )}/>
         </div>
     )
-}
+})

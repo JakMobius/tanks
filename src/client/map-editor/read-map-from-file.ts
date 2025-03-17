@@ -34,5 +34,9 @@ export function readMapFromDialog(): Promise<PackedEntity> {
             }
             input.remove()
         }
+        input.oncancel = () => {
+            input.remove()
+            reject(new Error("cancelled"))
+        }
     })
 }

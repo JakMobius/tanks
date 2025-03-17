@@ -16,7 +16,7 @@ export class SceneTreeViewDropItem {
     }
 }
 
-const SceneTreeView: React.FC = () => {
+const SceneTreeView: React.FC = React.memo(() => {
 
     const leftPadding = 10
     const editorScene = useMapEditorScene()
@@ -185,6 +185,6 @@ const SceneTreeView: React.FC = () => {
             </div>
         </ControlsProvider>
     )
-}
+})
 
 export default SceneTreeView

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { useTreeApi } from "../context";
 import { Cursor } from "./cursor";
 import React from "react";
@@ -9,14 +9,16 @@ export const ListOuterElement = forwardRef(function Outer(
 ) {
   const { children, ...rest } = props;
   const tree = useTreeApi();
+  const onClick = useCallback((e: React.MouseEvent) => {
+    if (e.currentTarget === e.target) tree.deselectAll();
+  }, [tree])
+  
   return (
     <div
       // @ts-ignore
       ref={ref}
       {...rest}
-      onClick={(e) => {
-        if (e.currentTarget === e.target) tree.deselectAll();
-      }}
+      onClick={onClick}
     >
       {children}
       <DropContainer />

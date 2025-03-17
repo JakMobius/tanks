@@ -15,7 +15,7 @@ export interface TreeNodeBase {
     id: string
 }
 
-export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>) {
+export const TreeViewNode = React.memo(<T extends TreeNodeBase>(props: NodeRendererProps<T>) => {
     let classNames = ["tree-row"]
 
     if (props.node.willReceiveDrop && props.tree.canDrop()) classNames.push("will-receive-drop")
@@ -92,7 +92,7 @@ export function TreeViewNode<T extends TreeNodeBase>(props: NodeRendererProps<T>
             </div>
         </div>
     );
-}
+})
 
 export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewProps<T>) {
     let item = props.item
@@ -125,7 +125,7 @@ export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewPr
     )
 }
 
-export const TreeViewContainer: React.FC = () => {
+export const TreeViewContainer: React.FC = React.memo(() => {
     useDataUpdates();
     const tree = useTreeApi();
     const controlsResponder = useRef<ControlsResponder | null>(null)
@@ -251,11 +251,7 @@ export const TreeViewContainer: React.FC = () => {
                     fixedItemHeight={tree.rowHeight}
                     overscan={tree.overscanCount}
                     computeItemKey={(index: number) => tree.visibleNodes[index]?.id || index}
-                    components={{
-                        List: React.forwardRef((props, ref) => (
-                            <ListOuterElement ref={ref} {...props} />
-                        ))
-                    }}
+                    components={{ List: ListOuterElement }}
                     rangeChanged={tree.onRangeChanged.bind(tree)}
                     ref={tree.list}
                     itemContent={(index) => {
@@ -265,7 +261,7 @@ export const TreeViewContainer: React.FC = () => {
             </div>
         </ControlsProvider>
     );
-}
+})
 
 export const TreeViewCursor: React.FC<CursorProps> = (props) => {
     return (
@@ -276,21 +272,19 @@ export const TreeViewCursor: React.FC<CursorProps> = (props) => {
     )
 }
 
-export function TreeViewRow<T extends TreeNodeBase>({
+export const TreeViewRow = React.memo(<T extends TreeNodeBase>({
     node,
     attrs,
     innerRef,
     children,
-}: RowRendererProps<T>) {
-    return (
-        <div
-            {...attrs}
-            style={{ height: 27 }}
-            ref={innerRef}
-            onFocus={(e) => e.stopPropagation()}
-            onClick={node.handleClick}
-        >
-            {children}
-        </div>
-    );
-}
+}: RowRendererProps<T>) => (
+    <div
+        {...attrs}
+        style={{ height: 27 }}
+        ref={innerRef}
+        onFocus={(e) => e.stopPropagation()}
+        onClick={node.handleClick}
+    >
+        {children}
+    </div>
+));

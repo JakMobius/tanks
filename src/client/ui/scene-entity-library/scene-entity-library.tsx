@@ -61,7 +61,7 @@ function createLibraryTree(tree: VirtualLibraryTree, id: string = "root"): Libra
     return { id, children, name: "" }
 }
 
-const SceneEntityLibrary: React.FC = () => {
+const SceneEntityLibrary: React.FC = React.memo(() => {
 
     const leftPadding = 10
     const rootNode = useMemo(() => {
@@ -144,6 +144,6 @@ const SceneEntityLibrary: React.FC = () => {
             </div>
         </ControlsProvider>
     )
-}
+})
 
 export default SceneEntityLibrary
