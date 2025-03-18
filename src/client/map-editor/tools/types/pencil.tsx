@@ -4,7 +4,6 @@ import Tool from '../tool';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
 import Color from "src/utils/color";
-import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 import { clamp } from "src/utils/utils";
 import { ToolViewProps } from '../../../ui/tool-settings/tool-settings-view';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +14,7 @@ import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import { squareQuadrangleFromPoints } from "src/utils/quadrangle";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
+import TilemapModificationWatcher from "../../history/tilemap-modification-watcher";
 
 const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
@@ -82,6 +82,8 @@ export default class Pencil extends Tool {
 
     cameraDrawCallback = (phase: DrawPhase) => this.drawPreview(phase)
 
+    private modificationWatcher: TilemapModificationWatcher | null = null
+
     public maxSize = 32
 
     constructor(manager: ToolManager) {
@@ -125,6 +127,9 @@ export default class Pencil extends Tool {
 
     onMouseDown(x: number, y: number) {
         super.onMouseDown(x, y);
+        if(!this.modificationWatcher) {
+            this.modificationWatcher = new TilemapModificationWatcher().listen(this.manager.getOnlySelectedEntity())
+        }
         this.onMouse(x, y)
     }
 
@@ -164,12 +169,13 @@ export default class Pencil extends Tool {
 
     onMouseUp(x: number, y: number) {
         super.onMouseUp(x, y);
-
-        const tilemap = this.getTilemap()
-        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
-
-        history?.commitActions(this.actionName)
-
+        if(this.modificationWatcher?.changes.length) {
+            let entity = this.getOnlySelectedEntity()
+            let modification = this.modificationWatcher.getModification(this.name, entity, this.manager.editor)
+            this.manager.editor.getHistoryManager().registerModification(modification)
+        }
+        this.modificationWatcher?.listen(null)
+        this.modificationWatcher = null
         this.oldX = null
         this.oldY = null
     }
@@ -231,16 +237,18 @@ export default class Pencil extends Tool {
         super.becomeActive()
         this.brushX = null
         this.brushY = null
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.entityDrawPhase.on("draw", this.cameraDrawCallback)
         this.manager.setNeedsRedraw()
     }
 
     resignActive() {
         super.resignActive();
+        this.modificationWatcher?.listen(null)
+        this.modificationWatcher = null
         this.brushX = null
         this.brushY = null
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.entityDrawPhase.off("draw", this.cameraDrawCallback)
         this.manager.setNeedsRedraw()
     }

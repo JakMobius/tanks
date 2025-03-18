@@ -8,6 +8,7 @@ import DrawPhase from 'src/client/graphics/drawers/draw-phase';
 import ConvexShapeProgram from 'src/client/graphics/programs/convex-shapes/convex-shape-program';
 import Color from 'src/utils/color';
 import { squareQuadrangleFromPoints } from 'src/utils/quadrangle';
+import TilemapModificationWatcher from '../../history/tilemap-modification-watcher';
 
 export default class Fill extends Tool {
     blockX: number | null = null
@@ -55,7 +56,7 @@ export default class Fill extends Tool {
         super.becomeActive()
         this.blockX = null
         this.blockY = null
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.entityDrawPhase.on("draw", this.cameraDrawCallback)
         this.manager.setNeedsRedraw()
     }
@@ -64,7 +65,7 @@ export default class Fill extends Tool {
         super.resignActive();
         this.blockX = null
         this.blockY = null
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.entityDrawPhase.off("draw", this.cameraDrawCallback)
         this.manager.setNeedsRedraw()
     }
@@ -84,11 +85,14 @@ export default class Fill extends Tool {
 
     fill() {
         const tilemap = this.getTilemap()
+        let watcher = new TilemapModificationWatcher().listen(tilemap.entity)
         let baseBlock = tilemap.getBlock(this.blockX, this.blockY)
 
         if(!baseBlock) return
-
+        let selectedBlock = this.manager.selectedBlock
         let baseId = (baseBlock.constructor as typeof BlockState).typeId
+        if(baseId === (selectedBlock.constructor as typeof BlockState).typeId) return
+
         let copy = new Uint8Array(Math.ceil(tilemap.blocks.length / 8))
         let carets = [this.blockX + this.blockY * tilemap.width]
 
@@ -125,8 +129,11 @@ export default class Fill extends Tool {
 
         this.manager.setNeedsRedraw()
 
-        // const history = tilemap.entity.getComponent(GameMapHistoryComponent)
-        // history.commitActions(this.actionName)
+        watcher.listen(null)
+        if(watcher.changes.length) {
+            let modification = watcher.getModification("Заливка", tilemap.entity, this.manager.editor)
+            this.manager.editor.getHistoryManager().registerModification(modification)
+        }
     }
 
     drawPreview(phase: DrawPhase) {

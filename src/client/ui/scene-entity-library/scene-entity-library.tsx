@@ -83,11 +83,12 @@ const SceneEntityLibrary: React.FC = React.memo(() => {
 
     useEffect(() => {
         if(!divRef.current) return undefined
+        let div = divRef.current
         const update = () => {
-            setSize([divRef.current.clientWidth, divRef.current.clientHeight])
+            setSize([div.clientWidth, div.clientHeight])
         }
         let observer = new ResizeObserver(update)
-        observer.observe(divRef.current)
+        observer.observe(div)
         update()
         return () => observer.disconnect()
     }, [divRef.current])

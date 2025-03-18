@@ -229,11 +229,12 @@ export const SidebarSections: React.FC<SidebarSectionsProps> = (props) => {
 
     useEffect(() => {
         if(!divRef.current) return undefined
+        let div = divRef.current
         let resizeObserver = new ResizeObserver(() => {
-            updateHeight(divRef.current.clientHeight)
+            updateHeight(div.clientHeight)
         })
-        updateHeight(divRef.current.clientHeight)
-        resizeObserver.observe(divRef.current)
+        updateHeight(div.clientHeight)
+        resizeObserver.observe(div)
         return () => resizeObserver.disconnect()
     }, [divRef.current])
 

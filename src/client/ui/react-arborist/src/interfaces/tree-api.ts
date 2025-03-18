@@ -161,14 +161,6 @@ export class TreeApi<T> {
     return this.state.nodes.edit.id;
   }
 
-  async delete(node: string | IdObj | null | string[] | IdObj[]) {
-    if (!node) return;
-    const idents = Array.isArray(node) ? node : [node];
-    const ids = idents.map(identify);
-    const nodes = ids.map((id) => this.get(id)!).filter((n) => !!n);
-    await safeRun(this.props.onDelete, { nodes, ids });
-  }
-
   edit(node: string | IdObj): Promise<EditResult> {
     const id = identify(node);
     this.resolveEdit({ cancelled: true });
@@ -258,20 +250,6 @@ export class TreeApi<T> {
     this.dispatch(selection.add(this.nodesBetween(anchor, identifyNull(id))));
     this.dispatch(selection.mostRecent(id));
     this.scrollTo(id);
-    safeRun(this.props.onSelect, this.selectedNodes);
-  }
-
-  deselectAll() {
-    this.setSelection({ ids: [], anchor: null, mostRecent: null });
-    safeRun(this.props.onSelect, this.selectedNodes);
-  }
-
-  selectAll() {
-    this.setSelection({
-      ids: Object.keys(this.idToIndex),
-      anchor: this.firstNode,
-      mostRecent: this.lastNode,
-    });
     safeRun(this.props.onSelect, this.selectedNodes);
   }
 

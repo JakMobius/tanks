@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useDataUpdates, useNodesContext, useTreeApi } from "../context";
 import { useDragHook } from "../dnd/drag-hook";
 import { useDropHook } from "../dnd/drop-hook";
-import { useFreshNode } from "../hooks/use-fresh-node";
 import { NodeApi } from "../interfaces/node-api";
 
 interface RowContainerInnerProps<T> {
@@ -67,6 +66,8 @@ interface RowContainerProps {
 }
 
 export const RowContainer = React.memo(function RowContainer<T>(props: RowContainerProps) {
-  let node = useFreshNode<T>(props.index)
-  return <RowContainerInner node={node} />
+  const _ = useDataUpdates();
+  const tree = useTreeApi<T>();
+  let node = tree.at(props.index);
+  return node ? <RowContainerInner node={node} /> : null
 })

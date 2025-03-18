@@ -31,32 +31,24 @@ export class SerializationContext {
 
 export abstract class Property<T = any> extends EventEmitter {
     eventHandler = new BasicEventHandlerSet()
-    value: T
     hidden = false
     serialized = true
     id: string
     name: string | null = null
-    getter: () => T = () => this.value
-    setter: (value: T) => void = (value) => this.value = value
-
-    shouldUpdate(oldValue: T, newValue: T) {
-        return true
-    }
+    getter?: () => T
+    setter?: (value: T) => void
 
     getValue() {
-        return this.value = this.getter()
+        return this.getter()
     }
 
     setValue(value: T) {
+        this.emit("will-set", value)
         this.setter(value)
-        this.emit("set")
     }
 
     update() {
-        let newValue = this.getter()
-        if (!this.shouldUpdate(this.value, newValue)) return
-        this.value = newValue
-        this.emit("change")
+        this.emit("update")
     }
 
     withGetter(getter: () => T) {
@@ -106,10 +98,6 @@ export class StringProperty extends Property<string> {
         this.id = id
         this.value = ""
     }
-
-    shouldUpdate(oldValue: string, newValue: string): boolean {
-        return oldValue !== newValue
-    }
 }
 
 export class VectorProperty extends Property<number[]> {
@@ -122,10 +110,6 @@ export class VectorProperty extends Property<number[]> {
         this.id = id
         this.dim = dim
         this.value = new Array(dim).fill(0)
-    }
-
-    shouldUpdate(oldValue: number[], newValue: number[]): boolean {
-        return oldValue.some((coord, i) => coord !== newValue[i])
     }
 
     withPrefixes(prefixes: string[]) {
@@ -164,10 +148,6 @@ export class EntityProperty extends Property<Entity> {
     constructor(id: string) {
         super()
         this.id = id
-    }
-
-    shouldUpdate(oldValue: Entity, newValue: Entity): boolean {
-        return oldValue !== newValue
     }
 
     serialize(ctx: SerializationContext) {
@@ -234,7 +214,8 @@ export class PropertyInspector extends EventEmitter {
     addProperty<T>(property: Property<T>) {
         this.properties.push(property)
         property.eventHandler.setTarget(this.entity)
-        property.on("set", () => this.emit("set"))
+        property.on("will-set", (value) => this.emit("will-set", property, value))
+        property.on("update", (value) => this.emit("update", property))
     }
 
     cleanup() {

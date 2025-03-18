@@ -30,11 +30,6 @@ export type RenameHandler<T> = (args: {
   node: NodeApi<T>;
 }) => void | Promise<void>;
 
-export type DeleteHandler<T> = (args: {
-  ids: string[];
-  nodes: NodeApi<T>[];
-}) => void | Promise<void>;
-
 export type EditResult =
   | { cancelled: true }
   | { cancelled: false; value: string };

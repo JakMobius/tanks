@@ -51,7 +51,7 @@ const HubView: React.FC = () => {
         game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
 
         const map = readEntityFile(getHubMap()).createEntity()
-        game.serverGame.appendChild(map)
+        game.serverWorld.appendChild(map)
 
         game.clientConnection.on(WorldDataPacket, (packet) => {
             game.clientWorld.getComponent(EntityDataReceiveComponent).receivePacket(packet)
@@ -61,13 +61,13 @@ const HubView: React.FC = () => {
             new WorldDataPacket(buffer.buffer).sendTo(game.clientConnection.connection)
         })
 
-        game.serverGame.on("client-connect", (client) => {
+        game.serverWorld.on("client-connect", (client) => {
             const player = new Entity()
 
             PlayerPrefab.prefab(player)
             player.getComponent(PlayerConnectionManagerComponent).setClient(client)
 
-            player.getComponent(PlayerWorldComponent).connectToWorld(game.serverGame)
+            player.getComponent(PlayerWorldComponent).connectToWorld(game.serverWorld)
         })
 
         const camera = new Entity()

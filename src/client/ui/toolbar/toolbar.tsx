@@ -5,7 +5,7 @@ import Tool from "src/client/map-editor/tools/tool";
 import React, { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import ToolManager from 'src/client/map-editor/tools/toolmanager';
 import BlockSelectOverlay from "../block-select/block-select-overlay";
-import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
+import { useMapEditor } from "src/client/map-editor/map-editor-scene";
 import Pencil from "src/client/map-editor/tools/types/pencil";
 import Drag from "src/client/map-editor/tools/types/drag";
 import Eraser from "src/client/map-editor/tools/types/eraser";
@@ -15,25 +15,21 @@ import BrickBlockState from "src/map/block-state/types/brick-block-state";
 import { useScene } from "src/client/scenes/scene-controller";
 import Fill from "src/client/map-editor/tools/types/fill";
 import Scale from "src/client/map-editor/tools/types/scale";
-import Entity from "src/utils/ecs/entity";
+import { MapEditorMouseHandler } from "src/client/controls/interact/map-editor-mouse-handler";
+import { ControlsProvider } from "src/client/utils/react-controls-responder";
+import { ControlsResponder } from "src/client/controls/root-controls-responder";
 
-export interface ToolBarRef {
-    toolManager: ToolManager
-}
+const ToolBarView: React.FC = React.memo(() => {
 
-export interface ToolBarProps {
-    ref: Ref<ToolBarRef>
-}
-
-const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
-
-    const mapEditorScene = useMapEditorScene()
-    const mapEditorSceneRef = useRef(mapEditorScene)
-    useEffect(() => { mapEditorSceneRef.current = mapEditorScene }, [mapEditorScene])
+    const mapEditor = useMapEditor()
+    const mapEditorRef = useRef(mapEditor)
+    useEffect(() => { mapEditorRef.current = mapEditor }, [mapEditor])
 
     const scene = useScene()
     const sceneRef = useRef(scene)
     useEffect(() => { sceneRef.current = scene }, [scene])
+
+    const controlsProvider = useRef<ControlsResponder | null>(null)
 
     const [state, setState] = useState({
         blockOverlayShown: false,
@@ -53,6 +49,8 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
 
     const [toolManager, toolList] = useMemo(() => {
         let toolManager = new ToolManager()
+        toolManager.setEditor(mapEditor)
+
         let toolList = [
             new Cursor(toolManager),
             new Scale(toolManager),
@@ -62,24 +60,11 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
             new Fill(toolManager),
             new BlockSelect(toolManager)
         ]
-        
+
         toolManager.selectBlock(new BrickBlockState())
-        toolManager.setClientRoot(mapEditorScene.game.clientWorld)
-        toolManager.setServerRoot(mapEditorScene.game.serverGame)
-        toolManager.setClientCameraEntity(mapEditorScene.clientCameraEntity)
         toolManager.setDefaultTool(toolList[0])
 
-        const onEntitiesSelect = (entities: Entity[]) => {
-            mapEditorSceneRef.current.selectEntities(entities)
-            onUpdate()
-        }
-
-        if(!toolManager) return undefined
-
-        toolManager.on("select-tool", onUpdate)
-        toolManager.on("select-block", onUpdate)
-        toolManager.on("select-entities", onEntitiesSelect)
-        toolManager.on("redraw", () => mapEditorScene.update())
+        toolManager.on("update", onUpdate)
 
         return [toolManager, toolList]
     }, [])
@@ -87,7 +72,7 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
     useEffect(() => {
         const setCursor = (cursor: string | null) => {
             let canvas = sceneRef.current.canvas.canvas
-            if(canvas instanceof HTMLCanvasElement) {
+            if (canvas instanceof HTMLCanvasElement) {
                 canvas.style.cursor = cursor
             }
         }
@@ -98,14 +83,6 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
         toolManager.on("cursor", onCursorUpdate)
         return () => setCursor(null)
     }, [])
-
-    useEffect(() => {
-        toolManager.setSelectedEntities(mapEditorScene.selectedServerEntities)
-        onUpdate()
-        toolManager.setNeedsRedraw()
-    }, [mapEditorScene.selectedServerEntities])
-
-    useImperativeHandle(props.ref, () => ({ toolManager }), [])
 
     const onToolSelect = useCallback((tool: Tool) => {
         toolManager.selectTool(tool)
@@ -124,20 +101,59 @@ const ToolBarView: React.FC<ToolBarProps> = React.memo((props) => {
         onBlockSelect(block)
     }, [onBlockSelect])
 
-    return (<>
-        <div className="editor-toolbar">
-            <div className="editor-toollist">
-                {state.tools.map((tool, index) => (
-                    <div
-                        key={tool.name ?? index}
-                        className={"tool " + (state.selectedTool === tool ? "selected" : "")}
-                        style={{ backgroundImage: `url(${tool.image})` }}
-                        onClick={() => onToolSelect(tool)} />
-                ))}
+    const onDrag = useCallback((dx: number, dy: number) => {
+        toolManager.selectedTool?.onDrag(dx, dy)
+    }, [])
+
+    const onZoom = useCallback((zoom: number, x: number, y: number) => {
+        toolManager.selectedTool?.onZoom(zoom, x, y)
+    }, [])
+
+    const onMouseDown = useCallback((x: number, y: number) => {
+        toolManager.selectedTool?.onMouseDown(x, y)
+    }, [])
+
+    const onMouseUp = useCallback((x: number, y: number) => {
+        toolManager.selectedTool?.onMouseUp(x, y)
+    }, [])
+
+    const onMouseMove = useCallback((x: number, y: number) => {
+        toolManager.selectedTool?.onMouseMove(x, y)
+    }, [])
+
+    useEffect(() => {
+        controlsProvider.current.on("editor-save", mapEditor.saveMap.bind(mapEditor))
+        controlsProvider.current.on("editor-open", mapEditor.openMap.bind(mapEditor))
+        controlsProvider.current.on("editor-select-all", mapEditor.selectAll.bind(mapEditor))
+        controlsProvider.current.on("editor-delete", mapEditor.deleteSelection.bind(mapEditor))
+        controlsProvider.current.on("editor-copy", mapEditor.copy.bind(mapEditor))
+        controlsProvider.current.on("editor-paste", mapEditor.paste.bind(mapEditor))
+        controlsProvider.current.on("editor-undo", mapEditor.undo.bind(mapEditor))
+        controlsProvider.current.on("editor-redo", mapEditor.redo.bind(mapEditor))
+    }, [])
+
+    return (
+        <ControlsProvider flat ref={controlsProvider}>
+            <MapEditorMouseHandler
+                onDrag={onDrag}
+                onZoom={onZoom}
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
+                onMouseMove={onMouseMove} />
+            <div className="editor-toolbar">
+                <div className="editor-toollist">
+                    {state.tools.map((tool, index) => (
+                        <div
+                            key={tool.name ?? index}
+                            className={"tool " + (state.selectedTool === tool ? "selected" : "")}
+                            style={{ backgroundImage: `url(${tool.image})` }}
+                            onClick={() => onToolSelect(tool)} />
+                    ))}
+                </div>
             </div>
-        </div>
-        {state.blockOverlayShown && <BlockSelectOverlay onBlockSelect={selectBlock}/>}
-        </>)
+            {state.blockOverlayShown && <BlockSelectOverlay onBlockSelect={selectBlock} />}
+        </ControlsProvider>
+    )
 })
 
- export default ToolBarView;
+export default ToolBarView;

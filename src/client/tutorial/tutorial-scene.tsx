@@ -64,7 +64,7 @@ const TutorialView: React.FC = () => {
 
         const game = new EmbeddedServerGame()
         game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(gameEntityFactory)
-        const worldController = new TutorialWorldController(game.serverGame)
+        const worldController = new TutorialWorldController(game.serverWorld)
         const remoteControlsManager = new RemoteControlsManager(controlsResponderRef.current, game.clientConnection.connection)
 
         game.clientConnection.on(WorldDataPacket, (packet) => {

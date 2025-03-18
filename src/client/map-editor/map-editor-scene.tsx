@@ -17,44 +17,16 @@ import Sprite from 'src/client/graphics/sprite';
 import { ControlsProvider } from 'src/client/utils/react-controls-responder';
 import MapEditorSidebar from '../ui/map-editor-sidebar/map-editor-sidebar';
 import { useDragLayer } from 'react-dnd';
-import EmbeddedServerGame from '../embedded-server/embedded-server-game';
-import WorldDataPacket from 'src/networking/packets/game-packets/world-data-packet';
-import EntityDataReceiveComponent from 'src/entity/components/network/receiving/entity-data-receive-component';
-import WriteBuffer from 'src/serialization/binary/write-buffer';
-import PlayerPrefab from "src/entity/types/player/server-prefab";
-import PlayerWorldComponent from 'src/entity/types/player/server-side/player-world-component';
-import { writeEntityFile } from 'src/map/map-serialization';
 import { FileDropOverlay } from '../ui/file-drop-overlay/file-drop-overlay';
-import GroupPrefab from 'src/entity/types/group/server-prefab';
-import PlayerConnectionManagerComponent from 'src/entity/types/player/server-side/player-connection-manager-component';
-import { mapEditorEntityFactory } from './editor-entity-factory';
-import { EntityEditorTreeRootComponent } from '../ui/scene-tree-view/components';
-import ToolBarView, { ToolBarRef } from '../ui/toolbar/toolbar';
-import { MapEditorMouseHandler } from '../controls/interact/map-editor-mouse-handler';
-import FileSaver from 'file-saver';
-import { readMapFromDialog } from './read-map-from-file';
-import { BasicEvent } from '../ui/events-hud/basic-event-view';
+import ToolBarView from '../ui/toolbar/toolbar';
+import { MapEditorApi } from './map-editor';
 
-interface MapEditorSceneContextProps {
-    clientCameraEntity: Entity,
-    game: EmbeddedServerGame,
-    selectedServerEntities: Entity[]
-    serverMapEntity: Entity,
-    mapName: string | null,
-    selectEntities: (entities: Entity[]) => void
-    update: () => void
-    loadMap: (name: string, entity: Entity) => void
-    saveMap: () => void,
-    openMap: () => Promise<void>,
-    setMapName: (name: string) => void
-}
+const MapEditorSceneContext = createContext<MapEditorApi | undefined>(undefined);
 
-const MapEditorSceneContext = createContext<MapEditorSceneContextProps | undefined>(undefined);
-
-export const useMapEditorScene = (): MapEditorSceneContextProps => {
+export const useMapEditor = (): MapEditorApi => {
     const context = useContext(MapEditorSceneContext);
     if (!context) {
-        throw new Error('useMapEditorScene must be used within a MapEditorScene');
+        throw new Error('useMapEditor must be used within a MapEditorScene');
     }
     return context;
 };
@@ -65,7 +37,6 @@ const DragPreviewContainer = () => {
         offset: m.getSourceClientOffset(),
         mouse: m.getClientOffset(),
         item: m.getItem(),
-        isDragging: m.isDragging(),
       };
     });
 
@@ -85,95 +56,13 @@ const MapEditorView: React.FC = () => {
     const scene = useScene()
     const eventRef = useRef<KeyedComponentsHandle | null>(null)
     const needsRedrawRef = useRef(true)
-    const toolBarRef = useRef<ToolBarRef>(null)
     const controlsResponderRef = useRef<ControlsResponder | null>(null)
 
-    const setNeedsRedraw = () => {
-        needsRedrawRef.current = true
-    }
+    const mapEditor = useMemo(() => {
+        const api = new MapEditorApi()
 
-    const saveMap = useCallback(() => {
-        let name = contextRef.current.mapName ?? "Новая карта"
-        let serialized = writeEntityFile(contextRef.current.serverMapEntity, contextRef.current.mapName)
-        let blob = new Blob([JSON.stringify(serialized)], {type: "application/json;charset=utf-8"});
-
-        FileSaver.saveAs(blob, name + ".json")
-    }, [])
-
-    const openMap = useCallback(() => {
-        return readMapFromDialog().then((packedEntity) => {
-            loadMap(packedEntity.name, packedEntity.createEntity())
-        }).catch(() => {
-            eventRef.current.addEvent(() => <BasicEvent text="Не удалось загрузить карту"/>)
-        })
-    }, [])
-
-    const setMapName = useCallback((name: string) => {
-        name = name || "Без названия"
-        setSceneContext((context) => ({
-            ...context,
-            mapName: name    
-        }))
-    }, [])
-
-    const loadMap = useCallback((name: string, entity: Entity) => {
-        setSceneContext((context) => {
-            let parent = context.serverMapEntity.parent
-            context.serverMapEntity.removeFromParent()
-            parent.appendChild(entity)
-            return {
-                ...context,
-                serverMapEntity: entity,
-                selectedServerEntities: [],
-                mapName: name,
-            }
-        })
-        setNeedsRedraw()
-    }, [])
-
-    const selectEntities = useCallback((entities: Entity[]) => {    
-        // Reset the focus to the default controls responders
-        controlsResponderRef.current.focus()        
-        setSceneContext((context) => {
-            for(let oldEntity of context.selectedServerEntities) oldEntity.emit("editor-blur")
-            for(let newEntity of entities) newEntity.emit("editor-focus")
-
-            return {
-                ...context,
-                selectedServerEntities: entities
-            }
-        })
-        setNeedsRedraw()
-    }, [])
-
-    const initialState = useMemo(() => {
-        const rootGroup = new Entity()
-        GroupPrefab.prefab(rootGroup)
-
-        const game = new EmbeddedServerGame()
-        game.clientWorld.getComponent(EntityDataReceiveComponent).makeRoot(mapEditorEntityFactory)
-        game.serverGame.addComponent(new EntityEditorTreeRootComponent())
-        game.serverGame.appendChild(rootGroup)
-
-        game.clientConnection.on(WorldDataPacket, (packet) => {
-            game.clientWorld.getComponent(EntityDataReceiveComponent).receivePacket(packet)
-        })
-
-        game.clientWorld.on("response", (buffer: WriteBuffer) => {
-            new WorldDataPacket(buffer.buffer).sendTo(game.clientConnection.connection)
-        })
-
-        game.serverGame.on("request-focus", (entity) => {
-            selectEntities([entity])
-        })
-
-        game.serverGame.on("client-connect", (client) => {
-            const player = new Entity()
-
-            PlayerPrefab.prefab(player)
-            player.getComponent(PlayerConnectionManagerComponent).setClient(client)
-            player.getComponent(PlayerWorldComponent).connectToWorld(game.serverGame)
-        })
+        api.on("redraw", () => needsRedrawRef.current = true)
+        api.newMap()
 
         const camera = new Entity()
         camera.addComponent(new TransformComponent())
@@ -185,40 +74,25 @@ const MapEditorView: React.FC = () => {
         camera.addComponent(new WorldSoundListenerComponent(scene.soundEngine))
         camera.addComponent(new WorldDrawerComponent(scene.canvas))
 
-        game.clientWorld.appendChild(camera)
-        game.connectClientToServer()
+        api.setClientCameraEntity(camera)
+        api.getClientWorld().appendChild(camera)
 
-        return {
-            clientCameraEntity: camera,
-            game,
-            selectedServerEntities: [],
-            serverMapEntity: rootGroup,
-            mapName: "Новая карта",
-            update: setNeedsRedraw,
-            loadMap,
-            saveMap,
-            openMap,
-            setMapName,
-            selectEntities: selectEntities
-        } as MapEditorSceneContextProps
+        return api
     }, [])
-
-    const [sceneContext, setSceneContext] = useState<MapEditorSceneContextProps>(initialState)
-    const contextRef = useRef(sceneContext)
-    useEffect(() => { contextRef.current = sceneContext }, [sceneContext])
 
     const onDraw = useCallback((dt: number) => {
         RootControlsResponder.getInstance().refresh()
-        let needsRedraw = sceneContext.game?.serverLoop.runScheduledTasks(dt)
+        let needsRedraw = mapEditor.getGame()?.serverLoop.runScheduledTasks(dt)
 
         if(!needsRedrawRef.current && !needsRedraw && !scene.canvas.needsResize) return
         needsRedrawRef.current = false
+
+        let serverWorld = mapEditor.getServerWorld()
+        let clientWorld = mapEditor.getClientWorld()
         
-        sceneContext.clientCameraEntity?.getComponent(CameraComponent)
-            .setViewport({ x: scene.canvas.width, y: scene.canvas.height })
-        sceneContext.game?.serverLoop.emit("tick", dt)
-        sceneContext.game?.clientWorld.emit("tick", dt)
-        sceneContext.game?.clientWorld.emit("draw")
+        serverWorld.emit("tick", dt)
+        clientWorld.emit("tick", dt)
+        clientWorld.emit("draw")
     }, [])
 
     useEffect(() => {
@@ -227,16 +101,14 @@ const MapEditorView: React.FC = () => {
         scene.loop.start()
 
         let texture = Sprite.applyTexture(scene.canvas.ctx)
-
-        controlsResponderRef.current.on("editor-save", saveMap)
-        controlsResponderRef.current.on("editor-open", openMap)
         
         return () => {
             Sprite.cleanupTexture(scene.canvas.ctx, texture)
             
             scene.setTitle(undefined)
             scene.loop.stop()
-            contextRef.current.clientCameraEntity.removeFromParent()
+            mapEditor.getClientCameraEntity().removeFromParent()
+            mapEditor.setClientCameraEntity(null)
         }
     }, [])
 
@@ -245,40 +117,12 @@ const MapEditorView: React.FC = () => {
         return () => scene.loop.off("tick", onDraw)
     }, [])
 
-    const onDrag = useCallback((dx: number, dy: number) => {
-        toolBarRef.current?.toolManager.selectedTool?.onDrag(dx, dy)
-    }, [])
-
-    const onZoom = useCallback((zoom: number, x: number, y: number) => {
-        toolBarRef.current?.toolManager.selectedTool?.onZoom(zoom, x, y)
-    }, [])
-
-    const onMouseDown = useCallback((x: number, y: number) => {
-        toolBarRef.current?.toolManager.selectedTool?.onMouseDown(x, y)
-    }, [])
-
-    const onMouseUp = useCallback((x: number, y: number) => {
-        toolBarRef.current?.toolManager.selectedTool?.onMouseUp(x, y)
-    }, [])
-
-    const onMouseMove = useCallback((x: number, y: number) => {
-        toolBarRef.current?.toolManager.selectedTool?.onMouseMove(x, y)
-    }, [])
-
     return (
         <ControlsProvider default ref={controlsResponderRef}>
-            <MapEditorSceneContext.Provider value={sceneContext}>
+            <MapEditorSceneContext.Provider value={mapEditor}>
                 <EventsProvider ref={eventRef}>
-                    <MapEditorMouseHandler
-                        camera={sceneContext.clientCameraEntity}
-                        onDrag={onDrag}
-                        onZoom={onZoom}
-                        onMouseDown={onMouseDown}
-                        onMouseUp={onMouseUp}
-                        onMouseMove={onMouseMove}
-                    />
                     <MapEditorSidebar/>
-                    <ToolBarView ref={toolBarRef}/>
+                    <ToolBarView/>
                     <EventsHUD/>
                     <PauseOverlay rootComponent={<MapEditorPauseView/>}/>
                     <FileDropOverlay/>

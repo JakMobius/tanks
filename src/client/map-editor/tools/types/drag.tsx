@@ -33,7 +33,7 @@ export default class Drag extends Tool {
         super.onMouseMove(x, y)
         if(!this.dragging) return
 
-        let camera = this.manager.clientCameraEntity.getComponent(CameraPositionController)
+        let camera = this.manager.getCamera().getComponent(CameraPositionController)
         camera.target.x += this.oldX - x
         camera.target.y += this.oldY - y
         camera.onTick(0)

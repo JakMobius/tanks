@@ -16,7 +16,6 @@ export interface TreeProps<T> {
   onCreate?: handlers.CreateHandler<T>;
   onDrop?: handlers.DropHandler<T>
   onRename?: handlers.RenameHandler<T>;
-  onDelete?: handlers.DeleteHandler<T>;
 
   /* Renderers*/
   children?: ElementType<renderers.NodeRendererProps<T>>;

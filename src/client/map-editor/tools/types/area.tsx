@@ -1,11 +1,9 @@
 import Tool from '../tool';
 import Rectangle from '../../../../utils/rectangle';
-import MapAreaModification from '../../history/modification/map-area-modification';
 import ToolManager from "../toolmanager";
 import BlockState from "src/map/block-state/block-state";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import KeyboardListener from "src/client/controls/input/keyboard/keyboard-listener";
-import GameMapHistoryComponent from "src/client/map-editor/history/game-map-history-component";
 import {createOverlappingModel} from "src/utils/wfc/overlapping-model";
 import {createSuperposition} from "src/utils/wfc/superposition";
 import {createObservation} from "src/utils/wfc/observe";
@@ -119,13 +117,13 @@ export default class AreaTool extends Tool {
         const observe = createObservation(model, superpos);
 
         const tilemap = this.getTilemap()
-        let modification = new MapAreaModification(tilemap.entity, this.area.clone(), [])
-        let newData = modification.fetchData()
-        modification.newData = newData
-        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
+        // let modification = new MapAreaModification(tilemap.entity, this.area.clone(), [])
+        // let newData = modification.fetchData()
+        // modification.newData = newData
+        // const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
-        history.registerModification(modification)
-        history.commitActions("Автозаполнение")
+        // history.registerModification(modification)
+        // history.commitActions("Автозаполнение")
 
         const step = () => {
             let result = observe()
@@ -243,14 +241,14 @@ export default class AreaTool extends Tool {
 
         if(cut) {
             this.manager.createEvent(width * height + " блок(-ов) вырезано")
-            const history = tilemap.entity.getComponent(GameMapHistoryComponent)
+            // const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
             let bound = this.area.bounding(0, 0, tilemap.width, tilemap.height)
 
             let areaModification = new MapAreaModification(tilemap.entity, bound, void 0)
             areaModification.perform()
-            history.registerModification(areaModification)
-            history.commitActions("Вырезание")
+            // history.registerModification(areaModification)
+            // history.commitActions("Вырезание")
 
             this.resetSelection()
 
@@ -293,13 +291,13 @@ export default class AreaTool extends Tool {
         this.pasting = false
 
         const tilemap = this.getTilemap()
-        const history = tilemap.entity.getComponent(GameMapHistoryComponent)
+        // const history = tilemap.entity.getComponent(GameMapHistoryComponent)
 
         let modification = new MapAreaModification(tilemap.entity, this.area.clone(), this.copyBuffer.blocks.map((a: BlockState) => a.clone()))
 
         modification.perform()
-        history.registerModification(modification)
-        history.commitActions("Вставка")
+        // history.registerModification(modification)
+        // history.commitActions("Вставка")
 
         this.manager.setNeedsRedraw()
     }

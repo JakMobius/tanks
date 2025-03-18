@@ -11,13 +11,13 @@ import {clientGameWorldEntityPrefab} from "src/client/entity/client-game-world-e
 export default class EmbeddedServerGame {
     clientConnection: ConnectionClient<Connection>
     clientWorld: Entity
-    serverGame: Entity
+    serverWorld: Entity
 
     serverLoop = new AdapterLoop()
 
     constructor() {
-        this.serverGame = new Entity()
-        serverGameRoomPrefab(this.serverGame, {
+        this.serverWorld = new Entity()
+        serverGameRoomPrefab(this.serverWorld, {
             name: "Embedded Server Game",
             loop: this.serverLoop,
             tps: 20
@@ -43,7 +43,7 @@ export default class EmbeddedServerGame {
             data: {}
         })
 
-        let clientComponent = this.serverGame.getComponent(RoomClientComponent)
+        let clientComponent = this.serverWorld.getComponent(RoomClientComponent)
         clientComponent.portal.clientConnected(client)
     }
 

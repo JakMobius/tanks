@@ -80,11 +80,12 @@ export default class TilemapComponent extends EventHandlerComponent {
 			index = (base += this.width)
 		}
 
-		let event = new BlockChangeEvent(oldBlock, block, x, y)
+		let event = new BlockChangeEvent(this.entity, oldBlock, block, x, y)
 		this.entity.emit("block-change", event)
 	}
 
 	setSize(x: number, y: number) {
+		this.entity?.emit("will-update")
 		let oldWidth = this.width, oldHeight = this.height, oldBlocks = this.blocks
 		this.width = x
 		this.height = y
@@ -124,10 +125,15 @@ export default class TilemapComponent extends EventHandlerComponent {
 		}
 	}
 
-	setMap(width: number, height: number, blocks: BlockState[]) {
+	setMap(width: number, height: number, blocks: BlockState[] | string) {
+		this.entity.emit("will-update")
 		this.width = width
 		this.height = height
-		this.blocks = blocks
+		if(typeof blocks === "string") {
+			this.setBlocksString(blocks)
+		} else {
+			this.blocks = blocks
+		}
 		this.update()
 		this.entity.emit("update")
     }

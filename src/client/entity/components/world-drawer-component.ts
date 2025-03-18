@@ -6,6 +6,7 @@ import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import CanvasHandler from 'src/client/graphics/canvas-handler';
 import MapDebugDrawer from "src/entity/types/tilemap/client-side/map-debug-drawer";
 import { GameProgramPool, UIProgramPool } from "src/client/graphics/program-pools";
+import CameraComponent from "src/client/graphics/camera";
 
 export default class WorldDrawerComponent extends EventHandlerComponent {
     public canvasHandler: CanvasHandler
@@ -45,6 +46,9 @@ export default class WorldDrawerComponent extends EventHandlerComponent {
         if(this.canvasHandler.needsResize) {
             this.canvasHandler.updateSize()
         }
+        this.entity.getComponent(CameraComponent)
+            .setViewport({ x: this.canvasHandler.width, y: this.canvasHandler.height })
+            
         this.canvasHandler.clear()
 
         this.backgroundDrawPhase.draw()

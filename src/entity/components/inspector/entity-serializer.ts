@@ -123,6 +123,14 @@ export class EntitySerializer {
         return root
     }
 
+    serializeDangingEntity(entity: Entity) {
+        return this.serialize(entity)
+    }
+
+    getDanglingEntities() {
+        return this.danglingEntities
+    }
+
     getSerializedDanglingEntities() {
         return Array.from(this.danglingEntities).map(entity => this.serialize(entity))
     }

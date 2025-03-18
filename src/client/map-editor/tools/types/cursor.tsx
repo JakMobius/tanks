@@ -2,7 +2,7 @@ import Entity from "src/utils/ecs/entity";
 import Tool from "../tool";
 import { EditorOutlineBoundsComponent } from "../../editor-outline-bounds-component";
 import TransformComponent from "src/entity/components/transform/transform-component";
-import { radToDeg, raycastPolygon } from "src/utils/utils";
+import { raycastPolygon } from "src/utils/utils";
 import ToolManager from "../toolmanager";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
@@ -11,7 +11,33 @@ import CameraComponent from "src/client/graphics/camera";
 import EventEmitter from "src/utils/event-emitter";
 import CircleDrawer from "src/client/graphics/drawers/circle-drawer";
 import * as Box2D from "@box2d/core"
-import { ReadonlyMatrix3 } from "src/utils/matrix3";
+import { Matrix3, ReadonlyMatrix3 } from "src/utils/matrix3";
+import { Modification } from "../../history/history-manager";
+
+export class MovementModification implements Modification {
+    entity: Entity
+    oldTransform: Matrix3
+    newTransform: Matrix3
+    actionName = "Перемещение"
+
+    constructor(entity: Entity, oldTransform: Matrix3, newTransform: Matrix3) {
+        this.entity = entity
+        this.oldTransform = oldTransform
+        this.newTransform = newTransform
+    }
+
+    perform() {
+        let transformComponent = this.entity.getComponent(TransformComponent)
+        transformComponent.setTransform(this.newTransform)
+        this.entity.emit("request-focus-self")
+    }
+
+    revert() {
+        let transformComponent = this.entity.getComponent(TransformComponent)
+        transformComponent.setTransform(this.oldTransform)
+        this.entity.emit("request-focus-self")
+    }
+}
 
 export interface ArrowControlConfig {
     arrowLength: number,
@@ -42,14 +68,14 @@ export default class Cursor extends Tool {
 
     becomeActive() {
         super.becomeActive()
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.uiDrawPhase.on("draw", this.cameraDrawCallback, EventEmitter.PRIORITY_LOW)
         this.manager.setNeedsRedraw()
     }
 
     resignActive() {
         super.resignActive();
-        let drawer = this.manager.clientCameraEntity.getComponent(WorldDrawerComponent)
+        let drawer = this.manager.getCamera().getComponent(WorldDrawerComponent)
         drawer.uiDrawPhase.off("draw", this.cameraDrawCallback)
         this.manager.setNeedsRedraw()
     }
@@ -92,6 +118,13 @@ export default class Cursor extends Tool {
     onMouseUp(x: number, y: number): void {
         super.onMouseUp(x, y)
 
+        if(this.hoveredControl) {
+            let entity = this.manager.getOnlySelectedEntity()
+            let newTransform = entity.getComponent(TransformComponent).getTransform()
+            let modification = new MovementModification(entity, this.initialEntityTransform.clone(), newTransform.clone())
+            this.manager.editor.getHistoryManager().registerModification(modification)
+        }
+
         this.clickX = null
         this.clickY = null
         
@@ -126,9 +159,9 @@ export default class Cursor extends Tool {
             return
         }
 
-        let clickedEntity = this.raycastEntity(x, y, this.manager.clientRoot)
+        let clickedEntity = this.raycastEntity(x, y, this.manager.getClientWorld())
         // TODO: hack to avoid raycasting the camera and stuff outside the desired subtree
-        if(clickedEntity.parent === this.manager.clientRoot) clickedEntity = null
+        if(clickedEntity.parent === this.manager.getClientWorld()) clickedEntity = null
         if(clickedEntity) {
             clickedEntity?.emit("request-focus-self")
         } else {
@@ -217,7 +250,7 @@ export default class Cursor extends Tool {
     }
 
     toScreenPosition(x: number, y: number) {
-        let camera = this.manager.clientCameraEntity
+        let camera = this.manager.getCamera()
         let cameraTransformComponent = camera.getComponent(TransformComponent)
         let cameraTransformMatrix = cameraTransformComponent.getInvertedGlobalTransform()
         let cameraViewport = camera.getComponent(CameraComponent).viewport
@@ -305,7 +338,7 @@ export default class Cursor extends Tool {
             globalDirY = { x: -globalDirX.y, y: globalDirX.x }
         }
 
-        let camera = this.manager.clientCameraEntity
+        let camera = this.manager.getCamera()
         let cameraTransformComponent = camera.getComponent(TransformComponent)
         let cameraTransformMatrix = cameraTransformComponent.getInvertedGlobalTransform()
         let cameraViewport = camera.getComponent(CameraComponent).viewport

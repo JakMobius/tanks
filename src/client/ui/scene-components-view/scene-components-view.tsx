@@ -1,13 +1,14 @@
 import "./scene-components-view.scss"
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
+import { useMapEditor } from "src/client/map-editor/map-editor-scene";
 import { EntityProperty, Property, PropertyInspector, SelectProperty, VectorProperty } from "src/entity/components/inspector/property-inspector";
 import { SidebarSection } from "../sidebar-section/sidebar-section";
 import { EntityEditorTreeNodeComponent } from "../scene-tree-view/components";
 import { useDrop } from "react-dnd";
 import { SceneTreeViewDropItem } from "../scene-tree-view/scene-tree-view";
 import { DragItem } from "../react-arborist/src/types/dnd";
+import PropertyModification from "src/entity/components/inspector/property-modification";
 
 function useParameterValue<T>(property: Property<T>): T {
     const [value, setValue] = useState(property?.getValue())
@@ -17,8 +18,8 @@ function useParameterValue<T>(property: Property<T>): T {
         let handler = () => setValue(property.getValue())
         handler()
 
-        property.on("change", handler)
-        return () => property.off("change", handler)
+        property.on("update", handler)
+        return () => property.off("update", handler)
     }, [property])
 
     return value
@@ -226,30 +227,40 @@ export const ComponentPropertyView: React.FC<ComponentPropertyViewProps> = (prop
 }
 
 export const SceneComponentsView: React.FC = React.memo(() => {
-    let mapEditor = useMapEditorScene()
+    let mapEditor = useMapEditor()
+    let selectedEntities = mapEditor.useSelectedEntities()
 
     let [_, rerender] = useState({})
     let [inspector, setInspector] = useState<PropertyInspector | null>(null)
 
     useEffect(() => {
-        if(mapEditor.selectedServerEntities.length !== 1) return undefined
+        if(selectedEntities.length !== 1) return undefined
 
-        let entity = mapEditor.selectedServerEntities[0]
-        let onSet = () => mapEditor.update()
+        let entity = selectedEntities[0]
+        let inspector = new PropertyInspector(entity)
+
+        let onSet = (property: EntityProperty, value: any) => {
+            let modification = new PropertyModification(entity, property, value)
+            mapEditor.getHistoryManager().registerModification(modification)
+        }
+        let onUpdate = (id: string) => {
+            mapEditor.setNeedsRedraw()
+        } 
         let onRefresh = () => rerender({})
 
-        let inspector = new PropertyInspector(entity)
-        inspector.on("set", onSet)
+        inspector.on("will-set", onSet)
+        inspector.on("update", onUpdate)
         inspector.on("refresh", onRefresh)
         setInspector(inspector)
 
         return () => {
-            inspector.off("set", onSet)
-            inspector.on("refresh", onRefresh)
+            inspector.off("will-set", onSet)
+            inspector.off("update", onUpdate)
+            inspector.off("refresh", onRefresh)
             inspector.cleanup()
             setInspector(null)
         }
-    }, [mapEditor.selectedServerEntities])
+    }, [selectedEntities])
 
     if(inspector && inspector.properties.length) return (
         <div className="properties-container">
@@ -259,7 +270,7 @@ export const SceneComponentsView: React.FC = React.memo(() => {
         </div>
     )
 
-    if(mapEditor.selectedServerEntities.length > 1) {
+    if(selectedEntities.length > 1) {
         return (
             <div className="properties-container">
                 <div className="no-properties-text">
@@ -279,29 +290,29 @@ export const SceneComponentsView: React.FC = React.memo(() => {
 })
 
 export const SceneComponentsSection: React.FC = () => {
-    let mapEditor = useMapEditorScene()
+    let mapEditor = useMapEditor()
 
     const getName = () => {
-        if(mapEditor.selectedServerEntities.length > 1) {
-            return "Выбрано сущностей: " + mapEditor.selectedServerEntities.length
+        if(mapEditor.getSelectedEntities().length > 1) {
+            return "Выбрано сущностей: " + mapEditor.getSelectedEntities().length
         }
-        let entity = mapEditor.selectedServerEntities[0]
+        let entity = mapEditor.getSelectedEntities()[0]
         let treeComponent = entity?.getComponent(EntityEditorTreeNodeComponent)
         return treeComponent?.name || "Свойства"
     }
 
     let [name, setName] = useState(useMemo(() => getName(), []))
 
-    useEffect(() => {
+    mapEditor.useEvent("selection-change", () => {
         setName(getName())
-        if(mapEditor.selectedServerEntities.length !== 1) {
+        if(mapEditor.getSelectedEntities().length !== 1) {
             return undefined
         }
-        let entity = mapEditor.selectedServerEntities[0]
+        let entity = mapEditor.getSelectedEntities()[0]
         let handler = () => setName(getName())
         entity.on("name-set", handler)
         return () => entity.off("name-set", handler)
-    }, [mapEditor.selectedServerEntities])
+    })
 
     return (
         <SidebarSection header={name}>

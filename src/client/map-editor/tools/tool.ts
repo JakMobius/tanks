@@ -55,7 +55,7 @@ export default class Tool extends EventEmitter {
     }
 
     onDrag(dx: number, dy: number) {
-        let camera = this.manager.clientCameraEntity.getComponent(CameraPositionController)
+        let camera = this.manager.getCamera().getComponent(CameraPositionController)
         camera.target.x += dx
         camera.target.y += dy
         camera.onTick(0)
@@ -63,7 +63,7 @@ export default class Tool extends EventEmitter {
     }
 
     onZoom(zoom: number, x: number, y: number) {
-        let camera = this.manager.clientCameraEntity
+        let camera = this.manager.getCamera()
         let cameraPositionController = camera.getComponent(CameraPositionController)
         let cameraMatrix = camera.getComponent(TransformComponent).getGlobalTransform()
         let rightX = cameraMatrix.transformX(1, 0, 0)
@@ -130,7 +130,7 @@ export default class Tool extends EventEmitter {
     }
 
     getSelectedEntities() {
-        return this.manager.selectedServerEntities
+        return this.manager.getSelectedEntities()
     }
 
     setImage(image: string) {

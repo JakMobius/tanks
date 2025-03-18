@@ -2,9 +2,9 @@ import {isMacOS} from "src/utils/meta-key-name";
 import { useEffect, useRef } from "react";
 import React from "react";
 import CameraComponent from "src/client/graphics/camera";
-import Entity from "src/utils/ecs/entity";
 import TransformComponent from "src/entity/components/transform/transform-component";
 import { useScene } from "src/client/scenes/scene-controller";
+import { useMapEditor } from "src/client/map-editor/map-editor-scene";
 
 interface GestureEvent extends UIEvent {
     scale: number
@@ -16,12 +16,12 @@ interface MapEditorMouseHandlerProps {
     onMouseDown?: (x: number, y: number) => void
     onMouseUp?: (x: number, y: number) => void
     onMouseMove?: (x: number, y: number) => void
-    camera?: Entity,
 }
 
 export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React.memo((props) => {
 
     const scene = useScene()
+    const mapEditor = useMapEditor()
     const ref = useRef({
         oldScale: null as number | null,
         oldX: null as number | null,
@@ -74,7 +74,7 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     const toWorld = (x: number, y: number, z: number) => {
-        const cameraTransform = propsRef.current.camera?.getComponent(TransformComponent)
+        const cameraTransform = mapEditor.getClientCameraEntity()?.getComponent(TransformComponent)
         const cameraMatrix = cameraTransform?.getGlobalTransform()
 
         const canvas = scene.canvas.canvas
@@ -97,7 +97,7 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     const emitZoom = (zoom: number) => {
-        let viewport = propsRef.current.camera.getComponent(CameraComponent).viewport
+        let viewport = mapEditor.getClientCameraEntity().getComponent(CameraComponent).viewport
         let x = (ref.current.oldX / viewport.x) * 2 - 1
         let y = (ref.current.oldY / viewport.y) * 2 - 1
 

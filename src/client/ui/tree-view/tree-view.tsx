@@ -15,7 +15,7 @@ export interface TreeNodeBase {
     id: string
 }
 
-export const TreeViewNode = React.memo(<T extends TreeNodeBase>(props: NodeRendererProps<T>) => {
+export const TreeViewNode = <T extends TreeNodeBase>(props: NodeRendererProps<T>) => {
     let classNames = ["tree-row"]
 
     if (props.node.willReceiveDrop && props.tree.canDrop()) classNames.push("will-receive-drop")
@@ -92,7 +92,7 @@ export const TreeViewNode = React.memo(<T extends TreeNodeBase>(props: NodeRende
             </div>
         </div>
     );
-})
+}
 
 export function TreeViewDragPreview<T extends TreeNodeBase>(props: DragPreviewProps<T>) {
     let item = props.item
@@ -130,26 +130,16 @@ export const TreeViewContainer: React.FC = React.memo(() => {
     const tree = useTreeApi();
     const controlsResponder = useRef<ControlsResponder | null>(null)
 
-    const onDelete = () => {
-        if (!tree.props.onDelete) return;
-        const ids = Array.from(tree.selectedIds);
-        if (ids.length >= 1) {
-            let nextFocus = tree.mostRecentNode;
-            while (nextFocus && nextFocus.isSelected) {
-                nextFocus = nextFocus.nextSibling;
-            }
-            if (!nextFocus) nextFocus = tree.lastNode;
-            tree.delete(Array.from(ids));
-        }
-        return;
-    }
-
     const onNavigateDown = (responder: RootControlsResponder) => {
         const keyboard = responder.keyboard
 
-        let maxIndex = tree.selectedNodes[0]?.rowIndex ?? -1
-        for(let node of tree.selectedNodes) {
-            maxIndex = Math.max(maxIndex, node.rowIndex)
+        let maxIndex = tree.mostRecentNode?.rowIndex
+
+        if(maxIndex === undefined) {
+            maxIndex = tree.selectedNodes[0]?.rowIndex ?? -1       
+            for(let node of tree.selectedNodes) {
+                maxIndex = Math.max(maxIndex, node.rowIndex)
+            }
         }
 
         maxIndex = Math.min(maxIndex + 1, tree.visibleNodes.length - 1)
@@ -165,9 +155,13 @@ export const TreeViewContainer: React.FC = React.memo(() => {
     const onNavigateUp = (responder: RootControlsResponder) => {
         const keyboard = responder.keyboard
 
-        let minIndex = tree.selectedNodes[0]?.rowIndex ?? -1
-        for(let node of tree.selectedNodes) {
-            minIndex = Math.min(minIndex, node.rowIndex)
+        let minIndex = tree.mostRecentNode?.rowIndex
+
+        if(minIndex === undefined) {
+            let minIndex = tree.selectedNodes[0]?.rowIndex ?? -1
+            for(let node of tree.selectedNodes) {
+                minIndex = Math.min(minIndex, node.rowIndex)
+            }
         }
 
         minIndex = Math.max(minIndex - 1, 0)
@@ -190,12 +184,6 @@ export const TreeViewContainer: React.FC = React.memo(() => {
         const node = tree.mostRecentNode;
         if (!node) return;
         tree.close(node.id);
-    }
-
-    const onSelectAll = () => {
-        if (!tree.props.disableMultiSelection) {
-            tree.selectAll();
-        }
     }
 
     const onRename = () => {
@@ -222,10 +210,8 @@ export const TreeViewContainer: React.FC = React.memo(() => {
         controlsResponder.current.on("navigate-up", onNavigateUp)
         controlsResponder.current.on("navigate-right", onNavigateRight)
         controlsResponder.current.on("navigate-left", onNavigateLeft)
-        controlsResponder.current.on("editor-select-all", onSelectAll)
         controlsResponder.current.on("editor-rename", onRename)
         controlsResponder.current.on("editor-tree-toggle", onToggle)
-        controlsResponder.current.on("editor-delete", onDelete)
     }, [])
 
     return (
@@ -272,7 +258,7 @@ export const TreeViewCursor: React.FC<CursorProps> = (props) => {
     )
 }
 
-export const TreeViewRow = React.memo(<T extends TreeNodeBase>({
+export const TreeViewRow = <T extends TreeNodeBase>({
     node,
     attrs,
     innerRef,
@@ -287,4 +273,4 @@ export const TreeViewRow = React.memo(<T extends TreeNodeBase>({
     >
         {children}
     </div>
-));
+);

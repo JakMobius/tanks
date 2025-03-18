@@ -14,7 +14,7 @@ export default class KeyAxle extends ButtonAxle {
 
         const stoppedListeningHandler = () => { this.keyReleased(); }
         const keydownHandler = (event: KeyboardEvent) => {
-            if(this.eventMatches(event)) {
+            if(!event.repeat && this.eventMatches(event)) {
                 if(!event.metaKey && !event.ctrlKey) {
                     // Allow for browser keybindings to work
                     event.preventDefault()

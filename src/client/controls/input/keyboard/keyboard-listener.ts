@@ -24,11 +24,6 @@ export default class KeyboardListener extends EventEmitter {
 
     keydown(e: KeyboardEvent) {
         if(e.target instanceof HTMLInputElement) return
-
-        if(e.repeat) {
-            e.preventDefault()
-            return
-        }
         this.emit("keydown", e)
         this.keys.add(e.code)
     }

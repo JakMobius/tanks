@@ -7,8 +7,9 @@ import { SidebarSections } from "../sidebar-sections/sidebar-sections"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import { SidebarSection } from "../sidebar-section/sidebar-section"
 import { SceneComponentsSection } from "../scene-components-view/scene-components-view"
-import { useMapEditorScene } from "src/client/map-editor/map-editor-scene"
+import { useMapEditor } from "src/client/map-editor/map-editor-scene"
 import Dragger from "../dragger/dragger"
+import { Modification } from "src/client/map-editor/history/history-manager"
 
 interface MapEditorSidebarHeaderProps {
     onHide?: () => void
@@ -18,14 +19,23 @@ const MapEditorSidebarHeader: React.FC<MapEditorSidebarHeaderProps> = (props) =>
 
     const [isEditing, setIsEditing] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const editor = useMapEditorScene()
+    const editor = useMapEditor()
+    const mapName = editor.useMapName()
 
     const startEditing = useCallback(() => {
         setIsEditing(true)
     }, [])
 
     const commitChanges = () => {
-        editor.setMapName(inputRef.current.value)
+        let oldName = editor.getMapName()
+        let newName = inputRef.current.value
+        let modification = {
+            actionName: "Переименование карты",
+            perform: () => editor.setMapName(newName),
+            revert: () => editor.setMapName(oldName)
+        } as Modification
+        modification.perform()
+        editor.getHistoryManager().registerModification(modification)
         setIsEditing(false)
     }
 
@@ -60,8 +70,8 @@ const MapEditorSidebarHeader: React.FC<MapEditorSidebarHeaderProps> = (props) =>
     useEffect(() => {
         let input = inputRef.current
         if(!input) return undefined
-        input.value = editor.mapName
-    }, [isEditing, editor.mapName])
+        input.value = mapName
+    }, [isEditing, mapName])
 
     return (
         <div className="map-editor-sidebar-header">
@@ -70,7 +80,7 @@ const MapEditorSidebarHeader: React.FC<MapEditorSidebarHeaderProps> = (props) =>
                 isEditing ?
                 <input className="map-editor-sidebar-header-text" ref={inputRef}/> :
                 <div onClick={startEditing} className="map-editor-sidebar-header-text">
-                    {editor.mapName}
+                    {mapName}
                 </div>
             }
             <div className="map-editor-sidebar-close-button" onClick={props.onHide}/>

@@ -1,13 +1,14 @@
 import "./scene-tree-view.scss"
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { DeleteHandler, DropHandler, NodeApi, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
+import { DropHandler, NodeApi, RenameHandler, Tree, TreeApi } from '../react-arborist/src/index';
 import Entity from 'src/utils/ecs/entity';
 import { TreeViewContainer, TreeViewRow, TreeViewNode, TreeViewCursor, TreeViewDragPreview } from "../tree-view/tree-view";
 import { EntityEditorTreeNodeComponent, EntityTreeNode } from "./components";
 import { SceneEntityLibraryDropItem } from "../scene-entity-library/scene-entity-library";
-import { useMapEditorScene } from "src/client/map-editor/map-editor-scene";
-import { ControlsProvider } from "src/client/utils/react-controls-responder";
+import { useMapEditor } from "src/client/map-editor/map-editor-scene";
+import { ControlsProvider, useControls } from "src/client/utils/react-controls-responder";
+import { NodeRenameModification, TreeInsertionModification, TreeMoveModification } from "src/client/map-editor/history/tree-modification";
 
 export class SceneTreeViewDropItem {
     entities: Entity[]
@@ -19,9 +20,10 @@ export class SceneTreeViewDropItem {
 const SceneTreeView: React.FC = React.memo(() => {
 
     const leftPadding = 10
-    const editorScene = useMapEditorScene()
-
-    const serverMapEntity = editorScene.serverMapEntity
+    const controls = useControls()
+    const mapEditor = useMapEditor()
+    const selectedEntities = mapEditor.useSelectedEntities()
+    const serverMapEntity = mapEditor.getServerMapEntity()
 
     const treeRef = useRef<TreeApi<EntityTreeNode> | null>(null)
     const divRef = useRef<HTMLDivElement | null>(null)
@@ -45,8 +47,11 @@ const SceneTreeView: React.FC = React.memo(() => {
     }
 
     const onRename: RenameHandler<EntityTreeNode> = ({ id, name }) => {
-        getNodeById(id)?.setName(name)
-        editorScene.update()
+        let entity = getNodeById(id)?.entity
+        if(!entity) return
+        let modification = new NodeRenameModification(mapEditor, entity, name)
+        modification.perform()
+        mapEditor.getHistoryManager().registerModification(modification)
     };
 
     const onDrop: DropHandler<EntityTreeNode> = ({ item, parentId, index }) => {
@@ -54,16 +59,22 @@ const SceneTreeView: React.FC = React.memo(() => {
             let dragIds = treeRef.current.state.dnd.dragIds
             let parent = getNodeById(parentId)?.entity
             if(!parent) return
+
+            let modification = new TreeMoveModification("Перемещение сущностей", mapEditor)
+            
             let after = index === 0  ? null : parent.children[index - 1]
             for (let id of dragIds) {
                 let node = getNodeById(id)
                 let entity = node.entity
                 if (after !== entity) {
-                    entity.removeFromParent()
-                    parent.insertChildAfter(entity, after)
+                    modification.moveEntity(entity, () => {
+                        entity.removeFromParent()
+                        parent.insertChildAfter(entity, after)
+                    })
                 }
                 after = entity
             }
+            mapEditor.getHistoryManager().registerModification(modification)
         } else if(item.userData instanceof SceneEntityLibraryDropItem) {
             let dropItem = item.userData as SceneEntityLibraryDropItem
             if(dropItem.prefabs.length === 0) return
@@ -85,26 +96,22 @@ const SceneTreeView: React.FC = React.memo(() => {
                 after = entity
             }
 
-            // onFocus is not called in this case. TODO: fix in react-arborist
-            editorScene.selectEntities(entities)
+            let modification = new TreeInsertionModification("Добавление сущностей", mapEditor, entities)
+            mapEditor.getHistoryManager().registerModification(modification)
+            mapEditor.selectEntities(entities)
         }
     }
 
-    const onDelete: DeleteHandler<EntityTreeNode> = ({ ids }) => {
-        for (let id of ids) {
-            getNodeById(id)?.entity.removeFromParent()
-        }
-        editorScene.selectEntities([])
-    };
-
     const onSelect = useCallback((nodes: NodeApi<EntityTreeNode>[]) => {
-        editorScene.selectEntities(nodes.map(node => node.data.entity))
+        mapEditor.selectEntities(nodes.map(node => node.data.entity))
     }, [])
 
     useEffect(() => {
         if(!treeRef.current) return
 
-        let ids = editorScene.selectedServerEntities.map((node) => {
+        controls.focus()
+
+        let ids = selectedEntities.map((node) => {
             return node?.getComponent(EntityEditorTreeNodeComponent)?.id
         }).filter(node => node !== undefined)
         
@@ -133,29 +140,29 @@ const SceneTreeView: React.FC = React.memo(() => {
         // I need my own tree visualizer.
         treeRef.current?.update(treeRef.current?.props)
         treeRef.current?.setSelection({ ids: ids, anchor: null, mostRecent: ids[0] ?? null })
-        
-    }, [editorScene.selectedServerEntities])
+    }, [selectedEntities])
 
     useEffect(() => {
         if(!divRef.current) return undefined
+        let div = divRef.current
         const update = () => {
-            setSize([divRef.current.clientWidth, divRef.current.clientHeight])
+            setSize([div.clientWidth, div.clientHeight])
         }
         let observer = new ResizeObserver(update)
-        observer.observe(divRef.current)
+        observer.observe(div)
         update()
         return () => observer.disconnect()
     }, [divRef.current])
 
     useEffect(() => {
-        if(!editorScene.serverMapEntity) return undefined
+        if(!serverMapEntity) return undefined
         const dirtyHandler = () => {
             rerender({})
-            editorScene.update()
+            mapEditor.setNeedsRedraw()
         }
-        editorScene.serverMapEntity.on("tree-node-dirty", dirtyHandler)
-        return () => editorScene.serverMapEntity.off("tree-node-dirty", dirtyHandler)
-    }, [editorScene.serverMapEntity])
+        serverMapEntity.on("tree-node-dirty", dirtyHandler)
+        return () => serverMapEntity.off("tree-node-dirty", dirtyHandler)
+    }, [serverMapEntity])
 
     const dragItemUserData = (nodes: EntityTreeNode[]) => {
         return new SceneTreeViewDropItem(nodes.map(node => node.entity))
@@ -168,7 +175,6 @@ const SceneTreeView: React.FC = React.memo(() => {
                     data={getRoot()?.children}
                     onRename={onRename}
                     onDrop={onDrop}
-                    onDelete={onDelete}
                     onSelect={onSelect}
                     ref={treeRef}
                     renderCursor={TreeViewCursor}

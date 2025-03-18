@@ -1,25 +1,15 @@
-import { forwardRef, useCallback } from "react";
-import { useTreeApi } from "../context";
+import { forwardRef } from "react";
 import { Cursor } from "./cursor";
 import React from "react";
 
-export const ListOuterElement = forwardRef(function Outer(
+export const ListOuterElement = forwardRef<HTMLDivElement>(function Outer(
   props: React.HTMLProps<HTMLDivElement>,
   ref
 ) {
   const { children, ...rest } = props;
-  const tree = useTreeApi();
-  const onClick = useCallback((e: React.MouseEvent) => {
-    if (e.currentTarget === e.target) tree.deselectAll();
-  }, [tree])
-  
+
   return (
-    <div
-      // @ts-ignore
-      ref={ref}
-      {...rest}
-      onClick={onClick}
-    >
+    <div ref={ref} {...rest}>
       {children}
       <DropContainer />
     </div>

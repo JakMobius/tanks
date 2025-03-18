@@ -6,13 +6,13 @@ import { NativeTypes } from "react-dnd-html5-backend"
 import { useScene } from "../../scenes/scene-controller"
 import { useEvents } from "../events-hud/events-hud"
 import { BasicEvent } from "../events-hud/basic-event-view"
-import { useMapEditorScene } from "src/client/map-editor/map-editor-scene"
+import { useMapEditor } from "src/client/map-editor/map-editor-scene"
 import { readMapFromFile } from "src/client/map-editor/read-map-from-file"
 
 export const FileDropOverlay: React.FC = () => {
     const scene = useScene()
     const events = useEvents()
-    const mapEditorScene = useMapEditorScene()
+    const mapEditor = useMapEditor()
 
     const handleError = () => {
         events.addEvent(() => {
@@ -22,7 +22,7 @@ export const FileDropOverlay: React.FC = () => {
 
     const loadFile = useCallback((file: File) => {
         readMapFromFile(file).then((packedEntity) => {
-            mapEditorScene.loadMap(packedEntity.name, packedEntity.createEntity())
+            mapEditor.loadMap(packedEntity.name, packedEntity.createEntity())
         }).catch((e) => {
             handleError()
         })
