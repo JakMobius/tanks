@@ -82,7 +82,7 @@ export default class WheeledTankController extends EventHandlerComponent {
 
     getCurrentTurnRadius() {
         const controlsComponent = this.entity.getComponent(TankControls)
-        return this.getTurnRadiusForSteerInput(controlsComponent.getSteer())
+        return this.getTurnRadiusForSteerInput(-controlsComponent.getSteer())
     }
 
     private getDriveSpeed() {
@@ -144,7 +144,7 @@ export default class WheeledTankController extends EventHandlerComponent {
             for (let wheel of wheelGroup.wheels) {
                 if (radius === 0) wheel.angle = 0
                 else {
-                    wheel.angle = Math.atan2(wheel.x - this.config.steerAnchorOffset, radius - wheel.y)
+                    wheel.angle = Math.atan2(wheel.x - this.config.steerAnchorOffset, wheel.y - radius)
                     if (wheel.angle > Math.PI / 2) wheel.angle = -Math.PI + wheel.angle
                     if (wheel.angle < -Math.PI / 2) wheel.angle = Math.PI + wheel.angle
                 }

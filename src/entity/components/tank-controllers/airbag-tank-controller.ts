@@ -68,7 +68,7 @@ export default class AirbagTankController extends EventHandlerComponent {
         }
 
         const body = this.entity.getComponent(PhysicalComponent).getBody();
-        const steer = controlsComponent.getSteer()
+        const steer = -controlsComponent.getSteer()
 
         const propellerAOA = controlsComponent.getThrottle()
 

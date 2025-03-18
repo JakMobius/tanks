@@ -5,7 +5,7 @@ import { Modification } from "./history-manager";
 import TilemapComponent from "src/map/tilemap-component";
 import { MapEditorApi } from "../map-editor";
 
-export class MapUpdateEvent implements Modification{
+export class MapUpdateEvent implements Modification {
     actionName: string = "Изменение карты"
     map: Entity
 

@@ -139,7 +139,7 @@ export default class MapDebugDrawer {
             for(let wheel of wheelGroup.wheels) {
                 let wheelQuadrangle = squareQuadrangle(-wheelSize / 2, -wheelSize / 2, wheelSize, wheelSize)
 
-                turnQuadrangle(wheelQuadrangle, Math.sin(wheel.angle), Math.cos(wheel.angle))
+                turnQuadrangle(wheelQuadrangle, Math.cos(wheel.angle), Math.sin(wheel.angle))
                 translateQuadrangle(wheelQuadrangle, wheel.x, wheel.y)
                 transformQuadrangle(wheelQuadrangle, transform)
 

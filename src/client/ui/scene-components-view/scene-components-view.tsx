@@ -8,7 +8,6 @@ import { EntityEditorTreeNodeComponent } from "../scene-tree-view/components";
 import { useDrop } from "react-dnd";
 import { SceneTreeViewDropItem } from "../scene-tree-view/scene-tree-view";
 import { DragItem } from "../react-arborist/src/types/dnd";
-import PropertyModification from "src/entity/components/inspector/property-modification";
 
 function useParameterValue<T>(property: Property<T>): T {
     const [value, setValue] = useState(property?.getValue())
@@ -110,7 +109,7 @@ const VectorPropertyView: React.FC<{property: VectorProperty}> = (props) => {
         <div className="property-header">{props.property.name}</div>
         <div className="property-inputs-container">
             {
-                props.property.value.map((_, i) => {
+                props.property.getValue().map((_, i) => {
                     return <ParameterInput
                         key={i}
                         prefix={props.property.prefixes[i]}
@@ -240,8 +239,7 @@ export const SceneComponentsView: React.FC = React.memo(() => {
         let inspector = new PropertyInspector(entity)
 
         let onSet = (property: EntityProperty, value: any) => {
-            let modification = new PropertyModification(entity, property, value)
-            mapEditor.getHistoryManager().registerModification(modification)
+            property.registerModification(mapEditor.getHistoryManager(), entity, value)
         }
         let onUpdate = (id: string) => {
             mapEditor.setNeedsRedraw()

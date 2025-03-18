@@ -3,7 +3,10 @@ import AirBlockState from './block-state/types/air-block-state';
 import BlockDamageEvent from "../events/block-damage-event";
 import BlockChangeEvent from "../events/block-change-event";
 import EventHandlerComponent from 'src/utils/ecs/event-handler-component';
-import { PropertyInspector, StringProperty, VectorProperty } from 'src/entity/components/inspector/property-inspector';
+import PropertyModification, { PropertyInspector, StringProperty, VectorProperty } from 'src/entity/components/inspector/property-inspector';
+import HistoryManager from 'src/client/map-editor/history/history-manager';
+import Entity from 'src/utils/ecs/entity';
+import ModificationGroup from 'src/client/map-editor/history/modification-group';
 
 export function idToChar(id: number) {
 	if(id > 26 || id < 0) throw new Error("ID out of bounds")
@@ -36,6 +39,22 @@ export default class TilemapComponent extends EventHandlerComponent {
 				.withPrefixes(["W", "H"])
 				.withGetter(() => [this.width, this.height])
 				.withSetter(([width, height]) => this.setSize(width, height))
+				.withModificationCallback((historyManager: HistoryManager, entity: Entity, value: [number, number]) => {
+					let group = new ModificationGroup("Изменение размера карты")
+
+					// When the map size is decreased, the map is cropped. This is irreversible.
+					// So in case user undo the operation, the cropped blocks should be restored.
+					if(this.width > value[0] || this.height > value[1]) {
+						let blocks = this.getBlocksString()
+						group.add({
+							perform: () => {},
+							revert: () => this.setBlocksString(blocks),
+						})
+					}
+
+					group.add(new PropertyModification(entity, sizeProperty, value))
+					historyManager.registerModification(group)
+				})
 				.updateOn("update")
 				.requirePositive()
 				.requireInteger()
@@ -148,6 +167,7 @@ export default class TilemapComponent extends EventHandlerComponent {
 	}
 
 	setBlocksString(blocksString: string) {
+		this.entity.emit("will-update")
 		let blocks = this.width * this.height
 		if(blocks !== blocksString.length) throw new Error("Invalid string length")
 		for(let i = 0; i < blocks; i++) {
@@ -162,6 +182,7 @@ export default class TilemapComponent extends EventHandlerComponent {
 				this.blocks[i] = new Block()
 			}
 		}
+		this.entity.emit("update")
 	}
 
 	update() {

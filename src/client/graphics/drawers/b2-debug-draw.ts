@@ -117,7 +117,7 @@ export default class B2DebugDraw implements Box2D.b2Draw {
         let rotation = xf.GetAngle()
 
         this.transform.translate(position.x, position.y)
-        this.transform.rotate(-rotation)
+        this.transform.rotate(rotation)
     }
 }
 

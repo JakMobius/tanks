@@ -1,6 +1,6 @@
 
 export interface Modification {
-    actionName: string
+    actionName?: string
     perform: () => void
     revert: () => void
 }

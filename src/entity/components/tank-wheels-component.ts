@@ -44,7 +44,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             body.GetLocalVector(wheelVelocity, wheelTranslation)
 
             // set wheelTranslation to wheel-space velocity of the wheel
-            Box2D.b2Vec2.prototype.Rotate.call(wheelTranslation, -angle)
+            Box2D.b2Vec2.prototype.Rotate.call(wheelTranslation, angle)
 
             wheel.groundSpeed = wheelTranslation.x
 
@@ -101,7 +101,7 @@ export default class TankWheelsComponent extends EventHandlerComponent {
             }
 
             Box2D.b2Vec2.prototype.Scale.call(wheelTension, wheel.grip / wheel.tensionLimit);
-            Box2D.b2Vec2.prototype.Rotate.call(wheelTension, angle)
+            Box2D.b2Vec2.prototype.Rotate.call(wheelTension, -angle)
 
             let wheelPosition = {x: 0, y: 0}
             body.GetWorldVector({x: wheel.x, y: wheel.y}, wheelPosition)

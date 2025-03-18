@@ -118,7 +118,7 @@ export default class PhysicalComponent extends EventHandlerComponent {
         let position = this.body.GetPosition()
         let velocity = this.body.GetLinearVelocity()
         let angle = this.body.GetAngle()
-        let angularVelocity = -this.body.GetAngularVelocity()
+        let angularVelocity = this.body.GetAngularVelocity()
 
         transform.setGlobal({
             position: { x: position.x + velocity.x * extraTime, y: position.y + velocity.y * extraTime },

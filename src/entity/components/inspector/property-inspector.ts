@@ -1,3 +1,4 @@
+import HistoryManager, { Modification } from "src/client/map-editor/history/history-manager"
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set"
 import Entity from "src/utils/ecs/entity"
 import EventEmitter from "src/utils/event-emitter"
@@ -29,20 +30,56 @@ export class SerializationContext {
     }
 }
 
+export default class PropertyModification implements Modification {
+    actionName: string
+    oldValue: any
+    newValue: any
+    property: Property
+    entity: Entity
+
+    constructor(entity: Entity, property: Property, value: any) {
+        this.entity = entity
+        this.oldValue = property.getValue()
+        this.newValue = value
+        this.property = property
+        this.actionName = `Изменение ${property.name}`
+    }
+
+    perform() {
+        // Use setter instead of setValue because setValue would trigger will-set
+        // event, thus registering another unwanted modification in the history
+        this.property.setter(this.newValue)
+        this.entity.emit("request-focus-self")
+    }
+
+    revert() {
+        // Same as above
+        this.property.setter(this.oldValue)
+        this.entity.emit("request-focus-self")
+    }
+}
+
 export abstract class Property<T = any> extends EventEmitter {
     eventHandler = new BasicEventHandlerSet()
     hidden = false
     serialized = true
     id: string
     name: string | null = null
+
     getter?: () => T
     setter?: (value: T) => void
+    modificationCallback?: (historyManager: HistoryManager, entity: Entity, value: T) => void
 
     getValue() {
         return this.getter()
     }
 
+    filterUpdate(value: T) {
+        return false
+    }
+
     setValue(value: T) {
+        if(this.filterUpdate(value)) return
         this.emit("will-set", value)
         this.setter(value)
     }
@@ -76,6 +113,11 @@ export abstract class Property<T = any> extends EventEmitter {
         return this
     }
 
+    withModificationCallback(modificationCallback: (historyManager: HistoryManager, entity: Entity, value: T) => void) {
+        this.modificationCallback = modificationCallback
+        return this
+    }
+
     updateOn(event: string) {
         this.eventHandler.on(event, () => this.update())
         return this
@@ -88,20 +130,29 @@ export abstract class Property<T = any> extends EventEmitter {
     deserialize(value: any, ctx: SerializationContext) {
         this.setValue(value)
     }
+
+    registerModification(historyManager: HistoryManager, entity: Entity, value: T) {
+        if(this.modificationCallback) {
+            this.modificationCallback(historyManager, entity, value)
+        } else {
+            let modification = new PropertyModification(entity, this, value)
+            historyManager.registerModification(modification)
+        }
+    }
 }
 
 export class StringProperty extends Property<string> {
-    value: string
-
     constructor(id: string) {
         super()
         this.id = id
-        this.value = ""
+    }
+
+    filterUpdate(value: string) {
+        return value === this.getter()
     }
 }
 
 export class VectorProperty extends Property<number[]> {
-    value: number[] = []
     dim: number
     prefixes: string[] = []
 
@@ -109,7 +160,11 @@ export class VectorProperty extends Property<number[]> {
         super()
         this.id = id
         this.dim = dim
-        this.value = new Array(dim).fill(0)
+    }
+
+    filterUpdate(value: number[]) {
+        let original = this.getter()
+        return value.every((coord, i) => coord === original[i])
     }
 
     withPrefixes(prefixes: string[]) {
@@ -150,6 +205,10 @@ export class EntityProperty extends Property<Entity> {
         this.id = id
     }
 
+    filterUpdate(value: Entity): boolean {
+        return value === this.getter()
+    }
+
     serialize(ctx: SerializationContext) {
         let value = this.getValue()
         if(!value) return null
@@ -177,6 +236,10 @@ export class SelectProperty extends Property<string> {
     constructor(id: string) {
         super()
         this.id = id
+    }
+
+    filterUpdate(value: string) {
+        return value === this.getter()
     }
 
     withOptions(options: SelectOption[]) {

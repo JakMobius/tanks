@@ -95,8 +95,8 @@ export default class WheeledSteeringAssistant extends EventHandlerComponent {
 
     private refreshConstants() {
         const controls = this.entity.getComponent(TankControls)
-        const steer = controls.axles.get("x").getValue()
-        this.userSteer = steer - this.tractionSteerAxle.ownValue
+        const steer = -controls.axles.get("x").getValue()
+        this.userSteer = steer + this.tractionSteerAxle.ownValue
 
         const body = this.entity.getComponent(PhysicalComponent).body
         const velocityVector = body.GetLinearVelocity();
@@ -194,6 +194,6 @@ export default class WheeledSteeringAssistant extends EventHandlerComponent {
 
         // DebugDrawer.instance.plotData.plot(0xFFFF0066, newSteerValue / 2, Date.now() / 1000)
 
-        this.tractionSteerAxle.setValue(newSteerValue)
+        this.tractionSteerAxle.setValue(-newSteerValue)
     }
 }

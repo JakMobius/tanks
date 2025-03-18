@@ -19,17 +19,18 @@ const PauseOverlay: React.FC<PauseOverlayConfig> = React.memo((props) => {
 
     const [shown, setShown] = useState(false)
 
-    const show = () => {
-        setShown(true)
-        controlsProvider.current.focus()
-        scene.soundEngine.setEnabled(false)
-    }
+    const show = () => setShown(true)
+    const hide = () => setShown(false)
 
-    const hide = () => {
-        setShown(false)
-        controlsProvider.current.blur()
-        scene.soundEngine.setEnabled(true)
-    }
+    useEffect(() => {
+        if(!shown) return undefined
+        controlsProvider.current?.focus()
+        scene.soundEngine.setEnabled(false)
+        return () => {
+            controlsProvider.current?.blur()
+            scene.soundEngine.setEnabled(true)
+        }
+    }, [shown])
 
     useEffect(() => {
         controlsProvider.current.on("blur", hide)

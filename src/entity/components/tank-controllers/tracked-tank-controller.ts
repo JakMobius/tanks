@@ -131,7 +131,7 @@ export default class TrackedTankController extends EventHandlerComponent {
 
     protected updateWheelThrottle() {
         const controlsComponent = this.entity.getComponent(TankControls)
-        const steer = controlsComponent.getSteer()
+        const steer = -controlsComponent.getSteer()
 
         this.leftTrackWheels.setBrake(Math.max(0, Math.min(1, -steer)))
         this.rightTrackWheels.setBrake(Math.max(0, Math.min(1, steer)))
