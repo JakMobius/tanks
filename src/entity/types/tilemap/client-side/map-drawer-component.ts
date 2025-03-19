@@ -120,7 +120,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
 
         program.transform.save()
         program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
-        program.transform.translate(-tilemap.localToBlockX(0), -tilemap.localToBlockY(0))
+        program.transform.translate(tilemap.blockToLocalX(0), tilemap.blockToLocalX(0))
 
         this.updateBounds(map, phase.camera)
 
