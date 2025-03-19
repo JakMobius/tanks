@@ -15,6 +15,7 @@ export default class Scale extends Cursor {
         super(manager);
 
         this.image = "static/map-editor/scale@3x.png"
+        this.shortcutAction = "editor-scale-tool"
     }
 
     getArrowConfig(type: "x" | "y"): ArrowControlConfig {

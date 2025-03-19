@@ -113,6 +113,16 @@ export class ControlsResponder extends EventEmitter {
         }
     }
 
+    setFlat(flat: boolean) {
+        this.isFlat = flat
+        return this
+    }
+
+    setDefault(isDefault: boolean) {
+        this.isDefault = isDefault
+        return this
+    }
+
     getChildResponders() {
         return this.childrenResponders
     }
@@ -227,6 +237,14 @@ export default class RootControlsResponder extends ControlsResponder {
         this.configureTriggerAxle("editor-delete")
         this.configureTriggerAxle("editor-tree-toggle")
         this.configureTriggerAxle("editor-rename")
+
+        this.configureTriggerAxle("editor-move-tool")
+        this.configureTriggerAxle("editor-scale-tool")
+        this.configureTriggerAxle("editor-hand-tool")
+        this.configureTriggerAxle("editor-pencil-tool")
+        this.configureTriggerAxle("editor-eraser-tool")
+        this.configureTriggerAxle("editor-fill-tool")
+        this.configureTriggerAxle("editor-block-select-tool")
 
         this.configureTriggerAxle("editor-increase-brush-size")
         this.configureTriggerAxle("editor-decrease-brush-size")

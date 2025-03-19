@@ -1,7 +1,7 @@
 import Entity from "src/utils/ecs/entity"
 import EmbeddedServerGame from "../embedded-server/embedded-server-game"
 import EntityDataReceiveComponent from "src/entity/components/network/receiving/entity-data-receive-component"
-import { mapEditorEntityFactory } from "./editor-entity-factory"
+import { mapEditorEntityFactory, mapEditorPrefabFilter } from "./editor-entity-factory"
 import WorldDataPacket from "src/networking/packets/game-packets/world-data-packet"
 import { EntityEditorTreeRootComponent } from "../ui/scene-tree-view/components"
 import WriteBuffer from "src/serialization/binary/write-buffer"
@@ -112,7 +112,7 @@ export class MapEditorApi extends EventEmitter {
 
     openMap() {
         return readMapFromDialog().then((packedEntity) => {
-            this.loadMap(packedEntity.name, packedEntity.createEntity())
+            this.loadMap(packedEntity.name, packedEntity.createEntity(mapEditorPrefabFilter))
         })
     }
 
@@ -139,7 +139,7 @@ export class MapEditorApi extends EventEmitter {
     paste() {
         let selectedEntity = this.selectedServerEntities[0] ?? this.serverMapEntity
         
-        this.copyManager.paste().then((entities) => {
+        this.copyManager.paste(mapEditorPrefabFilter).then((entities) => {
             for(let newEntity of entities) {
                 selectedEntity.appendChild(newEntity)
             }

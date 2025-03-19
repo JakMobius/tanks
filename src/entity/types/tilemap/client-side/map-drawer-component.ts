@@ -4,12 +4,12 @@ import EventHandlerComponent from "src/utils/ecs/event-handler-component";
 import DrawPhase from "src/client/graphics/drawers/draw-phase";
 import Entity from "src/utils/ecs/entity";
 import WorldDrawerComponent from "src/client/entity/components/world-drawer-component";
-import CameraComponent from "src/client/graphics/camera";
 import TextureProgram from "src/client/graphics/programs/texture-program";
 import ConvexShapeProgram from "src/client/graphics/programs/convex-shapes/convex-shape-program";
 import TilemapComponent from "src/map/tilemap-component";
 import BlockDrawer from "src/client/graphics/drawers/block/block-drawer";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { clamp } from "src/utils/utils";
 
 export interface DrawerBounds {
     x0: number
@@ -43,6 +43,7 @@ export default class MapDrawerComponent extends EventHandlerComponent {
 
     private updateBounds(map: TilemapComponent, camera: Entity) {
         const cameraTransform = camera.getComponent(TransformComponent)
+        const tilemap = this.entity.getComponent(TilemapComponent)
         const inverseTransform = this.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
         const cameraMatrix = cameraTransform.getGlobalTransform()
 
@@ -70,19 +71,21 @@ export default class MapDrawerComponent extends EventHandlerComponent {
         const maxWidth = map.width;
         const maxHeight = map.height;
 
-        this.bounds.x0 = Math.floor(Math.max(0, x0) / 1)
-        this.bounds.y0 = Math.floor(Math.max(0, y0) / 1)
-        this.bounds.x1 = Math.ceil(Math.min(maxWidth, x1) / 1)
-        this.bounds.y1 = Math.ceil(Math.min(maxHeight, y1) / 1)
+        this.bounds.x0 = clamp(tilemap.localToBlockX(x0), 0, maxWidth)
+        this.bounds.y0 = clamp(tilemap.localToBlockY(y0), 0, maxHeight)
+        this.bounds.x1 = clamp(tilemap.localToBlockX(x1) + 1, 0, maxWidth)
+        this.bounds.y1 = clamp(tilemap.localToBlockY(y1) + 1, 0, maxHeight)
     }
 
     private drawMap(phase: DrawPhase) {
         let program = phase.getProgram(TextureProgram)
         let map = this.entity.getComponent(TilemapComponent)
+        let tilemap = this.entity.getComponent(TilemapComponent)
         if (!map) return
 
         program.transform.save()
         program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
+        program.transform.translate(-tilemap.localToBlockX(0), -tilemap.localToBlockY(0))
 
         this.updateBounds(map, phase.camera)
 
@@ -111,11 +114,13 @@ export default class MapDrawerComponent extends EventHandlerComponent {
 
     private drawGrid(phase: DrawPhase) {
         let program = phase.getProgram(ConvexShapeProgram)
+        let tilemap = this.entity.getComponent(TilemapComponent)
         let map = this.entity.getComponent(TilemapComponent)
         if (!map) return
 
         program.transform.save()
         program.transform.multiply(this.entity.getComponent(TransformComponent).getGlobalTransform())
+        program.transform.translate(-tilemap.localToBlockX(0), -tilemap.localToBlockY(0))
 
         this.updateBounds(map, phase.camera)
 

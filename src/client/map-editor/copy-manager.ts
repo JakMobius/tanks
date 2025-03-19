@@ -1,4 +1,4 @@
-import { EntityDeserializer, EntitySerializer, SerializedEntity } from "src/entity/components/inspector/entity-serializer"
+import { EntityDeserializer, EntitySerializer, PrefabFilter, SerializedEntity } from "src/entity/components/inspector/entity-serializer"
 import Entity from "src/utils/ecs/entity"
 
 export interface SerializedDanglingEntity extends SerializedEntity {
@@ -68,12 +68,12 @@ export default class CopyManager {
         await navigator.clipboard.writeText(json)
     }
 
-    async paste(): Promise<Entity[]> {
+    async paste(filter: PrefabFilter): Promise<Entity[]> {
         let json = await navigator.clipboard.readText()
         let data = JSON.parse(json) as CopyBufferValue
         if(data.signature !== "TNKS.COPY") return []
 
-        let deserializer = new EntityDeserializer()
+        let deserializer = new EntityDeserializer(filter)
         let result = [] as Entity[]
 
         const registerDanglingEntity = (entity: SerializedDanglingEntity) => {

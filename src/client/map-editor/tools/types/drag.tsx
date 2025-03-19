@@ -10,6 +10,7 @@ export default class Drag extends Tool {
         super(manager);
 
         this.image = "static/map-editor/drag.png"
+        this.shortcutAction = "editor-hand-tool"
     }
 
     becomeActive() {

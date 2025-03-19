@@ -82,7 +82,9 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
 
     private markRelevance(dt: number) {
         this.time += dt
+        
         const transform = this.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
+        const tilemap = this.entity.getComponent(TilemapComponent)
         const world = WorldComponent.getWorld(this.entity)
         const physicalComponents = world.getComponent(PhysicalHostComponent).physicalComponents
 
@@ -93,7 +95,10 @@ export default class ChunkedMapCollider extends EventHandlerComponent {
             let localX = transform.transformX(position.x, position.y)
             let localY = transform.transformY(position.x, position.y)
 
-            this.makeNearbyChunksRelevant(localX, localY)
+            let blockX = tilemap.localToBlockX(localX)
+            let blockY = tilemap.localToBlockY(localY)
+
+            this.makeNearbyChunksRelevant(blockX, blockY)
         }
 
         for(let row of this.chunkMap.rows.values()) {

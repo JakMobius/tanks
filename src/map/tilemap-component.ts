@@ -73,6 +73,22 @@ export default class TilemapComponent extends EventHandlerComponent {
 		this.setSize(50, 50)
 	}
 
+	localToBlockX(x: number) {
+		return Math.floor(x + this.width / 2)
+	}
+
+	localToBlockY(y: number) {
+		return Math.floor(y + this.height / 2)
+	}
+
+	blockToLocalX(x: number) {
+		return x - this.width / 2
+	}
+
+	blockToLocalY(y: number) {
+		return y - this.height / 2
+	}
+
 	getBlock(x: number, y: number): BlockState {
 		if(x < 0 || y < 0 || x >= this.width || y >= this.height) return null
 		return this.blocks[x + this.width * y]
@@ -123,9 +139,6 @@ export default class TilemapComponent extends EventHandlerComponent {
 	}
 
 	damageBlock(x: number, y: number, d: number) {
-		x = Math.floor(x)
-		y = Math.floor(y)
-
 		let block = this.getBlock(x, y);
 
 		if(!block || block instanceof AirBlockState) return

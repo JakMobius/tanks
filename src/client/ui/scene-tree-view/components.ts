@@ -1,14 +1,13 @@
 import { Component } from "src/utils/ecs/component"
 import Entity from "src/utils/ecs/entity"
 import EventHandlerComponent from "src/utils/ecs/event-handler-component"
-import { TreeNodeBase } from "../tree-view/tree-view"
 import PrefabComponent from "src/entity/components/prefab-id-component"
 import { PropertyInspector, StringProperty } from "src/entity/components/inspector/property-inspector"
 import EntityContextProvider from "src/utils/ecs/entity-context-provider"
 import { transmitterComponentFor } from "src/entity/components/network/transmitting/transmitter-component"
 import EditorEventTransmitter from "src/client/map-editor/editor-event-transmitter"
 
-export interface EntityTreeNode extends TreeNodeBase {
+export interface EntityTreeNode {
     id: string,
     name: string,
     children?: EntityTreeNode[]

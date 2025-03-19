@@ -27,6 +27,7 @@ const MapEditorSidebarHeader: React.FC<MapEditorSidebarHeaderProps> = (props) =>
     }, [])
 
     const commitChanges = () => {
+        if(!inputRef.current) return
         let oldName = editor.getMapName()
         let newName = inputRef.current.value
         let modification = {

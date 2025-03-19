@@ -5,13 +5,16 @@ import Entity from "src/utils/ecs/entity";
 import EventEmitter from "src/utils/event-emitter";
 import BasicEventHandlerSet from 'src/utils/basic-event-handler-set';
 import { MapEditorApi } from '../map-editor';
+import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 
 export default class ToolManager extends EventEmitter {
     selectedTool: Tool = null
+    previousTool: Tool = null
     selectedBlock: BlockState = null
     defaultTool: Tool = null
     editor: MapEditorApi | null = null
 
+    controlsResponder = new ControlsResponder().setFlat(true)
     editorEventHandler = new BasicEventHandlerSet()
 
     constructor() {
@@ -49,6 +52,9 @@ export default class ToolManager extends EventEmitter {
             this.selectedTool.resignActive()
         }
 
+        if(tool !== this.selectedTool) {
+            this.previousTool = this.selectedTool
+        }
         this.selectedTool = tool
 
         if(this.selectedTool) {
@@ -58,6 +64,14 @@ export default class ToolManager extends EventEmitter {
 
         this.emit("select-tool", tool)
         this.emit("update")
+    }
+
+    selectPreviousTool() {
+        if(this.previousTool && this.previousTool.isSuitable()) {
+            this.selectTool(this.previousTool)
+        } else {
+            this.selectTool(this.defaultTool)
+        }
     }
 
     selectBlock(block: BlockState) {
@@ -82,6 +96,10 @@ export default class ToolManager extends EventEmitter {
         this.emit("user-event", name)
     }
 
+    getSelectedBlock() {
+        return this.selectedBlock
+    }
+
     setWorldAlive(alive: boolean) {
         this.emit("world-alive", alive)
     }
@@ -101,6 +119,10 @@ export default class ToolManager extends EventEmitter {
 
     getClientWorld() {
         return this.editor.getClientWorld()
+    }
+
+    getControlsResponder() {
+        return this.controlsResponder
     }
 
     // Can be called from anywhere to select entities, forwards the request

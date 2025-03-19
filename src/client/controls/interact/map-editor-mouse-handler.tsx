@@ -1,5 +1,5 @@
 import {isMacOS} from "src/utils/meta-key-name";
-import { useEffect, useRef } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import React from "react";
 import CameraComponent from "src/client/graphics/camera";
 import TransformComponent from "src/entity/components/transform/transform-component";
@@ -20,13 +20,14 @@ interface MapEditorMouseHandlerProps {
 
 export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React.memo((props) => {
 
+    const [dragging, setDragging] = useState(false)
     const scene = useScene()
     const mapEditor = useMapEditor()
     const ref = useRef({
         oldScale: null as number | null,
         oldX: null as number | null,
         oldY: null as number | null,
-        dragging: false,
+        dragging: false
     })
     const propsRef = useRef<MapEditorMouseHandlerProps>(props)
 
@@ -56,21 +57,33 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
         let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseDown?.(x, y)
+        setDragging(true)
     }
 
     const mouseUp = (event: MouseEvent) => {
+        if(!ref.current.dragging) return
         let [x, y] = toWorld(event.pageX, event.pageY, 1)
-
         propsRef.current.onMouseUp?.(x, y)
+        setDragging(false)
     }
 
-    const mouseMove = (event: MouseEvent) => {
+    const mouseLeave = (event: MouseEvent) => {
+        propsRef.current.onMouseUp?.(ref.current.oldX, ref.current.oldY)
+        setDragging(false)
+    }
+    
+    const globalMouseMove = (event: MouseEvent) => {
         ref.current.oldX = event.pageX
         ref.current.oldY = event.pageY
 
         let [x, y] = toWorld(event.pageX, event.pageY, 1)
 
         propsRef.current.onMouseMove?.(x, y)
+    }
+
+    const mouseMove = (event: MouseEvent) => {
+        if(ref.current.dragging) return
+        globalMouseMove(event)
     }
 
     const toWorld = (x: number, y: number, z: number) => {
@@ -126,6 +139,19 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     useEffect(() => {
+        ref.current.dragging = dragging
+        if(!dragging) return undefined
+        let abortController = new AbortController()
+        let signal = abortController.signal
+
+        document.body.addEventListener("mouseup", mouseUp, { passive: false, signal })
+        document.body.addEventListener("mousemove", globalMouseMove, { passive: false, signal })
+        document.body.addEventListener("mouseleave", mouseLeave, { passive: false, signal })
+
+        return () => abortController.abort()
+    }, [dragging])
+
+    useEffect(() => {
         let abortController = new AbortController()
         let signal = abortController.signal
         let canvas = scene.canvas.canvas
@@ -134,9 +160,8 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
         canvas.addEventListener("gesturechange", zoomChange, { passive: false, signal })
         canvas.addEventListener("gestureend", zoomChange, { passive: false, signal })
         canvas.addEventListener("mousedown", mouseDown, { passive: false, signal })
-        canvas.addEventListener("mouseup", mouseUp, { passive: false, signal })
-        canvas.addEventListener("mousemove", mouseMove, { passive: false, signal })
         canvas.addEventListener("wheel", onWheel, { passive: false, signal })
+        canvas.addEventListener("mousemove", mouseMove, { passive: false, signal })
 
         return () => abortController.abort()
     }, [])

@@ -93,8 +93,8 @@ export default class CameraRandomMovement extends EventHandlerComponent {
 
     updateTarget() {
         this.targetPosition = {
-            x: Math.random() * this.mapWidth,
-            y: Math.random() * this.mapHeight
+            x: (Math.random() - 0.5) * this.mapWidth,
+            y: (Math.random() - 0.5) * this.mapHeight
         }
 
         this.targetScale = 2 + Math.random() * 5

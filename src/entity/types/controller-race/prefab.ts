@@ -8,6 +8,7 @@ const Prefab = new EntityPrefab({
         type: EntityType.gameController,
         displayName: "Гонка (RACE)",
         shortName: "RACE",
+        supportsOldMapFormat: false,
     },
     prefab: (entity: Entity) => {
         entity.addComponent(new PrefabComponent(Prefab))

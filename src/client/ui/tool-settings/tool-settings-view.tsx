@@ -28,7 +28,7 @@ const ToolSettingsView: React.FC<ToolSettingsViewProps> = React.memo((props) => 
         setState((state) => ({
             ...state,
             style: {
-                display: display ? "block" : "none",
+                display: display ? null : "none",
                 opacity: opacity
             }
         }))

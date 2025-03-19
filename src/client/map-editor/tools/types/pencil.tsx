@@ -48,19 +48,17 @@ const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
     const rangeValue = (props.tool.thickness - 1) / (props.tool.maxSize - 1)
 
-    return (
-        <div className="tool-preferences">
+    return (<>
+        <div className="box">
             <RangeView onChange={onRangeChange} value={rangeValue}/>
             <div className="thickness-text">{props.tool.thickness}</div>
-            <div 
-                className={"tool " + (!props.tool.isSquare ? "selected" : "")}
-                style={{ backgroundImage: "url(static/map-editor/round-brush.png)" }} 
-                onClick={onRoundModeClick}/>
-            <div className={"tool " + (props.tool.isSquare ? "selected" : "")} 
-                style={{ backgroundImage: "url(static/map-editor/square-brush.png)" }} 
-                onClick={onSquareModeClick}/>
         </div>
-    )
+        <div 
+            className={"box button square round-brush " + (!props.tool.isSquare ? "selected" : "")}
+            onClick={onRoundModeClick}/>
+        <div className={"box button square square-brush " + (props.tool.isSquare ? "selected" : "")}
+            onClick={onSquareModeClick}/>
+    </>)
 }
 
 export default class Pencil extends Tool {
@@ -90,14 +88,15 @@ export default class Pencil extends Tool {
         super(manager);
 
         this.settingsView = PencilToolView
+        this.shortcutAction = "editor-pencil-tool"
 
         this.setThickness(1)
 
-        this.controlsEventHandler.on("editor-increase-brush-size", () => {
+        this.controlsResponder.on("editor-increase-brush-size", () => {
             this.setThickness(this.thickness + 1)
         })
 
-        this.controlsEventHandler.on("editor-decrease-brush-size", () => {
+        this.controlsResponder.on("editor-decrease-brush-size", () => {
             this.setThickness(this.thickness - 1)
         })
 
@@ -254,8 +253,14 @@ export default class Pencil extends Tool {
     }
 
     refreshBrush() {
-        let brushX = (Math.floor(this.mouseX / 1))
-        let brushY = (Math.floor(this.mouseY / 1))
+        let tilemap = this.getTilemap()
+        if(!tilemap) {
+            this.brushX = null
+            this.brushY = null
+            return false
+        }
+        let brushX = tilemap.localToBlockX(this.mouseX)
+        let brushY = tilemap.localToBlockY(this.mouseY)
 
         if (this.thickness % 2 !== 0) {
             brushX++
@@ -303,7 +308,12 @@ export default class Pencil extends Tool {
             bounds[0] = clamp(bounds[0] + x, 0, tilemap.width)
             bounds[1] = clamp(bounds[1] + x, 0, tilemap.width)
 
-            let quadrangle = squareQuadrangleFromPoints(bounds[0], y + dy, bounds[1], y + dy + 1)
+            let quadrangle = squareQuadrangleFromPoints(
+                tilemap.blockToLocalX(bounds[0]),
+                tilemap.blockToLocalY(y + dy),
+                tilemap.blockToLocalX(bounds[1]),
+                tilemap.blockToLocalY(y + dy + 1)
+            )
 
             program.drawQuadrangle(quadrangle, this.brushColor.getUint32())
         }

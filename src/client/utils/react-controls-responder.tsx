@@ -17,8 +17,8 @@ export const ControlsProvider: React.FC<ControlsProviderProps> = (props) => {
     
     let newResponder = useMemo(() => {
         let responder = new ControlsResponder()
-        responder.isDefault = props.default ?? false
-        responder.isFlat = props.flat ?? false
+            .setFlat(props.flat ?? false)
+            .setDefault(props.default ?? false)
         return responder
     }, [])
 

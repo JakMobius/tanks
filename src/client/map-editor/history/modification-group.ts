@@ -2,9 +2,9 @@ import { Modification } from "./history-manager";
 
 export default class ModificationGroup implements Modification {
     modifications: Modification[] = []
-    actionName: string
+    actionName?: string
 
-    constructor(actionName: string) {
+    constructor(actionName?: string) {
         this.actionName = actionName
     }
 

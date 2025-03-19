@@ -8,6 +8,7 @@ import { useEvents } from "../events-hud/events-hud"
 import { BasicEvent } from "../events-hud/basic-event-view"
 import { useMapEditor } from "src/client/map-editor/map-editor-scene"
 import { readMapFromFile } from "src/client/map-editor/read-map-from-file"
+import { mapEditorPrefabFilter } from "src/client/map-editor/editor-entity-factory"
 
 export const FileDropOverlay: React.FC = () => {
     const scene = useScene()
@@ -22,7 +23,7 @@ export const FileDropOverlay: React.FC = () => {
 
     const loadFile = useCallback((file: File) => {
         readMapFromFile(file).then((packedEntity) => {
-            mapEditor.loadMap(packedEntity.name, packedEntity.createEntity())
+            mapEditor.loadMap(packedEntity.name, packedEntity.createEntity(mapEditorPrefabFilter))
         }).catch((e) => {
             handleError()
         })

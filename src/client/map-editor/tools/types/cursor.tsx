@@ -62,6 +62,7 @@ export default class Cursor extends Tool {
         super(manager);
 
         this.image = "static/map-editor/move@3x.png"
+        this.shortcutAction = "editor-move-tool"
     }
 
     cameraDrawCallback = (phase: DrawPhase) => this.drawPreview(phase)

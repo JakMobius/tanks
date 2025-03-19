@@ -192,10 +192,14 @@ const EntityPropertyView: React.FC<{property: EntityProperty}> = (props) => {
         props.property.setValue(null)
     }, [])
 
+    const onClick = useCallback(() => {
+        props.property.getValue()?.emit("request-focus-self")
+    }, [])
+
     return (<>
         <div className="property-header">{props.property.name}</div>
         <div className="property-inputs-container" ref={divRef}>
-            <div className={"property-entity " + (isOver ? "over" : "")}>
+            <div onClick={onClick} className={"property-entity " + (isOver ? "over" : "")}>
                 <span>{name}</span>
                 <div className="remove-button" onClick={remove}></div>
             </div>

@@ -2,9 +2,8 @@ import "./toolbar.scss"
 
 import BlockState from "src/map/block-state/block-state";
 import Tool from "src/client/map-editor/tools/tool";
-import React, { Ref, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ToolManager from 'src/client/map-editor/tools/toolmanager';
-import BlockSelectOverlay from "../block-select/block-select-overlay";
 import { useMapEditor } from "src/client/map-editor/map-editor-scene";
 import Pencil from "src/client/map-editor/tools/types/pencil";
 import Drag from "src/client/map-editor/tools/types/drag";
@@ -17,7 +16,67 @@ import Fill from "src/client/map-editor/tools/types/fill";
 import Scale from "src/client/map-editor/tools/types/scale";
 import { MapEditorMouseHandler } from "src/client/controls/interact/map-editor-mouse-handler";
 import { ControlsProvider } from "src/client/utils/react-controls-responder";
-import { ControlsResponder } from "src/client/controls/root-controls-responder";
+import RootControlsResponder, { ControlsResponder } from "src/client/controls/root-controls-responder";
+import ToolSettingsView from "../tool-settings/tool-settings-view";
+import GameSettings from "src/client/settings/game-settings";
+import ControlsPrinter from "src/client/controls/controls-printer";
+import { KeyboardInputConfig } from "src/client/controls/input/keyboard/keyboard-controller";
+
+interface ToolViewProps {
+    toolManager: ToolManager
+    tool: Tool
+}
+
+const ToolView: React.FC<ToolViewProps> = (props) => {
+
+    const [altPressed, setAltPressed] = useState(false)
+
+    const onClick = useCallback(() => {
+        props.toolManager.selectTool(props.tool)
+    }, [props.tool, props.toolManager])
+
+    let isSelected = props.toolManager.selectedTool === props.tool
+
+    let style = useMemo(() => {
+        return {
+            backgroundImage: `url(${props.tool.image})`
+        }
+    }, [props.tool.image])
+
+    useEffect(() => {
+        const onAltDown = (event: KeyboardEvent) => setAltPressed(event.altKey)
+        const onAltUp = (event: KeyboardEvent) => setAltPressed(event.altKey)
+
+        window.addEventListener("keydown", onAltDown)
+        window.addEventListener("keyup", onAltUp)
+
+        return () => {
+            window.removeEventListener("keydown", onAltDown)
+            window.removeEventListener("keyup", onAltUp)
+        }
+    }, [])
+
+    const shortcut = useMemo(() => {
+        if(!props.tool.shortcutAction) return null
+
+        let keyboard = RootControlsResponder.getInstance().keyboard
+        let settings = GameSettings.getInstance().controls.getConfigForDevice(keyboard)
+        let shortcuts = settings.get(props.tool.shortcutAction) ?? []
+
+        if(shortcuts.length === 0) return null
+        let shortcut = shortcuts[0] as KeyboardInputConfig
+        
+        return ControlsPrinter.getPrintedNameOfKeyboardAxle(shortcut, true)
+    }, [props.tool])
+
+    return (
+        <div className={"tool " + (isSelected ? "selected" : "")} style={style} onClick={onClick}>
+            {
+                altPressed ? <div className="tool-shortcut">{shortcut}</div> : null
+            }
+        </div>
+    )
+}
 
 const ToolBarView: React.FC = React.memo(() => {
 
@@ -32,7 +91,6 @@ const ToolBarView: React.FC = React.memo(() => {
     const controlsProvider = useRef<ControlsResponder | null>(null)
 
     const [state, setState] = useState({
-        blockOverlayShown: false,
         selectedBlock: null as BlockState | null,
         selectedTool: null as Tool | null,
         tools: [] as Tool[]
@@ -84,23 +142,6 @@ const ToolBarView: React.FC = React.memo(() => {
         return () => setCursor(null)
     }, [])
 
-    const onToolSelect = useCallback((tool: Tool) => {
-        toolManager.selectTool(tool)
-    }, [])
-
-    const onBlockSelect = useCallback((Block: typeof BlockState) => {
-        toolManager.selectBlock(new Block())
-    }, [])
-
-    const openBlockSelectOverlay = useCallback(() => {
-        setState(state => ({ ...state, blockOverlayShown: true }))
-    }, [])
-
-    const selectBlock = useCallback((block: typeof BlockState) => {
-        setState(state => ({ ...state, blockOverlayShown: false }))
-        onBlockSelect(block)
-    }, [onBlockSelect])
-
     const onDrag = useCallback((dx: number, dy: number) => {
         toolManager.selectedTool?.onDrag(dx, dy)
     }, [])
@@ -130,6 +171,15 @@ const ToolBarView: React.FC = React.memo(() => {
         controlsProvider.current.on("editor-paste", mapEditor.paste.bind(mapEditor))
         controlsProvider.current.on("editor-undo", mapEditor.undo.bind(mapEditor))
         controlsProvider.current.on("editor-redo", mapEditor.redo.bind(mapEditor))
+
+        for(let tool of toolList) {
+            if(!tool.shortcutAction) continue
+            controlsProvider.current.on(tool.shortcutAction, () => toolManager.selectTool(tool))
+        }
+
+        toolManager.getControlsResponder().setParentResponder(controlsProvider.current)
+
+        onUpdate()
     }, [])
 
     return (
@@ -140,18 +190,14 @@ const ToolBarView: React.FC = React.memo(() => {
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp}
                 onMouseMove={onMouseMove} />
+            <ToolSettingsView toolManager={toolManager}/>
             <div className="editor-toolbar">
                 <div className="editor-toollist">
                     {state.tools.map((tool, index) => (
-                        <div
-                            key={tool.name ?? index}
-                            className={"tool " + (state.selectedTool === tool ? "selected" : "")}
-                            style={{ backgroundImage: `url(${tool.image})` }}
-                            onClick={() => onToolSelect(tool)} />
+                        <ToolView tool={tool} key={index} toolManager={toolManager}/>
                     ))}
                 </div>
             </div>
-            {state.blockOverlayShown && <BlockSelectOverlay onBlockSelect={selectBlock} />}
         </ControlsProvider>
     )
 })

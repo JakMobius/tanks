@@ -94,7 +94,12 @@ export default class PhysicsChunk {
 
         this.entity = new Entity()
         this.entity.on("before-physics", () => this.update())
-        this.entity.addComponent(new TransformComponent().set({ position: { x: this.x, y: this.y } }))
+        
+        const map = this.getMap()
+        const x = map.blockToLocalX(this.x)
+        const y = map.blockToLocalY(this.y)
+
+        this.entity.addComponent(new TransformComponent().set({ position: { x, y } }))
         this.entity.addComponent(createTransmitterComponentFor(TransformTransmitter))
         this.entity.addComponent(new PhysicalComponent((host: PhysicalHostComponent) => {
             let body = host.world.CreateBody({ type: Box2D.b2BodyType.b2_staticBody })

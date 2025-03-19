@@ -32,10 +32,10 @@ export function manufactureEntity(prefab: EntityPrefab, factory?: (prefab: Entit
 export class EntityDeserializer {
     map = new Map<Entity, SerializedEntity>()
     ctx = new SerializationContext()
-    factory?: PrefabFilter
+    filter?: PrefabFilter
 
-    constructor(factory?: PrefabFilter) {
-        this.factory = factory
+    constructor(filter?: PrefabFilter) {
+        this.filter = filter
     }
 
     createTreeFor(serialized: SerializedEntity, root: boolean = true) {
@@ -45,9 +45,9 @@ export class EntityDeserializer {
         if(!prefab) return null
 
         if(root) {
-            entity = manufactureEntity(prefab, this.factory?.root)
+            entity = manufactureEntity(prefab, this.filter?.root)
         } else {
-            entity = manufactureEntity(prefab, this.factory?.leaf)
+            entity = manufactureEntity(prefab, this.filter?.leaf)
         }
 
         if(!entity) return null

@@ -41,8 +41,8 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         let blockX = transform.transformX(point.x, point.y)
         let blockY = transform.transformY(point.y, point.y)
 
-        const gridX = Math.floor(blockX)
-        const gridY = Math.floor(blockY)
+        const gridX = map.localToBlockX(blockX)
+        const gridY = map.localToBlockY(blockY)
 
         const block = map.getBlock(gridX, gridY)
         if (block && block.solid) {
@@ -61,8 +61,11 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         if (localVelocity.x === 0 && localVelocity.y === 0) return
 
         for(let i = 0; i < 3; i++) {
-            let nextDistanceX = localVelocity.x > 0 ? Math.ceil(blockX) - blockX : Math.floor(blockX) - blockX
-            let nextDistanceY = localVelocity.y > 0 ? Math.ceil(blockY) - blockY : Math.floor(blockY) - blockY
+            let localBlockX = map.blockToLocalX(gridX)
+            let localBlockY = map.blockToLocalY(gridY)
+
+            let nextDistanceX = localVelocity.x > 0 ? localBlockX + 1 - blockX : localBlockX - blockX
+            let nextDistanceY = localVelocity.y > 0 ? localBlockY + 1 - blockY : localBlockY - blockY
 
             if (nextDistanceX === 0) nextDistanceX = Math.sign(localVelocity.x)
             if (nextDistanceY === 0) nextDistanceY = Math.sign(localVelocity.y)
@@ -76,8 +79,8 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
                 nextDistanceFraction = Number.EPSILON
             }
 
-            const checkX = Math.floor(blockX + localVelocity.x * nextDistanceFraction * 0.5)
-            const checkY = Math.floor(blockY + localVelocity.y * nextDistanceFraction * 0.5)
+            const checkX = map.localToBlockX(blockX + localVelocity.x * nextDistanceFraction * 0.5)
+            const checkY = map.localToBlockY(blockY + localVelocity.y * nextDistanceFraction * 0.5)
 
             if (map.getBlock(checkX, checkY)?.solid) {
                 this.entity.emit("block-hit", checkX, checkY, point, map)

@@ -33,7 +33,11 @@ const ClientPrefab = new ClientEntityPrefab({
 
         const update = () => {
             let map = entity.getComponent(TilemapComponent)
-            entity.getComponent(EditorOutlineBoundsComponent).setBox(0, 0, map.width, map.height)
+            let x0 = map.blockToLocalX(0)
+            let y0 = map.blockToLocalY(0)
+            let x1 = map.blockToLocalX(map.width)
+            let y1 = map.blockToLocalY(map.height)
+            entity.getComponent(EditorOutlineBoundsComponent).setBox(x0, y0, x1 - x0, y1 - y0)
         }
 
         entity.addComponent(new EditorOutlineBoundsComponent())

@@ -1,15 +1,15 @@
 import ToolManager from "./toolmanager";
-import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
-import RootControlsResponder from "src/client/controls/root-controls-responder";
+import { ControlsResponder } from "src/client/controls/root-controls-responder";
 import EventEmitter from "src/utils/event-emitter";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import TransformComponent from "src/entity/components/transform/transform-component";
 
 export default class Tool extends EventEmitter {
-	public dragging: boolean;   
-	public cursor: string;
-	public settingsView: React.FC | null;
-    public controlsEventHandler = new BasicEventHandlerSet()
+	public dragging: boolean
+	public cursor: string
+	public settingsView: React.FC | null
+    public shortcutAction: string | null = null
+    public controlsResponder = new ControlsResponder().setFlat(true)
 
     /**
      * Path to tool icon
@@ -83,11 +83,11 @@ export default class Tool extends EventEmitter {
     }
 
     becomeActive(): void {
-        this.controlsEventHandler.setTarget(RootControlsResponder.getInstance())
+        this.controlsResponder.setParentResponder(this.manager.getControlsResponder())
     }
 
     resignActive(): void {
-        this.controlsEventHandler.setTarget(null)
+        this.controlsResponder.setParentResponder(null)
     }
 
     trace(x1: number, y1: number, x2: number, y2: number, callback: (x: number, y: number) => void) {

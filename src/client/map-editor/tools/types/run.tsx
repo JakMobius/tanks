@@ -36,20 +36,18 @@ const RunToolView: React.FC<ToolViewProps<RunTool>> = (props) => {
         }
     }, [props.tool])
 
-    return (
-        <div className="tool-preferences">
-            <div
-                className={"tool " + (props.tool.selectingLocation ? "selected" : "")}
-                style={{ backgroundImage: "url(static/map-editor/locate.png)" }}
-                onClick={onLocationClick}
-            />
-            <div
-                className={"tool " + (props.tool.running ? "selected" : "")}
-                style={{ backgroundImage: "url(static/map-editor/start.png)" }}
-                onClick={onRunClick}
-            />
-        </div>
-    )
+    return (<>
+        <div
+            className={"box " + (props.tool.selectingLocation ? "selected" : "")}
+            style={{ backgroundImage: "url(static/map-editor/locate.png)" }}
+            onClick={onLocationClick}
+        />
+        <div
+            className={"box " + (props.tool.running ? "selected" : "")}
+            style={{ backgroundImage: "url(static/map-editor/start.png)" }}
+            onClick={onRunClick}
+        />
+    </>)
 }
 
 export default class RunTool extends Tool {

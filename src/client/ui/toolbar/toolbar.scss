@@ -1,13 +1,12 @@
 .editor-toolbar {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 20px;
+    top: 20px;
     max-height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    padding: 20px;
     overflow-y: auto;
 
     .editor-toollist {
@@ -21,7 +20,18 @@
     }
 
     .tool {
+        position: relative;
         background-size: 20px auto;
+    }
+
+    .tool .tool-shortcut {
+        font-family: "Ropa Sans", "Roboto", sans-serif;
+        font-weight: 700;
+        position: absolute;
+        left: 3px;
+        top: 3px;
+        font-size: 10px;
+        color: #C8C8C8;
     }
 
     .tool.selected {

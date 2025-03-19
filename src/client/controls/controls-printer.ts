@@ -3,7 +3,9 @@ import {KeyAxleConfig} from "./input/keyboard/key-axle";
 import {MouseInputConfig, MouseInputType} from "./input/mouse/mouse-contoller";
 import {MouseAxisDirection} from "./input/mouse/mouse-axle";
 import {GamepadInputConfig, GamepadInputType} from "./input/gamepad/gamepad-controller";
-import {keyboardKeyMapping} from "./localized-keyboard-keys";
+import {keyboardKeyMapping, shortKeyboardKeyMapping} from "./localized-keyboard-keys";
+import { KeyboardInputConfig, KeyboardInputType } from "./input/keyboard/keyboard-controller";
+import { isMacOS } from "src/utils/meta-key-name";
 
 export default class ControlsPrinter {
     static getPrintedNameOfAxle(axleConfig: AxleConfig, device: InputDevice): string {
@@ -11,7 +13,7 @@ export default class ControlsPrinter {
             case InputDeviceType.gamepad:
                 return this.getPrintedNameOfGamepadAxle(axleConfig as GamepadInputConfig);
             case InputDeviceType.keyboard:
-                return this.getPrintedNameOfKeyboardAxle(axleConfig as KeyAxleConfig);
+                return this.getPrintedNameOfKeyboardAxle(axleConfig as KeyboardInputConfig, false);
             case InputDeviceType.mouse:
                 return this.getPrintedNameOfMouseAxle(axleConfig as MouseInputConfig);
         }
@@ -25,14 +27,28 @@ export default class ControlsPrinter {
         }
     }
 
-    static getPrintedNameOfKeyboardAxle(axleConfig: KeyAxleConfig) {
-        let rawKey = axleConfig.code
+    static getPrintedNameOfKeyboardAxle(axleConfig: KeyboardInputConfig, short: boolean) {
+        if(axleConfig.type === KeyboardInputType.shortcutTrigger) {
+            let shortcut = axleConfig.triggerShortcut
+            
+            if(isMacOS) shortcut.replace("Ctrl", "Meta")
 
-        if (rawKey.startsWith("Digit")) return rawKey.substring(5);
-        if (rawKey.startsWith("Key")) return rawKey.substring(3);
+            let parts = shortcut.split("-").map(key => this.getKeyName(key, short))
+
+            if(short) return parts.join("")
+            else return parts.join(" + ")
+
+        } else {
+            return this.getKeyName((axleConfig as KeyAxleConfig).code, short);
+        }
+    }
+
+    static getKeyName(rawKey: string, short: boolean) {
+        if (rawKey.startsWith("Digit")) return rawKey.substring(5)
+        if (rawKey.startsWith("Key")) return rawKey.substring(3)
         if (rawKey.startsWith("Numpad")) return rawKey
 
-        return keyboardKeyMapping[rawKey] || rawKey;
+        return (short ? shortKeyboardKeyMapping[rawKey] : keyboardKeyMapping[rawKey]) ?? rawKey
     }
 
     static getMouseButtonName(index: number) {

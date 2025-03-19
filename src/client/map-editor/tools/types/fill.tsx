@@ -22,16 +22,22 @@ export default class Fill extends Tool {
         super(manager);
 
         this.image = "static/map-editor/fill.png"
+        this.shortcutAction = "editor-fill-tool"
         // this.actionName = "Заливка"
         this.setCursor("url(static/map-editor/fill.png) 18 18, auto")
     }
 
     handleMouse(x: number, y: number) {
-        let transformComponent = this.getOnlySelectedEntity().getComponent(TransformComponent)
+        let entity = this.getOnlySelectedEntity()
+        let transformComponent = entity.getComponent(TransformComponent)
+        let tilemap = entity.getComponent(TilemapComponent)
         let transformMatrix = transformComponent.getInvertedGlobalTransform()
 
-        let blockX = Math.floor(transformMatrix.transformX(x, y))
-        let blockY = Math.floor(transformMatrix.transformY(x, y))
+        let localX = transformMatrix.transformX(x, y)
+        let localY = transformMatrix.transformY(x, y)
+
+        let blockX = tilemap.localToBlockX(localX)
+        let blockY = tilemap.localToBlockY(localY)
 
         if(blockX !== this.blockX || blockY !== this.blockY) {
             this.blockX = blockX
@@ -141,13 +147,27 @@ export default class Fill extends Tool {
             return
         }
 
+        if(this.blockX < 0 || this.blockY < 0) {
+            return
+        }
+
+        if(this.blockX >= this.getTilemap().width || this.blockY >= this.getTilemap().height) {
+            return
+        }
+
         const program = phase.getProgram(ConvexShapeProgram)
 
-        let transform = this.getOnlySelectedEntity().getComponent(TransformComponent)
+        const entity = this.getOnlySelectedEntity()
+        const transform = entity.getComponent(TransformComponent)
+        const tilemap = entity.getComponent(TilemapComponent)
+
         program.transform.save()
         program.transform.set(transform.getGlobalTransform())
 
-        let quadrangle = squareQuadrangleFromPoints(this.blockX, this.blockY, this.blockX + 1, this.blockY + 1)
+        let x = tilemap.blockToLocalX(this.blockX)
+        let y = tilemap.blockToLocalY(this.blockY)
+
+        let quadrangle = squareQuadrangleFromPoints(x, y, x + 1, y + 1)
         program.drawQuadrangle(quadrangle, this.brushColor.getUint32())
 
         program.transform.restore()

@@ -14,7 +14,7 @@ const RangeView: React.FC<RangeViewProps> = (props: RangeViewProps) => {
         oldX: null as number | null,
     })
 
-    const trackRef = React.useRef<HTMLDivElement>(null)
+    const thumbContainerRef = React.useRef<HTMLDivElement>(null)
 
     const onMouseUp = (event: MouseEvent) => {
         onMouseMove(event)
@@ -25,7 +25,7 @@ const RangeView: React.FC<RangeViewProps> = (props: RangeViewProps) => {
     }
 
     const onMouseMove = (event: MouseEvent) => {
-        let trackWidth = trackRef.current.clientWidth
+        let trackWidth = thumbContainerRef.current.clientWidth
         let newValue = props.value + (event.pageX - state.oldX) / trackWidth
 
         setState((state) => {
@@ -68,8 +68,8 @@ const RangeView: React.FC<RangeViewProps> = (props: RangeViewProps) => {
 
     return (
         <div className="range-input">
-            <div className="track" ref={trackRef}></div>
-            <div className="thumb-container">
+            <div className="track"></div>
+            <div className="thumb-container" ref={thumbContainerRef}>
                 <div
                     className="thumb"
                     onMouseDown={onMouseDown}

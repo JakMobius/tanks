@@ -49,6 +49,14 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardI
         "editor-tree-toggle": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Space"}],
         "editor-rename": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Enter"}],
 
+        "editor-move-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyV"}],
+        "editor-scale-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyS"}],
+        "editor-hand-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyH"}],
+        "editor-pencil-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyP"}],
+        "editor-eraser-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Shift-KeyP"}],
+        "editor-fill-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyF"}],
+        "editor-block-select-tool": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "KeyB"}],
+
         "editor-increase-brush-size": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Shift-Equal"}],
         "editor-decrease-brush-size": [{type: KeyboardInputType.shortcutTrigger, triggerShortcut: "Minus"}]
     }

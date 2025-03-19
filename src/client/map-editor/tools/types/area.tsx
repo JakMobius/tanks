@@ -42,10 +42,8 @@ export class AreaToolDrawer extends EntityDrawer {
 
 const AreaToolView: React.FC<ToolViewProps<AreaTool>> = (props) => {
     return (
-        <div className="tool-preferences">
-            <button onClick={() => props.tool.fillWFC()}>
-                Автогенерация на базе буфера обмена
-            </button>
+        <div className="box" onClick={() => props.tool.fillWFC()}>
+            Автогенерация на базе буфера обмена
         </div>
     )   
 }
@@ -80,12 +78,12 @@ export default class AreaTool extends Tool {
 
         this.copyBuffer = null
 
-        this.controlsEventHandler.on("editor-copy", () => this.copy(false))
-        this.controlsEventHandler.on("editor-paste", () => this.paste())
-        this.controlsEventHandler.on("editor-cut", () => this.copy(true))
-        this.controlsEventHandler.on("editor-reset-selection", () => this.resetSelection())
-        this.controlsEventHandler.on("editor-delete", () => this.deleteArea())
-        this.controlsEventHandler.on("editor-select-all", () => this.selectAll())
+        this.controlsResponder.on("editor-copy", () => this.copy(false))
+        this.controlsResponder.on("editor-paste", () => this.paste())
+        this.controlsResponder.on("editor-cut", () => this.copy(true))
+        this.controlsResponder.on("editor-reset-selection", () => this.resetSelection())
+        this.controlsResponder.on("editor-delete", () => this.deleteArea())
+        this.controlsResponder.on("editor-select-all", () => this.selectAll())
 
         this.initialAreaState = false
         this.movingArea = false
@@ -315,8 +313,10 @@ export default class AreaTool extends Tool {
     onMouseDown(x: number, y: number) {
         super.onMouseDown(x, y);
 
-        x = Math.floor(x / 1)
-        y = Math.floor(y / 1)
+        let tilemap = this.getTilemap()
+
+        x = tilemap.localToBlockX(x)
+        y = tilemap.localToBlockY(y)
 
         if(this.area.isValid()) {
             if(this.area.contains(x, y)) {
@@ -360,8 +360,10 @@ export default class AreaTool extends Tool {
     onMouseMove(x: number, y: number) {
         super.onMouseMove(x, y);
 
-        x = Math.floor(x / 1)
-        y = Math.floor(y / 1)
+        let tilemap = this.getTilemap()
+
+        x = tilemap.localToBlockX(x)
+        y = tilemap.localToBlockY(y)
 
         x = this.clampX(x)
         y = this.clampY(y)
