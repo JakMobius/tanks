@@ -118,7 +118,7 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
     }
 
     const emitScrollZoom = (movement: number) => {
-        emitZoom(1 - (movement / 150))
+        emitZoom(1 - (movement / 500))
     }
 
     const onWheel = (event: WheelEvent) => {
@@ -132,7 +132,7 @@ export const MapEditorMouseHandler: React.FC<MapEditorMouseHandlerProps> = React
             }
 
             if (event.deltaZ)
-                emitZoom(-event.deltaZ)
+                emitScrollZoom(-event.deltaZ)
         } else {
             emitScrollZoom(event.deltaY)
         }

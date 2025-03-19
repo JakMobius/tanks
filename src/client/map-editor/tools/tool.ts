@@ -3,6 +3,7 @@ import { ControlsResponder } from "src/client/controls/root-controls-responder";
 import EventEmitter from "src/utils/event-emitter";
 import CameraPositionController from "src/entity/components/camera-position-controller";
 import TransformComponent from "src/entity/components/transform/transform-component";
+import { clamp } from "src/utils/utils";
 
 export default class Tool extends EventEmitter {
 	public dragging: boolean
@@ -71,11 +72,14 @@ export default class Tool extends EventEmitter {
         let topX = cameraMatrix.transformX(0, -1, 0)
         let topY = cameraMatrix.transformY(0, -1, 0)
 
+        let oldZoom = cameraPositionController.baseScale
+        cameraPositionController.baseScale = clamp(oldZoom * zoom, 0.1, 1000)
+        zoom = cameraPositionController.baseScale / oldZoom
+
         let coef = 1 - (1 / zoom)
         let moveX = (rightX + topX) * x * coef
         let moveY = (rightY + topY) * y * coef
-
-        cameraPositionController.baseScale *= zoom
+        
         cameraPositionController.target.x += moveX
         cameraPositionController.target.y += moveY
         cameraPositionController.onTick(0)
