@@ -174,7 +174,10 @@ const ToolBarView: React.FC = React.memo(() => {
 
         for(let tool of toolList) {
             if(!tool.shortcutAction) continue
-            controlsProvider.current.on(tool.shortcutAction, () => toolManager.selectTool(tool))
+            controlsProvider.current.on(tool.shortcutAction, () => {
+                if(tool.isSuitable())
+                    toolManager.selectTool(tool)
+            })
         }
 
         toolManager.getControlsResponder().setParentResponder(controlsProvider.current)
