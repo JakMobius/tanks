@@ -31,10 +31,14 @@ const MapEditorPauseView: React.FC = () => {
         })
     }, [])
 
+    const saveMap = useCallback(() => {
+        mapEditor.saveMap()
+    }, [])
+
     return (
         <PauseNavigationItem title="Меню">
             <PauseMenuButton blue onClick={newMap}>Новая карта</PauseMenuButton>
-            <PauseMenuButton blue onClick={mapEditor.saveMap}>Сохранить карту</PauseMenuButton>
+            <PauseMenuButton blue onClick={saveMap}>Сохранить карту</PauseMenuButton>
             <PauseMenuButton blue onClick={openMap}>Загрузить карту</PauseMenuButton>
             <PauseMenuButton blue target={<SettingsView/>}>Настройки</PauseMenuButton>
             <PauseMenuButton blue onClick={closeHandler}>Вернуться в редактор</PauseMenuButton>
