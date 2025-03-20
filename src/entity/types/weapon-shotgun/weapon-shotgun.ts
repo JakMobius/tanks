@@ -66,7 +66,9 @@ export default class WeaponShotgun extends FirearmWeaponComponent {
 
         const weaponDirection = tankTransform.getDirection()
         Box2D.b2Vec2.prototype.RotateCosSin.call(weaponDirection, weaponCos, weaponSin)
-        Box2D.b2Vec2.prototype.Normalize.call(weaponDirection)
+        let length = Box2D.b2Vec2.prototype.Length.call(weaponDirection)
+        weaponDirection.x /= length
+        weaponDirection.y /= length
         const world = tank.parent
 
         const impulseVector = { x: weaponDirection.x * this.shootImpulse, y: weaponDirection.y * this.shootImpulse }
