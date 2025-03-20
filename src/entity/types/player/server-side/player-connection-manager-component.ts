@@ -93,7 +93,7 @@ export default class PlayerConnectionManagerComponent extends EventHandlerCompon
                     }
                     
                     let set = receiveComponent.transmitterSetFor(this.end)
-                    set.handleResponse(command, this.entity, buffer, size)
+                    set.handleResponse(command, buffer, size)
                 });
             }
         })
