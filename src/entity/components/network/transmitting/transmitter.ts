@@ -13,7 +13,7 @@ export default class Transmitter {
     protected transmitterPrecondition: TransmitterPrecondition | null = null
     enabled = false
 
-    addResponseHandler(command: number, callback: (player: Entity, buffer: ReadBuffer, size: number) => void) {
+    addResponseHandler(command: number, callback: (buffer: ReadBuffer, size: number) => void) {
         let currentHandlers = this.set.messageHandlers.get(command)
         if(!currentHandlers) {
             currentHandlers = []

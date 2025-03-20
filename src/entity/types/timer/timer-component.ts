@@ -1,5 +1,6 @@
 
 import EventHandlerComponent from "src/utils/ecs/event-handler-component";
+import { formatTimeMinSec } from "src/utils/utils";
 
 // Timer component is the only component of the timer entity.
 // It listens to the tick event and updates itself.
@@ -23,21 +24,15 @@ export default class TimerComponent extends EventHandlerComponent {
         return this
     }
 
+    formatTimeMinSec() {
+        return formatTimeMinSec(this.currentTime)
+    }
+
     countdownFrom(time: number) {
         this.originalTime = time
         this.currentTime = time
         this.needsUpdate = true
         return this
-    }
-
-    getMSTimeString() {
-        let minutes = String(Math.floor(this.currentTime / 60))
-        let seconds = String(Math.floor(this.currentTime % 60))
-
-        if (minutes.length == 1) minutes = "0" + minutes
-        if (seconds.length == 1) seconds = "0" + seconds
-
-        return minutes + ":" + seconds
     }
 
     private onTick(dt: number) {

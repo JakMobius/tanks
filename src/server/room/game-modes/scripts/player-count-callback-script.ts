@@ -1,6 +1,5 @@
 import ServerGameScript from "src/server/room/game-modes/scripts/server-game-script";
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import Entity from "src/utils/ecs/entity";
 
 export default class PlayerCountCallbackScript extends ServerGameScript {
@@ -15,7 +14,7 @@ export default class PlayerCountCallbackScript extends ServerGameScript {
     }
 
     private getPlayerCount() {
-        return this.controller.world.getComponent(ServerWorldPlayerManagerComponent)?.players.length ?? 0
+        return this.controller.players.size ?? 0
     }
 
     private triggerCallback() {

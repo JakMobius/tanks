@@ -191,3 +191,18 @@ export function raycastPolygon(point: { x: number, y: number }, vs: Array<{x: nu
     
     return inside;
 };
+
+export function formatTimeMinSec(seconds: number) {
+    let m = Math.floor(seconds / 60).toString().padStart(2, "0")
+    let s = Math.floor(seconds % 60).toString().padStart(2, "0")
+
+    return m + ":" + s
+}
+
+export function formatTimeMinSecMil(seconds: number) {
+    let ms = Math.floor((seconds % 1) * 1000).toString().padStart(3, "0")
+    let s = (Math.floor(seconds) % 60).toString().padStart(2, "0")
+    let m = Math.floor(seconds / 60).toString()
+
+    return m + ":" + s + "." + ms
+}

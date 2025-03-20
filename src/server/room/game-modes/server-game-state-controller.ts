@@ -1,6 +1,7 @@
 import ServerGameController from "src/server/room/game-modes/server-game-controller";
 import ServerGameScript from "src/server/room/game-modes/scripts/server-game-script";
 import {Constructor} from "src/utils/constructor"
+import Entity from "src/utils/ecs/entity";
 
 export default abstract class ServerGameStateController<
         ControllerClass extends ServerGameController = ServerGameController,
@@ -38,10 +39,10 @@ export default abstract class ServerGameStateController<
         }
     }
 
-    sendEvent(event: EventClass) {
-        this.controller.entity.emit("event-broadcast", event)
+    sendEvent(event: EventClass, player?: Entity) {
+        this.controller.sendEvent(event, player)
     }
 
     scripts: ServerGameScript[] = []
-    abstract getState(): StateClass
+    abstract getState(player: Entity): StateClass
 }

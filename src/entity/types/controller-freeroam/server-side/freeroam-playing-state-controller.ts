@@ -1,7 +1,6 @@
 
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
-import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { RandomRespawnScript } from "src/server/room/game-modes/scripts/respawn-script";
 import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 import ServerFreeroamControllerComponent from "./freeroam-controller";
 
@@ -20,7 +19,7 @@ export class FreeroamPlayingStateController extends ServerGameStateController<Se
     }
 
     private respawnPlayers() {
-        let players = this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players
+        let players = this.controller.players
         for(let player of players) {
             player.getComponent(PlayerRespawnActionComponent).performRespawnAction()
         }

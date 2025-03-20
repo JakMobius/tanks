@@ -5,8 +5,7 @@ import {TDMGameState, TDMGameStateType} from "src/entity/types/controller-tdm/td
 import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script";
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
-import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/respawn-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 import TDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
@@ -38,7 +37,7 @@ export class TDMPlayerWaitingStateController extends ServerGameStateController<T
         return {
             state: TDMGameStateType.waitingForPlayers,
             minPlayers: timeComponent.minPlayers,
-            currentPlayers: this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length,
+            currentPlayers: this.controller.players.size,
             timer: this.getScript(GameStartTimerScript).gameStartTimer
         }
     }

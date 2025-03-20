@@ -14,7 +14,7 @@ export default class EditorEventTransmitter extends Transmitter {
 
     attachToSet(set: TransmitterSet): void {
         super.attachToSet(set)
-        this.addResponseHandler(Commands.EDITOR_EVENT_COMMAND, (player, buffer, size) => {
+        this.addResponseHandler(Commands.EDITOR_EVENT_COMMAND, (buffer, size) => {
             let command = buffer.readString()
             if(this.supportedEvents.has(command)) {
                 this.getEntity().emit(command)

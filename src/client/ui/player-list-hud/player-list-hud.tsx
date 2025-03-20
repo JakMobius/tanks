@@ -63,7 +63,7 @@ const PlayerListHUD: React.FC<PlayerListHUDProps> = React.memo((props) => {
 
     const updateTimerText = useCallback(() => {
         let timerComponent = state.timer?.getComponent(TimerComponent)
-        let timeString = timerComponent?.getMSTimeString()
+        let timeString = timerComponent?.formatTimeMinSec()
         setState((state) => ({ ...state, roomTime: timeString ?? null }))
     }, [state.timer])
 

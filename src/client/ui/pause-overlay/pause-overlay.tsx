@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { NavigationProvider } from '../navigation/navigation-view';
 import NavigationEscapeHandler from "../navigation/navigation-escape-handler";
 import { useScene } from "src/client/scenes/scene-controller";
-import { ControlsProvider, useControls } from "src/client/utils/react-controls-responder";
+import { ControlsProvider } from "src/client/utils/react-controls-responder";
 import RootControlsResponder, { ControlsResponder } from "src/client/controls/root-controls-responder";
 
 export interface PauseOverlayConfig {
@@ -14,8 +14,8 @@ export interface PauseOverlayConfig {
 const PauseOverlay: React.FC<PauseOverlayConfig> = React.memo((props) => {
 
     const scene = useScene()
-    const gameControls = useControls()
-    const controlsProvider = useRef<ControlsResponder | null>(null)
+    const defaultControls = useRef<ControlsResponder | null>(null)
+    const controls = useRef<ControlsResponder | null>(null)
 
     const [shown, setShown] = useState(false)
 
@@ -24,29 +24,27 @@ const PauseOverlay: React.FC<PauseOverlayConfig> = React.memo((props) => {
 
     useEffect(() => {
         if(!shown) return undefined
-        controlsProvider.current?.focus()
+        controls.current?.focus()
         scene.soundEngine.setEnabled(false)
         return () => {
-            controlsProvider.current?.blur()
+            controls.current?.blur()
             scene.soundEngine.setEnabled(true)
         }
     }, [shown])
 
     useEffect(() => {
-        controlsProvider.current.on("blur", hide)
+        controls.current.on("blur", hide)
     }, [])
 
     useEffect(() => {
-        let callback = (responder: RootControlsResponder) => {
+        defaultControls.current.on("game-pause", (responder: RootControlsResponder) => {
             responder.onUpdate(show)
-        }
-        if(!gameControls) return undefined
-        gameControls.on("game-pause", callback)
-        return () => gameControls.off("game-pause", callback)
-    }, [gameControls])
+        })
+    }, [])
 
-    return (
-        <ControlsProvider ref={controlsProvider}>
+    return (<>
+        <ControlsProvider ref={defaultControls} default></ControlsProvider>
+        <ControlsProvider ref={controls}>
             <div className="pause-overlay" style={{display: shown ? undefined : "none"}}>
                 <NavigationProvider
                     onClose={hide}
@@ -56,7 +54,7 @@ const PauseOverlay: React.FC<PauseOverlayConfig> = React.memo((props) => {
                 </NavigationProvider>
             </div>
         </ControlsProvider>
-    )
+    </>)
 })
 
 export default PauseOverlay

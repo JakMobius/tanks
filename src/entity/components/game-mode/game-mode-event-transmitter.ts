@@ -10,30 +10,40 @@ export default class GameModeEventTransmitter extends Transmitter {
     private visibilityPrecondition = new TransmitterVisibilityPrecondition(this)
     private state: any
 
+    private stateChanged: boolean = false
+
     constructor(controller: ServerGameController) {
         super();
         this.controller = controller
-
-        this.eventHandler.on("state-broadcast", () => {
-            this.updatePrecondition()
-            this.sendState()
-        })
-
-        this.eventHandler.on("event-broadcast", (event) => {
-            this.updatePrecondition()
-            this.sendEvent(event)
-        })
-
         this.transmitterPrecondition = this.visibilityPrecondition
+    }
+
+    updateState() {
+        if(this.stateChanged) return
+        this.stateChanged = true
+        this.getEntity().once("tick", () => {
+            this.updatePrecondition()
+            this.packIfEnabled(Commands.GAME_STATE_COMMAND, (buffer) => {
+                this.encodeObject(this.state)
+            })
+            this.stateChanged = false
+        })
+    }
+
+    sendEvent(event: any) {
+        this.updatePrecondition()
+        this.packIfEnabled(Commands.GAME_EVENT_COMMAND, (buffer) => {
+            this.encodeObject(event)
+        })
     }
 
     onEnable() {
         super.onEnable()
-        this.sendState()
+        this.updateState()
     }
 
     getState() {
-        return this.controller.activeGameState?.getState() ?? {}
+        return this.controller.activeGameState?.getState(this.set.receivingEnd.player) ?? {}
     }
 
     updatePrecondition() {
@@ -41,17 +51,5 @@ export default class GameModeEventTransmitter extends Transmitter {
         let entityArray: Entity[] = []
         GameObjectWriter.getEntitiesFromObject(this.state, entityArray)
         this.visibilityPrecondition.setEntityArray(entityArray)
-    }
-
-    sendState() {
-        this.packIfEnabled(Commands.GAME_STATE_COMMAND, (buffer) => {
-            this.encodeObject(this.state)
-        })
-    }
-
-    sendEvent(event: any) {
-        this.packIfEnabled(Commands.GAME_EVENT_COMMAND, (buffer) => {
-            this.encodeObject(event)
-        })
     }
 }

@@ -75,16 +75,9 @@ export default class TrackedSteeringAssistant extends EventHandlerComponent {
         this.userSteer = steer - this.tractionSteerAxle.ownValue
     }
 
-    private getCorrectionSteer() {
-        if (this.maxAbsTrackSpeed < 0.1) return 0
-
-        let actualSteer = this.leftTrackSpeed - this.rightTrackSpeed
-        return (this.userSteer * this.direction - actualSteer) * this.motionCoefficient * this.trackSpeedCorrectionStrength
-    }
-
     private getAngularDamping() {
         let body = this.entity.getComponent(PhysicalComponent).body
-        let angularVelocity = this.userSteer * this.maxRadPerSecond * this.direction * this.motionCoefficient - body.GetAngularVelocity()
+        let angularVelocity = -this.userSteer * this.maxRadPerSecond * this.direction * this.motionCoefficient - body.GetAngularVelocity()
 
         return angularVelocity * this.angularDampingStrength * this.direction
     }
@@ -95,6 +88,8 @@ export default class TrackedSteeringAssistant extends EventHandlerComponent {
         this.refreshConstants()
         // newSteerValue += this.getCorrectionSteer()
         newSteerValue += this.getAngularDamping()
+
+        newSteerValue = -newSteerValue
 
         let dampingCoefficient = Math.exp(-dt * this.outputDamping)
 

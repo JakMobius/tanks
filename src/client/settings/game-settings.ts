@@ -24,7 +24,7 @@ export default class GameSettings {
         }, serialized)
 
         this.graphics = new GameGraphicsSettings(serialized.graphics)
-        this.controls = new GameControlsSettings(serialized.controls)
+        this.controls = new GameControlsSettings({} /* serialized.controls */)
         this.audio    = new GameAudioSettings   (serialized.audio)
 
         this.graphics.on("update", () => this.update())

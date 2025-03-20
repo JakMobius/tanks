@@ -1,5 +1,5 @@
 import ClientEntityPrefab from "src/client/entity/client-entity-prefab";
-import { TDMGameStateHUD } from "src/client/ui/game-hud/tdm-game-hud/tdm-game-state-hud";
+import { TDMGameStateHUD } from "src/entity/types/controller-tdm/client-side/tdm-game-state-hud";
 import { ClientGameControllerComponent } from "src/entity/components/game-mode/client-game-controller-component";
 import GameModeEventReceiver from "src/entity/components/game-mode/game-mode-event-receiver";
 import BasePrefab from "./prefab"

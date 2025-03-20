@@ -1,7 +1,7 @@
 import {Component} from "src/utils/ecs/component";
 import Entity from "src/utils/ecs/entity";
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import { EntityPrefab } from "../entity-prefabs";
+import { WorldComponent } from "../game-world-entity-prefab";
 
 export default class PrefabComponent implements Component {
     entity: Entity | null = null
@@ -24,7 +24,7 @@ export function getPrefabNameForEntity(entity: Entity) {
     if (!entity) {
         return "NULL"
     }
-    if (entity.getComponent(ServerWorldPlayerManagerComponent)) {
+    if (entity.getComponent(WorldComponent)) {
         return "WORLD"
     }
     let prefab = entity.getComponent(PrefabComponent)?.prefab

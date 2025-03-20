@@ -87,6 +87,8 @@ export class ControlsResponder extends EventEmitter {
                 axle.removeSource(this.parentResponder.getControlAxle(name))
             }
         }
+        this.parentResponder = null
+        this.blur()
         this.parentResponder = parent
         if (this.parentResponder) {
             this.parentResponder.addChildResponder(this)
@@ -103,6 +105,9 @@ export class ControlsResponder extends EventEmitter {
     private removeChildResponder(responder: ControlsResponder) {
         let index = this.childrenResponders.indexOf(responder)
         this.childrenResponders.splice(index, 1)
+        if(this.focusedResponder === responder) {
+            this.focusedResponder = null
+        }
     }
 
     public clearChildResponders() {
@@ -151,25 +156,22 @@ export class ControlsResponder extends EventEmitter {
         })
     }
 
-    emit(type: string, ...values: any[]): boolean {   
+    emitTrigger(type: string, useDefaults: boolean, ...values: any[]) {
         let result = true
 
         for(let child of this.childrenResponders) {
-            let childSuitable = child.isFlat
-            if(child === this.focusedResponder) childSuitable = true
-            if(!this.focusedResponder && child.isDefault) childSuitable = true
+            let nestedUseDefaults = useDefaults && !this.focusedResponder
+            let isFocused = child === this.focusedResponder
+
+            let childSuitable = child.isFlat || isFocused || (nestedUseDefaults && child.isDefault)
             if(!childSuitable) continue
             
-            if(child?.emit(type, ...values) === false) result = false
+            if(child?.emitTrigger(type, nestedUseDefaults, ...values) === false) result = false
         }
 
-        if(super.emit(type, ...values) === false) result = false
+        if(this.emit(type, ...values) === false) result = false
         
         return result
-    }
-
-    onUpdate(callback: () => void) {
-        this.once("update", callback)
     }
 }
 
@@ -318,9 +320,13 @@ export default class RootControlsResponder extends ControlsResponder {
         this.emit("update")
     }
 
+    onUpdate(callback: () => void) {
+        this.once("update", callback)
+    }
+
     private emitOnUpdate(activateName: string) {
         this.once("update", () => {
-            this.emit(activateName, this)
+            this.emitTrigger(activateName, true, this)
         })
     }
 }

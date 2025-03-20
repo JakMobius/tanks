@@ -11,12 +11,14 @@ import { DamageModifiers, DamageTypes } from "src/server/damage-reason/damage-re
 import { b2ScaledCircleShape } from "src/physics/b2-scale-shape";
 import Entity from "src/utils/ecs/entity";
 import { EntityPrefab } from "src/entity/entity-prefabs";
+import EntityHitEmitter from "src/entity/components/entity-hit-emitter";
 
 const Prefab = new EntityPrefab({
     id: "BULLET_BOMB",
     prefab: (entity: Entity) => {
         entity.addComponent(new PrefabComponent(Prefab))
         entity.addComponent(new TilemapHitEmitter())
+        entity.addComponent(new EntityHitEmitter())
         entity.addComponent(new TransformComponent())
         entity.addComponent(new HealthComponent())
         entity.addComponent(new SailingComponent(1))

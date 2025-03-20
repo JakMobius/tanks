@@ -1,5 +1,4 @@
 import ServerTDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
 import {TDMMatchOverStateController} from "src/entity/types/controller-tdm/server-side/tdm-match-over-state-controller";
 import WorldStatisticsComponent from "src/entity/components/world-statistics/world-statistics-component";
 import {TDMGameState, TDMGameStateType, TDMTeamStatistics} from "src/entity/types/controller-tdm/tdm-game-state";
@@ -15,7 +14,7 @@ import PlayerTeamComponent from "src/entity/types/player/server-side/player-team
 import Entity from "src/utils/ecs/entity";
 import PlayerRespawnActionComponent from "src/entity/types/player/server-side/player-respawn-action-component";
 import {chooseRandomIndex} from "src/utils/utils";
-import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { TeamedRespawnScript } from "src/server/room/game-modes/scripts/respawn-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 import TDMController from "src/entity/types/controller-tdm/server-side/tdm-controller";
@@ -73,7 +72,7 @@ export class TDMPlayingStateController extends ServerGameStateController<TDMCont
             })
         }
 
-        let playerArray = this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.slice()
+        let playerArray = Array.from(this.controller.players)
 
         while (playerArray.length) {
             let randomPlayer = playerArray.splice(chooseRandomIndex(playerArray), 1)[0]

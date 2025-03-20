@@ -17,7 +17,8 @@ export class ChatTransmitter extends Transmitter {
 
     attachToSet(set: TransmitterSet): void {
         super.attachToSet(set)
-        this.addResponseHandler(Commands.CHAT_MESSAGE_COMMAND, (player, buffer) => {
+        this.addResponseHandler(Commands.CHAT_MESSAGE_COMMAND, (buffer) => {
+            let player = this.set.receivingEnd.player
             let string = buffer.readString()
             string.trim()
             string = HTMLEscape(string)

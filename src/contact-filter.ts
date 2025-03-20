@@ -1,5 +1,4 @@
 import * as Box2D from '@box2d/core'
-import Entity from "./utils/ecs/entity";
 import { getObjectFromBody } from './entity/physical-body-data';
 
 export default class GameWorldContactFilter extends Box2D.b2ContactFilter {

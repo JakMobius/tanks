@@ -4,6 +4,7 @@ import GameSpawnzonesComponent from "src/server/room/game-modes/game-spawnzones-
 import RaceController from "./server-side/race-controller";
 import BasePrefab from "./prefab"
 import EntityStateTransmitComponent from "src/server/entity/components/entity-state-transmit-component";
+import { RaceCheckpointsComponent } from "./server-side/game-checkpoints-component";
 
 const ServerPrefab = new EntityPrefab({
     id: BasePrefab.id,
@@ -13,6 +14,7 @@ const ServerPrefab = new EntityPrefab({
         entity.addComponent(new EntityStateTransmitComponent())
         BasePrefab.prefab(entity)
         entity.addComponent(new GameSpawnzonesComponent())
+        entity.addComponent(new RaceCheckpointsComponent())
         entity.addComponent(new RaceController())
         let transmitComponent = entity.getComponent(EntityDataTransmitComponent)
         transmitComponent.visibleAnywhere = true

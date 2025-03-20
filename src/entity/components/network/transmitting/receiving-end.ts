@@ -8,6 +8,7 @@ import EventEmitter from "src/utils/event-emitter";
 export class ReceivingEnd extends EventEmitter {
     buffer = new WriteBuffer()
     root: Entity
+    player: Entity
 
     hasData() {
         return this.buffer.offset > 0

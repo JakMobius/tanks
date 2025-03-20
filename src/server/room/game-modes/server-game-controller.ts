@@ -12,16 +12,16 @@ import GameModeEventTransmitter from "src/entity/components/game-mode/game-mode-
 import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
 import PlayerDataComponent from "src/entity/types/player/server-side/player-data-component";
+import EntityDataTransmitComponent from "src/entity/components/network/transmitting/entity-data-transmit-component";
 
 
 export default abstract class ServerGameController extends EventHandlerComponent {
 
     worldEventHandler = new BasicEventHandlerSet()
     world: Entity
+    players = new Set<Entity>()
     activeGameState: ServerGameStateController
     db: ServerDatabase
-
-    private needsBroadcast = false
 
     protected constructor() {
         super()
@@ -30,17 +30,13 @@ export default abstract class ServerGameController extends EventHandlerComponent
             transmitterSet.initializeTransmitter(GameModeEventTransmitter, this)
         })
 
-        this.worldEventHandler.on("tick", () => {
-            if (this.needsBroadcast) {
-                this.needsBroadcast = false
-                this.entity.emit("state-broadcast")
-            }
-        })
-
         this.worldEventHandler.on("client-connect", (client) => this.onClientConnected(client), EventEmitter.PRIORITY_MONITOR)
 
         this.eventHandler.on("set-db", (db) => this.db = db)
         this.eventHandler.on("set-world", (world) => this.setWorld(world))
+
+        this.worldEventHandler.on("player-connect", (player) => this.players.add(player))
+        this.worldEventHandler.on("player-disconnect", (player) => this.players.delete(player))
     }
 
     setWorld(world: Entity) {
@@ -48,8 +44,30 @@ export default abstract class ServerGameController extends EventHandlerComponent
         this.worldEventHandler.setTarget(world)
     }
 
-    triggerStateBroadcast() {
-        this.needsBroadcast = true
+    triggerStateBroadcast(player?: Entity) {
+        let receivingEnd = player?.getComponent(PlayerConnectionManagerComponent)?.end
+        let transmitComponent = this.entity.getComponent(EntityDataTransmitComponent)
+        if(!receivingEnd) {
+            for(let set of transmitComponent.transmitterSets.values()) {
+                set.getTransmitter(GameModeEventTransmitter).updateState()
+            }
+        } else {
+            let transmitterSet = transmitComponent.transmitterSetFor(receivingEnd)
+            transmitterSet.getTransmitter(GameModeEventTransmitter).updateState()
+        }
+    }
+
+    sendEvent(event: any, player?: Entity) {
+        let receivingEnd = player?.getComponent(PlayerConnectionManagerComponent)?.end
+        let transmitComponent = this.entity.getComponent(EntityDataTransmitComponent)
+        if(!receivingEnd) {
+            for(let set of transmitComponent.transmitterSets.values()) {
+                set.getTransmitter(GameModeEventTransmitter).sendEvent(event)
+            }
+        } else {
+            let transmitterSet = transmitComponent.transmitterSetFor(receivingEnd)
+            transmitterSet.getTransmitter(GameModeEventTransmitter).sendEvent(event)
+        }
     }
 
     activateGameState(gameState: ServerGameStateController) {

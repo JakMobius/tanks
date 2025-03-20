@@ -339,7 +339,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     })
 
     const scene = useScene()
-    const gameControls = useControls()
+    const defaultControls = useRef<ControlsResponder | null>(null)
     const controlsResponderRef = useRef<ControlsResponder | null>(null)
     const carouselRef = useRef<TankSelectCarouselHandle | null>(null)
     const leftButtonRef = useRef<TankCarouselButtonHandle | null>(null)
@@ -442,13 +442,10 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     }, [])
 
     useEffect(() => {
-        let callback = (responder: RootControlsResponder) => {
+        defaultControls.current.on("game-change-tank", (responder: RootControlsResponder) => {
             responder.onUpdate(toggleVisibility)
-        }
-        if(!gameControls) return undefined
-        gameControls.on("game-change-tank", callback)
-        return () => gameControls.off("game-change-tank", callback)
-    }, [gameControls])
+        })
+    }, [])
 
     useEffect(() => {
         if(state.shown) controlsResponderRef.current.focus()
@@ -462,7 +459,8 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
     const tankName = state.tankPrefab?.metadata.displayName
     const tankDescription = state.tankPrefab?.metadata.description
 
-    return  (
+    return  (<>
+        <ControlsProvider ref={defaultControls} default/>
         <ControlsProvider ref={controlsResponderRef}>
             <div className="tank-select-overlay" style={{display: state.shown ? undefined : "none"}}>
                 <div className="tank-select-menu">
@@ -487,7 +485,7 @@ const TankSelectOverlay: React.FC<TankSelectOverlayProps> = React.memo((props) =
                 </div>
             </div>
         </ControlsProvider>
-    )
+    </>)
 })
 
 export default TankSelectOverlay

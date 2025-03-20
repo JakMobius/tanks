@@ -8,7 +8,6 @@ import ChildTickComponent from "src/entity/components/child-tick-component";
 
 export default class TankModel {
     static configureTank(entity: Entity) {
-        entity.addComponent(new TilemapHitEmitter())
         entity.addComponent(new TransformComponent())
         entity.addComponent(new HealthComponent())
         entity.addComponent(new TankControls())

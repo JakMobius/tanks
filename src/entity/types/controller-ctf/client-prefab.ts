@@ -1,9 +1,9 @@
 import ClientEntityPrefab from "src/client/entity/client-entity-prefab";
 import { ClientGameControllerComponent } from "src/entity/components/game-mode/client-game-controller-component";
-import { CTFGameStateHUD } from "src/client/ui/game-hud/ctf-game-hud/ctf-game-state-hud";
 import GameModeEventReceiver from "src/entity/components/game-mode/game-mode-event-receiver";
 import BasePrefab from "./prefab"
 import EntityStateReceiver from "src/entity/components/network/entity/entity-state-receiver";
+import { CTFGameStateHUD } from "./client-side/ctf-game-state-hud";
 
 const ClientPrefab = new ClientEntityPrefab({
     id: BasePrefab.id,

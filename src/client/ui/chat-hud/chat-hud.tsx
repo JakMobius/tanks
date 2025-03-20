@@ -5,7 +5,8 @@ import { Virtuoso, VirtuosoHandle } from 'react-virtuoso'
 import Color from 'src/utils/color';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useControls } from 'src/client/utils/react-controls-responder';
+import { ControlsProvider, useControls } from 'src/client/utils/react-controls-responder';
+import { ControlsResponder } from 'src/client/controls/root-controls-responder';
 
 function parseColor(text: string) {
     return Color.replace(text, function (color: string, bold: boolean, text: string) {
@@ -119,7 +120,7 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     const [shown, setShown] = useState(false)
 
     const inputRef = useRef<HTMLInputElement | null>(null)
-    const gameControls = useControls()
+    const defaultControls = useRef<ControlsResponder | null>(null)
 
     const onInputKeydown = (event: KeyboardEvent) => {
         let input = inputRef.current as HTMLInputElement
@@ -148,13 +149,10 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
     }
 
     useEffect(() => {
-        if (!gameControls) return undefined
-        const openChat = () => {
+        defaultControls.current.on("game-chat", () => {
             setShown(true)
-        }
-        gameControls.on("game-chat", openChat)
-        return () => gameControls.off("game-chat", openChat)
-    }, [gameControls])
+        })
+    }, [])
 
     useEffect(() => {
         if (shown) inputRef.current?.focus()
@@ -165,7 +163,8 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
         inputRef.current.addEventListener("keydown", onInputKeydown)
     }, [])
 
-    return (
+    return (<>
+        <ControlsProvider ref={defaultControls} default/>
         <div className="input-container">
             <input
                 style={{ display: shown ? undefined : "none" }}
@@ -175,7 +174,7 @@ const ChatInput: React.FC<ChatInputProps> = (props) => {
                 onBlur={onInputBlur}
             />
         </div>
-    )
+    </>)
 }
 
 export interface ChatHUDProps {

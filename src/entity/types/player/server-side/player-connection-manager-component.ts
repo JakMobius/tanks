@@ -32,6 +32,16 @@ export default class PlayerConnectionManagerComponent extends EventHandlerCompon
         this.eventHandler.on("tank-set", (tank: Entity) => this.setTank(tank))
     }
 
+    onAttach(entity: Entity): void {
+        super.onAttach(entity)
+        this.end.player = this.entity
+    }
+
+    onDetach(): void {
+        super.onDetach()
+        this.end.player = null
+    }
+
     setClient(client: SocketPortalClient) {
         this.client = client
 

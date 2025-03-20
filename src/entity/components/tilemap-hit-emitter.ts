@@ -22,10 +22,6 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
             const points = worldManifold.points.slice(0, contact.GetManifold().pointCount)
             this.emitMultipleBlockHits(points, data.physicsChunk.deref().getMap())
         }
-
-        if(data.entity?.deref()) {
-            this.entity.emit("entity-hit", data.entity.deref(), contact)
-        }
     }
 
     private emitMultipleBlockHits(points: Box2D.b2Vec2[], map: TilemapComponent) {
@@ -38,15 +34,15 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
     private emitBlockHit(point: Box2D.XY, map: TilemapComponent) {
         let transform = map.entity.getComponent(TransformComponent).getInvertedGlobalTransform()
 
-        let blockX = transform.transformX(point.x, point.y)
-        let blockY = transform.transformY(point.y, point.y)
+        let localX = transform.transformX(point.x, point.y)
+        let localY = transform.transformY(point.x, point.y)
 
-        const gridX = map.localToBlockX(blockX)
-        const gridY = map.localToBlockY(blockY)
+        let blockX = map.localToBlockX(localX)
+        let blockY = map.localToBlockY(localY)
 
-        const block = map.getBlock(gridX, gridY)
+        const block = map.getBlock(blockX, blockY)
         if (block && block.solid) {
-            this.entity.emit("block-hit", gridX, gridY, point, map)
+            this.entity.emit("block-hit", blockX, blockY, point, map)
             return
         }
 
@@ -61,11 +57,11 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
         if (localVelocity.x === 0 && localVelocity.y === 0) return
 
         for(let i = 0; i < 3; i++) {
-            let localBlockX = map.blockToLocalX(gridX)
-            let localBlockY = map.blockToLocalY(gridY)
+            let localBlockX = map.blockToLocalX(blockX)
+            let localBlockY = map.blockToLocalY(blockY)
 
-            let nextDistanceX = localVelocity.x > 0 ? localBlockX + 1 - blockX : localBlockX - blockX
-            let nextDistanceY = localVelocity.y > 0 ? localBlockY + 1 - blockY : localBlockY - blockY
+            let nextDistanceX = localVelocity.x > 0 ? localBlockX + 1 - localX : localBlockX - localX
+            let nextDistanceY = localVelocity.y > 0 ? localBlockY + 1 - localY : localBlockY - localY
 
             if (nextDistanceX === 0) nextDistanceX = Math.sign(localVelocity.x)
             if (nextDistanceY === 0) nextDistanceY = Math.sign(localVelocity.y)
@@ -79,16 +75,19 @@ export default class TilemapHitEmitter extends EventHandlerComponent {
                 nextDistanceFraction = Number.EPSILON
             }
 
-            const checkX = map.localToBlockX(blockX + localVelocity.x * nextDistanceFraction * 0.5)
-            const checkY = map.localToBlockY(blockY + localVelocity.y * nextDistanceFraction * 0.5)
+            const checkX = map.localToBlockX(localX + localVelocity.x * nextDistanceFraction * 0.5)
+            const checkY = map.localToBlockY(localY + localVelocity.y * nextDistanceFraction * 0.5)
 
             if (map.getBlock(checkX, checkY)?.solid) {
                 this.entity.emit("block-hit", checkX, checkY, point, map)
                 return
             }
 
-            blockX += localVelocity.x * nextDistanceFraction
-            blockY += localVelocity.y * nextDistanceFraction
+            localX += localVelocity.x * nextDistanceFraction
+            localY += localVelocity.y * nextDistanceFraction
+
+            blockX = map.localToBlockX(localX)
+            blockY = map.localToBlockY(localY)
         }
     }
 }

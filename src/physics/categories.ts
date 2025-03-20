@@ -1,8 +1,9 @@
 export const physicsCategories = {
-    mine:   0b00001,
-    wall:   0b00010,
-    bullet: 0b00100,
-    tank:   0b01000
+    mine:       0b00001,
+    wall:       0b00010,
+    bullet:     0b00100,
+    tank:       0b01000,
+    checkpoint: 0b10000
 }
 
 export const physicsMasks = {
@@ -20,7 +21,11 @@ export const physicsMasks = {
         physicsCategories.tank |
         physicsCategories.wall |
         physicsCategories.mine |
-        physicsCategories.bullet
+        physicsCategories.checkpoint |
+        physicsCategories.bullet,
+    checkpoint:
+        physicsCategories.tank |
+        physicsCategories.checkpoint
 }
 
 export const physicsFilters = {
@@ -39,5 +44,9 @@ export const physicsFilters = {
     tank: {
         categoryBits: physicsCategories.tank,
         maskBits: physicsMasks.tank
+    },
+    checkpoint: {
+        categoryBits: physicsCategories.checkpoint,
+        maskBits: physicsMasks.checkpoint
     }
 }

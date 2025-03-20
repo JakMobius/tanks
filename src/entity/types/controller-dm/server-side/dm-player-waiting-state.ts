@@ -4,8 +4,7 @@ import NoDamageScript from "src/server/room/game-modes/scripts/no-damage-script"
 import GameStartTimerScript from "src/server/room/game-modes/scripts/game-start-timer-script";
 import PlayerCountCallbackScript from "src/server/room/game-modes/scripts/player-count-callback-script";
 import {DMPlayingStateController} from "src/entity/types/controller-dm/server-side/dm-playing-state-controller";
-import ServerWorldPlayerManagerComponent from "src/server/entity/components/server-world-player-manager-component";
-import { RandomRespawnScript } from "src/server/room/game-modes/scripts/player-spawn-position-script";
+import { RandomRespawnScript } from "src/server/room/game-modes/scripts/respawn-script";
 import { GameTimeComponent } from "src/server/room/game-modes/game-time-component";
 import ServerGameStateController from "src/server/room/game-modes/server-game-state-controller";
 
@@ -35,7 +34,7 @@ export class DMPlayerWaitingStateController extends ServerGameStateController<DM
         return {
             state: DMGameStateType.waitingForPlayers,
             minPlayers: timeComponent.minPlayers,
-            currentPlayers: this.controller.world.getComponent(ServerWorldPlayerManagerComponent).players.length,
+            currentPlayers: this.controller.players.size,
             timer: this.getScript(GameStartTimerScript).gameStartTimer
         }
     }

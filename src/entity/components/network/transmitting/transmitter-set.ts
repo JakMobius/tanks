@@ -6,13 +6,12 @@ import EventEmitter from "src/utils/event-emitter";
 import BasicEventHandlerSet from "src/utils/basic-event-handler-set";
 import EntityIdTable from "src/entity/components/network/entity-id-table";
 import ReadBuffer from "src/serialization/binary/read-buffer";
-import Entity from "src/utils/ecs/entity";
 
 export class TransmitterSet extends EventEmitter {
     transmitters: Transmitter[] = []
     // TODO: Get rid
     transmitterMap = new Map<Constructor<Transmitter>, Transmitter>
-    messageHandlers = new Map<number, Array<(entity: Entity, buffer: ReadBuffer, size: number) => void>>
+    messageHandlers = new Map<number, Array<(buffer: ReadBuffer, size: number) => void>>
     transmitComponent: EntityDataTransmitComponent | null = null
     receivingEnd: ReceivingEnd
     entityId: number | null = null
@@ -41,13 +40,13 @@ export class TransmitterSet extends EventEmitter {
         return this.transmitterMap.get(TransmitterClass) as TransmitterType | null
     }
 
-    handleResponse(command: number, player: Entity, buffer: ReadBuffer, size: number) {
+    handleResponse(command: number, buffer: ReadBuffer, size: number) {
         let handlers = this.messageHandlers.get(command)
         if(!handlers) return
         let index = buffer.offset
         for(let handler of handlers) {
             buffer.offset = index
-            handler(player, buffer, size)
+            handler(buffer, size)
         }
     }
 

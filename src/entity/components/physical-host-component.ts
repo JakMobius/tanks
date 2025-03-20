@@ -18,6 +18,8 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
     public worldTicksModulo: number = 65536
     public loop: AdapterLoop
 
+    movementDisabled: boolean
+
     contactListener: GameWorldContactListener
     contactFilter: GameWorldContactFilter
     contextProvider = new EntityContextProvider()
@@ -92,6 +94,8 @@ export default class PhysicalHostComponent extends EventHandlerComponent {
         for(let component of this.physicalComponents) {
             component.onPhysicsTick(this.physicsTick);
         }
+
+        this.entity.emit("physics-tick", this.physicsTick)
 
         this.worldTicks = (this.worldTicks + 1) % this.worldTicksModulo
 
