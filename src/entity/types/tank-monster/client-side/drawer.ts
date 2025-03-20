@@ -58,7 +58,7 @@ export class Drawer extends TankDrawer {
             for(let wheel of wheelGroup.wheels) {
                 let spriteIndex = Math.floor(-wheelGroup.getDistance() * Drawer.spritesPerMeter % Drawer.wheelSpriteCount);
                 if (spriteIndex < 0) spriteIndex = Drawer.wheelSpriteCount + spriteIndex;
-                const angle = wheel.angle
+                const angle = -wheel.angle
 
                 const wheelQuadrangle = copyQuadrangle(Drawer.wheelQuadrangle)
                 if (angle) turnQuadrangle(wheelQuadrangle, Math.sin(angle), Math.cos(angle))

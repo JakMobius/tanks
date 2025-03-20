@@ -39,6 +39,7 @@ export class RacePlayingStateController extends ServerGameStateController<RaceCo
         this.worldEventHandler.on("physics-tick", () => this.onTick())
         this.worldEventHandler.on("entity-damage", (event: EntityDamageEvent) => this.onEntityDamage(event))
         this.worldEventHandler.on("player-connect", (player: Entity) => this.onPlayerConnect(player))
+        this.worldEventHandler.on("player-disconnect", (player: Entity) => this.onPlayerDisconnect(player))
     }
 
     onPhysicsTick() {
@@ -85,19 +86,28 @@ export class RacePlayingStateController extends ServerGameStateController<RaceCo
     }
 
     updateThrottles() {
-        this.playersGassing = 0
+        let newPlayersGassing = 0
 
         for(let player of this.waitingPlayers) {
-            if(this.isGassing(player)) this.playersGassing++
+            if(this.isGassing(player)) newPlayersGassing++
         }
 
-        let allPlayersThrottle = this.playersGassing === this.waitingPlayers.size
-
+        let allPlayersThrottle = newPlayersGassing === this.waitingPlayers.size
+        let shouldUpdate = this.playersGassing !== newPlayersGassing
+        this.playersGassing = newPlayersGassing
         if(this.getScript(GameStartTimerScript).setTimerStarted(allPlayersThrottle)) {
+            shouldUpdate = true
+        }
+    
+        if(shouldUpdate) {
             for(let player of this.waitingPlayers) {
                 this.controller.triggerStateBroadcast(player)
             }
         }
+    }
+
+    onPlayerDisconnect(player: Entity) {
+        this.waitingPlayers.delete(player)
     }
 
     onPlayerConnect(player: Entity): any {
