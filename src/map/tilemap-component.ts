@@ -59,7 +59,7 @@ export default class TilemapComponent extends EventHandlerComponent {
 				.requirePositive()
 				.requireInteger()
 				.replaceNaN()
-				.setBounds(0, 250)
+				.setBounds(0, 400)
 
 			let blocksProperty = new StringProperty("blocks")
 				.withHidden(true)
