@@ -8,7 +8,7 @@ export default class Eraser extends Pencil {
         super(manager);
 
         this.shortcutAction = "editor-eraser-tool"
-        this.image = "static/map-editor/eraser.png"
+        this.image = "/static/map-editor/eraser.png"
         this.actionName = "Ластик"
     }
 

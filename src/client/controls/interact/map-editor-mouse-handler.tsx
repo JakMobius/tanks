@@ -1,5 +1,5 @@
 import {isMacOS} from "src/utils/meta-key-name";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import React from "react";
 import CameraComponent from "src/client/graphics/camera";
 import TransformComponent from "src/entity/components/transform/transform-component";

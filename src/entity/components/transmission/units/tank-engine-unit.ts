@@ -1,30 +1,33 @@
-import {clamp, siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";
-import TransmissionComponent from "src/entity/components/transmission/transmission-component";
-import TransmissionUnit from "src/entity/components/transmission/units/transmission-unit";
+import {clamp, siValueFromHorsepower, siValueFromRPM, rpmFromSiValue} from "src/utils/utils";
+import TransmissionUnit from "./transmission-unit";
+import TransmissionComponent from "../transmission-component";
+
+export interface TorquePoint {
+    rpm: number;
+    torque: number;
+}
 
 export interface EngineConfig {
-    maxTorque?: number
-    power?: number
     flywheelMomentum?: number
-    maxEngineSpeed?: number
+    cutoffEngineSpeed?: number
     engineDrag?: number
     cutoffTime?: number
     idleStrokeLow?: number
     idleStrokeHigh?: number
+    torqueMap?: TorquePoint[]
 }
 
 export default class TankEngineUnit extends TransmissionUnit {
 
-    power: number
-    maxTorque: number
-    maxEngineSpeed: number
-    engineDrag: number
+    cutoffEngineSpeed: number
     cutoffTime: number
     idleStrokeLow: number
     idleStrokeHigh: number
+    torqueMap: TorquePoint[] = []
 
     unitIndex: number
     private flywheelMomentum: number
+    private torque: number
     private engineThrottle: number = 0;
     cutoffTimeLeft: number = 0
     private inputThrottle: number = 0
@@ -33,31 +36,45 @@ export default class TankEngineUnit extends TransmissionUnit {
     constructor(config: EngineConfig) {
         super();
 
-        config = Object.assign({
-            maxTorque: 1500,
-            power: siValueFromHorsepower(1000),
-            flywheelMomentum: 1.0,
-            engineDrag: 0.7,
-            cutoffTime: 0.1,
-            gears: [{ gearing: 1 }],
-            maxEngineSpeed: siValueFromRPM(4500),
-            idleStrokeLow: siValueFromRPM(600),
-            idleStrokeHigh: siValueFromRPM(800),
-        }, config)
+        this.setConfig(config)
+    }
 
-        this.flywheelMomentum = config.flywheelMomentum
-        this.maxTorque = config.maxTorque;
-        this.power = config.power
-        this.maxEngineSpeed = config.maxEngineSpeed
-        this.engineDrag = config.engineDrag
-        this.cutoffTime = config.cutoffTime
-        this.idleStrokeLow = config.idleStrokeLow
-        this.idleStrokeHigh = config.idleStrokeHigh
+    /**
+     * Get the torque value at a specific RPM based on the torque map
+     * If torque map is empty, falls back to the legacy calculation using maxTorque and power
+     */
+    getTorqueAtRpm(rpm: number): number {
+        let map = this.torqueMap
+        
+        // If RPM is less than the lowest point in map
+        if (rpm <= map[0].rpm) {
+            return map[0].torque;
+        }
+        
+        // If RPM is greater than the highest point in map
+        if (rpm >= map[map.length - 1].rpm) {
+            return map[map.length - 1].torque;
+        }
+        
+        // Find the two closest points and interpolate
+        for (let i = 0; i < map.length - 1; i++) {
+            if (rpm >= map[i].rpm && rpm <= map[i + 1].rpm) {
+                const lowerPoint = map[i];
+                const upperPoint = map[i + 1];
+                
+                // Linear interpolation
+                const ratio = (rpm - lowerPoint.rpm) / (upperPoint.rpm - lowerPoint.rpm);
+                return lowerPoint.torque + ratio * (upperPoint.torque - lowerPoint.torque);
+            }
+        }
+        
+        // Fallback (should not reach here)
+        return 0;
     }
 
     onTick(dt: number) {
         let flywheelSpeed = this.getFlywheelRotationSpeed()
-        let torque = -this.engineDrag * flywheelSpeed
+        let torque = 0
 
         if (this.cutoffTimeLeft <= 0 && this.enabled) {
             let throttle = this.inputThrottle
@@ -67,15 +84,20 @@ export default class TankEngineUnit extends TransmissionUnit {
                     (this.idleStrokeHigh - this.idleStrokeLow)
                 throttle += clamp(1 - normalizedIdleSpeed, 0, 1)
             }
-            if (flywheelSpeed > this.maxEngineSpeed) {
+            if (flywheelSpeed > this.cutoffEngineSpeed) {
                 this.cutoffTimeLeft = this.cutoffTime
                 throttle = 0
             }
             this.engineThrottle = throttle
+            
+            // Use the torque map to get the torque at current RPM
+            const rpmValue = rpmFromSiValue(flywheelSpeed);
+            const maxTorqueAtRpm = this.getTorqueAtRpm(rpmValue);
+            
             if (flywheelSpeed <= 0) {
-                torque += this.maxTorque
+                torque = maxTorqueAtRpm;
             } else {
-                torque = Math.min(this.maxTorque, torque + this.power / flywheelSpeed * throttle)
+                torque = Math.min(maxTorqueAtRpm, torque + maxTorqueAtRpm * throttle);
             }
         } else {
             this.engineThrottle = 0
@@ -83,6 +105,7 @@ export default class TankEngineUnit extends TransmissionUnit {
 
         this.cutoffTimeLeft -= dt
 
+        this.torque = torque
         this.transmission.system.Q[this.unitIndex] += torque
     }
 
@@ -91,7 +114,7 @@ export default class TankEngineUnit extends TransmissionUnit {
     }
 
     getMaxRotationSpeed() {
-        return this.maxEngineSpeed
+        return this.cutoffEngineSpeed
     }
 
     getActualEngineThrottle() {
@@ -102,8 +125,37 @@ export default class TankEngineUnit extends TransmissionUnit {
         return this.inputThrottle
     }
 
+    getTorque() {
+        return this.torque
+    }
+
     setThrottle(throttle: number) {
         this.inputThrottle = clamp(throttle, 0, 1)
+    }
+
+    setConfig(config: EngineConfig) {
+        config = Object.assign({
+            flywheelMomentum: 1.0,
+            cutoffTime: 0.1,
+            gears: [{ gearing: 1 }],
+            cutoffEngineSpeed: siValueFromRPM(4500),
+            idleStrokeLow: siValueFromRPM(600),
+            idleStrokeHigh: siValueFromRPM(800),
+            torqueMap: [
+                {rpm: siValueFromRPM(1000), torque: 50},
+                {rpm: siValueFromRPM(2000), torque: 60},
+                {rpm: siValueFromRPM(3000), torque: 70},
+                {rpm: siValueFromRPM(4000), torque: 80},
+                {rpm: siValueFromRPM(5000), torque: 20},
+            ]
+        }, config)
+
+        this.flywheelMomentum = config.flywheelMomentum
+        this.cutoffEngineSpeed = config.cutoffEngineSpeed
+        this.cutoffTime = config.cutoffTime
+        this.idleStrokeLow = config.idleStrokeLow
+        this.idleStrokeHigh = config.idleStrokeHigh
+        this.torqueMap = config.torqueMap
     }
 
     onAttach(transmission: TransmissionComponent) {

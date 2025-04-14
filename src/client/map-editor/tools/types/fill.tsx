@@ -21,7 +21,7 @@ export default class Fill extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "static/map-editor/fill.png"
+        this.image = "/static/map-editor/fill.png"
         this.shortcutAction = "editor-fill-tool"
         // this.actionName = "Заливка"
         this.setCursor("url(static/map-editor/fill.png) 18 18, auto")

@@ -7,7 +7,7 @@ import { EntityPrefab, EntityType } from "src/entity/entity-prefabs";
 import TankModel from "src/entity/tanks/tank-model";
 import SailingComponent from "src/entity/components/sailing-component";
 import HealthComponent from "src/entity/components/health/health-component";
-import {siValueFromHorsepower} from "src/utils/utils";
+import {siValueFromHorsepower, siValueFromRPM} from "src/utils/utils";
 import TransmissionComponent from "src/entity/components/transmission/transmission-component";
 import PrefabComponent from "src/entity/components/prefab-id-component";
 import { DamageModifiers, DamageTypes } from 'src/server/damage-reason/damage-reason';
@@ -64,8 +64,11 @@ const Prefab = new EntityPrefab({
                 }
             ],
             engineConfig: {
-                power: siValueFromHorsepower(8000),
-                maxTorque: 25000,
+                torqueMap: [
+                    { rpm: siValueFromRPM(0),    torque: 10000 },
+                    { rpm: siValueFromRPM(5000), torque: 10000 },
+                ],
+                cutoffEngineSpeed: siValueFromRPM(5000),
                 flywheelMomentum: 10.0
             },
             gearing: 2.5,

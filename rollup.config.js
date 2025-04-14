@@ -4,7 +4,7 @@ import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import json from '@rollup/plugin-json'
 import alias from '@rollup/plugin-alias'
-import sass from 'rollup-plugin-sass'
+import styles from "rollup-plugin-styler";
 import shaders from './rollup/rollup-plugin-shaders.js'
 import textureAtlas from './rollup/rollup-plugin-texture-atlas.js'
 import globImport from './rollup/rollup-plugin-glob-import.js'
@@ -18,8 +18,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const production = !!process.env.PRODUCTION;
+const projects = process.env.PROJECTS?.split(",") ?? [
+	'client',
+	'launcher',
+	'server',
+	'tests',
+	'engine-editor'
+];
 
 const projectRootDir = path.resolve(__dirname);
+
+const project = (projectName) => {
+	return projects.indexOf(projectName) !== -1;
+}
 
 const sharedPlugins = (side) => [
 	alias({
@@ -53,7 +64,8 @@ const sharedPlugins = (side) => [
 ]
 
 const serverBuild = (config) => {
-	return {
+	if(!config) return []
+	return [{
 		input: config.entry,
 		output: {
 			file: config.output,
@@ -74,19 +86,21 @@ const serverBuild = (config) => {
 				copyOnce: true
 			})
 		]
-	}
+	}]
 }
 
 const clientBuild = (config) => {
+	if(!config) return []
 	let texturesPath = "src/client/textures/"
 	let texturesExtension = ".texture.png"
 
-	return {
+	return [{
 		input: config.entry,
 		output: {
 			file: config.output,
 			format: 'iife',
-			sourcemap: true
+			sourcemap: true,
+			assetFileNames: '[name][extname]',
 		},
 		plugins: [
 			...sharedPlugins("client"),
@@ -100,33 +114,47 @@ const clientBuild = (config) => {
 					return id.substring(texturesPath.length, id.length - texturesExtension.length)
 				}
 			}),
-			config.stylesOutput && sass({
-				api: 'modern',
-				output: config.stylesOutput,
+			config.stylesOutput && styles({
+				mode: ["extract", config.stylesOutput]
 			}),
+			...(config.plugins ?? [])
 		]
-	}
+	}]
 }
 
 export default [
-	clientBuild({
+	...clientBuild(project('launcher') && {
 		entry: 'src/client/game-launcher/index.ts',
 		output: 'dist/resources/web/static/index.js',
 		// TODO: sass plugin uses fs.writeFileSync directly. Consider opening a PR
-		stylesOutput: 'dist/resources/web/static/styles/launcher-styles.css'
+		stylesOutput: 'styles/launcher-styles.css'
 	}),
-	clientBuild({
+	...clientBuild(project('client') && {
 		entry: 'src/client/index.ts',
 		output: 'dist/resources/web/static/main.js',
 		atlasOutput: 'textures',
-		stylesOutput: 'dist/resources/web/static/styles/styles.css'
+		stylesOutput: 'styles/styles.css'
 	}),
-	serverBuild({
+	...serverBuild(project('server') && {
 		entry: 'src/server/main.ts',
 		output: 'dist/index.js'
 	}),
-	serverBuild({
+	...serverBuild(project('tests') && {
 		entry: 'test/test.ts',
 		output: 'test/test.js'
-	})
+	}),
+	...clientBuild(project('engine-editor') && {
+		entry: 'src/tools/engine-editor/index.ts',
+		output: 'dist/resources/web/static/tools/engine-editor/index.js',
+		stylesOutput: 'styles.css',
+		atlasOutput: 'textures',
+		plugins: [
+			copy({
+				targets: [
+					{ src: "src/tools/engine-editor/ui/index.html", dest: "dist/resources/web/static/tools/engine-editor" }
+				],
+				copyOnce: true
+			})
+		]
+	}),
 ];

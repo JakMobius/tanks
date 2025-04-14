@@ -1,3 +1,4 @@
+import { b2Vec2 } from "@box2d/core";
 import {ControllerControlsConfig} from "../game-controls-settings";
 import {GamepadInputConfig, GamepadInputType} from "src/client/controls/input/gamepad/gamepad-controller";
 

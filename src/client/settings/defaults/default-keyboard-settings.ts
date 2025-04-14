@@ -12,12 +12,12 @@ export function getDefaultKeyboardControls(): ControllerControlsConfig<KeyboardI
             {type: KeyboardInputType.key, code: "ArrowDown", smooth: 0.4}
         ],
         "tank-steer-right": [
-            {type: KeyboardInputType.key, code: "KeyD", smooth: 0.4},
-            {type: KeyboardInputType.key, code: "ArrowRight", smooth: 0.4}
+            {type: KeyboardInputType.key, code: "KeyD", smooth: 0.5},
+            {type: KeyboardInputType.key, code: "ArrowRight", smooth: 0.5}
         ],
         "tank-steer-left": [
-            {type: KeyboardInputType.key, code: "KeyA", smooth: 0.4},
-            {type: KeyboardInputType.key, code: "ArrowLeft", smooth: 0.4}
+            {type: KeyboardInputType.key, code: "KeyA", smooth: 0.5},
+            {type: KeyboardInputType.key, code: "ArrowLeft", smooth: 0.5}
         ],
         "tank-miner": [{type: KeyboardInputType.key, code: "KeyQ"}],
         "tank-primary-weapon": [{type: KeyboardInputType.key, code: "Space"}],

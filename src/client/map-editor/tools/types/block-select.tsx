@@ -53,7 +53,7 @@ export default class BlockSelect extends Tool {
 
     updateImage() {
         let blockType = this.manager.selectedBlock?.constructor as typeof BlockState
-        this.setImage("static/map-editor/blocks/" + blockType?.typeName + ".png")
+        this.setImage("/static/map-editor/blocks/" + blockType?.typeName + ".png")
     }
 
     isSuitable(): boolean {

@@ -47,8 +47,11 @@ const Prefab = new EntityPrefab({
 
         entity.addComponent(new WheeledTankController({
             engineConfig: {
-                power: siValueFromHorsepower(500),
-                maxTorque: 600,
+                torqueMap: [
+                    { rpm: siValueFromRPM(0),    torque: 600 },
+                    { rpm: siValueFromRPM(5000), torque: 600 },
+                ],
+                cutoffEngineSpeed: siValueFromRPM(5000),
                 flywheelMomentum: 0.5
             },
             gearboxConfig: {

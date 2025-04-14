@@ -1,8 +1,8 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { MutableRefObject, Ref, RefObject, useCallback, useEffect, useRef, useState } from "react"
 
 interface DraggerProps {
     onDrag?: (dx: number, dy: number) => void
-    contents: (ref: RefObject<HTMLElement>) => React.ReactNode
+    contents: (ref: MutableRefObject<HTMLElement>) => React.ReactNode
 }
 
 const Dragger: React.FC<DraggerProps> = (props) => {

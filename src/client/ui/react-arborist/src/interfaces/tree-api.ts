@@ -1,7 +1,7 @@
 import { EditResult } from "../types/handlers";
 import { Identity, IdObj } from "../types/utils";
 import { TreeProps } from "../types/tree-props";
-import { RefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 import * as utils from "../utils";
 import { NodeApi } from "./node-api";
 import { edit } from "../state/edit-slice";
@@ -31,7 +31,7 @@ export class TreeApi<T> {
     public store: Store<RootState, Actions>,
     public props: TreeProps<T>,
     public list: RefObject<VirtuosoHandle | null>,
-    public listEl: RefObject<HTMLElement | null>
+    public listEl: MutableRefObject<HTMLElement | null>
   ) {
     /* Changes here must also be made in update() */
     this.root = createRoot<T>(this);

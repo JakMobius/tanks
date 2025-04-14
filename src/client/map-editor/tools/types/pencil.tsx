@@ -63,7 +63,7 @@ const PencilToolView: React.FC<ToolViewProps<Pencil>> = (props) => {
 
 export default class Pencil extends Tool {
     public actionName = "Карандаш";
-    public image = "static/map-editor/pencil.png"
+    public image = "/static/map-editor/pencil.png"
 
     public mouseX = 0
     public mouseY = 0

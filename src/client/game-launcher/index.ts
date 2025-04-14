@@ -51,12 +51,12 @@ function onIncompatibleBrowser() {
 
     browserContainer.appendChild(createBrowserLink(
         "Google Chrome",
-        "static/browser/chrome.png",
+        "/static/browser/chrome.png",
         "https://www.google.com/chrome/browser/desktop/"
     ))
     browserContainer.appendChild(createBrowserLink(
         "Firefox",
-        "static/browser/firefox.png",
+        "/static/browser/firefox.png",
         "https://www.mozilla.org/firefox/new"
     ))
 
@@ -103,7 +103,7 @@ function onLoaded() {
 
 function downloadGameScript() {
     var script = document.createElement("script")
-    script.src = "static/main.js"
+    script.src = "/static/main.js"
     script.onload = onLoaded
     script.onerror = onLoadingError
     document.head.appendChild(script)

@@ -69,27 +69,27 @@ const MainMenuView: React.FC = () => {
                         <MenuItem
                             title={profile.username}
                             subtitle="Личная карточка"
-                            icon="static/hub/profile@3x.png"
+                            icon="/static/hub/profile@3x.png"
                             onClick={navigateToProfile}/>
                     ) : (
                         <MenuItem
                             title="Личная карточка"
                             subtitle="Кто ты, воин?"
-                            icon="static/hub/profile@3x.png"
+                            icon="/static/hub/profile@3x.png"
                             onClick={navigateToLogin}/>
                     )}
                     <MenuItem
                         title="Как играть?"
                         subtitle="Новобранец? Научим!"
-                        icon="static/hub/tutorial@3x.png"
+                        icon="/static/hub/tutorial@3x.png"
                         onClick={navigateToTutorial}/>
                     <MenuItem
                         title="Редактор карт"
-                        icon="static/hub/map-editor@3x.png"
+                        icon="/static/hub/map-editor@3x.png"
                         onClick={navigateToMapEditor}/>
                     <MenuItem
                         title="Настройки"
-                        icon="static/hub/settings@3x.png"
+                        icon="/static/hub/settings@3x.png"
                         onClick={navigateToSettings}/>
                 </div>
             </div>

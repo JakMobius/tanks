@@ -1,4 +1,4 @@
-import { MapFileV0_0_1 } from "src/map/map-serialization";
+import { MapFileV0_0_1 } from "src/map/reader/v0.0.1"
 
 export function getHubMap(): MapFileV0_0_1 {
     // TODO: Fetch it from the server

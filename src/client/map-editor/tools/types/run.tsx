@@ -60,7 +60,7 @@ export default class RunTool extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "static/map-editor/tank.png"
+        this.image = "/static/map-editor/tank.png"
         this.selectingLocation = false
         this.settingsView = RunToolView
 

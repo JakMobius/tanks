@@ -8,7 +8,8 @@ export default class StaticModule extends WebserverModule {
 
         this.resourcesDirectory = this.webServer.server.getResourcePath("web")
         
-        this.router.use(express.static(this.resourcePath("static/favicon")))
+        this.router.use(express.static(this.resourcePath("/static/favicon")))
         this.router.use("/static/", express.static(this.resourcePath("static")))
+        this.router.use("/tools/", express.static(this.resourcePath("tools")))
     }
 }

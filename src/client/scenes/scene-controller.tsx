@@ -9,6 +9,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface SceneControlerProps {
     setTitle?: (value: string | undefined) => void
+    children?: React.ReactNode
 }
 
 export interface SceneContextProps {
@@ -29,7 +30,7 @@ export function useScene() {
     return context;
 }
 
-const SceneContainer: React.FC<SceneControlerProps> = (props) => {
+export const SceneContainer: React.FC<SceneControlerProps> = (props) => {
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const rootRef = useRef<HTMLDivElement | null>(null)
@@ -85,7 +86,7 @@ const SceneContainer: React.FC<SceneControlerProps> = (props) => {
             <SceneContext.Provider value={state}>
                 <div ref={rootRef} className="game-root">
                     <canvas className="game-canvas" ref={canvasRef}/>
-                    {state && <SceneRouter/>}
+                    {state && props.children}
                 </div>
             </SceneContext.Provider>
         </DndProvider>
@@ -144,7 +145,9 @@ export default class SceneController {
             setTitle={(title) => {
                 document.title = title ?? "Танчики"
             }}
-        />)
+        >
+            <SceneRouter/>
+        </SceneContainer>)
     }
 
     registerScene(name: string, component: React.FC) {

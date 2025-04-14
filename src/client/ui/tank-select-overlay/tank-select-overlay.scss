@@ -142,7 +142,7 @@
     
     .tank-carousel-button-left {
         left: 0;
-        background-image: url(../game/carousel-left.png);
+        background-image: url(/static/game/carousel-left.png);
     
         &.tank-carousel-button-active {
             animation-name: tank-carousel-button-bounce-left;
@@ -151,7 +151,7 @@
     
     .tank-carousel-button-right {
         right: 0;
-        background-image: url(../game/carousel-right.png);
+        background-image: url(/static/game/carousel-right.png);
     
         &.tank-carousel-button-active {
             animation-name: tank-carousel-button-bounce-right;

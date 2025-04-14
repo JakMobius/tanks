@@ -46,8 +46,11 @@ const Prefab = new EntityPrefab({
                 clutchTorque: 2500
             },
             engineConfig: {
-                power: siValueFromHorsepower(1000),
-                maxTorque: 1000
+                torqueMap: [
+                    { rpm: siValueFromRPM(0),    torque: 1000 },
+                    { rpm: siValueFromRPM(5000), torque: 1000 },
+                ],
+                cutoffEngineSpeed: siValueFromRPM(5000),
             }
         }));
 

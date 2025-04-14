@@ -14,7 +14,7 @@ export default class Scale extends Cursor {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "static/map-editor/scale@3x.png"
+        this.image = "/static/map-editor/scale@3x.png"
         this.shortcutAction = "editor-scale-tool"
     }
 

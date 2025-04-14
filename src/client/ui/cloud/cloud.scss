@@ -61,13 +61,13 @@
 
   &.left-arrowed:before {
     background-position: left center;
-    background-image: url(../hub/navigate-back@3x.png);
+    background-image: url(/static/hub/navigate-back@3x.png);
     left: -22px;
   }
 
   &.right-arrowed:before {
     background-position: right center;
-    background-image: url(../hub/navigate-forward@3x.png);
+    background-image: url(/static/hub/navigate-forward@3x.png);
     right: -22px;
   }
 }

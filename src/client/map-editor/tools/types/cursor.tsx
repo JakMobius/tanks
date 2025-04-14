@@ -61,7 +61,7 @@ export default class Cursor extends Tool {
     constructor(manager: ToolManager) {
         super(manager);
 
-        this.image = "static/map-editor/move@3x.png"
+        this.image = "/static/map-editor/move@3x.png"
         this.shortcutAction = "editor-move-tool"
     }
 

@@ -12,6 +12,7 @@ import { EntityPrefab } from "src/entity/entity-prefabs";
 import BigboiPrefab from "src/entity/types/tank-bigboi/server-prefab";
 import TinyPrefab from "src/entity/types/tank-tiny/server-prefab";
 import PlayerConnectionManagerComponent from "src/entity/types/player/server-side/player-connection-manager-component";
+import PlayerNickComponent from "src/entity/types/player/server-side/player-nick-component";
 
 export default class TutorialWorldController {
     game: Entity;
@@ -55,6 +56,7 @@ export default class TutorialWorldController {
         const player = new Entity()
 
         PlayerPrefab.prefab(player)
+        player.getComponent(PlayerNickComponent).nick = "Вы"
         player.getComponent(PlayerConnectionManagerComponent).setClient(client)
         player.getComponent(PlayerWorldComponent).connectToWorld(this.game)
 

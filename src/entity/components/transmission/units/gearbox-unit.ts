@@ -41,7 +41,10 @@ export default class GearboxUnit extends TransmissionUnit {
 
     constructor(config: GearboxUnitConfig) {
         super();
+        this.setConfig(config)
+    }
 
+    setConfig(config: GearboxUnitConfig) {
         config = Object.assign({
             gears: [{gearing: 1}],
             clutchStrokeLow: siValueFromRPM(1000),
@@ -113,13 +116,13 @@ export default class GearboxUnit extends TransmissionUnit {
     shiftUp() {
         this.shiftCooldownLeft = this.shiftCooldown
         this.gearIndex++
-        this.transmission.entity.emit("gearbox-shift", this)
+        this.transmission.entity?.emit("gearbox-shift", this)
     }
 
     shiftDown() {
         this.shiftCooldownLeft = this.shiftCooldown
         this.gearIndex--
-        this.transmission.entity.emit("gearbox-shift", this)
+        this.transmission.entity?.emit("gearbox-shift", this)
     }
 
     onAttach(transmission: TransmissionComponent) {

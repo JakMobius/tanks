@@ -324,7 +324,7 @@ const TankInfoWeaponView: React.FC<TankInfoWeaponViewProps> = (props) => {
         let info = props.weapon?.getComponent(WeaponComponent)?.info
 
         if (info) {
-            state.weaponImage = "url(\"static/game/weapon/" + info.id + "@3x.png\")"
+            state.weaponImage = "url(\"/static/game/weapon/" + info.id + "@3x.png\")"
         } else {
             state.weaponImage = null
         }

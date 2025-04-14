@@ -111,13 +111,13 @@ export default class Sprite {
     static download(): Progress {
         let textureProgress = Sprite.mipmapimages[0] ? 
             Progress.completed() : 
-            Downloader.downloadImage("static/textures/atlas.png", (image) => {
+            Downloader.downloadImage("/static/textures/atlas.png", (image) => {
                 Sprite.mipmapimages[0] = image
             })
 
         let atlasProgress = Sprite.mipmapatlases[0] ? 
             Progress.completed() :
-            Downloader.download("static/textures/atlas.json", (response: TextureAtlas) => {
+            Downloader.download("/static/textures/atlas.json", (response: TextureAtlas) => {
                 Sprite.mipmapatlases[0] = response
 
                 for(let key in response.textures) {

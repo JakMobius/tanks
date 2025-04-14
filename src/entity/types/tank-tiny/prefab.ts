@@ -58,9 +58,11 @@ const Prefab = new EntityPrefab({
             minTurnRadius: 3,
             steerAnchorOffset: (-baseLength + baseOffset) / 2,
             engineConfig: {
-                power: siValueFromHorsepower(600),
-                maxTorque: 600,
-                maxEngineSpeed: siValueFromRPM(5000),
+                torqueMap: [
+                    { rpm: siValueFromRPM(0),    torque: 600 },
+                    { rpm: siValueFromRPM(5000), torque: 600 },
+                ],
+                cutoffEngineSpeed: siValueFromRPM(5000),
                 flywheelMomentum: 0.5
             },
             gearboxConfig: {

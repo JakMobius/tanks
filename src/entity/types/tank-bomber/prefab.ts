@@ -38,8 +38,11 @@ const Prefab = new EntityPrefab({
             },
             trackGauge: 3.75,
             engineConfig: {
-                power: siValueFromHorsepower(600),
-                maxTorque: 600
+                torqueMap: [
+                    { rpm: siValueFromRPM(0),    torque: 600 },
+                    { rpm: siValueFromRPM(5000), torque: 600 },
+                ],
+                cutoffEngineSpeed: siValueFromRPM(5000),
             },
             gearboxConfig: {
                 gears: [

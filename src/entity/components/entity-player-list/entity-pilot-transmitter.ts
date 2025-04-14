@@ -21,7 +21,8 @@ export default class EntityPilotTransmitter extends Transmitter {
         let player = this.getEntity().getComponent(ServerEntityPilotComponent).pilot
 
         this.packIfEnabled(Commands.ENTITY_PILOT_LIST_COMMAND, (buffer) => {
-            if(player) {
+            let nick = player?.getComponent(PlayerNickComponent).nick
+            if(nick) {
                 buffer.writeInt8(1)
                 let nick = player.getComponent(PlayerNickComponent).nick
                 buffer.writeString(nick)

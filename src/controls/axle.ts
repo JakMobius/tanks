@@ -37,6 +37,7 @@ export default class Axle {
 
     connect(destination: Axle) {
         destination.addSource(this)
+        this.setNeedsUpdate()
     }
 
     getValue() {
@@ -55,6 +56,7 @@ export default class Axle {
     setValue(value: number) {
         this.ownValue = value
         this.setNeedsUpdate()
+        return this
     }
 
     setNeedsUpdate() {
