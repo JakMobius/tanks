@@ -1,0 +1,37 @@
+/* Tooltip styles */
+.tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    pointer-events: none;
+}
+
+.tooltip span {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Style for the vertical dashed line */
+.vertical-line {
+    position: absolute;
+    width: 1px;
+    background: black;
+    border-left: 1px dashed black;
+    top: 0;
+    pointer-events: none;
+}
+
+.dots-container {
+    position: absolute;
+    .dot {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: red;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+    }
+}
