@@ -56,17 +56,17 @@ export default class ServerLine extends EventEmitter {
             prompt: options.prompt ?? '> '
         })
 
-        if (!this.readline.terminal) {
-            console.warn("Warning: output is not a terminal. ")
-        }
-
-        this.consoleOverwrite(options.consoleOptions)
-
         this.keypressListener = (key: string, keypress: Keypress) => this.onKeypress(key, keypress)
         this.sigintListener = () => this.onExit()
+        this.readline.on('SIGINT', this.sigintListener)
+        this.consoleOverwrite(options.consoleOptions)
+
+        if (!this.readline.terminal) {
+            console.warn("Warning: output is not a terminal. ")
+            return
+        }
 
         KeypressListener.addListener(this.keypressListener)
-        this.readline.on('SIGINT', this.sigintListener)
 
         this.readline.prompt()
     }
@@ -91,7 +91,10 @@ export default class ServerLine extends EventEmitter {
         this.collection = null
         // console = this.originalConsole
         this.originalConsole = null
-        KeypressListener.removeListener(this.keypressListener)
+
+        if(this.readline.terminal) {
+            KeypressListener.removeListener(this.keypressListener)
+        }
     }
 
     private beforeTheLastLine(chunk: any) {
