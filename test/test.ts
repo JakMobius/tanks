@@ -1,3 +1,3 @@
 
-// import "tests/%"
-import "./tests/test-power-curve"
+import "tests/%"
+// import "./tests/test-power-curve"
