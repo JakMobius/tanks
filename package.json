@@ -71,6 +71,13 @@
     "release": "PRODUCTION=1 rollup -c",
     "watch": "rollup -c -w"
   },
+  "overrides": {
+    "@blueprintjs/core": {
+      "@types/react": "^19",
+      "react": "^19",
+      "react-dom": "^19"
+    }
+  },
   "author": "JakMobius",
   "license": "ISC",
   "type": "module"
