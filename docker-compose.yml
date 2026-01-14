@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./database:/var/opt/tanks/dist/database
+      # - type: bind
+      #   source: server-preferences.json
+      #   target: /var/opt/tanks/dist/server-preferences.json

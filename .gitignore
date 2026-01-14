@@ -108,6 +108,5 @@ dist
 .vscode
 .DS_Store
 dist
-package-lock.json
 *.tscache
 .rollup.cache
