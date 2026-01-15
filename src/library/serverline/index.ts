@@ -86,15 +86,14 @@ export default class ServerLine extends EventEmitter {
     close() {
         if(!this.readline) return
 
+        if(this.readline?.terminal) {
+            KeypressListener.removeListener(this.keypressListener)
+        }
+
         this.readline.close()
         this.readline = null
         this.collection = null
-        // console = this.originalConsole
         this.originalConsole = null
-
-        if(this.readline.terminal) {
-            KeypressListener.removeListener(this.keypressListener)
-        }
     }
 
     private beforeTheLastLine(chunk: any) {
