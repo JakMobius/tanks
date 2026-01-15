@@ -12,4 +12,4 @@ RUN npm run build
 EXPOSE 3000
 USER root
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["node", "dist", "-s", "autorun"]
+CMD ["node dist -s autorun"]
