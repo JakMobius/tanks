@@ -22,7 +22,8 @@
 		// You may store your user info and web sessions either in
 		// mongodb or local server files.
 
-		"type": "file"
+		"type": "file",
+		"path": "data/tanks"
 
 		// "type": "mongodb",
 		// "url": "mongodb://localhost:27017/",
