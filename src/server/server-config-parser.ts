@@ -151,5 +151,5 @@ function createMongodb(config: PreferencesSection) {
 }
 
 function createFileDb(config: PreferencesSection) {
-    return new FileDatabase(path.resolve(dirname, "database"))
+    return new FileDatabase(path.resolve(dirname, config.string("path")))
 }
