@@ -1,0 +1,13 @@
+build:
+  image: node:23
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq
+        libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+  script:
+    - npm ci
+    - npm run build
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - node_modules/
+      - .rollup.cache/
